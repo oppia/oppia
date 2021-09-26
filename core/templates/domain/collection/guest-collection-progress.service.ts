@@ -36,22 +36,22 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class GuestCollectionProgressService {
-  constructor(private windowRef: WindowRef) {}
+  constructor (private windowRef: WindowRef) {}
 
   COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
 
-  storeGuestCollectionProgress(
+  storeGuestCollectionProgress (
       guestCollectionProgress: GuestCollectionProgress): void {
     this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY] = (
       guestCollectionProgress.toJson());
   }
 
-  loadGuestCollectionProgress(): GuestCollectionProgress {
+  loadGuestCollectionProgress (): GuestCollectionProgress {
     return GuestCollectionProgress.createFromJson(
       this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY]);
   }
 
-  recordCompletedExploration(
+  recordCompletedExploration (
       collectionId: string, explorationId: string): void {
     let guestCollectionProgress = this.loadGuestCollectionProgress();
     const completedExplorationIdHasBeenAdded = (
@@ -62,7 +62,7 @@ export class GuestCollectionProgressService {
     }
   }
 
-  getValidCompletedExplorationIds(collection: Collection): string[] {
+  getValidCompletedExplorationIds (collection: Collection): string[] {
     const collectionId = collection.getId();
     const guestCollectionProgress = this.loadGuestCollectionProgress();
     if (collectionId === null) {
@@ -80,7 +80,7 @@ export class GuestCollectionProgressService {
   // This method corresponds to collection_domain.get_next_exploration_id.
   // A null value will be returned if no explorationIds exist or all
   // explorations are completed.
-  _getNextExplorationId(
+  _getNextExplorationId (
       collection: Collection, completedIds: string[]): string | null {
     var explorationIds = collection.getExplorationIds();
 
@@ -96,7 +96,7 @@ export class GuestCollectionProgressService {
    * Records that the specified exploration was completed in the context of
    * the specified collection, as a guest.
    */
-  recordExplorationCompletedInCollection(
+  recordExplorationCompletedInCollection (
       collectionId: string, explorationId: string): void {
     this.recordCompletedExploration(collectionId, explorationId);
   }
@@ -108,7 +108,7 @@ export class GuestCollectionProgressService {
    * explorations which are no longer referenced by the collection;
    * getCompletedExplorationIds() should be used for that, instead.
    */
-  hasCompletedSomeExploration(collectionId: string): boolean {
+  hasCompletedSomeExploration (collectionId: string): boolean {
     var guestCollectionProgress = this.loadGuestCollectionProgress();
     return guestCollectionProgress.hasCompletionProgress(collectionId);
   }
@@ -119,7 +119,7 @@ export class GuestCollectionProgressService {
    * not include any previously completed explorations for the given
    * collection that are no longer part of the collection.
    */
-  getCompletedExplorationIds(collection: Collection): string[] {
+  getCompletedExplorationIds (collection: Collection): string[] {
     return this.getValidCompletedExplorationIds(collection);
   }
 
@@ -129,7 +129,7 @@ export class GuestCollectionProgressService {
    * completing the collection. If this method returns null, the
    * guest has completed the collection.
    */
-  getNextExplorationId(
+  getNextExplorationId (
       collection: Collection,
       completedExplorationIds: string[]
   ): string | null {

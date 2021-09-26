@@ -46,18 +46,18 @@ export class ListOfUnicodeStringEditorComponent implements OnInit {
     }
   };
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.value = [];
       this.valueChanged.emit(this.value);
     }
   }
 
-  getSchema(): unknown {
+  getSchema (): unknown {
     return this.SCHEMA;
   }
 
-  updateValue(value: unknown): void {
+  updateValue (value: unknown): void {
     this.value = value;
     this.valueChanged.emit(this.value);
   }

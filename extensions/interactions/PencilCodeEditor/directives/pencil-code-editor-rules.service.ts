@@ -29,12 +29,12 @@ import { PencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class PencilCodeEditorRulesService {
-  constructor(
+  constructor (
     private nwp: NormalizeWhitespacePipe,
     private nwpac: NormalizeWhitespacePunctuationAndCasePipe,
     private cn: CodeNormalizerService) {}
 
-  CodeEquals(
+  CodeEquals (
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
@@ -43,7 +43,7 @@ export class PencilCodeEditorRulesService {
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode === normalizedExpectedCode;
   }
-  CodeContains(
+  CodeContains (
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
@@ -52,7 +52,7 @@ export class PencilCodeEditorRulesService {
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
-  CodeDoesNotContain(
+  CodeDoesNotContain (
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
@@ -61,7 +61,7 @@ export class PencilCodeEditorRulesService {
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
-  OutputEquals(
+  OutputEquals (
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedOutput = this.nwp.transform(answer.output);
@@ -69,17 +69,17 @@ export class PencilCodeEditorRulesService {
       this.nwp.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  OutputRoughlyEquals(
+  OutputRoughlyEquals (
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedOutput = this.nwpac.transform(answer.output);
     var normalizedExpectedOutput = this.nwpac.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  ResultsInError(answer: PencilCodeEditorAnswer): boolean {
+  ResultsInError (answer: PencilCodeEditorAnswer): boolean {
     return !!(answer.error.trim());
   }
-  ErrorContains(
+  ErrorContains (
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedError = this.nwp.transform(answer.error);

@@ -31,18 +31,18 @@ import { UtilsService } from 'services/utils.service';
   template: '',
 })
 export class LogoutPageComponent implements OnInit {
-  constructor(
+  constructor (
       private alertsService: AlertsService, private authService: AuthService,
       private loaderService: LoaderService, private windowRef: WindowRef,
       private utilsService: UtilsService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('I18N_LOGOUT_LOADING');
     this.authService.signOutAsync()
       .then(() => this.redirect(), error => this.onSignOutError(error));
   }
 
-  private redirect(): void {
+  private redirect (): void {
     const searchParams = (
       new URLSearchParams(this.windowRef.nativeWindow.location.search));
     const redirectUrl = searchParams.get('redirect_url') ?? '/';
@@ -50,7 +50,7 @@ export class LogoutPageComponent implements OnInit {
       this.utilsService.getSafeReturnUrl(redirectUrl));
   }
 
-  private onSignOutError(error: firebase.auth.Error): void {
+  private onSignOutError (error: firebase.auth.Error): void {
     this.loaderService.hideLoadingScreen();
     this.alertsService.addWarning(error.message);
     setTimeout(() => this.redirect(), 3000);

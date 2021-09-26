@@ -83,11 +83,11 @@ import { EnvDict, Expr, ExpressionSyntaxTreeService, SystemEnv } from
   providedIn: 'root'
 })
 export class ExpressionEvaluatorService {
-  constructor(
+  constructor (
       private expressionParserService: ExpressionParserService,
       private expressionSyntaxTreeService: ExpressionSyntaxTreeService) {}
 
-  evaluateExpression(expression: string, envs: EnvDict[]): Expr {
+  evaluateExpression (expression: string, envs: EnvDict[]): Expr {
     return this.expressionSyntaxTreeService.applyFunctionToParseTree(
       this.expressionParserService.parse(expression), envs,
       (parsed, envs) => this.evaluate(parsed, envs));
@@ -99,7 +99,7 @@ export class ExpressionEvaluatorService {
    * @param envs Represents a nested name space environment to look up the name
    *     in. The first element is looked up first (i.e. has higher precedence).
    */
-  evaluate(parsed: Expr | Expr[], envs: EnvDict[]): Expr {
+  evaluate (parsed: Expr | Expr[], envs: EnvDict[]): Expr {
     // The intermediate nodes of the parse tree are arrays. The terminal nodes
     // are JavaScript primitives (as described in the "Parser output" section of
     // parser.pegjs).

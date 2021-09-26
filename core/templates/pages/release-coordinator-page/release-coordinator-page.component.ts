@@ -50,12 +50,12 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
 
-  constructor(
+  constructor (
     private formBuilder: FormBuilder,
     private backendApiService: ReleaseCoordinatorBackendApiService,
     private promoBarBackendApiService: PromoBarBackendApiService) {}
 
-  flushMemoryCache(): void {
+  flushMemoryCache (): void {
     this.backendApiService.flushMemoryCacheAsync().then(() => {
       this.statusMessage = 'Success! Memory Cache Flushed.';
       this.memoryCacheDataFetched = false;
@@ -64,7 +64,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  getMemoryCacheProfile(): void {
+  getMemoryCacheProfile (): void {
     this.backendApiService.getMemoryCacheProfileAsync().then(response => {
       this.memoryCacheProfile = {
         totalAllocatedInBytes: response.total_allocation,
@@ -78,7 +78,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  updatePromoBarConfig(): void {
+  updatePromoBarConfig (): void {
     this.statusMessage = 'Updating promo-bar config...';
     this.promoBarBackendApiService.updatePromoBarDataAsync(
       this.promoBarConfigForm.controls.enabled.value,
@@ -90,7 +90,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.statusMessage = '';
     this.submitButtonDisabled = true;
     this.promoBarConfigForm = this.formBuilder.group({

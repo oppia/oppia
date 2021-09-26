@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').directive('schemaBasedBoolEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -28,6 +28,6 @@ angular.module('oppia').directive('schemaBasedBoolEditor', [
       },
       template: require('./schema-based-bool-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [function () {}]
     };
   }]);

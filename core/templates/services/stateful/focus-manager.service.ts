@@ -34,16 +34,16 @@ export class FocusManagerService {
   private nextLabelToFocusOn: string | undefined;
   private focusEventEmitter: EventEmitter<string> = new EventEmitter();
 
-  constructor(
+  constructor (
       private deviceInfoService: DeviceInfoService,
       private idGenerationService: IdGenerationService,
       private windowRef: WindowRef = new WindowRef(),
   ) {}
-  clearFocus(): void {
+  clearFocus (): void {
     this.setFocus(AppConstants.LABEL_FOR_CLEARING_FOCUS);
   }
 
-  setFocus(name: string): void {
+  setFocus (name: string): void {
     if (this.nextLabelToFocusOn === undefined) {
       this.nextLabelToFocusOn = name;
       setTimeout(() => {
@@ -53,24 +53,24 @@ export class FocusManagerService {
     }
   }
 
-  setFocusIfOnDesktop(newFocusLabel: string): void {
+  setFocusIfOnDesktop (newFocusLabel: string): void {
     if (!this.deviceInfoService.isMobileDevice()) {
       this.setFocus(newFocusLabel);
     }
   }
 
-  generateFocusLabel(): string {
+  generateFocusLabel (): string {
     return this.idGenerationService.generateNewId();
   }
 
-  setFocusWithoutScroll(name: string): void {
+  setFocusWithoutScroll (name: string): void {
     this.setFocus(name);
     setTimeout(() => {
       this.windowRef.nativeWindow.scrollTo(0, 0);
     }, 5);
   }
 
-  get onFocus(): EventEmitter<string> {
+  get onFocus (): EventEmitter<string> {
     return this.focusEventEmitter;
   }
 }

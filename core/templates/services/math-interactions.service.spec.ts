@@ -27,7 +27,7 @@ describe('MathInteractionsService', () => {
     mathInteractionsService = TestBed.get(MathInteractionsService);
   });
 
-  it('should validate expressions correctly', function() {
+  it('should validate expressions correctly', function () {
     // Success cases.
     // Algebraic Expressions.
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -218,7 +218,7 @@ describe('MathInteractionsService', () => {
       'Please enter numbers only.');
   });
 
-  it('should validate equations correctly', function() {
+  it('should validate equations correctly', function () {
     // Success cases.
     expect(mathInteractionsService.validateEquation(
       'x=y', ['x', 'y'])).toBeTrue();
@@ -345,7 +345,7 @@ describe('MathInteractionsService', () => {
       'variables α,β,γ in your answer.');
   });
 
-  it('should insert missing multiplication signs', function() {
+  it('should insert missing multiplication signs', function () {
     expect(mathInteractionsService.insertMultiplicationSigns(
       'ab/2')).toBe('a*b/2');
     expect(mathInteractionsService.insertMultiplicationSigns(
@@ -380,7 +380,7 @@ describe('MathInteractionsService', () => {
       'xalphayzgamma')).toBe('x*alpha*y*z*gamma');
   });
 
-  it('should replace abs symbol with text', function() {
+  it('should replace abs symbol with text', function () {
     expect(mathInteractionsService.replaceAbsSymbolWithText(
       '|x|')).toBe('abs(x)');
     expect(mathInteractionsService.replaceAbsSymbolWithText(
@@ -393,7 +393,7 @@ describe('MathInteractionsService', () => {
       '||')).toBe('abs()');
   });
 
-  it('should get terms from given expression', function() {
+  it('should get terms from given expression', function () {
     // Split by addition.
     expect(mathInteractionsService.getTerms('3+4*a')).toEqual(
       ['3', '4*a']);
@@ -437,7 +437,7 @@ describe('MathInteractionsService', () => {
       ['pi', '((4+3))^(-1)']);
   });
 
-  it('should correctly match terms', function() {
+  it('should correctly match terms', function () {
     expect(mathInteractionsService.termsMatch('4*5', '5*4')).toBeTrue();
     expect(mathInteractionsService.termsMatch(
       '3*10^2', '3/10^(-2)')).toBeTrue();
@@ -463,7 +463,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.termsMatch('sqrt(x^2)', 'x')).toBeFalse();
   });
 
-  it('should correctly match terms with placeholders', function() {
+  it('should correctly match terms with placeholders', function () {
     let expressionWithPlaceholders = 'a*x + b';
     expect(mathInteractionsService.expressionMatchWithPlaceholders(
       expressionWithPlaceholders, '2x + 3', ['a', 'b'])).toBeTrue();

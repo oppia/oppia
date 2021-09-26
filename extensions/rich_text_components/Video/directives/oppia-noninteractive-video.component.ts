@@ -76,14 +76,14 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
     origin: 'http://localhost:8181'
   };
 
-  constructor(
+  constructor (
     private autoplayedVideosService: AutoplayedVideosService,
     private contextService: ContextService,
     private elementRed: ElementRef,
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  private _updateViewOnNewVideo(): void {
+  private _updateViewOnNewVideo (): void {
     if (
       !this.autoplayWithValue ||
       !this.endWithValue ||
@@ -147,11 +147,11 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateViewOnNewVideo();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (
       changes.autoplayWithValue ||
       changes.endWithValue ||

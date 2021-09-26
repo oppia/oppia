@@ -33,20 +33,20 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
 
-describe('Un-customized profile page', function() {
+describe('Un-customized profile page', function () {
   var TEST_USERNAME = 'defaultProfileFeatures';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
   var profilePage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     profilePage = new ProfilePage.ProfilePage();
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
   });
 
   it('should display photo, default bio, and interest placeholder when ' +
     'logged in',
-  async function() {
+  async function () {
     await users.login(TEST_EMAIL);
     await profilePage.get(TEST_USERNAME);
     await profilePage.expectCurrUserToHaveProfilePhoto();
@@ -60,7 +60,7 @@ describe('Un-customized profile page', function() {
 
   it('should display default photo, default bio, and no interests when ' +
     'logged out',
-  async function() {
+  async function () {
     await profilePage.get(TEST_USERNAME);
     await profilePage.expectOtherUserToHaveProfilePhoto();
     await profilePage.expectUserToHaveBio(DEFAULT_BIO);
@@ -70,12 +70,12 @@ describe('Un-customized profile page', function() {
   }
   );
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
-describe('Customized profile page for current user', function() {
+describe('Customized profile page for current user', function () {
   var TEST_USERNAME = 'customizedProfileFeatures';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
   var TEST_BIO = 'My test bio!';
@@ -83,7 +83,7 @@ describe('Customized profile page for current user', function() {
 
   var profilePage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     profilePage = new ProfilePage.ProfilePage();
     var preferencesPage = new PreferencesPage.PreferencesPage();
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
@@ -96,7 +96,7 @@ describe('Customized profile page for current user', function() {
   });
 
   it('should display photo, custom bio, and interests when logged in',
-    async function() {
+    async function () {
       await users.login(TEST_EMAIL);
       await profilePage.get(TEST_USERNAME);
       await profilePage.expectCurrUserToHaveProfilePhoto();
@@ -107,7 +107,7 @@ describe('Customized profile page for current user', function() {
     });
 
   it('should display default photo, custom bio, and interests when logged out',
-    async function() {
+    async function () {
       await profilePage.get(TEST_USERNAME);
       await profilePage.expectOtherUserToHaveProfilePhoto();
       await profilePage.expectUserToHaveBio(TEST_BIO);
@@ -116,12 +116,12 @@ describe('Customized profile page for current user', function() {
     }
   );
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
-describe('Visiting user profile page', function() {
+describe('Visiting user profile page', function () {
   var TEST_USERNAME = 'myUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
@@ -138,7 +138,7 @@ describe('Visiting user profile page', function() {
     language: 'English'
   };
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     profilePage = new ProfilePage.ProfilePage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
 
@@ -158,7 +158,7 @@ describe('Visiting user profile page', function() {
     await users.logout();
   });
 
-  it('should show the explorations created by the user', async function() {
+  it('should show the explorations created by the user', async function () {
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
 
@@ -168,7 +168,7 @@ describe('Visiting user profile page', function() {
     await users.logout();
   });
 
-  it('should show created exploration stats for user', async function() {
+  it('should show created exploration stats for user', async function () {
     await users.login(TEST_EMAIL);
 
     await profilePage.get(ANOTHER_USERNAME);
@@ -176,12 +176,12 @@ describe('Visiting user profile page', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
-describe('Playing the exploration', function() {
+describe('Playing the exploration', function () {
   var TEST_USERNAME = 'testUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
@@ -198,7 +198,7 @@ describe('Playing the exploration', function() {
     language: 'English'
   };
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
     libraryPage = new LibraryPage.LibraryPage();
@@ -215,7 +215,7 @@ describe('Playing the exploration', function() {
   });
 
   it('should change the cards on clicking next and back buttons',
-    async function() {
+    async function () {
       await users.login(TEST_EMAIL);
       await libraryPage.get();
       await libraryPage.findExploration(EXPLORATION.title);
@@ -250,7 +250,7 @@ describe('Playing the exploration', function() {
       await users.logout();
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

@@ -50,7 +50,7 @@ export class InteractiveTextInputComponent implements OnInit {
   schema: TextInputSchema;
   rows: number;
 
-  constructor(
+  constructor (
     private changeDetectorRef: ChangeDetectorRef,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
@@ -58,18 +58,18 @@ export class InteractiveTextInputComponent implements OnInit {
     private textInputRulesService: TextInputRulesService
   ) { }
 
-  private _getAttrs() {
+  private _getAttrs () {
     return {
       placeholderWithValue: this.placeholderWithValue,
       rowsWithValue: this.rowsWithValue
     };
   }
 
-  private validityCheckFn() {
+  private validityCheckFn () {
     return this.answer.length > 0;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const {
       placeholder,
       rows
@@ -99,15 +99,15 @@ export class InteractiveTextInputComponent implements OnInit {
       () => this.submitAnswer(this.answer), () => this.validityCheckFn());
   }
 
-  getSchema(): TextInputSchema {
+  getSchema (): TextInputSchema {
     return this.schema;
   }
 
-  getLabelForFocusTarget(): string {
+  getLabelForFocusTarget (): string {
     return this.labelForFocusTarget;
   }
 
-  submitAnswer(answer: string): void {
+  submitAnswer (answer: string): void {
     if (!answer) {
       return;
     }
@@ -116,7 +116,7 @@ export class InteractiveTextInputComponent implements OnInit {
       this.textInputRulesService as unknown as InteractionRulesService);
   }
 
-  updateAnswer(answer: string): void {
+  updateAnswer (answer: string): void {
     if (this.answer === answer) {
       return;
     }

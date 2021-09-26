@@ -34,11 +34,11 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class TopicViewerBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
-  private _fetchTopicData(
+  private _fetchTopicData (
       topicUrlFragment: string,
       classroomUrlFragment: string,
       successCallback: (value: ReadOnlyTopic) => void,
@@ -64,7 +64,7 @@ export class TopicViewerBackendApiService {
       });
   }
 
-  async fetchTopicDataAsync(
+  async fetchTopicDataAsync (
       topicUrlFragment: string,
       classroomUrlFragment: string
   ): Promise<ReadOnlyTopic> {

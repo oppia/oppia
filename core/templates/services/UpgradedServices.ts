@@ -508,7 +508,7 @@ interface UpgradedServicesDict {
   providedIn: 'root'
 })
 export class UpgradedServices {
-  getUpgradedServices(): UpgradedServicesDict {
+  getUpgradedServices (): UpgradedServicesDict {
     var upgradedServices = {};
     // We are using eslint disable here for multilines because we have not used
     // dot notation at a lot of places so it does not seem practical to use

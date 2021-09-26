@@ -19,7 +19,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  * @fileoverview Unit tests for HelpModalController.
  */
 
-describe('Help Modal Controller', function() {
+describe('Help Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
@@ -31,7 +31,7 @@ describe('Help Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
@@ -53,7 +53,7 @@ describe('Help Modal Controller', function() {
     });
   }));
 
-  it('should begin editor tutorial when closing the modal', function() {
+  it('should begin editor tutorial when closing the modal', function () {
     $scope.beginEditorTutorial();
 
     expect(registerOpenTutorialFromHelpCenterEventSpy)
@@ -61,7 +61,7 @@ describe('Help Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith('editor');
   });
 
-  it('should begin translation tutorial when closing the modal', function() {
+  it('should begin translation tutorial when closing the modal', function () {
     $scope.beginTranslationTutorial();
 
     expect(registerOpenTutorialFromHelpCenterEventSpy)
@@ -69,7 +69,7 @@ describe('Help Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith('translation');
   });
 
-  it('should dismiss modal when changing to help center', function() {
+  it('should dismiss modal when changing to help center', function () {
     $scope.goToHelpCenter();
 
     expect(registerVisitHelpCenterEventSpy).toHaveBeenCalledWith(explorationId);

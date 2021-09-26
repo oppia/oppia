@@ -83,7 +83,7 @@ import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
-  function(
+  function (
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
     var ugs = (new UpgradedServices()).getUpgradedServices();
@@ -149,13 +149,13 @@ angular.module('oppia').config([
     // warnings for error responses.
     $httpProvider.interceptors.push([
       '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
+      function ($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
         return {
-          request: function(config) {
+          request: function (config) {
             if (config.data) {
-              return $q(function(resolve, reject) {
+              return $q(function (resolve, reject) {
                 // Get CSRF token before sending the request.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                CsrfTokenService.getTokenAsync().then(function (token) {
                   if ((config.data instanceof FormData)) {
                     var hasPayload = false;
                     // Check whether the FormData has payload in it.
@@ -186,7 +186,7 @@ angular.module('oppia').config([
             }
             return config;
           },
-          responseError: function(rejection) {
+          responseError: function (rejection) {
             // A rejection status of -1 seems to indicate (it's hard to find
             // documentation) that the response has not completed,
             // which can occur if the user navigates away from the page
@@ -227,18 +227,18 @@ angular.module('oppia').config([
   }
 ]);
 
-angular.module('oppia').config(['$provide', function($provide) {
+angular.module('oppia').config(['$provide', function ($provide) {
   $provide.decorator(
     '$log', ['$delegate', 'DEV_MODE',
-      function($delegate, DEV_MODE) {
+      function ($delegate, DEV_MODE) {
         var _originalError = $delegate.error;
 
         if (!DEV_MODE) {
-          $delegate.log = function() {};
-          $delegate.info = function() {};
+          $delegate.log = function () {};
+          $delegate.info = function () {};
           // TODO(sll): Send errors (and maybe warnings) to the backend.
-          $delegate.warn = function() { };
-          $delegate.error = function(message) {
+          $delegate.warn = function () { };
+          $delegate.error = function (message) {
             if (String(message).indexOf('$digest already in progress') === -1) {
               _originalError(message);
             }
@@ -262,7 +262,7 @@ angular.module('oppia').config(['$provide', function($provide) {
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
   '$log', 'CsrfTokenService', 'UtilsService', 'DEV_MODE',
-  function($log, CsrfTokenService, UtilsService, DEV_MODE) {
+  function ($log, CsrfTokenService, UtilsService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -276,7 +276,7 @@ angular.module('oppia').factory('$exceptionHandler', [
       /Possibly unhandled rejection: {.*"status":-1/);
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-    return function(exception, cause) {
+    return function (exception, cause) {
       // Suppress unhandled rejection errors status code -1
       // because -1 is the status code for aborted requests.
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
@@ -319,7 +319,7 @@ angular.module('oppia').factory('$exceptionHandler', [
       }
       if (!DEV_MODE) {
         sourceMappedStackTrace.mapStackTrace(
-          exception.stack, function(mappedStack) {
+          exception.stack, function (mappedStack) {
             var messageAndSourceAndStackTrace = [
               '',
               'Cause: ' + cause,
@@ -335,7 +335,7 @@ angular.module('oppia').factory('$exceptionHandler', [
               try {
                 // We use jQuery here instead of Angular's $http, since the
                 // latter creates a circular dependency.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                CsrfTokenService.getTokenAsync().then(function (token) {
                   $.ajax({
                     type: 'POST',
                     url: '/frontend_errors',
@@ -367,11 +367,11 @@ angular.module('oppia').factory('$exceptionHandler', [
 
 angular.module('oppia').config([
   '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
-  function(
+  function (
       $translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_SITE_LANGUAGES) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    SUPPORTED_SITE_LANGUAGES.forEach(function (language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });

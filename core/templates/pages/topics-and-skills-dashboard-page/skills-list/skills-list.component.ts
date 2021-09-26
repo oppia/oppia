@@ -66,7 +66,7 @@ export class SkillsListComponent {
     'index', 'description', 'worked_examples_count',
     'misconception_count', 'status'];
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private urlInterpolationService: UrlInterpolationService,
     private ngbModal: NgbModal,
@@ -76,7 +76,7 @@ export class SkillsListComponent {
     TopicsAndSkillsDashboardBackendApiService
   ) {}
 
-  getSkillEditorUrl(skillId: string): string {
+  getSkillEditorUrl (skillId: string): string {
     let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       SKILL_EDITOR_URL_TEMPLATE, {
@@ -85,7 +85,7 @@ export class SkillsListComponent {
     );
   }
 
-  deleteSkill(skillId: string): void {
+  deleteSkill (skillId: string): void {
     let modalRef: NgbModalRef =
     this.ngbModal.open(DeleteSkillModalComponent, {
       backdrop: true,
@@ -130,7 +130,7 @@ export class SkillsListComponent {
     }).then(() => {});
   }
 
-  unassignSkill(skillId: string): void {
+  unassignSkill (skillId: string): void {
     let modalRef: NgbModalRef = this.ngbModal.
       open(UnassignSkillFromTopicsModalComponent, {
         backdrop: 'static'
@@ -176,7 +176,7 @@ export class SkillsListComponent {
       });
   }
 
-  assignSkillToTopic(skill: AugmentedSkillSummary): void {
+  assignSkillToTopic (skill: AugmentedSkillSummary): void {
     let skillId: string = skill.id;
     let topicSummaries: CreatorTopicSummary[] = (
       this.editableTopicSummaries.filter(
@@ -220,7 +220,7 @@ export class SkillsListComponent {
     });
   }
 
-  mergeSkill(skill: AugmentedSkillSummary): void {
+  mergeSkill (skill: AugmentedSkillSummary): void {
     let skillSummaries: SkillSummary[] = this.mergeableSkillSummaries;
     let categorizedSkills: SkillsCategorizedByTopics =
     this.skillsCategorizedByTopics;
@@ -264,21 +264,21 @@ export class SkillsListComponent {
     });
   }
 
-  getSerialNumberForSkill(skillIndex: number): number {
+  getSerialNumberForSkill (skillIndex: number): number {
     const skillSerialNumber: number = (
       skillIndex + (this.pageNumber * this.itemsPerPage));
     return (skillSerialNumber + 1);
   }
 
-  changeEditOptions(skillId: string): void {
+  changeEditOptions (skillId: string): void {
     this.selectedIndex = this.selectedIndex ? '' : skillId;
   }
 
-  showEditOptions(skillId: string): boolean {
+  showEditOptions (skillId: string): boolean {
     return this.selectedIndex === skillId;
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

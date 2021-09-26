@@ -29,7 +29,7 @@ require('pages/exploration-editor-page/services/graph-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-describe('Parameter Metadata Service', function() {
+describe('Parameter Metadata Service', function () {
   var ParameterMetadataService = null;
   var StatesObjectFactory = null;
 
@@ -37,7 +37,7 @@ describe('Parameter Metadata Service', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('ExplorationParamChangesService', {
       savedMemento: [{
         customizationArgs: {
@@ -62,7 +62,7 @@ describe('Parameter Metadata Service', function() {
       }]
     });
     $provide.value('ExplorationStatesService', {
-      getStates: function() {
+      getStates: function () {
         return StatesObjectFactory.createFromBackendDict({
           Hola: {
             content: {
@@ -228,7 +228,7 @@ describe('Parameter Metadata Service', function() {
       }
     });
     $provide.value('GraphDataService', {
-      getGraphData: function() {
+      getGraphData: function () {
         return {
           links: [{
             source: 'Hola',
@@ -247,13 +247,13 @@ describe('Parameter Metadata Service', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ParameterMetadataService = $injector.get(
       'ParameterMetadataService');
     StatesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
-  it('should get unset parameters info', function() {
+  it('should get unset parameters info', function () {
     expect(ParameterMetadataService.getUnsetParametersInfo(
       ['Hola', 'State2']))
       .toEqual([{

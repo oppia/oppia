@@ -21,16 +21,16 @@ import 'proxy-polyfill';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
-  String.prototype.trim = function() {
+  String.prototype.trim = function () {
     return this.replace(/^\s+|\s+$/g, '');
   };
 }
 
 // Add an Object.create() polyfill for IE8.
 if (typeof Object.create !== 'function') {
-  (function() {
-    var F = function() {};
-    Object.create = function(o) {
+  (function () {
+    var F = function () {};
+    Object.create = function (o) {
       if (arguments.length > 1) {
         throw new Error(
           'Second argument for Object.create() is not supported');
@@ -48,7 +48,7 @@ if (typeof Object.create !== 'function') {
 }
 
 // Add a Number.isInteger() polyfill for IE.
-Number.isInteger = Number.isInteger || function(value) {
+Number.isInteger = Number.isInteger || function (value) {
   return (
     typeof value === 'number' && isFinite(value) &&
     Math.floor(value) === value);
@@ -58,7 +58,7 @@ Number.isInteger = Number.isInteger || function(value) {
 // Add Array.fill() polyfill for IE.
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {
-    value: function(value) {
+    value: function (value) {
       // Steps 1-2.
       if (this === null) {
         throw new TypeError('this is null or not defined');
@@ -104,7 +104,7 @@ if (!Array.prototype.fill) {
 // Add SVGElement.prototype.outerHTML polyfill for IE.
 if (!('outerHTML' in SVGElement.prototype)) {
   Object.defineProperty(SVGElement.prototype, 'outerHTML', {
-    get: function() {
+    get: function () {
       var $node, $temp;
       $temp = document.createElement('div');
       $node = this.cloneNode(true);
@@ -134,7 +134,7 @@ if (navigator.mediaDevices === undefined) {
 // Here, we will just add the getUserMedia property
 // if it's missing.
 if (navigator.mediaDevices.getUserMedia === undefined) {
-  navigator.mediaDevices.getUserMedia = async function(constraints) {
+  navigator.mediaDevices.getUserMedia = async function (constraints) {
     // First get ahold of the legacy getUserMedia, if present.
     var getUserMedia = (
       // This throws "Property 'webkitGetUserMedia' does not exist on
@@ -154,7 +154,7 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
 
     // Otherwise, wrap the call to the old navigator.getUserMedia
     // with a Promise.
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       getUserMedia.call(navigator, constraints, resolve, reject);
     });
   };

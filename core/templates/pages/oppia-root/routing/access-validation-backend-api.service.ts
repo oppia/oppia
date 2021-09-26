@@ -35,12 +35,12 @@ export class AccessValidationBackendApiService {
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  validateAccessToClassroomPage(
+  validateAccessToClassroomPage (
       classroomUrlFragment: string
   ): Promise<void> {
     return this.http.get<void>(this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {
@@ -50,12 +50,12 @@ export class AccessValidationBackendApiService {
     }).toPromise();
   }
 
-  validateCanManageOwnAccount(): Promise<void> {
+  validateCanManageOwnAccount (): Promise<void> {
     return this.http.get<void>(
       this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();
   }
 
-  doesProfileExist(username: string): Promise<void> {
+  doesProfileExist (username: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.DOES_PROFILE_EXIST, {
         username: username
@@ -64,11 +64,11 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
-  accountDeletionIsEnabled(): Promise<void> {
+  accountDeletionIsEnabled (): Promise<void> {
     return this.http.get<void>(this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
   }
 
-  validateAccessToReleaseCoordinatorPage():
+  validateAccessToReleaseCoordinatorPage ():
   Promise<void> {
     return this.http.get<void>(
       this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();

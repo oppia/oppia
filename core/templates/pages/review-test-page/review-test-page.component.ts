@@ -41,7 +41,7 @@ angular.module('oppia').component('reviewTestPage', {
     'PageTitleService', 'ReviewTestEngineService', 'UrlInterpolationService',
     'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TESTS_URL',
     'STORY_VIEWER_PAGE',
-    function(
+    function (
         PageTitleService, ReviewTestEngineService, UrlInterpolationService,
         UrlService, QUESTION_PLAYER_MODE, REVIEW_TESTS_URL,
         STORY_VIEWER_PAGE
@@ -51,7 +51,7 @@ angular.module('oppia').component('reviewTestPage', {
       ctrl.reviewTestBackendApiService = (
         OppiaAngularRootComponent.reviewTestBackendApiService);
 
-      var _fetchSkillDetails = function() {
+      var _fetchSkillDetails = function () {
         var topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());
         var storyUrlFragment = (
@@ -72,7 +72,7 @@ angular.module('oppia').component('reviewTestPage', {
           });
         ctrl.reviewTestBackendApiService.fetchReviewTestDataAsync(
           storyUrlFragment).then(
-          function(result) {
+          function (result) {
             var skillIdList = [];
             var skillDescriptions = [];
             PageTitleService.setDocumentTitle(
@@ -113,7 +113,7 @@ angular.module('oppia').component('reviewTestPage', {
           });
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.questionPlayerConfig = null;
         _fetchSkillDetails();
       };

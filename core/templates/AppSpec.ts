@@ -31,10 +31,10 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import constants from 'assets/constants';
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
-describe('App', function() {
-  describe('Generating Constants', function() {
+describe('App', function () {
+  describe('Generating Constants', function () {
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
@@ -46,7 +46,7 @@ describe('App', function() {
         new WrittenTranslationsObjectFactory(
           new WrittenTranslationObjectFactory()));
     }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
@@ -54,12 +54,12 @@ describe('App', function() {
     }));
 
     var $injector = null;
-    beforeEach(angular.mock.inject(function(_$injector_) {
+    beforeEach(angular.mock.inject(function (_$injector_) {
       $injector = _$injector_.get('$injector');
     }));
 
     it('should transform all key value pairs to angular constants',
-      function() {
+      function () {
         for (var constantName in constants) {
           expect($injector.has(constantName)).toBe(true);
           expect($injector.get(constantName)).toEqual(constants[constantName]);
@@ -67,12 +67,12 @@ describe('App', function() {
       });
   });
 
-  describe('Exception Handler', function() {
+  describe('Exception Handler', function () {
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.constant('DEV_MODE', false);
     }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
@@ -81,7 +81,7 @@ describe('App', function() {
 
     var $exceptionHandler = null;
     var $log = null;
-    beforeEach(angular.mock.inject(function(
+    beforeEach(angular.mock.inject(function (
         _$exceptionHandler_, _$log_) {
       $exceptionHandler = _$exceptionHandler_;
       $log = _$log_;
@@ -89,7 +89,7 @@ describe('App', function() {
       spyOn(sourceMappedStackTrace, 'mapStackTrace');
     }));
 
-    it('should handle undefined gracefully', function() {
+    it('should handle undefined gracefully', function () {
       $exceptionHandler(undefined);
       const errorFromObject = new Error('undefined');
 
@@ -98,7 +98,7 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(errorFromObject);
     });
 
-    it('should handle null gracefully', function() {
+    it('should handle null gracefully', function () {
       $exceptionHandler(null);
       const errorFromObject = new Error(null);
 
@@ -107,7 +107,7 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(errorFromObject);
     });
 
-    it('should handle string values gracefully', function() {
+    it('should handle string values gracefully', function () {
       $exceptionHandler('something');
       const errorFromObject = new Error('something');
 
@@ -116,7 +116,7 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(errorFromObject);
     });
 
-    it('should print stack trace when given empty string', function() {
+    it('should print stack trace when given empty string', function () {
       $exceptionHandler('');
       const errorFromObject = new Error('');
 
@@ -125,7 +125,7 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(errorFromObject);
     });
 
-    it('should handle object values gracefully', function() {
+    it('should handle object values gracefully', function () {
       // Error constructor will fail to compile without casting the object from
       // unknown to string.
       let obj: unknown = {a: 'something'};
@@ -138,7 +138,7 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(errorFromObject);
     });
 
-    it('should handle empty object values gracefully', function() {
+    it('should handle empty object values gracefully', function () {
       // Error constructor will fail to compile without casting the object from
       // unknown to string.
       let obj: unknown = {};
@@ -151,7 +151,7 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(errorFromObject);
     });
 
-    it('should handle Error type exceptions correctly', function() {
+    it('should handle Error type exceptions correctly', function () {
       var expectedError = new Error('something');
       $exceptionHandler(expectedError);
       expect(sourceMappedStackTrace.mapStackTrace).toHaveBeenCalledWith(
@@ -160,14 +160,14 @@ describe('App', function() {
       expect($log.error).toHaveBeenCalledWith(expectedError);
     });
 
-    it('should ignore exceptions with status code -1', function() {
+    it('should ignore exceptions with status code -1', function () {
       $exceptionHandler('Possibly unhandled rejection: { "status":-1 }');
       expect(sourceMappedStackTrace.mapStackTrace).not.toHaveBeenCalled();
       expect($log.error).not.toHaveBeenCalled();
     });
 
     it('should ignore $templateRequest:tpload error with status code -1',
-      function() {
+      function () {
         $exceptionHandler('[$templateRequest:tpload]?p1=-1&p2=');
         expect(sourceMappedStackTrace.mapStackTrace).not.toHaveBeenCalled();
         expect($log.error).not.toHaveBeenCalled();

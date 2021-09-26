@@ -30,11 +30,11 @@ require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
 
-describe('Compare versions service', function() {
+describe('Compare versions service', function () {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  describe('compare versions service', function() {
+  describe('compare versions service', function () {
     var cvs = null;
     let vts: VersionTreeService = null;
     var $httpBackend = null;
@@ -43,23 +43,23 @@ describe('Compare versions service', function() {
 
     beforeEach(
       angular.mock.module('oppia', TranslatorProviderForTests));
-    beforeEach(function() {
+    beforeEach(function () {
       mockExplorationData = {
         explorationId: '0'
       };
-      angular.mock.module(function($provide) {
+      angular.mock.module(function ($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       cvs = $injector.get('CompareVersionsService');
       vts = $injector.get('VersionTreeService');
       $httpBackend = $injector.get('$httpBackend');
       httpTestingController = TestBed.get(HttpTestingController);
     }));
 
-    afterEach(function() {
+    afterEach(function () {
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
       httpTestingController.verify();
@@ -72,7 +72,7 @@ describe('Compare versions service', function() {
     //    links
     // Only information accessed by getDiffGraphData is included in the return
     // value.
-    var _getStatesData = function(statesDetails) {
+    var _getStatesData = function (statesDetails) {
       var statesData = {};
       for (var stateName in statesDetails) {
         var newStateData = {
@@ -111,7 +111,7 @@ describe('Compare versions service', function() {
           },
         };
         newStateData.interaction.answer_groups =
-          statesDetails[stateName].ruleDests.map(function(ruleDestName) {
+          statesDetails[stateName].ruleDests.map(function (ruleDestName) {
             return {
               outcome: {
                 dest: ruleDestName,
@@ -417,7 +417,7 @@ describe('Compare versions service', function() {
     it('should detect changed, renamed and added states', fakeAsync(() => {
       vts.init(testSnapshots1);
       var nodeData = null;
-      cvs.getDiffGraphData(1, 7).then(function(data) {
+      cvs.getDiffGraphData(1, 7).then(function (data) {
         nodeData = data.nodes;
         expect(nodeData).toEqual({
           1: {
@@ -449,7 +449,7 @@ describe('Compare versions service', function() {
       fakeAsync(() => {
         vts.init(testSnapshots1);
         var nodeData = null;
-        cvs.getDiffGraphData(5, 8).then(function(data) {
+        cvs.getDiffGraphData(5, 8).then(function (data) {
           nodeData = data.nodes;
           expect(nodeData).toEqual({
             1: {
@@ -486,7 +486,7 @@ describe('Compare versions service', function() {
     it('should not include added, then deleted state', fakeAsync(() => {
       vts.init(testSnapshots1);
       var nodeData = null;
-      cvs.getDiffGraphData(7, 9).then(function(data) {
+      cvs.getDiffGraphData(7, 9).then(function (data) {
         nodeData = data.nodes;
         expect(nodeData).toEqual({
           1: {
@@ -517,7 +517,7 @@ describe('Compare versions service', function() {
     it('should mark deleted then added states as changed', fakeAsync(() => {
       vts.init(testSnapshots1);
       var nodeData = null;
-      cvs.getDiffGraphData(8, 10).then(function(data) {
+      cvs.getDiffGraphData(8, 10).then(function (data) {
         nodeData = data.nodes;
         expect(nodeData).toEqual({
           1: {
@@ -553,7 +553,7 @@ describe('Compare versions service', function() {
     it('should mark renamed then deleted states as deleted', fakeAsync(() => {
       vts.init(testSnapshots1);
       var nodeData = null;
-      cvs.getDiffGraphData(11, 13).then(function(data) {
+      cvs.getDiffGraphData(11, 13).then(function (data) {
         nodeData = data.nodes;
         expect(nodeData).toEqual({
           1: {
@@ -591,7 +591,7 @@ describe('Compare versions service', function() {
        'on both versions', fakeAsync(() => {
       vts.init(testSnapshots1);
       var nodeData = null;
-      cvs.getDiffGraphData(1, 11).then(function(data) {
+      cvs.getDiffGraphData(1, 11).then(function (data) {
         nodeData = data.nodes;
         expect(nodeData).toEqual({
           1: {
@@ -628,7 +628,7 @@ describe('Compare versions service', function() {
        'versions', fakeAsync(() => {
       vts.init(testSnapshots1);
       var nodeData = null;
-      cvs.getDiffGraphData(2, 4).then(function(data) {
+      cvs.getDiffGraphData(2, 4).then(function (data) {
         nodeData = data.nodes;
         expect(nodeData).toEqual({
           1: {
@@ -655,7 +655,7 @@ describe('Compare versions service', function() {
       fakeAsync(() => {
         vts.init(testSnapshots1);
         var nodeData = null;
-        cvs.getDiffGraphData(1, 13).then(function(data) {
+        cvs.getDiffGraphData(1, 13).then(function (data) {
           nodeData = data.nodes;
           expect(nodeData).toEqual({
             1: {
@@ -860,7 +860,7 @@ describe('Compare versions service', function() {
       fakeAsync(() => {
         vts.init(testSnapshots2);
         var nodeData = null;
-        cvs.getDiffGraphData(1, 5).then(function(data) {
+        cvs.getDiffGraphData(1, 5).then(function (data) {
           nodeData = data.nodes;
           expect(nodeData).toEqual({
             1: {
@@ -888,7 +888,7 @@ describe('Compare versions service', function() {
       fakeAsync(() => {
         vts.init(testSnapshots2);
         var nodeData = null;
-        cvs.getDiffGraphData(3, 5).then(function(data) {
+        cvs.getDiffGraphData(3, 5).then(function (data) {
           nodeData = data.nodes;
           expect(nodeData).toEqual({
             1: {
@@ -921,7 +921,7 @@ describe('Compare versions service', function() {
       fakeAsync(() => {
         vts.init(testSnapshots2);
         var nodeData = null;
-        cvs.getDiffGraphData(4, 5).then(function(data) {
+        cvs.getDiffGraphData(4, 5).then(function (data) {
           nodeData = data.nodes;
           expect(nodeData).toEqual({
             1: {
@@ -954,7 +954,7 @@ describe('Compare versions service', function() {
       'should mark states correctly when there are 2 reversions',
       fakeAsync(() => {
         vts.init(testSnapshots2);
-        cvs.getDiffGraphData(5, 8).then(function(data) {
+        cvs.getDiffGraphData(5, 8).then(function (data) {
           expect(data.nodes).toEqual({
             1: {
               newestStateName: 'A',
@@ -1212,7 +1212,7 @@ describe('Compare versions service', function() {
     it('should correctly display added links', fakeAsync(() => {
       vts.init(testSnapshots3);
       var linkData = null;
-      cvs.getDiffGraphData(1, 2).then(function(data) {
+      cvs.getDiffGraphData(1, 2).then(function (data) {
         linkData = data.links;
         expect(linkData).toEqual([{
           source: 1,
@@ -1240,7 +1240,7 @@ describe('Compare versions service', function() {
     it('should correctly display deleted links', fakeAsync(() => {
       vts.init(testSnapshots3);
       var linkData = null;
-      cvs.getDiffGraphData(5, 6).then(function(data) {
+      cvs.getDiffGraphData(5, 6).then(function (data) {
         linkData = data.links;
         expect(linkData).toEqual([{
           source: 1,
@@ -1280,7 +1280,7 @@ describe('Compare versions service', function() {
     it('should correctly display links on renamed states', fakeAsync(() => {
       vts.init(testSnapshots3);
       var linkData = null;
-      cvs.getDiffGraphData(3, 5).then(function(data) {
+      cvs.getDiffGraphData(3, 5).then(function (data) {
         linkData = data.links;
         expect(linkData).toEqual([{
           source: 1,
@@ -1320,7 +1320,7 @@ describe('Compare versions service', function() {
     it('should correctly display added, then deleted links', fakeAsync(() => {
       vts.init(testSnapshots3);
       var linkData = null;
-      cvs.getDiffGraphData(2, 7).then(function(data) {
+      cvs.getDiffGraphData(2, 7).then(function (data) {
         linkData = data.links;
         expect(linkData).toEqual([{
           source: 1,
@@ -1348,7 +1348,7 @@ describe('Compare versions service', function() {
     it('should correctly display deleted, then added links', fakeAsync(() => {
       vts.init(testSnapshots3);
       var linkData = null;
-      cvs.getDiffGraphData(6, 8).then(function(data) {
+      cvs.getDiffGraphData(6, 8).then(function (data) {
         linkData = data.links;
         expect(linkData).toEqual([{
           source: 1,
@@ -1385,8 +1385,8 @@ describe('Compare versions service', function() {
       flushMicrotasks();
     }));
 
-    it('should not compare versions if v1 > v2.', function() {
-      expect(function() {
+    it('should not compare versions if v1 > v2.', function () {
+      expect(function () {
         cvs.getDiffGraphData(8, 5);
       }).toThrowError('Tried to compare v1 > v2.');
     });

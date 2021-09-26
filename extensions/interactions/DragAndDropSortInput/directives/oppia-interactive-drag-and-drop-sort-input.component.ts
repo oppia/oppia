@@ -34,14 +34,14 @@ angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
     '$attrs', 'CurrentInteractionService',
     'DragAndDropSortInputRulesService',
     'InteractionAttributesExtractorService',
-    function(
+    function (
         $attrs, CurrentInteractionService,
         DragAndDropSortInputRulesService,
         InteractionAttributesExtractorService) {
       var ctrl = this;
       var answers = [];
 
-      const getContentIdOfHtml = function(html) {
+      const getContentIdOfHtml = function (html) {
         const {
           choices
         } = InteractionAttributesExtractorService.getValuesFromAttributes(
@@ -52,7 +52,7 @@ angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
         return choices[ctrl.choices.indexOf(html)].contentId;
       };
 
-      const getHtmlOfContentId = function(contentId) {
+      const getHtmlOfContentId = function (contentId) {
         const {
           choices
         } = InteractionAttributesExtractorService.getValuesFromAttributes(
@@ -66,7 +66,7 @@ angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
         }
       };
 
-      ctrl.submitAnswer = function() {
+      ctrl.submitAnswer = function () {
         // Converting list of dicts to list of lists to make it consistent
         // with the ListOfSetsOfTranslatableHtmlContentIds object.
         answers = [];
@@ -81,7 +81,7 @@ angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
         CurrentInteractionService.onSubmit(
           answers, DragAndDropSortInputRulesService);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         const {
           choices,
           allowMultipleItemsInSamePosition
@@ -130,7 +130,7 @@ angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
         }
 
         ctrl.treeOptions = {
-          dragMove: function(e) {
+          dragMove: function (e) {
             // Change the color of the placeholder based on the position of
             // the dragged item.
             if (e.dest.nodesScope.$childNodesScope !== undefined) {

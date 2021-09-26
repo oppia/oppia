@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Improvement Modal Service', function() {
+describe('Improvement Modal Service', function () {
   var ImprovementModalService = null;
   var $uibModal = null;
   var $q = null;
@@ -29,13 +29,13 @@ describe('Improvement Modal Service', function() {
   var openModalSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('ContextService', {
       getExplorationId: () => '0'
     });
@@ -50,7 +50,7 @@ describe('Improvement Modal Service', function() {
       })
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ImprovementModalService = $injector.get('ImprovementModalService');
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
@@ -59,18 +59,18 @@ describe('Improvement Modal Service', function() {
     openModalSpy = spyOn($uibModal, 'open').and.callThrough();
   }));
 
-  it('should open playthrough modal', function() {
+  it('should open playthrough modal', function () {
     ImprovementModalService.openPlaythroughModal({}, 0);
     expect(openModalSpy).toHaveBeenCalled();
   });
 
-  it('should open learner answer details modal', function() {
+  it('should open learner answer details modal', function () {
     ImprovementModalService.openLearnerAnswerDetails({});
     $rootScope.$apply();
     expect(openModalSpy).toHaveBeenCalled();
   });
 
-  it('should open confirmation modal', function() {
+  it('should open confirmation modal', function () {
     ImprovementModalService.openConfirmationModal(
       'Message', 'ButtonText', 'btn');
     expect(openModalSpy).toHaveBeenCalled();

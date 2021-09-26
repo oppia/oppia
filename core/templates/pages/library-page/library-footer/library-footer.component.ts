@@ -28,11 +28,11 @@ import { LibraryPageConstants } from '../library-page.constants';
 export class LibraryFooterComponent {
   footerIsDisplayed: boolean;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[
       this.windowRef.nativeWindow.location.pathname];
     this.footerIsDisplayed = (

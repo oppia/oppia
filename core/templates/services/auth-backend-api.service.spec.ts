@@ -33,7 +33,7 @@ describe('Auth Backend Api Service', () => {
 
   afterEach(() => httpTestingController.verify());
 
-  it('should call /session_begin', fakeAsync(async() => {
+  it('should call /session_begin', fakeAsync(async () => {
     const response = authBackendApiService.beginSessionAsync('TKN');
     flushMicrotasks();
 
@@ -46,7 +46,7 @@ describe('Auth Backend Api Service', () => {
     await expectAsync(response).toBeResolved();
   }));
 
-  it('should call /session_end', fakeAsync(async() => {
+  it('should call /session_end', fakeAsync(async () => {
     const response = authBackendApiService.endSessionAsync();
     flushMicrotasks();
 

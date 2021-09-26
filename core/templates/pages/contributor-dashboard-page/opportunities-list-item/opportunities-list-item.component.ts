@@ -49,7 +49,7 @@ export class OpportunitiesListItemComponent {
   progressBarStyle: { width: string; };
   isCorrespondingOpportunityDeleted: boolean = false;
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {

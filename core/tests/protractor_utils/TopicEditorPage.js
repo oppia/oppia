@@ -24,7 +24,7 @@ var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var TopicEditorPage = function() {
+var TopicEditorPage = function () {
   var EDITOR_URL_PREFIX = '/topic_editor/';
   var createStoryButton = element(
     by.css('.protractor-test-create-story-button'));
@@ -117,7 +117,7 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-skill-difficulty-easy'));
   var storyTitleClassname = '.protractor-test-story-title';
 
-  var dragAndDrop = async function(fromElement, toElement) {
+  var dragAndDrop = async function (fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
   var saveRearrangedSkillsButton = element(
@@ -149,41 +149,41 @@ var TopicEditorPage = function() {
   var storyPublicationStatusLocator = by.css(
     '.protractor-test-story-publication-status');
 
-  this.togglePracticeTab = async function() {
+  this.togglePracticeTab = async function () {
     await action.click('Practice tab checkbox', practiceTabCheckbox);
   };
 
-  this.get = async function(topicId) {
+  this.get = async function (topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getTopicThumbnailSource = async function() {
+  this.getTopicThumbnailSource = async function () {
     return await workflow.getImageSource(topicThumbnailImageElement);
   };
 
-  this.getSubtopicThumbnailSource = async function() {
+  this.getSubtopicThumbnailSource = async function () {
     return await workflow.getImageSource(subtopicThumbnailImageElement);
   };
 
-  this.submitTopicThumbnail = async function(imgPath, resetExistingImage) {
+  this.submitTopicThumbnail = async function (imgPath, resetExistingImage) {
     return await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath,
       resetExistingImage);
   };
 
-  this.submitSubtopicThumbnail = async function(imgPath, resetExistingImage) {
+  this.submitSubtopicThumbnail = async function (imgPath, resetExistingImage) {
     return await workflow.submitImage(
       subtopicThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
-  this.publishTopic = async function() {
+  this.publishTopic = async function () {
     await publishTopicButton.click();
     await waitFor.invisibilityOf(
       publishTopicButton, 'Topic is taking too long to publish.');
   };
 
-  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
+  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function (
       count, skillDescription) {
     await waitFor.elementToBeClickable(
       selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
@@ -194,14 +194,14 @@ var TopicEditorPage = function() {
     expect(await questionItems.count()).toEqual(count);
   };
 
-  this.saveQuestion = async function() {
+  this.saveQuestion = async function () {
     await general.scrollToTop();
     await saveQuestionButton.click();
     await waitFor.invisibilityOf(
       saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
-  this.createQuestionForSkillWithName = async function(skillDescription) {
+  this.createQuestionForSkillWithName = async function (skillDescription) {
     await action.click('Select skill dropdown', selectSkillDropdown);
     await waitFor.elementToBeClickable(
       selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
@@ -212,28 +212,28 @@ var TopicEditorPage = function() {
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
-  this.moveToQuestionsTab = async function() {
+  this.moveToQuestionsTab = async function () {
     await waitFor.elementToBeClickable(
       questionsTabButton,
       'Questions tab button takes too long to be clickable');
     await questionsTabButton.click();
   };
 
-  this.expectSubtopicPageContentsToMatch = async function(contents) {
+  this.expectSubtopicPageContentsToMatch = async function (contents) {
     var text = await subtopicContentText.getText();
     expect(text).toMatch(contents);
   };
 
-  this.expectTitleOfSubtopicWithIndexToMatch = async function(title, index) {
+  this.expectTitleOfSubtopicWithIndexToMatch = async function (title, index) {
     expect(await subtopics.get(index).getText()).toEqual(title);
   };
 
-  this.changeSubtopicTitle = async function(title) {
+  this.changeSubtopicTitle = async function (title) {
     await subtopicTitleField.clear();
     await subtopicTitleField.sendKeys(title);
   };
 
-  this.changeSubtopicPageContents = async function(content) {
+  this.changeSubtopicPageContents = async function (content) {
     await general.scrollToTop();
     await waitFor.elementToBeClickable(
       subtopicPageContentButton,
@@ -250,11 +250,11 @@ var TopicEditorPage = function() {
     await saveSubtopicPageContentButton.click();
   };
 
-  this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
+  this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
     expect(await uncategorizedSkillItems.count()).toEqual(count);
   };
 
-  this.deleteSubtopicWithIndex = async function(index) {
+  this.deleteSubtopicWithIndex = async function (index) {
     await waitFor.visibilityOf(
       subtopicEditOptions.first(),
       'Subtopic Edit Options taking too long to appear');
@@ -266,11 +266,11 @@ var TopicEditorPage = function() {
     await deleteSubtopicButton.click();
   };
 
-  this.expectNumberOfSubtopicsToBe = async function(count) {
+  this.expectNumberOfSubtopicsToBe = async function (count) {
     expect(await subtopics.count()).toEqual(count);
   };
 
-  this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
+  this.addSubtopic = async function (title, urlFragment, imgPath, htmlContent) {
     await action.click('Add subtopic button', addSubtopicButton);
     await action.sendKeys(
       'New subtopic title field', newSubtopicTitlefield, title);
@@ -292,7 +292,7 @@ var TopicEditorPage = function() {
       'Create subtopic modal taking too long to disappear.');
   };
 
-  this.addConceptCardToSubtopicExplanation = async function(skillName) {
+  this.addConceptCardToSubtopicExplanation = async function (skillName) {
     await action.click('RTE input', subtopicPageContentButton);
     var conceptCardButton = cKEditorElement.element(
       by.cssContainingText('.cke_button', 'Insert Concept Card Link'));
@@ -304,7 +304,7 @@ var TopicEditorPage = function() {
     await action.click('Close RTE button', closeRTEButton);
   };
 
-  this.saveSubtopicExplanation = async function() {
+  this.saveSubtopicExplanation = async function () {
     await waitFor.elementToBeClickable(
       saveSubtopicPageContentButton,
       'Save Subtopic content button taking too long to be clickable');
@@ -312,7 +312,7 @@ var TopicEditorPage = function() {
       'Save subtopic content button', saveSubtopicPageContentButton);
   };
 
-  this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
+  this.dragSkillToSubtopic = async function (skillDescription, subtopicIndex) {
     await waitFor.visibilityOf(
       uncategorizedSkills.first(),
       'Uncategorized skills taking too long to appear.');
@@ -329,19 +329,19 @@ var TopicEditorPage = function() {
     await dragAndDrop(toMove, target);
   };
 
-  this.saveRearrangedSkills = async function() {
+  this.saveRearrangedSkills = async function () {
     await action.click(
       'Save rearranged skills modal', saveRearrangedSkillsButton);
   };
 
-  this.navigateToReassignModal = async function() {
+  this.navigateToReassignModal = async function () {
     await waitFor.elementToBeClickable(
       reassignSkillButton,
       'Reassign skill button taking too long to be clickable');
     await reassignSkillButton.click();
   };
 
-  this.expectSubtopicWithIndexToHaveSkills = async function(
+  this.expectSubtopicWithIndexToHaveSkills = async function (
       subtopicIndex, skillNames) {
     var assignedSkillDescriptions = (
       subtopicColumns.get(subtopicIndex).all(
@@ -356,7 +356,7 @@ var TopicEditorPage = function() {
     }
   };
 
-  this.dragSkillFromSubtopicToSubtopic = async function(
+  this.dragSkillFromSubtopicToSubtopic = async function (
       fromSubtopicIndex, toSubtopicIndex, skillDescription) {
     var assignedSkillToMove = await this.getTargetMoveSkill(
       fromSubtopicIndex, skillDescription);
@@ -364,7 +364,7 @@ var TopicEditorPage = function() {
     await dragAndDrop(assignedSkillToMove, toSubtopicColumn);
   };
 
-  this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
+  this.expectUncategorizedSkillsToBe = async function (skillDescriptions) {
     await waitFor.visibilityOf(
       uncategorizedSkills.first(),
       'Uncategorized skills taking too long to appear.');
@@ -375,7 +375,7 @@ var TopicEditorPage = function() {
     }
   };
 
-  this.getTargetMoveSkill = async function(
+  this.getTargetMoveSkill = async function (
       subtopicIndex, skillDescription) {
     var fromSubtopicColumn = subtopicColumns.get(subtopicIndex);
     var assignedSkills = fromSubtopicColumn.all(
@@ -393,26 +393,26 @@ var TopicEditorPage = function() {
     return assignedSkills.get(toMoveSkillIndex);
   };
 
-  this.dragSkillFromSubtopicToUncategorized = async function(
+  this.dragSkillFromSubtopicToUncategorized = async function (
       subtopicIndex, skillDescription) {
     var assignedSkillToMove = await this.getTargetMoveSkill(
       subtopicIndex, skillDescription);
     await dragAndDrop(assignedSkillToMove, uncategorizedSkillsContainer);
   };
 
-  this.navigateToTopicEditorTab = async function() {
+  this.navigateToTopicEditorTab = async function () {
     await waitFor.elementToBeClickable(
       topicEditorTab, 'Topic editor tab taking too long to be clickable');
     await topicEditorTab.click();
   };
 
-  this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
+  this.navigateToSubtopicWithIndex = async function (subtopicIndex) {
     var subtopic = subtopics.get(subtopicIndex);
     await subtopic.click();
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfStoriesToBe = async function(count) {
+  this.expectNumberOfStoriesToBe = async function (count) {
     if (count) {
       await waitFor.visibilityOf(
         storyListTable, 'Story list table takes too long to appear.');
@@ -420,7 +420,7 @@ var TopicEditorPage = function() {
     expect(await storyListItems.count()).toEqual(count);
   };
 
-  this.expectStoryTitleToBe = async function(title, index) {
+  this.expectStoryTitleToBe = async function (title, index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     expect(
@@ -428,7 +428,7 @@ var TopicEditorPage = function() {
     ).toEqual(title);
   };
 
-  this.expectStoryPublicationStatusToBe = async function(status, index) {
+  this.expectStoryPublicationStatusToBe = async function (status, index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     expect(
@@ -437,7 +437,7 @@ var TopicEditorPage = function() {
     ).toEqual(status);
   };
 
-  this.navigateToStoryWithIndex = async function(index) {
+  this.navigateToStoryWithIndex = async function (index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     var storyItem = storyListItems.get(index);
@@ -447,7 +447,7 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table too long to disappear.');
   };
 
-  this.navigateToStoryWithTitle = async function(storyName) {
+  this.navigateToStoryWithTitle = async function (storyName) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     var storyItem = element(
@@ -458,7 +458,7 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table too long to disappear.');
   };
 
-  this.createStory = async function(
+  this.createStory = async function (
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
     await general.scrollToTop();
     await waitFor.elementToBeClickable(
@@ -485,7 +485,7 @@ var TopicEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.updatePageTitleFragment = async function(newPageTitleFragment) {
+  this.updatePageTitleFragment = async function (newPageTitleFragment) {
     await action.sendKeys(
       'Update Page Title Fragment',
       topicPageTitleFragmentField, newPageTitleFragment);
@@ -493,19 +493,19 @@ var TopicEditorPage = function() {
       'Page Title Fragment label', topicPageTitleFragmentLabel);
   };
 
-  this.updateMetaTagContent = async function(newMetaTagContent) {
+  this.updateMetaTagContent = async function (newMetaTagContent) {
     await action.sendKeys(
       'Update Meta Tag Content', topicMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', topicMetaTagContentLabel);
   };
 
-  this.changeTopicName = async function(newName) {
+  this.changeTopicName = async function (newName) {
     await topicNameField.clear();
     await topicNameField.sendKeys(newName);
     await topicNameHeading.click();
   };
 
-  this.expectTopicNameToBe = async function(name) {
+  this.expectTopicNameToBe = async function (name) {
     await waitFor.visibilityOf(
       topicNameField,
       'topicNameField takes too long to be visible'
@@ -517,14 +517,14 @@ var TopicEditorPage = function() {
     await expect(desc).toMatch(name);
   };
 
-  this.changeTopicDescription = async function(newDescription) {
+  this.changeTopicDescription = async function (newDescription) {
     await general.scrollToTop();
     await topicDescriptionField.clear();
     await topicDescriptionField.sendKeys(newDescription);
     await topicDescriptionHeading.click();
   };
 
-  this.expectTopicDescriptionToBe = async function(description) {
+  this.expectTopicDescriptionToBe = async function (description) {
     await waitFor.visibilityOf(
       topicDescriptionField,
       'topicDescriptionField takes too long to be visible'
@@ -536,7 +536,7 @@ var TopicEditorPage = function() {
     await expect(desc).toMatch(description);
   };
 
-  this.saveTopic = async function(commitMessage) {
+  this.saveTopic = async function (commitMessage) {
     await waitFor.elementToBeClickable(
       saveTopicButton,
       'Save topic button takes too long to be clickable');

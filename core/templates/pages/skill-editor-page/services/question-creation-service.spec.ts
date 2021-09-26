@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
-describe('Question Creation Service', function() {
+describe('Question Creation Service', function () {
   var $rootScope = null;
   var qcs = null;
   var SkillEditorStateService = null;
@@ -48,8 +48,8 @@ describe('Question Creation Service', function() {
 
   importAllAngularServices();
 
-  describe('when fetching skills is successful', function() {
-    beforeEach(angular.mock.inject(function($injector) {
+  describe('when fetching skills is successful', function () {
+    beforeEach(angular.mock.inject(function ($injector) {
       qcs = $injector.get('QuestionCreationService');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
@@ -206,7 +206,7 @@ describe('Question Creation Service', function() {
       $rootScope = $injector.get('$rootScope');
     }));
 
-    it('should create question', function() {
+    it('should create question', function () {
       var skillDiff = SkillDifficulty.create(
         'skillId1', 'description', 0.3);
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -215,7 +215,7 @@ describe('Question Creation Service', function() {
       expect(modalSpy).toHaveBeenCalled();
     });
 
-    it('should open question editor modal', function() {
+    it('should open question editor modal', function () {
       qcs.createQuestion();
       qcs.initializeNewQuestionCreation();
 
@@ -226,7 +226,7 @@ describe('Question Creation Service', function() {
     });
 
     it('should call question backend api service to create the question',
-      function() {
+      function () {
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
@@ -238,9 +238,9 @@ describe('Question Creation Service', function() {
       });
   });
 
-  describe('when question interaction validation fails', function() {
+  describe('when question interaction validation fails', function () {
     var AlertsService = null;
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       qcs = $injector.get('QuestionCreationService');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       AlertsService = $injector.get('AlertsService');
@@ -377,7 +377,7 @@ describe('Question Creation Service', function() {
       $rootScope = $injector.get('$rootScope');
     }));
 
-    it('should Alerts Service if populating misconceptions fails', function() {
+    it('should Alerts Service if populating misconceptions fails', function () {
       var alertsSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
       qcs.populateMisconceptions();
       $rootScope.$apply();
@@ -385,7 +385,7 @@ describe('Question Creation Service', function() {
     });
 
     it('should not call question backend api service to create the question',
-      function() {
+      function () {
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
@@ -396,9 +396,9 @@ describe('Question Creation Service', function() {
       });
   });
 
-  describe('when question misconceptions validation fails', function() {
+  describe('when question misconceptions validation fails', function () {
     var $q = null;
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       qcs = $injector.get('QuestionCreationService');
       $q = $injector.get('$q');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
@@ -556,7 +556,7 @@ describe('Question Creation Service', function() {
     }));
 
     it('should not call question backend api service to create the question',
-      function() {
+      function () {
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();

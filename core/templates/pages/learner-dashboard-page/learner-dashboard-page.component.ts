@@ -136,7 +136,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private deviceInfoService: DeviceInfoService,
     private dateTimeFormatService: DateTimeFormatService,
@@ -151,7 +151,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     private userService: UserService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let userProfileImagePromise =
       this.userService.getProfileImageDataUrlAsync();
     userProfileImagePromise.then(
@@ -247,11 +247,11 @@ export class LearnerDashboardPageComponent implements OnInit {
     };
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setActiveSection(newActiveSectionName: string): void {
+  setActiveSection (newActiveSectionName: string): void {
     this.activeSection = newActiveSectionName;
     if (this.activeSection ===
       LearnerDashboardPageConstants
@@ -261,15 +261,15 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  setActiveSubsection(newActiveSubsectionName: string): void {
+  setActiveSubsection (newActiveSubsectionName: string): void {
     this.activeSubsection = newActiveSubsectionName;
   }
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  showUsernamePopover(subscriberUsername: string): string {
+  showUsernamePopover (subscriberUsername: string): string {
     // The popover on the subscription card is only shown if the length
     // of the subscriber username is greater than 10 and the user hovers
     // over the truncated username.
@@ -280,7 +280,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  setFeedbackSortingOptions(sortType: string): void {
+  setFeedbackSortingOptions (sortType: string): void {
     if (sortType === this.currentFeedbackThreadsSortType) {
       this.isCurrentFeedbackSortDescending = (
         !this.isCurrentFeedbackSortDescending);
@@ -289,14 +289,14 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  getValueOfFeedbackThreadSortKey(): string {
+  getValueOfFeedbackThreadSortKey (): string {
     // 'Last Updated' is the default sorting operation
     // so we will return 'lastUpdatedMsecs' to SortByPipe when Last Updated
     // option is selected in the drop down menu.
     return this.currentFeedbackThreadsSortType;
   }
 
-  onClickThread(
+  onClickThread (
       threadStatus: string, explorationId: string,
       threadId: string, explorationTitle: string): void {
     this.loadingFeedbacks = true;
@@ -334,12 +334,12 @@ export class LearnerDashboardPageComponent implements OnInit {
       });
   }
 
-  showAllThreads(): void {
+  showAllThreads (): void {
     this.feedbackThreadActive = false;
     this.threadIndex = null;
   }
 
-  addNewMessage(threadId: string, newMessage: string): void {
+  addNewMessage (threadId: string, newMessage: string): void {
     let url = this.urlInterpolationService.interpolateUrl(
       '/threadhandler/<threadId>', {
         threadId: threadId
@@ -365,7 +365,7 @@ export class LearnerDashboardPageComponent implements OnInit {
       });
   }
 
-  showSuggestionModal(
+  showSuggestionModal (
       newContent: string, oldContent: string, description: string): void {
     this.suggestionModalForLearnerDashboardService.showSuggestionModal(
       'edit_exploration_state_content',
@@ -377,20 +377,20 @@ export class LearnerDashboardPageComponent implements OnInit {
     );
   }
 
-  getLabelClass(status: string): string {
+  getLabelClass (status: string): string {
     return this.threadStatusDisplayService.getLabelClass(status);
   }
 
-  getHumanReadableStatus(status: string): string {
+  getHumanReadableStatus (status: string): string {
     return this.threadStatusDisplayService.getHumanReadableStatus(status);
   }
 
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
+  getLocaleAbbreviatedDatetimeString (millisSinceEpoch: number): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   }
 
-  decodePngURIData(base64ImageData: string): string {
+  decodePngURIData (base64ImageData: string): string {
     return decodeURIComponent(base64ImageData);
   }
 }

@@ -76,7 +76,7 @@ export interface UserContributionRightsDataBackendDict {
   providedIn: 'root'
 })
 export class UserBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient) {}
 
   private USER_INFO_URL = '/userinfohandler';
@@ -86,7 +86,7 @@ export class UserBackendApiService {
     '/usercontributionrightsdatahandler');
   private SITE_LANGUAGE_URL = '/save_site_language';
 
-  async getUserInfoAsync(): Promise<UserInfo> {
+  async getUserInfoAsync (): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
       this.USER_INFO_URL).toPromise().then(
       (backendDict) => {
@@ -95,7 +95,7 @@ export class UserBackendApiService {
       });
   }
 
-  async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
+  async getProfileImageDataUrlAsync (defaultUrl: string): Promise<string> {
     return this.http.get<PreferencesBackendDict>(
       this.PROFILE_PICTURE_URL).toPromise().then(
       (backendDict) => {
@@ -103,13 +103,13 @@ export class UserBackendApiService {
       });
   }
 
-  async setProfileImageDataUrlAsync(
+  async setProfileImageDataUrlAsync (
       newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
     return this.updatePreferencesDataAsync(
       'profile_picture_data_url', newProfileImageDataUrl);
   }
 
-  async getLoginUrlAsync(currentUrl: string): Promise<string> {
+  async getLoginUrlAsync (currentUrl: string): Promise<string> {
     const urlParameters = {
       current_url: currentUrl
     };
@@ -120,13 +120,13 @@ export class UserBackendApiService {
       });
   }
 
-  async getUserContributionRightsDataAsync():
+  async getUserContributionRightsDataAsync ():
     Promise<UserContributionRightsDataBackendDict> {
     return this.http.get<UserContributionRightsDataBackendDict>(
       this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
   }
 
-  async updatePreferredSiteLanguageAsync(
+  async updatePreferredSiteLanguageAsync (
       currentLanguageCode: string
   ): Promise<Object> {
     return this.http.put(this.SITE_LANGUAGE_URL, {
@@ -134,12 +134,12 @@ export class UserBackendApiService {
     }).toPromise();
   }
 
-  async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+  async getPreferencesAsync (): Promise<PreferencesBackendDict> {
     return this.http.get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
       .toPromise();
   }
 
-  async updatePreferencesDataAsync(
+  async updatePreferencesDataAsync (
       updateType: string,
       data: boolean | string | string[] | EmailPreferencesBackendDict
   ): Promise<UpdatePreferencesResponse> {

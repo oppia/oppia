@@ -34,7 +34,7 @@ export class DateTimeFormatService {
   * @param {number} millisSinceEpoch - milliseconds since Epoch
   * @returns {string} - a date
   */
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
+  getLocaleAbbreviatedDatetimeString (millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
       return date.toLocaleTimeString([], {
@@ -56,7 +56,7 @@ export class DateTimeFormatService {
    * @param {number} millisSinceEpoch - The millisecond date to be converted
    * @returns {string} a date and time string
    */
-  getLocaleDateTimeHourString(millisSinceEpoch: number): string {
+  getLocaleDateTimeHourString (millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     if (date.getFullYear() === new Date().getFullYear()) {
       // Dayjs will return Oct 10 10:15 AM.
@@ -72,7 +72,7 @@ export class DateTimeFormatService {
    * @param {number} millisSinceEpoch - The millisecond date to be converted
    * @returns {string} a date and time string
    */
-  getDateTimeInWords(millisSinceEpoch: number): string {
+  getDateTimeInWords (millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     // Dayjs will return Monday, January 18, 2021 at 12:30 PM.
     return dayjs(date).format('dddd, MMMM D, YYYY [at] h:mm A');
@@ -83,7 +83,7 @@ export class DateTimeFormatService {
    * @param {number} millisSinceEpoch - The millisecond date to be converted
    * @returns {string} a date string
    */
-  getLocaleDateString(millisSinceEpoch: number): string {
+  getLocaleDateString (millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     return date.toLocaleDateString();
   }
@@ -94,7 +94,7 @@ export class DateTimeFormatService {
    * @returns {boolean} Whether the date is at most one week before
    *                    the current date
    */
-  isRecent(millisSinceEpoch: number): boolean {
+  isRecent (millisSinceEpoch: number): boolean {
     let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
     return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
   }

@@ -30,7 +30,7 @@ describe('InteractiveNumericInput', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         requireNonnegativeInput: {
           value: false

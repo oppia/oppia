@@ -35,7 +35,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
   'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
-  function(
+  function (
       $rootScope, ContributorDashboardAdminBackendApiService,
       LanguageUtilService, UrlInterpolationService, UserService,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
@@ -51,21 +51,21 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         '/pages/contributor-dashboard-admin-page/' +
         'contributor-dashboard-admin-page.component.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
+      controller: [function () {
         var ctrl = this;
         ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
 
-        var handleErrorResponse = function(errorResponse) {
+        var handleErrorResponse = function (errorResponse) {
           ctrl.statusMessage = 'Server error: ' + errorResponse;
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the directive is migrated to angular.
           $rootScope.$apply();
         };
 
-        var getLanguageDescriptions = function(languageCodes) {
+        var getLanguageDescriptions = function (languageCodes) {
           var languageDescriptions = [];
-          languageCodes.forEach(function(languageCode) {
+          languageCodes.forEach(function (languageCode) {
             languageDescriptions.push(
               LanguageUtilService.getAudioLanguageDescription(
                 languageCode));
@@ -73,13 +73,13 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           return languageDescriptions;
         };
 
-        ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
+        ctrl.isLanguageSpecificReviewCategory = function (reviewCategory) {
           return (
             reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
             reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
         };
 
-        ctrl.submitAddContributionRightsForm = function(formResponse) {
+        ctrl.submitAddContributionRightsForm = function (formResponse) {
           if (ctrl.taskRunningInBackground) {
             return;
           }
@@ -101,7 +101,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           ctrl.taskRunningInBackground = false;
         };
 
-        ctrl.submitViewContributorUsersForm = function(formResponse) {
+        ctrl.submitViewContributorUsersForm = function (formResponse) {
           if (ctrl.taskRunningInBackground) {
             return;
           }
@@ -155,7 +155,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           ctrl.taskRunningInBackground = false;
         };
 
-        ctrl.submitRemoveContributionRightsForm = function(formResponse) {
+        ctrl.submitRemoveContributionRightsForm = function (formResponse) {
           if (ctrl.taskRunningInBackground) {
             return;
           }
@@ -175,7 +175,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           ctrl.taskRunningInBackground = false;
         };
 
-        ctrl.submitViewTranslationContributionStatsForm = function(
+        ctrl.submitViewTranslationContributionStatsForm = function (
             formResponse) {
           if (ctrl.taskRunningInBackground) {
             return;
@@ -198,14 +198,14 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           ctrl.taskRunningInBackground = false;
         };
 
-        var refreshFormData = function() {
+        var refreshFormData = function () {
           ctrl.formData = {
             viewContributionReviewers: {
               filterCriterion: USER_FILTER_CRITERION_ROLE,
               username: '',
               category: null,
               languageCode: null,
-              isValid: function() {
+              isValid: function () {
                 if (this.filterCriterion === USER_FILTER_CRITERION_ROLE) {
                   if (this.category === null) {
                     return false;
@@ -225,7 +225,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               username: '',
               category: null,
               languageCode: null,
-              isValid: function() {
+              isValid: function () {
                 if (this.username === '') {
                   return false;
                 }
@@ -242,7 +242,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               username: '',
               category: null,
               languageCode: null,
-              isValid: function() {
+              isValid: function () {
                 if (this.username === '' || this.category === null) {
                   return false;
                 }
@@ -254,7 +254,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
             },
             viewTranslationContributionStats: {
               username: '',
-              isValid: function() {
+              isValid: function () {
                 if (this.username === '') {
                   return false;
                 }
@@ -264,7 +264,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           };
         };
 
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           UserService.getUserInfoAsync().then((userInfo) => {
             let translationCategories = {};
             let questionCategories = {};
@@ -299,7 +299,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
 
           ctrl.languageCodesAndDescriptions = (
             LanguageUtilService.getAllVoiceoverLanguageCodes().map(
-              function(languageCode) {
+              function (languageCode) {
                 return {
                   id: languageCode,
                   description: (
@@ -309,7 +309,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               }));
         };
 
-        ctrl.clearResults = function() {
+        ctrl.clearResults = function () {
           ctrl.contributionReviewersDataFetched = false;
           ctrl.contributionReviewersResult = {};
         };

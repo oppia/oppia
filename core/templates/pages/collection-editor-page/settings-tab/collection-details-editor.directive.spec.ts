@@ -32,7 +32,7 @@ import { CollectionUpdateService } from 'domain/collection/collection-update.ser
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 // ^^^ This block is to be removed.
 
-describe('Collection details editor directive', function() {
+describe('Collection details editor directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -60,7 +60,7 @@ describe('Collection details editor directive', function() {
     ctrl.$onDestroy();
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     directive = $injector.get('collectionDetailsEditorDirective')[0];
@@ -128,7 +128,7 @@ describe('Collection details editor directive', function() {
     });
   }));
 
-  it('should fetch collection when initialized', function() {
+  it('should fetch collection when initialized', function () {
     expect(ctrl.collection).toEqual(undefined);
 
     ctrl.$onInit();
@@ -137,7 +137,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should refresh collection properties in settings tab when ' +
-    'collection initialize event is emitted', function() {
+    'collection initialize event is emitted', function () {
     spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
       .and.returnValue(mockCollectionInitializedEventEmitter);
 
@@ -158,7 +158,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should check whether collection has loaded when ' +
-    'calling \'hasPageLoaded\'', function() {
+    'calling \'hasPageLoaded\'', function () {
     spyOn(collectionEditorStateService, 'hasLoadedCollection')
       .and.returnValue(true);
 
@@ -168,7 +168,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should update collection tags when given tag ' +
-    'is valid', function() {
+    'is valid', function () {
     let updateSpy = spyOn(collectionUpdateService, 'setCollectionTags')
       .and.returnValue(null);
     // Setting given tag to be valid.
@@ -182,7 +182,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should not update collection tags when given tag ' +
-    'is invalid', function() {
+    'is invalid', function () {
     let updateSpy = spyOn(collectionUpdateService, 'setCollectionTags')
       .and.returnValue(null);
     // Setting given tag to be invalid.
@@ -196,7 +196,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should update collection title when calling ' +
-    '\'updateCollectionTitle\'', function() {
+    '\'updateCollectionTitle\'', function () {
     let updateSpy = spyOn(collectionUpdateService, 'setCollectionTitle')
       .and.returnValue(null);
 
@@ -206,7 +206,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should update collection objective when calling ' +
-    '\'updateCollectionObjective\'', function() {
+    '\'updateCollectionObjective\'', function () {
     let updateSpy = spyOn(collectionUpdateService, 'setCollectionObjective')
       .and.returnValue(null);
 
@@ -216,7 +216,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should update collection category when calling ' +
-    '\'updateCollectionCategory\'', function() {
+    '\'updateCollectionCategory\'', function () {
     let updateSpy = spyOn(collectionUpdateService, 'setCollectionCategory')
       .and.returnValue(null);
 
@@ -226,7 +226,7 @@ describe('Collection details editor directive', function() {
   });
 
   it('should update language code when calling ' +
-    '\'updateCollectionLanguageCode\'', function() {
+    '\'updateCollectionLanguageCode\'', function () {
     let updateSpy = spyOn(collectionUpdateService, 'setCollectionLanguageCode')
       .and.returnValue(null);
 
@@ -246,7 +246,7 @@ describe('Upgraded component', () => {
       'collectionDetailsEditor',
       [CollectionDetailsEditor]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
+      async (textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

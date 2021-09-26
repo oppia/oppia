@@ -32,12 +32,12 @@ import {
   providedIn: 'root'
 })
 export class ExplorationPermissionsBackendApiService {
-  constructor(
+  constructor (
     private contextService: ContextService,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async getPermissionsAsync(): Promise<ExplorationPermissions> {
+  async getPermissionsAsync (): Promise<ExplorationPermissions> {
     let explorationPermissionsUrl = this.urlInterpolationService
       .interpolateUrl('/createhandler/permissions/<exploration_id>', {
         exploration_id: this.contextService.getExplorationId()

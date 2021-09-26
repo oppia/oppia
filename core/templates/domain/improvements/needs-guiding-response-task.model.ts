@@ -24,7 +24,7 @@ import { ImprovementsConstants } from
 
 export class NeedsGuidingResponsesTask extends TaskEntry<
     'needs_guiding_responses'> {
-  constructor(backendDict: TaskEntryBackendDict<'needs_guiding_responses'>) {
+  constructor (backendDict: TaskEntryBackendDict<'needs_guiding_responses'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -46,7 +46,7 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
     super(backendDict);
   }
 
-  private static createNewObsoleteTask(
+  private static createNewObsoleteTask (
       expId: string, expVersion: number, stateName: string
   ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask({
@@ -64,7 +64,7 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
     });
   }
 
-  static createFromAnswerStats(
+  static createFromAnswerStats (
       expId: string, expVersion: number, stateName: string,
       answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
     const task = NeedsGuidingResponsesTask.createNewObsoleteTask(
@@ -73,13 +73,13 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
     return task;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
   ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask(backendDict);
   }
 
-  public refreshStatus(topStateAnswersStats: readonly AnswerStats[]): void {
+  public refreshStatus (topStateAnswersStats: readonly AnswerStats[]): void {
     const numUnaddressedTopStateAnswers = (
       topStateAnswersStats.filter(a => !a.isAddressed).length);
     if (numUnaddressedTopStateAnswers === 0) {
@@ -94,7 +94,7 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
     }
   }
 
-  private generateIssueDescription(
+  private generateIssueDescription (
       numUnaddressedTopStateAnswers: number): void {
     this.issueDescription = (
       `${numUnaddressedTopStateAnswers} of the top 10 answers for this card ` +

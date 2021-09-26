@@ -39,11 +39,11 @@ export interface ExplorationFeatures {
   providedIn: 'root'
 })
 export class ExplorationFeaturesBackendApiService {
-  constructor(
+  constructor (
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async fetchExplorationFeaturesAsync(
+  async fetchExplorationFeaturesAsync (
       explorationId: string): Promise<ExplorationFeatures> {
     return this.http.get<ExplorationFeaturesBackendDict>(
       <string> this.urlInterpolationService.interpolateUrl(

@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Training Modal Controller', function() {
+describe('Training Modal Controller', function () {
   var $rootScope = null;
   var $scope = null;
   var $uibModalInstance;
@@ -38,7 +38,7 @@ describe('Training Modal Controller', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -51,7 +51,7 @@ describe('Training Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     StateEditorService = $injector.get('StateEditorService');
     ExplorationStatesService = $injector.get('ExplorationStatesService');
@@ -61,8 +61,8 @@ describe('Training Modal Controller', function() {
   }));
 
   describe('when answer group index is equal to response answer groups count',
-    function() {
-      beforeEach(angular.mock.inject(function($injector, $controller) {
+    function () {
+      beforeEach(angular.mock.inject(function ($injector, $controller) {
         callbackSpy = jasmine.createSpy('callback');
         $uibModalInstance = jasmine.createSpyObj(['close', 'dismiss']);
         ExplorationStatesService.init({
@@ -166,7 +166,7 @@ describe('Training Modal Controller', function() {
         });
       }));
 
-      it('should click on confirm button', function() {
+      it('should click on confirm button', function () {
         var answerGroups = (
           ExplorationStatesService.getInteractionAnswerGroupsMemento('Init'));
         var defaultOutcome = (
@@ -196,14 +196,14 @@ describe('Training Modal Controller', function() {
         expect(updatedDefaultOutcome.dest).toBe('Init');
       });
 
-      it('should exit training modal', function() {
+      it('should exit training modal', function () {
         $scope.exitTrainer();
         expect($uibModalInstance.close).toHaveBeenCalled();
       });
     });
 
   describe('when anwer group index is greater than response answer groups' +
-    ' count', function() {
+    ' count', function () {
     var $scope = null;
     var $uibModalInstance;
     var callbackSpy = jasmine.createSpy('callback');
@@ -213,7 +213,7 @@ describe('Training Modal Controller', function() {
     var ResponsesService = null;
     var InteractionObjectFactory = null;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       StateEditorService = $injector.get('StateEditorService');
       ExplorationStatesService = $injector.get('ExplorationStatesService');
@@ -332,7 +332,7 @@ describe('Training Modal Controller', function() {
       });
     }));
 
-    it('should click on confirm button', function() {
+    it('should click on confirm button', function () {
       var answerGroups = (
         ExplorationStatesService.getInteractionAnswerGroupsMemento('Init'));
       expect(answerGroups[0].trainingData).toEqual(['Not the answer']);
@@ -350,15 +350,15 @@ describe('Training Modal Controller', function() {
       expect(upgatedAnswerGroups[2]).toBeUndefined();
     });
 
-    it('should exit training modal', function() {
+    it('should exit training modal', function () {
       $scope.exitTrainer();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
   });
 
   describe('when anwer group index is less than response answer groups count',
-    function() {
-      beforeEach(angular.mock.inject(function($injector, $controller) {
+    function () {
+      beforeEach(angular.mock.inject(function ($injector, $controller) {
         var $rootScope = $injector.get('$rootScope');
         StateEditorService = $injector.get('StateEditorService');
         ExplorationStatesService = $injector.get('ExplorationStatesService');
@@ -469,7 +469,7 @@ describe('Training Modal Controller', function() {
         });
       }));
 
-      it('should click on confirm button', function() {
+      it('should click on confirm button', function () {
         var answerGroups = (
           ExplorationStatesService.getInteractionAnswerGroupsMemento('Init'));
 
@@ -488,7 +488,7 @@ describe('Training Modal Controller', function() {
           ['This is the answer']);
       });
 
-      it('should exit training modal', function() {
+      it('should exit training modal', function () {
         $scope.exitTrainer();
         expect($uibModalInstance.close).toHaveBeenCalled();
       });

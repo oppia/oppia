@@ -27,21 +27,21 @@ angular.module('oppia').component('parameterNameEditor', {
   controllerAs: '$ctrl',
   controller: [
     '$scope', 'ExplorationParamSpecsService',
-    function($scope, ExplorationParamSpecsService) {
+    function ($scope, ExplorationParamSpecsService) {
       var ctrl = this;
-      ctrl.validate = function() {
+      ctrl.validate = function () {
         return ctrl.availableParamNames.length !== 0;
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         // Reset the component each time the value changes (e.g. if this is
         // part of an editable list).
-        $scope.$watch('$ctrl.value', function(newValue) {
+        $scope.$watch('$ctrl.value', function (newValue) {
           if (newValue) {
             ctrl.localValue = newValue;
           }
         }, true);
 
-        $scope.$watch('$ctrl.localValue', function(newValue) {
+        $scope.$watch('$ctrl.localValue', function (newValue) {
           ctrl.value = newValue;
         });
         ctrl.availableParamNames = (

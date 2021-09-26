@@ -29,7 +29,7 @@ import { Collection } from 'domain/collection/collection.model';
   providedIn: 'root'
 })
 export class CollectionValidationService {
-  _getNonexistentExplorationIds(collection: Collection): string[] {
+  _getNonexistentExplorationIds (collection: Collection): string[] {
     return collection.getCollectionNodes().filter((collectionNode) => {
       return !collectionNode.doesExplorationExist();
     }).map((collectionNode) => {
@@ -37,7 +37,7 @@ export class CollectionValidationService {
     });
   }
 
-  _getPrivateExplorationIds(collection: Collection): string[] {
+  _getPrivateExplorationIds (collection: Collection): string[] {
     return collection.getCollectionNodes().filter((collectionNode) => {
       return collectionNode.isExplorationPrivate();
     }).map((collectionNode) => {
@@ -47,7 +47,7 @@ export class CollectionValidationService {
 
   // Validates that the tags for the collection are in the proper format,
   // returns true if all tags are in the correct format.
-  validateTagFormat(tags: string[]): boolean {
+  validateTagFormat (tags: string[]): boolean {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
     var tagRegex = new RegExp(AppConstants.TAG_REGEX);
@@ -58,20 +58,20 @@ export class CollectionValidationService {
 
   // Validates that the tags for the collection do not have duplicates,
   // returns true if there are no duplicates.
-  validateDuplicateTags(tags: string[]): boolean {
+  validateDuplicateTags (tags: string[]): boolean {
     return tags.every((tag: string, idx: number) => {
       return tags.indexOf(tag, idx + 1) === -1;
     });
   }
   // Validates that the tags for the collection are normalized,
   // returns true if all tags were normalized.
-  validateTagsNormalized(tags: string[]): boolean {
+  validateTagsNormalized (tags: string[]): boolean {
     return tags.every((tag: string) => {
       return tag === tag.trim().replace(/\s+/g, ' ');
     });
   }
 
-  _validateCollection(collection: Collection, isPublic: boolean): string[] {
+  _validateCollection (collection: Collection, isPublic: boolean): string[] {
     // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
     // same as that in core.domain.collection_domain.Collection.validate().
     var issues = [];
@@ -108,7 +108,7 @@ export class CollectionValidationService {
    * match the validations performed in the backend. This function is
    * expensive, so it should be called sparingly.
    */
-  findValidationIssuesForPrivateCollection(collection: Collection): string[] {
+  findValidationIssuesForPrivateCollection (collection: Collection): string[] {
     return this._validateCollection(collection, false);
   }
 
@@ -118,14 +118,14 @@ export class CollectionValidationService {
    * public collections. This function is expensive, so it should be called
    * sparingly.
    */
-  findValidationIssuesForPublicCollection(collection: Collection): string[] {
+  findValidationIssuesForPublicCollection (collection: Collection): string[] {
     return this._validateCollection(collection, true);
   }
 
   /**
    * Returns false if the tags are not validate.
    */
-  isTagValid(tags: string[]): boolean {
+  isTagValid (tags: string[]): boolean {
     return this.validateTagFormat(tags) && this.validateDuplicateTags(tags) &&
     this.validateTagsNormalized(tags);
   }

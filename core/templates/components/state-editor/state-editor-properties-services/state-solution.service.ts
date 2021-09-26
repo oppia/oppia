@@ -27,7 +27,7 @@ import { UtilsService } from 'services/utils.service';
   providedIn: 'root'
 })
 export class StateSolutionService extends StatePropertyService<Solution> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveSolution';
   }

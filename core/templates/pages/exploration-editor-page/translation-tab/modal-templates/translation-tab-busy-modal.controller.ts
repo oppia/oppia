@@ -22,7 +22,7 @@ require(
 
 angular.module('oppia').controller('TranslationTabBusyModalController', [
   '$controller', '$scope', '$uibModalInstance', 'message',
-  function($controller, $scope, $uibModalInstance, message) {
+  function ($controller, $scope, $uibModalInstance, message) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

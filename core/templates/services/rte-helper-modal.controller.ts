@@ -25,14 +25,14 @@ angular.module('oppia').controller('RteHelperModalController', [
   'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-  function(
+  function (
       $q, $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService,
       ExternalRteSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
       attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-    var extractVideoIdFromVideoUrl = function(videoUrl) {
+    var extractVideoIdFromVideoUrl = function (videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
       return (
         (videoUrl[2] !== undefined) ?
@@ -49,7 +49,7 @@ angular.module('oppia').controller('RteHelperModalController', [
     // modal instead.
     $scope.modalIsLoading = true;
     FocusManagerService.setFocus('tmpFocusPoint');
-    $timeout(function() {
+    $timeout(function () {
       $scope.modalIsLoading = false;
     });
 
@@ -85,7 +85,7 @@ angular.module('oppia').controller('RteHelperModalController', [
       }
     }
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       for (let i = 0; i < customizationArgSpecs.length; i++) {
         let caName = customizationArgSpecs[i].name;
         let attrsCaDict = attrsCustomizationArgsDict;
@@ -105,7 +105,7 @@ angular.module('oppia').controller('RteHelperModalController', [
       $uibModalInstance.dismiss(true);
     };
 
-    $scope.disableSaveButtonForMathRte = function() {
+    $scope.disableSaveButtonForMathRte = function () {
       // This method disables the save button when the Math SVG has not yet
       // been generated but being processed.
       if (!$scope.currentRteIsMathExpressionEditor) {
@@ -116,7 +116,7 @@ angular.module('oppia').controller('RteHelperModalController', [
             mathExpressionSvgIsBeingProcessed);
       }
     };
-    $scope.save = function() {
+    $scope.save = function () {
       ExternalRteSaveService.onExternalRteSave.emit();
 
       var customizationArgsDict = {};
@@ -169,7 +169,7 @@ angular.module('oppia').controller('RteHelperModalController', [
           AssetsBackendApiService.saveMathExpresionImage(
             resampledFile, svgFileName, ContextService.getEntityType(),
             ContextService.getEntityId())
-        ).then(function(response) {
+        ).then(function (response) {
           var mathContentDict = {
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: response.filename
@@ -177,7 +177,7 @@ angular.module('oppia').controller('RteHelperModalController', [
           var caName = $scope.tmpCustomizationArgs[0].name;
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
-        }, function(errorResponse) {
+        }, function (errorResponse) {
           AlertsService.addWarning(
             errorResponse.error || 'Error communicating with server.');
           $uibModalInstance.dismiss('cancel');

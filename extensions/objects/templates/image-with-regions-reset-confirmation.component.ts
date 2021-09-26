@@ -27,7 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class ImageWithRegionsResetConfirmationModalComponent
   extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
+  constructor (ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

@@ -35,7 +35,7 @@ angular.module('oppia').controller(
     '$controller', '$scope', '$uibModalInstance', 'SubtopicValidationService',
     'TopicEditorStateService',
     'TopicUpdateService', 'UrlInterpolationService',
-    function(
+    function (
         $controller, $scope, $uibModalInstance, SubtopicValidationService,
         TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
       $controller('ConfirmOrCancelModalController', {
@@ -45,14 +45,14 @@ angular.module('oppia').controller(
       var ctrl = this;
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.initEditor = function() {
+      ctrl.initEditor = function () {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopics = ctrl.topic.getSubtopics();
         ctrl.uncategorizedSkillSummaries = (
           ctrl.topic.getUncategorizedSkillSummaries());
       };
 
-      ctrl.getSkillEditorUrl = function(skillId) {
+      ctrl.getSkillEditorUrl = function (skillId) {
         return UrlInterpolationService.interpolateUrl(
           SKILL_EDITOR_URL_TEMPLATE, {
             skillId: skillId
@@ -67,7 +67,7 @@ angular.module('oppia').controller(
        * @param {SkillSummary} skillSummary - The summary of the skill that
        *    is to be moved.
        */
-      ctrl.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
+      ctrl.onMoveSkillStart = function (oldSubtopicId, skillSummary) {
         ctrl.skillSummaryToMove = skillSummary;
         ctrl.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
       };
@@ -77,7 +77,7 @@ angular.module('oppia').controller(
        *    skill is to be moved, or null if the destination is the
        *    uncategorized section.
        */
-      ctrl.onMoveSkillEnd = function(newSubtopicId) {
+      ctrl.onMoveSkillEnd = function (newSubtopicId) {
         if (newSubtopicId === ctrl.oldSubtopicId) {
           return;
         }
@@ -94,7 +94,7 @@ angular.module('oppia').controller(
       };
 
 
-      ctrl.updateSubtopicTitle = function(subtopicId) {
+      ctrl.updateSubtopicTitle = function (subtopicId) {
         if (!SubtopicValidationService.checkValidSubtopicName(
           ctrl.editableName)) {
           ctrl.errorMsg = 'A subtopic with this title already exists';
@@ -106,14 +106,14 @@ angular.module('oppia').controller(
         ctrl.editNameOfSubtopicWithId(null);
       };
 
-      ctrl.editNameOfSubtopicWithId = function(subtopicId) {
+      ctrl.editNameOfSubtopicWithId = function (subtopicId) {
         if (!subtopicId) {
           ctrl.editableName = '';
         }
         ctrl.selectedSubtopicId = subtopicId;
       };
 
-      ctrl.init = function() {
+      ctrl.init = function () {
         ctrl.editableName = '';
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicInitialized.subscribe(
@@ -126,7 +126,7 @@ angular.module('oppia').controller(
         ctrl.initEditor();
       };
       ctrl.init();
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

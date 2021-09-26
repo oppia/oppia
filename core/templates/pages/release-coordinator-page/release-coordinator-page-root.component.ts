@@ -30,14 +30,14 @@ export class ReleaseCoordinatorPageRootComponent {
   errorPageIsShown: boolean = false;
   pageIsShown: boolean = false;
 
-  constructor(
+  constructor (
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE);
     this.loaderService.showLoadingScreen('Loading');

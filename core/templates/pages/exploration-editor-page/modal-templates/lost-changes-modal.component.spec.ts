@@ -34,11 +34,11 @@ class ChangesInHumanReadableFormComponentStub {
 }
 
 class MockActiveModal {
-  close(): void {
+  close (): void {
     return;
   }
 
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }

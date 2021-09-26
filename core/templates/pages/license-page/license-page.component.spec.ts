@@ -24,18 +24,18 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Pipe({ name: 'translate' })
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
+  getCurrentI18nLanguageCode () {
     return 'en';
   }
 
-  get onI18nLanguageCodeChange() {
+  get onI18nLanguageCodeChange () {
     return this.codeChangeEventEmiiter;
   }
 }

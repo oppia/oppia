@@ -55,7 +55,7 @@ describe('Prediction Algorithm Registry Service', () => {
 
   describe('when trying to mock prediction services in tests', () => {
     class MockPredictionService {
-      predict(classifierData: ArrayBuffer, answer: InteractionAnswer): number {
+      predict (classifierData: ArrayBuffer, answer: InteractionAnswer): number {
         return 1;
       }
     }

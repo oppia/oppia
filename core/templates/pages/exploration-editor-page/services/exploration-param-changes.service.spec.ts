@@ -25,22 +25,22 @@ require(
   'pages/exploration-editor-page/' +
   'services/exploration-param-changes.service.ts');
 
-describe('Exploration Param Changes Service', function() {
+describe('Exploration Param Changes Service', function () {
   var epcs = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('oppia');
   });
 
   importAllAngularServices();
 
-  beforeEach(function() {
-    angular.mock.inject(function($injector) {
+  beforeEach(function () {
+    angular.mock.inject(function ($injector) {
       epcs = $injector.get('ExplorationParamChangesService');
     });
   });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(epcs.propertyName).toBe('param_changes');
   });
 });

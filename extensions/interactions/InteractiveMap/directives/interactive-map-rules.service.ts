@@ -27,10 +27,10 @@ import { InteractiveMapRuleInputs } from 'interactions/rule-input-defs';
 })
 export class InteractiveMapRulesService {
   static RADIUS_OF_EARTH_KM: number = 6371.0;
-  static degreesToRadians(angle: number): number {
+  static degreesToRadians (angle: number): number {
     return angle / 180 * Math.PI;
   }
-  static getDistanceInKm(point1: number[], point2: number[]): number {
+  static getDistanceInKm (point1: number[], point2: number[]): number {
     var latitude1: number = InteractiveMapRulesService.degreesToRadians(
       point1[0]);
     var latitude2: number = InteractiveMapRulesService.degreesToRadians(
@@ -50,14 +50,14 @@ export class InteractiveMapRulesService {
       2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
   }
 
-  Within(
+  Within (
       answer: InteractiveMapAnswer,
       inputs: InteractiveMapRuleInputs): boolean {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance <= inputs.d;
   }
-  NotWithin(
+  NotWithin (
       answer: InteractiveMapAnswer,
       inputs: InteractiveMapRuleInputs): boolean {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(

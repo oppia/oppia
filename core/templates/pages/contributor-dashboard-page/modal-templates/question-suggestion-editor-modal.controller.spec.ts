@@ -19,7 +19,7 @@
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Question Suggestion Editor Modal Controller', function() {
+describe('Question Suggestion Editor Modal Controller', function () {
   let $uibModal = null;
   let $uibModalInstance = null;
   let $q = null;
@@ -43,9 +43,9 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let suggestionId = null;
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.service('QuestionSuggestionBackendApiService', function() {
-      this.submitSuggestionAsync = function(
+  beforeEach(angular.mock.module('oppia', function ($provide) {
+    $provide.service('QuestionSuggestionBackendApiService', function () {
+      this.submitSuggestionAsync = function (
           question, associatedSkill, skillDifficulty, imagesData) {
         return {
           then: (successCallback, errorCallback) => {
@@ -54,8 +54,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
         };
       };
     });
-    $provide.service('ContributionAndReviewService', function() {
-      this.updateQuestionSuggestionAsync = function(
+    $provide.service('ContributionAndReviewService', function () {
+      this.updateQuestionSuggestionAsync = function (
           suggestionId, skillDifficulty, questionStateData, imagesData) {
         return {
           then: (successCallback, errorCallback) => {
@@ -66,8 +66,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
   }));
 
-  describe('when question is valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when question is valid', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
@@ -203,7 +203,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.canEditQuestion).toBe(true);
         expect($scope.newQuestionIsBeingCreated).toBe(true);
         expect($scope.question).toEqual(question);
@@ -214,11 +214,11 @@ describe('Question Suggestion Editor Modal Controller', function() {
         expect($scope.skill).toEqual(skill);
       });
 
-    it('should evaluate question validity', function() {
+    it('should evaluate question validity', function () {
       expect($scope.isQuestionValid()).toBe(true);
     });
 
-    it('should update the question', function() {
+    it('should update the question', function () {
       spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
             suggestionId, skillDifficulty, questionStateData, imagesData,
@@ -235,7 +235,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
         .toHaveBeenCalled();
     });
 
-    it('should show alert when suggestion is submitted', function() {
+    it('should show alert when suggestion is submitted', function () {
       spyOn(AlertsService, 'addSuccessMessage');
       $scope.isEditing = false;
       $scope.done();
@@ -244,7 +244,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should register Contributor Dashboard submit suggestion event on' +
-      ' submit', function() {
+      ' submit', function () {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardSubmitSuggestionEvent');
@@ -255,14 +255,14 @@ describe('Question Suggestion Editor Modal Controller', function() {
         .toHaveBeenCalledWith('Question');
     });
 
-    it('should dismiss modal if there is no pending changes', function() {
+    it('should dismiss modal if there is no pending changes', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
     it('should dismiss modal if there is pending changes which won\'t be' +
-      ' saved', function() {
+      ' saved', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -274,7 +274,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should not dismiss modal if there is pending changes which will be' +
-      ' saved', function() {
+      ' saved', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -286,7 +286,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should open skill difficulty selection modal on clicking' +
-        ' change difficulty icon', function() {
+        ' change difficulty icon', function () {
       var uibSpy = spyOn($uibModal, 'open').and.callThrough();
       $scope.onClickChangeDifficulty();
       $scope.$apply();
@@ -295,7 +295,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should change skill difficulty when skill difficulty' +
-      ' is edited via skill difficulty modal', function() {
+      ' is edited via skill difficulty modal', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           skillDifficulty: 0.6
@@ -308,7 +308,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.skillDifficultyString).toBe('Medium');
     });
 
-    it('should set the correct skill difficulty string', function() {
+    it('should set the correct skill difficulty string', function () {
       $scope.setDifficultyString(0.6);
       expect($scope.skillDifficultyString).toBe('Medium');
       $scope.setDifficultyString(0.9);
@@ -317,7 +317,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.skillDifficultyString).toBe('Easy');
     });
 
-    it('should dismiss modal if cancel button is clicked', function() {
+    it('should dismiss modal if cancel button is clicked', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -327,8 +327,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
   });
-  describe('when question is not valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when question is not valid', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
@@ -380,11 +380,11 @@ describe('Question Suggestion Editor Modal Controller', function() {
       });
     }));
 
-    it('should evaluate question validity', function() {
+    it('should evaluate question validity', function () {
       expect($scope.isQuestionValid()).toBe(false);
     });
 
-    it('should not submit question', function() {
+    it('should not submit question', function () {
       spyOn(QuestionSuggestionBackendApiService, 'submitSuggestionAsync')
         .and.callThrough();
       $scope.done();

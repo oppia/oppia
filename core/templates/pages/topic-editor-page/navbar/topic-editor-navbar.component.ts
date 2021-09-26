@@ -44,7 +44,7 @@ angular.module('oppia').component('topicEditorNavbar', {
     'TopicRightsBackendApiService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'TOPIC_VIEWER_URL_TEMPLATE',
-    function(
+    function (
         $rootScope, $scope, $uibModal, $window, AlertsService,
         TopicEditorRoutingService, TopicEditorStateService,
         TopicRightsBackendApiService, UndoRedoService,
@@ -52,11 +52,11 @@ angular.module('oppia').component('topicEditorNavbar', {
         TOPIC_VIEWER_URL_TEMPLATE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.isSaveInProgress = function() {
+      $scope.isSaveInProgress = function () {
         return TopicEditorStateService.isSavingTopic();
       };
 
-      var _validateTopic = function() {
+      var _validateTopic = function () {
         $scope.validationIssues = $scope.topic.validate();
         if (TopicEditorStateService.getTopicWithNameExists()) {
           $scope.validationIssues.push(
@@ -76,7 +76,7 @@ angular.module('oppia').component('topicEditorNavbar', {
             subtopicPrepublishValidationIssues));
       };
 
-      $scope.publishTopic = function() {
+      $scope.publishTopic = function () {
         if (!$scope.topicRights.canPublishTopic()) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -84,15 +84,15 @@ angular.module('oppia').component('topicEditorNavbar', {
                   'topic-editor-send-mail-modal.template.html'),
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
+          }).result.then(function () {
             TopicRightsBackendApiService.sendMailAsync(
-              $scope.topicId, $scope.topicName).then(function() {
+              $scope.topicId, $scope.topicName).then(function () {
               var successToast = 'Mail Sent.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);
               $rootScope.$applyAsync();
             });
-          }, function() {
+          }, function () {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -101,7 +101,7 @@ angular.module('oppia').component('topicEditorNavbar', {
         }
         var redirectToDashboard = false;
         TopicRightsBackendApiService.publishTopicAsync($scope.topicId).then(
-          function() {
+          function () {
             if (!$scope.topicRights.isPublished()) {
               redirectToDashboard = true;
             }
@@ -109,7 +109,7 @@ angular.module('oppia').component('topicEditorNavbar', {
             TopicEditorStateService.setTopicRights($scope.topicRights);
             $rootScope.$applyAsync();
           }
-        ).then(function() {
+        ).then(function () {
           var successToast = 'Topic published.';
           if (redirectToDashboard) {
             $window.location = '/topics-and-skills-dashboard';
@@ -119,17 +119,17 @@ angular.module('oppia').component('topicEditorNavbar', {
         });
       };
 
-      $scope.discardChanges = function() {
+      $scope.discardChanges = function () {
         UndoRedoService.clearChanges();
         $scope.discardChangesButtonIsShown = false;
         TopicEditorStateService.loadTopic($scope.topicId);
       };
 
-      $scope.getChangeListLength = function() {
+      $scope.getChangeListLength = function () {
         return UndoRedoService.getChangeCount();
       };
 
-      $scope.isTopicSaveable = function() {
+      $scope.isTopicSaveable = function () {
         return (
           $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0 && (
@@ -139,13 +139,13 @@ angular.module('oppia').component('topicEditorNavbar', {
         );
       };
 
-      $scope.toggleDiscardChangeButton = function() {
+      $scope.toggleDiscardChangeButton = function () {
         $scope.showTopicEditOptions = false;
         $scope.discardChangesButtonIsShown = (
           !$scope.discardChangesButtonIsShown);
       };
 
-      $scope.saveChanges = function() {
+      $scope.saveChanges = function () {
         var topicIsPublished = $scope.topicRights.isPublished();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -156,44 +156,44 @@ angular.module('oppia').component('topicEditorNavbar', {
             topicIsPublished: () => topicIsPublished
           },
           controller: 'TopicEditorSaveModalController'
-        }).result.then(function(commitMessage) {
+        }).result.then(function (commitMessage) {
           TopicEditorStateService.saveTopic(commitMessage, () => {
             AlertsService.addSuccessMessage('Changes Saved.');
             $rootScope.$applyAsync();
           });
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      $scope.unpublishTopic = function() {
+      $scope.unpublishTopic = function () {
         $scope.showTopicEditOptions = false;
         if (!$scope.topicRights.canPublishTopic()) {
           return false;
         }
         TopicRightsBackendApiService.unpublishTopicAsync(
-          $scope.topicId).then(function() {
+          $scope.topicId).then(function () {
           $scope.topicRights.markTopicAsUnpublished();
           TopicEditorStateService.setTopicRights($scope.topicRights);
           $rootScope.$applyAsync();
         });
       };
 
-      $scope.toggleNavigationOptions = function() {
+      $scope.toggleNavigationOptions = function () {
         $scope.showNavigationOptions = !$scope.showNavigationOptions;
       };
 
-      $scope.toggleTopicEditOptions = function() {
+      $scope.toggleTopicEditOptions = function () {
         $scope.showTopicEditOptions = !$scope.showTopicEditOptions;
       };
 
-      $scope.toggleWarningText = function() {
+      $scope.toggleWarningText = function () {
         $scope.warningsAreShown = !$scope.warningsAreShown;
       };
 
-      $scope._validateTopic = function() {
+      $scope._validateTopic = function () {
         $scope.validationIssues = $scope.topic.validate();
         var prepublishTopicValidationIssues = (
           $scope.topic.prepublishValidate());
@@ -205,18 +205,18 @@ angular.module('oppia').component('topicEditorNavbar', {
             subtopicPrepublishValidationIssues));
       };
 
-      $scope.getWarningsCount = function() {
+      $scope.getWarningsCount = function () {
         return $scope.validationIssues.length;
       };
 
-      $scope.getTotalWarningsCount = function() {
+      $scope.getTotalWarningsCount = function () {
         var validationIssuesCount = $scope.validationIssues.length;
         var prepublishValidationIssuesCount = (
           $scope.prepublishValidationIssues.length);
         return validationIssuesCount + prepublishValidationIssuesCount;
       };
 
-      $scope.openTopicViewer = function() {
+      $scope.openTopicViewer = function () {
         $scope.showNavigationOptions = false;
         var activeTab = TopicEditorRoutingService.getActiveTabName();
         if (activeTab !== 'subtopic_editor') {
@@ -244,23 +244,23 @@ angular.module('oppia').component('topicEditorNavbar', {
         }
       };
 
-      $scope.selectMainTab = function() {
+      $scope.selectMainTab = function () {
         $scope.activeTab = 'Editor';
         $scope.showNavigationOptions = false;
         TopicEditorRoutingService.navigateToMainTab();
       };
 
-      $scope.selectQuestionsTab = function() {
+      $scope.selectQuestionsTab = function () {
         $scope.activeTab = 'Question';
         $scope.showNavigationOptions = false;
         TopicEditorRoutingService.navigateToQuestionsTab();
       };
 
-      $scope.getActiveTabName = function() {
+      $scope.getActiveTabName = function () {
         return TopicEditorRoutingService.getActiveTabName();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicInitialized.subscribe(
             () => _validateTopic()
@@ -288,7 +288,7 @@ angular.module('oppia').component('topicEditorNavbar', {
         );
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }]

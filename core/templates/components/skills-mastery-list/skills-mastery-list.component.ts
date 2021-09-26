@@ -36,15 +36,15 @@ angular.module('oppia').component('skillsMasteryList', {
   controller: [
     '$rootScope', '$uibModal', 'UserService', 'MASTERY_COLORS',
     'MASTERY_CUTOFF',
-    function(
+    function (
         $rootScope, $uibModal, UserService, MASTERY_COLORS,
         MASTERY_CUTOFF) {
       var ctrl = this;
-      ctrl.getMasteryPercentage = function(degreeOfMastery) {
+      ctrl.getMasteryPercentage = function (degreeOfMastery) {
         return Math.round(degreeOfMastery * 100);
       };
 
-      ctrl.getColorForMastery = function(degreeOfMastery) {
+      ctrl.getColorForMastery = function (degreeOfMastery) {
         if (degreeOfMastery >= MASTERY_CUTOFF.GOOD_CUTOFF) {
           return MASTERY_COLORS.GOOD_MASTERY_COLOR;
         } else if (degreeOfMastery >= MASTERY_CUTOFF.MEDIUM_CUTOFF) {
@@ -54,7 +54,7 @@ angular.module('oppia').component('skillsMasteryList', {
         }
       };
 
-      ctrl.getMasteryBarStyle = function(skillId) {
+      ctrl.getMasteryBarStyle = function (skillId) {
         return {
           width: ctrl.getMasteryPercentage(
             ctrl.getDegreesOfMastery()[skillId]) + '%',
@@ -63,7 +63,7 @@ angular.module('oppia').component('skillsMasteryList', {
         };
       };
 
-      ctrl.openConceptCardModal = function(skillId) {
+      ctrl.openConceptCardModal = function (skillId) {
         var skillDescription = ctrl.getSkillDescriptions()[skillId];
         $uibModal.open({
           template: require(
@@ -75,15 +75,15 @@ angular.module('oppia').component('skillsMasteryList', {
             skillId: () => skillId
           },
           controller: 'SkillsMasteryListConceptCardModal'
-        }).result.then(function() {}, function() {
+        }).result.then(function () {}, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.userIsLoggedIn = null;
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function (userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
@@ -93,7 +93,7 @@ angular.module('oppia').component('skillsMasteryList', {
 
         var degreesOfMastery = ctrl.getDegreesOfMastery();
         ctrl.skillIdsAndMastery =
-          Object.keys(degreesOfMastery).map(function(skillId) {
+          Object.keys(degreesOfMastery).map(function (skillId) {
             return {
               skillId: skillId,
               mastery: degreesOfMastery[skillId]

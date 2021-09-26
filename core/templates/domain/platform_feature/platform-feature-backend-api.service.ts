@@ -33,7 +33,7 @@ import { PlatformFeatureDomainConstants } from
   providedIn: 'root'
 })
 export class PlatformFeatureBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient
   ) {}
 
@@ -46,7 +46,7 @@ export class PlatformFeatureBackendApiService {
    * @returns {Promise<FeatureStatusSummary>} - A promise that resolves to
    * the feature status summary.
    */
-  async fetchFeatureFlags(context: ClientContext):
+  async fetchFeatureFlags (context: ClientContext):
       Promise<FeatureStatusSummary> {
     const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
       PlatformFeatureDomainConstants.PLATFORM_FEATURES_EVALUATION_HANDLER_URL,

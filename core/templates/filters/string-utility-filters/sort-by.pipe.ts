@@ -32,7 +32,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
   providedIn: 'root'
 })
 export class SortByPipe implements PipeTransform {
-  transform<T>(
+  transform<T> (
       value: T[], isDescending: boolean,
       sortKey?: string): T[] {
     if (sortKey === 'default') {

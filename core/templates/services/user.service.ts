@@ -29,7 +29,7 @@ import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRight
   providedIn: 'root'
 })
 export class UserService {
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
@@ -44,7 +44,7 @@ export class UserService {
     private userInfo: UserInfo | null = null;
     private returnUrl = '';
 
-    async getUserInfoAsync(): Promise<UserInfo> {
+    async getUserInfoAsync (): Promise<UserInfo> {
       const pathname = this.urlService.getPathname();
       if (['/logout', '/signup'].includes(pathname)) {
         return UserInfo.createDefault();
@@ -55,12 +55,12 @@ export class UserService {
       return this.userInfo;
     }
 
-    async getProfileImageDataUrlAsync(): Promise<string> {
+    async getProfileImageDataUrlAsync (): Promise<string> {
       let defaultUrl = (
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
-        async(userInfo) => {
+        async (userInfo) => {
           if (userInfo.isLoggedIn()) {
             return this.userBackendApiService.getProfileImageDataUrlAsync(
               defaultUrl);
@@ -72,23 +72,23 @@ export class UserService {
         });
     }
 
-    async setProfileImageDataUrlAsync(
+    async setProfileImageDataUrlAsync (
         newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
       return this.userBackendApiService.setProfileImageDataUrlAsync(
         newProfileImageDataUrl);
     }
 
-    async getLoginUrlAsync(): Promise<string> {
+    async getLoginUrlAsync (): Promise<string> {
       return this.userBackendApiService.getLoginUrlAsync(
         this.returnUrl ||
         this.windowRef.nativeWindow.location.pathname);
     }
 
-    setReturnUrl(newReturnUrl: string): void {
+    setReturnUrl (newReturnUrl: string): void {
       this.returnUrl = newReturnUrl;
     }
 
-    async getUserContributionRightsDataAsync():
+    async getUserContributionRightsDataAsync ():
       Promise<UserContributionRightsDataBackendDict | null> {
       if (this.userContributionRightsInfo) {
         return new Promise((resolve, reject) => {
@@ -102,7 +102,7 @@ export class UserService {
         });
     }
 
-    async getUserPreferredDashboardAsync(): Promise<string> {
+    async getUserPreferredDashboardAsync (): Promise<string> {
       return this.userBackendApiService.getPreferencesAsync().then((data) => {
         return data.default_dashboard;
       });

@@ -35,14 +35,14 @@ angular.module('oppia').component('oppiaInteractiveEndExploration', {
     'ReadOnlyCollectionBackendApiService', 'UrlService',
     'EXPLORATION_EDITOR_TAB_CONTEXT',
     'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'PAGE_CONTEXT',
-    function(
+    function (
         $attrs, $http, ContextService,
         InteractionAttributesExtractorService,
         ReadOnlyCollectionBackendApiService, UrlService,
         EXPLORATION_EDITOR_TAB_CONTEXT,
         EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, PAGE_CONTEXT) {
       var ctrl = this;
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         const {
           recommendedExplorationIds
         } = InteractionAttributesExtractorService.getValuesFromAttributes(
@@ -66,8 +66,8 @@ angular.module('oppia').component('oppiaInteractiveEndExploration', {
         if (ctrl.collectionId) {
           ReadOnlyCollectionBackendApiService
             .loadCollectionAsync(ctrl.collectionId)
-            .then(function(collection) {
-              ctrl.getCollectionTitle = function() {
+            .then(function (collection) {
+              ctrl.getCollectionTitle = function () {
                 return collection.getTitle();
               };
             });
@@ -83,15 +83,15 @@ angular.module('oppia').component('oppiaInteractiveEndExploration', {
               stringified_exp_ids: JSON.stringify(
                 authorRecommendedExplorationIds)
             }
-          }).then(function(response) {
+          }).then(function (response) {
             var data = response.data;
             var foundExpIds = [];
-            data.summaries.map(function(expSummary) {
+            data.summaries.map(function (expSummary) {
               foundExpIds.push(expSummary.id);
             });
 
             var missingExpIds = [];
-            authorRecommendedExplorationIds.forEach(function(expId) {
+            authorRecommendedExplorationIds.forEach(function (expId) {
               if (foundExpIds.indexOf(expId) === -1) {
                 missingExpIds.push(expId);
               }

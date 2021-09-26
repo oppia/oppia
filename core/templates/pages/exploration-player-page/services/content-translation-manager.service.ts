@@ -56,18 +56,18 @@ export class ContentTranslationManagerService {
   // language in it's initial state.
   private originalTranscript: StateCard[] = [];
 
-  constructor(
+  constructor (
     private playerTranscriptService: PlayerTranscriptService,
     private extensionTagAssemblerService: ExtensionTagAssemblerService
   ) {}
 
-  setOriginalTranscript(explorationLanguageCode: string): void {
+  setOriginalTranscript (explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
     this.originalTranscript = cloneDeep(
       this.playerTranscriptService.transcript);
   }
 
-  get onStateCardContentUpdate(): EventEmitter<void> {
+  get onStateCardContentUpdate (): EventEmitter<void> {
     return this.onStateCardContentUpdateEmitter;
   }
 
@@ -82,7 +82,7 @@ export class ContentTranslationManagerService {
    * the page and restart the exploration.
    * @param {string} languageCode The language code to display translations for.
    */
-  displayTranslations(languageCode: string): void {
+  displayTranslations (languageCode: string): void {
     const cards = this.playerTranscriptService.transcript;
 
     if (languageCode === this.explorationLanguageCode) {
@@ -95,7 +95,7 @@ export class ContentTranslationManagerService {
     this.onStateCardContentUpdateEmitter.emit();
   }
 
-  getTranslatedHtml(
+  getTranslatedHtml (
       writtenTranslations: WrittenTranslations,
       languageCode: string,
       content: SubtitledHtml
@@ -122,7 +122,7 @@ export class ContentTranslationManagerService {
     return content.html;
   }
 
-  _swapContent(
+  _swapContent (
       writtenTranslations: WrittenTranslations,
       languageCode: string,
       content: SubtitledHtml|SubtitledUnicode
@@ -153,7 +153,7 @@ export class ContentTranslationManagerService {
     });
   }
 
-  _displayTranslationsForCard(card: StateCard, languageCode: string): void {
+  _displayTranslationsForCard (card: StateCard, languageCode: string): void {
     const writtenTranslations = card.writtenTranslations;
 
     const contentTranslation = writtenTranslations.translationsMapping[
@@ -199,7 +199,7 @@ export class ContentTranslationManagerService {
     }
   }
 
-  _swapContentInCustomizationArgs(card: StateCard, languageCode: string): void {
+  _swapContentInCustomizationArgs (card: StateCard, languageCode: string): void {
     const interactionId = card.getInteractionId();
     const caValues = card.getInteraction().customizationArgs;
     const writtenTranslations = card.writtenTranslations;
@@ -252,7 +252,7 @@ export class ContentTranslationManagerService {
     card.setInteractionHtml(element.get(0).outerHTML);
   }
 
-  _swapContentInRules(card: StateCard, languageCode: string): void {
+  _swapContentInRules (card: StateCard, languageCode: string): void {
     const writtenTranslations = card.writtenTranslations;
     const CONTENT_ID_KEY = 'contentId';
 
@@ -290,17 +290,17 @@ export class ContentTranslationManagerService {
     });
   }
 
-  _isTranslatableObject(
+  _isTranslatableObject (
       ruleInputValue: InteractionRuleInputs):
       ruleInputValue is BaseTranslatableObject {
     return isObject(ruleInputValue) && 'contentId' in ruleInputValue;
   }
 
-  _isString(translation: string|string[]): translation is string {
+  _isString (translation: string|string[]): translation is string {
     return (typeof translation === 'string');
   }
 
-  _isValidStringTranslation(writtenTranslation: WrittenTranslation): boolean {
+  _isValidStringTranslation (writtenTranslation: WrittenTranslation): boolean {
     return (
       writtenTranslation !== undefined &&
       this._isString(writtenTranslation.translation) &&

@@ -33,13 +33,13 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
   collectionTitle: string = '';
   directiveSubscriptions = new Subscription();
 
-  constructor(
+  constructor (
     private urlService: UrlService,
     private readOnlyCollectionBackendApiService:
       ReadOnlyCollectionBackendApiService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
         () => {
@@ -51,7 +51,7 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     return this.directiveSubscriptions.unsubscribe();
   }
 }

@@ -52,15 +52,15 @@ import { ImageClickAnswer } from './answer-defs';
 import { ImageClickRuleInputs } from './rule-input-defs';
 // ^^^ This block is to be removed.
 
-describe('Rule spec services', function() {
+describe('Rule spec services', function () {
   var rulesServices = {};
   var ruleTemplates: RuleTemplates;
 
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('oppia');
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
@@ -109,39 +109,39 @@ describe('Rule spec services', function() {
     $provide.value('ContinueRulesService', {});
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
-      IsInRegion: function(
+      IsInRegion: function (
           answer: ImageClickAnswer, inputs: ImageClickRuleInputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  var getRulesServiceName = function(interactionId) {
+  var getRulesServiceName = function (interactionId) {
     return (
       interactionId + 'RulesService'
     );
   };
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ruleTemplates =
       window.__fixtures__['extensions/interactions/rule_templates'];
-    Object.keys(ruleTemplates).forEach(function(interactionId) {
+    Object.keys(ruleTemplates).forEach(function (interactionId) {
       var serviceName = getRulesServiceName(interactionId);
       rulesServices[serviceName] = $injector.get(serviceName);
     });
   }));
 
-  it('should include evaluation methods for all explicit rules', function() {
-    Object.keys(ruleTemplates).forEach(function(interactionId) {
+  it('should include evaluation methods for all explicit rules', function () {
+    Object.keys(ruleTemplates).forEach(function (interactionId) {
       var serviceName = getRulesServiceName(interactionId);
-      Object.keys(ruleTemplates[interactionId]).forEach(function(ruleName) {
+      Object.keys(ruleTemplates[interactionId]).forEach(function (ruleName) {
         expect(rulesServices[serviceName][ruleName]).toBeDefined(
           '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
       });

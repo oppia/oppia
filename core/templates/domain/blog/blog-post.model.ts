@@ -43,7 +43,7 @@ export class BlogPostData {
   _urlFragment: string;
   _lastUpdated?: string;
   _publishedOn?: string;
-  constructor(
+  constructor (
       id: string | null,
       authorUsername: string,
       title: string,
@@ -64,68 +64,68 @@ export class BlogPostData {
     this._publishedOn = publishedOn;
   }
 
-  get id(): string | null {
+  get id (): string | null {
     return this._id;
   }
 
-  get authorUsername(): string {
+  get authorUsername (): string {
     return this._authorUsername;
   }
 
-  get lastUpdated(): string | undefined {
+  get lastUpdated (): string | undefined {
     return this._lastUpdated;
   }
 
-  get publishedOn(): string | undefined {
+  get publishedOn (): string | undefined {
     return this._publishedOn;
   }
 
-  set title(title: string) {
+  set title (title: string) {
     this._title = title;
   }
 
-  get title(): string {
+  get title (): string {
     return this._title;
   }
 
-  get tags(): string[] {
+  get tags (): string[] {
     return this._tags;
   }
 
-  set tags(tags: string[]) {
+  set tags (tags: string[]) {
     this._tags = tags;
   }
 
-  addTag(tag: string): void {
+  addTag (tag: string): void {
     this._tags.push(tag);
   }
 
-  removeTag(tag: string): void {
+  removeTag (tag: string): void {
     let index = this._tags.indexOf(tag);
     this._tags.splice(index, 1);
   }
 
-  get urlFragment(): string {
+  get urlFragment (): string {
     return this._urlFragment;
   }
 
-  set thumbnailFilename(thumbnailFilename: string | null) {
+  set thumbnailFilename (thumbnailFilename: string | null) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  get thumbnailFilename(): string | null {
+  get thumbnailFilename (): string | null {
     return this._thumbnailFilename;
   }
 
-  get content(): string {
+  get content (): string {
     return this._content;
   }
 
-  set content(content: string) {
+  set content (content: string) {
     this._content = content;
   }
 
-  validate(): string[] {
+  validate (): string[] {
     let issues = [];
     if (this._title === '') {
       issues.push(
@@ -143,7 +143,7 @@ export class BlogPostData {
     return issues;
   }
 
-  prepublishValidate(maxTags: number): string[] {
+  prepublishValidate (maxTags: number): string[] {
     let issues = [];
     if (this._title === '') {
       issues.push(
@@ -177,7 +177,7 @@ export class BlogPostData {
     }
     return issues;
   }
-  static createFromBackendDict(
+  static createFromBackendDict (
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
@@ -193,7 +193,7 @@ export class BlogPostData {
 
   // Create an interstitial blog post that would be displayed in the editor
   // until the actual blog post is fetched from the backend.
-  static createInterstitialBlogPost(): BlogPostData {
+  static createInterstitialBlogPost (): BlogPostData {
     return new BlogPostData (
       null, 'loading', 'Blog Post Title loading', '', [],
       null, 'Url Fragment loading'

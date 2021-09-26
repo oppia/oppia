@@ -39,7 +39,7 @@ export interface UserProfileBackendDict {
 }
 
 export class UserProfile {
-  constructor(
+  constructor (
     public username: string,
     public profileIsOfCurrentUser: boolean,
     public usernameOfViewedProfile: string,
@@ -54,7 +54,7 @@ export class UserProfile {
     public editedExpSummaries: LearnerExplorationSummary[]
   ) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: UserProfileBackendDict): UserProfile {
     return new UserProfile(
       backendDict.username,

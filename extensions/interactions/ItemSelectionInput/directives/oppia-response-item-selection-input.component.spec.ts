@@ -16,17 +16,17 @@
  * @fileoverview Directive for the ItemSelectionInput response.
  */
 
-describe('oppiaResponseItemSelectionInput', function() {
+describe('oppiaResponseItemSelectionInput', function () {
   let ctrl = null;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
 
     $provide.value('$attrs', {
@@ -49,7 +49,7 @@ describe('oppiaResponseItemSelectionInput', function() {
       ]
     });
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.inject(function ($componentController) {
     ctrl = $componentController('oppiaResponseItemSelectionInput');
   }));
 

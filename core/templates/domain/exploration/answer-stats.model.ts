@@ -41,7 +41,7 @@ export class AnswerStats {
    * @param {boolean} isAddressed - whether this answer is addressed by the
    *    associated state's answer groups.
    */
-  constructor(
+  constructor (
       answer: InteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
@@ -55,27 +55,27 @@ export class AnswerStats {
   }
 
   /** @returns {*} */
-  getAnswer(): InteractionAnswer {
+  getAnswer (): InteractionAnswer {
     return this.answer;
   }
 
   /** @returns {string} */
-  getAnswerHtml(): string {
+  getAnswerHtml (): string {
     return this.answerHtml;
   }
 
   /** @returns {number} */
-  getFrequency(): number {
+  getFrequency (): number {
     return this.frequency;
   }
 
   /** @returns {boolean} */
-  getIsAddressed(): boolean {
+  getIsAddressed (): boolean {
     return this.isAddressed;
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict(): AnswerStatsBackendDict {
+  toBackendDict (): AnswerStatsBackendDict {
     return {
       answer: cloneDeep(this.answer),
       frequency: this.frequency
@@ -91,7 +91,7 @@ export class AnswerStats {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: AnswerStatsBackendDict): AnswerStats {
   // TODO(brianrodri): Use a proper service which takes the state's
   // interaction type into account for generating the answer's HTML.

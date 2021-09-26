@@ -43,13 +43,13 @@ export class Rule {
   inputs: RuleInputs;
   inputTypes: RuleInputTypes;
 
-  constructor(type: string, inputs: RuleInputs, inputTypes: RuleInputTypes) {
+  constructor (type: string, inputs: RuleInputs, inputTypes: RuleInputTypes) {
     this.type = type;
     this.inputs = inputs;
     this.inputTypes = inputTypes;
   }
 
-  toBackendDict(): RuleBackendDict {
+  toBackendDict (): RuleBackendDict {
     return {
       rule_type: this.type,
       inputs: this.inputs
@@ -61,9 +61,9 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  constructor() {}
+  constructor () {}
 
-  createNew(
+  createNew (
       type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
   ): Rule {
     if (!isEqual(
@@ -75,7 +75,7 @@ export class RuleObjectFactory {
     return new Rule(type, inputs, inputTypes);
   }
 
-  createFromBackendDict(
+  createFromBackendDict (
       ruleDict: RuleBackendDict, interactionId: string | null
   ): Rule {
     let ruleType = ruleDict.rule_type;

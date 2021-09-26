@@ -61,11 +61,11 @@ interface Warning {
   providedIn: 'root'
 })
 export class TextInputValidationService {
-  constructor(
+  constructor (
     private bivs: baseInteractionValidationService
   ) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: TextInputCustomizationArgs): Warning[] {
     let warningsList = [];
     this.bivs.requireCustomizationArguments(
@@ -115,7 +115,7 @@ export class TextInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: TextInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {

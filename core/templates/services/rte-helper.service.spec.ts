@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Rte Helper Service', function() {
+describe('Rte Helper Service', function () {
   var RteHelperService = null;
   var $q = null;
   var $uibModal = null;
@@ -29,13 +29,13 @@ describe('Rte Helper Service', function() {
   var $rootScope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     RteHelperService = $injector.get('RteHelperService');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
@@ -43,7 +43,7 @@ describe('Rte Helper Service', function() {
     $rootScope = $injector.get('$rootScope');
   }));
 
-  it('should get rich text components', function() {
+  it('should get rich text components', function () {
     expect(RteHelperService.getRichTextComponents()).toEqual([{
       backendId: 'Collapsible',
       customizationArgSpecs: [{
@@ -271,19 +271,19 @@ describe('Rte Helper Service', function() {
     }]);
   });
 
-  it('should evalute when rich text component is inline', function() {
+  it('should evalute when rich text component is inline', function () {
     expect(RteHelperService.isInlineComponent('link')).toBe(true);
     expect(RteHelperService.isInlineComponent('math')).toBe(true);
     expect(RteHelperService.isInlineComponent('skillreview')).toBe(true);
   });
 
-  it('should evalute when rich text component is not inline', function() {
+  it('should evalute when rich text component is not inline', function () {
     expect(RteHelperService.isInlineComponent('video')).toBe(false);
     expect(RteHelperService.isInlineComponent('tabs')).toBe(false);
     expect(RteHelperService.isInlineComponent('image')).toBe(false);
   });
 
-  it('should create customization arg dict from attributes', function() {
+  it('should create customization arg dict from attributes', function () {
     var logSpy = spyOn($log, 'error').and.callThrough();
     var attrs = [{
       name: 'class'
@@ -307,37 +307,37 @@ describe('Rte Helper Service', function() {
       'RTE Error: invalid customization attribute invalid');
   });
 
-  it('should open customization modal', function() {
+  it('should open customization modal', function () {
     var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(
-      {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
+      {}, {}, submitCallBackSpy, dismissCallBackSpy, function () {});
 
     expect(uibModalSpy).toHaveBeenCalled();
   });
 
-  it('should open customization modal', function() {
+  it('should open customization modal', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(
-      {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
+      {}, {}, submitCallBackSpy, dismissCallBackSpy, function () {});
     $rootScope.$apply();
 
     expect(submitCallBackSpy).toHaveBeenCalled();
   });
 
-  it('should open customization modal', function() {
+  it('should open customization modal', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(
-      {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
+      {}, {}, submitCallBackSpy, dismissCallBackSpy, function () {});
     $rootScope.$apply();
 
     expect(dismissCallBackSpy).toHaveBeenCalled();

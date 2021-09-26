@@ -43,9 +43,9 @@ export class PositionOfTermsEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   alwaysEditable = true;
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
-  constructor() { }
+  constructor () { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.localValue = this.positionOfTerms[2] as unknown as PositionOfTerm;
     for (let i = 0; i < this.positionOfTerms.length; i++) {
       if (this.positionOfTerms[i].name === this.value) {
@@ -57,7 +57,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
       this.valueChanged.emit(this.value);
     }
   }
-  onChangePosition(name: string): void {
+  onChangePosition (name: string): void {
     this.value = name;
     this.valueChanged.emit(this.value);
     for (let i = 0; i < this.positionOfTerms.length; i++) {

@@ -24,7 +24,7 @@ import { StateEditorRefreshService } from
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 
-describe('Exploration Graph Modal Controller', function() {
+describe('Exploration Graph Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var GraphDataService = null;
@@ -41,14 +41,14 @@ describe('Exploration Graph Modal Controller', function() {
       imports: [HttpClientTestingModule]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     GraphDataService = $injector.get('GraphDataService');
     StateEditorService = $injector.get('StateEditorService');
@@ -68,13 +68,13 @@ describe('Exploration Graph Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.currentStateName).toBe(stateName);
       expect($scope.graphData).toEqual(graphData);
       expect($scope.isEditable).toBe(isEditable);
     });
 
-  it('should delete state when closing the modal', function() {
+  it('should delete state when closing the modal', function () {
     var stateName = 'State Name';
     $scope.deleteState(stateName);
 
@@ -84,7 +84,7 @@ describe('Exploration Graph Modal Controller', function() {
     });
   });
 
-  it('should select state when closing the modal', function() {
+  it('should select state when closing the modal', function () {
     var stateName = 'State Name';
     $scope.selectState(stateName);
 

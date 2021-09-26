@@ -63,7 +63,7 @@ getTestBed().initTestEnvironment(
 );
 
 jasmine.getEnv().addReporter({
-  specDone: function(result) {
+  specDone: function (result) {
     // Specs that are being excluded when using fit or fdescribe will not
     // be reported.
     if (result.status !== 'excluded') {

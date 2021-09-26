@@ -49,20 +49,20 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
     }]
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor (private changeDetectorRef: ChangeDetectorRef) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.value = [];
       this.valueChanged.emit(this.value);
     }
   }
 
-  getSchema(): unknown {
+  getSchema (): unknown {
     return this.SCHEMA;
   }
 
-  updateValue(value: unknown): void {
+  updateValue (value: unknown): void {
     if (this.value === value) {
       return;
     }

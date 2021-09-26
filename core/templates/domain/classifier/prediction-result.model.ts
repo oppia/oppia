@@ -31,15 +31,15 @@ export class PredictionResult {
    */
   predictionLabel: number;
   predictionConfidence: number;
-  constructor(label: number, confidence: number) {
+  constructor (label: number, confidence: number) {
     this.predictionLabel = label;
     this.predictionConfidence = confidence;
   }
 
-  getLabel(): number {
+  getLabel (): number {
     return this.predictionLabel;
   }
-  getConfidence(): number {
+  getConfidence (): number {
     return this.predictionConfidence;
   }
 }

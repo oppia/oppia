@@ -60,14 +60,14 @@ export class BlogAdminPageComponent implements OnInit {
   UPDATABLE_ROLES = {};
   statusMessage: string = '';
   configProperties: ConfigPropertiesBackendResponse = {};
-  constructor(
+  constructor (
     private backendApiService: BlogAdminBackendApiService,
     private blogAdminDataService: BlogAdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
     private windowRef: WindowRef,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.refreshFormData();
     this.blogAdminDataService.getDataAsync().then((DataObject) => {
       this.UPDATABLE_ROLES = DataObject.updatableRoles;
@@ -76,12 +76,12 @@ export class BlogAdminPageComponent implements OnInit {
     this.reloadConfigProperties();
   }
 
-  refreshFormData(): void {
+  refreshFormData (): void {
     this.formData = {
       updateRole: {
         newRole: null,
         username: '',
-        isValid(): boolean {
+        isValid (): boolean {
           if (this.newRole === 'BLOG_POST_EDITOR') {
             return Boolean(this.username);
           } else if (this.newRole === 'BLOG_ADMIN') {
@@ -92,7 +92,7 @@ export class BlogAdminPageComponent implements OnInit {
       },
       removeEditorRole: {
         username: '',
-        isValid(): boolean {
+        isValid (): boolean {
           if (this.username === '') {
             return false;
           }
@@ -102,7 +102,7 @@ export class BlogAdminPageComponent implements OnInit {
     };
   }
 
-  submitUpdateRoleForm(formResponse: UpdateRoleAction): void {
+  submitUpdateRoleForm (formResponse: UpdateRoleAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -124,7 +124,7 @@ export class BlogAdminPageComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  submitRemoveEditorRoleForm(
+  submitRemoveEditorRoleForm (
       formResponse: RemoveEditorRole): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
@@ -142,19 +142,19 @@ export class BlogAdminPageComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  reloadConfigProperties(): void {
+  reloadConfigProperties (): void {
     this.blogAdminDataService.getDataAsync().then((DataObject) => {
       this.configProperties = DataObject.configProperties;
     });
   }
 
-  getSchemaCallback(schema: Schema): () => Schema {
+  getSchemaCallback (schema: Schema): () => Schema {
     return () => {
       return schema;
     };
   }
 
-  revertToDefaultConfigPropertyValue(configPropertyId: string): void {
+  revertToDefaultConfigPropertyValue (configPropertyId: string): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This action is irreversible. Are you sure?')) {
       return;
@@ -169,7 +169,7 @@ export class BlogAdminPageComponent implements OnInit {
       });
   }
 
-  saveConfigProperties(): void {
+  saveConfigProperties (): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }

@@ -33,18 +33,18 @@ export class ParamSpec {
    * @constructor
    * @param {!ParamType} objType - The type of the parameter.
    */
-  constructor(objType: ParamType) {
+  constructor (objType: ParamType) {
     /** @member {ParamType} */
     this._objType = objType;
   }
 
   /** @returns {ParamType} - The type name of the parameter. */
-  getType(): ParamType {
+  getType (): ParamType {
     return this._objType;
   }
 
   /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
-  toBackendDict(): ParamSpecBackendDict {
+  toBackendDict (): ParamSpecBackendDict {
     return {
       obj_type: this._objType.getName(),
     };
@@ -55,20 +55,20 @@ export class ParamSpec {
   providedIn: 'root'
 })
 export class ParamSpecObjectFactory {
-  constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
+  constructor (private paramTypeObjectFactory: ParamTypeObjectFactory) {}
   /**
    * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
    *    backend.
    * @returns {ParamSpec} - A new ParamSpec instance.
    */
-  createFromBackendDict(
+  createFromBackendDict (
       paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
     return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
       paramSpecBackendDict.obj_type));
   }
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */
-  createDefault(): ParamSpec {
+  createDefault (): ParamSpec {
     return new ParamSpec(this.paramTypeObjectFactory.getDefaultType());
   }
 }

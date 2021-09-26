@@ -55,7 +55,7 @@ require('components/forms/validators/is-url-fragment.filter.ts');
 require('components/forms/validators/is-regex-matched.filter.ts');
 
 angular.module('oppia').directive('schemaBasedEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -72,9 +72,9 @@ angular.module('oppia').directive('schemaBasedEditor', [
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', function($rootScope) {
+        '$rootScope', function ($rootScope) {
           let ctrl = this;
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             /**
              * $rootScope.$applyAsync() is called here to fix the change
              * detection issue with moderator page. Please refer #12602.
@@ -111,7 +111,7 @@ export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() headersEnabled;
   @Input() notRequired: () => boolean;
 
-  constructor(
+  constructor (
       elementRef: ElementRef,
       injector: Injector) {
     super('schemaBasedEditor', elementRef, injector);

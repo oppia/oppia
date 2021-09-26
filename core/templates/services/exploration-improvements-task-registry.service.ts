@@ -81,7 +81,7 @@ export class SupportingStateStats {
   public readonly eqPlaythroughIssues: readonly EqPlaythroughIssue[];
   public readonly misPlaythroughIssues: readonly MisPlaythroughIssue[];
 
-  constructor(
+  constructor (
       stateStats: StateStats,
       answerStats: readonly AnswerStats[] = [],
       cstPlaythroughIssues: readonly CstPlaythroughIssue[] = [],
@@ -112,7 +112,7 @@ export class StateTasks implements Iterable<ExplorationTask> {
 
   public readonly supportingStats: SupportingStateStats;
 
-  constructor(
+  constructor (
       stateName: string,
       tasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask>,
       supportingStats: SupportingStateStats) {
@@ -128,7 +128,7 @@ export class StateTasks implements Iterable<ExplorationTask> {
     this.supportingStats = supportingStats;
   }
 
-  public refresh(
+  public refresh (
       expStats: ExplorationStats, config: ExplorationImprovementsConfig): void {
     this.hbrTask.refreshStatus(
       expStats, this.supportingStats.eqPlaythroughIssues.length, config);
@@ -140,14 +140,14 @@ export class StateTasks implements Iterable<ExplorationTask> {
       this.supportingStats.misPlaythroughIssues.length);
   }
 
-  *[Symbol.iterator](): Iterator<ExplorationTask> {
+  *[Symbol.iterator] (): Iterator<ExplorationTask> {
     yield this.hbrTask;
     yield this.iflTask;
     yield this.ngrTask;
     yield this.siaTask;
   }
 
-  map<U>(fn: <T extends ExplorationTask>(_: T) => U): U[] {
+  map<U> (fn: <T extends ExplorationTask>(_: T) => U): U[] {
     return [
       fn(this.hbrTask),
       fn(this.iflTask),
@@ -170,7 +170,7 @@ export class ExplorationImprovementsTaskRegistryService {
   private tasksByState: Map<string, StateTasks>;
   private openTasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
 
-  initialize(
+  initialize (
       config: ExplorationImprovementsConfig,
       states: States,
       expStats: ExplorationStats,
@@ -216,11 +216,11 @@ export class ExplorationImprovementsTaskRegistryService {
     }
   }
 
-  getExplorationStats(): ExplorationStats {
+  getExplorationStats (): ExplorationStats {
     return this.expStats;
   }
 
-  onStateAdded(newStateName: string): void {
+  onStateAdded (newStateName: string): void {
     this.expStats = this.expStats.createNewWithStateAdded(newStateName);
     const newStateTasks = new StateTasks(
       newStateName,
@@ -234,7 +234,7 @@ export class ExplorationImprovementsTaskRegistryService {
     this.tasksByState.set(newStateName, newStateTasks);
   }
 
-  onStateDeleted(oldStateName: string): void {
+  onStateDeleted (oldStateName: string): void {
     this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
 
@@ -248,7 +248,7 @@ export class ExplorationImprovementsTaskRegistryService {
     this.tasksByState.delete(oldStateName);
   }
 
-  onStateRenamed(oldStateName: string, newStateName: string): void {
+  onStateRenamed (oldStateName: string, newStateName: string): void {
     this.expStats = this.expStats.createNewWithStateRenamed(
       oldStateName, newStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
@@ -284,42 +284,42 @@ export class ExplorationImprovementsTaskRegistryService {
     this.tasksByState.delete(oldStateName);
   }
 
-  onStateInteractionSaved(state: State): void {
+  onStateInteractionSaved (state: State): void {
     this.refreshStateTasks(state.name);
   }
 
-  getOpenHighBounceRateTasks(): HbrTask[] {
+  getOpenHighBounceRateTasks (): HbrTask[] {
     return <HbrTask[]> this.openTasksByType.get(
       ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
   }
 
-  getOpenIneffectiveFeedbackLoopTasks(): IflTask[] {
+  getOpenIneffectiveFeedbackLoopTasks (): IflTask[] {
     return <IflTask[]> this.openTasksByType.get(
       ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
   }
 
-  getOpenNeedsGuidingResponsesTasks(): NgrTask[] {
+  getOpenNeedsGuidingResponsesTasks (): NgrTask[] {
     return <NgrTask[]> this.openTasksByType.get(
       ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
   }
 
-  getOpenSuccessiveIncorrectAnswersTasks(): SiaTask[] {
+  getOpenSuccessiveIncorrectAnswersTasks (): SiaTask[] {
     return <SiaTask[]> this.openTasksByType.get(
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
   }
 
-  getStateTasks(stateName: string): StateTasks {
+  getStateTasks (stateName: string): StateTasks {
     if (!this.tasksByState.has(stateName)) {
       throw new Error('Unknown state with name: ' + stateName);
     }
     return this.tasksByState.get(stateName);
   }
 
-  getAllStateTasks(): StateTasks[] {
+  getAllStateTasks (): StateTasks[] {
     return Array.from(this.tasksByState.values());
   }
 
-  private validateInitializationArgs(
+  private validateInitializationArgs (
       config: ExplorationImprovementsConfig,
       states: States,
       expStats: ExplorationStats,
@@ -401,7 +401,7 @@ export class ExplorationImprovementsTaskRegistryService {
     }
   }
 
-  private registerNewStateTasks(
+  private registerNewStateTasks (
       stateName: string,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypes: readonly ExplorationTaskType[],
@@ -447,7 +447,7 @@ export class ExplorationImprovementsTaskRegistryService {
     return newStateTasks;
   }
 
-  private refreshStateTasks(stateName: string): void {
+  private refreshStateTasks (stateName: string): void {
     const stateTasks = this.tasksByState.get(stateName);
     const tasksWithOldStatus: [ExplorationTask, string][] = (
       stateTasks.map(task => [task, task.getStatus()]));
@@ -466,12 +466,12 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   /** Pre-condition: task is missing from the openTasksByType data structure. */
-  private pushOpenTask(task: ExplorationTask): void {
+  private pushOpenTask (task: ExplorationTask): void {
     this.openTasksByType.get(task.taskType).push(task);
   }
 
   /** Pre-condition: task is present in the openTasksByType data structure. */
-  private popOpenTask(task: ExplorationTask): void {
+  private popOpenTask (task: ExplorationTask): void {
     const arrayWithTask = this.openTasksByType.get(task.taskType);
     arrayWithTask.splice(arrayWithTask.indexOf(task), 1);
   }

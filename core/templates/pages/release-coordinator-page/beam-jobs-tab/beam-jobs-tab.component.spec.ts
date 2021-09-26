@@ -70,7 +70,7 @@ describe('Beam Jobs Tab Component', () => {
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
   const terminalBeamJobRuns = [doneBarJob];
 
-  beforeEach(waitForAsync(async() => {
+  beforeEach(waitForAsync(async () => {
     TestBed.configureTestingModule({
       imports: [
         ClipboardModule,
@@ -172,7 +172,7 @@ describe('Beam Jobs Tab Component', () => {
     component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
-  it('should update the table when the job name input changes', async() => {
+  it('should update the table when the job name input changes', async () => {
     const input = await loader.getHarness(MatInputHarness);
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const table = await loader.getHarness(MatTableHarness);
@@ -198,7 +198,7 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should deselect a job after changing the input', async() => {
+  it('should deselect a job after changing the input', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -218,7 +218,7 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should add a new job after starting a new job run', async() => {
+  it('should add a new job after starting a new job run', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -253,7 +253,7 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should cancel the job and update its status', async() => {
+  it('should cancel the job and update its status', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -290,7 +290,7 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should show the job output', async() => {
+  it('should show the job output', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 

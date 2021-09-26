@@ -64,7 +64,7 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
-    function(
+    function (
         $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
@@ -86,30 +86,30 @@ angular.module('oppia').component('creatorDashboardPage', {
 
       var userDashboardDisplayPreference =
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
-      ctrl.setActiveTab = function(newActiveTabName) {
+      ctrl.setActiveTab = function (newActiveTabName) {
         ctrl.activeTab = newActiveTabName;
       };
 
-      ctrl.getExplorationUrl = function(explorationId) {
+      ctrl.getExplorationUrl = function (explorationId) {
         return '/create/' + explorationId;
       };
 
-      ctrl.getCollectionUrl = function(collectionId) {
+      ctrl.getCollectionUrl = function (collectionId) {
         return '/collection_editor/create/' + collectionId;
       };
 
-      ctrl.setMyExplorationsView = function(newViewType) {
+      ctrl.setMyExplorationsView = function (newViewType) {
         ctrl.myExplorationsView = newViewType;
         CreatorDashboardBackendApiService.postExplorationViewAsync(
-          newViewType).then(function() {});
+          newViewType).then(function () {});
         userDashboardDisplayPreference = newViewType;
       };
 
-      ctrl.checkMobileView = function() {
+      ctrl.checkMobileView = function () {
         return ($window.innerWidth < 500);
       };
 
-      ctrl.showUsernamePopover = function(subscriberUsername) {
+      ctrl.showUsernamePopover = function (subscriberUsername) {
         // The popover on the subscription card is only shown if the length
         // of the subscriber username is greater than 10 and the user hovers
         // over the truncated username.
@@ -120,7 +120,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         }
       };
 
-      ctrl.updatesGivenScreenWidth = function() {
+      ctrl.updatesGivenScreenWidth = function () {
         if (ctrl.checkMobileView()) {
           // For mobile users, the view of the creators
           // exploration list is shown only in
@@ -136,7 +136,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           ctrl.publishText = EXP_PUBLISH_TEXTS.defaultText;
         }
       };
-      ctrl.setExplorationsSortingOptions = function(sortType) {
+      ctrl.setExplorationsSortingOptions = function (sortType) {
         if (sortType === ctrl.currentSortType) {
           ctrl.isCurrentSortDescending = !ctrl.isCurrentSortDescending;
         } else {
@@ -144,7 +144,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         }
       };
 
-      ctrl.setSubscriptionSortingOptions = function(sortType) {
+      ctrl.setSubscriptionSortingOptions = function (sortType) {
         if (sortType === ctrl.currentSubscribersSortType) {
           ctrl.isCurrentSubscriptionSortDescending = (
             !ctrl.isCurrentSubscriptionSortDescending);
@@ -153,7 +153,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         }
       };
 
-      ctrl.sortSubscriptionFunction = function(entity) {
+      ctrl.sortSubscriptionFunction = function (entity) {
         // This function is passed as a custom comparator function to
         // `orderBy`, so that special cases can be handled while sorting
         // subscriptions.
@@ -165,9 +165,9 @@ angular.module('oppia').component('creatorDashboardPage', {
         return value;
       };
 
-      var _fetchMessages = function(threadId) {
+      var _fetchMessages = function (threadId) {
         ThreadDataBackendApiService.fetchMessagesAsync(
-          threadId).then(function(response) {
+          threadId).then(function (response) {
           var allThreads = ctrl.mySuggestionsList.concat(
             ctrl.suggestionsToReviewList);
           for (var i = 0; i < allThreads.length; i++) {
@@ -180,11 +180,11 @@ angular.module('oppia').component('creatorDashboardPage', {
         });
       };
 
-      ctrl.clearActiveThread = function() {
+      ctrl.clearActiveThread = function () {
         ctrl.activeThread = null;
       };
 
-      ctrl.setActiveThread = function(threadId) {
+      ctrl.setActiveThread = function (threadId) {
         _fetchMessages(threadId);
         for (var i = 0; i < ctrl.mySuggestionsList.length; i++) {
           if (ctrl.mySuggestionsList[i].threadId === threadId) {
@@ -204,7 +204,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         }
       };
 
-      ctrl.showSuggestionModal = function() {
+      ctrl.showSuggestionModal = function () {
         SuggestionModalForCreatorDashboardService.showSuggestionModal(
           ctrl.activeThread.suggestion.suggestionType,
           {
@@ -216,7 +216,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         );
       };
 
-      ctrl.sortByFunction = function(entity) {
+      ctrl.sortByFunction = function (entity) {
         // This function is passed as a custom comparator function to
         // `orderBy`, so that special cases can be handled while sorting
         // explorations.
@@ -236,10 +236,10 @@ angular.module('oppia').component('creatorDashboardPage', {
         return value;
       };
 
-      ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
+      ctrl.getCompleteThumbnailIconUrl = function (iconUrl) {
         return UrlInterpolationService.getStaticImageUrl(iconUrl);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
         ctrl.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
         ctrl.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
@@ -254,7 +254,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         ctrl.canCreateCollections = null;
         LoaderService.showLoadingScreen('Loading');
         var userInfoPromise = UserService.getUserInfoAsync();
-        userInfoPromise.then(function(userInfo) {
+        userInfoPromise.then(function (userInfo) {
           ctrl.canCreateCollections = userInfo.canCreateCollections();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
@@ -264,7 +264,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         var dashboardDataPromise = (
           CreatorDashboardBackendApiService.fetchDashboardDataAsync());
         dashboardDataPromise.then(
-          function(response) {
+          function (response) {
             // The following condition is required for Karma testing. The
             // Angular HttpClient returns an Observable which when converted
             // to a promise does not have the 'data' key but the AngularJS
@@ -308,14 +308,14 @@ angular.module('oppia').component('creatorDashboardPage', {
               ctrl.activeTab = 'myExplorations';
             }
           },
-          function(errorResponse) {
+          function (errorResponse) {
             if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
               AlertsService.addWarning('Failed to get dashboard data');
             }
           }
         );
 
-        $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
+        $q.all([userInfoPromise, dashboardDataPromise]).then(function () {
           LoaderService.hideLoadingScreen();
         });
 
@@ -330,12 +330,12 @@ angular.module('oppia').component('creatorDashboardPage', {
           .getStaticImageUrl('/general/empty_dashboard.svg');
         ctrl.canReviewActiveThread = null;
         ctrl.updatesGivenScreenWidth();
-        angular.element($window).on('resize', function() {
+        angular.element($window).on('resize', function () {
           ctrl.updatesGivenScreenWidth();
         });
       };
 
-      ctrl.createNewExploration = function() {
+      ctrl.createNewExploration = function () {
         ExplorationCreationService.createNewExploration();
         // TODO(#8521): Remove the use of $rootScope.$apply()
         // once the directive is migrated to angular.

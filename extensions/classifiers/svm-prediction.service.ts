@@ -35,8 +35,8 @@ import { PredictionResult } from 'domain/classifier/prediction-result.model';
   providedIn: 'root'
 })
 export class SVMPredictionService {
-  constructor() {}
-  kernel(
+  constructor () {}
+  kernel (
       kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {
     let kernel = kernelParams.kernel;
@@ -68,7 +68,7 @@ export class SVMPredictionService {
   // https://www.csie.ntu.edu.tw/~cjlin/papers/svmprob/svmprob.pdf
   // Also take a look at implementation by LibSVM:
   // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L1829
-  calculateMulticlassProbabilities(
+  calculateMulticlassProbabilities (
       nClasses: number, pairwiseProb: number[][]): number[] {
     let Q: number[][] = [];
     for (let i = 0; i < nClasses; i++) {
@@ -145,7 +145,7 @@ export class SVMPredictionService {
     return P;
   }
 
-  predict(
+  predict (
       classifierData: SVM, input: number[]): PredictionResult {
     let nSupport = classifierData.n_support;
     let supportVectors = classifierData.support_vectors;

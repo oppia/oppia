@@ -40,14 +40,14 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   @ViewChild('croppableImage') croppableImageRef: ElementRef;
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
-  constructor(
+  constructor (
     private changeDetectorRef: ChangeDetectorRef,
     private imageLocalStorageService: ImageLocalStorageService,
     private svgSanitizerService: SvgSanitizerService,
     private windowDimensionService: WindowDimensionsService,
   ) { }
 
-  initializeCropper(): void {
+  initializeCropper (): void {
     let thumbnail = this.croppableImageRef.nativeElement;
     if (!this.windowIsNarrow) {
       this.cropper = new Cropper(thumbnail, {
@@ -64,7 +64,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     }
   }
 
-  onFileChanged(file: File): void {
+  onFileChanged (file: File): void {
     let originalFilename = file.name;
     // The cropper always returns a png file, thus the extension should be
     // changed to png for the final image type to match the extension.
@@ -85,17 +85,17 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  reset(): void {
+  reset (): void {
     this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
   }
 
-  onInvalidImageLoaded(): void {
+  onInvalidImageLoaded (): void {
     this.reset();
     this.invalidImageWarningIsShown = true;
   }
 
-  save(): void {
+  save (): void {
     this.cropppedImageDataUrl = (
       this.cropper.getCroppedCanvas({
         height: 200,
@@ -108,12 +108,12 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.uploadedImage = null;
   }
 
-  cancel(): void {
+  cancel (): void {
     this.uploadedImage = false;
     this.cancelThumbnailUpload.emit();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 
     this.windowDimensionService.getResizeEvent().subscribe(() => {

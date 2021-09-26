@@ -38,19 +38,19 @@ export class StateClassifierMappingService {
   _explorationVersion!: number;
   stateClassifierMapping!: StateClassifierMapping;
 
-  constructor(
+  constructor (
     private appService: AppService,
     private classifierDataService: ClassifierDataBackendApiService,
     private loggerService: LoggerService) {}
 
-  init(explorationId: string, explorationVersion: number): void {
+  init (explorationId: string, explorationVersion: number): void {
     this.loggerService.info('Initializing state classifier mapping service');
     this._explorationId = explorationId;
     this._explorationVersion = explorationVersion;
     this.stateClassifierMapping = {};
   }
 
-  async initializeClassifierDataForState(stateName: string): Promise<void> {
+  async initializeClassifierDataForState (stateName: string): Promise<void> {
     if (this.appService.isMachineLearningClassificationEnabled()) {
       this.stateClassifierMapping[stateName] = null;
       this.loggerService.info('Fetching classifier data for ' + stateName);
@@ -67,7 +67,7 @@ export class StateClassifierMappingService {
     }
   }
 
-  hasClassifierData(stateName: string): boolean {
+  hasClassifierData (stateName: string): boolean {
     if (!this.appService.isMachineLearningClassificationEnabled()) {
       return false;
     }
@@ -77,7 +77,7 @@ export class StateClassifierMappingService {
   }
 
   // Function returns null if Machine Learning Classification is not enabled.
-  getClassifier(stateName: string): Classifier | null {
+  getClassifier (stateName: string): Classifier | null {
     if (this.stateClassifierMapping[stateName] &&
         this.appService.isMachineLearningClassificationEnabled() &&
         this.hasClassifierData(stateName)) {
@@ -87,7 +87,7 @@ export class StateClassifierMappingService {
   }
 
   // NOTE TO DEVELOPERS: This method should only be used for tests.
-  testOnlySetClassifierData(
+  testOnlySetClassifierData (
       stateName: string, classifierData: Classifier): void {
     this.stateClassifierMapping[stateName] = classifierData;
   }

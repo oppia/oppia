@@ -25,7 +25,7 @@ describe('ShortResponseInteractiveMapComponent', () => {
   let fixture: ComponentFixture<ShortResponseInteractiveMapComponent>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
+    escapedJsonToObj (answer: string): string {
       return JSON.parse(answer);
     }
   }

@@ -24,10 +24,10 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('Profile menu flow', function() {
+describe('Profile menu flow', function () {
   var learnerDashboardPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'desktopAndMobileVisitor';
     await users.createUser(
@@ -35,7 +35,7 @@ describe('Profile menu flow', function() {
   });
 
   it('should visit the topics and skills dashboard from the profile ' +
-    'dropdown menu when user is admin', async function() {
+    'dropdown menu when user is admin', async function () {
     await users.createAndLoginCurriculumAdminUser(
       'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
     await learnerDashboardPage.get();
@@ -45,21 +45,21 @@ describe('Profile menu flow', function() {
       'http://localhost:9001/topics-and-skills-dashboard');
   });
 
-  describe('profile dropdown menu', function() {
-    beforeEach(async function() {
+  describe('profile dropdown menu', function () {
+    beforeEach(async function () {
       await users.login('desktopAndMobileVisitor@profileMenuFlow.com');
       await learnerDashboardPage.get();
       await general.openProfileDropdown();
     });
 
     it('should land on the learner dashboard after successful login',
-      async function() {
+      async function () {
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/learner-dashboard');
       });
 
     it('should visit the profile page from the profile dropdown menu',
-      async function() {
+      async function () {
         var profileLink = element(by.css(
           '.protractor-test-profile-link'));
         await action.click('Profile Link', profileLink);
@@ -69,7 +69,7 @@ describe('Profile menu flow', function() {
       });
 
     it('should visit the creator dashboard from the profile dropdown menu',
-      async function() {
+      async function () {
         var creatorDashboardLink = element(by.css(
           '.protractor-test-creator-dashboard-link'));
         await action.click('Creator Dashboard Link', creatorDashboardLink);
@@ -79,7 +79,7 @@ describe('Profile menu flow', function() {
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
-      async function() {
+      async function () {
         var learnerDashboardLink = element(by.css(
           '.protractor-test-learner-dashboard-link'));
         await action.click('Learner Dashboard Link', learnerDashboardLink);
@@ -89,14 +89,14 @@ describe('Profile menu flow', function() {
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
-      'dropdown menu when user is not admin', async function() {
+      'dropdown menu when user is not admin', async function () {
       var links = element.all(by.css(
         '.protractor-test-topics-and-skills-dashboard-link'));
       expect(await links.count()).toEqual(0);
     });
 
     it('should visit the preferences page from the profile dropdown menu',
-      async function() {
+      async function () {
         var preferencesLink = element(by.css(
           '.protractor-test-preferences-link'));
         await action.click('Preferences Link', preferencesLink);
@@ -106,7 +106,7 @@ describe('Profile menu flow', function() {
       });
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });

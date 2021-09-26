@@ -31,7 +31,7 @@ export class EventBusService {
   // Subjects are used for the event passing mechanism.
   private _subject$ = new Subject<BaseEvent>();
 
-  private _errorHandler(error: Error): void {
+  private _errorHandler (error: Error): void {
     error.message = 'Error in event bus\n' + error.message;
     throw error;
   }
@@ -45,7 +45,7 @@ export class EventBusService {
   *
   * @returns A subscription to the event asked for.
   */
-  on<T extends BaseEvent>(
+  on<T extends BaseEvent> (
       eventType: Newable<T>,
       action: (event: T) => void,
       callbackContext = null): Subscription {
@@ -73,7 +73,7 @@ export class EventBusService {
   * A function to trigger a particular event.
   * @param event OppiaEvent that we want to trigger.
   */
-  emit<T extends BaseEvent>(event: T): void {
+  emit<T extends BaseEvent> (event: T): void {
     this._subject$.next(event);
   }
 }
@@ -90,18 +90,18 @@ export class EventBusGroup {
   private eventBus: EventBusService;
   private subscriptions: Subscription;
 
-  constructor(eventBus: EventBusService) {
+  constructor (eventBus: EventBusService) {
     this.eventBus = eventBus;
     this.subscriptions = new Subscription();
   }
 
-  public emit(event: BaseEvent): EventBusGroup {
+  public emit (event: BaseEvent): EventBusGroup {
     this.eventBus.emit(event);
     return (this);
   }
 
 
-  public on<T extends BaseEvent>(
+  public on<T extends BaseEvent> (
       eventType: Newable<T>,
       action: (event: T) => void,
       callbackContext = null): void {
@@ -110,7 +110,7 @@ export class EventBusGroup {
     );
   }
 
-  public unsubscribe(): void {
+  public unsubscribe (): void {
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
   }

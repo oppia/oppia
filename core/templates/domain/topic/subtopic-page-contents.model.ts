@@ -37,43 +37,43 @@ export interface SubtopicPageContentsBackendDict {
 export class SubtopicPageContents {
   _subtitledHtml: SubtitledHtml;
   _recordedVoiceovers: RecordedVoiceovers;
-  constructor(
+  constructor (
       subtitledHtml: SubtitledHtml, recordedVoiceovers: RecordedVoiceovers) {
     this._subtitledHtml = subtitledHtml;
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  getSubtitledHtml(): SubtitledHtml {
+  getSubtitledHtml (): SubtitledHtml {
     return this._subtitledHtml;
   }
 
-  setSubtitledHtml(newSubtitledHtml: SubtitledHtml): void {
+  setSubtitledHtml (newSubtitledHtml: SubtitledHtml): void {
     this._subtitledHtml = cloneDeep(newSubtitledHtml);
   }
 
-  getHtml(): string {
+  getHtml (): string {
     return this._subtitledHtml.html;
   }
 
-  setHtml(html: string): void {
+  setHtml (html: string): void {
     this._subtitledHtml.html = html;
   }
 
-  getRecordedVoiceovers(): RecordedVoiceovers {
+  getRecordedVoiceovers (): RecordedVoiceovers {
     return this._recordedVoiceovers;
   }
 
-  setRecordedVoiceovers(newRecordedVoiceovers: RecordedVoiceovers): void {
+  setRecordedVoiceovers (newRecordedVoiceovers: RecordedVoiceovers): void {
     this._recordedVoiceovers = cloneDeep(newRecordedVoiceovers);
   }
 
-  toBackendDict(): SubtopicPageContentsBackendDict {
+  toBackendDict (): SubtopicPageContentsBackendDict {
     return {
       subtitled_html: this._subtitledHtml.toBackendDict(),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
     };
   }
-  static createDefault(): SubtopicPageContents {
+  static createDefault (): SubtopicPageContents {
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     recordedVoiceovers.addContentId('content');
     return new SubtopicPageContents(
@@ -81,7 +81,7 @@ export class SubtopicPageContents {
       recordedVoiceovers);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: SubtopicPageContentsBackendDict): SubtopicPageContents {
     return new SubtopicPageContents(
       SubtitledHtml.createFromBackendDict(

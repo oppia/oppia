@@ -23,39 +23,39 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Undo/Redo Service', function() {
+describe('Undo/Redo Service', function () {
   var UndoRedoService = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     UndoRedoService = $injector.get('UndoRedoService');
   }));
 
-  var _createBackendChangeObject = function(value) {
+  var _createBackendChangeObject = function (value) {
     return {
       roperty_name: value
     };
   };
 
-  var _createChangeDomainObject = function(
-      backendObj, applyFunc = function() {}, reverseFunc = function() {}) {
+  var _createChangeDomainObject = function (
+      backendObj, applyFunc = function () {}, reverseFunc = function () {}) {
     return new Change(backendObj, applyFunc, reverseFunc);
   };
 
-  var _createNoOpChangeDomainObject = function(value) {
+  var _createNoOpChangeDomainObject = function (value) {
     var backendObject = _createBackendChangeObject(value);
     return _createChangeDomainObject(backendObject);
   };
 
-  it('should apply a single change', function() {
+  it('should apply a single change', function () {
     var applyFunc = jasmine.createSpy('applyChange');
 
     expect(UndoRedoService.hasChanges()).toBeFalsy();
@@ -65,7 +65,7 @@ describe('Undo/Redo Service', function() {
     };
     var backendChangeObject = _createBackendChangeObject('value');
     var changeDomainObject = _createChangeDomainObject(
-      backendChangeObject, applyFunc, function() {});
+      backendChangeObject, applyFunc, function () {});
     UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
 
     expect(UndoRedoService.hasChanges()).toBeTruthy();
@@ -73,7 +73,7 @@ describe('Undo/Redo Service', function() {
       backendChangeObject, fakeDomainObject);
   });
 
-  it('should be able to undo an applied change', function() {
+  it('should be able to undo an applied change', function () {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -98,7 +98,7 @@ describe('Undo/Redo Service', function() {
       backendChangeObject, fakeDomainObject);
   });
 
-  it('should be able to redo an undone change', function() {
+  it('should be able to redo an undone change', function () {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -127,7 +127,7 @@ describe('Undo/Redo Service', function() {
     expect(applyFunc.calls.count()).toEqual(2);
   });
 
-  it('should not undo anything if no changes are applied', function() {
+  it('should not undo anything if no changes are applied', function () {
     var fakeDomainObject = {
       domain_property_name: 'fake value'
     };
@@ -136,7 +136,7 @@ describe('Undo/Redo Service', function() {
     expect(UndoRedoService.undoChange(fakeDomainObject)).toBeFalsy();
   });
 
-  it('should not redo anything if no changes are undone', function() {
+  it('should not redo anything if no changes are undone', function () {
     var fakeDomainObject = {
       domain_property_name: 'fake value'
     };
@@ -149,7 +149,7 @@ describe('Undo/Redo Service', function() {
     expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
   });
 
-  it('should only clear the list on clear and not undo changes', function() {
+  it('should only clear the list on clear and not undo changes', function () {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -173,7 +173,7 @@ describe('Undo/Redo Service', function() {
     expect(applyFunc.calls.count()).toEqual(1);
   });
 
-  it('should undo changes in the reverse order of applying', function() {
+  it('should undo changes in the reverse order of applying', function () {
     var appliedChanges = [];
     var reversedChanges = [];
 
@@ -182,25 +182,25 @@ describe('Undo/Redo Service', function() {
     };
     var backendChangeObject1 = _createBackendChangeObject('value1');
     var changeDomainObject1 = _createChangeDomainObject(
-      backendChangeObject1, function() {
+      backendChangeObject1, function () {
         appliedChanges.push('change1');
-      }, function() {
+      }, function () {
         reversedChanges.push('change1');
       });
 
     var backendChangeObject2 = _createBackendChangeObject('value2');
     var changeDomainObject2 = _createChangeDomainObject(
-      backendChangeObject2, function() {
+      backendChangeObject2, function () {
         appliedChanges.push('change2');
-      }, function() {
+      }, function () {
         reversedChanges.push('change2');
       });
 
     var backendChangeObject3 = _createBackendChangeObject('value3');
     var changeDomainObject3 = _createChangeDomainObject(
-      backendChangeObject3, function() {
+      backendChangeObject3, function () {
         appliedChanges.push('change3');
-      }, function() {
+      }, function () {
         reversedChanges.push('change3');
       });
 
@@ -225,7 +225,7 @@ describe('Undo/Redo Service', function() {
   });
 
   it('should not be able to redo after applying a new change after undo',
-    function() {
+    function () {
       expect(UndoRedoService.getChangeCount()).toEqual(0);
 
       var fakeDomainObject = {
@@ -246,12 +246,12 @@ describe('Undo/Redo Service', function() {
     }
   );
 
-  it('should have an empty change list with no changes', function() {
+  it('should have an empty change list with no changes', function () {
     expect(UndoRedoService.hasChanges()).toBeFalsy();
     expect(UndoRedoService.getChangeList()).toEqual([]);
   });
 
-  it('should build a change list from only applied changes', function() {
+  it('should build a change list from only applied changes', function () {
     expect(UndoRedoService.getChangeCount()).toEqual(0);
 
     var fakeDomainObject = {
@@ -273,7 +273,7 @@ describe('Undo/Redo Service', function() {
   });
 
   it('should return a change list whose mutations do not change the service',
-    function() {
+    function () {
       var fakeDomainObject = {
         domain_property_name: 'fake value'
       };
@@ -297,7 +297,7 @@ describe('Undo/Redo Service', function() {
     }
   );
 
-  it('should build a committable change list with one change', function() {
+  it('should build a committable change list with one change', function () {
     var fakeDomainObject = {
       domain_property_name: 'fake value'
     };
@@ -313,7 +313,7 @@ describe('Undo/Redo Service', function() {
   });
 
   it('should build a committable change list in the order of applied changes',
-    function() {
+    function () {
       // Perform a series of complex operations to build the committable change
       // list. Apply 3 changes, undo two, redo one, and apply one.
       var fakeDomainObject = {

@@ -33,27 +33,27 @@ class MockWindowRef {
   _window = {
     location: {
       _href: '',
-      get href() {
+      get href () {
         return this._href;
       },
-      set href(val) {
+      set href (val) {
         this._href = val;
       },
       replace: (val: string) => {}
     },
     gtag: () => {}
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
 class MockUrlService {
-  getPathname(): string {
+  getPathname (): string {
     return '/creator-dashboard';
   }
 
-  getUrlParams(): UrlParamsType {
+  getUrlParams (): UrlParamsType {
     return {
       mode: 'create'
     };

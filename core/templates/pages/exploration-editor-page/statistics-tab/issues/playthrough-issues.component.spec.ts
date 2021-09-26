@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Playthrough Issues Component', function() {
+describe('Playthrough Issues Component', function () {
   var $q = null;
   var $scope = null;
   var PlaythroughIssuesService = null;
@@ -63,7 +63,7 @@ describe('Playthrough Issues Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
@@ -80,25 +80,25 @@ describe('Playthrough Issues Component', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.issues).toEqual(issues);
     });
 
   it('should check if issue is on init display based on its index on array',
-    function() {
+    function () {
       expect($scope.isIssueOnInitDisplay(issues[0])).toBe(true);
       expect($scope.isIssueOnInitDisplay(issues[1])).toBe(false);
       expect($scope.isIssueOnInitDisplay(issues[2])).toBe(false);
     });
 
-  it('should create issue nav id based on an issue', function() {
+  it('should create issue nav id based on an issue', function () {
     expect($scope.createIssueNavId(issues[0])).toBe(1);
     expect($scope.createIssueNavId(issues[1])).toBe(2);
     expect($scope.createIssueNavId(issues[2])).toBe(3);
   });
 
   it('should change css styles in issue html elements when changing to' +
-    ' next issue index', function() {
+    ' next issue index', function () {
     expect($scope.currentIssueIndex).toBe(-1);
     expect($scope.isIssueDisplayed()).toBe(false);
 

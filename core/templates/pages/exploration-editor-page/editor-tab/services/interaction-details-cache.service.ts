@@ -38,19 +38,19 @@ interface InteractionDetailsCache {
 export class InteractionDetailsCacheService {
   static _cache: InteractionDetailsCache = {};
 
-  reset(): void {
+  reset (): void {
     InteractionDetailsCacheService._cache = {};
   }
 
-  contains(interactionId: string): boolean {
+  contains (interactionId: string): boolean {
     return InteractionDetailsCacheService._cache.hasOwnProperty(interactionId);
   }
 
-  removeDetails(interactionId: string): void {
+  removeDetails (interactionId: string): void {
     delete InteractionDetailsCacheService._cache[interactionId];
   }
 
-  set(
+  set (
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs): void {
     InteractionDetailsCacheService._cache[interactionId] = {
@@ -58,7 +58,7 @@ export class InteractionDetailsCacheService {
     };
   }
 
-  get(interactionId: string): InteractionCustomizationArgs | null {
+  get (interactionId: string): InteractionCustomizationArgs | null {
     if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
       return null;
     }

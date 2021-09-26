@@ -28,7 +28,7 @@ require('pages/exploration-editor-page/services/graph-data.service.ts');
 angular.module('oppia').controller('ExplorationGraphModalController', [
   '$controller', '$scope', '$uibModalInstance', 'GraphDataService',
   'StateEditorService', 'isEditable',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, GraphDataService,
       StateEditorService, isEditable) {
     $controller('ConfirmOrCancelModalController', {
@@ -40,14 +40,14 @@ angular.module('oppia').controller('ExplorationGraphModalController', [
     $scope.graphData = GraphDataService.getGraphData();
     $scope.isEditable = isEditable;
 
-    $scope.deleteState = function(stateName) {
+    $scope.deleteState = function (stateName) {
       $uibModalInstance.close({
         action: 'delete',
         stateName: stateName
       });
     };
 
-    $scope.selectState = function(stateName) {
+    $scope.selectState = function (stateName) {
       $uibModalInstance.close({
         action: 'navigate',
         stateName: stateName

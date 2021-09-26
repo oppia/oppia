@@ -24,16 +24,16 @@ import { TakeBreakModalComponent } from
   './take-break-modal.component';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 
-  close(): void {
+  close (): void {
     return;
   }
 }
 
-describe('TakeBreakModalComponent', function() {
+describe('TakeBreakModalComponent', function () {
   let component: TakeBreakModalComponent;
   let fixture: ComponentFixture<TakeBreakModalComponent>;
   let ngbActiveModal: NgbActiveModal;

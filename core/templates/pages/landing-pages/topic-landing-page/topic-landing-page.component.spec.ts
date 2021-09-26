@@ -35,28 +35,28 @@ class MockWindowRef {
     location: {
       _pathname: '/math/ratios',
       _href: '',
-      get pathname(): string {
+      get pathname (): string {
         return this._pathname;
       },
-      set pathname(val: string) {
+      set pathname (val: string) {
         this._pathname = val;
       },
-      get href(): string {
+      get href (): string {
         return this._href;
       },
-      set href(val) {
+      set href (val) {
         this._href = val;
       }
     },
     gtag: () => {}
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
 class MockSiteAnalyticsService {
-  registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
+  registerOpenCollectionFromLandingPageEvent (collectionId: string): void {
     return;
   }
 }
@@ -137,7 +137,7 @@ describe('Topic Landing Page', () => {
       'Fractions | Add, Subtract, Multiply and Divide | Oppia');
   }));
 
-  it('should return correct lesson quality image src', function() {
+  it('should return correct lesson quality image src', function () {
     let imageSrc = component.getLessonQualityImageSrc('someImage.png');
     expect(imageSrc).toBe('/assets/images/landing/someImage.png');
 

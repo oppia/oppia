@@ -46,13 +46,13 @@ export class SubtopicPreviewTab {
   CONTENT: string = 'content';
   thumbnailIsShown: boolean;
 
-  constructor(
+  constructor (
     private topicEditorRoutingService: TopicEditorRoutingService,
     private topicEditorStateService: TopicEditorStateService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  private _initEditor(): void {
+  private _initEditor (): void {
     this.topic = this.topicEditorStateService.getTopic();
     this.subtopicId = (
       this.topicEditorRoutingService.getSubtopicIdFromUrl());
@@ -76,12 +76,12 @@ export class SubtopicPreviewTab {
     }
   }
 
-  navigateToSubtopic(): void {
+  navigateToSubtopic (): void {
     this.topicEditorRoutingService.navigateToSubtopicEditorWithId(
       this.subtopicId);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
         this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
@@ -104,7 +104,7 @@ export class SubtopicPreviewTab {
     this._initEditor();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

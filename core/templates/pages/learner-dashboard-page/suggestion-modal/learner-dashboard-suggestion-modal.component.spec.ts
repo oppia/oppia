@@ -26,7 +26,7 @@ import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-su
 
 // TODO(#9749): Call original AngularHtmlBindWrapperDirective
 // after migration of that directive.
-let MockAngularHtmlBindWrapperDirective = function(
+let MockAngularHtmlBindWrapperDirective = function (
     options: Component) {
   const metadata: Directive = {
     selector: options.selector,
@@ -37,11 +37,11 @@ let MockAngularHtmlBindWrapperDirective = function(
 };
 
 class MockActiveModal {
-  close(): void {
+  close (): void {
     return;
   }
 
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }

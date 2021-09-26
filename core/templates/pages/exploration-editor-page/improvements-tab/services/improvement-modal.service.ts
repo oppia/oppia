@@ -23,7 +23,7 @@ require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
   '$uibModal', 'UrlInterpolationService', 'UserExplorationPermissionsService',
-  function(
+  function (
       $uibModal, UrlInterpolationService, UserExplorationPermissionsService) {
     return {
       /**
@@ -31,7 +31,7 @@ angular.module('oppia').factory('ImprovementModalService', [
        * @param {Playthrough} playthrough.
        * @param {int} playthroughIndex.
        */
-      openPlaythroughModal: function(playthrough, playthroughIndex) {
+      openPlaythroughModal: function (playthrough, playthroughIndex) {
         $uibModal.open({
           template: require(
             'pages/exploration-editor-page/statistics-tab/templates/' +
@@ -45,7 +45,7 @@ angular.module('oppia').factory('ImprovementModalService', [
           windowClass: 'oppia-improvement-playthrough-modal'
         });
       },
-      openLearnerAnswerDetails: function(learnerAnswerDetails) {
+      openLearnerAnswerDetails: function (learnerAnswerDetails) {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/improvements-tab/templates/' +
@@ -63,7 +63,7 @@ angular.module('oppia').factory('ImprovementModalService', [
        * @returns {Promise} - State is resolved when the confirmation button is
        *    pressed, or rejected when the cancel button is pressed.
        */
-      openConfirmationModal: function(message, buttonText, buttonClass) {
+      openConfirmationModal: function (message, buttonText, buttonClass) {
         return $uibModal.open({
           template: require(
             'components/common-layout-directives/common-elements/' +

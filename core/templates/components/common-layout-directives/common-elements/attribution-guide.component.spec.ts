@@ -28,58 +28,58 @@ import { BrowserCheckerService } from 'domain/utilities/browser-checker.service'
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockAttributionService {
-  init() {
+  init () {
     return;
   }
 
-  isGenerateAttributionAllowed() {
+  isGenerateAttributionAllowed () {
     return true;
   }
 
-  isAttributionModalShown() {
+  isAttributionModalShown () {
     return true;
   }
 
-  showAttributionModal() {
+  showAttributionModal () {
     return;
   }
 
-  hideAttributionModal() {
+  hideAttributionModal () {
     return;
   }
 
-  getAuthors() {
+  getAuthors () {
     return ['Ellie', 'Abby', 'Joel', 'Dina'];
   }
 
-  getExplorationTitle() {
+  getExplorationTitle () {
     return 'Place Values';
   }
 }
 
 class MockBrowserCheckerService {
-  isMobileDevice() {
+  isMobileDevice () {
     return true;
   }
 }
 
 class MockUrlService {
-  isIframed() {
+  isIframed () {
     return true;
   }
 
-  getCurrentLocation() {
+  getCurrentLocation () {
     return { href: 'localhost:8181/explore/0' };
   }
 }
 
 class MockContextService {
-  getExplorationId() {
+  getExplorationId () {
     return 'expId';
   }
 }
 
-describe('Attribution Guide Component', function() {
+describe('Attribution Guide Component', function () {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
 

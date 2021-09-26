@@ -37,7 +37,7 @@ describe('StateEditorComponent', () => {
     ctrl.$onDestroy();
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 

@@ -71,7 +71,7 @@ export class ThreadDataBackendApiService {
   // Cached number of open threads requiring action.
   openThreadsCount: number = 0;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private contextService: ContextService,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
@@ -81,21 +81,21 @@ export class ThreadDataBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  getFeedbackStatsHandlerUrl(): string {
+  getFeedbackStatsHandlerUrl (): string {
     return this.urlInterpolationService.interpolateUrl(
       '/feedbackstatshandler/<exploration_id>', {
         exploration_id: this.contextService.getExplorationId()
       });
   }
 
-  getFeedbackThreadViewEventUrl(threadId: string): string {
+  getFeedbackThreadViewEventUrl (threadId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       '/feedbackhandler/thread_view_event/<thread_id>', {
         thread_id: threadId
       });
   }
 
-  getSuggestionActionHandlerUrl(threadId: string): string {
+  getSuggestionActionHandlerUrl (threadId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
         exploration_id: this.contextService.getExplorationId(),
@@ -103,25 +103,25 @@ export class ThreadDataBackendApiService {
       });
   }
 
-  getSuggestionListHandlerUrl(): string {
+  getSuggestionListHandlerUrl (): string {
     return '/suggestionlisthandler';
   }
 
-  getThreadHandlerUrl(threadId: string): string {
+  getThreadHandlerUrl (threadId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       '/threadhandler/<thread_id>', {
         thread_id: threadId
       });
   }
 
-  getThreadListHandlerUrl(): string {
+  getThreadListHandlerUrl (): string {
     return this.urlInterpolationService.interpolateUrl(
       '/threadlisthandler/<exploration_id>', {
         exploration_id: this.contextService.getExplorationId()
       });
   }
 
-  setFeedbackThreadFromBackendDict(
+  setFeedbackThreadFromBackendDict (
       threadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
     if (!threadBackendDict) {
       throw new Error('Missing input backend dict');
@@ -132,7 +132,7 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  setSuggestionThreadFromBackendDicts(
+  setSuggestionThreadFromBackendDicts (
       threadBackendDict: FeedbackThreadBackendDict,
       suggestionBackendDict: SuggestionBackendDict
   ): SuggestionThread {
@@ -146,11 +146,11 @@ export class ThreadDataBackendApiService {
   }
 
   // A 'null' value will be returned if threadId is invalid.
-  getThread(threadId: string): SuggestionAndFeedbackThread | null {
+  getThread (threadId: string): SuggestionAndFeedbackThread | null {
     return this.threadsById.get(threadId) || null;
   }
 
-  async getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
+  async getThreadsAsync (): Promise<SuggestionAndFeedbackThreads> {
     let suggestions = this.http.get<SuggestionData>(
       this.getSuggestionListHandlerUrl(), {
         params: {
@@ -191,10 +191,10 @@ export class ThreadDataBackendApiService {
                 dict?.thread_id)))
         };
       },
-      async() => Promise.reject('Error on retrieving feedback threads.'));
+      async () => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  async getMessagesAsync(
+  async getMessagesAsync (
       thread: SuggestionAndFeedbackThread
   ): Promise<ThreadMessage[]> {
     if (!thread) {
@@ -212,7 +212,7 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  async fetchMessagesAsync(
+  async fetchMessagesAsync (
       threadId: string
   ): Promise<ThreadMessages> {
     return this.http.get<ThreadMessages>(
@@ -220,7 +220,7 @@ export class ThreadDataBackendApiService {
     ).toPromise();
   }
 
-  async getOpenThreadsCountAsync(): Promise<number> {
+  async getOpenThreadsCountAsync (): Promise<number> {
     let threadsCount = this.http.get<NumberOfOpenThreads>(
       this.getFeedbackStatsHandlerUrl()
     ).toPromise().then(
@@ -232,18 +232,18 @@ export class ThreadDataBackendApiService {
     return threadsCount;
   }
 
-  getOpenThreadsCount(): number {
+  getOpenThreadsCount (): number {
     return this.openThreadsCount;
   }
 
-  async createNewThreadAsync(newSubject: string, newText: string):
+  async createNewThreadAsync (newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
     return this.http.post<void | SuggestionAndFeedbackThreads>(
       this.getThreadListHandlerUrl(), {
         subject: newSubject,
         text: newText
       }
-    ).toPromise().then(async() => {
+    ).toPromise().then(async () => {
       this.openThreadsCount += 1;
       return this.getThreadsAsync();
     },
@@ -253,7 +253,7 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  async markThreadAsSeenAsync(
+  async markThreadAsSeenAsync (
       thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -264,7 +264,7 @@ export class ThreadDataBackendApiService {
       this.getFeedbackThreadViewEventUrl(threadId), {}).toPromise().then();
   }
 
-  async addNewMessageAsync(
+  async addNewMessageAsync (
       thread: SuggestionAndFeedbackThread, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
@@ -295,7 +295,7 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  async resolveSuggestionAsync(
+  async resolveSuggestionAsync (
       thread: SuggestionAndFeedbackThread,
       action: string,
       commitMsg: string,
@@ -312,7 +312,7 @@ export class ThreadDataBackendApiService {
       commit_message: (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
           commitMsg : null)
-    }).toPromise().then(async() => {
+    }).toPromise().then(async () => {
       thread.status = (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
         ExplorationEditorPageConstants.STATUS_FIXED :

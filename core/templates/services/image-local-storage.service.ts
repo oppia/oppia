@@ -44,13 +44,13 @@ export class ImageLocalStorageService {
   // storage or ImageData has been flushed.
   thumbnailBgColor: string | null = null;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private imageUploadHelperService: ImageUploadHelperService,
     private windowRef: WindowRef) {}
 
   // Function returns null if filename doesn't exist in local storage.
-  getRawImageData(filename: string): string | null {
+  getRawImageData (filename: string): string | null {
     return this.windowRef.nativeWindow.sessionStorage.getItem(filename);
   }
 
@@ -59,7 +59,7 @@ export class ImageLocalStorageService {
    * @param {string} filename - Filename of the image.
    * @param {string} rawImage - Raw base64/URLEncoded data of the image.
    */
-  saveImage(filename: string, rawImage: string): void {
+  saveImage (filename: string, rawImage: string): void {
     if (this.storedImageFilenames.length + 1 > this.MAX_IMAGES_STORABLE) {
       // Since the service is going to be used in the create modal for
       // entities, more images can be added after entity creation, when
@@ -73,13 +73,13 @@ export class ImageLocalStorageService {
     this.storedImageFilenames.push(filename);
   }
 
-  deleteImage(filename: string): void {
+  deleteImage (filename: string): void {
     this.windowRef.nativeWindow.sessionStorage.removeItem(filename);
     const index = this.storedImageFilenames.indexOf(filename);
     this.storedImageFilenames.splice(index, 1);
   }
 
-  getStoredImagesData(): ImagesData[] {
+  getStoredImagesData (): ImagesData[] {
     const returnData = [];
     for (const idx in this.storedImageFilenames) {
       returnData.push({
@@ -92,20 +92,20 @@ export class ImageLocalStorageService {
     return returnData;
   }
 
-  isInStorage(filename: string): boolean {
+  isInStorage (filename: string): boolean {
     return this.storedImageFilenames.indexOf(filename) !== -1;
   }
 
-  setThumbnailBgColor(bgColor: string): void {
+  setThumbnailBgColor (bgColor: string): void {
     this.thumbnailBgColor = bgColor;
   }
 
   // Function returns null if no image is present in local storage.
-  getThumbnailBgColor(): string | null {
+  getThumbnailBgColor (): string | null {
     return this.thumbnailBgColor;
   }
 
-  flushStoredImagesData(): void {
+  flushStoredImagesData (): void {
     this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
     this.thumbnailBgColor = null;

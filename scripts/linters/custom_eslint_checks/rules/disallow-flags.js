@@ -41,11 +41,11 @@ module.exports = {
     }
   },
 
-  create: function(context) {
+  create: function (context) {
     var camelCaseRegex = /^ eslint-(enable|disable)(-next-line)? camelcase$/;
     var expicitRegex = /no-explicit-any/;
 
-    var checkAndReportDisallowedFlagMessage = function(comment) {
+    var checkAndReportDisallowedFlagMessage = function (comment) {
       if (camelCaseRegex.test(comment.value)) {
         context.report({
           node: comment,
@@ -61,7 +61,7 @@ module.exports = {
     };
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         var sourceCode = context.getSourceCode();
         var comments = sourceCode.getAllComments();
         comments.forEach(checkAndReportDisallowedFlagMessage);

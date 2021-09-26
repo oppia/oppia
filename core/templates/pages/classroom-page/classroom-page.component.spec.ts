@@ -33,7 +33,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ClassroomPageComponent } from './classroom-page.component';
 
 class MockCapitalizePipe {
-  transform(input: string): string {
+  transform (input: string): string {
     return input;
   }
 }

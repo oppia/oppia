@@ -23,7 +23,7 @@ import { ThreadStatusDisplayService } from '../services/thread-status-display.se
 import { ThreadTableComponent } from './thread-table.component';
 
 export class MockDateTimeFormatService {
-  getLocaleAbbreviatedDatetimeString(): string {
+  getLocaleAbbreviatedDatetimeString (): string {
     return '11/21/2014';
   }
 }

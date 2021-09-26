@@ -23,24 +23,24 @@ export interface SkillMasteryBackendDict {
 export class SkillMastery {
   private _skillMasteryDict: SkillMasteryBackendDict;
 
-  constructor(backendDict: SkillMasteryBackendDict) {
+  constructor (backendDict: SkillMasteryBackendDict) {
     this._skillMasteryDict = { ...backendDict };
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: SkillMasteryBackendDict): SkillMastery {
     return new SkillMastery(backendDict);
   }
 
-  getMasteryDegree(skillId: string): number {
+  getMasteryDegree (skillId: string): number {
     return this._skillMasteryDict[skillId];
   }
 
-  setMasteryDegree(skillId: string, masteryDegree: number): void {
+  setMasteryDegree (skillId: string, masteryDegree: number): void {
     this._skillMasteryDict[skillId] = masteryDegree;
   }
 
-  toBackendDict(): SkillMasteryBackendDict {
+  toBackendDict (): SkillMasteryBackendDict {
     return { ...this._skillMasteryDict };
   }
 }

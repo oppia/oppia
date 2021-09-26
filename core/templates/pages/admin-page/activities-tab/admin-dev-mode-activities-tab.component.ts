@@ -38,14 +38,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
 
-  constructor(
+  constructor (
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
     private windowRef: WindowRef
   ) {}
 
-  reloadExploration(explorationId: string): void {
+  reloadExploration (explorationId: string): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -70,7 +70,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     });
   }
 
-  printResult(numSucceeded: number, numFailed: number, numTried: number): void {
+  printResult (numSucceeded: number, numFailed: number, numTried: number): void {
     if (numTried < this.demoExplorationIds.length) {
       this.setStatusMessage.emit(
         'Processing...' + numTried + '/' +
@@ -84,7 +84,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  reloadAllExplorations(): void {
+  reloadAllExplorations (): void {
     if (!this.reloadingAllExplorationPossible) {
       return;
     }
@@ -120,7 +120,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     }
   }
 
-  generateDummyExplorations(): void {
+  generateDummyExplorations (): void {
     // Generate dummy explorations with random title.
     if (this.numDummyExpsToPublish > this.numDummyExpsToGenerate) {
       this.setStatusMessage.emit(
@@ -141,7 +141,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  loadNewStructuresData(): void {
+  loadNewStructuresData (): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
@@ -156,7 +156,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  generateNewSkillData(): void {
+  generateNewSkillData (): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
@@ -171,7 +171,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  reloadCollection(collectionId: string): void {
+  reloadCollection (collectionId: string): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -194,7 +194,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  async getDataAsync(): Promise<void> {
+  async getDataAsync (): Promise<void> {
     const adminDataObject = await this.adminDataService.getDataAsync();
 
     this.DEMO_EXPLORATIONS = adminDataObject.demoExplorations;
@@ -203,7 +203,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.reloadingAllExplorationPossible = true;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.getDataAsync();
   }
 }

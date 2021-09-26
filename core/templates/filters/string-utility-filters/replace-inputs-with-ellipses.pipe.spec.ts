@@ -19,7 +19,7 @@
 import { ReplaceInputsWithEllipsesPipe } from
   'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let pipe: ReplaceInputsWithEllipsesPipe = null;
   beforeEach(() => {
     pipe = new ReplaceInputsWithEllipsesPipe();

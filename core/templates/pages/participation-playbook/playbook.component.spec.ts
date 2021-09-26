@@ -30,11 +30,11 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
+  getCurrentI18nLanguageCode () {
     return 'en';
   }
 
-  get onI18nLanguageCodeChange() {
+  get onI18nLanguageCodeChange () {
     return this.codeChangeEventEmiiter;
   }
 }
@@ -49,22 +49,22 @@ class MockWindowRef {
       href: '',
       reload: (val: string) => val
     },
-    get onhashchange() {
+    get onhashchange () {
       return this.location.hashChange;
     },
 
-    set onhashchange(val) {
+    set onhashchange (val) {
       this.location.hashChange = val;
     },
     gtag: () => {}
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
 class MockSiteAnalyticsService {
-  registerApplyToTeachWithOppiaEvent(): void {
+  registerApplyToTeachWithOppiaEvent (): void {
     return;
   }
 }

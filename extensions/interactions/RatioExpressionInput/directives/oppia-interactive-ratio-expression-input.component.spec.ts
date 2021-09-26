@@ -23,24 +23,24 @@ require(
   'interactions/RatioExpressionInput/directives/' +
   'oppia-interactive-ratio-expression-input.component.ts');
 
-describe('RatioExpressionInputInteractive', function() {
+describe('RatioExpressionInputInteractive', function () {
   let ctrl = null, $scope = null, $rootScope = null;
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    onSubmit: function (answer, rulesService) {},
+    registerCurrentInteraction: function (submitAnswerFn, isAnswerValid) {
       submitAnswerFn();
     }
   };
   let mockRatioExpressionInputRulesService = {};
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function (interactionId, attrs) {
       return attrs;
     }
   };
 
-  describe('without saved solution', function() {
+  describe('without saved solution', function () {
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('Ratio', Ratio);
       $provide.value(
         'CurrentInteractionService', mockCurrentInteractionService);
@@ -58,21 +58,21 @@ describe('RatioExpressionInputInteractive', function() {
         labelForFocusTarget: 'label'
       });
     }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
       ctrl.RatioExpressionInputForm = {
         answer: {
           $invalid: false,
-          $setValidity: function(errorType, valid) {
+          $setValidity: function (errorType, valid) {
             this.$invalid = !valid;
           }
         }
       };
     }));
 
-    it('should init the component', function() {
+    it('should init the component', function () {
       spyOn(mockCurrentInteractionService, 'registerCurrentInteraction');
       ctrl.$onInit();
       expect(ctrl.answer).toEqual('');
@@ -89,12 +89,12 @@ describe('RatioExpressionInputInteractive', function() {
       ).toHaveBeenCalled();
     });
 
-    it('should return valid answer before the form is initialized', function() {
+    it('should return valid answer before the form is initialized', function () {
       ctrl.RatioExpressionInputForm = undefined;
       expect(ctrl.isAnswerValid()).toBe(true);
     });
 
-    it('should raise error if invalid answer is submitted', function() {
+    it('should raise error if invalid answer is submitted', function () {
       ctrl.$onInit();
       ctrl.answer = '2:3';
       ctrl.RatioExpressionInputForm.$invalid = false;
@@ -106,7 +106,7 @@ describe('RatioExpressionInputInteractive', function() {
       expect(ctrl.isAnswerValid()).toBe(false);
     });
 
-    it('should submit the answer if valid', function() {
+    it('should submit the answer if valid', function () {
       ctrl.$onInit();
       ctrl.answer = '2:3:4';
       $scope.$apply();
@@ -118,9 +118,9 @@ describe('RatioExpressionInputInteractive', function() {
     });
   });
 
-  describe('with saved solution', function() {
+  describe('with saved solution', function () {
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('Ratio', Ratio);
       $provide.value(
         'CurrentInteractionService', mockCurrentInteractionService);
@@ -138,7 +138,7 @@ describe('RatioExpressionInputInteractive', function() {
         labelForFocusTarget: 'label',
       });
     }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
@@ -146,14 +146,14 @@ describe('RatioExpressionInputInteractive', function() {
       ctrl.RatioExpressionInputForm = {
         answer: {
           $invalid: false,
-          $setValidity: function(errorType, valid) {
+          $setValidity: function (errorType, valid) {
             this.$invalid = !valid;
           }
         }
       };
     }));
 
-    it('should populate answer with solution if provided', function() {
+    it('should populate answer with solution if provided', function () {
       ctrl.$onInit();
       expect(ctrl.answer).toEqual('1:2:3');
     });

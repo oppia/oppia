@@ -27,7 +27,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
@@ -40,12 +40,12 @@ class MockWindowRef {
       href: 'host.name:1234/explore/0'
     },
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
-describe('SwitchContentLanguageRefreshRequiredModalComponent', function() {
+describe('SwitchContentLanguageRefreshRequiredModalComponent', function () {
   let component: SwitchContentLanguageRefreshRequiredModalComponent;
   let fixture: ComponentFixture<
     SwitchContentLanguageRefreshRequiredModalComponent>;

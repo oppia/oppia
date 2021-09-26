@@ -26,7 +26,7 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 angular.module('oppia').controller('AddMisconceptionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'MisconceptionObjectFactory',
   'SkillEditorStateService', 'MAX_CHARS_IN_MISCONCEPTION_NAME',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, MisconceptionObjectFactory,
       SkillEditorStateService, MAX_CHARS_IN_MISCONCEPTION_NAME) {
     $controller('ConfirmOrCancelModalController', {
@@ -61,7 +61,7 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.misconceptionMustBeAddressed = true;
     $scope.misconceptionNameIsDuplicate = false;
 
-    $scope.saveMisconception = function() {
+    $scope.saveMisconception = function () {
       if ($scope.misconceptionNameIsDuplicate) {
         return;
       }
@@ -76,7 +76,7 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
       });
     };
 
-    $scope.checkIfMisconceptionNameIsDuplicate = function() {
+    $scope.checkIfMisconceptionNameIsDuplicate = function () {
       $scope.misconceptionNameIsDuplicate = (
         $scope.existingMisconceptionNames.includes($scope.misconceptionName)
       );

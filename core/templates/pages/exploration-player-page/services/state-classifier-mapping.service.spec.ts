@@ -92,7 +92,7 @@ describe('State classifier mapping service', () => {
           .and.returnValue(true);
       });
 
-      it('should fetch classifier data correctly', waitForAsync(async() => {
+      it('should fetch classifier data correctly', waitForAsync(async () => {
         spyOn(
           classifierDataBackendApiService,
           'getClassifierDataAsync').and.callFake(() => {
@@ -106,7 +106,7 @@ describe('State classifier mapping service', () => {
       }));
 
       it('should handle failure of fetching classifier data', waitForAsync(
-        async() => {
+        async () => {
           spyOn(
             classifierDataBackendApiService,
             'getClassifierDataAsync').and.callFake(() => {

@@ -35,7 +35,7 @@ export class FilepathEditorComponent implements OnInit {
   svgEditorIsShown = false;
   imageEditorIsShown = false;
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.validityChange.emit({ empty: false });
       return;
@@ -47,17 +47,17 @@ export class FilepathEditorComponent implements OnInit {
     }
   }
 
-  valueHasChanged(event: string): void {
+  valueHasChanged (event: string): void {
     this.valueChanged.emit(event);
   }
-  validityHasChanged(event: Record<'empty', boolean>): void {
+  validityHasChanged (event: Record<'empty', boolean>): void {
     this.validityChange.emit(event);
   }
-  onClickCreateImage(): void {
+  onClickCreateImage (): void {
     this.svgEditorIsShown = true;
     this.imageEditorIsShown = false;
   }
-  onClickUploadImage(): void {
+  onClickUploadImage (): void {
     this.imageEditorIsShown = true;
     this.svgEditorIsShown = false;
   }

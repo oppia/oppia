@@ -35,11 +35,11 @@ import { Rule } from 'domain/exploration/RuleObjectFactory';
   providedIn: 'root'
 })
 export class DragAndDropSortInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: DragAndDropSortInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
@@ -86,7 +86,7 @@ export class DragAndDropSortInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: DragAndDropSortInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {

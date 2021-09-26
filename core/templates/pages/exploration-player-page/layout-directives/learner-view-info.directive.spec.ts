@@ -31,7 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { ContextService } from 'services/context.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 
-describe('Learner view info directive', function() {
+describe('Learner view info directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -56,7 +56,7 @@ describe('Learner view info directive', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
@@ -115,11 +115,11 @@ describe('Learner view info directive', function() {
     });
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     ctrl.$onDestroy();
   });
 
-  it('should set properties when initialized', fakeAsync(function() {
+  it('should set properties when initialized', fakeAsync(function () {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('topicUrlFragment');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
@@ -137,7 +137,7 @@ describe('Learner view info directive', function() {
   }));
 
   it('should set \'isLinkedToTopic\' property to false ' +
-    'when error is occured while initializing', function() {
+    'when error is occured while initializing', function () {
     expect(ctrl.isLinkedToTopic).toBe(undefined);
 
     ctrl.$onInit();
@@ -145,7 +145,7 @@ describe('Learner view info directive', function() {
     expect(ctrl.isLinkedToTopic).toBe(false);
   });
 
-  it('should open information card modal', fakeAsync(function() {
+  it('should open information card modal', fakeAsync(function () {
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.resolveTo({
         summaries: ['summary1']
@@ -166,7 +166,7 @@ describe('Learner view info directive', function() {
   }));
 
   it('should fail to open information card modal if there is an ' +
-    'error while loading an info card', fakeAsync(function() {
+    'error while loading an info card', fakeAsync(function () {
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());
     const modalSpy = spyOn($uibModal, 'open').and.callThrough();

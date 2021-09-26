@@ -29,9 +29,9 @@ import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
         Sample2 </p>
    will give as output: Sample1 [Math] Sample2 */
 export class FormatRtePreviewPipe {
-  constructor(private capitalizePipe: CapitalizePipe) {}
+  constructor (private capitalizePipe: CapitalizePipe) {}
 
-  transform(html: string): string {
+  transform (html: string): string {
     html = html.replace(/&nbsp;/ig, ' ');
     html = html.replace(/&quot;/ig, '');
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.

@@ -21,7 +21,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Create new subtopic modal', function() {
+describe('Create new subtopic modal', function () {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
@@ -32,7 +32,7 @@ describe('Create new subtopic modal', function() {
   var TopicObjectFactory = null;
   var SubtopicValidationService = null;
   var topic = null;
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -52,7 +52,7 @@ describe('Create new subtopic modal', function() {
 
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       ctrl.$onInit();
       expect(ctrl.topic).toEqual(topic);
       expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
@@ -64,20 +64,20 @@ describe('Create new subtopic modal', function() {
       expect(ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(64);
     });
 
-  it('should close the modal and save the subtopicId', function() {
+  it('should close the modal and save the subtopicId', function () {
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.subtopicId = 1;
     ctrl.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith(1);
   });
 
-  it('should show schema editor', function() {
+  it('should show schema editor', function () {
     expect(ctrl.schemaEditorIsShown).toEqual(false);
     ctrl.showSchemaEditor();
     expect(ctrl.schemaEditorIsShown).toEqual(true);
   });
 
-  it('should show error message if subtopic name is invalid', function() {
+  it('should show error message if subtopic name is invalid', function () {
     expect(ctrl.errorMsg).toEqual(null);
     spyOn(
       SubtopicValidationService,
@@ -89,7 +89,7 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.errorMsg).toEqual(errorMessage);
   });
 
-  it('should show reset the error message', function() {
+  it('should show reset the error message', function () {
     expect(ctrl.errorMsg).toEqual(null);
     spyOn(
       SubtopicValidationService,
@@ -104,7 +104,7 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.errorMsg).toEqual(null);
   });
 
-  it('should check if subtopic with url fragment exists', function() {
+  it('should check if subtopic with url fragment exists', function () {
     expect(ctrl.subtopicUrlFragmentExists).toEqual(false);
     spyOn(
       SubtopicValidationService,
@@ -113,7 +113,7 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.subtopicUrlFragmentExists).toEqual(true);
   });
 
-  it('should return the validity of the subtopic', function() {
+  it('should return the validity of the subtopic', function () {
     // Fails when all fields are empty.
     ctrl.editableThumbnailFilename = '';
     ctrl.subtopicTitle = '';
@@ -231,18 +231,18 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.isSubtopicValid()).toEqual(true);
   });
 
-  it('should dismiss the modal on cancel', function() {
+  it('should dismiss the modal on cancel', function () {
     ctrl.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 
-  it('should update the subtopic thumbnail filename', function() {
+  it('should update the subtopic thumbnail filename', function () {
     expect(ctrl.editableThumbnailFilename).toEqual('');
     ctrl.updateSubtopicThumbnailFilename('img_512.svg');
     expect(ctrl.editableThumbnailFilename).toEqual('img_512.svg');
   });
 
-  it('should update the subtopic thumbnail bg color', function() {
+  it('should update the subtopic thumbnail bg color', function () {
     expect(ctrl.editableThumbnailBgColor).toEqual('');
     ctrl.updateSubtopicThumbnailBgColor('#FFFFFF');
     expect(ctrl.editableThumbnailBgColor).toEqual('#FFFFFF');

@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Welcome Translation Modal Controller', function() {
+describe('Welcome Translation Modal Controller', function () {
   let $scope = null;
   let $uibModalInstance = null;
   let ContextService = null;
@@ -28,7 +28,7 @@ describe('Welcome Translation Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     const $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
@@ -48,7 +48,7 @@ describe('Welcome Translation Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.explorationId).toBe(explorationId);
       expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
         .toHaveBeenCalledWith(explorationId);

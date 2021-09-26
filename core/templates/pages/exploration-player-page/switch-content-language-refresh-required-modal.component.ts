@@ -35,16 +35,16 @@ export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = (
 export class SwitchContentLanguageRefreshRequiredModalComponent {
   @Input() languageCode!: string;
 
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
     private windowRef: WindowRef
   ) {}
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 
-  confirm(): void {
+  confirm (): void {
     const url = new URL(this.windowRef.nativeWindow.location.href);
     url.searchParams.set(
       INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM, this.languageCode);

@@ -183,7 +183,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'UserService', 'WindowDimensionsService',
-    function(
+    function (
         $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
@@ -214,7 +214,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
 
-      var setDocumentTitle = function() {
+      var setDocumentTitle = function () {
         if (ExplorationTitleService.savedMemento) {
           PageTitleService.setDocumentTitle(
             ExplorationTitleService.savedMemento + ' - Oppia Editor');
@@ -227,12 +227,12 @@ angular.module('oppia').component('explorationEditorPage', {
       /** ******************************************
       * Methods affecting the graph visualization.
       ********************************************/
-      ctrl.toggleExplorationWarningVisibility = function() {
+      ctrl.toggleExplorationWarningVisibility = function () {
         ctrl.areExplorationWarningsVisible = (
           !ctrl.areExplorationWarningsVisible);
       };
 
-      ctrl.getExplorationUrl = function(explorationId) {
+      ctrl.getExplorationUrl = function (explorationId) {
         return explorationId ? ('/explore/' + explorationId) : '';
       };
 
@@ -251,7 +251,7 @@ angular.module('oppia').component('explorationEditorPage', {
             ContextService.getExplorationId()),
           ThreadDataBackendApiService.getOpenThreadsCountAsync(),
           UserService.getUserInfoAsync()
-        ]).then(async(
+        ]).then(async (
             [explorationData, featuresData, openThreadsCount, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
@@ -392,11 +392,11 @@ angular.module('oppia').component('explorationEditorPage', {
         });
       };
 
-      ctrl.getActiveTabName = function() {
+      ctrl.getActiveTabName = function () {
         return RouterService.getActiveTabName();
       };
 
-      ctrl.setFocusOnActiveTab = function(activeTab) {
+      ctrl.setFocusOnActiveTab = function (activeTab) {
         if (activeTab === 'history') {
           FocusManagerService.setFocus('usernameInputField');
         }
@@ -410,7 +410,7 @@ angular.module('oppia').component('explorationEditorPage', {
         }
       };
 
-      ctrl.startEditorTutorial = function() {
+      ctrl.startEditorTutorial = function () {
         EditabilityService.onStartTutorial();
         if (RouterService.getActiveTabName() !== 'main') {
           ctrl.selectMainTab();
@@ -419,7 +419,7 @@ angular.module('oppia').component('explorationEditorPage', {
         }
       };
 
-      ctrl.startTranslationTutorial = function() {
+      ctrl.startTranslationTutorial = function () {
         EditabilityService.onStartTutorial();
         if (RouterService.getActiveTabName() !== 'translation') {
           ctrl.selectTranslationTab();
@@ -428,7 +428,7 @@ angular.module('oppia').component('explorationEditorPage', {
         }
       };
 
-      ctrl.showWelcomeExplorationModal = function() {
+      ctrl.showWelcomeExplorationModal = function () {
         $uibModal.open({
           template: require(
             'pages/exploration-editor-page/modal-templates/' +
@@ -436,18 +436,18 @@ angular.module('oppia').component('explorationEditorPage', {
           backdrop: true,
           controller: 'WelcomeModalController',
           windowClass: 'oppia-welcome-modal'
-        }).result.then(function(explorationId) {
+        }).result.then(function (explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
           ctrl.startEditorTutorial();
-        }, function(explorationId) {
+        }, function (explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
             explorationId);
           StateTutorialFirstTimeService.markEditorTutorialFinished();
         });
       };
 
-      ctrl.getNavbarText = function() {
+      ctrl.getNavbarText = function () {
         return 'Exploration Editor';
       };
 
@@ -501,7 +501,7 @@ angular.module('oppia').component('explorationEditorPage', {
         });
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
@@ -601,7 +601,7 @@ angular.module('oppia').component('explorationEditorPage', {
           });
         ctrl.isImprovementsTabEnabled = () => improvementsTabIsEnabled;
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

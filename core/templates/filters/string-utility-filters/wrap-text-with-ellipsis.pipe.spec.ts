@@ -23,7 +23,7 @@ import { NormalizeWhitespacePipe } from
 import { WrapTextWithEllipsisPipe } from
   'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let wrapTextWithEllipsis: WrapTextWithEllipsisPipe;
   beforeEach(() => {
     TestBed.configureTestingModule({

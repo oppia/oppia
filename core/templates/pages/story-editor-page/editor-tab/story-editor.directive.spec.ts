@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Story editor Directive having two story nodes', function() {
+describe('Story editor Directive having two story nodes', function () {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -37,7 +37,7 @@ describe('Story editor Directive having two story nodes', function() {
   var StoryObjectFactory = null;
   var WindowRef = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -110,26 +110,26 @@ describe('Story editor Directive having two story nodes', function() {
     ctrl.$onDestroy();
   });
 
-  it('should init the controller', function() {
+  it('should init the controller', function () {
     expect($scope.storyPreviewCardIsShown).toEqual(false);
     expect($scope.mainStoryCardIsShown).toEqual(true);
     expect($scope.getTopicName()).toEqual('addition');
   });
 
-  it('should toggle story preview card', function() {
+  it('should toggle story preview card', function () {
     $scope.storyPreviewCardIsShown = false;
     $scope.togglePreview();
     expect($scope.mainStoryCardIsShown).toEqual(true);
   });
 
-  it('should toggle chapter edit options', function() {
+  it('should toggle chapter edit options', function () {
     $scope.toggleChapterEditOptions(10);
     expect($scope.selectedChapterIndex).toEqual(10);
     $scope.toggleChapterEditOptions(10);
     expect($scope.selectedChapterIndex).toEqual(-1);
   });
 
-  it('should toggle chapter lists', function() {
+  it('should toggle chapter lists', function () {
     $scope.chaptersListIsShown = false;
     $scope.toggleChapterLists();
     expect($scope.chaptersListIsShown).toEqual(true);
@@ -138,7 +138,7 @@ describe('Story editor Directive having two story nodes', function() {
     expect($scope.chaptersListIsShown).toEqual(false);
   });
 
-  it('should toggle main story card', function() {
+  it('should toggle main story card', function () {
     $scope.mainStoryCardIsShown = false;
     $scope.toggleStoryEditorCard();
     expect($scope.mainStoryCardIsShown).toEqual(true);
@@ -147,7 +147,7 @@ describe('Story editor Directive having two story nodes', function() {
     expect($scope.mainStoryCardIsShown).toEqual(false);
   });
 
-  it('should open and close notes editor', function() {
+  it('should open and close notes editor', function () {
     $scope.notesEditorIsShown = false;
     $scope.openNotesEditor();
     expect($scope.notesEditorIsShown).toEqual(true);
@@ -156,55 +156,55 @@ describe('Story editor Directive having two story nodes', function() {
     expect($scope.notesEditorIsShown).toEqual(false);
   });
 
-  it('should return when the node is the initial node', function() {
+  it('should return when the node is the initial node', function () {
     expect($scope.isInitialNode('node_1')).toEqual(false);
     expect($scope.isInitialNode('node_2')).toEqual(true);
   });
 
-  it('should note the index of the node being dragged', function() {
+  it('should note the index of the node being dragged', function () {
     $scope.onMoveChapterStart(3, null);
     expect($scope.dragStartIndex).toEqual(3);
   });
 
-  it('should call StoryUpdate service to rearrange nodes', function() {
+  it('should call StoryUpdate service to rearrange nodes', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'rearrangeNodeInStory');
     $scope.rearrangeNodeInStory(10);
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate to update story title', function() {
+  it('should call StoryUpdate to update story title', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryTitle');
     $scope.updateStoryTitle('title99');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate to update story thumbnail filename', function() {
+  it('should call StoryUpdate to update story thumbnail filename', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setThumbnailFilename');
     $scope.updateStoryThumbnailFilename('abcd');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate to update story thumbnail bg color', function() {
+  it('should call StoryUpdate to update story thumbnail bg color', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setThumbnailBgColor');
     $scope.updateStoryThumbnailBgColor('abcd');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should return the classroom and topic url fragment', function() {
+  it('should return the classroom and topic url fragment', function () {
     expect($scope.getClassroomUrlFragment()).toEqual('math');
     expect($scope.getTopicUrlFragment()).toEqual('fractions');
   });
 
   it('should not open confirm or cancel modal if the initial node is' +
       ' being deleted',
-  function() {
+  function () {
     var modalSpy = spyOn($uibModal, 'open');
     $scope.deleteNode('node_2');
     expect(modalSpy).not.toHaveBeenCalled();
   });
 
   it('should open confirm or cancel modal when a node is being deleted',
-    function() {
+    function () {
       var deferred = $q.defer();
       deferred.resolve();
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -217,7 +217,7 @@ describe('Story editor Directive having two story nodes', function() {
     });
 
   it('should call StoryUpdateService to add destination node id',
-    function() {
+    function () {
       var modalSpy = spyOn($uibModal, 'open').and.callThrough();
       $scope.createNode();
       $rootScope.$apply();
@@ -225,7 +225,7 @@ describe('Story editor Directive having two story nodes', function() {
     });
 
   it('should call StoryUpdateService to add destination node id',
-    function() {
+    function () {
       var deferred = $q.defer();
       deferred.resolve();
       var storySpy = spyOn(StoryUpdateService, 'addDestinationNodeIdToNode');
@@ -237,25 +237,25 @@ describe('Story editor Directive having two story nodes', function() {
       expect(storySpy).toHaveBeenCalled();
     });
 
-  it('should call StoryUpdateService to update story notes', function() {
+  it('should call StoryUpdateService to update story notes', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNotes');
     $scope.updateNotes('Updated the story notes');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdateService to update story notes', function() {
+  it('should call StoryUpdateService to update story notes', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryMetaTagContent');
     $scope.updateStoryMetaTagContent('storyone');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should call not update url fragment if it is unchanged', function() {
+  it('should call not update url fragment if it is unchanged', function () {
     $scope.storyUrlFragmentExists = true;
     $scope.updateStoryUrlFragment('story_title');
     expect($scope.storyUrlFragmentExists).toEqual(false);
   });
 
-  it('should update the existence of story url fragment', function() {
+  it('should update the existence of story url fragment', function () {
     var storyUpdateSpy = spyOn(
       StoryEditorStateService,
       'updateExistenceOfStoryUrlFragment').and.callFake(
@@ -264,7 +264,7 @@ describe('Story editor Directive having two story nodes', function() {
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should set story url fragment', function() {
+  it('should set story url fragment', function () {
     var storyUpdateSpy = spyOn(
       StoryUpdateService, 'setStoryUrlFragment');
     $scope.updateStoryUrlFragment('');
@@ -272,14 +272,14 @@ describe('Story editor Directive having two story nodes', function() {
   });
 
   it('should call StoryEditorNavigationService to navigate to chapters',
-    function() {
+    function () {
       var navigationSpy = spyOn(
         StoryEditorNavigationService, 'navigateToChapterEditorWithId');
       $scope.navigateToChapterWithId('chapter_1', 0);
       expect(navigationSpy).toHaveBeenCalled();
     });
 
-  it('should make story description status', function() {
+  it('should make story description status', function () {
     $scope.editableDescriptionIsEmpty = true;
     $scope.storyDescriptionChanged = false;
     $scope.updateStoryDescriptionStatus('New description');
@@ -287,21 +287,21 @@ describe('Story editor Directive having two story nodes', function() {
     $scope.storyDescriptionChanged = true;
   });
 
-  it('should update the story description', function() {
+  it('should update the story description', function () {
     var storyUpdateSpy = spyOn(
       StoryUpdateService, 'setStoryDescription');
     $scope.updateStoryDescription('New skill description');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should show modal if there are unsaved changes on leaving', function() {
+  it('should show modal if there are unsaved changes on leaving', function () {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
     $scope.returnToTopicEditorPage();
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should call Windowref to open a tab', function() {
+  it('should call Windowref to open a tab', function () {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
     spyOnProperty(WindowRef, 'nativeWindow').and.returnValue({
       open: jasmine.createSpy('open', () => {})

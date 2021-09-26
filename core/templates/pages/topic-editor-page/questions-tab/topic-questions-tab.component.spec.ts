@@ -26,7 +26,7 @@ import { TestBed } from '@angular/core/testing';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
-describe('Topic questions tab', function() {
+describe('Topic questions tab', function () {
   var $rootScope = null;
   var $scope = null;
   var $window = null;
@@ -91,7 +91,7 @@ describe('Topic questions tab', function() {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
-    fetchDashboardDataAsync() {
+    fetchDashboardDataAsync () {
       return {
         then: (callback: (resp) => void) => {
           callback(topicsAndSkillsDashboardData);
@@ -117,7 +117,7 @@ describe('Topic questions tab', function() {
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $window = $injector.get('$window');
@@ -133,19 +133,19 @@ describe('Topic questions tab', function() {
     topic = TopicObjectFactory.createInterstitialTopic();
     subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.addSkill('skill1', 'subtopic1 skill');
-    topic.getSubtopics = function() {
+    topic.getSubtopics = function () {
       return [subtopic1];
     };
 
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOn(focusManagerService, 'setFocus');
     spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-      function() {
+      function () {
         return topicInitializedEventEmitter;
       });
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-      function() {
+      function () {
         return topicReinitializedEventEmitter;
       });
     ctrl.$onInit();
@@ -155,7 +155,7 @@ describe('Topic questions tab', function() {
     ctrl.$onDestroy();
   });
 
-  it('should initialize the variables when topic is initialized', function() {
+  it('should initialize the variables when topic is initialized', function () {
     const topicRights = TopicRights.createInterstitialRights();
     const allSkillSummaries = subtopic1.getSkillSummaries();
     spyOn(TopicEditorStateService, 'getSkillIdToRubricsObject').and
@@ -180,14 +180,14 @@ describe('Topic questions tab', function() {
     expect($scope.emptyMisconceptionsList).toEqual([]);
   });
 
-  it('should setFocus on selectSkillField when screen loads', function() {
+  it('should setFocus on selectSkillField when screen loads', function () {
     $window.onload();
 
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'selectSkillField');
   });
 
-  it('should initialize tab when topic is initialized', function() {
+  it('should initialize tab when topic is initialized', function () {
     // Setup.
     const topicRights = TopicRights.createInterstitialRights();
     const allSkillSummaries = subtopic1.getSkillSummaries();
@@ -209,7 +209,7 @@ describe('Topic questions tab', function() {
     expect($scope.topic).toBe(topic);
   });
 
-  it('should initialize tab when topic is reinitialized', function() {
+  it('should initialize tab when topic is reinitialized', function () {
     const topicRights = TopicRights.createInterstitialRights();
     const allSkillSummaries = subtopic1.getSkillSummaries();
     $scope.allSkillSummaries = null;
@@ -235,7 +235,7 @@ describe('Topic questions tab', function() {
     expect($scope.topic).toBe(topic);
   });
 
-  it('should unsubscribe when component is destroyed', function() {
+  it('should unsubscribe when component is destroyed', function () {
     spyOn(ctrl.directiveSubscriptions, 'unsubscribe').and.callThrough();
 
     expect(ctrl.directiveSubscriptions.closed).toBe(false);
@@ -246,7 +246,7 @@ describe('Topic questions tab', function() {
     expect(ctrl.directiveSubscriptions.closed).toBe(true);
   });
 
-  it('should reinitialize questions list when a skill is selected', function() {
+  it('should reinitialize questions list when a skill is selected', function () {
     spyOn(qls, 'resetPageNumber').and.callThrough();
     spyOn(qls, 'getQuestionSummariesAsync');
     qls.incrementPageNumber();

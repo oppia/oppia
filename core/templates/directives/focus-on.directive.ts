@@ -42,7 +42,7 @@ require('services/stateful/focus-manager.service.ts');
 // when a 'focusOn' event is broadcast.
 angular.module('oppia').directive('focusOn', [
   'FocusManagerService', 'LABEL_FOR_CLEARING_FOCUS',
-  function(FocusManagerService, LABEL_FOR_CLEARING_FOCUS) {
+  function (FocusManagerService, LABEL_FOR_CLEARING_FOCUS) {
     return (scope, elt, attrs) => {
       const directiveSubscriptions = new Subscription();
       directiveSubscriptions.add(
@@ -60,7 +60,7 @@ angular.module('oppia').directive('focusOn', [
           }
         )
       );
-      scope.$on('$destroy', function() {
+      scope.$on('$destroy', function () {
         directiveSubscriptions.unsubscribe();
       });
     };
@@ -76,7 +76,7 @@ export class FocusOnDirective implements OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input('oppiaFocusOn') focusOn!: string;
   directiveSubscriptions = new Subscription();
-  constructor(
+  constructor (
     private el: ElementRef, private focusManagerService: FocusManagerService) {
     this.directiveSubscriptions.add(
       this.focusManagerService.onFocus.subscribe(
@@ -95,7 +95,7 @@ export class FocusOnDirective implements OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

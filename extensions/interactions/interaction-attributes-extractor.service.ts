@@ -46,12 +46,12 @@ export class InteractionAttributesExtractorService {
     'MathEquationInput'
   ];
 
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService,
     private interactionFactory: InteractionObjectFactory,
   ) {}
 
-  getValuesFromAttributes(
+  getValuesFromAttributes (
       interactionId: InteractionSpecsKey, attributes: Object
   ): InteractionCustomizationArgs {
     const caBackendDict: InteractionCustomizationArgsBackendDict = {};

@@ -42,7 +42,7 @@ export class InteractiveNumericInput implements OnInit {
   requireNonnegativeInput: boolean = false;
   answer = null;
   NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
-  constructor(
+  constructor (
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
     private numericInputValidationService: NumericInputValidationService,
@@ -51,7 +51,7 @@ export class InteractiveNumericInput implements OnInit {
       InteractionAttributesExtractorService
   ) { }
 
-  private isAnswerValid(): boolean {
+  private isAnswerValid (): boolean {
     return (
       this.answer !== undefined &&
       this.answer !== null &&
@@ -61,7 +61,7 @@ export class InteractiveNumericInput implements OnInit {
           this.answer, this.requireNonnegativeInput)));
   }
 
-  submitAnswer(answer: number): void {
+  submitAnswer (answer: number): void {
     if (this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
         answer as unknown as string,
@@ -69,14 +69,14 @@ export class InteractiveNumericInput implements OnInit {
     }
   }
 
-  private getAttributesObject() {
+  private getAttributesObject () {
     return {
       requireNonnegativeInputWithValue:
         this.requireNonnegativeInputWithValue
     };
   }
 
-  onAnswerChange(answer: string | number): void {
+  onAnswerChange (answer: string | number): void {
     if (this.answer === answer) {
       return;
     }
@@ -84,15 +84,15 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {}; } {
+  getSchema (): { type: string; 'ui_config': {}; } {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 
-  getLabelForFocusTarget(): string | null {
+  getLabelForFocusTarget (): string | null {
     return this.labelForFocusTarget;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const {
       requireNonnegativeInput
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(

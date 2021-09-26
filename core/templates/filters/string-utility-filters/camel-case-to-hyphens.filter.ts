@@ -16,8 +16,8 @@
  * @fileoverview CamelCaseToHyphens filter for Oppia.
  */
 
-angular.module('oppia').filter('camelCaseToHyphens', [function() {
-  return function(input) {
+angular.module('oppia').filter('camelCaseToHyphens', [function () {
+  return function (input) {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
     if (result[0] === '-') {
       result = result.substring(1);

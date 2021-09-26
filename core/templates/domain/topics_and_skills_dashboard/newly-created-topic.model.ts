@@ -28,7 +28,7 @@ export class NewlyCreatedTopic {
    * @param {String} description - description of the topic.
    * @param {String} urlFragment - url fragment of the topic.
    */
-  constructor(name: string, description: string, urlFragment: string) {
+  constructor (name: string, description: string, urlFragment: string) {
     this.name = name;
     this.description = description;
     this.urlFragment = urlFragment;
@@ -36,7 +36,7 @@ export class NewlyCreatedTopic {
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
-  isValid(): boolean {
+  isValid (): boolean {
     let validUrlFragmentRegex = new RegExp(
       AppConstants.VALID_URL_FRAGMENT_REGEX);
     let urlFragmentCharLimit = AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
@@ -49,7 +49,7 @@ export class NewlyCreatedTopic {
   /**
    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
-  static createDefault(): NewlyCreatedTopic {
+  static createDefault (): NewlyCreatedTopic {
     return new NewlyCreatedTopic('', '', '');
   }
 }

@@ -28,33 +28,33 @@ export class TopicRights {
   _canPublishTopic: boolean;
   _canEditTopic: boolean;
 
-  constructor(
+  constructor (
       published: boolean, canPublishTopic: boolean, canEditTopic: boolean) {
     this._published = published;
     this._canPublishTopic = canPublishTopic;
     this._canEditTopic = canEditTopic;
   }
 
-  canEditTopic(): boolean {
+  canEditTopic (): boolean {
     return this._canEditTopic;
   }
-  isPublished(): boolean {
+  isPublished (): boolean {
     return this._published;
   }
-  canPublishTopic(): boolean {
+  canPublishTopic (): boolean {
     return this._canPublishTopic;
   }
-  canEditName(): boolean {
+  canEditName (): boolean {
     return this._canPublishTopic;
   }
-  markTopicAsPublished(): void {
+  markTopicAsPublished (): void {
     if (this._canPublishTopic) {
       this._published = true;
     } else {
       throw new Error('User is not allowed to publish this topic.');
     }
   }
-  markTopicAsUnpublished(): void {
+  markTopicAsUnpublished (): void {
     if (this._canPublishTopic) {
       this._published = false;
     } else {
@@ -64,7 +64,7 @@ export class TopicRights {
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.
-  copyFromTopicRights(otherTopicRights: TopicRights): void {
+  copyFromTopicRights (otherTopicRights: TopicRights): void {
     this._published = otherTopicRights.isPublished();
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
@@ -72,7 +72,7 @@ export class TopicRights {
 
   // This function takes a JSON object which represents a backend
   // topic python dict.
-  static createFromBackendDict(
+  static createFromBackendDict (
       topicRightsBackendObject: TopicRightsBackendDict): TopicRights {
     return new TopicRights(
       topicRightsBackendObject.published,
@@ -85,7 +85,7 @@ export class TopicRights {
   // placeholder until the actual topic rights object is fetched from
   // the backend. Since it is acting as a placeholder, it should be valid and
   // hence the most restrictive rights are given to the object.
-  static createInterstitialRights(): TopicRights {
+  static createInterstitialRights (): TopicRights {
     return new TopicRights(false, false, false);
   }
 }

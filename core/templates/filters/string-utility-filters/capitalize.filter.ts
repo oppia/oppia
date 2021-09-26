@@ -16,8 +16,8 @@
  * @fileoverview Capitalize filter for Oppia.
  */
 
-angular.module('oppia').filter('capitalize', [function() {
-  return function(input) {
+angular.module('oppia').filter('capitalize', [function () {
+  return function (input) {
     if (!input) {
       return input;
     }

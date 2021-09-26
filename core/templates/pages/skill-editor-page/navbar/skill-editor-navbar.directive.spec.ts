@@ -30,7 +30,7 @@ import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
-describe('Skill Editor Navbar Directive', function() {
+describe('Skill Editor Navbar Directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -55,7 +55,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
@@ -88,7 +88,7 @@ describe('Skill Editor Navbar Directive', function() {
     });
   }));
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     expect($scope.activeTab).toBe(undefined);
     expect(ctrl.skill).toEqual(undefined);
 
@@ -100,7 +100,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should get current active tab name when ' +
-    'calling \'getActiveTabName\'', function() {
+    'calling \'getActiveTabName\'', function () {
     spyOn(skillEditorRoutingService, 'getActiveTabName')
       .and.returnValue('activeTab');
 
@@ -110,7 +110,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should check whether the skill is still loading when ' +
-    'calling \'isLoadingSkill\'', function() {
+    'calling \'isLoadingSkill\'', function () {
     spyOn(skillEditorStateService, 'isLoadingSkill')
       .and.returnValue(false);
 
@@ -120,7 +120,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should check whether the skill is being saved when ' +
-    'calling \'isSaveInProgress \'', function() {
+    'calling \'isSaveInProgress \'', function () {
     spyOn(skillEditorStateService, 'isSavingSkill')
       .and.returnValue(false);
 
@@ -130,7 +130,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should get change list count when calling ' +
-    '\'getChangeListCount\'', function() {
+    '\'getChangeListCount\'', function () {
     spyOn(undoRedoService, 'getChangeCount')
       .and.returnValue(2);
 
@@ -140,7 +140,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should discard changes when calling ' +
-    '\'discardChanges\'', function() {
+    '\'discardChanges\'', function () {
     let discardSpy = spyOn(undoRedoService, 'clearChanges')
       .and.returnValue(null);
 
@@ -151,7 +151,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should get change list count when calling ' +
-    '\'getChangeListCount\'', function() {
+    '\'getChangeListCount\'', function () {
     ctrl.$onInit();
     let result = $scope.getWarningsCount();
 
@@ -159,7 +159,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should check whether the skill is saveable when ' +
-    'calling \'isSkillSaveable\'', function() {
+    'calling \'isSkillSaveable\'', function () {
     spyOn(skillEditorStateService, 'isSavingSkill')
       .and.returnValue(false);
 
@@ -169,7 +169,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should toggle navigation options when calling ' +
-    '\'toggleNavigationOptions\'', function() {
+    '\'toggleNavigationOptions\'', function () {
     $scope.showNavigationOptions = true;
 
     $scope.toggleNavigationOptions();
@@ -180,7 +180,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should navigate to main tab when ' +
-    'calling \'selectMainTab\'', function() {
+    'calling \'selectMainTab\'', function () {
     let navigateToMainTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToMainTab')
       .and.returnValue(null);
@@ -191,7 +191,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should navigate to main tab when ' +
-    'calling \'selectPreviewTab\'', function() {
+    'calling \'selectPreviewTab\'', function () {
     let navigateToPreviewTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToPreviewTab')
       .and.returnValue(null);
@@ -202,7 +202,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should toggle skill edit options when calling ' +
-    '\'toggleSkillEditOptions\'', function() {
+    '\'toggleSkillEditOptions\'', function () {
     $scope.showSkillEditOptions = true;
 
     $scope.toggleSkillEditOptions();
@@ -213,7 +213,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should save changes if save changes modal is opened and confirm ' +
-    'button is clicked', fakeAsync(function() {
+    'button is clicked', fakeAsync(function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve('commitMessage')
     });
@@ -231,7 +231,7 @@ describe('Skill Editor Navbar Directive', function() {
   }));
 
   it('should not save changes if save changes modal is opened and cancel ' +
-    'button is clicked', fakeAsync(function() {
+    'button is clicked', fakeAsync(function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -245,9 +245,9 @@ describe('Skill Editor Navbar Directive', function() {
     expect(saveSkillSpy).not.toHaveBeenCalled();
   }));
 
-  describe('on navigating to questions tab ', function() {
+  describe('on navigating to questions tab ', function () {
     it('should open undo changes modal if there are unsaved ' +
-      'changes', fakeAsync(function() {
+      'changes', fakeAsync(function () {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
@@ -267,7 +267,7 @@ describe('Skill Editor Navbar Directive', function() {
     }));
 
     it('should navigate to questions tab if there are no unsaved ' +
-      'changes', function() {
+      'changes', function () {
       // Setting unsaved changes to be zero.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(0);

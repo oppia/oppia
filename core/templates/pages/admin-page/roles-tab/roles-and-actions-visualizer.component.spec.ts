@@ -25,7 +25,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MaterialModule } from 'modules/material.module';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 
-describe('Roles and actions visualizer component', function() {
+describe('Roles and actions visualizer component', function () {
   let component: RolesAndActionsVisualizerComponent;
   let fixture: ComponentFixture<RolesAndActionsVisualizerComponent>;
   let adminBackendApiService: AdminBackendApiService;
@@ -56,20 +56,20 @@ describe('Roles and actions visualizer component', function() {
     };
   });
 
-  it('should intialize correct active role', function() {
+  it('should intialize correct active role', function () {
     component.ngOnInit();
 
     expect(component.activeRole).toEqual('TRANSLATION_ADMIN');
   });
 
-  it('should intialize roles with all the roles', function() {
+  it('should intialize roles with all the roles', function () {
     component.ngOnInit();
 
     expect(component.roles).toEqual(
       ['FULL_USER', 'MOBILE_LEARNER', 'MODERATOR', 'TRANSLATION_ADMIN']);
   });
 
-  it('should intialize roleToReadableActions correctly', function() {
+  it('should intialize roleToReadableActions correctly', function () {
     component.ngOnInit();
 
     expect(component.roleToReadableActions).toEqual({
@@ -80,7 +80,7 @@ describe('Roles and actions visualizer component', function() {
     });
   });
 
-  it('should set active role correctly', function() {
+  it('should set active role correctly', function () {
     component.ngOnInit();
 
     component.activeRole = 'MOBILE_LEARNER';

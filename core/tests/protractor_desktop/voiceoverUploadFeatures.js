@@ -26,7 +26,7 @@ var ExplorationEditorPage =
 var CreatorDashboardPage =
     require('../protractor_utils/CreatorDashboardPage.js');
 
-describe('Voiceover upload features', function() {
+describe('Voiceover upload features', function () {
   var TEST_USERNAME = 'uploadUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
   var EXPLORATION_TITLE = 'Upload audio file';
@@ -36,7 +36,7 @@ describe('Voiceover upload features', function() {
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -67,14 +67,14 @@ describe('Voiceover upload features', function() {
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await users.login(TEST_EMAIL);
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
   });
 
-  it('should upload an audio file', async function() {
+  it('should upload an audio file', async function () {
     await explorationEditorTranslationTab.openUploadAudioModal();
     await explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
@@ -88,7 +88,7 @@ describe('Voiceover upload features', function() {
     expect(pauseClick).toBe(false);
   });
 
-  it('should not let upload a non audio file', async function() {
+  it('should not let upload a non audio file', async function () {
     await explorationEditorTranslationTab.openUploadAudioModal();
     await explorationEditorTranslationTab.expectWrongFileType(
       '../data/img.png');
@@ -97,7 +97,7 @@ describe('Voiceover upload features', function() {
     await explorationEditorTranslationTab.closeUploadAudioModal();
   });
 
-  it('should not let upload a five minutes longer audio', async function() {
+  it('should not let upload a five minutes longer audio', async function () {
     await explorationEditorTranslationTab.openUploadAudioModal();
     await explorationEditorTranslationTab.expectAudioOverFiveMinutes(
       '../data/cafe-over-five-minutes.mp3');
@@ -108,7 +108,7 @@ describe('Voiceover upload features', function() {
   });
 
   it('should upload recorded audio and play after logging out',
-    async function() {
+    async function () {
       await explorationEditorTranslationTab.addAudioRecord();
       await explorationEditorTranslationTab.stopAudioRecord();
       await explorationEditorTranslationTab.confirmAudioRecord();
@@ -128,7 +128,7 @@ describe('Voiceover upload features', function() {
     });
 
   it('should upload audio file from path and play after logout',
-    async function() {
+    async function () {
       await explorationEditorTranslationTab.uploadAudioRecord(
         '../../../data/explorations/audio_test/assets/audio/' +
         'test_audio_1_en.mp3');
@@ -151,7 +151,7 @@ describe('Voiceover upload features', function() {
       await workflow.publishExploration();
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
       '(Bad Request)', {status_code: 400,

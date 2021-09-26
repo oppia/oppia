@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Welcome Modal Controller', function() {
+describe('Welcome Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
@@ -28,7 +28,7 @@ describe('Welcome Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
@@ -49,7 +49,7 @@ describe('Welcome Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.explorationId).toBe(explorationId);
       expect($scope.editorWelcomeImgUrl).toBe(
         '/assets/images/general/editor_welcome.svg');

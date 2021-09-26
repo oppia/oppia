@@ -29,7 +29,7 @@ import { UtilsService } from 'services/utils.service';
 })
 export class StateCardIsCheckpointService extends
   StatePropertyService<boolean> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveCardIsCheckpoint';
   }

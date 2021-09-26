@@ -20,7 +20,7 @@ require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 angular.module('oppia').directive('schemaBasedHtmlEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -33,9 +33,9 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
       },
       template: require('./schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
+      controller: ['$scope', function ($scope) {
         var ctrl = this;
-        ctrl.updateValue = function(value: string) {
+        ctrl.updateValue = function (value: string) {
           ctrl.localValue = value;
           $scope.$applyAsync();
           setTimeout(() => {

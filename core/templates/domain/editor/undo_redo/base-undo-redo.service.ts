@@ -28,30 +28,30 @@ import { BackendChangeObject, Change, DomainObject } from './change.model';
  * not currently supported.
  */
 export class BaseUndoRedo {
-  constructor() {
+  constructor () {
     this.init();
   }
   private _appliedChanges: Change[] = [];
   private _undoneChanges: Change[] = [];
   _undoRedoChangeEventEmitter: EventEmitter<void> = new EventEmitter();
 
-  private _dispatchMutation(): void {
+  private _dispatchMutation (): void {
     this._undoRedoChangeEventEmitter.emit();
   }
 
-  private _applyChange(
+  private _applyChange (
       Change: Change, domainObject: DomainObject): void {
     Change.applyChange(domainObject);
     this._dispatchMutation();
   }
 
-  private _reverseChange(
+  private _reverseChange (
       Change: Change, domainObject: DomainObject): void {
     Change.reverseChange(domainObject);
     this._dispatchMutation();
   }
 
-  init(): void {
+  init (): void {
     this._appliedChanges = [];
     this._undoneChanges = [];
   }
@@ -61,7 +61,7 @@ export class BaseUndoRedo {
    * provided domain object. When a new change is applied, all undone changes
    * are lost and cannot be redone. This fires mutation event.
    */
-  applyChange(change: Change, domainObject: DomainObject): void {
+  applyChange (change: Change, domainObject: DomainObject): void {
     this._applyChange(change, domainObject);
     this._appliedChanges.push(change);
     this._undoneChanges = [];
@@ -72,7 +72,7 @@ export class BaseUndoRedo {
    * returns false if there are no changes to undo, and true otherwise. This
    * fires mutation event.
    */
-  undoChange(domainObject: DomainObject): boolean {
+  undoChange (domainObject: DomainObject): boolean {
     if (this._appliedChanges.length !== 0) {
       var change = this._appliedChanges.pop();
       this._undoneChanges.push(change);
@@ -87,7 +87,7 @@ export class BaseUndoRedo {
    * object. This list will not contain undone actions. Changes to the
    * returned list will not be reflected in this class instance.
    */
-  redoChange(domainObject: DomainObject): boolean {
+  redoChange (domainObject: DomainObject): boolean {
     if (this._undoneChanges.length !== 0) {
       var change = this._undoneChanges.pop();
       this._appliedChanges.push(change);
@@ -102,7 +102,7 @@ export class BaseUndoRedo {
    * object. This list will not contain undone actions. Changes to the
    * returned list will not be reflected in this class instance.
    */
-  getChangeList(): Change[] {
+  getChangeList (): Change[] {
     // TODO(bhenning): Consider integrating something like Immutable.js to
     // avoid the slice here and ensure the returned object is truly an
     // immutable copy.
@@ -115,7 +115,7 @@ export class BaseUndoRedo {
    * instance. Furthermore, the returned list is ready to be sent to the
    * backend.
    */
-  getCommittableChangeList(): BackendChangeObject[] {
+  getCommittableChangeList (): BackendChangeObject[] {
     const committableChangeList: BackendChangeObject[] = [];
     for (let i = 0; i < this._appliedChanges.length; i++) {
       committableChangeList[i] =
@@ -124,7 +124,7 @@ export class BaseUndoRedo {
     return committableChangeList;
   }
 
-  setChangeList(changeList: Change[]): void {
+  setChangeList (changeList: Change[]): void {
     this._appliedChanges = changeList;
   }
 
@@ -132,14 +132,14 @@ export class BaseUndoRedo {
    * Returns the number of changes that have been applied to the domain
    * object.
    */
-  getChangeCount(): number {
+  getChangeCount (): number {
     return this._appliedChanges.length;
   }
 
   /**
    * Returns whether this objcet has any applied changes.
    */
-  hasChanges(): boolean {
+  hasChanges (): boolean {
     return this._appliedChanges.length !== 0;
   }
 
@@ -147,13 +147,13 @@ export class BaseUndoRedo {
    * Clears the change history. This does not reverse any of the changes
    * applied from applyChange() or redoChange(). This fires mutation event.
    */
-  clearChanges(): void {
+  clearChanges (): void {
     this._appliedChanges = [];
     this._undoneChanges = [];
     this._dispatchMutation();
   }
 
-  onUndoRedoChangeApplied$(): Observable<void> {
+  onUndoRedoChangeApplied$ (): Observable<void> {
     return this._undoRedoChangeEventEmitter.asObservable();
   }
 }

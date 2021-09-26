@@ -28,7 +28,7 @@ require(
 angular.module('oppia').controller('TagMisconceptionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'StateEditorService',
   'taggedSkillMisconceptionId',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, StateEditorService,
       taggedSkillMisconceptionId) {
     $controller('ConfirmOrCancelModalController', {
@@ -43,7 +43,7 @@ angular.module('oppia').controller('TagMisconceptionModalController', [
     $scope.taggedSkillMisconceptionId = (
       taggedSkillMisconceptionId);
 
-    $scope.done = function() {
+    $scope.done = function () {
       $uibModalInstance.close({
         misconception: $scope.tempSelectedMisconception,
         misconceptionSkillId: $scope.tempSelectedMisconceptionSkillId,
@@ -51,7 +51,7 @@ angular.module('oppia').controller('TagMisconceptionModalController', [
       });
     };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       $uibModalInstance.dismiss('cancel');
     };
   }

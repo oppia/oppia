@@ -50,14 +50,14 @@ export class SharingLinksComponent implements OnInit {
   serverName!: string;
   escapedTwitterText!: string;
 
-  constructor(
+  constructor (
     private nbgModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
     private htmlEscaperService: HtmlEscaperService,
     private windowRef: WindowRef) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.shareType === 'exploration') {
       this.activityId = this.explorationId;
       this.activityUrlFragment = 'explore';
@@ -85,7 +85,7 @@ export class SharingLinksComponent implements OnInit {
       '/general/classroom.png');
   }
 
-  getFontAndFlexClass(): string {
+  getFontAndFlexClass (): string {
     let classes = '';
     classes += this.smallFont ? 'font-small' : 'font-big';
     classes += ' fx-' + this.layoutType;
@@ -98,7 +98,7 @@ export class SharingLinksComponent implements OnInit {
     return classes;
   }
 
-  getUrl(network: SharingPlatform): string {
+  getUrl (network: SharingPlatform): string {
     let queryString: string;
     const url = (
       `${this.serverName}/${this.activityUrlFragment}/${this.activityId}`);
@@ -128,14 +128,14 @@ export class SharingLinksComponent implements OnInit {
     }
   }
 
-  showEmbedExplorationModal(): void {
+  showEmbedExplorationModal (): void {
     const modelRef = this.nbgModal.open(
       ExplorationEmbedButtonModalComponent, {backdrop: true});
     modelRef.componentInstance.serverName = this.serverName;
     modelRef.componentInstance.explorationId = this.explorationId;
   }
 
-  registerShareEvent(network: SharingPlatform): void {
+  registerShareEvent (network: SharingPlatform): void {
     if (this.shareType === 'exploration') {
       this.siteAnalyticsService.registerShareExplorationEvent(network);
     } else if (this.shareType === 'collection') {

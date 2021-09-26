@@ -57,7 +57,7 @@ angular.module('oppia').component('versionDiffVisualization', {
   },
   template: require('./version-diff-visualization.component.html'),
   controllerAs: '$ctrl',
-  controller: ['$uibModal', 'UrlInterpolationService', function(
+  controller: ['$uibModal', 'UrlInterpolationService', function (
       $uibModal, UrlInterpolationService) {
     var ctrl = this;
     // Constants for color of nodes in diff graph.
@@ -89,7 +89,7 @@ angular.module('oppia').component('versionDiffVisualization', {
     // Opens the modal showing the history diff for a given state.
     // stateId is the unique ID assigned to a state during the
     // calculation of the state graph.
-    ctrl.onClickStateInDiffGraph = function(stateId) {
+    ctrl.onClickStateInDiffGraph = function (stateId) {
       var oldStateName = undefined;
       if (nodesData[stateId].newestStateName !==
           nodesData[stateId].originalStateName) {
@@ -109,7 +109,7 @@ angular.module('oppia').component('versionDiffVisualization', {
     //     version if the state name is changed.
     // - stateProperty is whether the state is added, changed, unchanged or
     //   deleted.
-    ctrl.showStateDiffModal = function(
+    ctrl.showStateDiffModal = function (
         newStateName, oldStateName, stateProperty) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -118,13 +118,13 @@ angular.module('oppia').component('versionDiffVisualization', {
         backdrop: true,
         windowClass: 'state-diff-modal',
         resolve: {
-          newStateName: function() {
+          newStateName: function () {
             return newStateName;
           },
-          oldStateName: function() {
+          oldStateName: function () {
             return oldStateName;
           },
-          newState: function() {
+          newState: function () {
             if (stateProperty !== STATE_PROPERTY_DELETED &&
                 ctrl.getDiffData().v2States.hasOwnProperty(
                   newStateName)) {
@@ -133,7 +133,7 @@ angular.module('oppia').component('versionDiffVisualization', {
               return null;
             }
           },
-          oldState: function() {
+          oldState: function () {
             var stateNameToRetrieve = oldStateName || newStateName;
             if (stateProperty !== STATE_PROPERTY_ADDED &&
                 ctrl.getDiffData().v1States.hasOwnProperty(
@@ -143,7 +143,7 @@ angular.module('oppia').component('versionDiffVisualization', {
               return null;
             }
           },
-          headers: function() {
+          headers: function () {
             return {
               leftPane: ctrl.getEarlierVersionHeader(),
               rightPane: ctrl.getLaterVersionHeader()
@@ -151,13 +151,13 @@ angular.module('oppia').component('versionDiffVisualization', {
           }
         },
         controller: 'StateDiffModalController'
-      }).result.then(function() {}, function() {
+      }).result.then(function () {}, function () {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
       });
     };
-    ctrl.$onInit = function() {
+    ctrl.$onInit = function () {
       nodesData = ctrl.getDiffData().nodes;
       _stateTypeUsed[NODE_TYPE_ADDED] = false;
       _stateTypeUsed[NODE_TYPE_DELETED] = false;

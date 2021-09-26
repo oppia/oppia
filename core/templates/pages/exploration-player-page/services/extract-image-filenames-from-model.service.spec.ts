@@ -959,7 +959,7 @@ describe('Extracting Image file names in the state service', () => {
       stateNames.forEach((statename) => {
         let filenamesInState = (
           eifms.getImageFilenamesInState(states.getState(statename)));
-        filenamesInState.forEach(function(filename) {
+        filenamesInState.forEach(function (filename) {
           expect(ImageFilenamesInExploration[statename]).toContain(filename);
         });
       });

@@ -22,7 +22,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
   'canReviewActiveThread', 'description', 'newContent', 'oldContent',
   'stateName', 'suggestionIsHandled', 'suggestionStatus',
   'suggestionType', 'IMPORT_STATEMENT',
-  function(
+  function (
       $uibModalInstance, $scope, SuggestionModalService,
       canReviewActiveThread, description, newContent, oldContent,
       stateName, suggestionIsHandled, suggestionStatus,
@@ -54,13 +54,13 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
     $scope.reviewMessage = null;
     $scope.summaryMessage = null;
     $scope.canReviewActiveThread = canReviewActiveThread;
-    // ng-model needs to bind to a property of an object on
+    // Ng-model needs to bind to a property of an object on
     // the scope (the property cannot sit directly on the scope)
     // Reference https://stackoverflow.com/q/12618342
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
     $scope.suggestionEditorIsShown = false;
 
-    $scope.acceptSuggestion = function() {
+    $scope.acceptSuggestion = function () {
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
@@ -70,7 +70,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
         });
     };
 
-    $scope.rejectSuggestion = function() {
+    $scope.rejectSuggestion = function () {
       SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
@@ -80,38 +80,38 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
         });
     };
 
-    $scope.editSuggestion = function() {
+    $scope.editSuggestion = function () {
       $scope.suggestionEditorIsShown = true;
     };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
 
-    $scope.isEditButtonShown = function() {
+    $scope.isEditButtonShown = function () {
       return (
         !$scope.isNotHandled && $scope.isSuggestionRejected &&
         !$scope.suggestionEditorIsShown);
     };
 
-    $scope.isResubmitButtonShown = function() {
+    $scope.isResubmitButtonShown = function () {
       return (
         !$scope.isNotHandled && $scope.isSuggestionRejected &&
         $scope.suggestionEditorIsShown);
     };
 
-    $scope.isResubmitButtonDisabled = function() {
+    $scope.isResubmitButtonDisabled = function () {
       return !(
         $scope.summaryMessage &&
         ($scope.suggestionData.newSuggestionHtml.trim() !==
           newContent.html.trim()));
     };
 
-    $scope.cancelEditMode = function() {
+    $scope.cancelEditMode = function () {
       $scope.suggestionEditorIsShown = false;
     };
 
-    $scope.resubmitChanges = function() {
+    $scope.resubmitChanges = function () {
       $uibModalInstance.close({
         action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,
         newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,

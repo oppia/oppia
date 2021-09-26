@@ -27,7 +27,7 @@ export class ClassroomData {
   _courseDetails: string;
   _topicListIntro: string;
 
-  constructor(
+  constructor (
       name: string, topicSummaries: CreatorTopicSummary[],
       courseDetails: string, topicListIntro: string) {
     this._name = name;
@@ -36,7 +36,7 @@ export class ClassroomData {
     this._topicListIntro = topicListIntro;
   }
 
-  static createFromBackendData(
+  static createFromBackendData (
       name: string, topicSummaryDicts: CreatorTopicSummaryBackendDict[],
       courseDetails: string, topicListIntro: string): ClassroomData {
     let topicSummaries = topicSummaryDicts.map(
@@ -49,19 +49,19 @@ export class ClassroomData {
       name, topicSummaries, courseDetails, topicListIntro);
   }
 
-  getName(): string {
+  getName (): string {
     return this._name;
   }
 
-  getTopicSummaries(): CreatorTopicSummary[] {
+  getTopicSummaries (): CreatorTopicSummary[] {
     return this._topicSummaries.slice();
   }
 
-  getCourseDetails(): string {
+  getCourseDetails (): string {
     return this._courseDetails;
   }
 
-  getTopicListIntro(): string {
+  getTopicListIntro (): string {
     return this._topicListIntro;
   }
 }

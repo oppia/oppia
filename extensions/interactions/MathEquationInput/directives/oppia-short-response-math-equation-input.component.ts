@@ -32,11 +32,11 @@ export class ShortResponseMathEquationInput implements OnInit {
   @Input() answer: string;
   displayAnswer: Object;
 
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
   }
 }

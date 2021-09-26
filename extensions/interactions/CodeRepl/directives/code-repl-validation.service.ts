@@ -34,11 +34,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class CodeReplValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: CodeReplCustomizationArgs): Warning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -82,7 +82,7 @@ export class CodeReplValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: CodeReplCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(

@@ -40,13 +40,13 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   errorMessage: string = '';
   eventBusGroup: EventBusGroup;
 
-  constructor(
+  constructor (
     private eventBusService: EventBusService,
     private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.value !== null) {
       const defaultNumberWithUnits =
         this.numberWithUnitsObjectFactory.fromDict(this.value);
@@ -55,7 +55,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
     }
   }
 
-  updateValue(newValue: string): void {
+  updateValue (newValue: string): void {
     try {
       let numberWithUnits =
         this.numberWithUnitsObjectFactory.fromRawInputString(newValue);

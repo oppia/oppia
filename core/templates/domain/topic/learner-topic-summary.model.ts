@@ -40,7 +40,7 @@ export interface LearnerTopicSummaryBackendDict {
 }
 
 export class LearnerTopicSummary {
-  constructor(
+  constructor (
       public id: string,
       public name: string,
       public languageCode: string,
@@ -58,7 +58,7 @@ export class LearnerTopicSummary {
       public subtopics: Subtopic[],
       public urlFragment: string) { }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       topicSummaryBackendDict: LearnerTopicSummaryBackendDict
   ): LearnerTopicSummary {
     let subtopics = topicSummaryBackendDict.subtopics.map(subtopic => {
@@ -88,67 +88,67 @@ export class LearnerTopicSummary {
       topicSummaryBackendDict.url_fragment);
   }
 
-  getId(): string {
+  getId (): string {
     return this.id;
   }
 
-  getName(): string {
+  getName (): string {
     return this.name;
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this.languageCode;
   }
 
-  getDescription(): string {
+  getDescription (): string {
     return this.description;
   }
 
-  getVersion(): number {
+  getVersion (): number {
     return this.version;
   }
 
-  getStoryTitles(): string[] {
+  getStoryTitles (): string[] {
     return this.storyTitles;
   }
 
-  getTotalPublishedNodeCount(): number {
+  getTotalPublishedNodeCount (): number {
     return this.totalPublishedNodeCount;
   }
 
-  getCanonicalStorySummaryDicts(): StorySummary[] {
+  getCanonicalStorySummaryDicts (): StorySummary[] {
     return this.canonicalStorySummaryDicts;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename (): string {
     return this.thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor (): string {
     return this.thumbnailBgColor;
   }
 
-  getClassroom(): string {
+  getClassroom (): string {
     return this.classroom;
   }
 
-  getPracticeTabIsDisplayed(): boolean {
+  getPracticeTabIsDisplayed (): boolean {
     return this.practiceTabIsDisplayed;
   }
 
-  getDegreesOfMastery(): DegreesOfMastery {
+  getDegreesOfMastery (): DegreesOfMastery {
     return this.degreesOfMastery;
   }
 
-  getSkillDescriptions(): SkillIdToDescriptionMap {
+  getSkillDescriptions (): SkillIdToDescriptionMap {
     return this.skillDescriptions;
   }
 
-  getSubtopics(): Subtopic[] {
+  getSubtopics (): Subtopic[] {
     return this.subtopics;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment (): string {
     return this.urlFragment;
   }
 }

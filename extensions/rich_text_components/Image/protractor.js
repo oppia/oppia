@@ -123,7 +123,7 @@ const SVGTAGS = {
     '="0" cy="0" r="40" id="group1"/></g></g></g></svg>')
 };
 
-var customizeComponent = async function(modal, selectedAction, args, altText) {
+var customizeComponent = async function (modal, selectedAction, args, altText) {
   // The arguments for this function are as follows:
   //   - modal: The selector for the customisation arguments modal.
   //   - selectedAction: Represents the user action. Image RTE component
@@ -169,7 +169,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
   }
 };
 
-var expectComponentDetailsToMatch = async function(
+var expectComponentDetailsToMatch = async function (
     elem, selectedAction, args, altText) {
   if (selectedAction === 'create') {
     var svgName = args.join('_');
@@ -181,7 +181,7 @@ var expectComponentDetailsToMatch = async function(
     var src = await svgDiagramInputElement.getAttribute('src');
     var alt = await svgDiagramInputElement.getAttribute('alt');
     expect(alt).toEqual(altText);
-    await request(src, function(error, response, body) {
+    await request(src, function (error, response, body) {
       expect(body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[svgName]);
     });
   }

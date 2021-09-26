@@ -41,18 +41,18 @@ angular.module('oppia').component('solutionExplanationEditor', {
   controller: [
     'ContextService', 'EditabilityService',
     'ExternalSaveService', 'StateSolutionService',
-    function(
+    function (
         ContextService, EditabilityService,
         ExternalSaveService, StateSolutionService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.openExplanationEditor = function() {
+      ctrl.openExplanationEditor = function () {
         if (ctrl.isEditable) {
           ctrl.explanationEditorIsOpen = true;
         }
       };
 
-      ctrl.saveThisExplanation = function() {
+      ctrl.saveThisExplanation = function () {
         var contentHasChanged = (
           StateSolutionService.displayed.explanation.html !==
           StateSolutionService.savedMemento.explanation.html);
@@ -67,11 +67,11 @@ angular.module('oppia').component('solutionExplanationEditor', {
         ctrl.explanationEditorIsOpen = false;
       };
 
-      ctrl.cancelThisExplanationEdit = function() {
+      ctrl.cancelThisExplanationEdit = function () {
         ctrl.explanationEditorIsOpen = false;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(() => {
             if (ctrl.explanationEditorIsOpen &&
@@ -93,7 +93,7 @@ angular.module('oppia').component('solutionExplanationEditor', {
           }
         };
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

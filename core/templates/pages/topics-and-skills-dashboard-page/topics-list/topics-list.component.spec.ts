@@ -62,7 +62,7 @@ describe('Topics List Component', () => {
 
   class MockNgbModal {
     modalRef: MockNgbRef = new MockNgbRef();
-    open(content, options): MockNgbRef {
+    open (content, options): MockNgbRef {
       return this.modalRef;
     }
   }
@@ -70,7 +70,7 @@ describe('Topics List Component', () => {
   class MockEditableBackendApiService {
     success: boolean = true;
     message: string = '';
-    deleteTopicAsync(topicId: string): object {
+    deleteTopicAsync (topicId: string): object {
       return {
         then: (
             successCallback: (status: number) => void,

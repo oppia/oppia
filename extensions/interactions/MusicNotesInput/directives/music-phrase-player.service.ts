@@ -33,7 +33,7 @@ export class MusicPhrasePlayerService {
   _MIDI_VELOCITY: number = 127;
   _SECS_TO_MILLISECS: number = 1000.0;
 
-  _playNote(
+  _playNote (
       midiValues: number[], durationInSecs: number, delayInSecs: number): void {
     setTimeout(() => {
       MIDI.chordOn(
@@ -52,7 +52,7 @@ export class MusicPhrasePlayerService {
    * - start: Float. A decimal number representing the time offset (after the
    *     beginning of the phrase) at which to start playing the note.
    */
-  _playMusicPhrase(notes: Note[]): void {
+  _playMusicPhrase (notes: Note[]): void {
     MIDI.Player.stop();
 
     for (var i: number = 0; i < notes.length; i++) {
@@ -61,7 +61,7 @@ export class MusicPhrasePlayerService {
     }
   }
 
-  playMusicPhrase(notes: Note[]): void {
+  playMusicPhrase (notes: Note[]): void {
     this._playMusicPhrase(notes);
   }
 }

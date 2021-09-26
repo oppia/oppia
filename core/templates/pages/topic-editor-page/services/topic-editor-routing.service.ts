@@ -36,7 +36,7 @@ export class TopicEditorRoutingService {
   private _activeTabName = this._MAIN_TAB;
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService
@@ -45,7 +45,7 @@ export class TopicEditorRoutingService {
     this._changeTab(currentHash.substring(1, currentHash.length));
   }
 
-  private _changeTab(newHash: string) {
+  private _changeTab (newHash: string) {
     if (newHash === '') {
       this._changeTab('/');
     }
@@ -64,53 +64,53 @@ export class TopicEditorRoutingService {
     this._updateViewEventEmitter.emit();
   }
 
-  getActiveTabName(): string {
+  getActiveTabName (): string {
     return this._activeTabName;
   }
 
-  getLastTabVisited(): string {
+  getLastTabVisited (): string {
     return this._lastTabVisited;
   }
-  getLastSubtopicIdVisited(): number {
+  getLastSubtopicIdVisited (): number {
     return this._lastSubtopicId;
   }
 
-  navigateToMainTab(): void {
+  navigateToMainTab (): void {
     this._lastTabVisited = 'topic';
     this.pageTitleService.setNavbarTitleForMobileView('Topic Editor');
     this._changeTab('/');
   }
 
-  navigateToSubtopicPreviewTab(subtopicId: number): void {
+  navigateToSubtopicPreviewTab (subtopicId: number): void {
     this._lastTabVisited = 'subtopic';
     this.pageTitleService.setNavbarTitleForMobileView('Subtopic Preview');
     this._changeTab('/subtopic_preview/' + subtopicId);
   }
 
-  navigateToTopicPreviewTab(): void {
+  navigateToTopicPreviewTab (): void {
     this._lastTabVisited = 'topic';
     this.pageTitleService.setNavbarTitleForMobileView('Topic Preview');
     this._changeTab('/topic_preview');
   }
 
-  navigateToSubtopicEditorWithId(subtopicId: number): void {
+  navigateToSubtopicEditorWithId (subtopicId: number): void {
     this._lastTabVisited = 'subtopic';
     this.pageTitleService.setNavbarTitleForMobileView('Subtopic Editor');
     this._changeTab('/subtopic_editor/' + subtopicId);
   }
 
-  navigateToQuestionsTab(): void {
+  navigateToQuestionsTab (): void {
     this._lastSubtopicId = this.getSubtopicIdFromUrl();
     this.pageTitleService.setNavbarTitleForMobileView('Question Editor');
     this._changeTab('/questions');
   }
 
-  getSubtopicIdFromUrl(): number {
+  getSubtopicIdFromUrl (): number {
     return parseInt(
       this.windowRef.nativeWindow.location.hash.split('/')[2]);
   }
 
-  navigateToSkillEditorWithId(skillId: string): void {
+  navigateToSkillEditorWithId (skillId: string): void {
     let SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
 
     let skillEditorUrl = this.urlInterpolationService.interpolateUrl(
@@ -120,7 +120,7 @@ export class TopicEditorRoutingService {
     this.windowRef.nativeWindow.open(skillEditorUrl);
   }
 
-  get updateViewEventEmitter(): EventEmitter<void> {
+  get updateViewEventEmitter (): EventEmitter<void> {
     return this._updateViewEventEmitter;
   }
 }

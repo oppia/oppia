@@ -24,15 +24,15 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './story-editor-unpublish-modal.component.html'
 })
 export class StoryEditorUnpublishModalComponent {
-  constructor(
+  constructor (
      private activeModal: NgbActiveModal
   ) {}
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 
-  confirm(): void {
+  confirm (): void {
     this.activeModal.close();
   }
 }

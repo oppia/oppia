@@ -39,16 +39,16 @@ import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
   providedIn: 'root'
 })
 export class NumberWithUnitsValidationService {
-  constructor(
+  constructor (
     private unitObjectFactory: NumberWithUnitsObjectFactory,
     private baseInteraction: baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: NumberWithUnitsCustomizationArgs): Warning[] {
     return [];
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: NumberWithUnitsCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {

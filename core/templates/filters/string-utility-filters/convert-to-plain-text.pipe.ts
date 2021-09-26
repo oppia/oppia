@@ -23,7 +23,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
   providedIn: 'root'
 })
 export class ConvertToPlainTextPipe implements PipeTransform {
-  transform(input: string): string {
+  transform (input: string): string {
     let strippedText = input.replace(/(<([^>]+)>)/ig, '');
     strippedText = strippedText.replace(/&nbsp;/ig, ' ');
     strippedText = strippedText.replace(/&quot;/ig, '');

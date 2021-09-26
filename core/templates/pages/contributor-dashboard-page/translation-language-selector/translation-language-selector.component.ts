@@ -46,13 +46,13 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   explanationPopupPxOffsetY = 0;
   explanationPopupContent = '';
 
-  constructor(
+  constructor (
     private contributionOpportunitiesBackendApiService:
       ContributionOpportunitiesBackendApiService,
     private languageUtilService: LanguageUtilService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.options = this.languageUtilService
       .getAllVoiceoverLanguageCodes().map(languageCode => {
         const description = this.languageUtilService
@@ -68,16 +68,16 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       });
   }
 
-  toggleDropdown(): void {
+  toggleDropdown (): void {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  selectOption(activeLanguageCode: string): void {
+  selectOption (activeLanguageCode: string): void {
     this.setActiveLanguageCode.emit(activeLanguageCode);
     this.dropdownShown = false;
   }
 
-  showExplanationPopup(index: number): void {
+  showExplanationPopup (index: number): void {
     /**
      * Align popup to mouse-overed info icon.
      * 75: approximate height of selector and featured languages label.
@@ -89,7 +89,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.explanationPopupShown = true;
   }
 
-  hideExplanationPopup(): void {
+  hideExplanationPopup (): void {
     this.explanationPopupShown = false;
   }
 
@@ -98,7 +98,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
    * @param event mouse click event
    */
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
+  onDocumentClick (event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
     if (
       targetElement &&

@@ -19,7 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Training Data Editor Panel Service', function() {
+describe('Training Data Editor Panel Service', function () {
   importAllAngularServices();
 
   var TrainingDataEditorPanelService = null;
@@ -30,14 +30,14 @@ describe('Training Data Editor Panel Service', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     TrainingDataEditorPanelService = $injector.get(
       'TrainingDataEditorPanelService');
     $uibModal = $injector.get('$uibModal');
@@ -45,7 +45,7 @@ describe('Training Data Editor Panel Service', function() {
     spyOn(mockExternalSaveEventEmitter, 'emit');
   }));
 
-  it('should call $uibModal when opening training data editor', function() {
+  it('should call $uibModal when opening training data editor', function () {
     var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
     var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings').and
       .callThrough();

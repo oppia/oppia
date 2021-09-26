@@ -27,7 +27,7 @@ import { StateRecordedVoiceoversService } from 'components/state-editor/state-ed
   providedIn: 'root'
 })
 export class TranslationTabActiveContentIdService {
-  constructor(
+  constructor (
     private _stateRecordedVoiceoversService: StateRecordedVoiceoversService) {}
   // 'activeContentId' and 'activeDataFormat' will be 'null' if active content
   // has not been set.
@@ -35,15 +35,15 @@ export class TranslationTabActiveContentIdService {
   activeDataFormat: string | null = null;
   _activeContentIdChangedEventEmitter = new EventEmitter();
 
-  getActiveContentId(): string | null {
+  getActiveContentId (): string | null {
     return this.activeContentId;
   }
 
-  getActiveDataFormat(): string | null {
+  getActiveDataFormat (): string | null {
     return this.activeDataFormat;
   }
 
-  setActiveContent(contentId: string, dataFormat: string): void {
+  setActiveContent (contentId: string, dataFormat: string): void {
     var allContentIds = (
       this._stateRecordedVoiceoversService.displayed.getAllContentIds());
     if (allContentIds.indexOf(contentId) === -1) {
@@ -54,7 +54,7 @@ export class TranslationTabActiveContentIdService {
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
 
-  get onActiveContentIdChanged(): EventEmitter<string> {
+  get onActiveContentIdChanged (): EventEmitter<string> {
     return this._activeContentIdChangedEventEmitter;
   }
 }

@@ -69,7 +69,7 @@ export class Solution {
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
-  constructor(
+  constructor (
       ehfs: ExplorationHtmlFormatterService,
       answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
       explanation: SubtitledHtml) {
@@ -79,7 +79,7 @@ export class Solution {
     this.explanation = explanation;
   }
 
-  toBackendDict(): SolutionBackendDict {
+  toBackendDict (): SolutionBackendDict {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
@@ -87,7 +87,7 @@ export class Solution {
     };
   }
 
-  getSummary(interactionId: string): string {
+  getSummary (interactionId: string): string {
     const solutionType = this.answerIsExclusive ? 'The only' : 'One';
     let correctAnswer = null;
     if (interactionId === 'GraphInput') {
@@ -128,15 +128,15 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
-  setCorrectAnswer(correctAnswer: InteractionAnswer): void {
+  setCorrectAnswer (correctAnswer: InteractionAnswer): void {
     this.correctAnswer = correctAnswer;
   }
 
-  setExplanation(explanation: SubtitledHtml): void {
+  setExplanation (explanation: SubtitledHtml): void {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(interaction: Interaction):
+  getOppiaShortAnswerResponseHtml (interaction: Interaction):
     ShortAnswerResponse {
     if (interaction.id === null) {
       throw new Error('Interaction id is possibly null.');
@@ -150,7 +150,7 @@ export class Solution {
     };
   }
 
-  getOppiaSolutionExplanationResponseHtml(): string {
+  getOppiaSolutionExplanationResponseHtml (): string {
     return this.explanation.html;
   }
 }
@@ -159,9 +159,9 @@ export class Solution {
   providedIn: 'root'
 })
 export class SolutionObjectFactory {
-  constructor(
+  constructor (
     private ehfs: ExplorationHtmlFormatterService) {}
-  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
+  createFromBackendDict (solutionBackendDict: SolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,
       solutionBackendDict.answer_is_exclusive,
@@ -170,7 +170,7 @@ export class SolutionObjectFactory {
         solutionBackendDict.explanation));
   }
 
-  createNew(
+  createNew (
       answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
       explanationHtml: string, explanationId: string): Solution {
     return new Solution(

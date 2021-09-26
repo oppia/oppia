@@ -19,7 +19,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var SubscriptionDashboardPage = function() {
+var SubscriptionDashboardPage = function () {
   var subscriptionButton = element(
     by.css('.protractor-test-subscription-button'));
   var subscriptionName = element.all(
@@ -27,33 +27,33 @@ var SubscriptionDashboardPage = function() {
   var subscribeLabel = element(by.css('.protractor-test-subscribe-label'));
   var unsubscribeLabel = element(by.css('.protractor-test-unsubscribe-label'));
 
-  this.navigateToUserSubscriptionPage = async function(userName) {
+  this.navigateToUserSubscriptionPage = async function (userName) {
     await browser.get('/profile/' + userName);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectSubscriptionFirstNameToMatch = async function(name) {
+  this.expectSubscriptionFirstNameToMatch = async function (name) {
     var firstSubscriberNameElem = subscriptionName.first();
     await waitFor.visibilityOf(
       firstSubscriberNameElem, 'First Subscriber Name is not visible');
     expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionLastNameToMatch = async function(name) {
+  this.expectSubscriptionLastNameToMatch = async function (name) {
     var lastSubscriberNameElem = subscriptionName.last();
     await waitFor.visibilityOf(
       lastSubscriberNameElem, 'Last Subscriber Name is not visible');
     expect(await lastSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionCountToEqual = async function(value) {
+  this.expectSubscriptionCountToEqual = async function (value) {
     await waitFor.visibilityOf(
       subscriptionName.first(),
       'Subscriber Name Card takes too long to appear');
     expect(await subscriptionName.count()).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = async function() {
+  this.navigateToSubscriptionButton = async function () {
     await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
     var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();

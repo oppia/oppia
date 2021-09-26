@@ -33,7 +33,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { UserInfo } from 'domain/user/user-info.model';
 
-describe('Collection player page directive', function() {
+describe('Collection player page directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -71,7 +71,7 @@ describe('Collection player page directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
@@ -191,7 +191,7 @@ describe('Collection player page directive', function() {
     });
   }));
 
-  it('should set properties when initialized', fakeAsync(function() {
+  it('should set properties when initialized', fakeAsync(function () {
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
@@ -235,7 +235,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should throw warning message when an invalid collection ' +
-    'is fetched from backend', fakeAsync(function() {
+    'is fetched from backend', fakeAsync(function () {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.rejectWith();
     spyOn(userService, 'getUserInfoAsync')
@@ -250,7 +250,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should throw warning message when an invalid collection summary ' +
-    'is fetched from the backend', fakeAsync(function() {
+    'is fetched from the backend', fakeAsync(function () {
     ctrl.collection = sampleCollection;
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
@@ -278,7 +278,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should scroll to the given location when calling ' +
-    '\scrollToLocation\'', function() {
+    '\scrollToLocation\'', function () {
     ctrl.scrollToLocation('location');
 
     expect($anchorScroll).toHaveBeenCalled();
@@ -302,7 +302,7 @@ describe('Collection player page directive', function() {
   });
 
   it('should return exploration title position given index ' +
-    'when calling \'getExplorationTitlePosition\'', function() {
+    'when calling \'getExplorationTitlePosition\'', function () {
     // Case 1.
     let result = ctrl.getExplorationTitlePosition(2);
     expect(result).toBe('8px');
@@ -316,14 +316,14 @@ describe('Collection player page directive', function() {
     expect(result).toBe('-40px');
   });
 
-  it('should return exploration url given exploration id', function() {
+  it('should return exploration url given exploration id', function () {
     ctrl.collectionId = 'colId1';
     let url = ctrl.getExplorationUrl('id1');
 
     expect(url).toBe('/explore/id1?collection_id=colId1');
   });
 
-  it('should generate path icon parameters', fakeAsync(function() {
+  it('should generate path icon parameters', fakeAsync(function () {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     spyOn(userService, 'getUserInfoAsync')
@@ -337,7 +337,7 @@ describe('Collection player page directive', function() {
     expect(pathIconParameters).toEqual(collectionNodesList);
   }));
 
-  it('should check whether the exploration is completed', fakeAsync(function() {
+  it('should check whether the exploration is completed', fakeAsync(function () {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     spyOn(userService, 'getUserInfoAsync')
@@ -352,7 +352,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should trigger \'$watch\' when collection is ' +
-    'updated', fakeAsync(function() {
+    'updated', fakeAsync(function () {
     let $watchSpy = spyOn($scope, '$watch').and.callThrough();
     sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
     sampleCollection = Collection.create(
@@ -372,7 +372,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should generate empty path parameters when collection ' +
-    'node count is one', fakeAsync(function() {
+    'node count is one', fakeAsync(function () {
     sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
@@ -390,7 +390,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should generate path parameters when collection ' +
-    'node count is two', fakeAsync(function() {
+    'node count is two', fakeAsync(function () {
     sampleCollectionBackendObject.nodes = [
       collectionNodeBackendObject,
       collectionNodeBackendObject
@@ -411,7 +411,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should generate path parameters when collection ' +
-    'node count is three', fakeAsync(function() {
+    'node count is three', fakeAsync(function () {
     sampleCollectionBackendObject.nodes = [
       collectionNodeBackendObject,
       collectionNodeBackendObject,
@@ -431,7 +431,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should generate path parameters when collection ' +
-    'node count is four', fakeAsync(function() {
+    'node count is four', fakeAsync(function () {
     sampleCollectionBackendObject.nodes = [
       collectionNodeBackendObject,
       collectionNodeBackendObject,
@@ -454,7 +454,7 @@ describe('Collection player page directive', function() {
       'M250 80  C 470 100, 470 280, 250 300 S 30 500, 250 520, ');
   }));
 
-  it('should return static image url given image path', function() {
+  it('should return static image url given image path', function () {
     let urlInterpolationSpy = spyOn(
       urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('imageUrl');
@@ -465,7 +465,7 @@ describe('Collection player page directive', function() {
     expect(url).toBe('imageUrl');
   });
 
-  it('should set icon hight when calling \'setIconHighlight\'', function() {
+  it('should set icon hight when calling \'setIconHighlight\'', function () {
     // Default value.
     ctrl.activeHighlightedIconIndex = -1;
 
@@ -477,7 +477,7 @@ describe('Collection player page directive', function() {
   });
 
   it('should toggle preview card when calling ' +
-    '\'togglePreviewCard\'', function() {
+    '\'togglePreviewCard\'', function () {
     ctrl.explorationCardIsShown = false;
 
     ctrl.togglePreviewCard();
@@ -487,7 +487,7 @@ describe('Collection player page directive', function() {
     expect(ctrl.explorationCardIsShown).toBe(false);
   });
 
-  it('should return collecton node from exploration id', function() {
+  it('should return collecton node from exploration id', function () {
     ctrl.collection = sampleCollection;
 
     let result = ctrl.getCollectionNodeForExplorationId('exp_id');
@@ -496,7 +496,7 @@ describe('Collection player page directive', function() {
   });
 
   it('should update exploration preview card when calling ' +
-    '\'updateExplorationPreview\'', function() {
+    '\'updateExplorationPreview\'', function () {
     ctrl.explorationCardIsShown = false;
 
     ctrl.collection = sampleCollection;
@@ -507,7 +507,7 @@ describe('Collection player page directive', function() {
   });
 
   it('should show warning message if we try to ' +
-    'load a collection with invalid id', function() {
+    'load a collection with invalid id', function () {
     ctrl.collection = sampleCollection;
 
     ctrl.getCollectionNodeForExplorationId('invalidId');
@@ -516,7 +516,7 @@ describe('Collection player page directive', function() {
       'There was an error loading the collection.');
   });
 
-  it('should return next recommended collection node', fakeAsync(function() {
+  it('should return next recommended collection node', fakeAsync(function () {
     ctrl.collection = sampleCollection;
     ctrl.collectionPlaythrough = (
       CollectionPlaythrough.create('exp_id', ['exp_id0']));
@@ -526,7 +526,7 @@ describe('Collection player page directive', function() {
     expect(result).toEqual(sampleCollection.nodes[0]);
   }));
 
-  it('should return completed collection node', fakeAsync(function() {
+  it('should return completed collection node', fakeAsync(function () {
     ctrl.collection = sampleCollection;
     ctrl.collectionPlaythrough = (
       CollectionPlaythrough.create('exp_id0', ['exp_id']));
@@ -537,7 +537,7 @@ describe('Collection player page directive', function() {
   }));
 
   it('should return non recommended collection node ' +
-    'count', fakeAsync(function() {
+    'count', fakeAsync(function () {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     spyOn(userService, 'getUserInfoAsync')

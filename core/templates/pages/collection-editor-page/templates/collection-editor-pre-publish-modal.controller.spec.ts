@@ -25,7 +25,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 
-describe('Collection Editor Pre Publish Modal Controller', function() {
+describe('Collection Editor Pre Publish Modal Controller', function () {
   var ctrl = null;
   var $scope = null;
   var $uibModalInstance = null;
@@ -34,14 +34,14 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   let collectionUpdateService = null;
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('when title, objective and category are specified', function() {
+  describe('when title, objective and category are specified', function () {
     var collectionDict = {
       id: 'collection1',
       title: 'This is the collection title',
@@ -60,7 +60,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       }
     };
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       CollectionEditorStateService = $injector.get(
         'CollectionEditorStateService');
@@ -82,7 +82,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect(ctrl.requireTitleToBeSpecified).toBe(false);
         expect(ctrl.requireObjectiveToBeSpecified).toBe(false);
         expect(ctrl.requireCategoryToBeSpecified).toBe(false);
@@ -116,13 +116,13 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
         'title', 'objective', 'category']);
     }));
 
-    it('should cancel the modal on dismiss', function() {
+    it('should cancel the modal on dismiss', function () {
       ctrl.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
   });
 
-  describe('when title, objective or category are not specified', function() {
+  describe('when title, objective or category are not specified', function () {
     var collectionDict = {
       id: 'collection1',
       title: '',
@@ -141,7 +141,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       }
     };
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       CollectionEditorStateService = $injector.get(
@@ -163,7 +163,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect(ctrl.requireTitleToBeSpecified).toBe(true);
         expect(ctrl.requireObjectiveToBeSpecified).toBe(true);
         expect(ctrl.requireCategoryToBeSpecified).toBe(true);
@@ -173,7 +173,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
         expect(ctrl.newCategory).toBe(collectionDict.category);
       });
 
-    it('should not allow saving a collection with an empty title', function() {
+    it('should not allow saving a collection with an empty title', function () {
       ctrl.newTitle = '';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
@@ -187,7 +187,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
     });
 
     it('should not allow saving a collection with an empty objective',
-      function() {
+      function () {
         ctrl.newTitle = 'New title';
         ctrl.newObjective = '';
         ctrl.newCategory = 'Algorithm';
@@ -201,7 +201,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
 
     it('should not allow saving a collection with an empty category',
-      function() {
+      function () {
         ctrl.newTitle = 'New title';
         ctrl.newObjective = 'New objective';
         ctrl.newCategory = '';

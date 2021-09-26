@@ -17,9 +17,9 @@
  */
 
 // Filter that replaces all {{...}} in a string with '...'.
-angular.module('oppia').filter('replaceInputsWithEllipses', [function() {
+angular.module('oppia').filter('replaceInputsWithEllipses', [function () {
   var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
-  return function(input) {
+  return function (input) {
     return input ? input.replace(pattern, '...') : '';
   };
 }]);

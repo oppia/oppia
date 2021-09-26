@@ -30,23 +30,23 @@ export class SkillCreationService {
     TopicsAndSkillsDashboardPageConstants
       .SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
 
-  markChangeInSkillDescription(): void {
+  markChangeInSkillDescription (): void {
     this.skillDescriptionStatusMarker = (
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
         .STATUS_CHANGED);
   }
 
-  getSkillDescriptionStatus(): string {
+  getSkillDescriptionStatus (): string {
     return this.skillDescriptionStatusMarker;
   }
 
-  disableSkillDescriptionStatusMarker(): void {
+  disableSkillDescriptionStatusMarker (): void {
     this.skillDescriptionStatusMarker = (
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
         .STATUS_DISABLED);
   }
 
-  resetSkillDescriptionStatusMarker(): void {
+  resetSkillDescriptionStatusMarker (): void {
     this.skillDescriptionStatusMarker = (
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
         .STATUS_UNCHANGED);

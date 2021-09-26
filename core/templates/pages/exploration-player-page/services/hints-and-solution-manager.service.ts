@@ -62,7 +62,7 @@ export class HintsAndSolutionManagerService {
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
 
-  constructor(private playerPositionService: PlayerPositionService) {
+  constructor (private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
     playerPositionService.onNewCardAvailable.subscribe(
       () => {
@@ -73,7 +73,7 @@ export class HintsAndSolutionManagerService {
   }
 
   // This replaces any timeouts that are already queued.
-  enqueueTimeout(func: () => void, timeToWaitMsec: number): void {
+  enqueueTimeout (func: () => void, timeToWaitMsec: number): void {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
@@ -81,13 +81,13 @@ export class HintsAndSolutionManagerService {
     this.timeout = setTimeout(func.bind(this), timeToWaitMsec);
   }
 
-  showTooltip(): void {
+  showTooltip (): void {
     this.tooltipIsOpen = true;
     this.hintsDiscovered = true;
     this._timeoutElapsedEventEmitter.next();
   }
 
-  releaseHint(): void {
+  releaseHint (): void {
     if (!this.correctAnswerSubmitted) {
       this.numHintsReleased++;
       if (!this.hintsDiscovered && !this.tooltipTimeout) {
@@ -97,22 +97,22 @@ export class HintsAndSolutionManagerService {
     }
     this._timeoutElapsedEventEmitter.next();
   }
-  releaseSolution(): void {
+  releaseSolution (): void {
     this.solutionReleased = true;
     this._timeoutElapsedEventEmitter.next();
   }
-  accelerateHintRelease(): void {
+  accelerateHintRelease (): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
   }
 
-  areAllHintsExhausted(): boolean {
+  areAllHintsExhausted (): boolean {
     return this.numHintsReleased === this.hintsForLatestCard.length;
   }
-  isAHintWaitingToBeViewed(): boolean {
+  isAHintWaitingToBeViewed (): boolean {
     return this.numHintsConsumed < this.numHintsReleased;
   }
 
-  consumeHint(): void {
+  consumeHint (): void {
     this.hintsDiscovered = true;
     this.tooltipIsOpen = false;
     if (this.tooltipTimeout) {
@@ -136,7 +136,7 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  reset(newHints: Hint[], newSolution: Solution): void {
+  reset (newHints: Hint[], newSolution: Solution): void {
     this.numHintsReleased = 0;
     this.numHintsConsumed = 0;
     this.solutionReleased = false;
@@ -163,7 +163,7 @@ export class HintsAndSolutionManagerService {
   // WARNING: This method has a side-effect. If the retrieved hint is a
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
-  displayHint(index: number): SubtitledHtml | null {
+  displayHint (index: number): SubtitledHtml | null {
     if (index === this.numHintsConsumed &&
       this.numHintsConsumed < this.numHintsReleased) {
       // The latest hint has been consumed. Start the timer.
@@ -176,7 +176,7 @@ export class HintsAndSolutionManagerService {
     return null;
   }
 
-  displaySolution(): Solution {
+  displaySolution (): Solution {
     this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
@@ -187,31 +187,31 @@ export class HintsAndSolutionManagerService {
     return this.solutionForLatestCard;
   }
 
-  getNumHints(): number {
+  getNumHints (): number {
     return this.hintsForLatestCard.length;
   }
 
-  isHintViewable(index: number): boolean {
+  isHintViewable (index: number): boolean {
     return index < this.numHintsReleased;
   }
 
-  isHintConsumed(index: number): boolean {
+  isHintConsumed (index: number): boolean {
     return index < this.numHintsConsumed;
   }
 
-  isHintTooltipOpen(): boolean {
+  isHintTooltipOpen (): boolean {
     return this.tooltipIsOpen;
   }
 
-  isSolutionViewable(): boolean {
+  isSolutionViewable (): boolean {
     return this.solutionReleased;
   }
 
-  isSolutionConsumed(): boolean {
+  isSolutionConsumed (): boolean {
     return this.solutionConsumed;
   }
 
-  recordWrongAnswer(): void {
+  recordWrongAnswer (): void {
     if (this.isAHintWaitingToBeViewed()) {
       return;
     }
@@ -230,11 +230,11 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  get onSolutionViewedEventEmitter(): EventEmitter<unknown> {
+  get onSolutionViewedEventEmitter (): EventEmitter<unknown> {
     return this._solutionViewedEventEmitter;
   }
 
-  get onHintConsumed(): EventEmitter<unknown> {
+  get onHintConsumed (): EventEmitter<unknown> {
     return this._hintConsumedEventEmitter;
   }
 }

@@ -43,14 +43,14 @@ require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.component.ts');
 
-describe('Improvements tab', function() {
+describe('Improvements tab', function () {
   let $ctrl, $scope, explorationImprovementsService, routerService;
 
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function(
+  beforeEach(angular.mock.inject(function (
       $componentController, $rootScope, _ExplorationImprovementsService_,
       _ExplorationImprovementsTaskRegistryService_, _RouterService_) {
     explorationImprovementsService = _ExplorationImprovementsService_;

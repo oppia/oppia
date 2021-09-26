@@ -57,7 +57,7 @@ describe('Solution Verification Service', () => {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -75,7 +75,7 @@ describe('Solution Verification Service', () => {
 
   // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
   // block when ExplorationStateService has been migrated to Angular 8.
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ess = $injector.get('ExplorationStatesService');
     ess.init({
       'First State': {

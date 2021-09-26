@@ -35,13 +35,13 @@ export class ActivityTilesInfinityGridComponent {
   directiveSubscriptions = new Subscription();
   libraryWindowIsNarrow: boolean;
 
-  constructor(
+  constructor (
     private loaderService: LoaderService,
     private searchService: SearchService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  showMoreActivities(): void {
+  showMoreActivities (): void {
     if (!this.loadingMessage && !this.endOfPageIsReached) {
       this.searchResultsAreLoading = true;
       this.searchService.loadMoreData((data, endOfPageIsReached) => {
@@ -56,7 +56,7 @@ export class ActivityTilesInfinityGridComponent {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.loaderService.onLoadingMessageChange.subscribe(
         (message: string) => this.loadingMessage = message

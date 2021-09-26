@@ -19,7 +19,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-describe('Reassign Role Confirm Or Cancel Modal Controller ', function() {
+describe('Reassign Role Confirm Or Cancel Modal Controller ', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var testUsername = 'testUsername';
@@ -27,7 +27,7 @@ describe('Reassign Role Confirm Or Cancel Modal Controller ', function() {
   var testOldRole = 'testOldRole';
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
@@ -41,7 +41,7 @@ describe('Reassign Role Confirm Or Cancel Modal Controller ', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.username).toBe(testUsername);
       expect($scope.newRole).toBe(testRole);
       expect($scope.oldRole).toBe(testOldRole);

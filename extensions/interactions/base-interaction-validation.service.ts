@@ -38,7 +38,7 @@ export class baseInteractionValidationService {
   // 'argNames' is an array of top-level customization argument names (such
   // as 'chocies') used to verify the basic structure of the input
   // customization arguments object.
-  requireCustomizationArguments(
+  requireCustomizationArguments (
       customizationArguments: {}, argNames: string[]): void {
     var missingArgs = [];
 
@@ -60,7 +60,7 @@ export class baseInteractionValidationService {
     }
   }
 
-  getAnswerGroupWarnings(
+  getAnswerGroupWarnings (
       answerGroups: AnswerGroup[], stateName: string): Warning[] {
     var partialWarningsList = [];
 
@@ -87,7 +87,7 @@ export class baseInteractionValidationService {
     return partialWarningsList;
   }
 
-  getDefaultOutcomeWarnings(
+  getDefaultOutcomeWarnings (
       defaultOutcome: Outcome | null, stateName: string): Warning[] {
     var partialWarningsList = [];
     if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
@@ -110,7 +110,7 @@ export class baseInteractionValidationService {
     return partialWarningsList;
   }
 
-  getAllOutcomeWarnings(
+  getAllOutcomeWarnings (
       answerGroups: AnswerGroup[], defaultOutcome: Outcome | null,
       stateName: string): Warning[] {
     return (

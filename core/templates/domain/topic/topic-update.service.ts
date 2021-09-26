@@ -48,12 +48,12 @@ type SubtopicUpdateReverse = (
   providedIn: 'root'
 })
 export class TopicUpdateService {
-  constructor(private undoRedoService: UndoRedoService) {}
+  constructor (private undoRedoService: UndoRedoService) {}
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
   // entity can be a topic object or a subtopic page object.
-  private _applyChange(
+  private _applyChange (
       entity,
       command: string, params,
       apply: TopicUpdateApply | SubtopicUpdateApply,
@@ -64,13 +64,13 @@ export class TopicUpdateService {
     this.undoRedoService.applyChange(changeObj, entity);
   }
 
-  private _getParameterFromChangeDict(changeDict, paramName: string) {
+  private _getParameterFromChangeDict (changeDict, paramName: string) {
     return changeDict[paramName];
   }
 
   // Applies a topic property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
-  private _applyTopicPropertyChange(
+  private _applyTopicPropertyChange (
       topic: Topic, propertyName: string, newValue: string|boolean,
       oldValue: string|boolean,
       apply: TopicUpdateApply, reverse: TopicUpdateReverse) {
@@ -81,7 +81,7 @@ export class TopicUpdateService {
     }, apply, reverse);
   }
 
-  private _applySubtopicPropertyChange(
+  private _applySubtopicPropertyChange (
       topic: Topic, propertyName: string, subtopicId: number, newValue: string,
       oldValue: string,
       apply: SubtopicUpdateApply, reverse: SubtopicUpdateReverse) {
@@ -94,7 +94,7 @@ export class TopicUpdateService {
       }, apply, reverse);
   }
 
-  private _applySubtopicPagePropertyChange(
+  private _applySubtopicPagePropertyChange (
       subtopicPage: SubtopicPage, propertyName: string,
       subtopicId: number, newValue, oldValue,
       apply: SubtopicUpdateApply, reverse: SubtopicUpdateReverse): void {
@@ -107,11 +107,11 @@ export class TopicUpdateService {
       }, apply, reverse);
   }
 
-  private _getNewPropertyValueFromChangeDict(changeDict) {
+  private _getNewPropertyValueFromChangeDict (changeDict) {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
-  private _getSubtopicIdFromChangeDict(changeDict) {
+  private _getSubtopicIdFromChangeDict (changeDict) {
     return this._getParameterFromChangeDict(changeDict, 'subtopic_id');
   }
 
@@ -122,7 +122,7 @@ export class TopicUpdateService {
    * Changes the name of a topic and records the change in the
    * undo/redo service.
    */
-  setTopicName(
+  setTopicName (
       topic: Topic, name: string): void {
     let oldName = cloneDeep(topic.getName());
     this._applyTopicPropertyChange(
@@ -141,7 +141,7 @@ export class TopicUpdateService {
    * Changes the abbreviated name of a topic and records the change in the
    * undo/redo service.
    */
-  setAbbreviatedTopicName(
+  setAbbreviatedTopicName (
       topic: Topic, abbreviatedName: string): void {
     let oldAbbreviatedName = cloneDeep(topic.getAbbreviatedName());
     this._applyTopicPropertyChange(
@@ -161,7 +161,7 @@ export class TopicUpdateService {
    * Changes the meta tag content of a topic and records the change in the
    * undo/redo service.
    */
-  setMetaTagContent(
+  setMetaTagContent (
       topic: Topic, metaTagContent: string): void {
     let oldMetaTagContent = cloneDeep(topic.getMetaTagContent());
     this._applyTopicPropertyChange(
@@ -182,7 +182,7 @@ export class TopicUpdateService {
    * Changes the 'practice tab is displayed' property of a topic and
    * records the change in the undo/redo service.
    */
-  setPracticeTabIsDisplayed(
+  setPracticeTabIsDisplayed (
       topic: Topic, practiceTabIsDisplayed: boolean): void {
     let oldPracticeTabIsDisplayed = cloneDeep(
       topic.getPracticeTabIsDisplayed());
@@ -204,7 +204,7 @@ export class TopicUpdateService {
    * Changes the page title fragment of a topic and records the change in the
    * undo/redo service.
    */
-  setPageTitleFragmentForWeb(
+  setPageTitleFragmentForWeb (
       topic: Topic, pageTitleFragmentForWeb: string): void {
     let oldPageTitleFragmentForWeb = cloneDeep(
       topic.getPageTitleFragmentForWeb());
@@ -226,7 +226,7 @@ export class TopicUpdateService {
    * Changes the url fragment of a topic and records the change in the
    * undo/redo service.
    */
-  setTopicUrlFragment(
+  setTopicUrlFragment (
       topic: Topic, urlFragment: string): void {
     let oldUrlFragment = cloneDeep(topic.getUrlFragment());
     this._applyTopicPropertyChange(
@@ -246,7 +246,7 @@ export class TopicUpdateService {
    * Changes the thumbnail filename of a topic and records the change in the
    * undo/redo service.
    */
-  setTopicThumbnailFilename(
+  setTopicThumbnailFilename (
       topic: Topic, thumbnailFilename: string): void {
     let oldThumbnailFilename = cloneDeep(topic.getThumbnailFilename());
     this._applyTopicPropertyChange(
@@ -267,7 +267,7 @@ export class TopicUpdateService {
    * Changes the thumbnail background color of a topic and records the
    * change in the undo/redo service.
    */
-  setTopicThumbnailBgColor(
+  setTopicThumbnailBgColor (
       topic: Topic, thumbnailBgColor: string): void {
     let oldThumbnailBgColor = cloneDeep(topic.getThumbnailBgColor());
     this._applyTopicPropertyChange(
@@ -288,7 +288,7 @@ export class TopicUpdateService {
    * Changes the description of a topic and records the change in the
    * undo/redo service.
    */
-  setTopicDescription(
+  setTopicDescription (
       topic: Topic, description: string): void {
     let oldDescription = cloneDeep(topic.getDescription());
     this._applyTopicPropertyChange(
@@ -308,7 +308,7 @@ export class TopicUpdateService {
    * Changes the language code of a topic and records the change in
    * the undo/redo service.
    */
-  setTopicLanguageCode(
+  setTopicLanguageCode (
       topic: Topic, languageCode: string): void {
     let oldLanguageCode = cloneDeep(topic.getLanguageCode());
     this._applyTopicPropertyChange(
@@ -328,7 +328,7 @@ export class TopicUpdateService {
    * Creates a subtopic and adds it to the topic and records the change in
    * the undo/redo service.
    */
-  addSubtopic(
+  addSubtopic (
       topic: Topic, title: string): void {
     let nextSubtopicId = topic.getNextSubtopicId();
     this._applyChange(topic, TopicDomainConstants.CMD_ADD_SUBTOPIC, {
@@ -348,7 +348,7 @@ export class TopicUpdateService {
    * @param {Topic} topic - The topic object to be edited.
    * @param {number} subtopicId - The id of the subtopic to delete.
    */
-  deleteSubtopic(
+  deleteSubtopic (
       topic: Topic, subtopicId: number): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
@@ -473,7 +473,7 @@ export class TopicUpdateService {
    * Moves a skill to a subtopic from either another subtopic or
    * uncategorized skills and records the change in the undo/redo service.
    */
-  moveSkillToSubtopic(
+  moveSkillToSubtopic (
       topic: Topic, oldSubtopicId: number,
       newSubtopicId: number, skillSummary: ShortSkillSummary): void {
     if (!newSubtopicId) {
@@ -515,7 +515,7 @@ export class TopicUpdateService {
    * Moves a skill from a subtopic to uncategorized skills
    * and records the change in the undo/redo service.
    */
-  removeSkillFromSubtopic(
+  removeSkillFromSubtopic (
       topic: Topic, subtopicId: number,
       skillSummary: ShortSkillSummary): void {
     let subtopic = topic.getSubtopicById(subtopicId);
@@ -541,7 +541,7 @@ export class TopicUpdateService {
    * Changes the thumbnail filename of a subtopic and records the change in
    * the undo/redo service.
    */
-  setSubtopicThumbnailFilename(
+  setSubtopicThumbnailFilename (
       topic: Topic, subtopicId: number, thumbnailFilename: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
@@ -567,7 +567,7 @@ export class TopicUpdateService {
    * Changes the url fragment of a subtopic and records the change in
    * the undo/redo service.
    */
-  setSubtopicUrlFragment(
+  setSubtopicUrlFragment (
       topic: Topic, subtopicId: number, urlFragment: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
@@ -592,7 +592,7 @@ export class TopicUpdateService {
    * Changes the thumbnail background color of a subtopic and records
    * the change in the undo/redo service.
    */
-  setSubtopicThumbnailBgColor(
+  setSubtopicThumbnailBgColor (
       topic: Topic, subtopicId: number, thumbnailBgColor: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
@@ -618,7 +618,7 @@ export class TopicUpdateService {
    * Changes the title of a subtopic and records the change in
    * the undo/redo service.
    */
-  setSubtopicTitle(
+  setSubtopicTitle (
       topic: Topic, subtopicId: number, title: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
@@ -638,7 +638,7 @@ export class TopicUpdateService {
       });
   }
 
-  setSubtopicPageContentsHtml(
+  setSubtopicPageContentsHtml (
       subtopicPage: SubtopicPage, subtopicId: number,
       newSubtitledHtml: SubtitledHtml): void {
     let oldSubtitledHtml = cloneDeep(
@@ -657,7 +657,7 @@ export class TopicUpdateService {
       });
   }
 
-  setSubtopicPageContentsAudio(
+  setSubtopicPageContentsAudio (
       subtopicPage: SubtopicPage, subtopicId: number,
       newRecordedVoiceovers: RecordedVoiceovers): void {
     let oldRecordedVoiceovers = cloneDeep(
@@ -682,7 +682,7 @@ export class TopicUpdateService {
    * Removes an additional story id from a topic and records the change
    * in the undo/redo service.
    */
-  removeAdditionalStory(
+  removeAdditionalStory (
       topic: Topic, storyId: string): void {
     this._applyChange(
       topic, TopicDomainConstants.CMD_DELETE_ADDITIONAL_STORY, {
@@ -700,7 +700,7 @@ export class TopicUpdateService {
    * Removes an canonical story id from a topic and records the change
    * in the undo/redo service.
    */
-  removeCanonicalStory(
+  removeCanonicalStory (
       topic: Topic, storyId: string): void {
     this._applyChange(topic, TopicDomainConstants.CMD_DELETE_CANONICAL_STORY, {
       story_id: storyId
@@ -717,7 +717,7 @@ export class TopicUpdateService {
    * Rearranges or moves a canonical story to another position and
    * records the change in undo/redo service.
    */
-  rearrangeCanonicalStory(
+  rearrangeCanonicalStory (
       topic: Topic, fromIndex: number, toIndex: number): void {
     this._applyChange(
       topic, TopicDomainConstants.CMD_REARRANGE_CANONICAL_STORY, {
@@ -736,7 +736,7 @@ export class TopicUpdateService {
    * Rearranges or moves a skill in a subtopic to another position and
    * records the change in undo/redo service.
    */
-  rearrangeSkillInSubtopic(
+  rearrangeSkillInSubtopic (
       topic: Topic, subtopicId: number,
       fromIndex: number, toIndex: number): void {
     this._applyChange(
@@ -757,7 +757,7 @@ export class TopicUpdateService {
    * Rearranges a subtopic to another position and records the change in
    * undo/redo service.
    */
-  rearrangeSubtopic(
+  rearrangeSubtopic (
       topic: Topic, fromIndex: number, toIndex: number): void {
     this._applyChange(topic, TopicDomainConstants.CMD_REARRANGE_SUBTOPIC, {
       from_index: fromIndex,
@@ -775,7 +775,7 @@ export class TopicUpdateService {
    * Removes an uncategorized skill from a topic and records the change
    * in the undo/redo service.
    */
-  removeUncategorizedSkill(
+  removeUncategorizedSkill (
       topic: Topic, skillSummary: ShortSkillSummary): void {
     this._applyChange(
       topic, TopicDomainConstants.CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {

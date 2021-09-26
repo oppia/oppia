@@ -40,7 +40,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Training Panel Component', function() {
+describe('Training Panel Component', function () {
   importAllAngularServices();
 
   var ctrl = null;
@@ -120,14 +120,14 @@ describe('Training Panel Component', function() {
     });
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     generateContentIdService = TestBed.get(GenerateContentIdService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value('GenerateContentIdService', generateContentIdService);
     $provide.value(
@@ -146,7 +146,7 @@ describe('Training Panel Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     responsesService = $injector.get('ResponsesService');
@@ -182,7 +182,7 @@ describe('Training Panel Component', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect(ctrl.addingNewResponse).toBe(false);
       expect($scope.allOutcomes.length).toBe(2);
       expect($scope.selectedAnswerGroupIndex).toBe(0);
@@ -191,11 +191,11 @@ describe('Training Panel Component', function() {
         '</oppia-response-multiple-choice-input>');
     });
 
-  it('should get name from current state', function() {
+  it('should get name from current state', function () {
     expect($scope.getCurrentStateName()).toBe(stateName);
   });
 
-  it('should add new feedback and select it', function() {
+  it('should add new feedback and select it', function () {
     spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(0);
     expect($scope.allOutcomes.length).toBe(2);
     expect($scope.selectedAnswerGroupIndex).toBe(0);
@@ -205,7 +205,7 @@ describe('Training Panel Component', function() {
     expect($scope.selectedAnswerGroupIndex).toBe(2);
   });
 
-  it('should start to add new response and then cancel it', function() {
+  it('should start to add new response and then cancel it', function () {
     $scope.beginAddingNewResponse();
     expect(ctrl.addingNewResponse).toBe(true);
     expect(ctrl.classification.newOutcome.feedback.contentId).toBe(

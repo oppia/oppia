@@ -22,7 +22,7 @@ require(
 
 angular.module('oppia').controller('ChangeSubtopicAssignmentModalController', [
   '$controller', '$scope', '$uibModalInstance', 'subtopics',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, subtopics) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -30,7 +30,7 @@ angular.module('oppia').controller('ChangeSubtopicAssignmentModalController', [
     });
     $scope.subtopics = subtopics;
     $scope.selectedSubtopicId = null;
-    $scope.changeSelectedSubtopic = function(subtopicId) {
+    $scope.changeSelectedSubtopic = function (subtopicId) {
       $scope.selectedSubtopicId = subtopicId;
     };
   }

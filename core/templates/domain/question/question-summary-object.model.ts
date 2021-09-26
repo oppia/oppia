@@ -30,7 +30,7 @@ export class QuestionSummary {
   _interactionId: string;
   _misconceptionIds: string[];
 
-  constructor(
+  constructor (
       questionId: string, questionContent: string, interactionId: string,
       misconceptionIds: string[]) {
     this._questionId = questionId;
@@ -39,27 +39,27 @@ export class QuestionSummary {
     this._misconceptionIds = misconceptionIds;
   }
 
-  getQuestionId(): string {
+  getQuestionId (): string {
     return this._questionId;
   }
 
-  getQuestionContent(): string {
+  getQuestionContent (): string {
     return this._questionContent;
   }
 
-  getInteractionId(): string {
+  getInteractionId (): string {
     return this._interactionId;
   }
 
-  getMisconceptionIds(): string[] {
+  getMisconceptionIds (): string[] {
     return this._misconceptionIds;
   }
 
-  setQuestionContent(questionContent: string): void {
+  setQuestionContent (questionContent: string): void {
     this._questionContent = questionContent;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: QuestionSummaryBackendDict): QuestionSummary {
     return new QuestionSummary(
       backendDict.id,

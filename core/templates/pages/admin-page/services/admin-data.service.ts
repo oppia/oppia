@@ -33,11 +33,11 @@ export class AdminDataService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   dataPromise!: Promise<AdminPageData>;
 
-  constructor(
+  constructor (
     private adminBackendApiService: AdminBackendApiService
   ) {}
 
-  async _getDataAsync(): Promise<AdminPageData> {
+  async _getDataAsync (): Promise<AdminPageData> {
     if (this.dataPromise) {
       return this.dataPromise;
     }
@@ -47,7 +47,7 @@ export class AdminDataService {
     return this.dataPromise;
   }
 
-  async getDataAsync(): Promise<AdminPageData> {
+  async getDataAsync (): Promise<AdminPageData> {
     return this._getDataAsync();
   }
 }

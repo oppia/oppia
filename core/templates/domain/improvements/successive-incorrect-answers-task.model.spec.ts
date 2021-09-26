@@ -19,7 +19,7 @@
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/successive-incorrect-answers-task.model';
 
-describe('Successive incorrect answers task model', function() {
+describe('Successive incorrect answers task model', function () {
   it('should return new task if there are playthroughs demonstrating ' +
     'multiple incorrect submissions', () => {
     const task = SuccessiveIncorrectAnswersTask.createNew(

@@ -30,7 +30,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
-describe('Question misconception selector component', function() {
+describe('Question misconception selector component', function () {
   var $componentController = null;
   var ctrl = null;
   var misconceptionObjectFactory = null;
@@ -38,7 +38,7 @@ describe('Question misconception selector component', function() {
   var ses = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
@@ -47,13 +47,13 @@ describe('Question misconception selector component', function() {
   }));
 
   beforeEach(angular.mock.inject(
-    function(_$componentController_, _$q_, _$rootScope_, $injector) {
+    function (_$componentController_, _$q_, _$rootScope_, $injector) {
       $componentController = _$componentController_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');
     }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
@@ -64,7 +64,7 @@ describe('Question misconception selector component', function() {
           '2', 'misc2', 'notes2', 'feedback1', true)
       ]
     };
-    spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {
+    spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function () {
       return mockMisconceptionObject;
     });
     ctrl = $componentController('questionMisconceptionSelector', null, {
@@ -75,17 +75,17 @@ describe('Question misconception selector component', function() {
     ctrl.$onInit();
   });
 
-  it('should initialize correctly', function() {
+  it('should initialize correctly', function () {
     expect(ctrl.misconceptionsBySkill).toEqual(mockMisconceptionObject);
   });
 
-  it('should toggle feedback usage boolean correctly', function() {
+  it('should toggle feedback usage boolean correctly', function () {
     expect(ctrl.misconceptionFeedbackIsUsed).toBeTrue();
     ctrl.toggleMisconceptionFeedbackUsage();
     expect(ctrl.misconceptionFeedbackIsUsed).toBeFalse();
   });
 
-  it('should set selected misconception correctly', function() {
+  it('should set selected misconception correctly', function () {
     expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.abc[0]);
     expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
     ctrl.selectMisconception(mockMisconceptionObject.def[0], 'def');

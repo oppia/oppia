@@ -26,56 +26,56 @@ import { SetInputRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class SetInputRulesService {
-  Equals(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
+  Equals (answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return (
       answer.length === inputs.x.unicodeStrSet.length &&
-      inputs.x.unicodeStrSet.every(function(val) {
+      inputs.x.unicodeStrSet.every(function (val) {
         return answer.indexOf(val) >= 0;
       })
     );
   }
 
-  IsSubsetOf(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
+  IsSubsetOf (answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return (
       answer.length < inputs.x.unicodeStrSet.length &&
-      answer.every(function(val) {
+      answer.every(function (val) {
         return inputs.x.unicodeStrSet.indexOf(val) >= 0;
       })
     );
   }
 
-  IsSupersetOf(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
+  IsSupersetOf (answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return (
       answer.length > inputs.x.unicodeStrSet.length &&
-      inputs.x.unicodeStrSet.every(function(val) {
+      inputs.x.unicodeStrSet.every(function (val) {
         return answer.indexOf(val) >= 0;
       })
     );
   }
 
-  HasElementsIn(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.unicodeStrSet.some(function(val) {
+  HasElementsIn (answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
+    return inputs.x.unicodeStrSet.some(function (val) {
       return answer.indexOf(val) >= 0;
     });
   }
 
-  HasElementsNotIn(
+  HasElementsNotIn (
       answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return answer.some(function(val) {
+    return answer.some(function (val) {
       return inputs.x.unicodeStrSet.indexOf(val) === -1;
     });
   }
 
-  OmitsElementsIn(
+  OmitsElementsIn (
       answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.unicodeStrSet.some(function(val) {
+    return inputs.x.unicodeStrSet.some(function (val) {
       return answer.indexOf(val) === -1;
     });
   }
 
-  IsDisjointFrom(
+  IsDisjointFrom (
       answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.unicodeStrSet.every(function(val) {
+    return inputs.x.unicodeStrSet.every(function (val) {
       return answer.indexOf(val) === -1;
     });
   }

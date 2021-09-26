@@ -98,7 +98,7 @@ describe('AudioPlayerService', () => {
         }));
     });
 
-    it('should load track when user plays audio', fakeAsync(async() => {
+    it('should load track when user plays audio', fakeAsync(async () => {
       audioPlayerService.loadAsync('test.mp3').then(
         successHandler, failHandler);
       flushMicrotasks();
@@ -427,7 +427,7 @@ describe('AudioPlayerService', () => {
   });
 
   it('should clear secondary audio translations when audio ' +
-  'ends', fakeAsync(async() => {
+  'ends', fakeAsync(async () => {
     spyOn(howler, 'Howl').and.returnValue({
       on: (evt: string, func: () => void) => {
         if (evt === 'end') {

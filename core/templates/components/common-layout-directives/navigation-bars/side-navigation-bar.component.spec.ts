@@ -39,7 +39,7 @@ describe('Side Navigation Bar Component', () => {
   }
 
   class MockUrlInterpolationService {
-    getStaticImageUrl(imagePath: string): string {
+    getStaticImageUrl (imagePath: string): string {
       return imageUrl;
     }
   }

@@ -51,14 +51,14 @@ export class PracticeTabComponent implements OnInit {
   subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
 
-  constructor(
+  constructor (
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.selectedSubtopics = [];
     this.availableSubtopics = this.subtopicsList.filter(
       (subtopic: Subtopic) => {
@@ -87,7 +87,7 @@ export class PracticeTabComponent implements OnInit {
     }
   }
 
-  isStartButtonDisabled(): boolean {
+  isStartButtonDisabled (): boolean {
     if (this.startButtonIsDisabled) {
       return true;
     }
@@ -99,7 +99,7 @@ export class PracticeTabComponent implements OnInit {
     return true;
   }
 
-  checkIfQuestionsExist(subtopicIndices: boolean[]): void {
+  checkIfQuestionsExist (subtopicIndices: boolean[]): void {
     const skillIds = [];
     this.questionsStatusCallIsComplete = false;
     for (let idx in subtopicIndices) {
@@ -119,7 +119,7 @@ export class PracticeTabComponent implements OnInit {
     }
   }
 
-  openNewPracticeSession(): void {
+  openNewPracticeSession (): void {
     const selectedSubtopicIds = [];
     for (let idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
@@ -136,17 +136,17 @@ export class PracticeTabComponent implements OnInit {
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
   }
 
-  isAtLeastOneSubtopicSelected(): boolean {
+  isAtLeastOneSubtopicSelected (): boolean {
     return this.selectedSubtopicIndices.some(item => item);
   }
 
-  getBackgroundForProgress(i: number): number {
+  getBackgroundForProgress (i: number): number {
     return this.subtopicMasteryArray[i];
   }
 
   // This function is used to calculate the position of subtopic mastery
   // percent in the capsule shaped progress bar.
-  subtopicMasteryPosition(i: number): number {
+  subtopicMasteryPosition (i: number): number {
     if (this.clientWidth > 510) {
       if (this.subtopicMasteryArray[i] <= 89) {
         return 225 - this.subtopicMasteryArray[i] * 2.5;
@@ -160,7 +160,7 @@ export class PracticeTabComponent implements OnInit {
     }
   }
 
-  masteryTextColor(i: number): string {
+  masteryTextColor (i: number): string {
     if (this.subtopicMasteryArray[i] <= 89) {
       return 'black';
     }

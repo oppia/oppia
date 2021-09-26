@@ -41,13 +41,13 @@ export class UserEmailPreferencesService {
   MESSAGE_TYPE_FEEDBACK = 'feedback';
   feedbackNotificationsMuted: boolean;
   suggestionNotificationsMuted: boolean;
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private userEmailPreferencesBackendApiService:
     UserEmailPreferencesBackendApiService
   ) { }
 
-  init(
+  init (
       feedbackNotificationsMuted: boolean,
       suggestionNotificationsMuted: boolean): void {
     this.feedbackNotificationsMuted = feedbackNotificationsMuted;
@@ -57,14 +57,14 @@ export class UserEmailPreferencesService {
   /**
    * @return {boolean} Whether the feedback notification is muted.
    */
-  areFeedbackNotificationsMuted(): boolean {
+  areFeedbackNotificationsMuted (): boolean {
     return this.feedbackNotificationsMuted;
   }
 
   /**
    * @return {boolean} Whether the suggestion notification is muted.
    */
-  areSuggestionNotificationsMuted(): boolean {
+  areSuggestionNotificationsMuted (): boolean {
     return this.suggestionNotificationsMuted;
   }
 
@@ -72,7 +72,7 @@ export class UserEmailPreferencesService {
    * Set the message type to feedback and mute to true or false.
    * @param {boolean} mute - Whether the feedback notification is muted.
    */
-  setFeedbackNotificationPreferences(
+  setFeedbackNotificationPreferences (
       mute: boolean, successCallback: () => void): void {
     this.saveChangeToBackendAsync({
       message_type: this.MESSAGE_TYPE_FEEDBACK,
@@ -86,7 +86,7 @@ export class UserEmailPreferencesService {
    * Set the message type to suggestion and mute to true or false.
    * @param {boolean} mute - Whether the suggestion notification is muted.
    */
-  setSuggestionNotificationPreferences(
+  setSuggestionNotificationPreferences (
       mute: boolean, successCallback: () => void): void {
     this.saveChangeToBackendAsync({
       message_type: this.MESSAGE_TYPE_SUGGESTION,
@@ -100,7 +100,7 @@ export class UserEmailPreferencesService {
    * Save the change of message_type and mute to backend.
    * @param {RequestParam} requestParams - Info about message_type and mute.
    */
-  async saveChangeToBackendAsync(requestParams: RequestParams):
+  async saveChangeToBackendAsync (requestParams: RequestParams):
   Promise<void> {
     return this.userEmailPreferencesBackendApiService
       .saveChangeToBackendAsync(requestParams).then(

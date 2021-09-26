@@ -20,13 +20,13 @@ import { Directive, ElementRef, Input, NgModule, Pipe } from '@angular/core';
 
 @Pipe({name: 'translate'})
 export class MockTranslatePipe {
-  transform(value: string): string {
+  transform (value: string): string {
     return value;
   }
 }
 
 export class MockCapitalizePipe {
-  transform(input: string): string {
+  transform (input: string): string {
     return input;
   }
 }
@@ -35,11 +35,11 @@ export class MockCapitalizePipe {
   selector: '[translate],[ngx-translate]'
 })
 export class MockTranslateDirective {
-  @Input() set translate(key: string) {}
+  @Input() set translate (key: string) {}
 
-  @Input() set translateParams(params: Object) {}
+  @Input() set translateParams (params: Object) {}
 
-  constructor(private element: ElementRef) {}
+  constructor (private element: ElementRef) {}
 }
 
 @NgModule({

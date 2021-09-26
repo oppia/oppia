@@ -20,14 +20,14 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 
-describe('Admin Page', function() {
+describe('Admin Page', function () {
   var adminPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     adminPage = new AdminPage.AdminPage();
   });
 
-  it('should allow assigning roles and show them', async function() {
+  it('should allow assigning roles and show them', async function () {
     await users.createUser('moderator1@adminTab.com', 'moderator1');
     await users.createUser('moderator2@adminTab.com', 'moderator2');
     await users.createUser(
@@ -54,7 +54,7 @@ describe('Admin Page', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

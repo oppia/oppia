@@ -46,7 +46,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   @Input() savedSolution: InteractionAnswer;
   @Input() useFractionForDivisionWithValue: string;
 
-  constructor(
+  constructor (
     private algebraicExpressionInputRulesService:
       AlgebraicExpressionInputRulesService,
     private currentInteractionService: CurrentInteractionService,
@@ -58,7 +58,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     private mathInteractionsService: MathInteractionsService
   ) {}
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid (): boolean {
     const activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
     if (this.hasBeenTouched && activeGuppyObject === undefined) {
@@ -76,7 +76,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     return true;
   }
 
-  submitAnswer(): void {
+  submitAnswer (): void {
     if (!this.isCurrentAnswerValid()) {
       return;
     }
@@ -87,7 +87,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
@@ -131,7 +131,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
       submitAnswer, isCurrentAnswerValid);
   }
 
-  showOsk(): void {
+  showOsk (): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
   }

@@ -48,11 +48,11 @@ export class AlertsService {
   // created by our hybrid app (one for Angular, the other for AngularJS) can
   // refer to the same objects.
   private static warnings: Warning[] = [];
-  get warnings(): Warning[] {
+  get warnings (): Warning[] {
     return AlertsService.warnings;
   }
   private static messages: Message[] = [];
-  get messages(): Message[] {
+  get messages (): Message[] {
     return AlertsService.messages;
   }
 
@@ -60,7 +60,7 @@ export class AlertsService {
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(private log: LoggerService) {
+  constructor (private log: LoggerService) {
     // Since warnings and messages are static, clearing them in the constructor
     // retain "instance-like" behavior.
     this.clearWarnings();
@@ -71,7 +71,7 @@ export class AlertsService {
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
-  addWarning(warning: string): void {
+  addWarning (warning: string): void {
     this.log.error(warning);
     if (this.warnings.length >= this.MAX_TOTAL_WARNINGS) {
       return;
@@ -87,7 +87,7 @@ export class AlertsService {
    * exception to cause a hard failure in the frontend.
    * @param {string} warning - The warning message to display.
    */
-  fatalWarning(warning: string): void {
+  fatalWarning (warning: string): void {
     this.addWarning(warning);
     throw new Error(warning);
   }
@@ -96,7 +96,7 @@ export class AlertsService {
    * Deletes the warning from the warnings list.
    * @param {Object} warningToDelete - The warning message to be deleted.
    */
-  deleteWarning(warningToDelete: Warning): void {
+  deleteWarning (warningToDelete: Warning): void {
     const filteredWarnings = (
       this.warnings.filter(w => w.content !== warningToDelete.content));
     this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
@@ -105,7 +105,7 @@ export class AlertsService {
   /**
    * Clears all warnings.
    */
-  clearWarnings(): void {
+  clearWarnings (): void {
     this.warnings.splice(0, this.warnings.length);
   }
 
@@ -115,7 +115,7 @@ export class AlertsService {
    * @param {string} message - Message content
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addMessage(type: string, message: string, timeoutMilliseconds: number): void {
+  addMessage (type: string, message: string, timeoutMilliseconds: number): void {
     if (this.messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }
@@ -130,7 +130,7 @@ export class AlertsService {
    * Deletes the message from the messages list.
    * @param {Object} messageToDelete - Message to be deleted.
    */
-  deleteMessage(messageToDelete: Message): void {
+  deleteMessage (messageToDelete: Message): void {
     const isMessageToKeep = (m: Message) => (
       m.type !== messageToDelete.type || m.content !== messageToDelete.content);
     const filteredMessages = this.messages.filter(isMessageToKeep);
@@ -142,7 +142,7 @@ export class AlertsService {
    * @param {string} message - Info message to display.
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addInfoMessage(message: string, timeoutMilliseconds?: number): void {
+  addInfoMessage (message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
     }
@@ -154,7 +154,7 @@ export class AlertsService {
    * @param {string} message - Success message to display
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
+  addSuccessMessage (message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
     }
@@ -164,7 +164,7 @@ export class AlertsService {
   /**
    * Clears all messages.
    */
-  clearMessages(): void {
+  clearMessages (): void {
     this.messages.splice(0, this.messages.length);
   }
 }

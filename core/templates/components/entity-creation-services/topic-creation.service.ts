@@ -35,7 +35,7 @@ export class TopicCreationService {
   TOPIC_EDITOR_URL_TEMPLATE: string = '/topic_editor/<topic_id>';
   topicCreationInProgress: boolean = false;
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
@@ -47,7 +47,7 @@ export class TopicCreationService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  createNewTopic(): void {
+  createNewTopic (): void {
     if (this.topicCreationInProgress) {
       return;
     }

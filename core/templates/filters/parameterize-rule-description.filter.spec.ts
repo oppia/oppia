@@ -25,25 +25,25 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   var filterName = 'parameterizeRuleDescription';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  it('should have all expected filters', angular.mock.inject(function($filter) {
+  it('should have all expected filters', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should correctly parameterize rule description filter',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var ruleMultipleChoice = {
         type: 'Equals',
         inputs: {
@@ -78,7 +78,7 @@ describe('Testing filters', function() {
     }));
 
   it('should correctly display RTE components in Answer Group Header',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var ruleMath = {
         type: 'Equals',
         inputs: {

@@ -31,16 +31,16 @@ angular.module('oppia').controller('Base', [
   '$rootScope', '$scope',
   'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
   'UrlInterpolationService', 'SUPPORTED_SITE_LANGUAGES',
-  function(
+  function (
       $rootScope, $scope,
       CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
       UrlInterpolationService, SUPPORTED_SITE_LANGUAGES) {
     var ctrl = this;
-    $scope.getAssetUrl = function(path) {
+    $scope.getAssetUrl = function (path) {
       return UrlInterpolationService.getFullStaticAssetUrl(path);
     };
 
-    ctrl.$onInit = function() {
+    ctrl.$onInit = function () {
       $scope.currentLang = 'en';
       $scope.direction = 'ltr';
       // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -49,7 +49,7 @@ angular.module('oppia').controller('Base', [
       CsrfTokenService.initializeToken();
 
       // Listener function to catch the change in language preference.
-      $rootScope.$on('$translateChangeSuccess', function(evt, response) {
+      $rootScope.$on('$translateChangeSuccess', function (evt, response) {
         $scope.currentLang = response.language;
         for (var i = 0; i < SUPPORTED_SITE_LANGUAGES.length; i++) {
           if (SUPPORTED_SITE_LANGUAGES[i].id === $scope.currentLang) {

@@ -25,7 +25,7 @@ require(
   'pages/exploration-editor-page/improvements-tab/' +
   'needs-guiding-responses-task.component.ts');
 
-describe('NeedsGuidingResponsesTask component', function() {
+describe('NeedsGuidingResponsesTask component', function () {
   let $ctrl, RouterService;
 
   const stateName = 'Introduction';
@@ -36,7 +36,7 @@ describe('NeedsGuidingResponsesTask component', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function(
+  beforeEach(angular.mock.inject(function (
       $componentController, _RouterService_) {
     RouterService = _RouterService_;
 

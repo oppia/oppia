@@ -29,7 +29,7 @@ angular.module('oppia').component('multipleIncorrectSubmissionsIssue', {
     '$attrs', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
     'HtmlEscaperService', 'LearnerActionRenderService',
     'ACTION_TYPE_ANSWER_SUBMIT',
-    function(
+    function (
         $attrs, ExplorationHtmlFormatterService, ExplorationStatesService,
         HtmlEscaperService, LearnerActionRenderService,
         ACTION_TYPE_ANSWER_SUBMIT) {
@@ -50,7 +50,7 @@ angular.module('oppia').component('multipleIncorrectSubmissionsIssue', {
       ctrl.nonSubmitActions = _nonSubmitActions;
       ctrl.tableIndex = ctrl.actionStartIndex + i;
 
-      ctrl.getShortAnswerHtml = function(action) {
+      ctrl.getShortAnswerHtml = function (action) {
         var _answer = action.actionCustomizationArgs.submitted_answer.value;
         var interaction = ExplorationStatesService.getState(
           ctrl.stateName).interaction;
@@ -58,14 +58,14 @@ angular.module('oppia').component('multipleIncorrectSubmissionsIssue', {
           _answer, interaction.id, interaction.customizationArgs);
       };
 
-      ctrl.getFeedback = function(action) {
+      ctrl.getFeedback = function (action) {
         var _feedback = action.actionCustomizationArgs.feedback.value._html;
         _feedback = _feedback.replace(
           '{{answer}}', ctrl.getShortAnswerHtml(action));
         return _feedback;
       };
 
-      ctrl.isActionSubmit = function(action) {
+      ctrl.isActionSubmit = function (action) {
         return action.actionType === ACTION_TYPE_ANSWER_SUBMIT;
       };
 
@@ -74,7 +74,7 @@ angular.module('oppia').component('multipleIncorrectSubmissionsIssue', {
        * @param {int} learnerActionIndex.
        * @returns {int}
        */
-      ctrl.getLearnerActionIndex = function(learnerActionIndex) {
+      ctrl.getLearnerActionIndex = function (learnerActionIndex) {
         return (
           ctrl.actionStartIndex + learnerActionIndex + 1);
       };
@@ -85,7 +85,7 @@ angular.module('oppia').component('multipleIncorrectSubmissionsIssue', {
        * @param {int} actionIndex - The index of the learner action.
        * @returns {string}
        */
-      ctrl.renderLearnerAction = function(
+      ctrl.renderLearnerAction = function (
           learnerAction, actionIndex) {
         return LearnerActionRenderService.renderLearnerAction(
           learnerAction, actionIndex);

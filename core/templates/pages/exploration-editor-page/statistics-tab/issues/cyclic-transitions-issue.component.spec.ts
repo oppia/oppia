@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  * @fileoverview Unit tests for cyclicTransitionsIssue.
  */
 
-describe('Cyclic Transitions Issue Component', function() {
+describe('Cyclic Transitions Issue Component', function () {
   var $scope = null;
   var alertsService = null;
   var playthroughIssueObjectFactory = null;
@@ -33,12 +33,12 @@ describe('Cyclic Transitions Issue Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(function() {
+  beforeEach(function () {
     alertsService = TestBed.get(AlertsService);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     playthroughIssuesService = $injector.get('PlaythroughIssuesService');
     var $rootScope = $injector.get('$rootScope');
 
@@ -67,7 +67,7 @@ describe('Cyclic Transitions Issue Component', function() {
   }));
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect($scope.currentIssueIdentifier).toBe(2);
       expect($scope.issueStatement).toBe(
         'Several learners ended up in a cyclic loop revisiting card "State1"' +
@@ -78,20 +78,20 @@ describe('Cyclic Transitions Issue Component', function() {
       expect($scope.playthroughIds).toEqual(['1', '2', '3']);
     });
 
-  it('should open playthrough modal with specific playthrough id', function() {
+  it('should open playthrough modal with specific playthrough id', function () {
     spyOn(playthroughIssuesService, 'openPlaythroughModal');
     $scope.showPlaythrough('2');
     expect(playthroughIssuesService.openPlaythroughModal)
       .toHaveBeenCalledWith('2', 1);
   });
 
-  it('should create playthorugh nav id based on playthrough id', function() {
+  it('should create playthorugh nav id based on playthrough id', function () {
     expect($scope.createPlaythroughNavId('1')).toBe(1);
     expect($scope.createPlaythroughNavId('2')).toBe(2);
     expect($scope.createPlaythroughNavId('3')).toBe(3);
   });
 
-  it('should resolve issue if it\'s not resolved yet', function() {
+  it('should resolve issue if it\'s not resolved yet', function () {
     spyOn(playthroughIssuesService, 'resolveIssue').and.callFake(() => {});
     spyOn(alertsService, 'addSuccessMessage');
     $scope.resolveIssue();
@@ -101,7 +101,7 @@ describe('Cyclic Transitions Issue Component', function() {
       'Issue resolved. Refresh the page to view changes.');
   });
 
-  it('should not resolve issue if it\'s already resolved', function() {
+  it('should not resolve issue if it\'s already resolved', function () {
     // Resolve issue.
     $scope.resolveIssue();
 

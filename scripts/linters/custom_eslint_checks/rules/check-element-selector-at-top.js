@@ -41,7 +41,7 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var elementSelector = 'CallExpression[callee.name=element]';
     var elmentAllSelector = (
       'CallExpression[callee.object.name=element][callee.property.name=all]');
@@ -50,7 +50,7 @@ module.exports = {
       'CallExpression[callee.object.property.name=element]' +
       '[callee.property.name=all]');
 
-    var checkLocator = function(selectorNode, inNestedSelector) {
+    var checkLocator = function (selectorNode, inNestedSelector) {
       var locatorNode = selectorNode.arguments[0];
       var upperScopeType = context.getScope().upper.type;
       if (['global', 'module'].includes(upperScopeType)) {
@@ -78,16 +78,16 @@ module.exports = {
     };
 
     return {
-      [elementSelector]: function(node) {
+      [elementSelector]: function (node) {
         checkLocator(node, false);
       },
-      [elmentAllSelector]: function(node) {
+      [elmentAllSelector]: function (node) {
         checkLocator(node, false);
       },
-      [subElementSelector]: function(node) {
+      [subElementSelector]: function (node) {
         checkLocator(node, true);
       },
-      [subElmentAllSelector]: function(node) {
+      [subElmentAllSelector]: function (node) {
         checkLocator(node, true);
       }
     };

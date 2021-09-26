@@ -25,7 +25,7 @@ require('services/contextual/url.service.ts');
 angular.module('oppia').controller('QuestionPlayerConceptCardModalController', [
   '$controller', '$scope', '$uibModalInstance', '$window',
   'UrlService', 'skillIds', 'skills',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, $window,
       UrlService, skillIds, skills) {
     $controller('ConfirmOrCancelModalController', {
@@ -38,16 +38,16 @@ angular.module('oppia').controller('QuestionPlayerConceptCardModalController', [
     $scope.modalHeader = $scope.skills[$scope.index];
     $scope.isInTestMode = true;
 
-    $scope.isLastConceptCard = function() {
+    $scope.isLastConceptCard = function () {
       return $scope.index === $scope.skills.length - 1;
     };
 
-    $scope.goToNextConceptCard = function() {
+    $scope.goToNextConceptCard = function () {
       $scope.index++;
       $scope.modalHeader = $scope.skills[$scope.index];
     };
 
-    $scope.retryTest = function() {
+    $scope.retryTest = function () {
       var selectedSubtopics = UrlService.getUrlParams().selected_subtopic_ids;
       $window.location.replace(
         UrlService.getPathname() + '?selected_subtopic_ids=' +

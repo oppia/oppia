@@ -31,18 +31,18 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
   skill: Skill;
   index: number;
 
-  constructor(
+  constructor (
     private skillEditorStateService: SkillEditorStateService,
     protected modalInstance: NgbActiveModal
   ) {
     super(modalInstance);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.skill = this.skillEditorStateService.getSkill();
   }
 
-  confirm(): void {
+  confirm (): void {
     this.modalInstance.close({
       id: this.skill.getMisconceptionAtIndex(this.index).getId()
     });

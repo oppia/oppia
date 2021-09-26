@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').factory('VoiceoverRecordingService', [
-  '$log', '$q', '$window', function($log, $q, $window) {
+  '$log', '$q', '$window', function ($log, $q, $window) {
     var audioContextAvailable = null,
       defer = null,
       definedAudioContext = null, // Will be defined audio context.
@@ -29,7 +29,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       processor = null;
 
 
-    var _initWorker = function() {
+    var _initWorker = function () {
       if (!$window.Worker) {
         $log.warn('Worker API not supported in this browser.');
         return;
@@ -40,7 +40,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
         // Config the mp3 encoding worker.
         var config = {sampleRate: 44100, bitRate: 128};
         mp3Worker = new Worker(lameWorkerFileUrl);
-        mp3Worker.onmessage = function(e) {
+        mp3Worker.onmessage = function (e) {
           // Async data flow.
           defer.resolve(e.data.buf);
         };
@@ -48,14 +48,14 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       }
     };
 
-    var _postMessage = function(buffer) {
+    var _postMessage = function (buffer) {
       // Ensure the mp3Worker is available when this is run.
       if (mp3Worker) {
         mp3Worker.postMessage({cmd: 'encode', buf: buffer});
       }
     };
 
-    var _stopWorker = function() {
+    var _stopWorker = function () {
       if (mp3Worker) {
         mp3Worker.terminate();
         $log.log('Ending mp3 worker');
@@ -63,7 +63,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       }
     };
 
-    var _initRecorder = function() {
+    var _initRecorder = function () {
       // Browser agnostic AudioContext API check.
       audioContextAvailable = $window.AudioContext ||
         $window.webkitAudioContext;
@@ -79,7 +79,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
 
 
     // Setup microphone inputs for mp3 audio processing.
-    var _processMicAudio = function(stream) {
+    var _processMicAudio = function (stream) {
       definedAudioContext = new audioContextAvailable();
       // Settings a bufferSize of 0 instructs the browser
       // to choose the best bufferSize.
@@ -95,16 +95,16 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
     };
 
     // Convert directly from mic input to mp3.
-    var _onAudioProcess = function(event) {
+    var _onAudioProcess = function (event) {
       var array = event.inputBuffer.getChannelData(0);
       _postMessage(array);
     };
 
-    var _startMicrophoneAsync = async function() {
+    var _startMicrophoneAsync = async function () {
       return navigator.mediaDevices.getUserMedia({audio: true, video: false});
     };
 
-    var _stopRecord = function() {
+    var _stopRecord = function () {
       if (microphone && processor && mp3Worker) {
         // Disconnect mic and processor and stop processing.
         microphone.disconnect();
@@ -113,40 +113,40 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
         // Issue command to retrieve converted audio.
         mp3Worker.postMessage({cmd: 'finish'});
         // Stop microphone stream.
-        microphoneStream.getTracks().forEach(function(track) {
+        microphoneStream.getTracks().forEach(function (track) {
           track.stop();
         });
         isRecording = false;
       }
     };
 
-    var _closeRecorder = function() {
+    var _closeRecorder = function () {
       _stopWorker();
     };
 
     return {
-      initRecorder: function() {
+      initRecorder: function () {
         _initRecorder();
       },
-      status: function() {
+      status: function () {
         return {
           isAvailable: isAvailable,
           isRecording: isRecording
         };
       },
-      startRecordingAsync: async function() {
+      startRecordingAsync: async function () {
         // If worker is not available then do not start recording.
         if (mp3Worker === null) {
           return null;
         }
         var navigator = _startMicrophoneAsync();
-        navigator.then(function(stream) {
+        navigator.then(function (stream) {
           isRecording = true;
           // Set microphone stream will be used for stopping track
           // stream in another function.
           microphoneStream = stream;
           _processMicAudio(stream);
-        }, function() {
+        }, function () {
           $log.warn(
             'Microphone was not started because ofuser denied permission.');
           isRecording = false;
@@ -154,15 +154,15 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
 
         return navigator;
       },
-      stopRecord: function() {
+      stopRecord: function () {
         if (mp3Worker !== null) {
           _stopRecord();
         }
       },
-      getMp3Data: function() {
+      getMp3Data: function () {
         return defer.promise;
       },
-      closeRecorder: function() {
+      closeRecorder: function () {
         _closeRecorder();
       }
     };

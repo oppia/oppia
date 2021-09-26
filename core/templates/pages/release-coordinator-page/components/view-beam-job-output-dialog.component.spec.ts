@@ -45,7 +45,7 @@ describe('View beam job output dialog', () => {
   let backendApiService: ReleaseCoordinatorBackendApiService;
   let alertsService: AlertsService;
 
-  beforeEach(waitForAsync(async() => {
+  beforeEach(waitForAsync(async () => {
     const mockDialogRef = { disableClose: false, close: () => {} };
 
     TestBed.configureTestingModule({
@@ -172,7 +172,7 @@ describe('View beam job output dialog', () => {
     expect(component.getOutput()).toEqual('abc');
   });
 
-  it('should show the error dialog if the operation failed', async() => {
+  it('should show the error dialog if the operation failed', async () => {
     const error = new Error();
     const getBeamJobRunOutputSpy = (
       spyOn(backendApiService, 'getBeamJobRunOutput')

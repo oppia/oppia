@@ -45,7 +45,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
   'ExplorationStatesService', 'ExplorationStatsService',
   'PlaythroughIssuesService', 'StateTopAnswersStatsService',
   'UserExplorationPermissionsService',
-  function(
+  function (
       ContextService, ExplorationImprovementsBackendApiService,
       ExplorationImprovementsTaskRegistryService, ExplorationRightsService,
       ExplorationStatesService, ExplorationStatsService,
@@ -73,7 +73,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     /** @private */
     let improvementsTabIsAccessible: boolean;
     /** @private */
-    const doInitAsync = async() => {
+    const doInitAsync = async () => {
       const userPermissions = (
         await UserExplorationPermissionsService.getPermissionsAsync());
 
@@ -134,7 +134,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     };
 
     return {
-      async initAsync(): Promise<void> {
+      async initAsync (): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
           doInitAsync().then(resolveInitPromise, rejectInitPromise);
@@ -142,7 +142,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
         return initPromise;
       },
 
-      async flushUpdatedTasksToBackend(): Promise<void> {
+      async flushUpdatedTasksToBackend (): Promise<void> {
         if (!await this.isImprovementsTabEnabledAsync()) {
           return;
         }
@@ -160,7 +160,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
         ngrTasksOpenSinceInit = ngrTasksOpenSinceInit.filter(t => t.isOpen());
       },
 
-      async isImprovementsTabEnabledAsync(): Promise<boolean> {
+      async isImprovementsTabEnabledAsync (): Promise<boolean> {
         await initPromise;
         return improvementsTabIsAccessible && config.improvementsTabIsEnabled;
       },

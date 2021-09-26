@@ -26,9 +26,9 @@ require(
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log', '$uibModal', 'UrlInterpolationService',
-  function(
+  function (
       $http, $log, $uibModal, UrlInterpolationService) {
-    var _showEditStateContentSuggestionModal = function(
+    var _showEditStateContentSuggestionModal = function (
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {
       $uibModal.open({
@@ -39,33 +39,33 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
         backdrop: 'static',
         size: 'lg',
         resolve: {
-          suggestionIsHandled: function() {
+          suggestionIsHandled: function () {
             return activeThread.isSuggestionHandled();
           },
-          suggestionStatus: function() {
+          suggestionStatus: function () {
             return activeThread.getSuggestionStatus();
           },
-          description: function() {
+          description: function () {
             return activeThread.description;
           },
-          oldContent: function() {
+          oldContent: function () {
             return activeThread.suggestion.oldValue;
           },
-          newContent: function() {
+          newContent: function () {
             return activeThread.suggestion.newValue;
           },
-          canReviewActiveThread: function() {
+          canReviewActiveThread: function () {
             return canReviewActiveThread;
           },
-          stateName: function() {
+          stateName: function () {
             return activeThread.suggestion.stateName;
           },
-          suggestionType: function() {
+          suggestionType: function () {
             return activeThread.suggestion.suggestionType;
           }
         },
         controller: 'SuggestionModalForCreatorViewController'
-      }).result.then(function(result) {
+      }).result.then(function (result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
         var HANDLE_SUGGESTION_URL_TEMPLATE = (
@@ -108,7 +108,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
           };
         }
 
-        $http.put(url, data).then(function() {
+        $http.put(url, data).then(function () {
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
             if (suggestionsToReviewList[i] === activeThread) {
               suggestionsToReviewList.splice(i, 1);
@@ -116,7 +116,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             }
           }
           clearActiveThread();
-        }).catch(function() {
+        }).catch(function () {
           $log.error('Error resolving suggestion');
         });
       }, () => {
@@ -127,7 +127,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
     };
 
     return {
-      showSuggestionModal: function(suggestionType, extraParams) {
+      showSuggestionModal: function (suggestionType, extraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,

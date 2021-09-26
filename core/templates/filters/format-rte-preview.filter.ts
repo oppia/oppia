@@ -25,13 +25,13 @@ require('filters/string-utility-filters/capitalize.filter.ts');
         Sample2 </p>
    will give as output: Sample1 [Math] Sample2 */
 angular.module('oppia').filter('formatRtePreview', [
-  '$filter', function($filter) {
-    return function(html) {
+  '$filter', function ($filter) {
+    return function (html) {
       html = html.replace(/&nbsp;/ig, ' ');
       html = html.replace(/&quot;/ig, '');
       // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
       html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
-      var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+      var formattedOutput = html.replace(/(<([^>]+)>)/g, function (rteTag) {
         var replaceString = $filter(
           'capitalize')(rteTag.split('-')[2].split(' ')[0]);
         if (replaceString[replaceString.length - 1] === '>') {

@@ -29,20 +29,20 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class SaveValidationFailModalComponent extends ConfirmOrCancelModal {
   MSECS_TO_REFRESH: number = 20;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }
 
-  private _refreshPage(delay: number): void {
+  private _refreshPage (delay: number): void {
     setTimeout(() => {
       this.windowRef.nativeWindow.location.reload();
     }, delay);
   }
 
-  closeAndRefresh(): void {
+  closeAndRefresh (): void {
     this.ngbActiveModal.dismiss('cancel');
     this._refreshPage(this.MSECS_TO_REFRESH);
   }

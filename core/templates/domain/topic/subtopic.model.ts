@@ -42,7 +42,7 @@ export class Subtopic {
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
-  constructor(
+  constructor (
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       thumbnailFilename: string, thumbnailBgColor: string,
@@ -60,36 +60,36 @@ export class Subtopic {
       });
   }
 
-  getId(): number {
+  getId (): number {
     return this._id;
   }
 
-  decrementId(): number {
+  decrementId (): number {
     return --this._id;
   }
 
-  incrementId(): number {
+  incrementId (): number {
     return ++this._id;
   }
 
   // Returns the title of the subtopic.
-  getTitle(): string {
+  getTitle (): string {
     return this._title;
   }
 
-  setTitle(title: string): void {
+  setTitle (title: string): void {
     this._title = title;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment (): string {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string): void {
+  setUrlFragment (urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
-  validate(): string[] {
+  validate (): string[] {
     let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
       constants.VALID_URL_FRAGMENT_REGEX);
@@ -115,7 +115,7 @@ export class Subtopic {
     return issues;
   }
 
-  prepublishValidate(): string[] {
+  prepublishValidate (): string[] {
     let issues: string[] = [];
     if (!this._thumbnailFilename) {
       issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
@@ -124,21 +124,21 @@ export class Subtopic {
   }
 
   // Returns the summaries of the skills in the subtopic.
-  getSkillSummaries(): ShortSkillSummary[] {
+  getSkillSummaries (): ShortSkillSummary[] {
     return this._skillSummaries.slice();
   }
 
-  getSkillIds(): string[] {
+  getSkillIds (): string[] {
     return this._skillIds.slice();
   }
 
-  hasSkill(skillId: string): boolean {
-    return this._skillSummaries.some(function(skillSummary) {
+  hasSkill (skillId: string): boolean {
+    return this._skillSummaries.some(function (skillSummary) {
       return skillSummary.getId() === skillId;
     });
   }
 
-  addSkill(skillId: string, skillDescription: string): boolean {
+  addSkill (skillId: string, skillDescription: string): boolean {
     if (!this.hasSkill(skillId)) {
       this._skillSummaries.push(ShortSkillSummary.create(
         skillId, skillDescription));
@@ -147,7 +147,7 @@ export class Subtopic {
     return false;
   }
 
-  removeSkill(skillId: string): void {
+  removeSkill (skillId: string): void {
     let index = this._skillSummaries.map((skillSummary) => {
       return skillSummary.getId();
     }).indexOf(skillId);
@@ -158,23 +158,23 @@ export class Subtopic {
     }
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename (thumbnailFilename: string): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename (): string {
     return this._thumbnailFilename;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor (thumbnailBgColor: string): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor (): string {
     return this._thumbnailBgColor;
   }
 
-  static create(
+  static create (
       subtopicBackendDict: SubtopicBackendDict,
       skillIdToDescriptionMap: SkillIdToDescriptionMap): Subtopic {
     return new Subtopic(
@@ -185,7 +185,7 @@ export class Subtopic {
       subtopicBackendDict.url_fragment);
   }
 
-  static createFromTitle(subtopicId: number, title: string): Subtopic {
+  static createFromTitle (subtopicId: number, title: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,

@@ -35,9 +35,9 @@ export class ShortResponseSetInputComponent implements OnInit {
   @Input() answer!: string;
   displayedAnswer!: string;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor (private htmlEscaperService: HtmlEscaperService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as unknown[];
     this.displayedAnswer = (

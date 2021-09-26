@@ -32,11 +32,11 @@ export class PlaythroughBackendApiService {
   private readonly STORE_PLAYTHROUGH_URL: string = (
     '/explorehandler/store_playthrough/<exploration_id>');
 
-  constructor(
+  constructor (
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async storePlaythroughAsync(
+  async storePlaythroughAsync (
       playthrough: Playthrough, issueSchemaVersion: number): Promise<void> {
     let playthroughUrl = this.urlInterpolationService.interpolateUrl(
       this.STORE_PLAYTHROUGH_URL, {

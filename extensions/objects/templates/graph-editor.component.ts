@@ -34,7 +34,7 @@ export class GraphEditorComponent {
   @Input() value!: GraphAnswer;
   @Output() valueChanged: EventEmitter<GraphAnswer> = new EventEmitter();
   alwaysEditable = true;
-  updateValue(graph: GraphAnswer): void {
+  updateValue (graph: GraphAnswer): void {
     this.value = graph;
     this.valueChanged.emit(graph);
   }

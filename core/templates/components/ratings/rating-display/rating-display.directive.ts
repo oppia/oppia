@@ -19,7 +19,7 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('ratingDisplay', [
-  function() {
+  function () {
     return {
       // This will display a star-rating based on the given data. The attributes
       // passed in are as follows:
@@ -36,22 +36,22 @@ angular.module('oppia').directive('ratingDisplay', [
       },
       template: require(
         'components/ratings/rating-display/rating-display.directive.html'),
-      link: function(scope, element) {
+      link: function (scope, element) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
         // details.
-        element[0].getControllerScope = function() {
+        element[0].getControllerScope = function () {
           return scope;
         };
       },
-      controller: ['$scope', function($scope) {
+      controller: ['$scope', function ($scope) {
         var ctrl = this;
         var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
         var STATUS_ACTIVE = 'active';
         var STATUS_INACTIVE = 'inactive';
         var STATUS_RATING_SET = 'rating_set';
 
-        var displayValue = function(ratingValue) {
+        var displayValue = function (ratingValue) {
           for (var i = 0; i < $scope.stars.length; i++) {
             $scope.stars[i].cssClass = (
               ratingValue === undefined ? 'far fa-star' :
@@ -66,7 +66,7 @@ angular.module('oppia').directive('ratingDisplay', [
           }
         };
 
-        $scope.clickStar = function(starValue) {
+        $scope.clickStar = function (starValue) {
           if ($scope.isEditable && $scope.status === STATUS_ACTIVE) {
             $scope.status = STATUS_RATING_SET;
             $scope.ratingValue = starValue;
@@ -74,7 +74,7 @@ angular.module('oppia').directive('ratingDisplay', [
             $scope.onEdit(starValue);
           }
         };
-        $scope.enterStar = function(starValue) {
+        $scope.enterStar = function (starValue) {
           var starsHaveNotBeenClicked = (
             $scope.status === STATUS_ACTIVE ||
             $scope.status === STATUS_INACTIVE);
@@ -83,13 +83,13 @@ angular.module('oppia').directive('ratingDisplay', [
             displayValue(starValue);
           }
         };
-        $scope.leaveArea = function() {
+        $scope.leaveArea = function () {
           $scope.status = STATUS_INACTIVE;
           displayValue($scope.ratingValue);
         };
 
-        ctrl.$onInit = function() {
-          $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
+        ctrl.$onInit = function () {
+          $scope.stars = POSSIBLE_RATINGS.map(function (starValue) {
             return {
               cssClass: 'far fa-star',
               value: starValue
@@ -98,7 +98,7 @@ angular.module('oppia').directive('ratingDisplay', [
 
           $scope.status = STATUS_INACTIVE;
           displayValue($scope.ratingValue);
-          $scope.$watch('ratingValue', function() {
+          $scope.$watch('ratingValue', function () {
             displayValue($scope.ratingValue);
           });
         };

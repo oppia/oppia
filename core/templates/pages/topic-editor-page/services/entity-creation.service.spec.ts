@@ -23,7 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import { Subtopic } from 'domain/topic/subtopic.model';
 
-describe('Entity creation service', function() {
+describe('Entity creation service', function () {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
@@ -38,7 +38,7 @@ describe('Entity creation service', function() {
   var EntityCreationService = null;
   var CreateNewSkillModalService = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
@@ -52,10 +52,10 @@ describe('Entity creation service', function() {
     var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     var subtopic2 = Subtopic.createFromTitle(2, 'Subtopic2');
     var subtopic3 = Subtopic.createFromTitle(3, 'Subtopic3');
-    topic.getSubtopics = function() {
+    topic.getSubtopics = function () {
       return [subtopic1, subtopic2, subtopic3];
     };
-    topic.getId = function() {
+    topic.getId = function () {
       return '1';
     };
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
@@ -63,7 +63,7 @@ describe('Entity creation service', function() {
 
 
   it('should call TopicEditorRoutingService to navigate to subtopic editor',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('1')
       });
@@ -75,7 +75,7 @@ describe('Entity creation service', function() {
       expect(routingSpy).toHaveBeenCalledWith('1');
     });
 
-  it('should open create subtopic modal', function() {
+  it('should open create subtopic modal', function () {
     var spy = spyOn($uibModal, 'open').and.callThrough();
     EntityCreationService.createSubtopic();
 
@@ -83,7 +83,7 @@ describe('Entity creation service', function() {
   });
 
   it('should close create subtopic modal when cancel button is clicked',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -97,7 +97,7 @@ describe('Entity creation service', function() {
     });
 
   it('should call CreateNewSkillModalService to navigate to skill editor',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('1')
       });

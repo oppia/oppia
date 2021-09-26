@@ -32,7 +32,7 @@ interface HelpCardEventResponse {
   providedIn: 'root'
 })
 export class PlayerPositionService {
-  constructor(private playerTranscriptService: PlayerTranscriptService) {}
+  constructor (private playerTranscriptService: PlayerTranscriptService) {}
 
   private _activeCardChangedEventEmitter = new EventEmitter<void>();
   private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
@@ -48,7 +48,7 @@ export class PlayerPositionService {
   onChangeCallback!: Function;
   learnerJustSubmittedAnAnswer = false;
 
-  init(callback: Function): void {
+  init (callback: Function): void {
     this.displayedCardIndex = -1;
     this.onChangeCallback = callback;
   }
@@ -57,7 +57,7 @@ export class PlayerPositionService {
    * This function is used to find the name of the current state.
    * @return {string} a string that shows the name of current state.
    */
-  getCurrentStateName(): string {
+  getCurrentStateName (): string {
     return (
       this.playerTranscriptService.getCard(
         this.displayedCardIndex).getStateName());
@@ -67,7 +67,7 @@ export class PlayerPositionService {
    * This function is used to set the index of the displayed card.
    * @param {number} index - The new index of the card.
    */
-  setDisplayedCardIndex(index: number): void {
+  setDisplayedCardIndex (index: number): void {
     let oldIndex = this.displayedCardIndex;
     this.displayedCardIndex = index;
 
@@ -83,14 +83,14 @@ export class PlayerPositionService {
    * This function is used to find the index of the displayed card.
    * @return {number} The index of the displayed card.
    */
-  getDisplayedCardIndex(): number {
+  getDisplayedCardIndex (): number {
     return this.displayedCardIndex;
   }
 
   /**
    * This function is used to record that the user has submitted an answer.
    */
-  recordAnswerSubmission(): void {
+  recordAnswerSubmission (): void {
     this.learnerJustSubmittedAnAnswer = true;
   }
 
@@ -98,7 +98,7 @@ export class PlayerPositionService {
    * This function is used to record that the user has clicked
    * on the navigation button.
    */
-  recordNavigationButtonClick(): void {
+  recordNavigationButtonClick (): void {
     this.learnerJustSubmittedAnAnswer = false;
   }
 
@@ -107,31 +107,31 @@ export class PlayerPositionService {
    * submitted an answer.
    * @return {boolean} Whether the learner has just submitted an answer.
    */
-  hasLearnerJustSubmittedAnAnswer(): boolean {
+  hasLearnerJustSubmittedAnAnswer (): boolean {
     return this.learnerJustSubmittedAnAnswer;
   }
 
-  get onNewCardAvailable(): EventEmitter<void> {
+  get onNewCardAvailable (): EventEmitter<void> {
     return this._newCardAvailableEventEmitter;
   }
 
-  get onHelpCardAvailable(): EventEmitter<HelpCardEventResponse> {
+  get onHelpCardAvailable (): EventEmitter<HelpCardEventResponse> {
     return this._helpCardAvailableEventEmitter;
   }
 
-  get onNewCardOpened(): EventEmitter<StateCard> {
+  get onNewCardOpened (): EventEmitter<StateCard> {
     return this._newCardOpenedEventEmitter;
   }
 
-  changeCurrentQuestion(index: number): void {
+  changeCurrentQuestion (index: number): void {
     this._currentQuestionChangedEventEmitter.emit(index);
   }
 
-  get onActiveCardChanged(): EventEmitter<void> {
+  get onActiveCardChanged (): EventEmitter<void> {
     return this._activeCardChangedEventEmitter;
   }
 
-  get onCurrentQuestionChange(): EventEmitter<number> {
+  get onCurrentQuestionChange (): EventEmitter<number> {
     return this._currentQuestionChangedEventEmitter;
   }
 }

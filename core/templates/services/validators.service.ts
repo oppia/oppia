@@ -30,7 +30,7 @@ import constants from 'assets/constants';
   providedIn: 'root'
 })
 export class ValidatorsService {
-  constructor(
+  constructor (
     private alerts: AlertsService,
     private whitespacefilter: NormalizeWhitespacePipe) {}
   /**
@@ -41,7 +41,7 @@ export class ValidatorsService {
    *   butterbar.
    * @return {boolean} True if the entity name is valid, false otherwise.
    */
-  isValidEntityName(
+  isValidEntityName (
       input: string, showWarnings: boolean, allowEmpty: boolean): boolean {
     input = this.whitespacefilter.transform(input);
     if (!input && !allowEmpty) {
@@ -65,7 +65,7 @@ export class ValidatorsService {
     }
     return true;
   }
-  isValidExplorationTitle(input: string, showWarnings: boolean): boolean {
+  isValidExplorationTitle (input: string, showWarnings: boolean): boolean {
     if (!this.isValidEntityName(input, showWarnings, false)) {
       return false;
     }
@@ -82,7 +82,7 @@ export class ValidatorsService {
   }
   // NB: this does not check whether the card name already exists in the
   // states dict.
-  isValidStateName(input: string, showWarnings: boolean): boolean {
+  isValidStateName (input: string, showWarnings: boolean): boolean {
     if (!this.isValidEntityName(input, showWarnings, false)) {
       return false;
     }
@@ -97,7 +97,7 @@ export class ValidatorsService {
 
     return true;
   }
-  isNonempty(input: string, showWarnings: boolean): boolean {
+  isNonempty (input: string, showWarnings: boolean): boolean {
     if (!input) {
       if (showWarnings) {
         // TODO(sll): Allow this warning to be more specific in terms of
@@ -108,7 +108,7 @@ export class ValidatorsService {
     }
     return true;
   }
-  isValidExplorationId(input: string, showWarnings: boolean): boolean {
+  isValidExplorationId (input: string, showWarnings: boolean): boolean {
     // Exploration IDs are urlsafe base64-encoded.
     var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
     if (!input || !VALID_ID_CHARS_REGEX.test(input)) {
@@ -119,7 +119,7 @@ export class ValidatorsService {
     }
     return true;
   }
-  isValidReviewMessage(input: string, showWarnings: boolean): boolean {
+  isValidReviewMessage (input: string, showWarnings: boolean): boolean {
     if (!input) {
       return true;
     }

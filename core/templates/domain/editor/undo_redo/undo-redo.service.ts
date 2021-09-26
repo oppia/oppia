@@ -23,7 +23,7 @@ import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
   providedIn: 'root'
 })
 export class UndoRedoService extends BaseUndoRedo {
-  constructor() {
+  constructor () {
     super();
   }
 }

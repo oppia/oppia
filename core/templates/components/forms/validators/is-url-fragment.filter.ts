@@ -18,10 +18,10 @@
 
 import { AppConstants } from 'app.constants';
 
-angular.module('oppia').filter('isUrlFragment', [function() {
+angular.module('oppia').filter('isUrlFragment', [function () {
   const VALID_URL_FRAGMENT_REGEX = new RegExp(
     AppConstants.VALID_URL_FRAGMENT_REGEX);
-  return function(input, args) {
+  return function (input, args) {
     return (
       VALID_URL_FRAGMENT_REGEX.test(input) &&
       input.length <= args.charLimit);

@@ -23,17 +23,17 @@ require(
   'interactions/RatioExpressionInput/directives/' +
   'oppia-short-response-ratio-expression-input.component.ts');
 
-describe('RatioExpressionInputShortResponse', function() {
+describe('RatioExpressionInputShortResponse', function () {
   let ctrl = null;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('Ratio', Ratio);
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
 
@@ -41,11 +41,11 @@ describe('RatioExpressionInputShortResponse', function() {
       answer: [1, 2, 3]
     });
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.inject(function ($componentController) {
     ctrl = $componentController('oppiaShortResponseRatioExpressionInput');
   }));
 
-  it('should init the component', function() {
+  it('should init the component', function () {
     ctrl.$onInit();
     expect(ctrl.answer).toEqual('1:2:3');
   });

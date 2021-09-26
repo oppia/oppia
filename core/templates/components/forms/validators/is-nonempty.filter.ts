@@ -16,8 +16,8 @@
  * @fileoverview Validator to check if input is nonempty.
  */
 
-angular.module('oppia').filter('isNonempty', [function() {
-  return function(input) {
+angular.module('oppia').filter('isNonempty', [function () {
+  return function (input) {
     return Boolean(input);
   };
 }]);

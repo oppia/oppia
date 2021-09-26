@@ -29,7 +29,7 @@ export abstract class BaseEvent {
 abstract class EventWithMessage<T> extends BaseEvent {
   public readonly message: T;
 
-  constructor(message: T) {
+  constructor (message: T) {
     super();
     this.message = message;
   }

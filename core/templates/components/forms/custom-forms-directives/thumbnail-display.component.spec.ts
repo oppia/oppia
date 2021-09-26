@@ -26,7 +26,7 @@ describe('Thumbnail Component', () => {
   let fixture: ComponentFixture<ThumbnailDisplayComponent>;
   let svgSanitizerService: SvgSanitizerService;
   class MockSvgSanitizerService {
-    getTrustedSvgResourceUrl(str: string): string {
+    getTrustedSvgResourceUrl (str: string): string {
       return str;
     }
   }

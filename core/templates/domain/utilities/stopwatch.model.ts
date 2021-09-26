@@ -24,19 +24,19 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class Stopwatch {
   // Start time is null initially .
   startTime: number | null;
-  constructor(private log: LoggerService) {
+  constructor (private log: LoggerService) {
     this.startTime = null;
   }
 
-  _getCurrentTime(): number {
+  _getCurrentTime (): number {
     return Date.now();
   }
 
-  reset(): void {
+  reset (): void {
     this.startTime = this._getCurrentTime();
   }
 
-  getTimeInSecs(): number | null {
+  getTimeInSecs (): number | null {
     if (this.startTime === null) {
       this.log.error(
         'Tried to retrieve the elapsed time, but no start time was set.');
@@ -45,7 +45,7 @@ export class Stopwatch {
     return (this._getCurrentTime() - this.startTime) / 1000;
   }
 
-  static create(): Stopwatch {
+  static create (): Stopwatch {
     return new Stopwatch(new LoggerService());
   }
 }

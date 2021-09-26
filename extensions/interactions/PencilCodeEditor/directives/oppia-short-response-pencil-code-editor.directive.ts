@@ -25,16 +25,16 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponsePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', function (HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       template: require('./pencil-code-editor-short-response.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
+      controller: ['$attrs', function ($attrs) {
         var ctrl = this;
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           ctrl.answerCode = (
             HtmlEscaperService.escapedJsonToObj($attrs.answer).code);
         };

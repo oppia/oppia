@@ -66,7 +66,7 @@ export type BeamJobRunState = (
 );
 
 class MatIcon {
-  constructor(
+  constructor (
       public readonly tooltip: string,
       public readonly code: string,
       // The color is null for the job state 'cancelling', 'cancelled' and
@@ -87,7 +87,7 @@ export interface BeamJobRunBackendDict {
 export class BeamJobRun {
   private matIcon: MatIcon;
 
-  constructor(
+  constructor (
       public readonly jobId: string,
       public readonly jobName: string,
       public readonly jobState: BeamJobRunState,
@@ -132,21 +132,21 @@ export class BeamJobRun {
     }
   }
 
-  getJobStatusTooltipString(): string {
+  getJobStatusTooltipString (): string {
     return this.matIcon.tooltip;
   }
 
-  getJobStatusMaterialIconCode(): string {
+  getJobStatusMaterialIconCode (): string {
     return this.matIcon.code;
   }
 
   // This will return null if the current font color of the
   // component is to be used as the color for the icon.
-  getJobStatusMaterialThemeColor(): string | null {
+  getJobStatusMaterialThemeColor (): string | null {
     return this.matIcon.color;
   }
 
-  inTerminalState(): boolean {
+  inTerminalState (): boolean {
     switch (this.jobState) {
       case 'CANCELLED':
       case 'DRAINED':
@@ -159,15 +159,15 @@ export class BeamJobRun {
     }
   }
 
-  isRunning(): boolean {
+  isRunning (): boolean {
     return !this.inTerminalState();
   }
 
-  canBeCancelled(): boolean {
+  canBeCancelled (): boolean {
     return !this.inTerminalState() && this.jobState !== 'CANCELLING';
   }
 
-  hasOutput(): boolean {
+  hasOutput (): boolean {
     switch (this.jobState) {
       case 'DRAINED':
       case 'DONE':
@@ -178,7 +178,7 @@ export class BeamJobRun {
     }
   }
 
-  static createFromBackendDict(backendDict: BeamJobRunBackendDict): BeamJobRun {
+  static createFromBackendDict (backendDict: BeamJobRunBackendDict): BeamJobRun {
     return new BeamJobRun(
       backendDict.job_id, backendDict.job_name, backendDict.job_state,
       backendDict.job_started_on_msecs, backendDict.job_updated_on_msecs,

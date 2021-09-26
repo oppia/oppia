@@ -52,20 +52,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 class MockLearnerDashboardActivityBackendApiService {
-  async removeActivityModalAsync(): Promise<void> {
+  async removeActivityModalAsync (): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -338,7 +338,7 @@ describe('Learner dashboard page', () => {
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
 
-      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
+      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async () => {
         return Promise.resolve('sample-csrf-token');
       });
       // Generate completed explorations and exploration playlist.
@@ -400,12 +400,12 @@ describe('Learner dashboard page', () => {
       }
 
       spyOn(userService, 'getProfileImageDataUrlAsync').and
-        .callFake(async() => {
+        .callFake(async () => {
           return Promise.resolve(profilePictureDataUrl);
         });
 
       spyOn(userService, 'getUserInfoAsync').and
-        .callFake(async() => {
+        .callFake(async () => {
           return Promise.resolve(userInfo);
         });
 

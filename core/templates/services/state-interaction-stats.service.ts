@@ -60,7 +60,7 @@ export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
   statsCache: Map<string, Promise<StateInteractionStats>> = new Map();
 
-  constructor(
+  constructor (
       private answerClassificationService: AnswerClassificationService,
       private interactionRulesRegistryService: InteractionRulesRegistryService,
       private stateInteractionStatsBackendApiService:
@@ -70,12 +70,12 @@ export class StateInteractionStatsService {
    * Returns whether given state has an implementation for displaying the
    * improvements overview tab in the State Editor.
    */
-  stateSupportsImprovementsOverview(state: State): boolean {
+  stateSupportsImprovementsOverview (state: State): boolean {
     return state.interaction.id === 'TextInput';
   }
 
   // Converts answer to a more-readable representation based on its type.
-  private getReadableAnswerString(
+  private getReadableAnswerString (
       state: State, answer: InteractionAnswer): InteractionAnswer {
     if (state.interaction.id === 'FractionInput') {
       return Fraction.fromDict(<FractionAnswer> answer).toString();
@@ -93,7 +93,7 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  async computeStatsAsync(
+  async computeStatsAsync (
       expId: string, state: State): Promise<StateInteractionStats> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);

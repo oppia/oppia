@@ -30,7 +30,7 @@ angular.module('oppia').controller('PreviewSummaryTileModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ExplorationCategoryService',
   'ExplorationObjectiveService', 'ExplorationTitleService', 'ALL_CATEGORIES',
   'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON', 'DEFAULT_COLOR',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, ExplorationCategoryService,
       ExplorationObjectiveService, ExplorationTitleService, ALL_CATEGORIES,
       CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON, DEFAULT_COLOR) {
@@ -39,23 +39,23 @@ angular.module('oppia').controller('PreviewSummaryTileModalController', [
       $uibModalInstance: $uibModalInstance
     });
 
-    $scope.getExplorationTitle = function() {
+    $scope.getExplorationTitle = function () {
       return ExplorationTitleService.displayed;
     };
-    $scope.getExplorationObjective = function() {
+    $scope.getExplorationObjective = function () {
       return ExplorationObjectiveService.displayed;
     };
-    $scope.getExplorationCategory = function() {
+    $scope.getExplorationCategory = function () {
       return ExplorationCategoryService.displayed;
     };
-    $scope.getThumbnailIconUrl = function() {
+    $scope.getThumbnailIconUrl = function () {
       var category = ExplorationCategoryService.displayed;
       if (ALL_CATEGORIES.indexOf(category) === -1) {
         category = DEFAULT_CATEGORY_ICON;
       }
       return '/subjects/' + category + '.svg';
     };
-    $scope.getThumbnailBgColor = function() {
+    $scope.getThumbnailBgColor = function () {
       var category = ExplorationCategoryService.displayed;
       var color = null;
       if (!CATEGORIES_TO_COLORS.hasOwnProperty(category)) {

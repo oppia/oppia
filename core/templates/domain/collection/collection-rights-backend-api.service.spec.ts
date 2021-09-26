@@ -26,7 +26,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { CollectionRights, CollectionRightsBackendDict } from
   'domain/collection/collection-rights.model';
 
-describe('Collection rights backend API service', function() {
+describe('Collection rights backend API service', function () {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: CollectionRightsBackendDict;
@@ -42,7 +42,7 @@ describe('Collection rights backend API service', function() {
       TestBed.get(CollectionRightsBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });

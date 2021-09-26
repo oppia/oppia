@@ -37,11 +37,11 @@ describe('Story Creation Service', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     StoryCreationService = $injector.get('StoryCreationService');
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');

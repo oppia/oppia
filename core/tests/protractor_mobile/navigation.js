@@ -22,16 +22,16 @@ var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Navigation features on mobile', function() {
+describe('Navigation features on mobile', function () {
   var libraryPage = null;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     libraryPage = new LibraryPage.LibraryPage();
     await libraryPage.get();
   });
 
   it('should open the sidebar menu by clicking on the hamburger button',
-    async function() {
+    async function () {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
@@ -42,7 +42,7 @@ describe('Navigation features on mobile', function() {
     });
 
   it('should navigate to About page using the sidebar menu',
-    async function() {
+    async function () {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
@@ -58,7 +58,7 @@ describe('Navigation features on mobile', function() {
     });
 
   it('should navigate to Donate page using the sidebar menu',
-    async function() {
+    async function () {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
@@ -75,7 +75,7 @@ describe('Navigation features on mobile', function() {
     });
 
   it('should navigate to Library page using the sidebar menu',
-    async function() {
+    async function () {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
@@ -91,7 +91,7 @@ describe('Navigation features on mobile', function() {
     });
 
   it('should navigate to Classroom page using the sidebar menu',
-    async function() {
+    async function () {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
@@ -112,7 +112,7 @@ describe('Navigation features on mobile', function() {
     });
 
   it('should navigate to Home page by clicking on the Oppia logo',
-    async function() {
+    async function () {
       var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
       await waitFor.elementToBeClickable(
         oppiaLogo, 'Could not click oppia logo');
@@ -122,7 +122,7 @@ describe('Navigation features on mobile', function() {
     });
 
   it('should navigate to the login page by clicking on the sign in button',
-    async function() {
+    async function () {
       var signInButton = element(
         by.css('.protractor-mobile-test-login'));
       await waitFor.elementToBeClickable(
@@ -148,7 +148,7 @@ describe('Navigation features on mobile', function() {
       browser.ignoreSynchronization = false;
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

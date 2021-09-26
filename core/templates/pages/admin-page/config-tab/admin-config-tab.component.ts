@@ -32,34 +32,34 @@ export class AdminConfigTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   configProperties: ConfigPropertiesBackendResponse = {};
 
-  constructor(
+  constructor (
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.reloadConfigProperties();
   }
 
-  isNonemptyObject(object: Object): boolean {
+  isNonemptyObject (object: Object): boolean {
     return Object.keys(object).length !== 0;
   }
 
-  getSchemaCallback(schema: Schema): () => Schema {
+  getSchemaCallback (schema: Schema): () => Schema {
     return () => {
       return schema;
     };
   }
 
-  reloadConfigProperties(): void {
+  reloadConfigProperties (): void {
     this.adminDataService.getDataAsync().then((adminDataObject) => {
       this.configProperties = adminDataObject.configProperties;
     });
   }
 
-  revertToDefaultConfigPropertyValue(configPropertyId: string): void {
+  revertToDefaultConfigPropertyValue (configPropertyId: string): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This action is irreversible. Are you sure?')) {
       return;
@@ -74,7 +74,7 @@ export class AdminConfigTabComponent {
       });
   }
 
-  saveConfigProperties(): void {
+  saveConfigProperties (): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }

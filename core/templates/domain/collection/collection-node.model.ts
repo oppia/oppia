@@ -31,19 +31,19 @@ export class CollectionNode {
   _explorationId: string;
   _explorationSummaryObject: LearnerExplorationSummaryBackendDict | null;
 
-  constructor(collectionNodeBackendObject: CollectionNodeBackendDict) {
+  constructor (collectionNodeBackendObject: CollectionNodeBackendDict) {
     this._explorationId = collectionNodeBackendObject.exploration_id;
     this._explorationSummaryObject = cloneDeep(
       collectionNodeBackendObject.exploration_summary);
   }
 
-  static create(
+  static create (
       collectionNodeBackendObject: CollectionNodeBackendDict):
       CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
-  static createFromExplorationId(explorationId: string): CollectionNode {
+  static createFromExplorationId (explorationId: string): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
       exploration_summary: null
@@ -52,14 +52,14 @@ export class CollectionNode {
 
   // Returns the ID of the exploration represented by this collection node.
   // This property is immutable.
-  getExplorationId(): string {
+  getExplorationId (): string {
     return this._explorationId;
   }
 
   // Returns the title of the exploration represented by this collection node.
   // This property is immutable. The value returned by this function is
   // null if doesExplorationExist() returns false.
-  getExplorationTitle(): string | null {
+  getExplorationTitle (): string | null {
     if (this._explorationSummaryObject) {
       return this._explorationSummaryObject.title;
     } else {
@@ -69,14 +69,14 @@ export class CollectionNode {
 
   // Returns whether the exploration referenced by this node is known to exist
   // in the backend. This property is immutable.
-  doesExplorationExist(): boolean {
+  doesExplorationExist (): boolean {
     return this._explorationSummaryObject !== null;
   }
 
   // Returns whether the exploration referenced by this node is private and
   // not published. This property is immutable. The value returned by this
   // function is undefined if doesExplorationExist() returns false.
-  isExplorationPrivate(): boolean {
+  isExplorationPrivate (): boolean {
     if (this._explorationSummaryObject !== null) {
       return this._explorationSummaryObject.status === (
         AppConstants.ACTIVITY_STATUS_PRIVATE);
@@ -90,7 +90,7 @@ export class CollectionNode {
   // object are not reflected in this domain object. The value returned by
   // this function is an object with empty values
   // if doesExplorationExist() returns false.
-  getExplorationSummaryObject(): LearnerExplorationSummaryBackendDict | null {
+  getExplorationSummaryObject (): LearnerExplorationSummaryBackendDict | null {
     // TODO(bhenning): This should be represented by a
     // frontend summary domain object that is also shared with
     // the search result and profile pages.
@@ -98,14 +98,14 @@ export class CollectionNode {
   }
 
   // Sets the raw exploration summary object stored within this node.
-  setExplorationSummaryObject(
+  setExplorationSummaryObject (
       explorationSummaryBackendObject:
       LearnerExplorationSummaryBackendDict | null): void {
     this._explorationSummaryObject = cloneDeep(
       explorationSummaryBackendObject);
   }
 
-  getCapitalizedObjective(): string | null {
+  getCapitalizedObjective (): string | null {
     if (this._explorationSummaryObject !== null) {
       return (
         this._explorationSummaryObject.objective.charAt(0).toUpperCase() +

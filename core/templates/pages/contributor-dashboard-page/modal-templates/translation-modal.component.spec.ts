@@ -33,7 +33,7 @@ import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
 
 class MockChangeDetectorRef {
-  detectChanges(): void {}
+  detectChanges (): void {}
 }
 
 describe('Translation Modal Component', () => {
@@ -259,11 +259,11 @@ describe('Translation Modal Component', () => {
         ckEditorCopyContentService, 'broadcastCopy').and.stub();
 
       component.ngOnInit();
-      nonParagraphTarget.onclick = function(this, ev) {
+      nonParagraphTarget.onclick = function (this, ev) {
         propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
         component.onContentClick(ev);
       };
-      paragraphTarget.onclick = function(this, ev) {
+      paragraphTarget.onclick = function (this, ev) {
         propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
         component.onContentClick(ev);
       };

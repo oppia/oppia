@@ -20,13 +20,13 @@
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 export class ConfirmOrCancelModal {
-  constructor(protected modalInstance: NgbActiveModal) {}
+  constructor (protected modalInstance: NgbActiveModal) {}
 
-  confirm<T>(value: T): void {
+  confirm<T> (value: T): void {
     this.modalInstance.close(value);
   }
 
-  cancel<T>(value: T | 'cancel' = 'cancel'): void {
+  cancel<T> (value: T | 'cancel' = 'cancel'): void {
     this.modalInstance.dismiss(value);
   }
 }

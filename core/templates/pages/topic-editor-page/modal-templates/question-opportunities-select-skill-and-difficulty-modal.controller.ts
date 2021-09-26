@@ -42,7 +42,7 @@ angular.module('oppia').controller(
     'AssetsBackendApiService', 'ExtractImageFilenamesFromModelService',
     'ImageLocalStorageService', 'SkillBackendApiService', 'skillId',
     'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
-    function(
+    function (
         $controller, $rootScope, $scope, $uibModalInstance, AlertsService,
         AssetsBackendApiService, ExtractImageFilenamesFromModelService,
         ImageLocalStorageService, SkillBackendApiService, skillId,
@@ -55,7 +55,7 @@ angular.module('oppia').controller(
         'Select the skill(s) to link the question to:');
       $scope.currentMode = MODE_SELECT_DIFFICULTY;
       SkillBackendApiService.fetchSkillAsync(skillId)
-        .then(function(backendSkillObject) {
+        .then(function (backendSkillObject) {
           $scope.skill = backendSkillObject.skill;
           // Skills have SubtitledHtml fields that can contain images. In
           // order to render them in the contributor dashboard, we parse the
@@ -91,12 +91,12 @@ angular.module('oppia').controller(
               $scope.skill.getRubrics();
             $rootScope.$apply();
           });
-        }, function(error) {
+        }, function (error) {
           AlertsService.addWarning(
             `Error populating skill: ${error}.`);
         });
 
-      $scope.startQuestionCreation = function() {
+      $scope.startQuestionCreation = function () {
         const result = {
           skill: $scope.skill,
           skillDifficulty:

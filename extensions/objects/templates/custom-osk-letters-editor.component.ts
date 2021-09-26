@@ -61,12 +61,12 @@ export class CustomOskLettersEditorComponent implements OnInit {
   lettersAreLowercase = true;
   currentTab = this.latinTab;
 
-  constructor(
+  constructor (
     private guppyInitializationService: GuppyInitializationService,
     private windowRef: WindowRef
   ) {}
 
-  updateLettersList(letter: string): void {
+  updateLettersList (letter: string): void {
     let index = this.value.indexOf(letter);
     if (index === -1) {
       this.value.push(letter);
@@ -76,17 +76,17 @@ export class CustomOskLettersEditorComponent implements OnInit {
     this.guppyInitializationService.setCustomOskLetters(this.value);
   }
 
-  getRemainingLettersCount(): number {
+  getRemainingLettersCount (): number {
     return Math.max(
       AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value.length, 0);
   }
 
-  isCustomizationArgOpen(): boolean {
+  isCustomizationArgOpen (): boolean {
     return document.getElementsByClassName(
       'custom-letters-div').length !== 0;
   }
 
-  keyDownCallBack(e: KeyboardEvent): void {
+  keyDownCallBack (e: KeyboardEvent): void {
     if (this.isCustomizationArgOpen()) {
       let keyPressed = e.key;
       if (keyPressed === 'Shift') {
@@ -102,7 +102,7 @@ export class CustomOskLettersEditorComponent implements OnInit {
     }
   }
 
-  keyUpCallBack(e: KeyboardEvent): void {
+  keyUpCallBack (e: KeyboardEvent): void {
     if (this.isCustomizationArgOpen()) {
       let keyPressed = e.key;
       if (keyPressed === 'Shift') {
@@ -111,7 +111,7 @@ export class CustomOskLettersEditorComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.windowRef.nativeWindow.addEventListener(
       'keydown', (e) => this.keyDownCallBack(e));
     this.windowRef.nativeWindow.addEventListener(

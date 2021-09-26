@@ -30,7 +30,7 @@ export class StoryValidationService {
    *
    * @returns {string[]} - List of validation issues.
    */
-  validatePrerequisiteSkillsInStoryContents(
+  validatePrerequisiteSkillsInStoryContents (
       topicRelevantSkills: string[], storyContents: StoryContents): string[] {
     let issues: string[] = [];
     let nodeIds = storyContents.getNodeIds();

@@ -36,17 +36,17 @@ type CurrencyUnitsKeys = (
 
 export class Units {
   units: Unit[];
-  constructor(unitsList: Unit[]) {
+  constructor (unitsList: Unit[]) {
     this.units = unitsList;
   }
 
-  toDict(): UnitsBackendDict {
+  toDict (): UnitsBackendDict {
     return {
       units: this.units
     };
   }
 
-  toString(): string {
+  toString (): string {
     var unit = '';
     for (var i = 0; i < this.units.length; i++) {
       var d = this.units[i];
@@ -64,18 +64,18 @@ export class Units {
   providedIn: 'root'
 })
 export class UnitsObjectFactory {
-  isunit(unit: string): boolean {
+  isunit (unit: string): boolean {
     return !('/*() '.includes(unit));
   }
 
-  isLastElementUnit(unitList: string[]): boolean {
+  isLastElementUnit (unitList: string[]): boolean {
     return (
       unitList.length > 0 &&
       this.isunit(<string> unitList.slice(-1).pop())
     );
   }
 
-  stringToLexical(units: string): string[] {
+  stringToLexical (units: string): string[] {
     units += '#';
     var unitList = [];
     var unit = '';
@@ -101,7 +101,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  unitWithMultiplier(unitList: string[]): [string, number][] {
+  unitWithMultiplier (unitList: string[]): [string, number][] {
     var multiplier = 1;
     var unitsWithMultiplier: [string, number][] = [];
     var parenthesisStack = [];
@@ -139,7 +139,7 @@ export class UnitsObjectFactory {
     return unitsWithMultiplier;
   }
 
-  convertUnitDictToList(unitDict: UnitsDict): Unit[] {
+  convertUnitDictToList (unitDict: UnitsDict): Unit[] {
     var unitList: Unit[] = [];
     for (var key in unitDict) {
       unitList.push({ unit: key, exponent: unitDict[key] });
@@ -147,7 +147,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
+  unitToList (unitsWithMultiplier: [string, number][]): Unit[] {
     var unitDict: UnitsDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
@@ -170,16 +170,16 @@ export class UnitsObjectFactory {
     return this.convertUnitDictToList(unitDict);
   }
 
-  fromList(unitsList: Unit[]): Units {
+  fromList (unitsList: Unit[]): Units {
     return new Units(unitsList);
   }
 
-  fromStringToList(unitsString: string): Unit[] {
+  fromStringToList (unitsString: string): Unit[] {
     return this.unitToList(
       this.unitWithMultiplier(this.stringToLexical(unitsString)));
   }
 
-  createCurrencyUnits(): void {
+  createCurrencyUnits (): void {
     var keys = (
       <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
     );
@@ -205,7 +205,7 @@ export class UnitsObjectFactory {
     }
   }
 
-  toMathjsCompatibleString(units: string): string {
+  toMathjsCompatibleString (units: string): string {
     // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
 
@@ -245,7 +245,7 @@ export class UnitsObjectFactory {
     return units.trim();
   }
 
-  fromRawInputString(units: string): Units {
+  fromRawInputString (units: string): Units {
     try {
       this.createCurrencyUnits();
     } catch (parsingError) {}

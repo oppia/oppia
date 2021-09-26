@@ -38,11 +38,11 @@ export class RatioExpressionEditorComponent implements OnInit {
   warningText: string = '';
   eventBusGroup: EventBusGroup;
 
-  constructor(private eventBusService: EventBusService) {
+  constructor (private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.value === undefined || this.value === null) {
       this.value = [1, 1];
       this.valueChanged.emit(this.value);
@@ -52,7 +52,7 @@ export class RatioExpressionEditorComponent implements OnInit {
     };
   }
 
-  isValidRatio(value: string): boolean {
+  isValidRatio (value: string): boolean {
     try {
       this.value = Ratio.fromRawInputString(value).components;
       this.valueChanged.emit(this.value);

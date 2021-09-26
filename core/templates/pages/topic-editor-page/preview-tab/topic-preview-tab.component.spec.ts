@@ -34,24 +34,24 @@ describe('Topic Preview Tab Component', () => {
     null, null, [], null, null, null, null, [], null, [], '', '', '')];
 
   class MockTopicEditorStateService {
-    getTopic() {
+    getTopic () {
       return {
-        getName(): string {
+        getName (): string {
           return testName;
         },
-        getSubtopics() {
+        getSubtopics () {
           return [];
         },
       };
     }
 
-    getCanonicalStorySummaries() {
+    getCanonicalStorySummaries () {
       return storySummaries;
     }
   }
 
   class MockUrlInterpolationService {
-    getStaticImageUrl(imagePath: string): string {
+    getStaticImageUrl (imagePath: string): string {
       return mockUrl;
     }
   }

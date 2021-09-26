@@ -25,9 +25,9 @@ import { ErrorPageRootComponent } from './error-page-root.component';
 class MockWindowRef {
   nativeWindow = {
     document: {
-      getElementsByTagName(tagName: string) {
+      getElementsByTagName (tagName: string) {
         return [{
-          getAttribute(attr: string) {
+          getAttribute (attr: string) {
             return '401';
           }
         }];

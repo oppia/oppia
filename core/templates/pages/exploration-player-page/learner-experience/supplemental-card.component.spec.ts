@@ -35,7 +35,7 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
-describe('Supplemental card component', function() {
+describe('Supplemental card component', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -63,7 +63,7 @@ describe('Supplemental card component', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $compile = $injector.get('$compile');
@@ -245,7 +245,7 @@ describe('Supplemental card component', function() {
       CONTINUE_BUTTON_FOCUS_LABEL: 'continueButtonFocusLabel'
     });
 
-    ctrl.getDisplayedCard = function() {
+    ctrl.getDisplayedCard = function () {
       return sampleCard;
     };
     $scope.displayedCard = ctrl.getDisplayedCard();
@@ -269,7 +269,7 @@ describe('Supplemental card component', function() {
     ctrl.$onDestroy();
   });
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     expect($scope.OPPIA_AVATAR_LINK_URL).toBe(undefined);
     expect($scope.CONTINUE_BUTTON_FOCUS_LABEL).toBe(undefined);
     ctrl.getDisplayedCard().markAsCompleted();
@@ -285,7 +285,7 @@ describe('Supplemental card component', function() {
     expect($scope.CONTINUE_BUTTON_FOCUS_LABEL).toBe('continueButtonFocusLabel');
   });
 
-  it('should clear help card when initialized', function() {
+  it('should clear help card when initialized', function () {
     let clearHelpCardSpy = spyOn($scope, 'clearHelpCard')
       .and.returnValue(null);
 
@@ -294,19 +294,19 @@ describe('Supplemental card component', function() {
     expect(clearHelpCardSpy).toHaveBeenCalled();
   });
 
-  it('should check whether the help card is tall enough', function() {
+  it('should check whether the help card is tall enough', function () {
     let result = $scope.isHelpCardTall();
 
     expect(result).toBe(false);
   });
 
-  it('should get help card bottom position', function() {
+  it('should get help card bottom position', function () {
     let result = $scope.getHelpCardBottomPosition();
 
     expect(result).toBe(50);
   });
 
-  it('should getFeedbackAudioHighlightClass', function() {
+  it('should getFeedbackAudioHighlightClass', function () {
     spyOn(audioTranslationManagerService, 'getCurrentComponentName').and
       .returnValue('feedback');
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);

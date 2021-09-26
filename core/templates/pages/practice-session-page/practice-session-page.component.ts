@@ -39,12 +39,12 @@ angular.module('oppia').component('practiceSessionPage', {
     '$http', 'PageTitleService', 'UrlInterpolationService', 'UrlService',
     'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
     'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
-    function(
+    function (
         $http, PageTitleService, UrlInterpolationService, UrlService,
         PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
         TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
       var ctrl = this;
-      var _fetchSkillDetails = function() {
+      var _fetchSkillDetails = function () {
         var topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());
         var practiceSessionsDataUrl = UrlInterpolationService
@@ -68,7 +68,7 @@ angular.module('oppia').component('practiceSessionPage', {
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl()),
           });
-        $http.get(practiceSessionsDataUrl).then(function(result) {
+        $http.get(practiceSessionsDataUrl).then(function (result) {
           var skillList = [];
           var skillDescriptions = [];
           for (var skillId in result.data.skill_ids_to_descriptions_map) {
@@ -104,7 +104,7 @@ angular.module('oppia').component('practiceSessionPage', {
             'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
         ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());

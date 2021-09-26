@@ -25,14 +25,14 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 
 class MockWindowRef {
-  constructor(
+  constructor (
     public location: string | null = null, public searchParams: string = '') {}
 
-  get nativeWindow() {
+  get nativeWindow () {
     const that = this;
     return {
       location: {
-        get search() {
+        get search () {
           return that.searchParams;
         },
         assign: (url: string) => {
@@ -48,7 +48,7 @@ class PendingPromise<T = void> {
   public readonly resolve: (_: T | PromiseLike<T>) => void;
   public readonly reject: (_?: Object) => void;
 
-  constructor() {
+  constructor () {
     let resolve: (_: T | PromiseLike<T>) => void = () => {};
     let reject: (_?: Object) => void = () => {};
     this.promise = new Promise((res, rej) => {
@@ -61,7 +61,7 @@ class PendingPromise<T = void> {
   }
 }
 
-describe('Logout Page', function() {
+describe('Logout Page', function () {
   let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
   let loaderService: jasmine.SpyObj<LoaderService>;

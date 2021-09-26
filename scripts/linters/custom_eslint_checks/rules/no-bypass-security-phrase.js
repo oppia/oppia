@@ -35,8 +35,8 @@ module.exports = {
     },
   },
 
-  create: function(context) {
-    var checkAndReportBypassSecurity = function(node) {
+  create: function (context) {
+    var checkAndReportBypassSecurity = function (node) {
       var identifierName = node.name;
       if (identifierName.includes('bypassSecurity')) {
         context.report({
@@ -47,7 +47,7 @@ module.exports = {
     };
 
     return {
-      Identifier: function(node) {
+      Identifier: function (node) {
         checkAndReportBypassSecurity(node);
       }
     };

@@ -25,7 +25,7 @@ export class AnswerClassificationResult {
   ruleIndex: number;
   classificationCategorization: string;
 
-  constructor(
+  constructor (
       outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string) {
     this.outcome = outcome;

@@ -23,7 +23,7 @@ import { ExplorationDataService } from '../services/exploration-data.service';
  * @fileoverview Unit tests for ExplorationMetadataModalController.
  */
 
-describe('Exploration Metadata Modal Controller', function() {
+describe('Exploration Metadata Modal Controller', function () {
   var $scope = null;
   var $timeout = null;
   var $uibModalInstance = null;
@@ -44,7 +44,7 @@ describe('Exploration Metadata Modal Controller', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -53,13 +53,13 @@ describe('Exploration Metadata Modal Controller', function() {
     });
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
   }));
 
-  describe('when all metadata are filled', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when all metadata are filled', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       $timeout = $injector.get('$timeout');
       ExplorationCategoryService = $injector.get('ExplorationCategoryService');
@@ -89,7 +89,7 @@ describe('Exploration Metadata Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         var TOTAL_CATEGORIES = 42;
         expect($scope.objectiveHasBeenPreviouslyEdited).toBe(false);
         expect($scope.requireTitleToBeSpecified).toBe(true);
@@ -101,7 +101,7 @@ describe('Exploration Metadata Modal Controller', function() {
       });
 
     it('should save all exploration metadata values when it contains title,' +
-      ' category and objective', function() {
+      ' category and objective', function () {
       ExplorationCategoryService.displayed = 'New Category';
       ExplorationLanguageCodeService.displayed = 'es';
       ExplorationObjectiveService.displayed = (
@@ -119,8 +119,8 @@ describe('Exploration Metadata Modal Controller', function() {
     });
   });
 
-  describe('when all metadata are not filled', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when all metadata are not filled', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       $timeout = $injector.get('$timeout');
       AlertsService = $injector.get('AlertsService');
@@ -151,7 +151,7 @@ describe('Exploration Metadata Modal Controller', function() {
     }));
 
     it('should not save exploration metadata values when title is not' +
-      ' provided', function() {
+      ' provided', function () {
       spyOn(AlertsService, 'addWarning');
       expect($scope.isSavingAllowed()).toBe(false);
       $scope.save();
@@ -162,7 +162,7 @@ describe('Exploration Metadata Modal Controller', function() {
     });
 
     it('should not save exploration metadata values when objective is not' +
-      ' provided', function() {
+      ' provided', function () {
       ExplorationTitleService.displayed = 'New Title';
 
       spyOn(AlertsService, 'addWarning');
@@ -175,7 +175,7 @@ describe('Exploration Metadata Modal Controller', function() {
     });
 
     it('should not save exploration metadata values when category is not' +
-      ' provided', function() {
+      ' provided', function () {
       ExplorationTitleService.displayed = 'New Title';
       ExplorationObjectiveService.displayed = 'Exp Objective';
       ExplorationCategoryService.displayed = '';

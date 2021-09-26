@@ -30,19 +30,19 @@ angular.module('oppia').component('multipleIncorrectIssue', {
   template: require('./multiple-incorrect-issue.component.html'),
   controller: [
     '$scope', 'AlertsService', 'PlaythroughIssuesService',
-    function($scope, AlertsService, PlaythroughIssuesService) {
+    function ($scope, AlertsService, PlaythroughIssuesService) {
       var ctrl = this;
       var issue = null;
-      var getPlaythroughIndex = function(playthroughId) {
+      var getPlaythroughIndex = function (playthroughId) {
         return $scope.playthroughIds.indexOf(playthroughId);
       };
 
-      $scope.createPlaythroughNavId = function(playthroughId) {
+      $scope.createPlaythroughNavId = function (playthroughId) {
         return getPlaythroughIndex(playthroughId) + 1;
       };
 
       var issueResolved = false;
-      $scope.resolveIssue = function() {
+      $scope.resolveIssue = function () {
         if (!issueResolved) {
           PlaythroughIssuesService.resolveIssue(issue);
           AlertsService.addSuccessMessage(
@@ -55,12 +55,12 @@ angular.module('oppia').component('multipleIncorrectIssue', {
         }
       };
 
-      $scope.showPlaythrough = function(playthroughId) {
+      $scope.showPlaythrough = function (playthroughId) {
         var index = $scope.playthroughIds.indexOf(playthroughId);
         PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         issue = ctrl.issue();
         $scope.currentIssueIdentifier = ctrl.index() + 1;
         $scope.issueStatement =

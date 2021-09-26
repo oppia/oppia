@@ -34,7 +34,7 @@ type AlgorithmIdPredictionServiceMap = (
 export class PredictionAlgorithmRegistryService {
   private algorithmIdPredictionServiceMapping: AlgorithmIdPredictionServiceMap;
 
-  constructor(
+  constructor (
       private textInputPredictionService: TextInputPredictionService) {
     this.algorithmIdPredictionServiceMapping = new Map(Object.entries({
       TextClassifier: new Map([
@@ -43,7 +43,7 @@ export class PredictionAlgorithmRegistryService {
     }));
   }
 
-  getPredictionService(
+  getPredictionService (
       algorithmId: string, dataSchemaVersion: number):
      PredictionService | null {
     const predictionServicesByAlgorithmId = (
@@ -58,7 +58,7 @@ export class PredictionAlgorithmRegistryService {
     return null;
   }
 
-  testOnlySetPredictionService(
+  testOnlySetPredictionService (
       algorithmId: string, dataSchemaVersion: number,
       service: PredictionService): void {
     if (!this.algorithmIdPredictionServiceMapping.get(algorithmId)) {

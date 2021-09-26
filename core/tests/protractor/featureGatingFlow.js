@@ -20,7 +20,7 @@ var AdminPage = require('../protractor_utils/AdminPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 
-describe('Feature Gating Flow', function() {
+describe('Feature Gating Flow', function () {
   // Indicator in Angular component that is visible if the dummy_feature
   // is enabled, and the feature status is successfully loaded in the
   // Angular component.
@@ -35,15 +35,15 @@ describe('Feature Gating Flow', function() {
 
   let adminPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     adminPage = new AdminPage.AdminPage();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.createAndLoginCurriculumAdminUser(
       'admin1@featureGatingFlow.com', 'featuregating1');
 
@@ -57,7 +57,7 @@ describe('Feature Gating Flow', function() {
   });
 
   it('should not show indicators gated by dummy feature when disabled',
-    async() => {
+    async () => {
       await users.createAndLoginCurriculumAdminUser(
         'admin2@featureGatingFlow.com', 'featuregating2');
 
@@ -69,7 +69,7 @@ describe('Feature Gating Flow', function() {
     }
   );
 
-  it('should show dummy feature in the features tab', async() => {
+  it('should show dummy feature in the features tab', async () => {
     await users.createAndLoginCurriculumAdminUser(
       'admin3@featureGatingFlow.com', 'featuregating3');
 

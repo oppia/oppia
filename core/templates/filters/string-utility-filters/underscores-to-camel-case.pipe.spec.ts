@@ -19,7 +19,7 @@
 import { UnderscoresToCamelCasePipe } from
   'filters/string-utility-filters/underscores-to-camel-case.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let underscoresToCamelCase: UnderscoresToCamelCasePipe = null;
   beforeEach(() => {
     underscoresToCamelCase = new UnderscoresToCamelCasePipe();

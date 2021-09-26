@@ -37,32 +37,32 @@ interface ImageData {
 export class BlogPostUpdateService {
   changeDict: BlogPostChangeDict = {};
 
-  setBlogPostTitle(blogPost: BlogPostData, title: string): void {
+  setBlogPostTitle (blogPost: BlogPostData, title: string): void {
     blogPost.title = title;
     this.changeDict.title = title;
   }
 
-  setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
+  setBlogPostThumbnail (blogPost: BlogPostData, image: ImageData[]): void {
     let filename = image[0].filename;
     blogPost.thumbnailFilename = filename;
     this.changeDict.thumbnail_filename = filename;
   }
 
-  setBlogPostTags(blogPost: BlogPostData, tags: string[]): void {
+  setBlogPostTags (blogPost: BlogPostData, tags: string[]): void {
     blogPost.tags = tags;
     this.changeDict.tags = blogPost.tags;
   }
 
-  setBlogPostContent(blogPost: BlogPostData, content: string): void {
+  setBlogPostContent (blogPost: BlogPostData, content: string): void {
     blogPost.content = content;
     this.changeDict.content = content;
   }
 
-  getBlogPostChangeDict(): BlogPostChangeDict {
+  getBlogPostChangeDict (): BlogPostChangeDict {
     return this.changeDict;
   }
 
-  setBlogPostChangeDictToDefault(): void {
+  setBlogPostChangeDictToDefault (): void {
     this.changeDict = {};
   }
 }

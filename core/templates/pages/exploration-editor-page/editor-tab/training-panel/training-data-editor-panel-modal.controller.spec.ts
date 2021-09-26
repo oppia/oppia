@@ -24,7 +24,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('TrainingDataEditorPanelServiceModalController', function() {
+describe('TrainingDataEditorPanelServiceModalController', function () {
   importAllAngularServices();
 
   var $scope = null;
@@ -44,7 +44,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -54,22 +54,22 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   });
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.module(function($provide) {
+  beforeEach(angular.mock.module(function ($provide) {
     $provide.value('StateEditorService', {
-      getActiveStateName: function() {
+      getActiveStateName: function () {
         return 'Hola';
       }
     });
   }));
 
-  describe('when answer group has rules', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when answer group has rules', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       ResponsesService = $injector.get('ResponsesService');
       InteractionObjectFactory = $injector.get('InteractionObjectFactory');
@@ -189,7 +189,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.stateName).toBe('Hola');
         expect($scope.stateContent).toBe('This is Hola State');
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
@@ -199,7 +199,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           '></oppia-interactive-text-input>');
       });
 
-    it('should call init when controller is initialized', function() {
+    it('should call init when controller is initialized', function () {
       expect($scope.trainingData).toEqual([{
         answer: 'Answer1',
         answerTemplate: '<oppia-response-text-input answer="&' +
@@ -213,7 +213,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       expect($scope.answerSuccessfullyAdded).toBe(false);
     });
 
-    it('should remove answer from training data', function() {
+    it('should remove answer from training data', function () {
       $scope.removeAnswerFromTrainingData(0);
       expect($scope.trainingData).toEqual([{
         answer: 'Answer2',
@@ -222,7 +222,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       }]);
     });
 
-    it('should submit answer that is explicity classified', function() {
+    it('should submit answer that is explicity classified', function () {
       $scope.submitAnswer('Answer2');
 
       expect($scope.newAnswerTemplate).toBe(
@@ -234,7 +234,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       expect($scope.newAnswerIsAlreadyResolved).toBe(true);
     });
 
-    it('should submit answer that is not explicity classified', function() {
+    it('should submit answer that is not explicity classified', function () {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       $scope.submitAnswer('Answer1');
@@ -250,11 +250,11 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'The answer Answer1 has been successfully trained.', 1000);
     });
 
-    it('should open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function () {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
+        .callFake(function (answer, callback) {
           callback();
         });
 
@@ -263,7 +263,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'The answer Answer2 has been successfully trained.', 1000);
     });
 
-    it('should exit modal', function() {
+    it('should exit modal', function () {
       expect(true).toBe(true);
       $scope.exit();
       expect($uibModalInstance.close).toHaveBeenCalled();
@@ -271,8 +271,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   });
 
   describe('when answer group does not have rule and has at least 2' +
-    ' training data', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    ' training data', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       ResponsesService = $injector.get('ResponsesService');
       InteractionObjectFactory = $injector.get('InteractionObjectFactory');
@@ -385,11 +385,11 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('should open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function () {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
+        .callFake(function (answer, callback) {
           callback();
         });
 
@@ -400,8 +400,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   });
 
   describe('when answer group does not have rule and has one training' +
-    ' data', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    ' data', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       ResponsesService = $injector.get('ResponsesService');
       InteractionObjectFactory = $injector.get('InteractionObjectFactory');
@@ -512,7 +512,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('should open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function () {
       var openTrainUnresolvedAnswerModalSpy = spyOn(
         TrainingModalService, 'openTrainUnresolvedAnswerModal').and
         .callThrough();

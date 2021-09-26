@@ -32,17 +32,17 @@ import { Outcome } from
   providedIn: 'root'
 })
 export class MusicNotesInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: MusicNotesInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(

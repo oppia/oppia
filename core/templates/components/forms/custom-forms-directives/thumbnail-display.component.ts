@@ -40,9 +40,9 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   height = '180px';
   width = '320px';
 
-  constructor(private svgSanitizerService: SvgSanitizerService) {}
+  constructor (private svgSanitizerService: SvgSanitizerService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.imgSrc !== undefined) {
       this.updateSvgInViewIfSafe();
     }
@@ -51,7 +51,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   /**
    * Update the SVG data if the SVG  given is valid.
    */
-  updateSvgInViewIfSafe(): void {
+  updateSvgInViewIfSafe (): void {
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') === 0) {
       const safeResourceUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
@@ -66,7 +66,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
   }
 
-  ngOnChanges(): void {
+  ngOnChanges (): void {
     if (this.imgSrc !== undefined) {
       this.updateSvgInViewIfSafe();
       this.width = this.aspectRatio === '4:3' ? '248px' : '320px';

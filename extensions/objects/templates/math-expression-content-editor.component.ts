@@ -56,14 +56,14 @@ export class MathExpressionContentEditorComponent implements OnInit {
   active: boolean = false;
   localValue: { label: string } = { label: '' };
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private externalRteSaveService: ExternalRteSaveService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     // Reset the component each time the value changes (e.g. if this is
     // part of an editable list).
     this.svgString = '';
@@ -98,7 +98,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // TODO(#10197): Upgrade to MathJax 3, after proper investigation
   // and testing. MathJax 3 provides a faster and more cleaner way to
   // convert a LaTeX string to an SVG.
-  private convertLatexStringToSvg(inputLatexString: string) {
+  private convertLatexStringToSvg (inputLatexString: string) {
     const outputElement = document.createElement('div');
     // We need to append the element with a script tag so that Mathjax
     // can typeset and convert this element. The typesetting is not
@@ -140,7 +140,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // svgFile field in the this.value passed to it and the
   // RteHelperModalController will handle the saving of the file to the
   // backend.
-  private processAndSaveSvg() {
+  private processAndSaveSvg () {
     const cleanedSvgString = (
       this.svgSanitizerService.cleanMathExpressionSvgString(
         this.svgString));
@@ -170,28 +170,28 @@ export class MathExpressionContentEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 
-  updateLocalValue(newValue: string): void {
+  updateLocalValue (newValue: string): void {
     this.value.mathExpressionSvgIsBeingProcessed = true;
     this.value.raw_latex = newValue;
     this.valueChanged.emit(this.value);
     this.convertLatexStringToSvg(this.localValue.label);
   }
 
-  openEditor(): void {
+  openEditor (): void {
     if (!this.alwaysEditable) {
       return;
     }
     this.active = true;
   }
 
-  closeEditor(): void {
+  closeEditor (): void {
     if (!this.alwaysEditable) {
       return;
     }
     this.active = false;
   }
 
-  replaceValue(newValue: string): void {
+  replaceValue (newValue: string): void {
     if (!this.alwaysEditable) {
       return;
     }
@@ -203,7 +203,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
     this.closeEditor();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.value &&
       changes.value.currentValue.raw_latex !==
       changes.value.previousValue.raw_latex) {
@@ -213,7 +213,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

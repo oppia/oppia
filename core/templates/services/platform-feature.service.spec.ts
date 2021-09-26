@@ -80,12 +80,12 @@ describe('PlatformFeatureService', () => {
         removeItem: (key: string) => delete store[key]
       },
       document: {
-        get cookie() {
+        get cookie () {
           return cookie;
         }
       },
       navigator: {
-        get userAgent() {
+        get userAgent () {
           return userAgent;
         }
       }
@@ -348,7 +348,7 @@ describe('PlatformFeatureService', () => {
 
   describe('platformFeatureInitFactory', () => {
     let factoryFn = (service: PlatformFeatureService) => {
-      return async(): Promise<void> => service.initialize();
+      return async (): Promise<void> => service.initialize();
     };
 
     beforeEach(() => {
@@ -356,7 +356,7 @@ describe('PlatformFeatureService', () => {
       platformFeatureService = TestBed.inject(PlatformFeatureService);
     });
 
-    it('should return a function that calls initialize', async() => {
+    it('should return a function that calls initialize', async () => {
       const mockPromise = Promise.resolve();
       const spy = spyOn(platformFeatureService, 'initialize')
         .and.returnValue(mockPromise);

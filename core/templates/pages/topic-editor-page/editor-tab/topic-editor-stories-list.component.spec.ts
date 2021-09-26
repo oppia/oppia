@@ -32,7 +32,7 @@ describe('topicEditorStoriesList', () => {
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     topicUpdateService = $injector.get('TopicUpdateService');
     undoRedoService = $injector.get('UndoRedoService');
     $window = $injector.get('$window');

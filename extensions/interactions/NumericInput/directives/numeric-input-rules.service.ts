@@ -30,39 +30,39 @@ import {
   providedIn: 'root'
 })
 export class NumericInputRulesService {
-  Equals(
+  Equals (
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer === inputs.x;
   }
-  IsLessThan(
+  IsLessThan (
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer < inputs.x;
   }
-  IsGreaterThan(
+  IsGreaterThan (
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer > inputs.x;
   }
-  IsLessThanOrEqualTo(
+  IsLessThanOrEqualTo (
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer <= inputs.x;
   }
-  IsGreaterThanOrEqualTo(
+  IsGreaterThanOrEqualTo (
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer >= inputs.x;
   }
-  IsInclusivelyBetween(
+  IsInclusivelyBetween (
       answer: NumericInputAnswer,
       inputs: NumericInputIsInclusivelyBetweenRuleInputs): boolean {
     // TODO(wxy): Have frontend validation at creation time to check that
     // inputs.a <= inputs.b.
     return answer >= inputs.a && answer <= inputs.b;
   }
-  IsWithinTolerance(
+  IsWithinTolerance (
       answer: NumericInputAnswer,
       inputs: NumericInputIsWithinToleranceRuleInputs): boolean {
     return answer >= inputs.x - inputs.tol &&

@@ -35,9 +35,9 @@ export class ShortResponseInteractiveMapComponent implements OnInit {
   @Input() answer!: string;
   formattedCoords!: string;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor (private htmlEscaperService: HtmlEscaperService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as Record<number, number>;
     this.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';

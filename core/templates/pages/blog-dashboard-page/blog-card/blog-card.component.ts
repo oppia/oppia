@@ -38,12 +38,12 @@ export class BlogCardComponent implements OnInit {
   thumbnailUrl: string = '';
   publishedDateString: string = '';
 
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.blogPostSummary.thumbnailFilename) {
       this.thumbnailUrl = this.assetsBackendApiService
         .getThumbnailUrlForPreview(
@@ -61,7 +61,7 @@ export class BlogCardComponent implements OnInit {
     this.publishedDateString = this.getDateStringInWords(publishedOn);
   }
 
-  getDateStringInWords(naiveDate: string): string {
+  getDateStringInWords (naiveDate: string): string {
     return dayjs(
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
   }

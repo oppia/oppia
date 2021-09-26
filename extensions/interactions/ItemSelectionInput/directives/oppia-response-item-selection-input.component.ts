@@ -26,9 +26,9 @@ angular.module('oppia').component('oppiaResponseItemSelectionInput', {
   template: require('./item-selection-input-response.component.html'),
   controllerAs: '$ctrl',
   controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
+    function ($attrs, HtmlEscaperService) {
       var ctrl = this;
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         const choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
         const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 

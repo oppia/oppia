@@ -42,14 +42,14 @@ module.exports = {
     }
   },
 
-  create: function(context) {
+  create: function (context) {
     var allowedTerminatingPunctuations = ['.', '?', ';', ',', '{', '^', ')',
       '}', '>', '/>'];
     var allowedPhrases = [
       '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
       'eslint-enable', 'http://', 'https://', 'disable', '----'];
 
-    var getGroupComments = function() {
+    var getGroupComments = function () {
       var sourceCode = context.getSourceCode();
       var comments = sourceCode.getAllComments();
       comments = comments.filter(token => token.type === 'Line');
@@ -72,7 +72,7 @@ module.exports = {
       return groupComments;
     };
 
-    var checkPunctuation = function(comment) {
+    var checkPunctuation = function (comment) {
       var validComment = false;
       for (var i = 0; i < allowedTerminatingPunctuations.length - 1; i++) {
         if (comment.value.endsWith(allowedTerminatingPunctuations[i])) {
@@ -88,7 +88,7 @@ module.exports = {
       }
     };
 
-    var checkTsIgnore = function(multiLineComment) {
+    var checkTsIgnore = function (multiLineComment) {
       var expectedFormatRegex = (
         /^ This throws .* We need to suppress this error because .*\.$/);
       var comment = '';
@@ -104,7 +104,7 @@ module.exports = {
       }
     };
 
-    var checkTsExpectError = function(multiLineComment) {
+    var checkTsExpectError = function (multiLineComment) {
       var expectedFormatRegex = (
         /^ This throws .* We need to suppress this error because .*\.$/);
       var comment = '';
@@ -120,7 +120,7 @@ module.exports = {
       }
     };
 
-    var checkComment = function(multLineComment) {
+    var checkComment = function (multLineComment) {
       var allowedPhrasesPresent = false;
       var lastLineComment = multLineComment[multLineComment.length - 1];
       for (var i = 0; i < allowedPhrases.length; i++) {
@@ -143,7 +143,7 @@ module.exports = {
     };
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         var groupedComments = getGroupComments();
         for (var i = 0; i < groupedComments.length; i++) {
           checkComment(groupedComments[i]);

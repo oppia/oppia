@@ -26,19 +26,19 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
-describe('Subscriptions functionality', function() {
+describe('Subscriptions functionality', function () {
   var creatorDashboardPage = null;
   var preferencesPage = null;
   var subscriptionDashboardPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     preferencesPage = new PreferencesPage.PreferencesPage();
     subscriptionDashboardPage = (
       new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
-  it('should handle subscriptions to creators correctly', async function() {
+  it('should handle subscriptions to creators correctly', async function () {
     // Create two creators.
     await users.createUser(
       'creator1Id@subscriptions.com', 'creator1Idsubscriptions');
@@ -105,7 +105,7 @@ describe('Subscriptions functionality', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

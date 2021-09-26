@@ -40,7 +40,7 @@ export class CollectionEditorStateService {
   private _collectionInitializedEventEmitter: EventEmitter<void> = (
   new EventEmitter());
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private collectionRightsBackendApiService:
     CollectionRightsBackendApiService,
@@ -49,7 +49,7 @@ export class CollectionEditorStateService {
     private undoRedoService: UndoRedoService
   ) { }
 
-  private _setCollection(collection: Collection) {
+  private _setCollection (collection: Collection) {
     this._collection.copyFromCollection(collection);
     if (this._collectionIsInitialized) {
       this._collectionInitializedEventEmitter.emit();
@@ -59,11 +59,11 @@ export class CollectionEditorStateService {
     }
   }
 
-  private _updateCollection(newCollectionObject: Collection): void {
+  private _updateCollection (newCollectionObject: Collection): void {
     this._setCollection(newCollectionObject);
   }
 
-  private _setCollectionRights(collectionRights: CollectionRights): void {
+  private _setCollectionRights (collectionRights: CollectionRights): void {
     this._collectionRights.copyFromCollectionRights(collectionRights);
   }
 
@@ -72,7 +72,7 @@ export class CollectionEditorStateService {
    * specified collection ID. See setCollection() for more information on
    * additional behavior of this function.
    */
-  loadCollection(collectionId: string, successCallback: () => void): void {
+  loadCollection (collectionId: string, successCallback: () => void): void {
     this._collectionIsLoading = true;
     this.editableCollectionBackendApiService.fetchCollectionAsync(
       collectionId).then(
@@ -105,7 +105,7 @@ export class CollectionEditorStateService {
    * Returns whether this service is currently attempting to load the
    * collection maintained by this service.
    */
-  isLoadingCollection(): boolean {
+  isLoadingCollection (): boolean {
     return this._collectionIsLoading;
   }
 
@@ -113,7 +113,7 @@ export class CollectionEditorStateService {
    * Returns whether a collection has yet been loaded using either
    * loadCollection() or setCollection().
    */
-  hasLoadedCollection(): boolean {
+  hasLoadedCollection (): boolean {
     return this._collectionIsInitialized;
   }
 
@@ -125,7 +125,7 @@ export class CollectionEditorStateService {
    * return an empty collection object if the collection has not yet been
    * loaded for this editor instance.
    */
-  getCollection(): Collection {
+  getCollection (): Collection {
     return this._collection;
   }
 
@@ -137,7 +137,7 @@ export class CollectionEditorStateService {
    * null, though it may return an empty collection rights object if the
    * collection rights has not yet been loaded for this editor instance.
    */
-  getCollectionRights(): CollectionRights {
+  getCollectionRights (): CollectionRights {
     return this._collectionRights;
   }
 
@@ -149,7 +149,7 @@ export class CollectionEditorStateService {
    * calls will similarly fire a event based on
    * _collectionInitializedEventEmitter
    */
-  setCollection(collection: Collection): void {
+  setCollection (collection: Collection): void {
     this._setCollection(collection);
   }
 
@@ -161,7 +161,7 @@ export class CollectionEditorStateService {
    * subsequent calls will similarly fire a EVENT_COLLECTION_REINITIALIZED
    * event.
    */
-  setCollectionRights(collectionRights: CollectionRights): void {
+  setCollectionRights (collectionRights: CollectionRights): void {
     this._setCollectionRights(collectionRights);
   }
 
@@ -173,7 +173,7 @@ export class CollectionEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setCollection(), when it succeeds.
    */
-  saveCollection(commitMessage: string, successCallback: () => void): boolean {
+  saveCollection (commitMessage: string, successCallback: () => void): boolean {
     if (!this._collectionIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a collection before one is loaded.');
@@ -206,11 +206,11 @@ export class CollectionEditorStateService {
    * Returns whether this service is currently attempting to save the
    * collection maintained by this service.
    */
-  isSavingCollection(): boolean {
+  isSavingCollection (): boolean {
     return this._collectionIsBeingSaved;
   }
 
-  get onCollectionInitialized(): EventEmitter<void> {
+  get onCollectionInitialized (): EventEmitter<void> {
     return this._collectionInitializedEventEmitter;
   }
 }

@@ -112,7 +112,7 @@ class FakeSkillBackendApiService {
   skillObject = null;
   failure = null;
 
-  async fetchSkillAsync() {
+  async fetchSkillAsync () {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({
@@ -139,7 +139,7 @@ class FakeSkillBackendApiService {
     });
   }
 
-  async updateSkillAsync() {
+  async updateSkillAsync () {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.skillObject);
@@ -162,7 +162,7 @@ class FakeSkillRightsBackendApiService {
     fetchSkillRightsAsync: null,
   };
 
-  async fetchSkillRightsAsync() {
+  async fetchSkillRightsAsync () {
     return new Promise((resolve, reject) => {
       if (!this.self.failure) {
         resolve(this.self.backendSkillRightsObject);

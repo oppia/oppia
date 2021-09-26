@@ -33,7 +33,7 @@ var SkillEditorPage = require(
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
-describe('Contributor dashboard page', function() {
+describe('Contributor dashboard page', function () {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
@@ -55,7 +55,7 @@ describe('Contributor dashboard page', function() {
   let adminPage = null;
   let contributorDashboardAdminPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     contributorDashboardPage = (
       new ContributorDashboardPage.ContributorDashboardPage());
     contributorDashboardTranslateTextTab = (
@@ -77,7 +77,7 @@ describe('Contributor dashboard page', function() {
     await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
+      'Boolean', async function (elem) {
         await elem.setValue(true);
       });
 
@@ -103,7 +103,7 @@ describe('Contributor dashboard page', function() {
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
       'List',
-      async function(elem) {
+      async function (elem) {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
@@ -119,7 +119,7 @@ describe('Contributor dashboard page', function() {
     await users.logout();
   });
 
-  it('should allow user to switch to translate text tab', async function() {
+  it('should allow user to switch to translate text tab', async function () {
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(HINDI_LANGUAGE);
@@ -127,7 +127,7 @@ describe('Contributor dashboard page', function() {
       HINDI_LANGUAGE);
   });
 
-  it('should allow reviewer to accept question suggestions', async function() {
+  it('should allow reviewer to accept question suggestions', async function () {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);
     await contributorDashboardPage.get();
@@ -190,7 +190,7 @@ describe('Contributor dashboard page', function() {
     await users.logout();
   });
 
-  it('should allow reviewer to reject question suggestions', async function() {
+  it('should allow reviewer to reject question suggestions', async function () {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);
     await contributorDashboardPage.get();
@@ -253,7 +253,7 @@ describe('Contributor dashboard page', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
@@ -275,7 +275,7 @@ describe('Contributor dashboard admin page contribution rights form', () => {
   var questionReviewerUsername = 'questionreviewer';
   var questionReviewerEmail = 'questionreviewer@contributor.com';
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     adminPage = new AdminPage.AdminPage();
     contributorDashboardPage = (
       new ContributorDashboardPage.ContributorDashboardPage());
@@ -295,14 +295,14 @@ describe('Contributor dashboard admin page contribution rights form', () => {
     await adminPage.addRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
+      'Boolean', async function (elem) {
         await elem.setValue(true);
       });
     await users.logout();
   });
 
   it('should allow translation admin to add translation reviewer',
-    async function() {
+    async function () {
       await users.login(TRANSLATION_ADMIN_EMAIL);
       await contributorDashboardAdminPage.get();
       await contributorDashboardAdminPage.assignTranslationReviewer(
@@ -318,7 +318,7 @@ describe('Contributor dashboard admin page contribution rights form', () => {
       await users.logout();
     });
 
-  it('should allow admin to add question reviewer', async function() {
+  it('should allow admin to add question reviewer', async function () {
     await users.login(QUESTION_ADMIN_EMAIL);
     await contributorDashboardAdminPage.get();
     await contributorDashboardAdminPage.assignQuestionReviewer(
@@ -333,7 +333,7 @@ describe('Contributor dashboard admin page contribution rights form', () => {
     await users.logout();
   });
 
-  it('should allow admin to add question contributor', async function() {
+  it('should allow admin to add question contributor', async function () {
     await users.login(QUESTION_ADMIN_EMAIL);
     await contributorDashboardAdminPage.get();
     await contributorDashboardAdminPage.assignQuestionContributor(
@@ -348,7 +348,7 @@ describe('Contributor dashboard admin page contribution rights form', () => {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
@@ -357,7 +357,7 @@ describe('Translation contribution featured languages', () => {
   var contributorDashboardPage = null;
   var contributorDashboardTranslateTextTab = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     contributorDashboardPage = (
       new ContributorDashboardPage.ContributorDashboardPage());
     contributorDashboardTranslateTextTab = (
@@ -368,7 +368,7 @@ describe('Translation contribution featured languages', () => {
     await adminPage.editConfigProperty(
       'Featured Translation Languages',
       'List',
-      async function(elem) {
+      async function (elem) {
         var featured = await elem.addItem('Dictionary');
         await (await featured.editEntry(0, 'Unicode')).setValue('fr');
         await (await featured.editEntry(1, 'Unicode'))
@@ -377,24 +377,24 @@ describe('Translation contribution featured languages', () => {
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
   });
 
-  it('should show correct featured languages', async function() {
+  it('should show correct featured languages', async function () {
     await contributorDashboardTranslateTextTab
       .expectFeaturedLanguagesToBe(['French']);
   });
 
-  it('should show correct explanation', async function() {
+  it('should show correct explanation', async function () {
     await contributorDashboardTranslateTextTab
       .mouseoverFeaturedLanguageTooltip(0);
     await contributorDashboardTranslateTextTab
       .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

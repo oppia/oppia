@@ -29,13 +29,13 @@ import { UtilsService } from 'services/utils.service';
 })
 // TODO(sll): Add validation.
 export class StateInteractionIdService extends StatePropertyService<string> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionId';
   }
   private _interactionIdChanged = new EventEmitter<string>();
 
-  get onInteractionIdChanged(): EventEmitter<string> {
+  get onInteractionIdChanged (): EventEmitter<string> {
     return this._interactionIdChanged;
   }
 }

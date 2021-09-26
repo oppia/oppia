@@ -23,7 +23,7 @@ angular.module('oppia').component('oppiaShortResponseDragAndDropSortInput', {
     './drag-and-drop-sort-input-short-response.component.html'),
   controllerAs: '$ctrl',
   controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
+    function ($attrs, HtmlEscaperService) {
       var ctrl = this;
       ctrl.chooseItemType = (index) => {
         return (
@@ -32,7 +32,7 @@ angular.module('oppia').component('oppiaShortResponseDragAndDropSortInput', {
           'drag-and-drop-response-subitem'
         );
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.isAnswerLengthGreaterThanZero = ctrl.answer.length > 0;
       };

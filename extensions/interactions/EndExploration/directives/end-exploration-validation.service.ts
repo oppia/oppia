@@ -34,11 +34,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class EndExplorationValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: EndExplorationCustomizationArgs): Warning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -64,7 +64,7 @@ export class EndExplorationValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: EndExplorationCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
     var warningsList: Warning[] = [];

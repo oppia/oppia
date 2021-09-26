@@ -31,7 +31,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Question Editor Modal Controller', function() {
+describe('Question Editor Modal Controller', function () {
   let $q = null;
   let $scope = null;
   let ngbModal: NgbModal;
@@ -69,8 +69,8 @@ describe('Question Editor Modal Controller', function() {
   const skillName = [];
   let associatedSkillSummaries = null;
 
-  describe('when question is valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when question is valid', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       ngbModal = TestBed.inject(NgbModal);
@@ -177,7 +177,7 @@ describe('Question Editor Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.question).toEqual(question);
         expect($scope.questionStateData).toBe(questionStateData);
         expect($scope.associatedSkillSummaries).toEqual(
@@ -191,14 +191,14 @@ describe('Question Editor Modal Controller', function() {
         expect($scope.skillName).toEqual(skillName);
       });
 
-    it('should get skill editor url based on the skill id', function() {
+    it('should get skill editor url based on the skill id', function () {
       expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');
       expect($scope.getSkillEditorUrl('undefined')).toBe(
         '/skill_editor/undefined');
     });
 
     it('should try to remove all skill successfully and then undo changes',
-      function() {
+      function () {
         let skillId = '3';
         $scope.removeSkill(skillId);
 
@@ -240,12 +240,12 @@ describe('Question Editor Modal Controller', function() {
         expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
       });
 
-    it('should close modal successfully', function() {
+    it('should close modal successfully', function () {
       $scope.done();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should open add skill modal when adding a new skill', function() {
+    it('should open add skill modal when adding a new skill', function () {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
         return <NgbModalRef>(
@@ -286,14 +286,14 @@ describe('Question Editor Modal Controller', function() {
       expect(modalSpy).toHaveBeenCalled();
     });
 
-    it('should save and commit when there is no pending changes', function() {
+    it('should save and commit when there is no pending changes', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(true);
       $scope.saveAndCommit();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should save and commit after modifying skills', function() {
+    it('should save and commit after modifying skills', function () {
       const openModalSpy = spyOn($uibModal, 'open');
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
@@ -312,7 +312,7 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should not save and commit when dismissing the add skill modal',
-      function() {
+      function () {
         const openModalSpy = spyOn($uibModal, 'open');
         spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
         expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
@@ -325,14 +325,14 @@ describe('Question Editor Modal Controller', function() {
         expect($uibModalInstance.close).not.toHaveBeenCalled();
       });
 
-    it('should dismiss modal when there is no pending changes', function() {
+    it('should dismiss modal when there is no pending changes', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
     it('should dismiss modal when there are pending changes which won\'t be' +
-      ' saved', function() {
+      ' saved', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -344,7 +344,7 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should not dismiss modal when there are pending changes which will be' +
-      ' saved', function() {
+      ' saved', function () {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -356,8 +356,8 @@ describe('Question Editor Modal Controller', function() {
     });
   });
 
-  describe('when question is not valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when question is not valid', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       ngbModal = TestBed.inject(NgbModal);
       $q = $injector.get('$q');
@@ -464,12 +464,12 @@ describe('Question Editor Modal Controller', function() {
       });
     }));
 
-    it('should not close modal', function() {
+    it('should not close modal', function () {
       $scope.done();
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
 
-    it('should not save and commit changes', function() {
+    it('should not save and commit changes', function () {
       $scope.saveAndCommit();
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });

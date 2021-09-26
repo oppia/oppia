@@ -19,12 +19,12 @@
 
 angular.module('oppia').controller('ConfirmOrCancelModalController', [
   '$scope', '$uibModalInstance',
-  function($scope, $uibModalInstance) {
-    $scope.confirm = function(value) {
+  function ($scope, $uibModalInstance) {
+    $scope.confirm = function (value) {
       $uibModalInstance.close(value);
     };
 
-    $scope.cancel = function(value) {
+    $scope.cancel = function (value) {
       var dismissValue = value || 'cancel';
       $uibModalInstance.dismiss(dismissValue);
     };

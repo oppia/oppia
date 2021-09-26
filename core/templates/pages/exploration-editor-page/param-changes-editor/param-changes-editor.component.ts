@@ -52,16 +52,16 @@ angular.module('oppia').component('paramChangesEditor', {
     'ExplorationParamSpecsService', 'ExplorationStatesService',
     'ExternalSaveService', 'ParamChangeObjectFactory',
     'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
-    function(
+    function (
         $scope, AlertsService, EditabilityService,
         ExplorationParamSpecsService, ExplorationStatesService,
         ExternalSaveService, ParamChangeObjectFactory,
         UrlInterpolationService, INVALID_PARAMETER_NAMES) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var generateParamNameChoices = function() {
+      var generateParamNameChoices = function () {
         return ExplorationParamSpecsService.displayed.getParamNames().sort()
-          .map(function(paramName) {
+          .map(function (paramName) {
             return {
               id: paramName,
               text: paramName
@@ -69,7 +69,7 @@ angular.module('oppia').component('paramChangesEditor', {
           });
       };
 
-      $scope.addParamChange = function() {
+      $scope.addParamChange = function () {
         var newParamName = (
           $scope.paramNameChoices.length > 0 ?
             $scope.paramNameChoices[0].id : 'x');
@@ -84,7 +84,7 @@ angular.module('oppia').component('paramChangesEditor', {
         ctrl.paramChangesService.displayed.push(newParamChange);
       };
 
-      $scope.openParamChangesEditor = function() {
+      $scope.openParamChangesEditor = function () {
         if (!EditabilityService.isEditable()) {
           return;
         }
@@ -97,11 +97,11 @@ angular.module('oppia').component('paramChangesEditor', {
         }
       };
 
-      $scope.onChangeGeneratorType = function(paramChange) {
+      $scope.onChangeGeneratorType = function (paramChange) {
         paramChange.resetCustomizationArgs();
       };
 
-      $scope.areDisplayedParamChangesValid = function() {
+      $scope.areDisplayedParamChangesValid = function () {
         var paramChanges = ctrl.paramChangesService.displayed;
 
         for (var i = 0; i < paramChanges.length; i++) {
@@ -145,7 +145,7 @@ angular.module('oppia').component('paramChangesEditor', {
         return true;
       };
 
-      $scope.saveParamChanges = function() {
+      $scope.saveParamChanges = function () {
         // Validate displayed value.
         if (!$scope.areDisplayedParamChangesValid()) {
           AlertsService.addWarning('Invalid parameter changes.');
@@ -156,7 +156,7 @@ angular.module('oppia').component('paramChangesEditor', {
 
         // Update paramSpecs manually with newly-added param names.
         ExplorationParamSpecsService.restoreFromMemento();
-        ctrl.paramChangesService.displayed.forEach(function(paramChange) {
+        ctrl.paramChangesService.displayed.forEach(function (paramChange) {
           ExplorationParamSpecsService.displayed.addParamIfNew(
             paramChange.name);
         });
@@ -173,7 +173,7 @@ angular.module('oppia').component('paramChangesEditor', {
         }
       };
 
-      $scope.deleteParamChange = function(index) {
+      $scope.deleteParamChange = function (index) {
         if (index < 0 ||
             index >= ctrl.paramChangesService.displayed.length) {
           AlertsService.addWarning(
@@ -185,7 +185,7 @@ angular.module('oppia').component('paramChangesEditor', {
         // before the deletion are added to the list of possible names in
         // the select2 dropdowns. Otherwise, after the deletion, the
         // dropdowns may turn blank.
-        ctrl.paramChangesService.displayed.forEach(function(paramChange) {
+        ctrl.paramChangesService.displayed.forEach(function (paramChange) {
           ExplorationParamSpecsService.displayed.addParamIfNew(
             paramChange.name);
         });
@@ -194,12 +194,12 @@ angular.module('oppia').component('paramChangesEditor', {
         ctrl.paramChangesService.displayed.splice(index, 1);
       };
 
-      $scope.cancelEdit = function() {
+      $scope.cancelEdit = function () {
         ctrl.paramChangesService.restoreFromMemento();
         $scope.isParamChangesEditorOpen = false;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.EditabilityService = EditabilityService;
         $scope.isParamChangesEditorOpen = false;
         $scope.warningText = '';
@@ -214,7 +214,7 @@ angular.module('oppia').component('paramChangesEditor', {
                 $scope.saveParamChanges();
               }
             }));
-        $scope.getStaticImageUrl = function(imagePath) {
+        $scope.getStaticImageUrl = function (imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
         // This is a local variable that is used by the select2 dropdowns
@@ -224,10 +224,10 @@ angular.module('oppia').component('paramChangesEditor', {
         // the course of a single "parameter changes" edit.
         $scope.paramNameChoices = [];
         $scope.HUMAN_READABLE_ARGS_RENDERERS = {
-          Copier: function(customizationArgs) {
+          Copier: function (customizationArgs) {
             return 'to ' + customizationArgs.value;
           },
-          RandomSelector: function(customizationArgs) {
+          RandomSelector: function (customizationArgs) {
             var result = 'to one of [';
             for (
               var i = 0; i < customizationArgs.list_of_values.length; i++) {
@@ -247,17 +247,17 @@ angular.module('oppia').component('paramChangesEditor', {
           handle: '.oppia-param-change-sort-handle',
           items: '.oppia-param-editor-row',
           tolerance: 'pointer',
-          start: function(e, ui) {
+          start: function (e, ui) {
             $scope.$apply();
             ui.placeholder.height(ui.item.height());
           },
-          stop: function() {
+          stop: function () {
             // This ensures that any new parameter names that have been
             // added before the swap are added to the list of possible names
             // in the select2 dropdowns. Otherwise, after the swap, the
             // dropdowns may turn blank.
             ctrl.paramChangesService.displayed.forEach(
-              function(paramChange) {
+              function (paramChange) {
                 ExplorationParamSpecsService.displayed.addParamIfNew(
                   paramChange.name);
               }
@@ -267,7 +267,7 @@ angular.module('oppia').component('paramChangesEditor', {
           }
         };
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }
@@ -281,7 +281,7 @@ export class ParamChangesEditorDirective extends UpgradeComponent {
   @Input() paramChangesService: unknown;
   @Input() postSaveHook: () => void;
   @Input() currentlyInSettingsTab: boolean;
-  constructor(elementRef: ElementRef, injector: Injector) {
+  constructor (elementRef: ElementRef, injector: Injector) {
     super('paramChangesEditor', elementRef, injector);
   }
 }

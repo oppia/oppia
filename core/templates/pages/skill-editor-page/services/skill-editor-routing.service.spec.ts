@@ -18,18 +18,18 @@
 
 require('pages/skill-editor-page/services/skill-editor-routing.service');
 
-describe('Skill Editor Routing Service', function() {
+describe('Skill Editor Routing Service', function () {
   var sers = null;
   var $rootScope = null;
   var $location = null;
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     sers = $injector.get('SkillEditorRoutingService');
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
   }));
 
-  it('should handler calls with unexpect paths', function() {
+  it('should handler calls with unexpect paths', function () {
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
     $location.path();
@@ -42,7 +42,7 @@ describe('Skill Editor Routing Service', function() {
     expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should toggle between main tab, questions and preview tab', function() {
+  it('should toggle between main tab, questions and preview tab', function () {
     sers.navigateToQuestionsTab();
     $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('questions');
@@ -59,7 +59,7 @@ describe('Skill Editor Routing Service', function() {
     expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should open the question-editor directly', function() {
+  it('should open the question-editor directly', function () {
     sers.creatingNewQuestion(true);
     expect(sers.navigateToQuestionEditor()).toBe(true);
     sers.creatingNewQuestion(false);

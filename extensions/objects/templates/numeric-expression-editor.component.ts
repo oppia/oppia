@@ -48,7 +48,7 @@ export class NumericExpressionEditorComponent implements OnInit {
   alwaysEditable: boolean = false;
   eventBusGroup: EventBusGroup;
 
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private eventBusService: EventBusService,
     private guppyConfigurationService: GuppyConfigurationService,
@@ -59,7 +59,7 @@ export class NumericExpressionEditorComponent implements OnInit {
   }
 
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
     if (this.value === null || this.value === undefined) {
@@ -110,7 +110,7 @@ export class NumericExpressionEditorComponent implements OnInit {
     }
   }
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid (): boolean {
     if (this.currentValue === undefined) {
       this.currentValue = '';
     }
@@ -145,7 +145,7 @@ export class NumericExpressionEditorComponent implements OnInit {
     return answerIsValid;
   }
 
-  showOSK(): void {
+  showOSK (): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'NumericExpressionInput';
   }

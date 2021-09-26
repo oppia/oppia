@@ -27,7 +27,7 @@ export class DebouncerService {
   // Returns a function that will not be triggered as long as it continues to
   // be invoked. The function only gets executed after it stops being called
   // for `wait` milliseconds.
-  debounce(func: () => void, millisecsToWait: number): () => void {
+  debounce (func: () => void, millisecsToWait: number): () => void {
     let timeout: number;
     let context: this | null = this;
     let timestamp: number;
@@ -48,7 +48,7 @@ export class DebouncerService {
       }
     };
 
-    return function() {
+    return function () {
       timestamp = new Date().getTime();
       if (!timeout) {
         timeout = window.setTimeout(later, millisecsToWait);

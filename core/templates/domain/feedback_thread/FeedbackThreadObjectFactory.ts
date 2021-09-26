@@ -48,7 +48,7 @@ export class FeedbackThread {
   lastNonemptyMessageSummary: ThreadMessageSummary;
   messages: ThreadMessage[] = [];
 
-  constructor(
+  constructor (
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdatedMsecs: number,
       messageCount: number, stateName: string, threadId: string,
@@ -64,7 +64,7 @@ export class FeedbackThread {
     this.lastNonemptyMessageSummary = lastNonemptyMessageSummary;
   }
 
-  setMessages(messages: ThreadMessage[]): void {
+  setMessages (messages: ThreadMessage[]): void {
     this.messages = messages;
     // Since messages have been updated, we need to update all of our other
     // message-related fields to maintain consistency between them.
@@ -76,18 +76,18 @@ export class FeedbackThread {
     }
   }
 
-  getMessages(): ThreadMessage[] {
+  getMessages (): ThreadMessage[] {
     return this.messages;
   }
 
-  isSuggestionThread(): boolean {
+  isSuggestionThread (): boolean {
     return false;
   }
 }
 
 @Injectable({providedIn: 'root'})
 export class FeedbackThreadObjectFactory {
-  createFromBackendDict(
+  createFromBackendDict (
       feedbackThreadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,

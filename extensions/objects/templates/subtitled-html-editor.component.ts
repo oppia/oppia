@@ -38,9 +38,9 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   SCHEMA!: SubtitledHtmlEditorSchema;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor (private changeDetectorRef: ChangeDetectorRef) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const uiConfig = (
       this.schema.replacement_ui_config ? this.schema.replacement_ui_config : {}
     );
@@ -50,11 +50,11 @@ export class SubtitledHtmlEditorComponent implements OnInit {
     };
   }
 
-  getSchema(): SubtitledHtmlEditorSchema {
+  getSchema (): SubtitledHtmlEditorSchema {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: unknown): void {
+  updateValue (newValue: unknown): void {
     if (this.value._html === newValue) {
       return;
     }

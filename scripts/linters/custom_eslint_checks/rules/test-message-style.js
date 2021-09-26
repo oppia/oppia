@@ -37,8 +37,8 @@ module.exports = {
     }
   },
 
-  create: function(context) {
-    var checkMessageStartsWithShould = function(testMessageNode, testMessage) {
+  create: function (context) {
+    var checkMessageStartsWithShould = function (testMessageNode, testMessage) {
       if (!testMessage.startsWith('should ')) {
         context.report({
           testMessageNode,
@@ -48,7 +48,7 @@ module.exports = {
       }
     };
 
-    var checkSpacesInMessage = function(testMessageNode, testMessage) {
+    var checkSpacesInMessage = function (testMessageNode, testMessage) {
       if (testMessage.includes('  ')) {
         context.report({
           testMessageNode,
@@ -58,7 +58,7 @@ module.exports = {
       }
     };
 
-    var checkNoSpaceAtEndOfMessage = function(testMessageNode, testMessage) {
+    var checkNoSpaceAtEndOfMessage = function (testMessageNode, testMessage) {
       if (testMessage.endsWith(' ')) {
         context.report({
           testMessageNode,
@@ -68,13 +68,13 @@ module.exports = {
       }
     };
 
-    var checkMessage = function(node, testMessage) {
+    var checkMessage = function (node, testMessage) {
       checkMessageStartsWithShould(node, testMessage);
       checkNoSpaceAtEndOfMessage(node, testMessage);
       checkSpacesInMessage(node, testMessage);
     };
 
-    var extractMessage = function(node) {
+    var extractMessage = function (node) {
       if (node.type === 'BinaryExpression') {
         return extractMessage(node.left) + extractMessage(node.right);
       } else {
@@ -83,7 +83,7 @@ module.exports = {
     };
 
     return {
-      CallExpression(node) {
+      CallExpression (node) {
         if (node.callee.name === 'it') {
           const testMessageNode = node.arguments[0];
           var testMessage = extractMessage(testMessageNode);

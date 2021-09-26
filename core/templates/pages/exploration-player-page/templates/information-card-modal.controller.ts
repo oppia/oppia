@@ -29,7 +29,7 @@ angular.module('oppia').controller('InformationCardModalController', [
   'DateTimeFormatService', 'RatingComputationService',
   'UrlInterpolationService', 'expInfo',
   'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
-  function(
+  function (
       $controller, $scope, $uibModalInstance,
       DateTimeFormatService, RatingComputationService,
       UrlInterpolationService, expInfo,
@@ -38,7 +38,7 @@ angular.module('oppia').controller('InformationCardModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    var getExplorationTagsSummary = function(arrayOfTags) {
+    var getExplorationTagsSummary = function (arrayOfTags) {
       var tagsToShow = [];
       var tagsInTooltip = [];
       var MAX_CHARS_TO_SHOW = 45;
@@ -60,7 +60,7 @@ angular.module('oppia').controller('InformationCardModalController', [
       };
     };
 
-    var getLastUpdatedString = function(millisSinceEpoch) {
+    var getLastUpdatedString = function (millisSinceEpoch) {
       return DateTimeFormatService
         .getLocaleAbbreviatedDatetimeString(
           millisSinceEpoch);
@@ -75,7 +75,7 @@ angular.module('oppia').controller('InformationCardModalController', [
       expInfo.human_readable_contributors_summary || {});
     $scope.contributorNames = Object.keys(
       contributorsSummary).sort(
-      function(contributorUsername1, contributorUsername2) {
+      function (contributorUsername1, contributorUsername2) {
         var commitsOfContributor1 = contributorsSummary[
           contributorUsername1].num_commits;
         var commitsOfContributor2 = contributorsSummary[
@@ -90,7 +90,7 @@ angular.module('oppia').controller('InformationCardModalController', [
     $scope.infoCardBackgroundCss = {
       'background-color': expInfo.thumbnail_bg_color
     };
-    $scope.titleWrapper = function() {
+    $scope.titleWrapper = function () {
       var titleHeight = (
         document.querySelectorAll(
           '.oppia-info-card-logo-thumbnail')[0].clientWidth - 20);
@@ -102,7 +102,7 @@ angular.module('oppia').controller('InformationCardModalController', [
     };
     $scope.infoCardBackgroundImageUrl = expInfo
       .thumbnail_icon_url;
-    $scope.getStaticImageUrl = function(imagePath) {
+    $scope.getStaticImageUrl = function (imagePath) {
       return UrlInterpolationService.getStaticImageUrl(imagePath);
     };
     $scope.lastUpdatedString = getLastUpdatedString(

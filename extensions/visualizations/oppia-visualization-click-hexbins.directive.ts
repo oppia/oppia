@@ -53,7 +53,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
   controller: [
     '$scope', 'AssetsBackendApiService', 'ContextService',
     'ImagePreloaderService',
-    function(
+    function (
         $scope, AssetsBackendApiService, ContextService,
         ImagePreloaderService) {
       const imagePath = $scope.interactionArgs.imageAndRegions.value.imagePath;
@@ -64,13 +64,13 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
 
       let tooltipTarget: Hexbin = null;
 
-      const showTooltip = function(bin: Hexbin) {
+      const showTooltip = function (bin: Hexbin) {
         if (tooltipTarget === null && bin.length > 0) {
           tooltipTarget = bin;
         }
       };
 
-      const hideTooltip = function(bin: Hexbin) {
+      const hideTooltip = function (bin: Hexbin) {
         if (tooltipTarget === bin) {
           tooltipTarget = null;
         }

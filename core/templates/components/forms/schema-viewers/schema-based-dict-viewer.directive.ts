@@ -23,7 +23,7 @@ require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedDictViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  function(
+  function (
       NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {
@@ -37,8 +37,8 @@ angular.module('oppia').directive('schemaBasedDictViewer', [
         'schema-based-dict-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
+      controller: ['$scope', function ($scope) {
+        $scope.getHumanReadablePropertyDescription = function (property) {
           return property.description || '[' + property.name + ']';
         };
       }]

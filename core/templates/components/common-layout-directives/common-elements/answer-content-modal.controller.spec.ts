@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for AnswerContentModalController.
  */
 
-describe('Improvement Confirmation Modal', function() {
+describe('Improvement Confirmation Modal', function () {
   let $scope = null;
   let $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     let $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = (
@@ -35,7 +35,7 @@ describe('Improvement Confirmation Modal', function() {
     });
   }));
 
-  it('should evalute scope letiables values correctly', function() {
+  it('should evalute scope letiables values correctly', function () {
     expect($scope.answerHtml).toEqual('<div>Lorem ipsum dolor sit amet.</div>');
     expect($scope.close).toBe($uibModalInstance.close);
   });

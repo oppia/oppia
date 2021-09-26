@@ -36,13 +36,13 @@ import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 export class TextInputPredictionService {
   private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = (
     InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
-  constructor(
+  constructor (
     private countVectorizerService: CountVectorizerService,
     private svmPredictionService: SVMPredictionService,
     private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierBuffer: ArrayBuffer, textInput: string): number {
+  predict (classifierBuffer: ArrayBuffer, textInput: string): number {
     // The model_json attribute in TextClassifierFrozenModel class can't be
     // changed to camelcase since the class definition is automatically compiled
     // with the help of protoc.

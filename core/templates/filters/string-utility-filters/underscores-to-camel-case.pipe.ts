@@ -20,8 +20,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'underscoresToCamelCase'})
 export class UnderscoresToCamelCasePipe implements PipeTransform {
-  transform(input: string): string {
-    return input.replace(/_+(.)/g, function(match, group1) {
+  transform (input: string): string {
+    return input.replace(/_+(.)/g, function (match, group1) {
       return group1.toUpperCase();
     });
   }

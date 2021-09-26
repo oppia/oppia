@@ -34,16 +34,16 @@ export class FilteredChoicesFieldComponent {
     new EventEmitter());
   filteredChoices!: string[];
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.filteredChoices = this.choices;
   }
 
-  filterChoices(searchTerm: string): void {
+  filterChoices (searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
       choice => choice.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
   }
 
-  updateSelection(selection: string): void {
+  updateSelection (selection: string): void {
     this.selection = selection;
     this.selectionChange.emit(selection);
   }

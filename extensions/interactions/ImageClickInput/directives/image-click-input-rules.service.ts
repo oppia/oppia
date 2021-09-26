@@ -26,7 +26,7 @@ import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class ImageClickInputRulesService {
-  IsInRegion(
+  IsInRegion (
       answer: ImageClickAnswer, inputs: ImageClickRuleInputs): boolean {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }

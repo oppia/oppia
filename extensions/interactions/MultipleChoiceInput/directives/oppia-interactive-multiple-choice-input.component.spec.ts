@@ -30,7 +30,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   let browserCheckerService: BrowserCheckerService;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         showChoicesInShuffledOrder: {
           value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue)
@@ -43,10 +43,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {
+    onSubmit (answer, rulesService) {
       expect(answer).toBe(1);
     }
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    registerCurrentInteraction (submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();
     }

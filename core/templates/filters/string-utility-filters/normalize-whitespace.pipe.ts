@@ -26,8 +26,8 @@ import { UtilsService } from 'services/utils.service';
 })
 @Pipe({name: 'normalizeWhitespace'})
 export class NormalizeWhitespacePipe implements PipeTransform {
-  constructor(private utilsService: UtilsService) {}
-  transform(input: string): string {
+  constructor (private utilsService: UtilsService) {}
+  transform (input: string): string {
     if (this.utilsService.isString(input)) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.

@@ -22,7 +22,7 @@ import { AboutFoundationPageComponent } from './about-foundation-page.component'
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 describe('About foundation page', () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [AboutFoundationPageComponent],
       providers: [

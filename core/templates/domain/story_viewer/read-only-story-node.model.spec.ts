@@ -67,7 +67,7 @@ describe('Read only story node model', () => {
       sampleReadOnlyStoryNodeBackendDict);
   });
 
-  it('should correctly return all the values', function() {
+  it('should correctly return all the values', function () {
     expect(_sampleStoryNode.getId()).toEqual('node_1');
     expect(_sampleStoryNode.getTitle()).toEqual('Title 1');
     expect(_sampleStoryNode.getDescription()).toEqual('Description');

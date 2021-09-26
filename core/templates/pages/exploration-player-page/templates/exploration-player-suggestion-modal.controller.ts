@@ -26,7 +26,7 @@ angular.module('oppia').controller(
     '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
     'PlayerPositionService', 'PlayerTranscriptService',
     'SuggestionModalService',
-    function(
+    function (
         $scope, $timeout, $uibModalInstance, ExplorationEngineService,
         PlayerPositionService, PlayerTranscriptService,
         SuggestionModalService) {
@@ -41,20 +41,20 @@ angular.module('oppia').controller(
       $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
       $scope.showEditor = false;
       // Rte initially displays content unrendered for a split second.
-      $timeout(function() {
+      $timeout(function () {
         $scope.showEditor = true;
       }, 500);
 
-      $scope.cancelSuggestion = function() {
+      $scope.cancelSuggestion = function () {
         SuggestionModalService.cancelSuggestion($uibModalInstance);
       };
 
-      $scope.updateValue = function(value: string) {
+      $scope.updateValue = function (value: string) {
         $scope.suggestionData.suggestionHtml = value;
         $scope.$applyAsync();
       };
 
-      $scope.submitSuggestion = function() {
+      $scope.submitSuggestion = function () {
         var data = {
           target_id: ExplorationEngineService.getExplorationId(),
           version: ExplorationEngineService.getExplorationVersion(),

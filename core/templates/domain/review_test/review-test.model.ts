@@ -26,11 +26,11 @@ export interface ReviewTestBackendDict {
 }
 
 export class ReviewTest {
-  constructor(
+  constructor (
     public storyName: string,
     public skillDescriptions: SkillDescriptions) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ReviewTestBackendDict): ReviewTest {
     return new ReviewTest(
       backendDict.story_name, backendDict.skill_descriptions);

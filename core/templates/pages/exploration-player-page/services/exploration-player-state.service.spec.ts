@@ -96,26 +96,26 @@ describe('Exploration Player State Service', () => {
   };
 
   class MockContextService {
-    isInExplorationEditorPage(): boolean {
+    isInExplorationEditorPage (): boolean {
       return false;
     }
 
-    isInQuestionPlayerMode(): boolean {
+    isInQuestionPlayerMode (): boolean {
       return false;
     }
 
-    getExplorationId(): string {
+    getExplorationId (): string {
       return '123';
     }
   }
 
   class MockReadOnlyExplorationBackendApiService {
-    async loadLatestExplorationAsync(explorationId: string):
+    async loadLatestExplorationAsync (explorationId: string):
     Promise<FetchExplorationBackendResponse> {
       return Promise.resolve(returnDict);
     }
 
-    async loadExplorationAsync(explorationId: string, version: number):
+    async loadExplorationAsync (explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
       return Promise.resolve(returnDict);
     }

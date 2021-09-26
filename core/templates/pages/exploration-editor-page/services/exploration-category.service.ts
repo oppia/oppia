@@ -26,7 +26,7 @@ require('services/validators.service.ts');
 angular.module('oppia').factory('ExplorationCategoryService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',
-  function(
+  function (
       $filter, ExplorationPropertyService, ExplorationRightsService,
       ValidatorsService) {
     var child = Object.create(ExplorationPropertyService);
@@ -36,7 +36,7 @@ angular.module('oppia').factory('ExplorationCategoryService', [
      * @param {string} value - The input to be validated.
      * @returns {boolean} - True if category name is valid.
      */
-    child._isValid = function(value) {
+    child._isValid = function (value) {
       return ValidatorsService.isValidEntityName(
         value, true, ExplorationRightsService.isPrivate());
     };

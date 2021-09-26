@@ -27,12 +27,12 @@ import { DeleteAccountModalComponent } from './templates/delete-account-modal.co
   templateUrl: './delete-account-page.component.html'
 })
 export class DeleteAccountPageComponent {
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private deleteAccountBackendApiService: DeleteAccountBackendApiService
   ) {}
 
-  deleteAccount(): void {
+  deleteAccount (): void {
     const modelRef = this.ngbModal.open(
       DeleteAccountModalComponent, { backdrop: true });
     modelRef.result.then(() => {

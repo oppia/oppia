@@ -41,7 +41,7 @@ export interface CreatorTopicSummaryBackendDict {
 }
 
 export class CreatorTopicSummary {
-  constructor(
+  constructor (
       public id: string,
       public name: string,
       public canonicalStoryCount: number,
@@ -62,7 +62,7 @@ export class CreatorTopicSummary {
       public thumbnailBgColor: string,
       public urlFragment: string) { }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       topicSummaryBackendDict: CreatorTopicSummaryBackendDict
   ): CreatorTopicSummary {
     return new CreatorTopicSummary(
@@ -87,75 +87,75 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.url_fragment);
   }
 
-  getId(): string {
+  getId (): string {
     return this.id;
   }
 
-  getName(): string {
+  getName (): string {
     return this.name;
   }
 
-  getCanonicalStoryCount(): number {
+  getCanonicalStoryCount (): number {
     return this.canonicalStoryCount;
   }
 
-  getSubtopicCount(): number {
+  getSubtopicCount (): number {
     return this.subtopicCount;
   }
 
-  getTotalSkillCount(): number {
+  getTotalSkillCount (): number {
     return this.totalSkillCount;
   }
 
-  getTotalPublishedNodeCount(): number {
+  getTotalPublishedNodeCount (): number {
     return this.totalPublishedNodeCount;
   }
 
-  getUncategorizedSkillCount(): number {
+  getUncategorizedSkillCount (): number {
     return this.uncategorizedSkillCount;
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this.languageCode;
   }
 
-  getDescription(): string {
+  getDescription (): string {
     return this.description;
   }
 
-  getVersion(): number {
+  getVersion (): number {
     return this.version;
   }
 
-  getAdditionalStoryCount(): number {
+  getAdditionalStoryCount (): number {
     return this.additionalStoryCount;
   }
 
-  getTopicModelCreatedOn(): number {
+  getTopicModelCreatedOn (): number {
     return this.topicModelCreatedOn;
   }
 
-  getTopicModelLastUpdated(): number {
+  getTopicModelLastUpdated (): number {
     return this.topicModelLastUpdated;
   }
 
-  getClassroom(): string | undefined {
+  getClassroom (): string | undefined {
     return this.classroom;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment (): string {
     return this.urlFragment;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename (): string {
     return this.thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor (): string {
     return this.thumbnailBgColor;
   }
 
-  isTopicPublished(): boolean {
+  isTopicPublished (): boolean {
     return this.isPublished;
   }
 }

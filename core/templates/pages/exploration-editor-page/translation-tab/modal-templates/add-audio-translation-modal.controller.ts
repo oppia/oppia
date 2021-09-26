@@ -27,7 +27,7 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
   '$controller', '$q', '$rootScope', '$scope', '$uibModalInstance',
   'AssetsBackendApiService', 'ContextService', 'audioFile', 'generatedFilename',
   'isAudioAvailable', 'languageCode',
-  function(
+  function (
       $controller, $q, $rootScope, $scope, $uibModalInstance,
       AssetsBackendApiService, ContextService, audioFile, generatedFilename,
       isAudioAvailable, languageCode) {
@@ -49,26 +49,26 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
     var uploadedFile = null;
     $scope.droppedFile = audioFile;
 
-    $scope.isAudioTranslationValid = function() {
+    $scope.isAudioTranslationValid = function () {
       return (
         uploadedFile !== null &&
         uploadedFile.size !== null &&
         uploadedFile.size > 0);
     };
 
-    $scope.updateUploadedFile = function(file) {
+    $scope.updateUploadedFile = function (file) {
       $scope.errorMessage = null;
       uploadedFile = file;
       $rootScope.$applyAsync();
     };
 
-    $scope.clearUploadedFile = function() {
+    $scope.clearUploadedFile = function () {
       $scope.errorMessage = null;
       uploadedFile = null;
       $rootScope.$applyAsync();
     };
 
-    $scope.confirm = function() {
+    $scope.confirm = function () {
       if ($scope.isAudioTranslationValid()) {
         $scope.saveButtonText = BUTTON_TEXT_SAVING;
         $scope.saveInProgress = true;
@@ -77,14 +77,14 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
         $q.when(
           AssetsBackendApiService.saveAudio(
             explorationId, generatedFilename, uploadedFile)
-        ).then(function(response) {
+        ).then(function (response) {
           $uibModalInstance.close({
             languageCode: languageCode,
             filename: generatedFilename,
             fileSizeBytes: uploadedFile.size,
             durationSecs: response.duration_secs
           });
-        }, function(errorResponse) {
+        }, function (errorResponse) {
           $scope.errorMessage = (
             errorResponse.error || ERROR_MESSAGE_BAD_FILE_UPLOAD);
           uploadedFile = null;

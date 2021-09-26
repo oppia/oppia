@@ -22,7 +22,7 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = async function(elem, customLetters) {
+var customizeInteraction = async function (elem, customLetters) {
   await waitFor.presenceOf(elem.element(by.css(
     '.protractor-test-custom-letters-div')),
   'The custom letters div took too long to load.');
@@ -36,7 +36,7 @@ var customizeInteraction = async function(elem, customLetters) {
   }
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
+var expectInteractionDetailsToMatch = async function (elem) {
   expect(
     await elem.element(by.tagName(
       'oppia-interactive-math-equation-input')).isPresent()
@@ -48,7 +48,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
   ).toBe('\\color{grey}{\\text{\\small{Type an equation here.}}}');
 };
 
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-math-equation-input'))).setValue(answer);
   await element(by.css('.protractor-test-submit-answer-button')).click();

@@ -52,7 +52,7 @@ export class VisualizationInfo {
     [name: string]: Object;
   };
 
-  constructor(
+  constructor (
       addressedInfoIsSupported: boolean, data: AnswerStats[], id: string,
       options: { [name: string]: Object; }) {
     this.addressedInfoIsSupported = addressedInfoIsSupported;
@@ -61,7 +61,7 @@ export class VisualizationInfo {
     this.options = options;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: VisualizationInfoBackendDict): VisualizationInfo {
     let answerStatsDicts = backendDict.data;
     let answerStatsObjects = answerStatsDicts.map((

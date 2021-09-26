@@ -35,13 +35,13 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
   collectionId: string = '';
   directiveSubscriptions = new Subscription();
 
-  constructor(
+  constructor (
       private readOnlyCollectionBackendApiService:
        ReadOnlyCollectionBackendApiService,
       private urlService: UrlService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.directiveSubscriptions.add(
       this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
@@ -55,7 +55,7 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

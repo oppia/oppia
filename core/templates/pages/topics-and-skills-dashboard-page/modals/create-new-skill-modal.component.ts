@@ -48,7 +48,7 @@ export class CreateNewSkillModalComponent {
     constants.MAX_CHARS_IN_SKILL_DESCRIPTION);
   newExplanationObject = null;
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
@@ -58,26 +58,26 @@ export class CreateNewSkillModalComponent {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.contextService.setImageSaveDestinationToLocalStorage();
   }
 
-  updateExplanation($event: string): void {
+  updateExplanation ($event: string): void {
     if ($event !== this.bindableDict.displayedConceptCardExplanation) {
       this.bindableDict.displayedConceptCardExplanation = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  openConceptCardExplanationEditor(): void {
+  openConceptCardExplanationEditor (): void {
     this.conceptCardExplanationEditorIsShown = true;
   }
 
-  getHtmlSchema(): { type: string } {
+  getHtmlSchema (): { type: string } {
     return this.HTML_SCHEMA;
   }
 
-  setErrorMessageIfNeeded(): void {
+  setErrorMessageIfNeeded (): void {
     if (
       !this.skillObjectFactory.hasValidDescription(
         this.newSkillDescription)) {
@@ -92,11 +92,11 @@ export class CreateNewSkillModalComponent {
     }
   }
 
-  _skillDescriptionExistsCallback(skillDescriptionExists: boolean): void {
+  _skillDescriptionExistsCallback (skillDescriptionExists: boolean): void {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
   }
-  updateSkillDescriptionAndCheckIfExists(): void {
+  updateSkillDescriptionAndCheckIfExists (): void {
     this.resetErrorMsg();
 
     if (this.newSkillDescription !== '') {
@@ -114,11 +114,11 @@ export class CreateNewSkillModalComponent {
     }
   }
 
-  resetErrorMsg(): void {
+  resetErrorMsg (): void {
     this.errorMsg = '';
   }
 
-  saveConceptCardExplanation(): void {
+  saveConceptCardExplanation (): void {
     const explanationObject: SubtitledHtml =
     SubtitledHtml.createDefault(
       this.bindableDict.displayedConceptCardExplanation,
@@ -128,7 +128,7 @@ export class CreateNewSkillModalComponent {
       explanationObject.html);
   }
 
-  createNewSkill(): void {
+  createNewSkill (): void {
     this.setErrorMessageIfNeeded();
     if (this.errorMsg !== '') {
       return;
@@ -141,7 +141,7 @@ export class CreateNewSkillModalComponent {
     });
   }
 
-  cancel(): void {
+  cancel (): void {
     this.imageLocalStorageService.flushStoredImagesData();
     this.skillCreationService.resetSkillDescriptionStatusMarker();
     this.ngbActiveModal.dismiss('cancel');

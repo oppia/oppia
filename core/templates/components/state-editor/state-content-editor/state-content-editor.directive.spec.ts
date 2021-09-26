@@ -37,10 +37,10 @@ require(
   'state-recorded-voiceovers.service.ts');
 require('services/editability.service.ts');
 
-describe('State content editor directive', function() {
+describe('State content editor directive', function () {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, srvos;
 
-  var _getContent = function(contentId, contentString) {
+  var _getContent = function (contentId, contentString) {
     return shof.createFromBackendDict({
       content_id: contentId,
       html: contentString
@@ -55,7 +55,7 @@ describe('State content editor directive', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -67,10 +67,10 @@ describe('State content editor directive', function() {
   });
 
   beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('oppia', TranslatorProviderForTests);
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -78,7 +78,7 @@ describe('State content editor directive', function() {
   }));
 
   beforeEach(angular.mock.inject(
-    function($compile, $injector, $rootScope, $templateCache) {
+    function ($compile, $injector, $rootScope, $templateCache) {
       srvos = $injector.get('StateRecordedVoiceoversService');
       scs = $injector.get('StateContentService');
       es = $injector.get('EditabilityService');
@@ -274,11 +274,11 @@ describe('State content editor directive', function() {
       ctrlScope = compiledElem[0].getControllerScope();
     }));
 
-  it('should start with the content editor not being open', function() {
+  it('should start with the content editor not being open', function () {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
   });
 
-  it('should correctly handle no-op edits', function() {
+  it('should correctly handle no-op edits', function () {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
     expect(scs.savedMemento).toEqual(_getContent(
       'content', 'This is some content.'));
@@ -291,7 +291,7 @@ describe('State content editor directive', function() {
     expect(cls.getChangeList()).toEqual([]);
   });
 
-  it('should check that content edits are saved correctly', function() {
+  it('should check that content edits are saved correctly', function () {
     expect(cls.getChangeList()).toEqual([]);
 
     ctrlScope.openStateContentEditor();
@@ -309,7 +309,7 @@ describe('State content editor directive', function() {
       .toHaveBeenCalled();
   });
 
-  it('should not save changes to content when edit is cancelled', function() {
+  it('should not save changes to content when edit is cancelled', function () {
     var contentBeforeEdit = angular.copy(scs.savedMemento);
 
     scs.displayed = _getContent('content', 'Test Content');
@@ -319,7 +319,7 @@ describe('State content editor directive', function() {
     expect(scs.displayed).toEqual(contentBeforeEdit);
   });
 
-  it('should call the callback function on-save', function() {
+  it('should call the callback function on-save', function () {
     ctrlScope.onSaveContentButtonClicked();
     expect(outerScope.saveStateContent).toHaveBeenCalled();
   });

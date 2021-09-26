@@ -37,12 +37,12 @@ import { UrlInterpolationService } from
 export class PlaythroughIssuesBackendApiService {
   private cachedIssues: PlaythroughIssue[] = [];
 
-  constructor(
+  constructor (
       private httpClient: HttpClient,
       private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async fetchIssuesAsync(
+  async fetchIssuesAsync (
       explorationId: string,
       explorationVersion: number): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues.length !== 0) {
@@ -62,7 +62,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  async fetchPlaythroughAsync(
+  async fetchPlaythroughAsync (
       explorationId: string,
       playthroughId: string): Promise<PlaythroughIssue> {
     return new Promise((resolve, reject) => {
@@ -77,7 +77,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  async resolveIssueAsync(
+  async resolveIssueAsync (
       issueToResolve: PlaythroughIssue,
       explorationId: string, explorationVersion: number): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -103,14 +103,14 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  private getFetchIssuesUrl(explorationId: string): string {
+  private getFetchIssuesUrl (explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_ISSUES_URL, {
         exploration_id: explorationId
       });
   }
 
-  private getFetchPlaythroughUrl(
+  private getFetchPlaythroughUrl (
       explorationId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
@@ -119,7 +119,7 @@ export class PlaythroughIssuesBackendApiService {
       });
   }
 
-  private getResolveIssueUrl(explorationId: string): string {
+  private getResolveIssueUrl (explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.RESOLVE_ISSUE_URL, {
         exploration_id: explorationId

@@ -32,7 +32,7 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var _selectLanguage = async function(language) {
+var _selectLanguage = async function (language) {
   var languageDropdown = element(by.css('.protractor-test-language-dropdown'));
   var languageOption = element(
     by.css('.protractor-test-i18n-language-' + language));
@@ -43,17 +43,17 @@ var _selectLanguage = async function(language) {
 };
 
 
-describe('Basic user journeys', function() {
-  describe('Account creation', function() {
+describe('Basic user journeys', function () {
+  describe('Account creation', function () {
     var libraryPage = null;
     var moderatorPage = null;
 
-    beforeAll(function() {
+    beforeAll(function () {
       libraryPage = new LibraryPage.LibraryPage();
       moderatorPage = new ModeratorPage.ModeratorPage();
     });
 
-    it('should create users', async function() {
+    it('should create users', async function () {
       await users.createUser(
         'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
 
@@ -68,7 +68,7 @@ describe('Basic user journeys', function() {
       await users.logout();
     });
 
-    it('should create moderators', async function() {
+    it('should create moderators', async function () {
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
       await users.login('mod@userManagement.com');
@@ -82,7 +82,7 @@ describe('Basic user journeys', function() {
     });
 
     // Usernames containing "admin" are not permitted.
-    it('should create admins', async function() {
+    it('should create admins', async function () {
       await users.createAdmin(
         'admin@userManagement.com', 'adm1nUserManagement');
       await general.checkForConsoleErrors([]);
@@ -90,7 +90,7 @@ describe('Basic user journeys', function() {
   });
 });
 
-describe('Site language', function() {
+describe('Site language', function () {
   var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
@@ -101,7 +101,7 @@ describe('Site language', function() {
   var libraryPage = null;
   var preferencesPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -167,7 +167,7 @@ describe('Site language', function() {
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     // Starting language is English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
@@ -177,7 +177,7 @@ describe('Site language', function() {
       'Imagine what you could learn today...');
   });
 
-  it('should change after selecting a different language', async function() {
+  it('should change after selecting a different language', async function () {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('es');
@@ -188,7 +188,7 @@ describe('Site language', function() {
     await general.ensurePageHasNoTranslationIds();
   });
 
-  it('should use language selected in the Preferences page.', async function() {
+  it('should use language selected in the Preferences page.', async function () {
     await users.createUser('varda@example.com', 'Varda');
     await users.login('varda@example.com');
     await preferencesPage.get();
@@ -199,7 +199,7 @@ describe('Site language', function() {
   });
 
   it('should set preferred audio language selected in the Preferences page.',
-    async function() {
+    async function () {
       await users.createUser('audioPlayer@example.com', 'audioPlayer');
       await users.login('audioPlayer@example.com');
       await preferencesPage.get();
@@ -214,7 +214,7 @@ describe('Site language', function() {
     });
 
   it('should save the language selected in the footer into the preferences.',
-    async function() {
+    async function () {
       await users.createUser('feanor@example.com', 'Feanor');
       await users.login('feanor@example.com');
       await browser.get('/about');
@@ -232,7 +232,7 @@ describe('Site language', function() {
     }
   );
 
-  it('should not change in an exploration', async function() {
+  it('should not change in an exploration', async function () {
     await users.login('langCreator@explorations.com');
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
@@ -252,7 +252,7 @@ describe('Site language', function() {
   });
 
   it('should not change in exploration and collection player for guest users',
-    async function() {
+    async function () {
       await browser.get('/about');
       await waitFor.pageToFullyLoad();
       await _selectLanguage('es');
@@ -275,7 +275,7 @@ describe('Site language', function() {
     }
   );
 
-  afterEach(async function() {
+  afterEach(async function () {
     // Reset language back to English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();

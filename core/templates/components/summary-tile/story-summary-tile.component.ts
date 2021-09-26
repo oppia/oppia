@@ -56,14 +56,14 @@ export class StorySummaryTileComponent implements OnInit {
   gapLength = 5;
   EXPLORE_PAGE_PREFIX = '/explore/';
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
-  getStoryLink(): string {
+  getStoryLink (): string {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
@@ -81,11 +81,11 @@ export class StorySummaryTileComponent implements OnInit {
     return storyLink;
   }
 
-  isChapterCompleted(title: string): boolean {
+  isChapterCompleted (title: string): boolean {
     return this.storySummary.isNodeCompleted(title);
   }
 
-  isPreviousChapterCompleted(index: number): boolean {
+  isPreviousChapterCompleted (index: number): boolean {
     if (index === 0) {
       return true;
     }
@@ -94,16 +94,16 @@ export class StorySummaryTileComponent implements OnInit {
     return this.storySummary.isNodeCompleted(previousNodeTitle);
   }
 
-  showAllChapters(): void {
+  showAllChapters (): void {
     this.initialCount = this.chaptersDisplayed;
     this.chaptersDisplayed = this.nodeCount;
   }
 
-  hideExtraChapters(): void {
+  hideExtraChapters (): void {
     this.chaptersDisplayed = this.initialCount;
   }
 
-  getStrokeDashArrayValues(): number | string {
+  getStrokeDashArrayValues (): number | string {
     if (this.nodeCount === 1) {
       return '';
     }
@@ -115,7 +115,7 @@ export class StorySummaryTileComponent implements OnInit {
   }
 
   // Returns the exploration page URL for the provided chapter title.
-  getChapterUrl(nodeTitle: string): string {
+  getChapterUrl (nodeTitle: string): string {
     let node = this.storySummary.getAllNodes().find(node => {
       return node.getTitle() === nodeTitle;
     });
@@ -134,7 +134,7 @@ export class StorySummaryTileComponent implements OnInit {
       `${this.EXPLORE_PAGE_PREFIX}${node.getExplorationId()}${urlParams}`);
   }
 
-  getCompletedStrokeDashArrayValues(): string {
+  getCompletedStrokeDashArrayValues (): string {
     let completedStrokeValues = '';
     let remainingCircumference = this.circumference;
     if (this.completedStoriesCount === 0) {
@@ -158,7 +158,7 @@ export class StorySummaryTileComponent implements OnInit {
     return completedStrokeValues;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.nodeCount = this.storySummary.getNodeTitles().length;
     this.completedStoriesCount = 0;
     for (let idx in this.storySummary.getNodeTitles()) {

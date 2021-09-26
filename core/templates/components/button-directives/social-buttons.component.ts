@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class SocialButtonsComponent {
-  constructor() {}
+  constructor () {}
 }
 
 angular.module('oppia').directive('oppiaSocialButtons',

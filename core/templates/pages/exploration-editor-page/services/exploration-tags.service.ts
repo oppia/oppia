@@ -29,7 +29,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 })
 export class ExplorationTagsService extends ExplorationPropertyService {
   propertyName: string = 'tags';
-  constructor(
+  constructor (
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
     protected loggerService: LoggerService
@@ -42,7 +42,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
     *@return {string} -normalized array
   */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _normalize(value) {
+  _normalize (value) {
     for (let i = 0; i < value.length; i++) {
       value[i] = value[i].trim().replace(/\s+/g, ' ');
     }
@@ -54,7 +54,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
     *@return {boolean} -whether or not all tags match TAG_REGEX
   */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _isValid(value) {
+  _isValid (value) {
     // Every tag should match the TAG_REGEX.
     for (let i = 0; i < value.length; i++) {
       let tagRegex = new RegExp(constants.TAG_REGEX);

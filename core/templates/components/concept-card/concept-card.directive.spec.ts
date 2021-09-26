@@ -31,7 +31,7 @@ describe('ConceptCardDirective', () => {
   let loadConceptCardsAsync: jasmine.Spy;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     loadConceptCardsAsync = jasmine.createSpy('loadConceptCardsAsyncSpy');
     const mockConceptBackendApiService = {
       loadConceptCardsAsync
@@ -40,7 +40,7 @@ describe('ConceptCardDirective', () => {
       'ConceptCardBackendApiService', mockConceptBackendApiService);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     $scope = $rootScope.$new();
@@ -119,6 +119,6 @@ describe('Upgraded component', () => {
       'conceptCard',
       [ConceptCardComponent]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!'));
+      async (textContext) => expect(textContext).toBe('Hello Oppia!'));
   }));
 });

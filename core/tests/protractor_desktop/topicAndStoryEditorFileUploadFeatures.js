@@ -30,12 +30,12 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-describe('Topic editor functionality', function() {
+describe('Topic editor functionality', function () {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var explorationEditorPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
@@ -47,12 +47,12 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await topicsAndSkillsDashboardPage.get();
   });
 
   it('should edit topic name, thumbnail and description ' +
-    'correctly', async function() {
+    'correctly', async function () {
     var TOPIC_NAME = 'TASEFUF_1';
     var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-one';
     var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
@@ -80,7 +80,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
-  it('should edit subtopic page contents correctly', async function() {
+  it('should edit subtopic page contents correctly', async function () {
     var TOPIC_NAME = 'TASEFUF_2';
     var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-two';
     var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
@@ -124,7 +124,7 @@ describe('Topic editor functionality', function() {
       'Subtopic Contents');
   });
 
-  it('should publish and unpublish a story correctly', async function() {
+  it('should publish and unpublish a story correctly', async function () {
     var TOPIC_NAME = 'TASEFUF_3';
     var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-three';
     var TOPIC_DESCRIPTION = 'TASEFUF_3 description';
@@ -160,16 +160,16 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 });
 
-describe('Chapter editor functionality', function() {
+describe('Chapter editor functionality', function () {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
@@ -180,7 +180,7 @@ describe('Chapter editor functionality', function() {
   var TOPIC_NAME = 'TASEFUF_4';
   var USER_EMAIL = 'creator@chapterTest.com';
 
-  var createDummyExplorations = async function(numExplorations) {
+  var createDummyExplorations = async function (numExplorations) {
     var ids = [];
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
@@ -194,7 +194,7 @@ describe('Chapter editor functionality', function() {
     return ids;
   };
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
@@ -207,7 +207,7 @@ describe('Chapter editor functionality', function() {
     dummyExplorationIds = await createDummyExplorations(1);
   });
 
-  it('should create a basic chapter with a thumbnail.', async function() {
+  it('should create a basic chapter with a thumbnail.', async function () {
     await topicsAndSkillsDashboardPage.get();
     var defaultThumbnailImageSrc = null;
     var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-four';
@@ -250,7 +250,7 @@ describe('Chapter editor functionality', function() {
       defaultThumbnailImageSrc);
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 });

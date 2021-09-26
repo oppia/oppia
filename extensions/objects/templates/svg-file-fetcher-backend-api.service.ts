@@ -27,18 +27,18 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   providedIn: 'root'
 })
 export class SvgFileFetcherBackendApiService {
-  constructor(
+  constructor (
     private httpClient: HttpClient,
     private imageUploadHelperService: ImageUploadHelperService,
     private urlInterpolationService: UrlInterpolationService) { }
 
-  fetchSvg(savedSvgUrl: string): Observable<string> {
+  fetchSvg (savedSvgUrl: string): Observable<string> {
     return this.httpClient.get(savedSvgUrl, {
       responseType: 'text'
     });
   }
 
-  postSvgFile(
+  postSvgFile (
       resampledFile: Blob,
       dimensions: Dimensions,
       entityType: string,

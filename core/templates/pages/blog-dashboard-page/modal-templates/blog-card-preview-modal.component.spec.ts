@@ -31,18 +31,18 @@ import { BlogCardComponent } from '../blog-card/blog-card.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 
-  close(): void {
+  close (): void {
     return;
   }
 }
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
-  transform(value: string, params: number): string {
+  transform (value: string, params: number): string {
     return value;
   }
 }

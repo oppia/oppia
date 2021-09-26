@@ -31,7 +31,7 @@ export class ProfilePageRootComponent {
   pageIsShown: boolean = false;
   errorPageIsShown: boolean = false;
 
-  constructor(
+  constructor (
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private loaderService: LoaderService,
@@ -39,7 +39,7 @@ export class ProfilePageRootComponent {
     private urlService: UrlService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE);
 

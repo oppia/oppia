@@ -43,7 +43,7 @@ export interface GroupedSkillSummaries {
   providedIn: 'root'
 })
 export class SkillEditorStateService {
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private questionsListService: QuestionsListService,
     private skillBackendApiService: SkillBackendApiService,
@@ -139,7 +139,7 @@ export class SkillEditorStateService {
    * specified collection ID. See setSkill() for more information on
    * additional behavior of this function.
    */
-  loadSkill(skillId: string): void {
+  loadSkill (skillId: string): void {
     this._skillIsBeingLoaded = true;
     this.loaderService.showLoadingScreen('Loading Skill Editor');
     let skillDataPromise = this.skillBackendApiService.fetchSkillAsync(skillId);
@@ -167,22 +167,22 @@ export class SkillEditorStateService {
    * Returns whether this service is currently attempting to load the
    * skill maintained by this service.
    */
-  isLoadingSkill(): boolean {
+  isLoadingSkill (): boolean {
     return this._skillIsBeingLoaded;
   }
 
-  getAssignedSkillTopicData(): string {
+  getAssignedSkillTopicData (): string {
     return this.assignedSkillTopicData;
   }
 
-  getGroupedSkillSummaries(): GroupedSkillSummaries {
+  getGroupedSkillSummaries (): GroupedSkillSummaries {
     return cloneDeep(this._groupedSkillSummaries);
   }
   /**
      * Returns whether a skill has yet been loaded using either
      * loadSkill().
      */
-  hasLoadedSkill(): boolean {
+  hasLoadedSkill (): boolean {
     return this._skillIsInitialized;
   }
   /**
@@ -193,7 +193,7 @@ export class SkillEditorStateService {
    * return an empty skill object if the skill has not yet been
    * loaded for this editor instance.
    */
-  getSkill(): Skill {
+  getSkill (): Skill {
     return this._skill;
   }
   /**
@@ -204,7 +204,7 @@ export class SkillEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setSkill(), when it succeeds.
    */
-  saveSkill(
+  saveSkill (
       commitMessage: string,
       successCallback: (value?: Object) => void): boolean {
     if (!this._skillIsInitialized) {
@@ -239,7 +239,7 @@ export class SkillEditorStateService {
    * variable. `create-new-skill-modal.controller` will search
    * for that variable.
    */
-  updateExistenceOfSkillDescription(
+  updateExistenceOfSkillDescription (
       description: string, successCallback: (value?: Object) => void): void {
     this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
       description).then(
@@ -253,19 +253,19 @@ export class SkillEditorStateService {
       });
   }
 
-  get onSkillChange(): EventEmitter<unknown> {
+  get onSkillChange (): EventEmitter<unknown> {
     return this._skillChangedEventEmitter;
   }
 
-  getSkillRights(): SkillRights {
+  getSkillRights (): SkillRights {
     return this._skillRights;
   }
 
-  isSavingSkill(): boolean {
+  isSavingSkill (): boolean {
     return this._skillIsBeingSaved;
   }
 
-  setSkillRights(skillRights: SkillRights): void {
+  setSkillRights (skillRights: SkillRights): void {
     this._setSkillRights(skillRights);
   }
 }

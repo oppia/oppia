@@ -23,7 +23,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
   'stateName', 'suggestionIsHandled', 'suggestionStatus',
   'suggestionType', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   'MAX_COMMIT_MESSAGE_LENGTH',
-  function(
+  function (
       $scope, $uibModalInstance, SuggestionModalService,
       canReviewActiveThread, description, newContent, oldContent,
       stateName, suggestionIsHandled, suggestionStatus,
@@ -63,7 +63,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
     $scope.suggestionEditorIsShown = false;
     $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
 
-    $scope.acceptSuggestion = function() {
+    $scope.acceptSuggestion = function () {
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
@@ -73,7 +73,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
         });
     };
 
-    $scope.rejectSuggestion = function() {
+    $scope.rejectSuggestion = function () {
       SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
@@ -83,27 +83,27 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
         });
     };
 
-    $scope.editSuggestion = function() {
+    $scope.editSuggestion = function () {
       $scope.suggestionEditorIsShown = true;
     };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
 
-    $scope.isEditButtonShown = function() {
+    $scope.isEditButtonShown = function () {
       return (
         !$scope.isNotHandled && $scope.isSuggestionRejected &&
         !$scope.suggestionEditorIsShown);
     };
 
-    $scope.isResubmitButtonShown = function() {
+    $scope.isResubmitButtonShown = function () {
       return (
         !$scope.isNotHandled && $scope.isSuggestionRejected &&
         $scope.suggestionEditorIsShown);
     };
 
-    $scope.isResubmitButtonDisabled = function() {
+    $scope.isResubmitButtonDisabled = function () {
       return !(
         $scope.summaryMessage &&
         (
@@ -111,16 +111,16 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
           newContent.html.trim()));
     };
 
-    $scope.cancelEditMode = function() {
+    $scope.cancelEditMode = function () {
       $scope.suggestionEditorIsShown = false;
     };
 
-    $scope.updateValue = function(value: string) {
+    $scope.updateValue = function (value: string) {
       $scope.suggestionData.newSuggestionHtml = value;
       $scope.$applyAsync();
     };
 
-    $scope.resubmitChanges = function() {
+    $scope.resubmitChanges = function () {
       $uibModalInstance.close({
         action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,
         newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,

@@ -52,7 +52,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
   hasBeenTouched: boolean = false;
   alwaysEditable: boolean = false;
 
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
@@ -62,7 +62,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
     if (this.value === undefined || this.value === null) {
@@ -116,7 +116,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
   }
 
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid (): boolean {
     if (this.currentValue === undefined) {
       this.currentValue = '';
     }
@@ -157,12 +157,12 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     return answerIsValid;
   }
 
-  showOSK(): void {
+  showOSK (): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'MathEquationInput';
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.eventBusGroup.unsubscribe();
   }
 }

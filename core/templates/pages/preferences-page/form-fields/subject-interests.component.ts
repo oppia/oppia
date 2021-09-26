@@ -45,14 +45,14 @@ export class SubjectInterestsComponent {
   @ViewChild('subjectInterestInput') subjectInterestInput!:
   ElementRef<HTMLInputElement>;
 
-  constructor() {
+  constructor () {
     this.filteredSubjectInterests = this.formCtrl.valueChanges.pipe(
       startWith(null),
       map((interest: string | null) => interest ? this.filter(
         interest) : this.allSubjectInterests.slice()));
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
         this.chipList.errorState = true;
@@ -63,12 +63,12 @@ export class SubjectInterestsComponent {
     this.allSubjectInterests = cloneDeep(this.subjectInterests);
   }
 
-  validInput(value: string): boolean {
+  validInput (value: string): boolean {
     return value === value.toLowerCase() &&
       this.subjectInterests.indexOf(value) < 0 ? true : false;
   }
 
-  add(event: { value: string }): void {
+  add (event: { value: string }): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -84,7 +84,7 @@ export class SubjectInterestsComponent {
     }
   }
 
-  remove(interest: string): void {
+  remove (interest: string): void {
     const index = this.subjectInterests.indexOf(interest);
 
     if (index >= 0) {
@@ -93,7 +93,7 @@ export class SubjectInterestsComponent {
     }
   }
 
-  selected(event: { option: {value: string }}): void {
+  selected (event: { option: {value: string }}): void {
     if (this.subjectInterests.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -101,7 +101,7 @@ export class SubjectInterestsComponent {
     }
   }
 
-  filter(value: string): string[] {
+  filter (value: string): string[] {
     const filterValue = value.toLowerCase();
 
     return this.allSubjectInterests.filter(

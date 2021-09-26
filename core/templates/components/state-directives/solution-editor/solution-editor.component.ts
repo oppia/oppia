@@ -59,18 +59,18 @@ angular.module('oppia').component('solutionEditor', {
     'EditabilityService', 'ExplorationHtmlFormatterService',
     'StateCustomizationArgsService', 'StateInteractionIdService',
     'StateSolutionService',
-    function(
+    function (
         EditabilityService, ExplorationHtmlFormatterService,
         StateCustomizationArgsService, StateInteractionIdService,
         StateSolutionService) {
       var ctrl = this;
-      ctrl.getAnswerHtml = function() {
+      ctrl.getAnswerHtml = function () {
         return ExplorationHtmlFormatterService.getAnswerHtml(
           StateSolutionService.savedMemento.correctAnswer,
           StateInteractionIdService.savedMemento,
           StateCustomizationArgsService.savedMemento);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.StateSolutionService = StateSolutionService;
         ctrl.isEditable = EditabilityService.isEditable();
 

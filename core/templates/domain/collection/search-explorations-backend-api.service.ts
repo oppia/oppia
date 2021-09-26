@@ -39,12 +39,12 @@ interface SearchExplorationBackendResponse {
   providedIn: 'root'
 })
 export class SearchExplorationsBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  private _fetchExplorations(
+  private _fetchExplorations (
       searchQuery: string,
       successCallback: (value: ExplorationMetadata[]) => void,
       errorCallback: (reason: string) => void): void {
@@ -71,7 +71,7 @@ export class SearchExplorationsBackendApiService {
    * queries are tokens that will be matched against exploration's title
    * and objective.
    */
-  async fetchExplorationsAsync(
+  async fetchExplorationsAsync (
       searchQuery: string): Promise<ExplorationMetadata[]> {
     return new Promise((resolve, reject) => {
       this._fetchExplorations(searchQuery, resolve, reject);

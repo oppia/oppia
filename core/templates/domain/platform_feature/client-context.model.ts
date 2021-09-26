@@ -29,12 +29,12 @@ export class ClientContext {
   readonly platformType: string;
   readonly browserType: string;
 
-  constructor(platformType: string, browserType: string) {
+  constructor (platformType: string, browserType: string) {
     this.platformType = platformType;
     this.browserType = browserType;
   }
 
-  static create(platformType: string, browserType: string): ClientContext {
+  static create (platformType: string, browserType: string): ClientContext {
     return new ClientContext(platformType, browserType);
   }
 
@@ -44,7 +44,7 @@ export class ClientContext {
    * @returns {ClientContextBackendDict} - The dict representation of the
    * instance.
    */
-  toBackendDict(): ClientContextBackendDict {
+  toBackendDict (): ClientContextBackendDict {
     return {
       platform_type: this.platformType,
       browser_type: this.browserType,

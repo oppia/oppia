@@ -35,7 +35,7 @@ import { ExplorationCreationBackendApiService } from './exploration-creation-bac
 export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
   explorationCreationInProgress: boolean = false;
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private csrfTokenService: CsrfTokenService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -47,7 +47,7 @@ export class ExplorationCreationService {
      ExplorationCreationBackendApiService
   ) {}
 
-  createNewExploration(): void {
+  createNewExploration (): void {
     if (this.explorationCreationInProgress) {
       return;
     }
@@ -73,7 +73,7 @@ export class ExplorationCreationService {
         this.explorationCreationInProgress = false;
       });
   }
-  showUploadExplorationModal(): void {
+  showUploadExplorationModal (): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(
       UploadActivityModalComponent,

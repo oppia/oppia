@@ -32,7 +32,7 @@ describe('NoninteractiveSkillreview', () => {
   let contextService: ContextService;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
+    escapedJsonToObj (answer: string): string {
       return answer;
     }
   }

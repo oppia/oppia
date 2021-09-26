@@ -40,7 +40,7 @@ require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
-describe('Audio translation bar directive', function() {
+describe('Audio translation bar directive', function () {
   var ctrl = null;
   var $interval = null;
   var $q = null;
@@ -89,14 +89,14 @@ describe('Audio translation bar directive', function() {
     spyOn(zone, 'run').and.callFake((fn: Function) => fn());
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $interval = $injector.get('$interval');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -124,7 +124,7 @@ describe('Audio translation bar directive', function() {
     // This method is being mocked because this spec only handles with
     // recordedvoiceovers and not all the exploration.
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
-      .callFake(function() {});
+      .callFake(function () {});
 
     spyOnProperty(
       translationTabActiveContentIdService,
@@ -164,19 +164,19 @@ describe('Audio translation bar directive', function() {
     $scope.getVoiceoverRecorder();
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     // eslint-disable-next-line oppia/disallow-angularjs-properties
     $rootScope.$broadcast('$destroy');
   });
 
   it('should evaluate $scope properties after audio bar initialization',
-    function() {
+    function () {
       expect($scope.languageCode).toBe('en');
       expect($scope.contentId).toBe('content');
     });
 
   it('should not check and start recording when user deny access',
-    function() {
+    function () {
       spyOn(voiceoverRecordingService, 'status').and.returnValue({
         isAvailable: true
       });
@@ -192,7 +192,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should not check and start recording when voiceover recorder is' +
-    ' not available', function() {
+    ' not available', function () {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
@@ -204,7 +204,7 @@ describe('Audio translation bar directive', function() {
     expect($scope.cannotRecord).toBe(true);
   });
 
-  it('should stop recording when reaching recording time limit', function() {
+  it('should stop recording when reaching recording time limit', function () {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true
     });
@@ -245,7 +245,7 @@ describe('Audio translation bar directive', function() {
       'cancel the recording.');
   });
 
-  it('should stop record when content id changes', function() {
+  it('should stop record when content id changes', function () {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true,
       isRecording: true
@@ -268,7 +268,7 @@ describe('Audio translation bar directive', function() {
       'recording and either save or cancel the recording.');
   });
 
-  it('should stop record when language changes', function() {
+  it('should stop record when language changes', function () {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true,
       isRecording: true
@@ -293,7 +293,7 @@ describe('Audio translation bar directive', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('should stop record when externalSave flag is broadcasted', function() {
+  it('should stop record when externalSave flag is broadcasted', function () {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true,
       isRecording: true
@@ -317,7 +317,7 @@ describe('Audio translation bar directive', function() {
     expect($scope.audioBlob).toBe(null);
   });
 
-  it('should toggle audio needs update', function() {
+  it('should toggle audio needs update', function () {
     spyOn(
       stateRecordedVoiceoversService.displayed, 'toggleNeedsUpdateAttribute');
 
@@ -335,7 +335,7 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should play and pause unsaved audio when wave surfer calls on method' +
-    ' callback', function() {
+    ' callback', function () {
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
@@ -364,7 +364,7 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should play and pause unsaved audio when wave surfer on method does' +
-    ' not call the callbacl', function() {
+    ' not call the callbacl', function () {
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
@@ -395,7 +395,7 @@ describe('Audio translation bar directive', function() {
     expect(waveSurferObjSpy.pause).toHaveBeenCalled();
   });
 
-  it('should toggle start and stop recording on keyup event', function() {
+  it('should toggle start and stop recording on keyup event', function () {
     $scope.canVoiceover = true;
     $scope.isAudioAvailable = false;
 
@@ -436,7 +436,7 @@ describe('Audio translation bar directive', function() {
     $scope.canVoiceover = false;
   });
 
-  it('should not toggle start and stop recording on keyup event', function() {
+  it('should not toggle start and stop recording on keyup event', function () {
     $scope.canVoiceover = false;
 
     spyOn(siteAnalyticsService, 'registerStartAudioRecordingEvent');
@@ -448,14 +448,14 @@ describe('Audio translation bar directive', function() {
       .not.toHaveBeenCalled();
   });
 
-  it('should rerecord successfully', function() {
+  it('should rerecord successfully', function () {
     $scope.reRecord();
     $scope.$apply();
 
     expect($scope.selectedRecording).toBe(false);
   });
 
-  it('should cancel recording successfully', function() {
+  it('should cancel recording successfully', function () {
     $scope.cancelRecording();
 
     expect($scope.selectedRecording).toBe(false);
@@ -464,7 +464,7 @@ describe('Audio translation bar directive', function() {
     expect($scope.showRecorderWarning).toBe(false);
   });
 
-  it('should save recorded audio successfully', function() {
+  it('should save recorded audio successfully', function () {
     $scope.updateAudio();
     $scope.$apply();
 
@@ -490,7 +490,7 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should use reject handler when saving recorded audio fails',
-    function() {
+    function () {
       spyOn(siteAnalyticsService, 'registerSaveRecordedAudioEvent');
       spyOn(alertsService, 'addWarning');
       spyOn(assetsBackendApiService, 'saveAudio').and.returnValue($q.reject({
@@ -508,7 +508,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should open translation tab busy modal with $uibModal',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.callThrough();
 
       $scope.openTranslationTabBusyModal();
@@ -517,7 +517,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should close translation tab busy modal with promise resolve',
-    function() {
+    function () {
       spyOn($q, 'resolve').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -530,7 +530,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should dismiss translation tab busy modal with promise reject',
-    function() {
+    function () {
       spyOn($q, 'reject').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -542,7 +542,7 @@ describe('Audio translation bar directive', function() {
       expect($q.reject).toHaveBeenCalled();
     });
 
-  it('should play a loaded audio translation', function() {
+  it('should play a loaded audio translation', function () {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
     spyOn(audioPlayerService, 'play');
@@ -554,7 +554,7 @@ describe('Audio translation bar directive', function() {
     expect(audioPlayerService.play).toHaveBeenCalled();
   });
 
-  it('should play a not loaded audio translation', function() {
+  it('should play a not loaded audio translation', function () {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
     spyOn(audioPlayerService, 'loadAsync').and.returnValue($q.resolve());
@@ -570,7 +570,7 @@ describe('Audio translation bar directive', function() {
     expect(audioPlayerService.play).toHaveBeenCalled();
   });
 
-  it('should pause ongoing audio translation', function() {
+  it('should pause ongoing audio translation', function () {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
     spyOn(audioPlayerService, 'pause');
 
@@ -580,7 +580,7 @@ describe('Audio translation bar directive', function() {
     expect(audioPlayerService.pause).toHaveBeenCalled();
   });
 
-  it('should get set progress audio timer', function() {
+  it('should get set progress audio timer', function () {
     const setCurrentTimeSpy = spyOn(audioPlayerService, 'setCurrentTime');
     setCurrentTimeSpy.and.returnValue(undefined);
     $scope.setProgress({value: 100});
@@ -588,7 +588,7 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should delete audio when closing delete audio translation modal',
-    function() {
+    function () {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -604,7 +604,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should not delete audio when dismissing delete audio translation' +
-    ' modal', function() {
+    ' modal', function () {
     spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
@@ -618,10 +618,10 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should add audio translation when closing add audio translation modal',
-    function() {
+    function () {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
       spyOn(stateRecordedVoiceoversService.displayed, 'addVoiceover').and
-        .callFake(function() {});
+        .callFake(function () {});
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           durationSecs: 100
@@ -639,7 +639,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should not add audio translation when dismissing add audio' +
-    ' translation modal', function() {
+    ' translation modal', function () {
     spyOn(alertsService, 'clearWarnings');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
@@ -657,14 +657,14 @@ describe('Audio translation bar directive', function() {
     expect(applyAsyncSpy).toHaveBeenCalled();
   }));
 
-  describe('when compiling html element', function() {
+  describe('when compiling html element', function () {
     var compiledElement = null;
     var mainBodyDivMock = null;
     var translationTabDivMock = null;
     var dropAreaMessageDivMock = null;
     var scope = null;
 
-    beforeEach(angular.mock.inject(function($injector, $compile) {
+    beforeEach(angular.mock.inject(function ($injector, $compile) {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
@@ -719,7 +719,7 @@ describe('Audio translation bar directive', function() {
       scope = compiledElement[0].getControllerScope();
     }));
 
-    it('should trigger dragover event in translation tab element', function() {
+    it('should trigger dragover event in translation tab element', function () {
       translationTabDivMock.triggerHandler('dragover');
 
       expect(scope.dropAreaIsAccessible).toBe(true);
@@ -727,7 +727,7 @@ describe('Audio translation bar directive', function() {
     });
 
     it('should trigger drop event in translation tab element and open add' +
-      ' audio translation modal', function() {
+      ' audio translation modal', function () {
       translationTabDivMock.triggerHandler('dragover');
 
       spyOn($uibModal, 'open').and.callThrough();
@@ -749,7 +749,7 @@ describe('Audio translation bar directive', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should trigger dragleave event in main body element', function() {
+    it('should trigger dragleave event in main body element', function () {
       mainBodyDivMock.triggerHandler({
         pageX: 0,
         pageY: 0,

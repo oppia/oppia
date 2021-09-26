@@ -76,7 +76,7 @@ export class ProfilePageComponent {
   preferencesUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
-  constructor(
+  constructor (
     private dateTimeFormatService: DateTimeFormatService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
@@ -87,7 +87,7 @@ export class ProfilePageComponent {
     private windowRef: WindowRef
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.loaderService.showLoadingScreen('Loading');
@@ -165,7 +165,7 @@ export class ProfilePageComponent {
       });
   }
 
-  changeSubscriptionStatus(): void {
+  changeSubscriptionStatus (): void {
     if (this.userNotLoggedIn) {
       this.userService.getLoginUrlAsync().then(
         (loginUrl) => {
@@ -195,7 +195,7 @@ export class ProfilePageComponent {
     }
   }
 
-  updateSubscriptionButtonPopoverText(): void {
+  updateSubscriptionButtonPopoverText (): void {
     if (this.userNotLoggedIn) {
       this.subscriptionButtonPopoverText = (
         'Log in or sign up to subscribe to your ' +
@@ -213,7 +213,7 @@ export class ProfilePageComponent {
     }
   }
 
-  goToPreviousPage(): void {
+  goToPreviousPage (): void {
     if (this.currentPageNumber === 0) {
       this.loggerService.error('Error: cannot decrement page');
     } else {
@@ -225,7 +225,7 @@ export class ProfilePageComponent {
     }
   }
 
-  goToNextPage(): void {
+  goToNextPage (): void {
     let summariesLength = this.data.editedExpSummaries.length;
     if ((this.currentPageNumber + 1) * this.PAGE_SIZE >= summariesLength) {
       this.loggerService.error('Error: Cannot increment page');
@@ -239,7 +239,7 @@ export class ProfilePageComponent {
     }
   }
 
-  getExplorationsToDisplay(): Object[] {
+  getExplorationsToDisplay (): Object[] {
     this.explorationsOnPage = [];
     if (this.userEditedExplorations.length === 0) {
       return this.explorationsOnPage;
@@ -259,7 +259,7 @@ export class ProfilePageComponent {
     return this.explorationsOnPage;
   }
 
-  getLocaleDateString(millisSinceEpoch: number): string {
+  getLocaleDateString (millisSinceEpoch: number): string {
     return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
   }
 }

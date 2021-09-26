@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Add Audio Translation Modal Controller', function() {
+describe('Add Audio Translation Modal Controller', function () {
   var $q = null;
   var $scope = null;
   var $uibModalInstance = null;
@@ -33,13 +33,13 @@ describe('Add Audio Translation Modal Controller', function() {
   var isAudioAvailable = true;
   var languageCode = 'en';
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     AssetsBackendApiService = $injector.get('AssetsBackendApiService');
@@ -60,7 +60,7 @@ describe('Add Audio Translation Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.errorMessage).toBe(null);
       expect($scope.saveButtonText).toBe('Save');
       expect($scope.saveInProgress).toBe(false);
@@ -68,7 +68,7 @@ describe('Add Audio Translation Modal Controller', function() {
       expect($scope.droppedFile).toBe(audioFile);
     });
 
-  it('should save audio successfully then close the modal', function() {
+  it('should save audio successfully then close the modal', function () {
     var file = {
       size: 1000,
       name: 'file.mp3'
@@ -95,7 +95,7 @@ describe('Add Audio Translation Modal Controller', function() {
     });
   });
 
-  it('should use reject handler when trying to save audio fails', function() {
+  it('should use reject handler when trying to save audio fails', function () {
     var file = {
       size: 1000,
       name: 'file.mp3'

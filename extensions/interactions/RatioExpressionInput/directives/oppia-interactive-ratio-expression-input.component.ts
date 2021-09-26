@@ -38,7 +38,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
     '$attrs', '$scope', 'CurrentInteractionService',
     'InteractionAttributesExtractorService',
     'RatioExpressionInputRulesService',
-    function(
+    function (
         $attrs, $scope, CurrentInteractionService,
         InteractionAttributesExtractorService,
         RatioExpressionInputRulesService) {
@@ -46,11 +46,11 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
       var errorMessage = '';
       // Label for errors caused whilst parsing ratio expression.
       var FORM_ERROR_TYPE = 'RATIO_EXPRESSION_INPUT_FORMAT_ERROR';
-      ctrl.getWarningText = function() {
+      ctrl.getWarningText = function () {
         return errorMessage;
       };
 
-      ctrl.submitAnswer = function(answer) {
+      ctrl.submitAnswer = function (answer) {
         try {
           var ratioExpression =
             Ratio.fromRawInputString(answer);
@@ -76,7 +76,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
         }
       };
 
-      ctrl.isAnswerValid = function() {
+      ctrl.isAnswerValid = function () {
         if (ctrl.RatioExpressionInputForm === undefined) {
           return true;
         }
@@ -84,12 +84,12 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           !ctrl.RatioExpressionInputForm.answer.$invalid && ctrl.answer !== '');
       };
 
-      var submitAnswerFn = function() {
+      var submitAnswerFn = function () {
         ctrl.submitAnswer(ctrl.answer);
       };
 
-      ctrl.$onInit = function() {
-        $scope.$watch('$ctrl.answer', function(newValue) {
+      ctrl.$onInit = function () {
+        $scope.$watch('$ctrl.answer', function (newValue) {
           errorMessage = '';
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, true);

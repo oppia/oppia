@@ -31,7 +31,7 @@ require('pages/exploration-editor-page/services/router.service.ts');
 angular.module('oppia').controller('StateStatsModalController', [
   '$controller', '$scope', '$uibModalInstance', 'RouterService',
   'interactionArgs', 'stateName', 'stateStats', 'visualizationsInfo',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, RouterService,
       interactionArgs, stateName, stateStats, visualizationsInfo) {
     $controller('ConfirmOrCancelModalController', {$scope, $uibModalInstance});

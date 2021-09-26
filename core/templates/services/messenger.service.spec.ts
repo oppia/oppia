@@ -35,16 +35,16 @@ describe('BannerComponent', () => {
       location: {
         _href: '',
         _hash: '',
-        get href(): string {
+        get href (): string {
           return this._href;
         },
-        set href(val) {
+        set href (val) {
           this._href = val;
         },
-        get hash(): string {
+        get hash (): string {
           return this._hash;
         },
-        set hash(val) {
+        set hash (val) {
           this._hash = val;
         }
       },
@@ -52,7 +52,7 @@ describe('BannerComponent', () => {
         postMessage: () => {}
       }
     };
-    get nativeWindow() {
+    get nativeWindow () {
       return this._window;
     }
   }

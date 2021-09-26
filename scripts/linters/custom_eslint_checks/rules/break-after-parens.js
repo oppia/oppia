@@ -37,12 +37,12 @@ module.exports = {
     }
   },
 
-  create: function(context) {
+  create: function (context) {
     const sourceCode = context.getSourceCode();
     const lines = sourceCode.lines;
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         const tokens = sourceCode.tokensAndComments;
         var parensCount = 0;
         const separators = ['(', '{', '[', ' '];

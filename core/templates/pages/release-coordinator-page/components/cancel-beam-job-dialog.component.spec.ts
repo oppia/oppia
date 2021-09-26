@@ -43,7 +43,7 @@ describe('Cancel beam job dialog', () => {
   let alertsService: AlertsService;
   let matDialogRef: MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun>;
 
-  beforeEach(waitForAsync(async() => {
+  beforeEach(waitForAsync(async () => {
     const mockDialogRef = { disableClose: false, close: () => {} };
 
     TestBed.configureTestingModule({
@@ -112,7 +112,7 @@ describe('Cancel beam job dialog', () => {
     expect(closeDialogSpy).toHaveBeenCalledWith(cancelledBeamJobRun);
   });
 
-  it('should show the error dialog if the operation failed', async() => {
+  it('should show the error dialog if the operation failed', async () => {
     const error = new Error();
     const cancelBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
       .and.returnValue(throwError(error));

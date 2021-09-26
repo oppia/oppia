@@ -64,7 +64,7 @@ describe('On Screen Keyboard', () => {
       end: () => {},
     };
 
-    activate(): void {
+    activate (): void {
       guppy.isActive = true;
     }
   }

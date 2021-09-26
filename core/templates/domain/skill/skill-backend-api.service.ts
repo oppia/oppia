@@ -66,12 +66,12 @@ interface DoesSkillWithDescriptionExistBackendResponse {
   providedIn: 'root'
 })
 export class SkillBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private skillObjectFactory: SkillObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async fetchSkillAsync(skillId: string): Promise<FetchSkillResponse> {
+  async fetchSkillAsync (skillId: string): Promise<FetchSkillResponse> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -94,13 +94,13 @@ export class SkillBackendApiService {
     });
   }
 
-  fetchAllSkills(): Observable<{skills: SkillBackendDict[]}> {
+  fetchAllSkills (): Observable<{skills: SkillBackendDict[]}> {
     return this.http.get<{skills: SkillBackendDict[]}>(
       SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE
     );
   }
 
-  async fetchMultiSkillsAsync(skillIds: string[]): Promise<Skill[]> {
+  async fetchMultiSkillsAsync (skillIds: string[]): Promise<Skill[]> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
@@ -119,7 +119,7 @@ export class SkillBackendApiService {
     });
   }
 
-  async deleteSkillAsync(skillId: string): Promise<void> {
+  async deleteSkillAsync (skillId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -128,13 +128,13 @@ export class SkillBackendApiService {
 
       this.http.delete<void>(skillDataUrl).toPromise().then(() => {
         resolve();
-      }, function(errorResponse) {
+      }, function (errorResponse) {
         reject(errorResponse.error.error);
       });
     });
   }
 
-  async updateSkillAsync(
+  async updateSkillAsync (
       skillId: string, skillVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<Skill> {
@@ -159,7 +159,7 @@ export class SkillBackendApiService {
     });
   }
 
-  private _doesSkillWithDescriptionExist(
+  private _doesSkillWithDescriptionExist (
       description: string,
       successCallback: (value?: boolean) => void,
       errorCallback: (reason?: string) => void): void {
@@ -177,7 +177,7 @@ export class SkillBackendApiService {
     });
   }
 
-  async doesSkillWithDescriptionExistAsync(description: string):
+  async doesSkillWithDescriptionExistAsync (description: string):
       Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesSkillWithDescriptionExist(description, resolve, reject);

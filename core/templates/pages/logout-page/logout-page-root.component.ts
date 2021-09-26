@@ -25,11 +25,11 @@ import { PageHeadService } from 'services/page-head.service';
   templateUrl: './logout-page-root.component.html'
 })
 export class LogoutPageRootComponent {
-  constructor(
+  constructor (
     private pageHeadService: PageHeadService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT);
   }

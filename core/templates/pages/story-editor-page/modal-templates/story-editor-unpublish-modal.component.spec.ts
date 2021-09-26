@@ -21,10 +21,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StoryEditorUnpublishModalComponent } from './story-editor-unpublish-modal.component';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
-  close(): void {
+  close (): void {
     return;
   }
 }

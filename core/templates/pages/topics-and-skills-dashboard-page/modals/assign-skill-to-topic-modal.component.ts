@@ -32,7 +32,7 @@ export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
   topicSummaries!: CreatorTopicSummary[];
   selectedTopicIds: string[] = [];
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);

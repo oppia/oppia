@@ -71,7 +71,7 @@ describe('Blog Admin backend api service', () => {
       configProperties: blogAdminBackendResponse.config_properties,
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });

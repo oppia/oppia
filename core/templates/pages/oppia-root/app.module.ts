@@ -61,7 +61,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     'auth/user-not-found',
   ];
 
-  handleError(error: firebase.auth.Error): void {
+  handleError (error: firebase.auth.Error): void {
     if (FirebaseErrorFilterHandler.EXPECTED_ERROR_CODES.includes(error.code)) {
       return;
     }

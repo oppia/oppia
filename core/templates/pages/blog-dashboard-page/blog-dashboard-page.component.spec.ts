@@ -53,7 +53,7 @@ describe('Blog Dashboard Page Component', () => {
         reload: () => {}
       },
       open: (url) => {},
-      onhashchange() {
+      onhashchange () {
         return this.location._hashChange;
       },
     };

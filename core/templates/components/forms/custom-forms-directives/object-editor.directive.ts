@@ -40,7 +40,7 @@ interface ObjectEditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('objectEditor', [
-  '$compile', '$log', '$rootScope', function($compile, $log, $rootScope) {
+  '$compile', '$log', '$rootScope', function ($compile, $log, $rootScope) {
     return {
       scope: {
         alwaysEditable: '@',
@@ -51,7 +51,7 @@ angular.module('oppia').directive('objectEditor', [
         getSchema: '&schema',
         value: '='
       },
-      link: function(scope: ObjectEditorCustomScope, element) {
+      link: function (scope: ObjectEditorCustomScope, element) {
         const MIGRATED_EDITORS: string[] = [
           'algebraic-expression',
           'boolean',
@@ -96,20 +96,20 @@ angular.module('oppia').directive('objectEditor', [
         // string.
         var directiveName = scope.objType.replace(
           /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-        scope.getInitArgs = function() {
+        scope.getInitArgs = function () {
           return scope.initArgs;
         };
-        scope.getAlwaysEditable = function() {
+        scope.getAlwaysEditable = function () {
           return scope.alwaysEditable;
         };
-        scope.getIsEditable = function() {
+        scope.getIsEditable = function () {
           return scope.isEditable;
         };
-        scope.updateValue = function(e) {
+        scope.updateValue = function (e) {
           scope.value = e;
           $rootScope.$applyAsync();
         };
-        scope.updateValid = function(e) {
+        scope.updateValid = function (e) {
           if (!scope.ngModelController) {
             return;
           }

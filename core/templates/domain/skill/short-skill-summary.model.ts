@@ -23,21 +23,21 @@ export interface ShortSkillSummaryBackendDict {
 }
 
 export class ShortSkillSummary {
-  constructor(public id: string, public description: string) {}
+  constructor (public id: string, public description: string) {}
 
-  getId(): string {
+  getId (): string {
     return this.id;
   }
 
-  getDescription(): string {
+  getDescription (): string {
     return this.description;
   }
 
-  static create(skillId: string, skillDescription: string): ShortSkillSummary {
+  static create (skillId: string, skillDescription: string): ShortSkillSummary {
     return new ShortSkillSummary(skillId, skillDescription);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ShortSkillSummaryBackendDict): ShortSkillSummary {
     return new ShortSkillSummary(
       backendDict.skill_id,

@@ -27,7 +27,7 @@ import { KeyboardShortcutHelpModalComponent } from
   './keyboard-shortcut-help-modal.component';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }

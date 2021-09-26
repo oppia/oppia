@@ -37,7 +37,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
   eventBusGroup: EventBusGroup;
-  constructor(
+  constructor (
     private contextService: ContextService,
     private eventBusService: EventBusService,
     private skillBackendApiService: SkillBackendApiService
@@ -45,7 +45,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  private filterSkills(skillSelector: string): void {
+  private filterSkills (skillSelector: string): void {
     if (skillSelector === '') {
       this.skillsToShow = this.skills;
     }
@@ -57,7 +57,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     );
   }
 
-  selectSkill(skillId: string, skillDescription: string): void {
+  selectSkill (skillId: string, skillDescription: string): void {
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.SKILL, skillId);
     this.value = skillId;
@@ -68,7 +68,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     }));
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.showLoading = true;
     this.skills = [];
     if (this.value) {
@@ -92,7 +92,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.contextService.removeCustomEntityContext();
   }
 }

@@ -19,7 +19,7 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
-  function() {
+  function () {
     return {
       scope: {
         localValue: '='
@@ -28,8 +28,8 @@ angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
         'components/forms/schema-viewers/' +
         'schema-based-primitive-viewer.directive.html'),
       restrict: 'E',
-      controller: ['$scope', function($scope) {
-        $scope.isExpression = function(value) {
+      controller: ['$scope', function ($scope) {
+        $scope.isExpression = function (value) {
           return angular.isString(value);
         };
       }]

@@ -97,13 +97,13 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   ],
 })
 class BlogDashboardPageModule implements DoBootstrap {
-  ngDoBootstrap() {}
+  ngDoBootstrap () {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(BlogDashboardPageModule);
 };

@@ -26,13 +26,13 @@ import { UserService } from 'services/user.service';
   templateUrl: './registration-session-expired-modal.component.html'
 })
 export class RegistrationSessionExpiredModalComponent {
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal,
     private userService: UserService,
     private windowRef: WindowRef
   ) {}
 
-  continueRegistration(): void {
+  continueRegistration (): void {
     this.userService.getLoginUrlAsync().then((loginUrl) => {
       if (loginUrl) {
         setTimeout(() => {

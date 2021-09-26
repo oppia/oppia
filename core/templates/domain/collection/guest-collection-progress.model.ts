@@ -21,11 +21,11 @@ import cloneDeep from 'lodash/cloneDeep';
 export class GuestCollectionProgress {
   _completedExplorationsMap: {[key: string]: string[]};
 
-  constructor(completedExplorationsMap: {[key: string]: string[]}) {
+  constructor (completedExplorationsMap: {[key: string]: string[]}) {
     this._completedExplorationsMap = completedExplorationsMap;
   }
 
-  static createFromJson(
+  static createFromJson (
       collectionProgressJson: string): GuestCollectionProgress {
     if (collectionProgressJson) {
       return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
@@ -37,13 +37,13 @@ export class GuestCollectionProgress {
   // Returns whether the guest has made any progress towards completing the
   // specified collection ID. Note that this does not account for whether the
   // completed explorations are still contained within that collection.
-  hasCompletionProgress(collectionId: string): boolean {
+  hasCompletionProgress (collectionId: string): boolean {
     return this._completedExplorationsMap.hasOwnProperty(collectionId);
   }
 
   // Returns an array of exploration IDs which have been completed by the
   // specified collection ID, or empty if none have.
-  getCompletedExplorationIds(collectionId: string): string[] {
+  getCompletedExplorationIds (collectionId: string): string[] {
     if (!this.hasCompletionProgress(collectionId)) {
       return [];
     }
@@ -53,7 +53,7 @@ export class GuestCollectionProgress {
   // Specifies that a specific exploration ID has been completed in the
   // context of the specified collection. Returns whether that exploration ID
   // was not previously registered as completed for the collection.
-  addCompletedExplorationId(
+  addCompletedExplorationId (
       collectionId: string, explorationId: string): boolean {
     var completedExplorationIds = this.getCompletedExplorationIds(
       collectionId);
@@ -66,7 +66,7 @@ export class GuestCollectionProgress {
   }
 
   // Converts this object to JSON for storage.
-  toJson(): string {
+  toJson (): string {
     return JSON.stringify(this._completedExplorationsMap);
   }
 }

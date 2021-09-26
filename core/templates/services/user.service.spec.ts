@@ -35,7 +35,7 @@ class MockWindowRef {
       pathname: 'home'
     }
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
@@ -63,7 +63,7 @@ describe('User Api Service', () => {
     userBackendApiService = TestBed.inject(UserBackendApiService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
-      async() => {
+      async () => {
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
         });
@@ -303,7 +303,7 @@ describe('User Api Service', () => {
       const returnUrl = 'home';
 
       userService.setReturnUrl(returnUrl);
-      userService.getLoginUrlAsync().then(function(dataUrl) {
+      userService.getLoginUrlAsync().then(function (dataUrl) {
         expect(dataUrl).toBe(loginUrl);
       });
       const req = httpTestingController.expectOne(

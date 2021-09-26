@@ -25,10 +25,10 @@ import { discardPeriodicTasks, fakeAsync, flushMicrotasks, tick } from '@angular
 
 class MockWindowRef {
   nativeWindow = {
-    ononline() {
+    ononline () {
       return;
     },
-    onoffline() {
+    onoffline () {
       return;
     },
     navigator: {

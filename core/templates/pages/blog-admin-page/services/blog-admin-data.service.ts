@@ -30,16 +30,16 @@ export class BlogAdminDataService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   dataPromise!: Promise<BlogAdminPageData>;
 
-  constructor(
+  constructor (
     private BackendApiService: BlogAdminBackendApiService) {}
 
-  async _getDataAsync(): Promise<BlogAdminPageData> {
+  async _getDataAsync (): Promise<BlogAdminPageData> {
     this.dataPromise = this.BackendApiService.getDataAsync();
 
     return this.dataPromise;
   }
 
-  async getDataAsync(): Promise<BlogAdminPageData> {
+  async getDataAsync (): Promise<BlogAdminPageData> {
     return this._getDataAsync();
   }
 }

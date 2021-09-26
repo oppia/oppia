@@ -32,7 +32,7 @@ import { AlertsService } from 'services/alerts.service';
   providedIn: 'root'
 })
 export class StoryEditorStateService {
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private storyObjectFactory: StoryObjectFactory,
@@ -55,7 +55,7 @@ export class StoryEditorStateService {
   _viewStoryNodeEditorEventEmitter = new EventEmitter();
   _recalculateAvailableNodesEventEmitter = new EventEmitter();
 
-  private _setStory(story: Story): void {
+  private _setStory (story: Story): void {
     this._story.copyFromStory(story);
     if (this._storyIsInitialized) {
       this._storyReinitializedEventEmitter.emit();
@@ -65,33 +65,33 @@ export class StoryEditorStateService {
     }
   }
 
-  private _setSkillSummaries(skillSummaries: SkillSummaryBackendDict[]): void {
+  private _setSkillSummaries (skillSummaries: SkillSummaryBackendDict[]): void {
     this._skillSummaries = angular.copy(skillSummaries);
   }
 
-  private _setTopicName(topicName: string): void {
+  private _setTopicName (topicName: string): void {
     this._topicName = topicName;
   }
 
-  private _setStoryPublicationStatus(storyIsPublished: boolean): void {
+  private _setStoryPublicationStatus (storyIsPublished: boolean): void {
     this._storyIsPublished = storyIsPublished;
   }
 
-  private _updateStory(newBackendStoryObject: StoryBackendDict): void {
+  private _updateStory (newBackendStoryObject: StoryBackendDict): void {
     this._setStory(
       this.storyObjectFactory.createFromBackendDict(newBackendStoryObject));
   }
 
-  private _setStoryWithUrlFragmentExists(
+  private _setStoryWithUrlFragmentExists (
       storyWithUrlFragmentExists: boolean): void {
     this._storyWithUrlFragmentExists = storyWithUrlFragmentExists;
   }
 
-  private _setClassroomUrlFragment(classroomUrlFragment: string): void {
+  private _setClassroomUrlFragment (classroomUrlFragment: string): void {
     this._classroomUrlFragment = classroomUrlFragment;
   }
 
-  private _setTopicUrlFragment(topicUrlFragment: string): void {
+  private _setTopicUrlFragment (topicUrlFragment: string): void {
     this._topicUrlFragment = topicUrlFragment;
   }
 
@@ -100,7 +100,7 @@ export class StoryEditorStateService {
    * specified story ID. See setStory() for more information on
    * additional behavior of this function.
    */
-  loadStory(storyId: string): void {
+  loadStory (storyId: string): void {
     this._storyIsLoading = true;
     this.editableStoryBackendApiService.fetchStoryAsync(storyId).then(
       (newBackendStoryObject) => {
@@ -124,7 +124,7 @@ export class StoryEditorStateService {
    * Returns whether this service is currently attempting to load the
    * story maintained by this service.
    */
-  isLoadingStory(): boolean {
+  isLoadingStory (): boolean {
     return this._storyIsLoading;
   }
 
@@ -132,19 +132,19 @@ export class StoryEditorStateService {
    * Returns whether a story has yet been loaded using either
    * loadStory() or setStory().
    */
-  hasLoadedStory(): boolean {
+  hasLoadedStory (): boolean {
     return this._storyIsInitialized;
   }
 
-  setExpIdsChanged(): void {
+  setExpIdsChanged (): void {
     this._expIdsChanged = true;
   }
 
-  resetExpIdsChanged(): void {
+  resetExpIdsChanged (): void {
     this._expIdsChanged = false;
   }
 
-  areAnyExpIdsChanged(): boolean {
+  areAnyExpIdsChanged (): boolean {
     return this._expIdsChanged;
   }
 
@@ -156,11 +156,11 @@ export class StoryEditorStateService {
    * return an empty story object if the story has not yet been
    * loaded for this editor instance.
    */
-  getStory(): Story {
+  getStory (): Story {
     return this._story;
   }
 
-  getSkillSummaries(): SkillSummaryBackendDict[] {
+  getSkillSummaries (): SkillSummaryBackendDict[] {
     return this._skillSummaries;
   }
 
@@ -172,15 +172,15 @@ export class StoryEditorStateService {
    * calls will similarly fire a next() function of the
    * _storyReinitializedEventEmitter.
    */
-  setStory(story: Story): void {
+  setStory (story: Story): void {
     this._setStory(story);
   }
 
-  getTopicName(): string {
+  getTopicName (): string {
     return this._topicName;
   }
 
-  isStoryPublished(): boolean {
+  isStoryPublished (): boolean {
     return this._storyIsPublished;
   }
 
@@ -192,7 +192,7 @@ export class StoryEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setStory(), when it succeeds.
    */
-  saveStory(
+  saveStory (
       commitMessage: string,
       successCallback: (value?: Object) => void,
       errorCallback: (value?: Object) => void): boolean {
@@ -227,15 +227,15 @@ export class StoryEditorStateService {
     return true;
   }
 
-  getTopicUrlFragment(): string {
+  getTopicUrlFragment (): string {
     return this._topicUrlFragment;
   }
 
-  getClassroomUrlFragment(): string {
+  getClassroomUrlFragment (): string {
     return this._classroomUrlFragment;
   }
 
-  changeStoryPublicationStatus(
+  changeStoryPublicationStatus (
       newStoryStatusIsPublic: boolean,
       successCallback: (value?: Object) => void): boolean {
     if (!this._storyIsInitialized) {
@@ -262,29 +262,29 @@ export class StoryEditorStateService {
    * Returns whether this service is currently attempting to save the
    * story maintained by this service.
    */
-  isSavingStory(): boolean {
+  isSavingStory (): boolean {
     return this._storyIsBeingSaved;
   }
 
-  get onStoryInitialized(): EventEmitter<unknown> {
+  get onStoryInitialized (): EventEmitter<unknown> {
     return this._storyInitializedEventEmitter;
   }
 
-  get onStoryReinitialized(): EventEmitter<unknown> {
+  get onStoryReinitialized (): EventEmitter<unknown> {
     return this._storyReinitializedEventEmitter;
   }
 
-  get onViewStoryNodeEditor(): EventEmitter<unknown> {
+  get onViewStoryNodeEditor (): EventEmitter<unknown> {
     return this._viewStoryNodeEditorEventEmitter;
   }
 
-  get onRecalculateAvailableNodes(): EventEmitter<unknown> {
+  get onRecalculateAvailableNodes (): EventEmitter<unknown> {
     return this._recalculateAvailableNodesEventEmitter;
   }
   /**
    * Returns whether the story URL fragment already exists on the server.
    */
-  getStoryWithUrlFragmentExists(): boolean {
+  getStoryWithUrlFragmentExists (): boolean {
     return this._storyWithUrlFragmentExists;
   }
 
@@ -296,7 +296,7 @@ export class StoryEditorStateService {
    * async backend call was successful and that _storyWithUrlFragmentExists
    * has been successfully updated.
    */
-  updateExistenceOfStoryUrlFragment(
+  updateExistenceOfStoryUrlFragment (
       storyUrlFragment: string,
       successCallback: (value?: Object) => void): void {
     this.editableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(

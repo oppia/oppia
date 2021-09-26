@@ -22,7 +22,7 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 
 angular.module('oppia').directive('collectionPermissionsCard', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -31,12 +31,12 @@ angular.module('oppia').directive('collectionPermissionsCard', [
       controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService',
-        function(CollectionEditorStateService) {
+        function (CollectionEditorStateService) {
           var ctrl = this;
-          ctrl.hasPageLoaded = function() {
+          ctrl.hasPageLoaded = function () {
             return CollectionEditorStateService.hasLoadedCollection();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.collectionRights =
               CollectionEditorStateService.getCollectionRights();
           };
@@ -51,7 +51,7 @@ import { UpgradeComponent } from '@angular/upgrade/static';
   selector: 'collection-permissions-card'
 })
 export class CollectionPermissionsCard extends UpgradeComponent {
-  constructor(elementRef: ElementRef, injector: Injector) {
+  constructor (elementRef: ElementRef, injector: Injector) {
     super('collectionPermissionsCard', elementRef, injector);
   }
 }

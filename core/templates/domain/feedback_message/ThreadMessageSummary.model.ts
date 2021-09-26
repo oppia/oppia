@@ -21,12 +21,12 @@ export class ThreadMessageSummary {
   authorUsername: string;
   text: string = '';
 
-  constructor(authorUsername: string, text: string) {
+  constructor (authorUsername: string, text: string) {
     this.authorUsername = authorUsername;
     this.text = text;
   }
 
-  hasText(): boolean {
+  hasText (): boolean {
     return this.text.length > 0;
   }
 }

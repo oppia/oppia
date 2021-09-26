@@ -66,13 +66,13 @@ export class SanitizedUrlEditorComponent {
     }
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor (private changeDetectorRef: ChangeDetectorRef) {}
 
-  getSchema(): SanitizedUrlSchema {
+  getSchema (): SanitizedUrlSchema {
     return this.schema;
   }
 
-  updateValue(newValue: unknown): void {
+  updateValue (newValue: unknown): void {
     if (this.value === newValue) {
       return;
     }

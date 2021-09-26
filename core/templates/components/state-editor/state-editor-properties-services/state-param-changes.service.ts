@@ -32,7 +32,7 @@ import { UtilsService } from 'services/utils.service';
 // TODO(sll): Add validation.
 export class StateParamChangesService extends
   StatePropertyService<ParamChange[]> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveStateParamChanges';
   }

@@ -49,7 +49,7 @@ type PresubmitHookFn = () => void;
   providedIn: 'root'
 })
 export class CurrentInteractionService {
-  constructor(
+  constructor (
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
@@ -59,7 +59,7 @@ export class CurrentInteractionService {
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
-  setOnSubmitFn(onSubmit: OnSubmitFn): void {
+  setOnSubmitFn (onSubmit: OnSubmitFn): void {
     /**
      * The ConversationSkinDirective should register its onSubmit
      * callback here.
@@ -69,7 +69,7 @@ export class CurrentInteractionService {
     CurrentInteractionService.onSubmitFn = onSubmit;
   }
 
-  registerCurrentInteraction(
+  registerCurrentInteraction (
       submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
@@ -88,7 +88,7 @@ export class CurrentInteractionService {
     CurrentInteractionService.validityCheckFn = validityCheckFn || null;
   }
 
-  registerPresubmitHook(hookFn: PresubmitHookFn): void {
+  registerPresubmitHook (hookFn: PresubmitHookFn): void {
     /* Register a hook that will be called right before onSubmit.
      * All hooks for the current interaction will be cleared right
      * before loading the next card.
@@ -96,14 +96,14 @@ export class CurrentInteractionService {
     CurrentInteractionService.presubmitHooks.push(hookFn);
   }
 
-  clearPresubmitHooks(): void {
+  clearPresubmitHooks (): void {
     /* Clear out all the hooks for the current interaction. Should
      * be called before loading the next card.
      */
     CurrentInteractionService.presubmitHooks = [];
   }
 
-  onSubmit(
+  onSubmit (
       answer: string, interactionRulesService: InteractionRulesService): void {
     for (
       let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
@@ -112,7 +112,7 @@ export class CurrentInteractionService {
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
 
-  submitAnswer(): void {
+  submitAnswer (): void {
     /* This starts the answer submit process, it should be called once the
      * learner presses the "Submit" button.
      */
@@ -134,7 +134,7 @@ export class CurrentInteractionService {
     }
   }
 
-  isSubmitButtonDisabled(): boolean {
+  isSubmitButtonDisabled (): boolean {
     /* The submit button should be disabled if the current interaction
      * did not register a _submitAnswerFn. This could occur in
      * low-bandwidth scenarios where the interaction has not finished
@@ -155,11 +155,11 @@ export class CurrentInteractionService {
     return !CurrentInteractionService.validityCheckFn();
   }
 
-  updateViewWithNewAnswer(): void {
+  updateViewWithNewAnswer (): void {
     CurrentInteractionService.answerChangedSubject.next();
   }
 
-  get onAnswerChanged$(): Observable<void> {
+  get onAnswerChanged$ (): Observable<void> {
     return CurrentInteractionService.answerChangedSubject.asObservable();
   }
 }

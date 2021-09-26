@@ -35,7 +35,7 @@ describe('Save Version Mismatch Modal Controller', () => {
     state_name: 'State name',
   }];
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       providers: [
         UtilsService

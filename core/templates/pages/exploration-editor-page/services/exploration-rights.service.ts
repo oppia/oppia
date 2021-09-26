@@ -24,12 +24,12 @@ angular.module('oppia').factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
   'ACTIVITY_STATUS_PUBLIC', 'ROLE_EDITOR', 'ROLE_OWNER', 'ROLE_VIEWER',
   'ROLE_VOICE_ARTIST',
-  function(
+  function (
       $http, AlertsService, ExplorationDataService,
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, ROLE_EDITOR, ROLE_OWNER,
       ROLE_VIEWER, ROLE_VOICE_ARTIST) {
     return {
-      init: function(
+      init: function (
           ownerNames, editorNames, voiceArtistNames, viewerNames, status,
           clonedFrom, isCommunityOwned, viewableIfPrivate) {
         this.ownerNames = ownerNames;
@@ -43,25 +43,25 @@ angular.module('oppia').factory('ExplorationRightsService', [
         this._isCommunityOwned = isCommunityOwned;
         this._viewableIfPrivate = viewableIfPrivate;
       },
-      clonedFrom: function() {
+      clonedFrom: function () {
         return this._clonedFrom;
       },
-      isCloned: function() {
+      isCloned: function () {
         return Boolean(this._clonedFrom);
       },
-      isPrivate: function() {
+      isPrivate: function () {
         return this._status === ACTIVITY_STATUS_PRIVATE;
       },
-      isPublic: function() {
+      isPublic: function () {
         return this._status === ACTIVITY_STATUS_PUBLIC;
       },
-      isCommunityOwned: function() {
+      isCommunityOwned: function () {
         return this._isCommunityOwned;
       },
-      viewableIfPrivate: function() {
+      viewableIfPrivate: function () {
         return this._viewableIfPrivate;
       },
-      makeCommunityOwned: function() {
+      makeCommunityOwned: function () {
         var that = this;
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);
@@ -69,7 +69,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
         return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           make_community_owned: true
-        }).then(function(response) {
+        }).then(function (response) {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(
@@ -79,7 +79,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      setViewability: function(viewableIfPrivate) {
+      setViewability: function (viewableIfPrivate) {
         var that = this;
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);
@@ -87,7 +87,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
         return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           viewable_if_private: viewableIfPrivate
-        }).then(function(response) {
+        }).then(function (response) {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(
@@ -97,7 +97,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      saveRoleChanges: function(newMemberUsername, newMemberRole) {
+      saveRoleChanges: function (newMemberUsername, newMemberRole) {
         var that = this;
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);
@@ -106,7 +106,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           version: ExplorationDataService.data.version,
           new_member_role: newMemberRole,
           new_member_username: newMemberUsername
-        }).then(function(response) {
+        }).then(function (response) {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(
@@ -116,7 +116,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      removeRoleAsync: function(memberUsername) {
+      removeRoleAsync: function (memberUsername) {
         var that = this;
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);
@@ -125,7 +125,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           params: {
             username: memberUsername
           }
-        }).then(function(response) {
+        }).then(function (response) {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(
@@ -135,7 +135,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      assignVoiceArtistRoleAsync: function(newVoiceArtistUsername) {
+      assignVoiceArtistRoleAsync: function (newVoiceArtistUsername) {
         var that = this;
         var requestUrl = (
           '/voice_artist_management_handler/' + 'exploration/' +
@@ -147,7 +147,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           that.voiceArtistNames.push(newVoiceArtistUsername);
         });
       },
-      removeVoiceArtistRoleAsync: function(voiceArtistUsername) {
+      removeVoiceArtistRoleAsync: function (voiceArtistUsername) {
         var that = this;
         var requestUrl = (
           '/voice_artist_management_handler/' + 'exploration/' +
@@ -156,7 +156,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           params: {
             voice_artist: voiceArtistUsername
           }
-        }).then(function(response) {
+        }).then(function (response) {
           AlertsService.clearWarnings();
           that.voiceArtistNames.forEach((username, index) => {
             if (username === voiceArtistUsername) {
@@ -165,11 +165,11 @@ angular.module('oppia').factory('ExplorationRightsService', [
           });
         });
       },
-      checkUserAlreadyHasRoles: function(username) {
+      checkUserAlreadyHasRoles: function (username) {
         return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
           ...this.voiceArtistNames].includes(username);
       },
-      getOldRole: function(username) {
+      getOldRole: function (username) {
         if (this.ownerNames.includes(username)) {
           return ROLE_OWNER;
         } else if (this.editorNames.includes(username)) {
@@ -180,14 +180,14 @@ angular.module('oppia').factory('ExplorationRightsService', [
           return ROLE_VIEWER;
         }
       },
-      publish: function() {
+      publish: function () {
         var that = this;
         var requestUrl = (
           '/createhandler/status/' + ExplorationDataService.explorationId);
 
         return $http.put(requestUrl, {
           make_public: true
-        }).then(function(response) {
+        }).then(function (response) {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(
@@ -197,7 +197,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      saveModeratorChangeToBackendAsync: async function(
+      saveModeratorChangeToBackendAsync: async function (
           emailBody) {
         var that = this;
         var explorationModeratorRightsUrl = (
@@ -207,7 +207,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
         return $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
           version: ExplorationDataService.data.version
-        }).then(function(response) {
+        }).then(function (response) {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(

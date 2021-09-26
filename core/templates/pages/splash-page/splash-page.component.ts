@@ -48,7 +48,7 @@ export class SplashPageComponent implements OnInit {
   testimonials = [];
   userIsLoggedIn: boolean = null;
 
-  constructor(
+  constructor (
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
@@ -57,28 +57,28 @@ export class SplashPageComponent implements OnInit {
     private loaderService: LoaderService,
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickBrowseLessonsButton(): void {
+  onClickBrowseLessonsButton (): void {
     this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
     this.windowRef.nativeWindow.location.href = this.classroomUrl;
   }
 
-  onClickStartContributingButton(): void {
+  onClickStartContributingButton (): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
     this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 
-  onClickStartTeachingButton(): void {
+  onClickStartTeachingButton (): void {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
     this.windowRef.nativeWindow.location.href = ('/creator-guidelines');
   }
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
-  incrementDisplayedTestimonialId(): void {
+  incrementDisplayedTestimonialId (): void {
     // This makes sure that incrementing from (testimonialCount - 1)
     // returns 0 instead of testimonialCount,since we want the testimonials
     // to cycle through.
@@ -86,7 +86,7 @@ export class SplashPageComponent implements OnInit {
       this.displayedTestimonialId + 1) % this.testimonialCount;
   }
 
-  decrementDisplayedTestimonialId(): void {
+  decrementDisplayedTestimonialId (): void {
     // This makes sure that decrementing from 0, returns
     // (testimonialCount - 1) instead of -1, since we want the testimonials
     // to cycle through.
@@ -95,7 +95,7 @@ export class SplashPageComponent implements OnInit {
       this.testimonialCount;
   }
 
-  getTestimonials(): [Testimonial, Testimonial, Testimonial, Testimonial] {
+  getTestimonials (): [Testimonial, Testimonial, Testimonial, Testimonial] {
     return [{
       quote: 'I18N_SPLASH_TESTIMONIAL_1',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_1',
@@ -124,7 +124,7 @@ export class SplashPageComponent implements OnInit {
     }];
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;

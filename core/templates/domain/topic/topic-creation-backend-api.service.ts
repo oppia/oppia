@@ -33,9 +33,9 @@ interface TopicCreationResponse {
   providedIn: 'root'
 })
 export class TopicCreationBackendApiService {
-  constructor(private http: HttpClient) { }
+  constructor (private http: HttpClient) { }
 
-  _createTopic(
+  _createTopic (
       successCallback: (value: TopicCreationResponse) => void,
       errorCallback: (reason: string) => void,
       topic: NewlyCreatedTopic, imagesData: ImageData[],
@@ -67,7 +67,7 @@ export class TopicCreationBackendApiService {
       });
   }
 
-  async createTopicAsync(
+  async createTopicAsync (
       topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {

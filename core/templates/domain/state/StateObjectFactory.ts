@@ -73,7 +73,7 @@ export class State {
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
 
-  constructor(
+  constructor (
       name: string, classifierModelId: string | null,
       linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
@@ -92,11 +92,11 @@ export class State {
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
-  setName(newName: string): void {
+  setName (newName: string): void {
     this.name = newName;
   }
 
-  toBackendDict(): StateBackendDict {
+  toBackendDict (): StateBackendDict {
     return {
       content: this.content.toBackendDict(),
       classifier_model_id: this.classifierModelId,
@@ -113,7 +113,7 @@ export class State {
     };
   }
 
-  copy(otherState: State): void {
+  copy (otherState: State): void {
     this.name = otherState.name;
     this.classifierModelId = otherState.classifierModelId;
     this.content = otherState.content;
@@ -126,7 +126,7 @@ export class State {
     this.nextContentIdIndex = otherState.nextContentIdIndex;
   }
 
-  getRequiredWrittenTranslationContentIds(): Set<string> {
+  getRequiredWrittenTranslationContentIds (): Set<string> {
     let interactionId = this.interaction.id;
 
     let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
@@ -158,16 +158,16 @@ export class State {
   providedIn: 'root'
 })
 export class StateObjectFactory {
-  constructor(
+  constructor (
     private interactionObject: InteractionObjectFactory,
     private paramchangesObject: ParamChangesObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
-  get NEW_STATE_TEMPLATE(): StateBackendDict {
+  get NEW_STATE_TEMPLATE (): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
-  createDefaultState(newStateName: string): State {
+  createDefaultState (newStateName: string): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
@@ -188,7 +188,7 @@ export class StateObjectFactory {
     return newState;
   }
 
-  createFromBackendDict(
+  createFromBackendDict (
       stateName: string, stateDict: StateBackendDict): State {
     return new State(
       stateName,

@@ -67,7 +67,7 @@ export class ExplorationEngineService {
    initStateName: string;
    version: number;
 
-   constructor(
+   constructor (
      private alertsService: AlertsService,
      private answerClassificationService: AnswerClassificationService,
      private audioPreloaderService: AudioPreloaderService,
@@ -92,7 +92,7 @@ export class ExplorationEngineService {
      this.setExplorationProperties();
    }
 
-   setExplorationProperties(): void {
+   setExplorationProperties (): void {
      let pathnameArray = this.urlService.getPathname().split('/');
      let explorationContext = false;
 
@@ -129,18 +129,18 @@ export class ExplorationEngineService {
      }
    }
 
-   randomFromArray<T>(arr: T[]): T {
+   randomFromArray<T> (arr: T[]): T {
      return arr[Math.floor(Math.random() * arr.length)];
    }
 
    // Evaluate feedback.
-   makeFeedback(
+   makeFeedback (
        feedbackHtml: string, envs: Record<string, string>[]): string {
      return this.expressionInterpolationService
        .processHtml(feedbackHtml, envs);
    }
 
-   private _getRandomSuffix(): string {
+   private _getRandomSuffix (): string {
      // This is a bit of a hack. When a refresh to a $scope variable
      // happens,
      // AngularJS compares the new value of the variable to its previous
@@ -156,7 +156,7 @@ export class ExplorationEngineService {
    }
 
    // Evaluate parameters. Returns null if any evaluation fails.
-   makeParams(
+   makeParams (
        oldParams: ExplorationParams, paramChanges: ParamChange[],
        envs: Record<string, string>[]): ExplorationParams {
      let newParams: ExplorationParams = { ...oldParams };
@@ -188,14 +188,14 @@ export class ExplorationEngineService {
    }
 
    // Evaluate question string.
-   makeQuestion(newState: State, envs: Record<string, string>[]): string {
+   makeQuestion (newState: State, envs: Record<string, string>[]): string {
      return this.expressionInterpolationService.processHtml(
        newState.content.html, envs);
    }
 
 
    // This should only be called when 'exploration' is non-null.
-   _loadInitialState(
+   _loadInitialState (
        successCallback: (stateCard: StateCard, str: string) => void): void {
      let initialState: State = this.exploration.getInitialState();
      let oldParams: ExplorationParams = this.learnerParamsService
@@ -251,7 +251,7 @@ export class ExplorationEngineService {
    // Initialize the parameters in the exploration as specified in the
    // exploration-level initial parameter changes list, followed by any
    // manual parameter changes (in editor preview mode).
-   initParams(manualParamChanges: ParamChange[]): void {
+   initParams (manualParamChanges: ParamChange[]): void {
      let baseParams = {};
      this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
        baseParams[paramName] = paramSpec.getType().createDefaultValue();
@@ -265,7 +265,7 @@ export class ExplorationEngineService {
      this.learnerParamsService.init(startingParams);
    }
 
-   private _getNextInteractionHtml(labelForFocusTarget: string): string {
+   private _getNextInteractionHtml (labelForFocusTarget: string): string {
      let interactionId: string = this.exploration
        .getInteractionId(this.nextStateName);
 
@@ -276,7 +276,7 @@ export class ExplorationEngineService {
        labelForFocusTarget, null);
    }
 
-   checkAlwaysAskLearnersForAnswerDetails(): void {
+   checkAlwaysAskLearnersForAnswerDetails (): void {
      this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
        this._explorationId).then((featuresData) => {
        this.alwaysAskLearnersForAnswerDetails = (
@@ -287,7 +287,7 @@ export class ExplorationEngineService {
    // This should only be used in editor preview mode. It sets the
    // exploration data from what's currently specified in the editor, and
    // also initializes the parameters to empty strings.
-   initSettingsFromEditor(
+   initSettingsFromEditor (
        activeStateNameFromPreviewTab: string,
        manualParamChangesToInit: ParamChange[]): void {
      if (this._editorPreviewMode) {
@@ -312,7 +312,7 @@ export class ExplorationEngineService {
     *   - initHtml {string}, an HTML string representing the content of the
     *       first state.
     */
-   init(
+   init (
        explorationDict: ExplorationBackendDict,
        explorationVersion: number, preferredAudioLanguage: string,
        autoTtsEnabled: boolean, preferredContentLanguageCodes: string[],
@@ -357,48 +357,48 @@ export class ExplorationEngineService {
      );
    }
 
-   moveToExploration(successCallback: (StateCard, string) => void): void {
+   moveToExploration (successCallback: (StateCard, string) => void): void {
      this._loadInitialState(successCallback);
    }
 
-   isCurrentStateInitial(): boolean {
+   isCurrentStateInitial (): boolean {
      return this.currentStateName === this.exploration.initStateName;
    }
 
-   recordNewCardAdded(): void {
+   recordNewCardAdded (): void {
      this.currentStateName = this.nextStateName;
    }
 
-   getState(): State {
+   getState (): State {
      let stateName: string = this.playerTranscriptService.getLastStateName();
      return this.exploration.getState(stateName);
    }
 
-   getExplorationId(): string {
+   getExplorationId (): string {
      return this._explorationId;
    }
 
-   getExplorationTitle(): string {
+   getExplorationTitle (): string {
      return this.exploration.title;
    }
 
-   getExplorationVersion(): number {
+   getExplorationVersion (): number {
      return this.version;
    }
 
-   getAuthorRecommendedExpIds(): string[] {
+   getAuthorRecommendedExpIds (): string[] {
      return this.exploration.getAuthorRecommendedExpIds(this.currentStateName);
    }
 
-   getLanguageCode(): string {
+   getLanguageCode (): string {
      return this.exploration.getLanguageCode();
    }
 
-   isInPreviewMode(): boolean {
+   isInPreviewMode (): boolean {
      return !!this._editorPreviewMode;
    }
 
-   submitAnswer(
+   submitAnswer (
        answer: string, interactionRulesService: InteractionRulesService,
        successCallback: (
          nextCard: StateCard,
@@ -537,15 +537,15 @@ export class ExplorationEngineService {
      return answerIsCorrect;
    }
 
-   isAnswerBeingProcessed(): boolean {
+   isAnswerBeingProcessed (): boolean {
      return this.answerIsBeingProcessed;
    }
 
-   getAlwaysAskLearnerForAnswerDetails(): boolean {
+   getAlwaysAskLearnerForAnswerDetails (): boolean {
      return this.alwaysAskLearnersForAnswerDetails;
    }
 
-   get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
+   get onUpdateActiveStateIfInEditor (): EventEmitter<string> {
      return this._updateActiveStateIfInEditorEventEmitter;
    }
 }

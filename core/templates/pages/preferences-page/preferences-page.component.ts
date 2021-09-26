@@ -77,7 +77,7 @@ export class PreferencesPageComponent {
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
   userCanExportAccount: boolean = false;
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
@@ -90,11 +90,11 @@ export class PreferencesPageComponent {
     private userService: UserService
   ) { }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  private _saveDataItem(
+  private _saveDataItem (
       updateType: string,
       data: string | string[] | EmailPreferencesBackendDict
   ): void {
@@ -111,32 +111,32 @@ export class PreferencesPageComponent {
     });
   }
 
-  saveUserBio(userBio: string): void {
+  saveUserBio (userBio: string): void {
     this._saveDataItem('user_bio', userBio);
   }
 
-  registerBioChanged(): void {
+  registerBioChanged (): void {
     this.preventPageUnloadEventService.addListener();
   }
 
-  onSubjectInterestsSelectionChange(subjectInterests: string): void {
+  onSubjectInterestsSelectionChange (subjectInterests: string): void {
     this.alertsService.clearWarnings();
     this.subjectInterestsChangeAtLeastOnce = true;
     this._saveDataItem('subject_interests', subjectInterests);
   }
 
-  savePreferredSiteLanguageCodes(preferredSiteLanguageCode: string): void {
+  savePreferredSiteLanguageCodes (preferredSiteLanguageCode: string): void {
     this.i18nLanguageCodeService.setI18nLanguageCode(preferredSiteLanguageCode);
     this._saveDataItem(
       'preferred_site_language_code', preferredSiteLanguageCode);
   }
 
-  savePreferredAudioLanguageCode(preferredAudioLanguageCode: string): void {
+  savePreferredAudioLanguageCode (preferredAudioLanguageCode: string): void {
     this._saveDataItem(
       'preferred_audio_language_code', preferredAudioLanguageCode);
   }
 
-  saveEmailPreferences(
+  saveEmailPreferences (
       canReceiveEmailUpdates: boolean, canReceiveEditorRoleEmail: boolean,
       canReceiveFeedbackMessageEmail: boolean,
       canReceiveSubscriptionEmail: boolean): void {
@@ -150,15 +150,15 @@ export class PreferencesPageComponent {
     this._saveDataItem('email_preferences', data);
   }
 
-  savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
+  savePreferredLanguageCodes (preferredLanguageCodes: string[]): void {
     this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
   }
 
-  saveDefaultDashboard(defaultDashboard: string): void {
+  saveDefaultDashboard (defaultDashboard: string): void {
     this._saveDataItem('default_dashboard', defaultDashboard);
   }
 
-  showUsernamePopover(creatorUsername: string): string {
+  showUsernamePopover (creatorUsername: string): string {
     // The popover on the subscription card is only shown if the length
     // of the creator username is greater than 10 and the user hovers
     // over the truncated username.
@@ -169,13 +169,13 @@ export class PreferencesPageComponent {
     }
   }
 
-  handleExportDataClick(): void {
+  handleExportDataClick (): void {
     if (!this.exportingData) {
       this.exportingData = true;
     }
   }
 
-  showEditProfilePictureModal(): void {
+  showEditProfilePictureModal (): void {
     let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
       backdrop: 'static'
     });
@@ -194,7 +194,7 @@ export class PreferencesPageComponent {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then((userInfo) => {

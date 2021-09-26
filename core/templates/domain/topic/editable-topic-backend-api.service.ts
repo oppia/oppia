@@ -103,11 +103,11 @@ interface DoesTopicWithNameExistBackendResponse {
   providedIn: 'root'
 })
 export class EditableTopicBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchTopic(
+  private _fetchTopic (
       topicId: string,
       successCallback: (value?: FetchTopicResponse) => void,
       errorCallback: (reason?: string) => void): void {
@@ -141,7 +141,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  private _fetchStories(
+  private _fetchStories (
       topicId: string,
       successCallback: (value?: StorySummaryBackendDict[]) => void,
       errorCallback: (reason?: string) => void): void {
@@ -161,7 +161,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  private _fetchSubtopicPage(
+  private _fetchSubtopicPage (
       topicId: string,
       subtopicId: number,
       successCallback: (value?: SubtopicPageBackendDict) => void,
@@ -183,7 +183,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  private _deleteTopic(
+  private _deleteTopic (
       topicId: string,
       successCallback: (value?: number) => void,
       errorCallback: (reason?: string) => void): void {
@@ -201,7 +201,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  private _updateTopic(
+  private _updateTopic (
       topicId: string,
       topicVersion: number,
       commitMessage: string,
@@ -234,7 +234,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  private _doesTopicWithUrlFragmentExist(
+  private _doesTopicWithUrlFragmentExist (
       topicUrlFragment: string,
       successCallback: (value?: boolean) => void,
       errorCallback: (reason?: string) => void): void {
@@ -252,7 +252,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  private _doesTopicWithNameExist(
+  private _doesTopicWithNameExist (
       topicName: string,
       successCallback: (value?: boolean) => void,
       errorCallback: (reason?: string) => void): void {
@@ -270,19 +270,19 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  async fetchTopicAsync(topicId: string): Promise<FetchTopicResponse> {
+  async fetchTopicAsync (topicId: string): Promise<FetchTopicResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopic(topicId, resolve, reject);
     });
   }
 
-  async fetchStoriesAsync(topicId: string): Promise<StorySummaryBackendDict[]> {
+  async fetchStoriesAsync (topicId: string): Promise<StorySummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });
   }
 
-  async fetchSubtopicPageAsync(
+  async fetchSubtopicPageAsync (
       topicId: string,
       subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
@@ -300,7 +300,7 @@ export class EditableTopicBackendApiService {
    * the success callback, if one is provided to the returned promise
    * object. Errors are passed to the error callback, if one is provided.
    */
-  async updateTopicAsync(
+  async updateTopicAsync (
       topicId: string,
       topicVersion: number,
       commitMessage: string,
@@ -312,20 +312,20 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  async deleteTopicAsync(topicId: string): Promise<number> {
+  async deleteTopicAsync (topicId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteTopic(topicId, resolve, reject);
     });
   }
 
-  async doesTopicWithNameExistAsync(topicName: string):
+  async doesTopicWithNameExistAsync (topicName: string):
       Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesTopicWithNameExist(topicName, resolve, reject);
     });
   }
 
-  async doesTopicWithUrlFragmentExistAsync(topicUrlFragment: string):
+  async doesTopicWithUrlFragmentExistAsync (topicUrlFragment: string):
        Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);

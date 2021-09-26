@@ -21,18 +21,18 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('components/forms/validators/has-length-at-least.filter.ts');
 
-describe('hasLengthAtLeast filter', function() {
+describe('hasLengthAtLeast filter', function () {
   var filterName = 'hasLengthAtLeast';
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  it('should have the relevant filters', angular.mock.inject(function($filter) {
+  it('should have the relevant filters', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should impose minimum length bounds', angular.mock.inject(
-    function($filter) {
+    function ($filter) {
       var filter = $filter('hasLengthAtLeast');
       var args = {
         minValue: 3

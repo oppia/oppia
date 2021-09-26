@@ -48,7 +48,7 @@ import { SubtitledUnicode } from
 import { ContextService } from 'services/context.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Customize Interaction Modal Controller', function() {
+describe('Customize Interaction Modal Controller', function () {
   var $injector = null;
   var $scope = null;
   var $uibModal = null;
@@ -71,7 +71,7 @@ describe('Customize Interaction Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(function() {
+  beforeEach(function () {
     contextService = TestBed.get(ContextService);
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
     imageClickInputValidationService = TestBed.get(
@@ -97,8 +97,8 @@ describe('Customize Interaction Modal Controller', function() {
     testSubscriptions.unsubscribe();
   });
 
-  describe('when state editor is in story mode', function() {
-    beforeEach(angular.mock.inject(function(_$injector_, $controller) {
+  describe('when state editor is in story mode', function () {
+    beforeEach(angular.mock.inject(function (_$injector_, $controller) {
       $injector = _$injector_;
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -138,7 +138,7 @@ describe('Customize Interaction Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.ALLOWED_INTERACTION_CATEGORIES.length).toBe(2);
         expect(
           $scope.ALLOWED_INTERACTION_CATEGORIES[0].interaction_ids.length
@@ -149,8 +149,8 @@ describe('Customize Interaction Modal Controller', function() {
       });
   });
 
-  describe('when state editor is in question mode', function() {
-    beforeEach(angular.mock.inject(function(_$injector_, $controller) {
+  describe('when state editor is in question mode', function () {
+    beforeEach(angular.mock.inject(function (_$injector_, $controller) {
       $injector = _$injector_;
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -189,7 +189,7 @@ describe('Customize Interaction Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.customizationModalReopened).toBe(true);
         // Image Click Input has 2 arg specs.
         expect($scope.customizationArgSpecs.length).toBe(2);
@@ -209,20 +209,20 @@ describe('Customize Interaction Modal Controller', function() {
       });
 
     it('should get complete interaction thumbnail icon path corresponding to' +
-      ' a given relative path', function() {
+      ' a given relative path', function () {
       var interactionId = 'i1';
       expect($scope.getInteractionThumbnailImageUrl(interactionId)).toBe(
         '/extensions/interactions/i1/static/i1.png');
     });
 
-    it('should return the hyphenated category name as expected', function() {
+    it('should return the hyphenated category name as expected', function () {
       var categoryName = 'Camel Case CATEGORY Name With Spaces';
       expect($scope.getHyphenatedLowercaseCategoryName(categoryName)).toBe(
         'camel-case-category-name-with-spaces');
     });
 
     it('should get a customization args warning message when' +
-      ' customization args warning message button has no value', function() {
+      ' customization args warning message button has no value', function () {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {value: ''},
         highlightRegionsOnHover: {value: false}
@@ -243,7 +243,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should update state customization args when changing interaction id' +
-      ' that is not in cache', function() {
+      ' that is not in cache', function () {
       $scope.onChangeInteractionId('GraphInput');
 
       expect($scope.customizationArgSpecs.length).toBe(8);
@@ -294,7 +294,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should save interaction when there are no customization args left',
-      function() {
+      function () {
         spyOn(
           editorFirstTimeEventsService, 'registerFirstSaveInteractionEvent')
           .and.callThrough();
@@ -319,7 +319,7 @@ describe('Customize Interaction Modal Controller', function() {
       });
 
     it('should update state customization args when changing interaction id' +
-      ' that is in cache', function() {
+      ' that is in cache', function () {
       // Save GraphInput on cache.
       stateInteractionIdService.displayed = 'GraphInput';
       $scope.returnToInteractionSelector();
@@ -338,7 +338,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should have save interaction button enabled and return warning' +
-      ' message when image is not provided', function() {
+      ' message when image is not provided', function () {
       $scope.form.schemaForm = {
         $valid: true
       };
@@ -359,7 +359,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should have save interaction button disabled when form entries' +
-      ' are invalid', function() {
+      ' are invalid', function () {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {value: {
           imagePath: 'imagepath',
@@ -385,7 +385,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should have save interaction button enabled when there is no' +
-      ' warning message', function() {
+      ' warning message', function () {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {value: {
           imagePath: 'imagepath',
@@ -410,7 +410,7 @@ describe('Customize Interaction Modal Controller', function() {
       expect($scope.isSaveInteractionButtonEnabled()).toBe(true);
     });
 
-    it('should open a confirmation modal with resolution', function() {
+    it('should open a confirmation modal with resolution', function () {
       angular.element(document.querySelector('.modal-title')).remove();
 
       var mockDiv = document.createElement('div');
@@ -429,7 +429,7 @@ describe('Customize Interaction Modal Controller', function() {
       angular.element(document.querySelector('.modal-title')).remove();
     });
 
-    it('should open a confirmation modal with rejection', function() {
+    it('should open a confirmation modal with rejection', function () {
       angular.element(document.querySelector('.modal-title')).remove();
 
       var mockDiv = document.createElement('div');
@@ -449,7 +449,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should not open a new confirmation modal if one is already open',
-      function() {
+      function () {
         angular.element(document.querySelector('.modal-title')).remove();
 
         var mockDiv = document.createElement('div');
@@ -467,8 +467,8 @@ describe('Customize Interaction Modal Controller', function() {
     );
   });
 
-  describe('when state editor is not in question mode', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when state editor is not in question mode', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -491,14 +491,14 @@ describe('Customize Interaction Modal Controller', function() {
     }));
 
     it('should have save interaction button disabled when there is no' +
-      ' customization arg', function() {
+      ' customization arg', function () {
       expect($scope.getSaveInteractionButtonTooltip()).toBe(
         'No customization arguments');
       expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
     });
 
     it('should have save interaction button disabled when there is no' +
-      ' interaction being displayed', function() {
+      ' interaction being displayed', function () {
       // Change customization args.
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {value: null},
@@ -550,7 +550,7 @@ describe('Customize Interaction Modal Controller', function() {
   });
 
   it('should error when a saved customization arg is missing', () => {
-    angular.mock.inject(function($injector, $controller) {
+    angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -594,7 +594,7 @@ describe('Customize Interaction Modal Controller', function() {
     // arguments, we test dictionaries and more complex nested forms of
     // customization arguments for future changes.
 
-    angular.mock.inject(function($injector, $controller) {
+    angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -681,7 +681,7 @@ describe('Customize Interaction Modal Controller', function() {
     const mockShowMarkAllAudioAsNeedingUpdateModalIfRequired = (
       jasmine.createSpy());
 
-    angular.mock.inject(function($injector, $controller) {
+    angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(

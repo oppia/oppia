@@ -35,7 +35,7 @@ export class EmailDashboardQuery {
   submitterUsername: string;
   createdOn: string;
 
-  constructor(
+  constructor (
       id: string, status: string, numQualifiedUsers: number,
       submitterUsername: string, createdOn: string) {
     this.id = id;
@@ -45,14 +45,14 @@ export class EmailDashboardQuery {
     this.createdOn = createdOn;
   }
 
-  static createFromQueryDict(
+  static createFromQueryDict (
       queryDict: EmailDashboardQueryDict): EmailDashboardQuery {
     return new EmailDashboardQuery(
       queryDict.id, queryDict.status, queryDict.num_qualified_users,
       queryDict.submitter_username, queryDict.created_on);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: EmailDashboardQueryBackendDict): EmailDashboardQuery {
     return new EmailDashboardQuery(
       backendDict.query.id, backendDict.query.status,

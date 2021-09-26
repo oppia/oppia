@@ -26,9 +26,9 @@ var objects = require('../../../extensions/objects/protractor.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var DictionaryEditor = function(elem) {
+var DictionaryEditor = function (elem) {
   return {
-    editEntry: async function(index, objectType) {
+    editEntry: async function (index, objectType) {
       var entry = elem.element(
         await by.repeater('property in propertySchemas()').
           row(index));
@@ -38,7 +38,7 @@ var DictionaryEditor = function(elem) {
   };
 };
 
-var GraphEditor = function(graphInputContainer) {
+var GraphEditor = function (graphInputContainer) {
   var addNodeButton = graphInputContainer.element(
     by.css('.protractor-test-Add-Node-button'));
   var addEdgeButton = graphInputContainer.element(
@@ -49,14 +49,14 @@ var GraphEditor = function(graphInputContainer) {
   if (!graphInputContainer) {
     throw new Error('Please provide Graph Input Container element');
   }
-  var vertexElement = function(index) {
+  var vertexElement = function (index) {
     // Would throw incorrect element error if provided incorrect index number.
     // Node index starts at 0.
     return graphInputContainer.element(by.css(
       '.protractor-test-graph-vertex-' + index));
   };
 
-  var createVertex = async function(xOffset, yOffset) {
+  var createVertex = async function (xOffset, yOffset) {
     await addNodeButton.click();
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
@@ -64,7 +64,7 @@ var GraphEditor = function(graphInputContainer) {
     await browser.actions().click().perform();
   };
 
-  var createEdge = async function(vertexIndex1, vertexIndex2) {
+  var createEdge = async function (vertexIndex1, vertexIndex2) {
     await addEdgeButton.click();
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
@@ -74,7 +74,7 @@ var GraphEditor = function(graphInputContainer) {
     await browser.actions().mouseUp().perform();
   };
   return {
-    setValue: async function(graphDict) {
+    setValue: async function (graphDict) {
       var nodeCoordinatesList = graphDict.vertices;
       var edgesList = graphDict.edges;
       if (nodeCoordinatesList) {
@@ -90,14 +90,14 @@ var GraphEditor = function(graphInputContainer) {
         }
       }
     },
-    clearDefaultGraph: async function() {
+    clearDefaultGraph: async function () {
       await deleteButton.click();
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await vertexElement(i).click();
       }
     },
-    expectCurrentGraphToBe: async function(graphDict) {
+    expectCurrentGraphToBe: async function (graphDict) {
       var nodeCoordinatesList = graphDict.vertices;
       var edgesList = graphDict.edges;
       if (nodeCoordinatesList) {
@@ -116,11 +116,11 @@ var GraphEditor = function(graphInputContainer) {
   };
 };
 
-var ListEditor = function(elem) {
+var ListEditor = function (elem) {
   var deleteListEntryLocator = by.css('.protractor-test-delete-list-entry');
   var addListEntryLocator = by.css('.protractor-test-add-list-entry');
   // NOTE: this returns a promise, not an integer.
-  var _getLength = async function() {
+  var _getLength = async function () {
     var items = (
       await elem.all(by.repeater('item in localValue track by $index')));
     return items.length;
@@ -130,7 +130,7 @@ var ListEditor = function(elem) {
   // by calling setValue() on it). Clients should ensure the given objectType
   // corresponds to the type of elements in the list.
   // If objectType is not specified, this function returns nothing.
-  var addItem = async function(objectType = null) {
+  var addItem = async function (objectType = null) {
     var listLength = await _getLength();
     await elem.element(addListEntryLocator).click();
     if (objectType !== null) {
@@ -140,14 +140,14 @@ var ListEditor = function(elem) {
             'item in localValue track by $index').row(listLength)));
     }
   };
-  var deleteItem = async function(index) {
+  var deleteItem = async function (index) {
     await elem.element(
       await by.repeater('item in localValue track by $index').row(index)
     ).element(deleteListEntryLocator).click();
   };
 
   return {
-    editItem: async function(index, objectType) {
+    editItem: async function (index, objectType) {
       var item = await elem.element(
         await by.repeater('item in localValue track by $index').row(index));
       var editor = getEditor(objectType);
@@ -156,7 +156,7 @@ var ListEditor = function(elem) {
     addItem: addItem,
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary.
-    setLength: async function(desiredLength) {
+    setLength: async function (desiredLength) {
       var startingLength = await elem.all(
         await by.repeater('item in localValue track by $index')).count();
       for (var i = startingLength; i < desiredLength; i++) {
@@ -169,9 +169,9 @@ var ListEditor = function(elem) {
   };
 };
 
-var RealEditor = function(elem) {
+var RealEditor = function (elem) {
   return {
-    setValue: async function(value) {
+    setValue: async function (value) {
       await action.clear('Text Input', elem.element(by.tagName('input')));
       await action.sendKeys(
         'Text Input', elem.element(by.tagName('input')), value);
@@ -179,7 +179,7 @@ var RealEditor = function(elem) {
   };
 };
 
-var RichTextEditor = async function(elem) {
+var RichTextEditor = async function (elem) {
   var rteElements = elem.all(by.css('.protractor-test-rte'));
   var modalDialogElements = element.all(by.css('.modal-dialog'));
   var closeRteComponentButtonLocator = by.css(
@@ -188,16 +188,16 @@ var RichTextEditor = async function(elem) {
   await waitFor.elementToBeClickable(rteElements.first());
   await (await rteElements.first()).click();
 
-  var _appendContentText = async function(text) {
+  var _appendContentText = async function (text) {
     await (await rteElements.first()).sendKeys(text);
   };
-  var _clickToolbarButton = async function(buttonName) {
+  var _clickToolbarButton = async function (buttonName) {
     await waitFor.elementToBeClickable(
       elem.element(by.css('.' + buttonName)),
       'Toolbar button takes too long to be clickable.');
     await elem.element(by.css('.' + buttonName)).click();
   };
-  var _clearContent = async function() {
+  var _clearContent = async function () {
     expect(
       await (await rteElements.first()).isPresent()
     ).toBe(true);
@@ -205,27 +205,27 @@ var RichTextEditor = async function(elem) {
   };
 
   return {
-    clear: async function() {
+    clear: async function () {
       await _clearContent();
     },
-    setPlainText: async function(text) {
+    setPlainText: async function (text) {
       await _clearContent();
       await _appendContentText(text);
     },
-    appendPlainText: async function(text) {
+    appendPlainText: async function (text) {
       await _appendContentText(text);
     },
-    appendBoldText: async function(text) {
+    appendBoldText: async function (text) {
       await _clickToolbarButton('cke_button__bold');
       await _appendContentText(text);
       await _clickToolbarButton('cke_button__bold');
     },
-    appendItalicText: async function(text) {
+    appendItalicText: async function (text) {
       await _clickToolbarButton('cke_button__italic');
       await _appendContentText(text);
       await _clickToolbarButton('cke_button__italic');
     },
-    appendOrderedList: async function(textArray) {
+    appendOrderedList: async function (textArray) {
       await _appendContentText('\n');
       await _clickToolbarButton('cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
@@ -233,7 +233,7 @@ var RichTextEditor = async function(elem) {
       }
       await _clickToolbarButton('cke_button__numberedlist');
     },
-    appendUnorderedList: async function(textArray) {
+    appendUnorderedList: async function (textArray) {
       await _appendContentText('\n');
       await _clickToolbarButton('cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
@@ -244,7 +244,7 @@ var RichTextEditor = async function(elem) {
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
-    addRteComponent: async function(componentName) {
+    addRteComponent: async function (componentName) {
       await _clickToolbarButton(
         'cke_button__oppia' + componentName.toLowerCase());
 
@@ -284,9 +284,9 @@ var RichTextEditor = async function(elem) {
 
 // Used to edit entries of a set of HTML strings, specifically used in the item
 // selection interaction test to customize interaction details.
-var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
+var SetOfTranslatableHtmlContentIdsEditor = function (elem) {
   return {
-    editEntry: async function(index, objectType) {
+    editEntry: async function (index, objectType) {
       var entry = elem.element(
         await by.repeater('property in propertySchemas()').row(index));
       var editor = getEditor(objectType);
@@ -295,21 +295,21 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   };
 };
 
-var UnicodeEditor = function(elem) {
+var UnicodeEditor = function (elem) {
   return {
-    setValue: async function(text) {
+    setValue: async function (text) {
       await elem.element(by.tagName('input')).clear();
       await elem.element(by.tagName('input')).sendKeys(text);
     }
   };
 };
 
-var AutocompleteDropdownEditor = function(elem) {
+var AutocompleteDropdownEditor = function (elem) {
   var containerLocator = by.css('.select2-container');
   var dropdownElement = element(by.css('.select2-dropdown'));
   var searchInputLocator = by.css('.select2-search input');
   return {
-    setValue: async function(text) {
+    setValue: async function (text) {
       await elem.element(containerLocator).click();
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
@@ -317,10 +317,10 @@ var AutocompleteDropdownEditor = function(elem) {
       // field when it is 'activated', i.e. when the dropdown is clicked.
       await dropdownElement.element(searchInputLocator).sendKeys(text + '\n');
     },
-    expectOptionsToBe: async function(expectedOptions) {
+    expectOptionsToBe: async function (expectedOptions) {
       await elem.element(containerLocator).click();
       var actualOptions = await dropdownElement.all(by.tagName('li')).map(
-        async function(optionElem) {
+        async function (optionElem) {
           return await optionElem.getText();
         }
       );
@@ -331,16 +331,16 @@ var AutocompleteDropdownEditor = function(elem) {
   };
 };
 
-var AutocompleteMultiDropdownEditor = function(elem) {
+var AutocompleteMultiDropdownEditor = function (elem) {
   var selectionChoiceRemoveLocator = by.css(
     '.select2-selection__choice__remove');
   var selectionRenderedLocator = by.css('.select2-selection__rendered');
   var saerchFieldElement = elem.element(by.css('.select2-search__field'));
   return {
-    setValues: async function(texts) {
+    setValues: async function (texts) {
       // Clear all existing choices.
       var deleteButtons = await elem.element(selectionRenderedLocator).all(
-        by.tagName('li')).map(function(choiceElem) {
+        by.tagName('li')).map(function (choiceElem) {
         return choiceElem.element(selectionChoiceRemoveLocator);
       });
       // We iterate in descending order, because clicking on a delete button
@@ -356,9 +356,9 @@ var AutocompleteMultiDropdownEditor = function(elem) {
           texts[i] + '\n');
       }
     },
-    expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
+    expectCurrentSelectionToBe: async function (expectedCurrentSelection) {
       actualSelection = await elem.element(selectionRenderedLocator).all(
-        by.tagName('li')).map(async function(choiceElem) {
+        by.tagName('li')).map(async function (choiceElem) {
         return await choiceElem.getText();
       });
       // Remove the element corresponding to the last <li>, which actually
@@ -369,7 +369,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   };
 };
 
-var MultiSelectEditor = function(elem) {
+var MultiSelectEditor = function (elem) {
   var searchBarDropdownToggleElement = elem.element(
     by.css('.protractor-test-search-bar-dropdown-toggle'));
   var searchBarDropdownMenuLocator = by.css(
@@ -377,7 +377,7 @@ var MultiSelectEditor = function(elem) {
   var selectedLocator = by.css('.protractor-test-selected');
   // This function checks that the options corresponding to the given texts
   // have the expected class name, and then toggles those options accordingly.
-  var _toggleElementStatusesAndVerifyExpectedClass = async function(
+  var _toggleElementStatusesAndVerifyExpectedClass = async function (
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
     await searchBarDropdownToggleElement.click();
@@ -406,21 +406,21 @@ var MultiSelectEditor = function(elem) {
   };
 
   return {
-    selectValues: async function(texts) {
+    selectValues: async function (texts) {
       await _toggleElementStatusesAndVerifyExpectedClass(
         texts, 'protractor-test-deselected');
     },
-    deselectValues: async function(texts) {
+    deselectValues: async function (texts) {
       await _toggleElementStatusesAndVerifyExpectedClass(
         texts, 'protractor-test-selected');
     },
-    expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
+    expectCurrentSelectionToBe: async function (expectedCurrentSelection) {
       // Open the dropdown menu.
       await searchBarDropdownToggleElement.click();
 
       // Find the selected elements.
       var actualSelection = await elem.element(searchBarDropdownMenuLocator)
-        .all(selectedLocator).map(async function(selectedElem) {
+        .all(selectedLocator).map(async function (selectedElem) {
           return await selectedElem.getText();
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
@@ -445,8 +445,8 @@ var MultiSelectEditor = function(elem) {
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
 //   handler.readRteComponent('Math', ...);
-var expectRichText = function(elem) {
-  var toMatch = async function(richTextInstructions) {
+var expectRichText = function (elem) {
+  var toMatch = async function (richTextInstructions) {
     await waitFor.visibilityOf(elem, 'RTE taking too long to become visible');
     // TODO(#9821): Find a better way to parse through the tags rather than
     // using xpath.
@@ -456,7 +456,7 @@ var expectRichText = function(elem) {
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
     var arrayOfTexts = await elem.all(by.xpath(XPATH_SELECTOR))
-      .map(async function(entry) {
+      .map(async function (entry) {
         // It is necessary to obtain the texts of the elements in advance since
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
@@ -473,8 +473,8 @@ var expectRichText = function(elem) {
   };
   return {
     toMatch: toMatch,
-    toEqual: async function(text) {
-      await toMatch(async function(checker) {
+    toEqual: async function (text) {
+      await toMatch(async function (checker) {
         await checker.readPlainText(text);
       });
     }
@@ -490,7 +490,7 @@ var expectRichText = function(elem) {
 // 'fullText': a string consisting of all the visible text in the rich text
 //   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textbold'.
-var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
+var RichTextChecker = async function (arrayOfElems, arrayOfTexts, fullText) {
   expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
   // the child elements and text of the rich text area checking has gone. The
@@ -502,7 +502,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   // specially.
   var justPassedRteComponent = false;
 
-  var _readFormattedText = async function(text, tagName) {
+  var _readFormattedText = async function (text, tagName) {
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
@@ -516,7 +516,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   };
 
   return {
-    readPlainText: function(text) {
+    readPlainText: function (text) {
       // Plain text is in a text node so not recorded in either array.
       expect(
         fullText.substring(textPointer, textPointer + text.length)
@@ -524,16 +524,16 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       textPointer = textPointer + text.length;
       justPassedRteComponent = false;
     },
-    readBoldText: async function(text) {
+    readBoldText: async function (text) {
       await _readFormattedText(text, 'strong');
     },
-    readItalicText: async function(text) {
+    readItalicText: async function (text) {
       await _readFormattedText(text, 'em');
     },
     // TODO(Jacob): Add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
-    readRteComponent: async function(componentName) {
+    readRteComponent: async function (componentName) {
       var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
@@ -552,7 +552,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       arrayPointer = arrayPointer + 1;
       justPassedRteComponent = true;
     },
-    expectEnd: async function() {
+    expectEnd: async function () {
       expect(arrayPointer).toBe(await arrayOfElems.count());
     }
   };
@@ -568,9 +568,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 // representation of a 'rich text object'. This is because we are more
 // interested in the process of interacting with the page than in the
 // information thereby conveyed.
-var toRichText = async function(text) {
+var toRichText = async function (text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker.
-  return async function(handler) {
+  return async function (handler) {
     if (handler.hasOwnProperty('setPlainText')) {
       await handler.setPlainText(text);
     } else {
@@ -587,7 +587,7 @@ var toRichText = async function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
-var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
+var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
   var lineContentElements = elem.all(by.css('.CodeMirror-line'));
   var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
   var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
@@ -611,7 +611,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'checked': true or false, whether the line has been checked
    * compareHightlighting: Whether highlighting should be compared.
    */
-  var _compareText = async function(compareDict, compareHightlighting) {
+  var _compareText = async function (compareDict, compareHightlighting) {
     var scrollTo = 0;
     var prevScrollTop = -1;
     var actualDiffDict = {};
@@ -678,7 +678,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * This runs much slower than checking without highlighting, so the
      * expectTextToBe() function should be used when possible.
      */
-    expectTextWithHighlightingToBe: async function(expectedTextDict) {
+    expectTextWithHighlightingToBe: async function (expectedTextDict) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
@@ -688,7 +688,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * Compares text with codemirror. The input should be a string (with
      * line breaks) of the expected display on codemirror.
      */
-    expectTextToBe: async function(expectedTextString) {
+    expectTextToBe: async function (expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
@@ -703,9 +703,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   };
 };
 
-var CodeStringEditor = function(elem) {
+var CodeStringEditor = function (elem) {
   return {
-    setValue: async function(code) {
+    setValue: async function (code) {
       await elem.element(by.tagName('textarea')).clear();
       await elem.element(by.tagName('textarea')).sendKeys(code);
     }
@@ -725,7 +725,7 @@ var FORM_EDITORS = {
   Unicode: UnicodeEditor
 };
 
-var getEditor = function(formName) {
+var getEditor = function (formName) {
   if (FORM_EDITORS.hasOwnProperty(formName)) {
     return FORM_EDITORS[formName];
   } else if (objects.OBJECT_EDITORS.hasOwnProperty(formName)) {

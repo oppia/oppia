@@ -35,7 +35,7 @@ angular.module('oppia').component('stateTranslationEditor', {
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
-    function(
+    function (
         $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
@@ -44,7 +44,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         WrittenTranslationObjectFactory) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var showMarkAudioAsNeedingUpdateModalIfRequired = function(
+      var showMarkAudioAsNeedingUpdateModalIfRequired = function (
           contentId, languageCode) {
         var stateName = StateEditorService.getActiveStateName();
         var state = ExplorationStatesService.getState(stateName);
@@ -63,12 +63,12 @@ angular.module('oppia').component('stateTranslationEditor', {
               'mark-audio-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
+          }).result.then(function () {
             recordedVoiceovers.toggleNeedsUpdateAttribute(
               contentId, languageCode);
             ExplorationStatesService.saveRecordedVoiceovers(
               stateName, recordedVoiceovers);
-          }, function() {
+          }, function () {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -79,11 +79,11 @@ angular.module('oppia').component('stateTranslationEditor', {
       var languageCode = null;
       $scope.activeWrittenTranslation = null;
       $scope.translationEditorIsOpen = false;
-      $scope.isEditable = function() {
+      $scope.isEditable = function () {
         return EditabilityService.isEditable();
       };
 
-      var initEditor = function() {
+      var initEditor = function () {
         $scope.activeWrittenTranslation = null;
         $scope.translationEditorIsOpen = false;
         contentId = (
@@ -106,7 +106,7 @@ angular.module('oppia').component('stateTranslationEditor', {
               .getWrittenTranslation(contentId, languageCode));
         }
       };
-      var saveTranslation = function() {
+      var saveTranslation = function () {
         var oldWrittenTranslation = null;
         var newWrittenTranslation = null;
         contentId = (
@@ -141,7 +141,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.translationEditorIsOpen = false;
       };
 
-      $scope.openTranslationEditor = function() {
+      $scope.openTranslationEditor = function () {
         if ($scope.isEditable()) {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
@@ -151,7 +151,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         }
       };
 
-      $scope.onSaveTranslationButtonClicked = function() {
+      $scope.onSaveTranslationButtonClicked = function () {
         var displayedWrittenTranslations = (
           StateWrittenTranslationsService.displayed);
         if (displayedWrittenTranslations.hasWrittenTranslation(
@@ -169,12 +169,12 @@ angular.module('oppia').component('stateTranslationEditor', {
         saveTranslation();
       };
 
-      $scope.cancelEdit = function() {
+      $scope.cancelEdit = function () {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
 
@@ -215,7 +215,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           }));
       };
 
-      $scope.markAsNeedingUpdate = function() {
+      $scope.markAsNeedingUpdate = function () {
         let contentId = (
           TranslationTabActiveContentIdService.getActiveContentId());
         let stateName = StateEditorService.getActiveStateName();
@@ -226,7 +226,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         TranslationStatusService.refresh();
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

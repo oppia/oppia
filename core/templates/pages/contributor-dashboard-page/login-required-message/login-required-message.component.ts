@@ -37,20 +37,20 @@ export class LoginRequiredMessageComponent {
   // This constant is defined as null at AppConstants.
   OPPIA_AVATAR_LINK_URL!: string | null;
 
-  constructor(
+  constructor (
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
     private readonly windowRef: WindowRef) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
   }
 
-  onLoginButtonClicked(): void {
+  onLoginButtonClicked (): void {
     this.userService.getLoginUrlAsync().then(
       (loginUrl) => {
         if (loginUrl) {

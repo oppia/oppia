@@ -48,14 +48,14 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   codemirror: CodeMirror.Editor | undefined;
   autoFocus = false;
 
-  constructor() { }
+  constructor () { }
 
-  updateValue(val: string): void {
+  updateValue (val: string): void {
     this.value = val;
     this.valueChange.emit(val);
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit (): void {
     const runAfterViewInit = () => {
       if (this.codemirrorComponent !== undefined) {
         this.codemirror = this.codemirrorComponent.codeMirror;
@@ -67,7 +67,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
     setTimeout(() => runAfterViewInit(), 0);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (
       changes.refresh !== undefined &&
       changes.refresh.previousValue !== changes.refresh.currentValue &&

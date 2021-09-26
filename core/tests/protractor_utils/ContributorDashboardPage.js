@@ -21,7 +21,7 @@ var action = require('./action.js');
 
 var ContributorDashboardTranslateTextTab = require(
   '../protractor_utils/ContributorDashboardTranslateTextTab.js');
-var ContributorDashboardPage = function() {
+var ContributorDashboardPage = function () {
   var navigateToTranslateTextTabButton = element(
     by.css('.protractor-test-translateTextTab'));
   var submitQuestionTabButton = element(
@@ -54,30 +54,30 @@ var ContributorDashboardPage = function() {
 
   var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get('/contributor-dashboard');
     await waitFor.visibilityOf(
       usernameContainer, 'Username takes too much time to load');
   };
 
-  this.getTranslateTextTab = function() {
+  this.getTranslateTextTab = function () {
     return new ContributorDashboardTranslateTextTab
       .ContributorDashboardTranslateTextTab();
   };
 
-  this.waitForOpportunitiesToLoad = async function() {
+  this.waitForOpportunitiesToLoad = async function () {
     await waitFor.invisibilityOf(
       opportunityLoadingPlaceholder,
       'Opportunity placeholders take too long to become invisible.');
   };
 
-  this.waitForQuestionSuggestionReviewModalToAppear = async function() {
+  this.waitForQuestionSuggestionReviewModalToAppear = async function () {
     await waitFor.visibilityOf(
       questionReviewModalHeader,
       'Question suggestion review modal takes too long to appear');
   };
 
-  this.expectUserToBeTranslationReviewer = async function(language) {
+  this.expectUserToBeTranslationReviewer = async function (language) {
     await waitFor.visibilityOf(
       reviewRightsDiv, 'User does not have rights to review translation');
 
@@ -89,7 +89,7 @@ var ContributorDashboardPage = function() {
     );
   };
 
-  var _expectUserToBeReviewer = async function(
+  var _expectUserToBeReviewer = async function (
       reviewCategory, langaugeDescription = null) {
     await waitFor.visibilityOf(
       reviewRightsDiv,
@@ -108,30 +108,30 @@ var ContributorDashboardPage = function() {
       'Review right element ' + reviewCategory + ' is not visible');
   };
 
-  this.expectUserToBeTranslationReviewer = async function(langaugeDescription) {
+  this.expectUserToBeTranslationReviewer = async function (langaugeDescription) {
     await _expectUserToBeReviewer('translation', langaugeDescription);
   };
 
-  this.expectUserToBeVoiceoverReviewer = async function(langaugeDescription) {
+  this.expectUserToBeVoiceoverReviewer = async function (langaugeDescription) {
     await _expectUserToBeReviewer('voiceover', langaugeDescription);
   };
 
-  this.expectUserToBeQuestionReviewer = async function() {
+  this.expectUserToBeQuestionReviewer = async function () {
     await _expectUserToBeReviewer('question');
   };
 
-  this.expectNumberOfOpportunitiesToBe = async function(number) {
+  this.expectNumberOfOpportunitiesToBe = async function (number) {
     var opportunityCount = (await _getOpportunityElements()).length;
     expect(opportunityCount).toBe(number);
   };
 
-  this.expectEmptyOpportunityAvailabilityMessage = async function() {
+  this.expectEmptyOpportunityAvailabilityMessage = async function () {
     await waitFor.visibilityOf(
       opportunityListEmptyAvailabilityMessage,
       'Opportunity list is not empty');
   };
 
-  var _getOpportunityElements = async function() {
+  var _getOpportunityElements = async function () {
     await waitFor.visibilityOf(
       element(opportunityHeadingCss),
       'Opportunity Heading takes too long to appear.');
@@ -147,7 +147,7 @@ var ContributorDashboardPage = function() {
     return opportunityElements;
   };
 
-  var _getOpportunityWithHeadingAndSubheading = async function(
+  var _getOpportunityWithHeadingAndSubheading = async function (
       expectedHeading, expectedSubheading) {
     var opportunityElements = await _getOpportunityElements();
 
@@ -174,7 +174,7 @@ var ContributorDashboardPage = function() {
     return null;
   };
 
-  this.expectOpportunityWithPropertiesToExist = async function(
+  this.expectOpportunityWithPropertiesToExist = async function (
       expectedHeading, expectedSubheading, expectedLabel, expectedPercentage) {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
@@ -200,7 +200,7 @@ var ContributorDashboardPage = function() {
     }
   };
 
-  this.clickOpportunityActionButton = async function(
+  this.clickOpportunityActionButton = async function (
       opportunityHeading, opportunitySubheading) {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
@@ -214,29 +214,29 @@ var ContributorDashboardPage = function() {
       opportunity.element(opportunityActionButtonCss));
   };
 
-  this.clickAcceptQuestionSuggestionButton = async function() {
+  this.clickAcceptQuestionSuggestionButton = async function () {
     await action.click(
       'Question suggestion accept button', acceptQuestionSuggestionButton);
   };
 
-  this.clickRejectQuestionSuggestionButton = async function() {
+  this.clickRejectQuestionSuggestionButton = async function () {
     await action.click(
       'Reject question suggestion button', rejectQuestionSuggestionButton);
   };
 
-  this.setQuestionSuggestionReviewMessage = async function(message) {
+  this.setQuestionSuggestionReviewMessage = async function (message) {
     await action.sendKeys(
       'Question suggestion review message input field',
       questionSuggestionReviewMessageInput, message);
   };
 
-  this.navigateToTranslateTextTab = async function() {
+  this.navigateToTranslateTextTab = async function () {
     await action.click(
       'Translate text tab button', navigateToTranslateTextTabButton);
     await this.waitForOpportunitiesToLoad();
   };
 
-  this.navigateToSubmitQuestionTab = async function() {
+  this.navigateToSubmitQuestionTab = async function () {
     await action.click(
       'Submit question tab button', submitQuestionTabButton);
     await this.waitForOpportunitiesToLoad();

@@ -99,14 +99,14 @@ type SchemaDefaultValue = (
   providedIn: 'root'
 })
 export class SchemaDefaultValueService {
-  constructor(
+  constructor (
       private logger: LoggerService,
       private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
   ) {}
 
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
-  getDefaultValue(schema: Schema): SchemaDefaultValue {
+  getDefaultValue (schema: Schema): SchemaDefaultValue {
     const schemaIsSubtitledHtml = (
       schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
       schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);

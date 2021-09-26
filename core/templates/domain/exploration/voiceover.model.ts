@@ -29,7 +29,7 @@ export class Voiceover {
   needsUpdate: boolean;
   durationSecs: number;
 
-  constructor(
+  constructor (
       filename: string, fileSizeBytes: number, needsUpdate: boolean,
       durationSecs: number) {
     this.filename = filename;
@@ -38,20 +38,20 @@ export class Voiceover {
     this.durationSecs = durationSecs;
   }
 
-  markAsNeedingUpdate(): void {
+  markAsNeedingUpdate (): void {
     this.needsUpdate = true;
   }
 
-  toggleNeedsUpdateAttribute(): void {
+  toggleNeedsUpdateAttribute (): void {
     this.needsUpdate = !this.needsUpdate;
   }
 
-  getFileSizeMB(): number {
+  getFileSizeMB (): number {
     var NUM_BYTES_IN_MB = 1 << 20;
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
   }
 
-  toBackendDict(): VoiceoverBackendDict {
+  toBackendDict (): VoiceoverBackendDict {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
@@ -60,13 +60,13 @@ export class Voiceover {
     };
   }
 
-  static createNew(
+  static createNew (
       filename: string, fileSizeBytes: number,
       durationSecs: number): Voiceover {
     return new Voiceover(filename, fileSizeBytes, false, durationSecs);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       translationBackendDict: VoiceoverBackendDict): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,

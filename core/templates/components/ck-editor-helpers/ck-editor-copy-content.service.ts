@@ -49,7 +49,7 @@ export class CkEditorCopyContentService {
 
   copyModeActive = false;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor (private htmlEscaperService: HtmlEscaperService) {}
 
   /**
    * Traverses up and down element ancestors/descendants, searching for widget
@@ -61,7 +61,7 @@ export class CkEditorCopyContentService {
    *  always a child of angular-html-bind. containedWidgetTagName is the tag
    *  name of the widget if found in ancestors or descendants.
    */
-  private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
+  private _handleCopy (target: HTMLElement): CkEditorCopyEvent {
     let containedWidgetTagName;
     let currentElement = target;
     let descendants = <ChildNode[]> Array.from(target.childNodes);
@@ -114,7 +114,7 @@ export class CkEditorCopyContentService {
    * @param {string|undefined} containedWidgetTagName The name of the widget
    *  in which element contains, if present.
    */
-  private _handlePaste(
+  private _handlePaste (
       editor: CKEDITOR.editor,
       element: HTMLElement,
       containedWidgetTagName: string | undefined
@@ -154,7 +154,7 @@ export class CkEditorCopyContentService {
     }
   }
 
-  toggleCopyMode(): void {
+  toggleCopyMode (): void {
     this.copyModeActive = !this.copyModeActive;
   }
 
@@ -162,7 +162,7 @@ export class CkEditorCopyContentService {
    * Broadcasts to subject to copy target.
    * @param {HTMLElement} target The element to copy.
    */
-  broadcastCopy(target: HTMLElement): void {
+  broadcastCopy (target: HTMLElement): void {
     if (!this.copyModeActive) {
       return;
     }
@@ -176,7 +176,7 @@ export class CkEditorCopyContentService {
    * Binds ckeditor to subject.
    * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
-  bindPasteHandler(editor: CKEDITOR.editor): void {
+  bindPasteHandler (editor: CKEDITOR.editor): void {
     this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
       ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
         if (!rootElement) {

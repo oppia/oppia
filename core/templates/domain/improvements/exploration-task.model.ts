@@ -48,7 +48,7 @@ export type ExplorationTask = (
   SuccessiveIncorrectAnswersTask);
 
 export class ExplorationTaskModel {
-  static createNewObsoleteTask(
+  static createNewObsoleteTask (
       expId: string, expVersion: number, taskType: ExplorationTaskType,
       stateName: string): ExplorationTask {
     return ExplorationTaskModel.createFromBackendDict({
@@ -66,7 +66,7 @@ export class ExplorationTaskModel {
     });
   }
 
-  static createNewResolvedTask(
+  static createNewResolvedTask (
       expId: string, expVersion: number, taskType: ExplorationTaskType,
       stateName: string): ExplorationTask {
     return ExplorationTaskModel.createFromBackendDict({
@@ -84,7 +84,7 @@ export class ExplorationTaskModel {
     });
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ExplorationTaskBackendDict): ExplorationTask {
     const taskType = backendDict.task_type;
     switch (backendDict.task_type) {

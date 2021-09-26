@@ -35,14 +35,14 @@ export class EditabilityService {
   /**
    * @return {boolean} Whether the service is editable.
    */
-  isEditable(): boolean {
+  isEditable (): boolean {
     return EditabilityService.isEditable && !EditabilityService.inTutorialMode;
   }
 
   /**
    * @return {boolean} Whether the service is translatable.
    */
-  isTranslatable(): boolean {
+  isTranslatable (): boolean {
     return (
       EditabilityService.isTranslatable && !EditabilityService.inTutorialMode);
   }
@@ -50,49 +50,49 @@ export class EditabilityService {
   /**
    * @return {boolean} Whether the service is in tutorial mode.
    */
-  inTutorialMode(): boolean {
+  inTutorialMode (): boolean {
     return EditabilityService.inTutorialMode;
   }
 
   /**
    * @return {boolean} Whether the service is editable outside tutorial mode.
    */
-  isEditableOutsideTutorialMode(): boolean {
+  isEditableOutsideTutorialMode (): boolean {
     return EditabilityService.isEditable;
   }
 
   /**
    * Mark the service's editability outside tutorial mode to true.
    */
-  markEditable(): void {
+  markEditable (): void {
     EditabilityService.isEditable = true;
   }
 
   /**
    * Mark the serivce's translatability outside tutorial mode to true.
    */
-  markTranslatable(): void {
+  markTranslatable (): void {
     EditabilityService.isTranslatable = true;
   }
 
   /**
    * Mark the service's editability outside tutorial mode to false.
    */
-  markNotEditable(): void {
+  markNotEditable (): void {
     EditabilityService.isEditable = false;
   }
 
   /**
    * Set the service's tutorial mode status to false when tutorial mode ends.
    */
-  onEndTutorial(): void {
+  onEndTutorial (): void {
     EditabilityService.inTutorialMode = false;
   }
 
   /**
    * Set the service's tutorial mode status to true when tutorial mode starts.
    */
-  onStartTutorial(): void {
+  onStartTutorial (): void {
     EditabilityService.inTutorialMode = true;
   }
 }

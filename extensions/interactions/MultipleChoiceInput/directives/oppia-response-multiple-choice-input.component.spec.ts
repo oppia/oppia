@@ -25,7 +25,7 @@ describe('ResponseMultipleChoiceInputComponent', () => {
   let fixture: ComponentFixture<ResponseMultipleChoiceInputComponent>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
+    escapedJsonToObj (answer: string): string {
       return JSON.parse(answer);
     }
   }

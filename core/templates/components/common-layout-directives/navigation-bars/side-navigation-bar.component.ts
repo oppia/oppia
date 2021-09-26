@@ -36,20 +36,20 @@ export class SideNavigationBarComponent {
    PAGES_REGISTERED_WITH_FRONTEND = (
      AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-   constructor(
+   constructor (
      private windowRef: WindowRef,
      private urlInterpolationService: UrlInterpolationService
    ) {}
 
-   getStaticImageUrl(imagePath: string): string {
+   getStaticImageUrl (imagePath: string): string {
      return this.urlInterpolationService.getStaticImageUrl(imagePath);
    }
 
-   ngOnInit(): void {
+   ngOnInit (): void {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
    }
 
-   toggleClassroomSubmenu(): void {
+   toggleClassroomSubmenu (): void {
      this.classroomSubmenuIsShown = !this.classroomSubmenuIsShown;
    }
 }

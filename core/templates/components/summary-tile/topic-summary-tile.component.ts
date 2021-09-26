@@ -34,12 +34,12 @@ export class TopicSummaryTileComponent {
   @Input() isPublished: boolean;
   thumbnailUrl: string = '';
 
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.topicSummary.getThumbnailFilename()) {
       this.thumbnailUrl = this.assetsBackendApiService
         .getThumbnailUrlForPreview(
@@ -48,7 +48,7 @@ export class TopicSummaryTileComponent {
     }
   }
 
-  getTopicPageUrl(): string {
+  getTopicPageUrl (): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
         topic_url_fragment: this.topicSummary.getUrlFragment(),
@@ -57,7 +57,7 @@ export class TopicSummaryTileComponent {
     );
   }
 
-  getColorValueInHexForm(colorValue: number): string {
+  getColorValueInHexForm (colorValue: number): string {
     colorValue = (colorValue < 0) ? 0 : colorValue;
     let colorValueString = colorValue.toString(16);
     return (
@@ -65,7 +65,7 @@ export class TopicSummaryTileComponent {
       '0' + colorValueString : colorValueString);
   }
 
-  getDarkerThumbnailBgColor(): string {
+  getDarkerThumbnailBgColor (): string {
     let bgColor = this.topicSummary.getThumbnailBgColor();
     // Remove the '#' from the first position.
     bgColor = bgColor.slice(1);

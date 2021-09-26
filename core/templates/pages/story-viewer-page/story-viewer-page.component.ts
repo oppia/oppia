@@ -58,7 +58,7 @@ export class StoryViewerPageComponent implements OnInit {
   thumbnailBgColor: string;
   storyNodes: ReadOnlyStoryNode[];
   iconUrl: string;
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
     private userService: UserService,
@@ -70,18 +70,18 @@ export class StoryViewerPageComponent implements OnInit {
     private alertsService: AlertsService
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  showChapters(): boolean {
+  showChapters (): boolean {
     if (!this.storyPlaythroughObject) {
       return false;
     }
     return this.storyPlaythroughObject.getStoryNodeCount() > 0;
   }
 
-  generatePathIconParameters(): IconParametersArray[] {
+  generatePathIconParameters (): IconParametersArray[] {
     let iconParametersArray: IconParametersArray[] = [];
     for (
       let i = 0; i < this.storyPlaythroughObject.getStoryNodeCount();
@@ -106,7 +106,7 @@ export class StoryViewerPageComponent implements OnInit {
     return iconParametersArray;
   }
 
-  signIn(): void {
+  signIn (): void {
     this.userService.getLoginUrlAsync().then(
       (loginUrl) => {
         loginUrl ? this.windowRef.nativeWindow.location.href = loginUrl : (
@@ -114,7 +114,7 @@ export class StoryViewerPageComponent implements OnInit {
       });
   }
 
-  getExplorationUrl(
+  getExplorationUrl (
       node: { getExplorationId: () => string;
               getId: () => string; }): string {
     let result = '/explore/' + node.getExplorationId();
@@ -132,7 +132,7 @@ export class StoryViewerPageComponent implements OnInit {
     return result;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.storyIsLoaded = false;
     this.isLoggedIn = false;
     this.userService.getUserInfoAsync().then((userInfo) => {

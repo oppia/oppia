@@ -28,7 +28,7 @@ import { Rule } from 'domain/exploration/RuleObjectFactory';
   providedIn: 'root'
 })
 export class PopulateRuleContentIdsService {
-  constructor(private generateContentIdService: GenerateContentIdService) {}
+  constructor (private generateContentIdService: GenerateContentIdService) {}
 
   /**
    * The default values of translatable objects in the rule inputs have
@@ -37,7 +37,7 @@ export class PopulateRuleContentIdsService {
    * cancel.
    * @param {Rule} rule The rule to populate null content ids for.
    */
-  populateNullRuleContentIds(rule: Rule): void {
+  populateNullRuleContentIds (rule: Rule): void {
     const inputTypes = rule.inputTypes;
     const inputs = rule.inputs;
 

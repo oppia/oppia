@@ -30,7 +30,7 @@ describe('Schema Based Int Editor Directive', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     FocusManagerService = $injector.get('FocusManagerService');
     SchemaFormSubmittedService = $injector.get('SchemaFormSubmittedService');

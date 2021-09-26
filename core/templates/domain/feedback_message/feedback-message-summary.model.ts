@@ -44,7 +44,7 @@ export class FeedbackMessageSummary {
   authorPictureDataUrl: string;
   createdOnMsecs: number;
 
-  constructor(
+  constructor (
       messageId: number, text: string, updatedStatus: string | null,
       suggestionHtml: string | null, currentContentHtml: string | null,
       description: string | null, authorUsername: string,
@@ -60,7 +60,7 @@ export class FeedbackMessageSummary {
     this.createdOnMsecs = createdOnMsecs;
   }
 
-  static createNewMessage(
+  static createNewMessage (
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
@@ -70,7 +70,7 @@ export class FeedbackMessageSummary {
       authorPictureDataUrl, createdOnMsecs);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
       FeedbackMessageSummary {
     return new FeedbackMessageSummary(

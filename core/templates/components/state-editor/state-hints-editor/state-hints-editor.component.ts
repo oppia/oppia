@@ -68,7 +68,7 @@ angular.module('oppia').component('stateHintsEditor', {
     'StateSolutionService',
     'UrlInterpolationService', 'WindowDimensionsService',
     'INTERACTION_SPECS',
-    function(
+    function (
         $filter, $scope, $uibModal, AlertsService,
         EditabilityService, ExternalSaveService,
         StateEditorService, StateHintsService,
@@ -77,7 +77,7 @@ angular.module('oppia').component('stateHintsEditor', {
         UrlInterpolationService, WindowDimensionsService,
         INTERACTION_SPECS) {
       var ctrl = this;
-      $scope.getHintButtonText = function() {
+      $scope.getHintButtonText = function () {
         var hintButtonText = '+ ADD HINT';
         if ($scope.StateHintsService.displayed) {
           if ($scope.StateHintsService.displayed.length >= 5) {
@@ -87,13 +87,13 @@ angular.module('oppia').component('stateHintsEditor', {
         return hintButtonText;
       };
 
-      $scope.getHintSummary = function(hint) {
+      $scope.getHintSummary = function (hint) {
         var hintAsPlainText = $filter(
           'formatRtePreview')(hint.hintContent.html);
         return hintAsPlainText;
       };
 
-      $scope.changeActiveHintIndex = function(newIndex) {
+      $scope.changeActiveHintIndex = function (newIndex) {
         var currentActiveIndex = StateHintsService.getActiveHintIndex();
         if (currentActiveIndex !== null && (
           !StateHintsService.displayed[currentActiveIndex]
@@ -118,12 +118,12 @@ angular.module('oppia').component('stateHintsEditor', {
       };
 
       // This returns false if the current interaction ID is null.
-      $scope.isCurrentInteractionLinear = function() {
+      $scope.isCurrentInteractionLinear = function () {
         var interactionId = StateInteractionIdService.savedMemento;
         return interactionId && INTERACTION_SPECS[interactionId].is_linear;
       };
 
-      $scope.openAddHintModal = function() {
+      $scope.openAddHintModal = function () {
         if ($scope.StateHintsService.displayed.length >= 5) {
           return;
         }
@@ -138,19 +138,19 @@ angular.module('oppia').component('stateHintsEditor', {
           resolve: {},
           windowClass: 'add-hint-modal',
           controller: 'AddHintModalController'
-        }).result.then(function(result) {
+        }).result.then(function (result) {
           StateHintsService.displayed.push(result.hint);
           StateHintsService.saveDisplayedValue();
           ctrl.onSaveHints(StateHintsService.displayed);
           StateNextContentIdIndexService.saveDisplayedValue();
           ctrl.onSaveNextContentIdIndex(
             StateNextContentIdIndexService.displayed);
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      var openDeleteLastHintModal = function() {
+      var openDeleteLastHintModal = function () {
         AlertsService.clearWarnings();
 
         $uibModal.open({
@@ -159,7 +159,7 @@ angular.module('oppia').component('stateHintsEditor', {
             'modal-templates/delete-last-hint-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           StateSolutionService.displayed = null;
           StateSolutionService.saveDisplayedValue();
           ctrl.onSaveSolution(StateSolutionService.displayed);
@@ -167,12 +167,12 @@ angular.module('oppia').component('stateHintsEditor', {
           StateHintsService.displayed = [];
           StateHintsService.saveDisplayedValue();
           ctrl.onSaveHints(StateHintsService.displayed);
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      $scope.deleteHint = function(index, evt) {
+      $scope.deleteHint = function (index, evt) {
         // Prevent clicking on the delete button from also toggling the
         // display state of the hint.
         evt.stopPropagation();
@@ -184,7 +184,7 @@ angular.module('oppia').component('stateHintsEditor', {
             'modal-templates/delete-hint-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           if (StateSolutionService.savedMemento &&
             StateHintsService.savedMemento.length === 1) {
             openDeleteLastHintModal();
@@ -197,28 +197,28 @@ angular.module('oppia').component('stateHintsEditor', {
           if (index === StateHintsService.getActiveHintIndex()) {
             StateHintsService.setActiveHintIndex(null);
           }
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      $scope.onSaveInlineHint = function() {
+      $scope.onSaveInlineHint = function () {
         StateHintsService.saveDisplayedValue();
         ctrl.onSaveHints(StateHintsService.displayed);
       };
 
-      $scope.toggleHintCard = function() {
+      $scope.toggleHintCard = function () {
         $scope.hintCardIsShown = !$scope.hintCardIsShown;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.EditabilityService = EditabilityService;
         $scope.StateHintsService = StateHintsService;
         $scope.hintCardIsShown = (
           !WindowDimensionsService.isWindowNarrow());
         StateHintsService.setActiveHintIndex(null);
         $scope.canEdit = EditabilityService.isEditable();
-        $scope.getStaticImageUrl = function(imagePath) {
+        $scope.getStaticImageUrl = function (imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
         // When the page is scrolled so that the top of the page is above
@@ -232,12 +232,12 @@ angular.module('oppia').component('stateHintsEditor', {
           items: '.oppia-sortable-hint',
           revert: 100,
           tolerance: 'pointer',
-          start: function(e, ui) {
+          start: function (e, ui) {
             ExternalSaveService.onExternalSave.emit();
             StateHintsService.setActiveHintIndex(null);
             ui.placeholder.height(ui.item.height());
           },
-          stop: function() {
+          stop: function () {
             StateHintsService.saveDisplayedValue();
             ctrl.onSaveHints(StateHintsService.displayed);
           }

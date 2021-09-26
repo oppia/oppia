@@ -37,10 +37,10 @@ module.exports = {
     }
   },
 
-  create: function(context) {
+  create: function (context) {
     const sourceCode = context.getSourceCode();
 
-    var isEquals = function(sortedImports, params) {
+    var isEquals = function (sortedImports, params) {
       for (var i = 0; i < sortedImports.length; ++i) {
         if (sortedImports[i] !== params[i]) {
           return false;
@@ -49,7 +49,7 @@ module.exports = {
       return true;
     };
 
-    var isUnused = function(param, tokensList) {
+    var isUnused = function (param, tokensList) {
       var variableCounter = 0;
       tokensList.forEach((token) => {
         if (param === token) {
@@ -63,7 +63,7 @@ module.exports = {
       }
     };
 
-    var checkSortedDependency = function(node, params) {
+    var checkSortedDependency = function (node, params) {
       var dollarImports = [];
       var regularImports = [];
       var constantImports = [];
@@ -92,7 +92,7 @@ module.exports = {
     };
 
     return {
-      ArrayExpression: function checkDirective(node) {
+      ArrayExpression: function checkDirective (node) {
         var paramsList = [];
         var tokensList = [];
         if (!node.parent.key) {

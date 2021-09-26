@@ -51,7 +51,7 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
  * @fileoverview Tests for ExplorationImprovementsService.
  */
 
-describe('ExplorationImprovementsService', function() {
+describe('ExplorationImprovementsService', function () {
   let explorationImprovementsService;
 
   let $uibModal;
@@ -203,7 +203,7 @@ describe('ExplorationImprovementsService', function() {
   });
 
   it('should enable improvements tab based on back-end response',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(true)));
@@ -219,7 +219,7 @@ describe('ExplorationImprovementsService', function() {
     }));
 
   it('should disable improvements tab based on back-end response',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(true)));
@@ -235,7 +235,7 @@ describe('ExplorationImprovementsService', function() {
     }));
 
   it('should disable improvements tab for private explorations',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(false);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(true)));
@@ -251,7 +251,7 @@ describe('ExplorationImprovementsService', function() {
     }));
 
   it('should disable improvements tab for non-editors when config gives false',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(false)));
@@ -267,7 +267,7 @@ describe('ExplorationImprovementsService', function() {
     }));
 
   it('should disable improvements tab for non-editors when config gives true',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(false)));
@@ -282,7 +282,7 @@ describe('ExplorationImprovementsService', function() {
       ).toBeFalse();
     }));
 
-  it('should propagate errors from the back-end', fakeAsync(async() => {
+  it('should propagate errors from the back-end', fakeAsync(async () => {
     const error = new Error('Whoops!');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
       .and.throwError(error);
@@ -321,14 +321,14 @@ describe('ExplorationImprovementsService', function() {
 
       explorationImprovementsService.initAsync();
       expect(
-        async() => (
+        async () => (
           await explorationImprovementsService.flushUpdatedTasksToBackend()))
         .not.toThrowError();
 
       flushMicrotasks();
     }));
 
-    it('should post new high bounce rate tasks', fakeAsync(async() => {
+    it('should post new high bounce rate tasks', fakeAsync(async () => {
       // Set-up the conditions to generate an HBR task:
       // -   A state demonstrating a high bounce-rate (determined by config).
       const numStarts = 100;
@@ -351,7 +351,7 @@ describe('ExplorationImprovementsService', function() {
         [eqPlaythrough]));
 
       // The newly open HBR tasks should be flushed to the back-end.
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
         expect(tasks.length).toEqual(1);
         expect(tasks[0].taskType).toEqual('high_bounce_rate');
       });
@@ -365,7 +365,7 @@ describe('ExplorationImprovementsService', function() {
 
       // Each newly opened HBR task is flushed once and only once.
       this.eibasPostTasksAsyncSpy.calls.reset();
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
         expect(tasks.length).toEqual(0);
       });
 
@@ -376,7 +376,7 @@ describe('ExplorationImprovementsService', function() {
       expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
     }));
 
-    it('should post obsolete high bounce rate tasks', fakeAsync(async() => {
+    it('should post obsolete high bounce rate tasks', fakeAsync(async () => {
       // Set-up the conditions to obsolete an HBR task:
       // -   A state demonstrating a low bounce-rate.
       const numStarts = 100;
@@ -418,7 +418,7 @@ describe('ExplorationImprovementsService', function() {
         .toEqual(0);
 
       // The HBR task should be flushed.
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
         expect(tasks).toEqual([hbrTask]);
       });
 
@@ -430,7 +430,7 @@ describe('ExplorationImprovementsService', function() {
 
       // The HBR task should not be flushed again.
       this.eibasPostTasksAsyncSpy.calls.reset();
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
         expect(tasks).toEqual([]);
       });
 
@@ -442,7 +442,7 @@ describe('ExplorationImprovementsService', function() {
     }));
 
     it('should post new NGR tasks after they are resolved', fakeAsync(
-      async() => {
+      async () => {
       // Set-up the conditions to generate an NGR task:
       // -   A high-frequency unaddressed answer.
         const answerStats = new AnswerStats('foo', 'foo', 100, false);
@@ -467,7 +467,7 @@ describe('ExplorationImprovementsService', function() {
 
         // There should be no tasks to flush, because the NGR task is still
         // open.
-        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+        this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
           expect(tasks).toEqual([]);
         });
 
@@ -484,7 +484,7 @@ describe('ExplorationImprovementsService', function() {
         expect(ngrTask.isResolved()).toBeTrue();
 
         this.eibasPostTasksAsyncSpy.calls.reset();
-        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+        this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
           expect(tasks).toEqual([ngrTask]);
         });
 
@@ -496,7 +496,7 @@ describe('ExplorationImprovementsService', function() {
 
         // The NGR task should be flushed once and only once.
         this.eibasPostTasksAsyncSpy.calls.reset();
-        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+        this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
           expect(tasks).toEqual([]);
         });
 
@@ -507,7 +507,7 @@ describe('ExplorationImprovementsService', function() {
         expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
       }));
 
-    it('should not store post-init NGR tasks', fakeAsync(async() => {
+    it('should not store post-init NGR tasks', fakeAsync(async () => {
       // An NGR task will not be generated because all answers are addressed.
       const answerStats = new AnswerStats('foo', 'foo', 100, true);
       this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
@@ -539,7 +539,7 @@ describe('ExplorationImprovementsService', function() {
       expect(ngrTask.isResolved()).toBeTrue();
 
       // It should not be flushed because it wasn't created by initAsync().
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async (_, tasks) => {
         expect(tasks).toEqual([]);
       });
 

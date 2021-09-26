@@ -34,11 +34,11 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
+  getCurrentI18nLanguageCode () {
     return 'en';
   }
 
-  get onI18nLanguageCodeChange() {
+  get onI18nLanguageCodeChange () {
     return this.codeChangeEventEmiiter;
   }
 }
@@ -49,7 +49,7 @@ describe('Teach Page', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   var resizeEvent = new Event('resize');
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
       providers: [

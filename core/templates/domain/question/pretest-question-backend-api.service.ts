@@ -39,12 +39,12 @@ interface PretestQuestionsBackendResponse {
   providedIn: 'root'
 })
 export class PretestQuestionBackendApiService {
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
 
-  _fetchPretestQuestions(
+  _fetchPretestQuestions (
       explorationId: string, storyUrlFragment: string,
       successCallback: (value: QuestionBackendDict[]) => void,
       errorCallback: (reason: string) => void): void {
@@ -76,7 +76,7 @@ export class PretestQuestionBackendApiService {
     });
   }
 
-  async fetchPretestQuestionsAsync(
+  async fetchPretestQuestionsAsync (
       explorationId: string,
       storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {

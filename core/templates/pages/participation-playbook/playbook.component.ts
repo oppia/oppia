@@ -36,19 +36,19 @@ export class PlaybookPageComponent implements OnInit {
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
-  constructor(
+  constructor (
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit (): void {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onApplyToTeachWithOppia(): boolean {
+  onApplyToTeachWithOppia (): boolean {
     this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;

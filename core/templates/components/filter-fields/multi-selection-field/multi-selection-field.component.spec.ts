@@ -65,7 +65,7 @@ describe('Multi Selection Field Component', () => {
     input = 'selection 1';
     componentInstance.formCtrl = {
       valueChanges: {
-        subscribe(callb: (val: string) => void) {
+        subscribe (callb: (val: string) => void) {
           callb(input);
         }
       }

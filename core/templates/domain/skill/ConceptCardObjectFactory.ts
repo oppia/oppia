@@ -44,7 +44,7 @@ export class ConceptCard {
   _workedExamples: WorkedExample[];
   _recordedVoiceovers: RecordedVoiceovers;
 
-  constructor(
+  constructor (
       explanation: SubtitledHtml, workedExamples: WorkedExample[],
       recordedVoiceovers: RecordedVoiceovers) {
     this._explanation = explanation;
@@ -52,7 +52,7 @@ export class ConceptCard {
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  toBackendDict(): ConceptCardBackendDict {
+  toBackendDict (): ConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
@@ -63,7 +63,7 @@ export class ConceptCard {
     };
   }
 
-  _getElementsInFirstSetButNotInSecond(
+  _getElementsInFirstSetButNotInSecond (
       setA: Set<string>,
       setB: Set<string>): string[] {
     let diffList = Array.from(setA).filter((element) => {
@@ -72,7 +72,7 @@ export class ConceptCard {
     return diffList;
   }
 
-  _extractAvailableContentIdsFromWorkedExamples(
+  _extractAvailableContentIdsFromWorkedExamples (
       workedExamples: WorkedExample[]): Set<string> {
     let contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
@@ -88,19 +88,19 @@ export class ConceptCard {
     return contentIds;
   }
 
-  getExplanation(): SubtitledHtml {
+  getExplanation (): SubtitledHtml {
     return this._explanation;
   }
 
-  setExplanation(explanation: SubtitledHtml): void {
+  setExplanation (explanation: SubtitledHtml): void {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): WorkedExample[] {
+  getWorkedExamples (): WorkedExample[] {
     return this._workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: WorkedExample[]): void {
+  setWorkedExamples (workedExamples: WorkedExample[]): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
       this._workedExamples);
 
@@ -122,7 +122,7 @@ export class ConceptCard {
     }
   }
 
-  getRecordedVoiceovers(): RecordedVoiceovers {
+  getRecordedVoiceovers (): RecordedVoiceovers {
     return this._recordedVoiceovers;
   }
 }
@@ -131,10 +131,10 @@ export class ConceptCard {
   providedIn: 'root'
 })
 export class ConceptCardObjectFactory {
-  constructor(
+  constructor (
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
-  _generateWorkedExamplesFromBackendDict(
+  _generateWorkedExamplesFromBackendDict (
       workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
     return workedExampleDicts.map(workedExampleDict=> {
       return this.workedExampleObjectFactory.createFromBackendDict(
@@ -142,7 +142,7 @@ export class ConceptCardObjectFactory {
     });
   }
 
-  createFromBackendDict(
+  createFromBackendDict (
       conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       SubtitledHtml.createFromBackendDict(

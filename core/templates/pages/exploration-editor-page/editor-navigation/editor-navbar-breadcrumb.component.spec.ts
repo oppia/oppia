@@ -20,7 +20,7 @@ import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Editor Navbar Breadcrumb directive', function() {
+describe('Editor Navbar Breadcrumb directive', function () {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
@@ -32,7 +32,7 @@ describe('Editor Navbar Breadcrumb directive', function() {
   var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
     ExplorationPropertyService = $injector.get('ExplorationPropertyService');
@@ -58,12 +58,12 @@ describe('Editor Navbar Breadcrumb directive', function() {
   });
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.navbarTitle).toBe(null);
     });
 
   it('should go to settings tabs and focus on exploration title input' +
-    ' when editing title', function() {
+    ' when editing title', function () {
     spyOn(RouterService, 'navigateToSettingsTab');
     spyOn(FocusManagerService, 'setFocus');
 
@@ -75,18 +75,18 @@ describe('Editor Navbar Breadcrumb directive', function() {
   });
 
   it('should get an empty current tab name when there is no active tab',
-    function() {
+    function () {
       spyOn(RouterService, 'getActiveTabName').and.returnValue(null);
       expect($scope.getCurrentTabName()).toBe('');
     });
 
-  it('should get current tab name when there is an active tab', function() {
+  it('should get current tab name when there is an active tab', function () {
     spyOn(RouterService, 'getActiveTabName').and.returnValue('settings');
     expect($scope.getCurrentTabName()).toBe('Settings');
   });
 
   it('should update nav bar title when exploration property changes',
-    function() {
+    function () {
       mockExplorationPropertyChangedEventEmitter.emit('title');
 
       expect($scope.navbarTitle).toBe('Exploration Title...');

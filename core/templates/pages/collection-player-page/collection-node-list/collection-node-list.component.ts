@@ -30,7 +30,7 @@ import { CollectionNode } from
 export class CollectionNodeListComponent {
   @Input() collectionId: string;
   @Input() collectionNodes: CollectionNode[];
-  constructor() {}
+  constructor () {}
 }
 
 angular.module('oppia').directive(

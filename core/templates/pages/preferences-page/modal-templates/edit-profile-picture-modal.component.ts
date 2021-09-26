@@ -41,7 +41,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   cropper!: Cropper;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
-  constructor(
+  constructor (
     private changeDetectorRef: ChangeDetectorRef,
     private ngbActiveModal: NgbActiveModal,
     private svgSanitizerService: SvgSanitizerService,
@@ -49,7 +49,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  initializeCropper(): void {
+  initializeCropper (): void {
     if (this.croppableImageRef) {
       let profilePicture = this.croppableImageRef.nativeElement;
       this.cropper = new Cropper(profilePicture, {
@@ -60,7 +60,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     }
   }
 
-  onFileChanged(file: Blob): void {
+  onFileChanged (file: Blob): void {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
@@ -79,17 +79,17 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     reader.readAsDataURL(file);
   }
 
-  reset(): void {
+  reset (): void {
     this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
   }
 
-  onInvalidImageLoaded(): void {
+  onInvalidImageLoaded (): void {
     this.reset();
     this.invalidImageWarningIsShown = true;
   }
 
-  confirm(): void {
+  confirm (): void {
     if (this.cropper === undefined) {
       throw new Error('Cropper has not been initialized');
     }

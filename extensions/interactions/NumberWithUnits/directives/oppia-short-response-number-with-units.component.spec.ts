@@ -21,18 +21,18 @@ require(
   'oppia-short-response-number-with-units.component.ts');
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('oppiaShortResponseNumberWithUnits', function() {
+describe('oppiaShortResponseNumberWithUnits', function () {
   let ctrl = null;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
 
     $provide.value('$attrs', {
@@ -54,7 +54,7 @@ describe('oppiaShortResponseNumberWithUnits', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.inject(function ($componentController) {
     ctrl = $componentController('oppiaShortResponseNumberWithUnits');
   }));
 

@@ -31,7 +31,7 @@ angular.module('oppia').controller('AddHintModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'GenerateContentIdService', 'HintObjectFactory', 'StateHintsService',
   'COMPONENT_NAME_HINT',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, ContextService,
       GenerateContentIdService, HintObjectFactory, StateHintsService,
       COMPONENT_NAME_HINT) {
@@ -51,7 +51,7 @@ angular.module('oppia').controller('AddHintModalController', [
     $scope.tmpHint = '';
     $scope.addHintForm = {};
     $scope.hintIndex = StateHintsService.displayed.length + 1;
-    $scope.saveHint = function() {
+    $scope.saveHint = function () {
       var contentId = GenerateContentIdService.getNextStateId(
         COMPONENT_NAME_HINT);
       // Close the modal and save it afterwards.

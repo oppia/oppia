@@ -23,7 +23,7 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var path = require('path');
 
-var ExplorationEditorTranslationTab = function() {
+var ExplorationEditorTranslationTab = function () {
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
@@ -34,7 +34,7 @@ var ExplorationEditorTranslationTab = function() {
     '.protractor-test-translation-tab-start-tutorial'));
   var titleElement = element(by.css('.ng-joyride-title'));
 
-  this.exitTutorial = async function() {
+  this.exitTutorial = async function () {
     // If the translation welcome modal shows up, exit it.
     await action.click(
       'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
@@ -51,7 +51,7 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.finishTutorial = async function() {
+  this.finishTutorial = async function () {
     // Finish the tutorial.
     var finishTutorialButton = element.all(by.buttonText('Finish'));
     var buttons = finishTutorialButton;
@@ -62,7 +62,7 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.playTutorial = async function() {
+  this.playTutorial = async function () {
     var tutorialTabHeadings = [
       'Translations In Oppia',
       'Choose Language',
@@ -89,7 +89,7 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.startTutorial = async function() {
+  this.startTutorial = async function () {
     await waitFor.visibilityOf(
       translationWelcomeModal,
       'Translation welcome modal takes too long to appear');
@@ -187,19 +187,19 @@ var ExplorationEditorTranslationTab = function() {
     '.protractor-test-state-translation-editor');
   var activeTranslationTabElement = element(
     by.css('.protractor-test-active-translation-tab'));
-  var translationFeedback = function(index) {
+  var translationFeedback = function (index) {
     return element(by.css('.protractor-test-feedback-' + index));
   };
-  var translationFeedbackText = function(index) {
+  var translationFeedbackText = function (index) {
     return element(by.css('.protractor-test-feedback-' + index + '-text'));
   };
-  var translationHint = function(index) {
+  var translationHint = function (index) {
     return element(by.css('.protractor-test-hint-' + index));
   };
-  var translationHintText = function(index) {
+  var translationHintText = function (index) {
     return element(by.css('.protractor-test-hint-' + index + '-text'));
   };
-  var _selectLanguage = async function(language) {
+  var _selectLanguage = async function (language) {
     await waitFor.visibilityOf(
       languageSelectorElement,
       'Language selector takes too long to appear.');
@@ -207,11 +207,11 @@ var ExplorationEditorTranslationTab = function() {
       by.cssContainingText('option', language));
     await action.click('Language button', languageButton);
   };
-  var stateNodeLabel = function(nodeElement) {
+  var stateNodeLabel = function (nodeElement) {
     return nodeElement.element(nodeLabelLocator);
   };
 
-  this.deleteAudioRecord = async function() {
+  this.deleteAudioRecord = async function () {
     await action.click('Delete record button', deleteRecordButton);
     await action.click(
       'Confirm delete record button',
@@ -219,46 +219,46 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.uploadAudioRecord = async function(audioPath) {
+  this.uploadAudioRecord = async function (audioPath) {
     await action.click('Audio Record Button', uploadAudioButton);
     absPath = path.resolve(__dirname, audioPath);
     await action.sendKeys(
       'Audio upload input', audioUploadInput, absPath, false);
   };
 
-  this.saveAudioRecord = async function() {
+  this.saveAudioRecord = async function () {
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.addAudioRecord = async function() {
+  this.addAudioRecord = async function () {
     await action.click('Start record button', startRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.stopAudioRecord = async function() {
+  this.stopAudioRecord = async function () {
     await action.click('Stop record button', stopRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.confirmAudioRecord = async function() {
+  this.confirmAudioRecord = async function () {
     await action.click('Confirm record button', confirmRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.playAudioRecord = async function() {
+  this.playAudioRecord = async function () {
     await action.click('Play record button', playRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.uploadAudioFileForLanguage = async function(
+  this.uploadAudioFileForLanguage = async function (
       language, relativePathOfAudioToUpload) {
     await this.changeLanguage(language);
     await this.openUploadAudioModal();
     await this.uploadAudio(relativePathOfAudioToUpload);
   };
 
-  this.setTranslation = async function(richTextInstructions) {
+  this.setTranslation = async function (richTextInstructions) {
     await action.click('Edit translation button', editTranslationButtton);
     var stateTranslationEditorTag = element(
       by.tagName('state-translation-editor'));
@@ -276,14 +276,14 @@ var ExplorationEditorTranslationTab = function() {
       'State translation editor takes too long to disappear');
   };
 
-  this.expectSaveUploadedAudioButtonToBeDisabled = async function() {
+  this.expectSaveUploadedAudioButtonToBeDisabled = async function () {
     expect(await action.getAttribute(
       'Save uploaded audio button',
       saveUploadedAudioButton,
       'disabled')).toBe('true');
   };
 
-  this.uploadAudio = async function(relativePathOfAudioToUpload) {
+  this.uploadAudio = async function (relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
     await action.sendKeys(
@@ -294,7 +294,7 @@ var ExplorationEditorTranslationTab = function() {
       'Upload Audio modal takes too long to disappear');
   };
 
-  this.expectWrongFileType = async function(relativePathOfAudioToUpload) {
+  this.expectWrongFileType = async function (relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
     await action.sendKeys(
@@ -309,7 +309,7 @@ var ExplorationEditorTranslationTab = function() {
       .toContain('This file is not recognized as an audio file.');
   };
 
-  this.expectAudioOverFiveMinutes = async function(
+  this.expectAudioOverFiveMinutes = async function (
       relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
@@ -322,22 +322,22 @@ var ExplorationEditorTranslationTab = function() {
       'Audio files must be under 300 seconds in length.');
   };
 
-  this.openUploadAudioModal = async function() {
+  this.openUploadAudioModal = async function () {
     await action.click('Upload Audio button', uploadAudioButton);
   };
 
-  this.closeUploadAudioModal = async function() {
+  this.closeUploadAudioModal = async function () {
     await action.click(
       'Close audio uploader modal button',
       closeAudioUploaderModalButton);
   };
 
-  this.playOrPauseAudioFile = async function() {
+  this.playOrPauseAudioFile = async function () {
     await action.click('Play pause audio button', playPauseAudioButton);
     return await this._isAudioPlaying();
   };
 
-  this._isAudioPlaying = async function() {
+  this._isAudioPlaying = async function () {
     var firstValue = await action.getAttribute(
       'Audio progress slider bar',
       audioMaterialSliderDiv,
@@ -358,22 +358,22 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.expectTranslationToMatch = async function(richTextInstructions) {
+  this.expectTranslationToMatch = async function (richTextInstructions) {
     await forms.expectRichText(translationDisplay).toMatch(
       richTextInstructions);
   };
 
-  this.switchToVoiceoverMode = async function() {
+  this.switchToVoiceoverMode = async function () {
     await action.click('Voiceover mode button', voiceoverModeButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.switchToTranslationMode = async function() {
+  this.switchToTranslationMode = async function () {
     await action.click('Translation mode button', translationModeButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectToBeInTranslationMode = async function() {
+  this.expectToBeInTranslationMode = async function () {
     expect(await action.getText(
       'Language selector label element',
       languageSelectorLabelElement)).toBe('Translations for language:');
@@ -390,7 +390,7 @@ var ExplorationEditorTranslationTab = function() {
       'class')).not.toMatch('oppia-active-mode');
   };
 
-  this.expectToBeInVoiceoverMode = async function() {
+  this.expectToBeInVoiceoverMode = async function () {
     expect(await action.getText(
       'Language selector label element',
       languageSelectorLabelElement)).toBe('Voiceovers for language:');
@@ -407,14 +407,14 @@ var ExplorationEditorTranslationTab = function() {
       'class')).toMatch('oppia-active-mode');
   };
 
-  this.expectContentTabContentToMatch = async function(content) {
+  this.expectContentTabContentToMatch = async function (content) {
     await action.click('Content tab button', contentTabButton);
     expect(await action.getText(
       'Content tab text',
       contentTabText)).toMatch(content);
   };
 
-  this.expectFeedbackTabContentsToMatch = async function(contents) {
+  this.expectFeedbackTabContentsToMatch = async function (contents) {
     await action.click('Feedback tab button', feedbackTabButton);
     expect(await feedbackList.count()).toEqual(contents.length);
     for (var index in contents) {
@@ -427,7 +427,7 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.expectHintsTabContentsToMatch = async function(contents) {
+  this.expectHintsTabContentsToMatch = async function (contents) {
     await action.click('Hints tab button', hintsTabButton);
     for (var index in contents) {
       await action.click(
@@ -439,100 +439,100 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.expectSolutionTabContentToMatch = async function(content) {
+  this.expectSolutionTabContentToMatch = async function (content) {
     await action.click('Solution tab button', solutionTabButton);
     expect(await action.getText(
       'Solution tab button',
       solutionTabText)).toMatch(content);
   };
 
-  this.expectNumericalStatusToMatch = async function(content) {
+  this.expectNumericalStatusToMatch = async function (content) {
     expect(await action.getText(
       'Numerical status',
       numericalStatus)).toMatch(content);
   };
 
-  this.expectNumericalStatusAccessibilityToMatch = async function(content) {
+  this.expectNumericalStatusAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Numerical status element',
       numericalStatus, 'aria-label')).toMatch(content);
   };
 
-  this.expectContentAccessibilityToMatch = async function(content) {
+  this.expectContentAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab content',
       translationTabContentAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.expectFeedbackAccessibilityToMatch = async function(content) {
+  this.expectFeedbackAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab feedback',
       translationTabFeedbackAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.expectHintAccessibilityToMatch = async function(content) {
+  this.expectHintAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab hint',
       translationTabHintAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.expectSolutionAccessibilityToMatch = async function(content) {
+  this.expectSolutionAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab solution',
       translationTabSolutionAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.expectStartRecordingAccessibilityToMatch = async function(content) {
+  this.expectStartRecordingAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab start recording',
       translationTabStartRecordingAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.expectUploadRecordingAccessibilityToMatch = async function(content) {
+  this.expectUploadRecordingAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab upload recording',
       translationTabUploadRecordingAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.expectPlayRecordingAccessibilityToMatch = async function(content) {
+  this.expectPlayRecordingAccessibilityToMatch = async function (content) {
     expect(await action.getAttribute(
       'Translation tab play recording',
       translationTabPlayRecordingAccessibility,
       'aria-label')).toMatch(content);
   };
 
-  this.changeLanguage = async function(language) {
+  this.changeLanguage = async function (language) {
     await _selectLanguage(language);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectSelectedLanguageToBe = async function(language) {
+  this.expectSelectedLanguageToBe = async function (language) {
     expect(await action.getText(
       'Selected language element',
       selectedLanguageElement)).toMatch(language);
   };
 
-  this.navigateToFeedbackTab = async function() {
+  this.navigateToFeedbackTab = async function () {
     await general.scrollToTop();
     await action.click('Feedback tab button', feedbackTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectFeedbackTabToBeActive = function() {
+  this.expectFeedbackTabToBeActive = function () {
     expect(
       feedbackTabButton[0]
     ).toEqual(activeTranslationTabElement[0]);
   };
 
-  this.moveToState = async function(targetName) {
+  this.moveToState = async function (targetName) {
     await general.scrollToTop();
-    var listOfNames = await stateNodes.map(async function(stateElement) {
+    var listOfNames = await stateNodes.map(async function (stateElement) {
       return await action.getText(
         'State element',
         stateNodeLabel(stateElement));
@@ -551,8 +551,8 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.expectCorrectStatusColor = async function(stateName, expectedColor) {
-    var listOfNames = await stateNodes.map(async function(stateElement) {
+  this.expectCorrectStatusColor = async function (stateName, expectedColor) {
+    var listOfNames = await stateNodes.map(async function (stateElement) {
       return await action.getText(
         'State Element',
         stateNodeLabel(stateElement));

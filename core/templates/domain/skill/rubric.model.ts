@@ -28,37 +28,37 @@ export class Rubric {
   _difficulty: string;
   _explanations: string[];
 
-  constructor(difficulty: string, explanations: string[]) {
+  constructor (difficulty: string, explanations: string[]) {
     this._difficulty = difficulty;
     this._explanations = explanations;
   }
 
-  toBackendDict(): RubricBackendDict {
+  toBackendDict (): RubricBackendDict {
     return {
       difficulty: this._difficulty,
       explanations: this._explanations
     };
   }
 
-  getDifficulty(): string {
+  getDifficulty (): string {
     return this._difficulty;
   }
 
-  getExplanations(): string[] {
+  getExplanations (): string[] {
     return this._explanations.slice();
   }
 
-  setExplanations(newExplanations: string[]): void {
+  setExplanations (newExplanations: string[]): void {
     this._explanations = cloneDeep(newExplanations);
   }
 
-  static createFromBackendDict(rubricBackendDict: RubricBackendDict): Rubric {
+  static createFromBackendDict (rubricBackendDict: RubricBackendDict): Rubric {
     return new Rubric(
       rubricBackendDict.difficulty,
       rubricBackendDict.explanations);
   }
 
-  static create(difficulty: string, explanations: string[]): Rubric {
+  static create (difficulty: string, explanations: string[]): Rubric {
     return new Rubric(difficulty, explanations);
   }
 }

@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
 
-describe('Exploration Correctness Feedback Service', function() {
+describe('Exploration Correctness Feedback Service', function () {
   var ExplorationCorrectnessFeedbackService;
   importAllAngularServices();
 
@@ -33,7 +33,7 @@ describe('Exploration Correctness Feedback Service', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -43,12 +43,12 @@ describe('Exploration Correctness Feedback Service', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ExplorationCorrectnessFeedbackService = $injector.get(
       'ExplorationCorrectnessFeedbackService');
   }));
 
-  it('should toggle correctness feedback display', function() {
+  it('should toggle correctness feedback display', function () {
     var isValidSpy = spyOn(
       ExplorationCorrectnessFeedbackService, '_isValid').and.callThrough();
 

@@ -49,7 +49,7 @@ export class OpportunitiesListComponent {
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
 
-  constructor(
+  constructor (
     private zone: NgZone,
     private readonly contributionOpportunitiesService:
       ContributionOpportunitiesService,
@@ -57,7 +57,7 @@ export class OpportunitiesListComponent {
     this.init();
   }
 
-  init(): void {
+  init (): void {
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(
         () => this.ngOnInit()));
@@ -79,11 +79,11 @@ export class OpportunitiesListComponent {
         }));
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
@@ -98,7 +98,7 @@ export class OpportunitiesListComponent {
     });
   }
 
-  gotoPage(pageNumber: number): void {
+  gotoPage (pageNumber: number): void {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
     if (startIndex >= this.opportunities.length) {

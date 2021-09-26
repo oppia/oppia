@@ -39,13 +39,13 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var selector = 'CallExpression[callee.object.callee.object.name=angular]' +
     '[callee.object.callee.property.name=module]' +
     '[callee.property.name=directive]';
 
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         if (node.arguments.length !== 2 ||
           node.arguments[1].type !== 'ArrayExpression') {
           return;
@@ -64,7 +64,7 @@ module.exports = {
         var returnDictProperties = (
           controllerFunctionNode.body.body[0].argument.properties);
 
-        returnDictProperties.forEach(function(property) {
+        returnDictProperties.forEach(function (property) {
           if (property.key.name !== 'scope') {
             return;
           }

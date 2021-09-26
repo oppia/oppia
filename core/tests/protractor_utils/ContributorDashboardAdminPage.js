@@ -20,7 +20,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ContributorDashboardAdminPage = function() {
+var ContributorDashboardAdminPage = function () {
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'TRANSLATION';
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'QUESTION';
@@ -48,12 +48,12 @@ var ContributorDashboardAdminPage = function() {
     '.protractor-test-view-contribution-rights-method');
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get('/contributor-dashboard-admin');
     await waitFor.pageToFullyLoad();
   };
 
-  var _assignContributionRights = async function(
+  var _assignContributionRights = async function (
       username, category, languageDescription = null) {
     await waitFor.visibilityOf(
       addContributionRightsForm, 'Assign reviewer form is not visible');
@@ -85,7 +85,7 @@ var ContributorDashboardAdminPage = function() {
         'too long to appear'));
   };
 
-  var _getUserContributionRightsElement = async function(username, category) {
+  var _getUserContributionRightsElement = async function (username, category) {
     await waitFor.visibilityOf(
       viewContributionRightsForm, 'View reviewer form is not visible');
 
@@ -118,7 +118,7 @@ var ContributorDashboardAdminPage = function() {
     }
   };
 
-  this.assignTranslationReviewer = async function(
+  this.assignTranslationReviewer = async function (
       username, languageDescription) {
     await _assignContributionRights(
       username,
@@ -126,45 +126,45 @@ var ContributorDashboardAdminPage = function() {
       languageDescription);
   };
 
-  this.assignVoiceoverReviewer = async function(username, languageDescription) {
+  this.assignVoiceoverReviewer = async function (username, languageDescription) {
     await _assignContributionRights(
       username,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
       languageDescription);
   };
 
-  this.assignQuestionReviewer = async function(username) {
+  this.assignQuestionReviewer = async function (username) {
     await _assignContributionRights(
       username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
   };
 
-  this.assignQuestionContributor = async function(username) {
+  this.assignQuestionContributor = async function (username) {
     await _assignContributionRights(username, CATEGORY_SUBMIT_QUESTION);
   };
 
-  this.expectUserToBeTranslationReviewer = async function(
+  this.expectUserToBeTranslationReviewer = async function (
       username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
       username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION);
     var languageList = await Promise.all(
-      contributionRights.map(function(languageElem) {
+      contributionRights.map(function (languageElem) {
         return languageElem.getText();
       }));
     expect(languageList).toContain(languageDescription);
   };
 
-  this.expectUserToBeVoiceoverReviewer = async function(
+  this.expectUserToBeVoiceoverReviewer = async function (
       username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
       username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
     var languageList = await Promise.all(contributionRights.map(
-      function(languageElem) {
+      function (languageElem) {
         return languageElem.getText();
       }));
     expect(languageList).toContain(languageDescription);
   };
 
-  this.expectUserToBeQuestionReviewer = async function(username) {
+  this.expectUserToBeQuestionReviewer = async function (username) {
     var contributionRights = await _getUserContributionRightsElement(
       username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
     await waitFor.visibilityOf(
@@ -173,7 +173,7 @@ var ContributorDashboardAdminPage = function() {
     expect(await contributionRights.getText()).toBe('Allowed');
   };
 
-  this.expectUserToBeQuestionContributor = async function(username) {
+  this.expectUserToBeQuestionContributor = async function (username) {
     var contributionRights = await _getUserContributionRightsElement(
       username, CATEGORY_SUBMIT_QUESTION);
     await waitFor.visibilityOf(

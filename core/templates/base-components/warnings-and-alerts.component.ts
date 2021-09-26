@@ -25,19 +25,19 @@ import { AlertsService, Message, Warning } from 'services/alerts.service';
   templateUrl: './warnings-and-alerts.component.html'
 })
 export class WarningsAndAlertsComponent {
-  constructor(
+  constructor (
     private alertsService: AlertsService
   ) {}
 
-  getWarnings(): Warning[] {
+  getWarnings (): Warning[] {
     return this.alertsService.warnings;
   }
 
-  deleteWarning(warning: Warning): void {
+  deleteWarning (warning: Warning): void {
     this.alertsService.deleteWarning(warning);
   }
 
-  getMessages(): Message[] {
+  getMessages (): Message[] {
     return this.alertsService.messages;
   }
 }

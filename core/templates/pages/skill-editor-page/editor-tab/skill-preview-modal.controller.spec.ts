@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillPreviewModalController.
  */
 
-describe('Skill Preview Modal Controller', function() {
+describe('Skill Preview Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDescription = 'Description1';
@@ -24,7 +24,7 @@ describe('Skill Preview Modal Controller', function() {
   var skillWorkedExamples = [];
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -40,7 +40,7 @@ describe('Skill Preview Modal Controller', function() {
     });
   }));
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', function () {
     expect($scope.skillDescription).toEqual(skillDescription);
     expect($scope.skillExplanation).toEqual(skillExplanation);
     expect($scope.skillWorkedExamples).toEqual(skillWorkedExamples);

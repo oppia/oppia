@@ -20,7 +20,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ContributorDashboardTranslateTextTab = function() {
+var ContributorDashboardTranslateTextTab = function () {
   var selectorContainer = element(
     by.css('.protractor-test-language-selector'));
   var selectedLanguageElement = selectorContainer.element(
@@ -34,11 +34,11 @@ var ContributorDashboardTranslateTextTab = function() {
   var featuredLanguageExplanation = selectorContainer.element(
     by.css('.protractor-test-language-selector-featured-explanation'));
 
-  var _openLanguageSelector = async function() {
+  var _openLanguageSelector = async function () {
     await action.click('Test Language Selector Container', selectorContainer);
   };
 
-  var _selectLanguage = async function(language) {
+  var _selectLanguage = async function (language) {
     await _openLanguageSelector();
     var selectorOption = selectorContainer.element(
       by.cssContainingText(
@@ -48,12 +48,12 @@ var ContributorDashboardTranslateTextTab = function() {
     await action.click('Test Language Selector Option', selectorOption);
   };
 
-  this.changeLanguage = async function(language) {
+  this.changeLanguage = async function (language) {
     await _selectLanguage(language);
     await waitFor.pageToFullyLoad();
   };
 
-  this.mouseoverFeaturedLanguageTooltip = async function(index) {
+  this.mouseoverFeaturedLanguageTooltip = async function (index) {
     await _openLanguageSelector();
     await waitFor.visibilityOf(
       featuredLanguageContainer,
@@ -64,7 +64,7 @@ var ContributorDashboardTranslateTextTab = function() {
     ).perform();
   };
 
-  this.expectFeaturedLanguagesToBe = async function(languages) {
+  this.expectFeaturedLanguagesToBe = async function (languages) {
     await _openLanguageSelector();
     await waitFor.visibilityOf(
       featuredLanguageContainer,
@@ -75,13 +75,13 @@ var ContributorDashboardTranslateTextTab = function() {
       'Featured language elements taking too long to appear'
     );
     var displayedFeaturedLanguages = await featuredLanguageElements
-      .map(async function(featuredLanguageElement) {
+      .map(async function (featuredLanguageElement) {
         return (await featuredLanguageElement.getText()).replace('info\n', '');
       });
     expect(displayedFeaturedLanguages).toEqual(languages);
   };
 
-  this.expectFeaturedLanguageExplanationToBe = async function(explanation) {
+  this.expectFeaturedLanguageExplanationToBe = async function (explanation) {
     await waitFor.visibilityOf(
       featuredLanguageExplanation,
       'Featured language explanation took too long to show'
@@ -89,7 +89,7 @@ var ContributorDashboardTranslateTextTab = function() {
     expect(await featuredLanguageExplanation.getText()).toEqual(explanation);
   };
 
-  this.expectSelectedLanguageToBe = async function(language) {
+  this.expectSelectedLanguageToBe = async function (language) {
     await waitFor.visibilityOf(
       selectorContainer,
       'Selector Container took too long to load'

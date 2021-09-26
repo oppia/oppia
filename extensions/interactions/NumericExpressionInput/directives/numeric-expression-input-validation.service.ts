@@ -35,16 +35,16 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class NumericExpressionInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: NumericExpressionInputCustomizationArgs): Warning[] {
     return [];
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: NumericExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {

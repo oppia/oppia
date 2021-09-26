@@ -46,7 +46,7 @@ export class FeedbackThreadSummary {
   explorationId: string;
   threadId: string;
 
-  constructor(
+  constructor (
       status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
       lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
@@ -66,14 +66,14 @@ export class FeedbackThreadSummary {
     this.threadId = threadId;
   }
 
-  markTheLastTwoMessagesAsRead(): void {
+  markTheLastTwoMessagesAsRead (): void {
     if (this.authorSecondLastMessage) {
       this.secondLastMessageIsRead = true;
     }
     this.lastMessageIsRead = true;
   }
 
-  appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
+  appendNewMessage (lastMessageText: string, authorLastMessage: string): void {
     this.lastMessageText = lastMessageText;
     this.lastUpdatedMsecs = new Date().getTime();
     this.authorSecondLastMessage = this.authorLastMessage;
@@ -83,7 +83,7 @@ export class FeedbackThreadSummary {
     this.secondLastMessageIsRead = true;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
       FeedbackThreadSummary {
     return new FeedbackThreadSummary(

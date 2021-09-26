@@ -63,7 +63,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ExplorationRecommendationsService } from '../services/exploration-recommendations.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 
-describe('Conversation skin directive', function() {
+describe('Conversation skin directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -143,10 +143,10 @@ describe('Conversation skin directive', function() {
   let mockWindow = {
     location: {
       replace: jasmine.createSpy('replace'),
-      reload: function() {}
+      reload: function () {}
     },
     addEventListener: () => {},
-    scrollTo: function() {},
+    scrollTo: function () {},
     event: {
       returnValue: ''
     }
@@ -167,11 +167,11 @@ describe('Conversation skin directive', function() {
     focusManagerService = TestBed.inject(FocusManagerService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
@@ -667,7 +667,7 @@ describe('Conversation skin directive', function() {
       ENABLE_NEW_STRUCTURE_VIEWER_UPDATES: true,
       TWO_CARD_THRESHOLD_PX: 960
     });
-    $scope.getQuestionPlayerConfig = function() {
+    $scope.getQuestionPlayerConfig = function () {
       return;
     };
   }));
@@ -676,8 +676,8 @@ describe('Conversation skin directive', function() {
     ctrl.$onDestroy();
   });
 
-  describe('on initalization', function() {
-    it('should set user rating', function() {
+  describe('on initalization', function () {
+    it('should set user rating', function () {
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
       expect($scope.userRating).toBe(undefined);
@@ -689,7 +689,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should show user that hint has been used ' +
-      'if it has already been used', function() {
+      'if it has already been used', function () {
       spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
         .and.returnValue(onHintConsumedEventEmitter);
       let hintConsumedSpy = spyOn(
@@ -703,7 +703,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should show user that solution has been shown ' +
-      'when user has already requested for solution', function() {
+      'when user has already requested for solution', function () {
       spyOnProperty(
         hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
         .and.returnValue(onSolutionViewedEventEmitter);
@@ -717,7 +717,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should set collection title to null if' +
-      'collection id is invalid', function() {
+      'collection id is invalid', function () {
       spyOn(urlService, 'getCollectionIdFromExplorationUrl')
         .and.returnValue(null);
       expect($scope.collectionTitle).toBe(undefined);
@@ -728,7 +728,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should call success alert message when ' +
-      'rating is updated successfully', function() {
+      'rating is updated successfully', function () {
       spyOnProperty(
         learnerViewRatingService, 'onRatingUpdated')
         .and.returnValue(onRatingUpdatedEventEmitter);
@@ -744,7 +744,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should send request to backend to fetch collection summary ' +
-      'given collection id', fakeAsync(function() {
+      'given collection id', fakeAsync(function () {
       spyOn(urlService, 'getCollectionIdFromExplorationUrl')
         .and.returnValue('collectionId');
       $httpBackend.expect(
@@ -765,7 +765,7 @@ describe('Conversation skin directive', function() {
     }));
 
     it('should fail to fetch collection summary from backend' +
-      'incase of backend error', fakeAsync(function() {
+      'incase of backend error', fakeAsync(function () {
       spyOn(urlService, 'getCollectionIdFromExplorationUrl')
         .and.returnValue('collectionId');
       $httpBackend.expect(
@@ -784,7 +784,7 @@ describe('Conversation skin directive', function() {
 
     it('should call record \'maybeLeave\' event ' +
       'when answer is not being processed and ' +
-      'window has been resized', function() {
+      'window has been resized', function () {
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
       spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
@@ -840,7 +840,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should show upcoming card if feedback html ' +
-      'is not specified and \'remainOnSameCard\' is set false', function() {
+      'is not specified and \'remainOnSameCard\' is set false', function () {
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
       spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
@@ -898,7 +898,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should not record event when user redirects ' +
-      'to refresher exploration', function() {
+      'to refresher exploration', function () {
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
       spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
@@ -954,9 +954,9 @@ describe('Conversation skin directive', function() {
     });
   });
 
-  describe('on exploration player state change', function() {
+  describe('on exploration player state change', function () {
     it('should not preload image when ' +
-      'given state name is not valid', function() {
+      'given state name is not valid', function () {
       spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
         .and.returnValue(onPlayerStateChangeEventEmitter);
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -970,7 +970,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should preload image when ' +
-      'given state name is valid', function() {
+      'given state name is valid', function () {
       spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
         .and.returnValue(onPlayerStateChangeEventEmitter);
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -986,7 +986,7 @@ describe('Conversation skin directive', function() {
       expect(imagePreloaderSpy).toHaveBeenCalled();
     });
 
-    it('should record guest user\'s collection progress', function() {
+    it('should record guest user\'s collection progress', function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -1015,7 +1015,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should open sign in page if user is not signed in' +
-    'when clicking on sign in button', fakeAsync(function() {
+    'when clicking on sign in button', fakeAsync(function () {
     let loginSpy = spyOn(
       userService, 'getLoginUrlAsync').and.resolveTo('loginUrl');
 
@@ -1026,7 +1026,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should be able to submit answer from progress navbar ' +
-    'when calling \'submitAnswerFromProgressNav\'', fakeAsync(function() {
+    'when calling \'submitAnswerFromProgressNav\'', fakeAsync(function () {
     let submtAnswerSpy = spyOn(
       currentInteractionService, 'submitAnswer').and.returnValue(null);
 
@@ -1037,7 +1037,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should check whether submit button is disabled ' +
-    'when calling \'isSubmitButtonDisabled\'', function() {
+    'when calling \'isSubmitButtonDisabled\'', function () {
     spyOn(currentInteractionService, 'isSubmitButtonDisabled')
       .and.returnValue(true);
     spyOn(playerTranscriptService, 'isLastCard')
@@ -1049,7 +1049,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should enable submit button when ' +
-    'current index is not last index', function() {
+    'current index is not last index', function () {
     spyOn(playerTranscriptService, 'isLastCard')
       .and.returnValue(false);
 
@@ -1058,9 +1058,9 @@ describe('Conversation skin directive', function() {
     expect(result).toBe(false);
   });
 
-  describe('on showing upcoming card ', function() {
+  describe('on showing upcoming card ', function () {
     it('should return back to exploration if concept card is ' +
-      'being shown and current card is last card', function() {
+      'being shown and current card is last card', function () {
       sampleCard = StateCard.createNewCard(
         null, '<p>Content</p>', '<interaction></interaction>',
         null, RecordedVoiceovers.createEmpty(),
@@ -1085,7 +1085,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should notify \'QuestionPlayerStateService\' ' +
-      'if question player session has completed', function() {
+      'if question player session has completed', function () {
       spyOn(playerPositionService, 'getDisplayedCardIndex')
         .and.returnValue(1);
       spyOn(explorationPlayerStateService, 'isInQuestionMode')
@@ -1105,7 +1105,7 @@ describe('Conversation skin directive', function() {
       expect(questionSessionCompletedSpy).toHaveBeenCalled();
     });
 
-    it('should navigate to the given exploration', function() {
+    it('should navigate to the given exploration', function () {
       spyOn(playerPositionService, 'getDisplayedCardIndex')
         .and.returnValue(1);
       spyOn(explorationPlayerStateService, 'isInQuestionMode')
@@ -1126,7 +1126,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should set \'pendingCardWasSeenBefore\' to false ' +
-      'if submitted answer is correct', function() {
+      'if submitted answer is correct', function () {
       spyOn($scope, 'showPendingCard').and.returnValue(null);
       expect($scope.pendingCardWasSeenBefore).toBe(undefined);
 
@@ -1137,7 +1137,7 @@ describe('Conversation skin directive', function() {
       expect($scope.pendingCardWasSeenBefore).toBe(false);
     });
 
-    it('should record if new card was added', function() {
+    it('should record if new card was added', function () {
       spyOn(playerTranscriptService, 'getLastCard')
         .and.returnValue(sampleCard);
       spyOn($scope, 'showPendingCard').and.returnValue(null);
@@ -1166,8 +1166,8 @@ describe('Conversation skin directive', function() {
     });
   });
 
-  describe('on verifying if the learn again button is active ', function() {
-    it('should return false if concept card is being shown', function() {
+  describe('on verifying if the learn again button is active ', function () {
+    it('should return false if concept card is being shown', function () {
       spyOn(explorationPlayerStateService, 'isInQuestionMode')
         .and.returnValue(false);
       sampleCard = StateCard.createNewCard(
@@ -1182,7 +1182,7 @@ describe('Conversation skin directive', function() {
       expect(result).toBe(false);
     });
 
-    it('should return false if interaction is linear', function() {
+    it('should return false if interaction is linear', function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict1),
@@ -1197,7 +1197,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should return true if pending card was seen ' +
-      'before and answer is incorrect', function() {
+      'before and answer is incorrect', function () {
       let interactionDict = {
         id: 'TextInput',
         answer_groups: [
@@ -1266,9 +1266,9 @@ describe('Conversation skin directive', function() {
     });
   });
 
-  describe('on fetching exploration link ', function() {
+  describe('on fetching exploration link ', function () {
     it('should return corresponding link if url ' +
-      'parameters consist of collection id', function() {
+      'parameters consist of collection id', function () {
       spyOn(urlService, 'getUrlParams').and.returnValue({
         collection_id: 'collectionId'
       });
@@ -1287,7 +1287,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should return corresponding link if url ' +
-      'parameters consist of \'story_url_fragment\'', function() {
+      'parameters consist of \'story_url_fragment\'', function () {
       $scope.storyNodeIdToAdd = true;
       spyOn(urlService, 'getUrlParams').and.returnValue({
         story_url_fragment: '/story/abcd',
@@ -1312,7 +1312,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should return \'#\' if recommended exploration id ' +
-      'is invalid', function() {
+      'is invalid', function () {
       // Setting id to null.
       let storyNode = {
         id: null,
@@ -1328,7 +1328,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should return corresponding link if url ' +
-      'parameters does not consist of collection id', function() {
+      'parameters does not consist of collection id', function () {
       $scope.storyNodeIdToAdd = true;
       spyOn(urlService, 'getUrlParams').and.returnValue({});
       spyOn(urlService, 'getPathname').and.returnValue('/story/hfdjkahfauda');
@@ -1355,7 +1355,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should register an iframe event when' +
-    'calling \'onNavigateFromIframe\'', function() {
+    'calling \'onNavigateFromIframe\'', function () {
     let iframeEventSpy = spyOn(
       siteAnalyticsService, 'registerVisitOppiaFromIframeEvent')
       .and.returnValue(null);
@@ -1366,7 +1366,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should get static image url when' +
-    'calling \'getStaticImageUrl\'', function() {
+    'calling \'getStaticImageUrl\'', function () {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('url');
 
@@ -1376,14 +1376,14 @@ describe('Conversation skin directive', function() {
   });
 
   it('should get content focus label when' +
-    'calling \'getContentFocusLabel\'', function() {
+    'calling \'getContentFocusLabel\'', function () {
     let result = $scope.getContentFocusLabel('2');
 
     expect(result).toBe('contentLabel2');
   });
 
   it('should get feedback popover url when' +
-    'calling \'getFeedbackPopoverUrl\'', function() {
+    'calling \'getFeedbackPopoverUrl\'', function () {
     spyOn(urlInterpolationService, 'getDirectiveTemplateUrl')
       .and.returnValue('/directiveTemplateUrl');
 
@@ -1392,7 +1392,7 @@ describe('Conversation skin directive', function() {
     expect(result).toBe('/directiveTemplateUrl');
   });
 
-  it('should check whether a learner can ask for answer info', function() {
+  it('should check whether a learner can ask for answer info', function () {
     spyOn(learnerAnswerInfoService, 'getCanAskLearnerForAnswerInfo')
       .and.returnValue(true);
 
@@ -1401,7 +1401,7 @@ describe('Conversation skin directive', function() {
     expect(result).toBe(true);
   });
 
-  it('should check whether correctness footer is enabled', function() {
+  it('should check whether correctness footer is enabled', function () {
     $scope.answerIsCorrect = false;
 
     let result = $scope.isCorrectnessFooterEnabled();
@@ -1410,7 +1410,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should send message if height is adjusted when ' +
-    'calling \'adjustPageHeight\'', function() {
+    'calling \'adjustPageHeight\'', function () {
     spyOnProperty(document.body, 'scrollHeight').and.returnValue(45);
     let sendMessageSpy = spyOn(
       messengerService, 'sendMessage').and.returnValue(null);
@@ -1424,7 +1424,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should check whether the card is terminal ' +
-    'when calling \'isOnTerminalCard\'', function() {
+    'when calling \'isOnTerminalCard\'', function () {
     $scope.displayedCard = sampleCard;
 
     let result = $scope.isOnTerminalCard();
@@ -1433,7 +1433,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should check whether the supplemental card is non empty ' +
-    'when calling \'isCurrentSupplementalCardNonempty\'', function() {
+    'when calling \'isCurrentSupplementalCardNonempty\'', function () {
     $scope.displayedCard = sampleCard;
 
     let result = $scope.isCurrentSupplementalCardNonempty();
@@ -1442,7 +1442,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should check whether the supplemental navbar is being shown ' +
-    'when calling \'isSupplementalNavShown\'', function() {
+    'when calling \'isSupplementalNavShown\'', function () {
     $scope.displayedCard = sampleCard;
 
     let result = $scope.isSupplementalNavShown();
@@ -1451,7 +1451,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should return false when calling \'isSupplementalNavShown\' ' +
-    'if current state has invalid name', function() {
+    'if current state has invalid name', function () {
     // Setting state name to null.
     sampleCard = StateCard.createNewCard(
       null, '<p>Content</p>', '<interaction></interaction>',
@@ -1469,7 +1469,7 @@ describe('Conversation skin directive', function() {
 
   it('should navigate to display card ' +
     'when answer is submitted and new card is initialized' +
-    '', fakeAsync(function() {
+    '', fakeAsync(function () {
     sampleCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -1514,7 +1514,7 @@ describe('Conversation skin directive', function() {
       node_id: 'node_1'
     });
 
-    $scope.getQuestionPlayerConfig = function() {
+    $scope.getQuestionPlayerConfig = function () {
       return {
         resultActionButtons: [{
           type: 'BOOST_SCORE',
@@ -1559,7 +1559,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should focus on the given focus label if user is on ' +
-    'desktop', fakeAsync(function() {
+    'desktop', fakeAsync(function () {
     let element = angular.element(
       '<html><body><div class="conversation-skin-main-tutor-card"' +
       'style="height: 2000px"></div></body></html>');
@@ -1617,7 +1617,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should check if the user is in question player ' +
-    'mode', fakeAsync(function() {
+    'mode', fakeAsync(function () {
     spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
     spyOn(playerTranscriptService, 'isLastCard')
       .and.returnValue(true);
@@ -1664,7 +1664,7 @@ describe('Conversation skin directive', function() {
     expect(questionPlayerSpy).toHaveBeenCalled();
   }));
 
-  it('should check whether the user is in editor mode', fakeAsync(function() {
+  it('should check whether the user is in editor mode', fakeAsync(function () {
     spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
     spyOn(playerTranscriptService, 'isLastCard')
       .and.returnValue(true);
@@ -1713,7 +1713,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should add new repsonse if feedback content is ' +
-    'provided', fakeAsync(function() {
+    'provided', fakeAsync(function () {
     spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
     spyOn(playerTranscriptService, 'isLastCard')
       .and.returnValue(true);
@@ -1759,7 +1759,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should add an empty response if feedback content ' +
-    'is not provided', fakeAsync(function() {
+    'is not provided', fakeAsync(function () {
     spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
     spyOn(playerTranscriptService, 'isLastCard')
       .and.returnValue(true);
@@ -1803,7 +1803,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should set I18n language code if given language code is' +
-    'valid', fakeAsync(function() {
+    'valid', fakeAsync(function () {
     sampleCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -1846,7 +1846,7 @@ describe('Conversation skin directive', function() {
     spyOn(statsReportingService, 'recordExplorationCompleted')
       .and.returnValue(null);
 
-    $scope.getQuestionPlayerConfig = function() {
+    $scope.getQuestionPlayerConfig = function () {
       return {
         resultActionButtons: [{
           type: 'BOOST_SCORE',
@@ -1887,7 +1887,7 @@ describe('Conversation skin directive', function() {
   }));
 
   it('should return to exploratin after completion of concept card ' +
-    'when calling \'returnToExplorationAfterConceptCard\'', function() {
+    'when calling \'returnToExplorationAfterConceptCard\'', function () {
     spyOn(playerTranscriptService, 'addPreviousCard')
       .and.returnValue(null);
     spyOn(playerTranscriptService, 'getNumCards')
@@ -1901,7 +1901,7 @@ describe('Conversation skin directive', function() {
   });
 
   it('should submit user rating given rating value ' +
-    'when calling \'submitUserRating\'', function() {
+    'when calling \'submitUserRating\'', function () {
     let ratingSpy = spyOn(learnerViewRatingService, 'submitUserRating')
       .and.returnValue(null);
 
@@ -1910,9 +1910,9 @@ describe('Conversation skin directive', function() {
     expect(ratingSpy).toHaveBeenCalledWith(1);
   });
 
-  describe('on submitting answer ', function() {
+  describe('on submitting answer ', function () {
     it('should submit answer successfully' +
-      '', function() {
+      '', function () {
       spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
       spyOn(playerTranscriptService, 'isLastCard')
         .and.returnValue(true);
@@ -1949,7 +1949,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should not submit answer again if answer is ' +
-      'still being processed in the queue', function() {
+      'still being processed in the queue', function () {
       $scope.answerIsBeingProcessed = true;
       spyOn(playerTranscriptService, 'isLastCard')
         .and.returnValue(false);
@@ -1964,7 +1964,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should display break messag if answer is ' +
-      'still being processed in the queue', function() {
+      'still being processed in the queue', function () {
       spyOn(fatigueDetectionService, 'isSubmittingTooFast')
         .and.returnValue(true);
       spyOn(fatigueDetectionService, 'recordSubmissionTimestamp')
@@ -1985,7 +1985,7 @@ describe('Conversation skin directive', function() {
       expect(displayBreakMessageSpy).toHaveBeenCalled();
     });
 
-    it('should check whether the helper card is available', function() {
+    it('should check whether the helper card is available', function () {
       spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
       spyOn(playerTranscriptService, 'isLastCard')
         .and.returnValue(true);
@@ -2025,7 +2025,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should mark exploration as completed if the ' +
-      'current card is last card', function() {
+      'current card is last card', function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -2067,7 +2067,7 @@ describe('Conversation skin directive', function() {
       expect(explorationCompletedSpy).toHaveBeenCalled();
     });
 
-    it('should stay on same card if anwer is incorrect', fakeAsync(function() {
+    it('should stay on same card if anwer is incorrect', fakeAsync(function () {
       spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
       spyOn(playerTranscriptService, 'isLastCard')
         .and.returnValue(true);
@@ -2115,7 +2115,7 @@ describe('Conversation skin directive', function() {
     }));
 
     it('should open a modal to confirm redirection ' +
-      'to refresher exploration', fakeAsync(function() {
+      'to refresher exploration', fakeAsync(function () {
       let requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(['refresherId']));
       spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
@@ -2170,9 +2170,9 @@ describe('Conversation skin directive', function() {
     }));
   });
 
-  describe('on showing a pending card ', function() {
+  describe('on showing a pending card ', function () {
     it('should check whether the user is in story chapter ' +
-      'mode', fakeAsync(function() {
+      'mode', fakeAsync(function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -2219,7 +2219,7 @@ describe('Conversation skin directive', function() {
     }));
 
     it('should set display card index when current card is ' +
-      'supplemental and next card is non empty', fakeAsync(function() {
+      'supplemental and next card is non empty', fakeAsync(function () {
       let samplePreviousCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -2270,7 +2270,7 @@ describe('Conversation skin directive', function() {
 
     it('should set display card index when ' +
       'current card is not inline and previous ' +
-      'card is non empty', fakeAsync(function() {
+      'card is non empty', fakeAsync(function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict2),
@@ -2324,7 +2324,7 @@ describe('Conversation skin directive', function() {
 
     it('should set display card index when ' +
       'current card is inline and previous ' +
-      'card is non empty', fakeAsync(function() {
+      'card is non empty', fakeAsync(function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict2),
@@ -2376,7 +2376,7 @@ describe('Conversation skin directive', function() {
     }));
 
     it('should throw error if current exploration has ' +
-      'no parent exploration', fakeAsync(function() {
+      'no parent exploration', fakeAsync(function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -2428,7 +2428,7 @@ describe('Conversation skin directive', function() {
     }));
 
     it('should fetch recommeded summary dicts ' +
-      'when user is logged in and not in story mode', fakeAsync(function() {
+      'when user is logged in and not in story mode', fakeAsync(function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -2479,7 +2479,7 @@ describe('Conversation skin directive', function() {
     }));
 
     it('should set return url when user is not ' +
-      'logged in', fakeAsync(function() {
+      'logged in', fakeAsync(function () {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),

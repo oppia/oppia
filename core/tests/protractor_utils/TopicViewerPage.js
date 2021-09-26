@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var TopicViewerPage = function() {
+var TopicViewerPage = function () {
   var topicDescription = element(by.css('.protractor-test-topic-description'));
   var storySummaryTitleList =
     element.all(by.css('.protractor-test-story-summary-title'));
@@ -31,7 +31,7 @@ var TopicViewerPage = function() {
   var messageOnCompletion = element(
     by.css('.protractor-test-practice-complete-message'));
 
-  this.get = async function(classroomUrlFragment, topicName) {
+  this.get = async function (classroomUrlFragment, topicName) {
     await browser.get(`/learn/${classroomUrlFragment}`);
     await waitFor.pageToFullyLoad();
     var topicLink = element(by.cssContainingText(
@@ -43,14 +43,14 @@ var TopicViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectTopicInformationToBe = async function(description) {
+  this.expectTopicInformationToBe = async function (description) {
     await waitFor.visibilityOf(
       topicDescription, 'Topic description takes too long to be visible.');
     var text = await topicDescription.getText();
     expect(text).toEqual(description);
   };
 
-  this.expectStoryCountToBe = async function(count) {
+  this.expectStoryCountToBe = async function (count) {
     if (count === 0) {
       expect(await storySummaryTitleList.count()).toEqual(0);
     } else {
@@ -61,26 +61,26 @@ var TopicViewerPage = function() {
     }
   };
 
-  this.moveToRevisionTab = async function() {
+  this.moveToRevisionTab = async function () {
     await action.click('Revision Tab', revisionTabLink);
   };
 
-  this.moveToPracticeTab = async function() {
+  this.moveToPracticeTab = async function () {
     await action.click('Practice Tab', practiceTabLink);
   };
 
-  this.selectSkillForPractice = async function(subtopicTitle) {
+  this.selectSkillForPractice = async function (subtopicTitle) {
     var skillCheckbox = element(by.cssContainingText(
       '.protractor-test-skill-checkbox', subtopicTitle));
     await action.click('Select skill to practice', skillCheckbox);
   };
 
-  this.startPractice = async function() {
+  this.startPractice = async function () {
     await action.click('Start practice', startPracticeButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectMessageAfterCompletion = async function(message) {
+  this.expectMessageAfterCompletion = async function (message) {
     await waitFor.visibilityOf(
       messageOnCompletion, 'Completion message takes too long to be visible.');
     var text = await messageOnCompletion.getText();

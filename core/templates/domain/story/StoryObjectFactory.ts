@@ -56,7 +56,7 @@ export class Story {
   _thumbnailBgColor: string;
   _urlFragment: string;
   _metaTagContent: string;
-  constructor(
+  constructor (
       id: string, title: string, description: string, notes: string,
       storyContents: StoryContents, languageCode: string, version: number,
       correspondingTopicId: string, thumbnailBgColor: string,
@@ -75,87 +75,87 @@ export class Story {
     this._metaTagContent = metaTagContent;
   }
 
-  getId(): string {
+  getId (): string {
     return this._id;
   }
 
-  getTitle(): string {
+  getTitle (): string {
     return this._title;
   }
 
-  setTitle(title: string): void {
+  setTitle (title: string): void {
     this._title = title;
   }
 
-  getDescription(): string {
+  getDescription (): string {
     return this._description;
   }
 
-  setDescription(description: string): void {
+  setDescription (description: string): void {
     this._description = description;
   }
 
-  getNotes(): string {
+  getNotes (): string {
     return this._notes;
   }
 
-  setNotes(notes: string): void {
+  setNotes (notes: string): void {
     this._notes = notes;
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this._languageCode;
   }
 
-  setLanguageCode(languageCode: string): void {
+  setLanguageCode (languageCode: string): void {
     this._languageCode = languageCode;
   }
 
-  getMetaTagContent(): string {
+  getMetaTagContent (): string {
     return this._metaTagContent;
   }
 
-  setMetaTagContent(metaTagContent: string): void {
+  setMetaTagContent (metaTagContent: string): void {
     this._metaTagContent = metaTagContent;
   }
 
-  getVersion(): number {
+  getVersion (): number {
     return this._version;
   }
 
-  getStoryContents(): StoryContents {
+  getStoryContents (): StoryContents {
     return this._storyContents;
   }
 
-  getCorrespondingTopicId(): string {
+  getCorrespondingTopicId (): string {
     return this._correspondingTopicId;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename (): string {
     return this._thumbnailFilename;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename (thumbnailFilename: string): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor (): string {
     return this._thumbnailBgColor;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor (thumbnailBgColor: string): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment (): string {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string): void {
+  setUrlFragment (urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
-  validate(): string[] {
+  validate (): string[] {
     var issues = [];
     if (this._title === '') {
       issues.push('Story title should not be empty');
@@ -184,7 +184,7 @@ export class Story {
     return issues;
   }
 
-  prepublishValidate(): string[] {
+  prepublishValidate (): string[] {
     const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
     let issues = [];
     if (!this._thumbnailFilename) {
@@ -203,7 +203,7 @@ export class Story {
   // Reassigns all values within this story to match the existing
   // story. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this story.
-  copyFromStory(otherStory: Story): void {
+  copyFromStory (otherStory: Story): void {
     this._id = otherStory.getId();
     this.setTitle(otherStory.getTitle());
     this.setDescription(otherStory.getDescription());
@@ -223,8 +223,8 @@ export class Story {
   providedIn: 'root'
 })
 export class StoryObjectFactory {
-  constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
-  createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
+  constructor (private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+  createFromBackendDict (storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,
@@ -240,7 +240,7 @@ export class StoryObjectFactory {
 
   // Create an interstitial story that would be displayed in the editor until
   // the actual story is fetched from the backend.
-  createInterstitialStory(): Story {
+  createInterstitialStory (): Story {
     return new Story(
       null, 'Story title loading', 'Story description loading',
       'Story notes loading', null, 'en', 1, null, null, null, null, '');

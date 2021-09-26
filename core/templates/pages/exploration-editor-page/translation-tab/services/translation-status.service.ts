@@ -42,7 +42,7 @@ angular.module('oppia').factory('TranslationStatusService', [
   'StateWrittenTranslationsService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
-  function(
+  function (
       ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
       TranslationTabActiveModeService, COMPONENT_NAME_HINT,
@@ -61,7 +61,7 @@ angular.module('oppia').factory('TranslationStatusService', [
     var explorationTranslationContentNotAvailableCount = 0;
     var explorationVoiceoverContentNotAvailableCount = 0;
 
-    var _getVoiceOverStatus = function(recordedVoiceovers, contentId) {
+    var _getVoiceOverStatus = function (recordedVoiceovers, contentId) {
       var availabilityStatus = {
         available: false,
         needsUpdate: false,
@@ -77,7 +77,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       return availabilityStatus;
     };
 
-    var _getTranslationStatus = function(writtenTranslations, contentId) {
+    var _getTranslationStatus = function (writtenTranslations, contentId) {
       var availabilityStatus = {
         available: false,
         needsUpdate: false,
@@ -95,7 +95,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
       return availabilityStatus;
     };
-    var _getContentAvailabilityStatus = function(stateName, contentId) {
+    var _getContentAvailabilityStatus = function (stateName, contentId) {
       langCode = TranslationLanguageService.getActiveLanguageCode();
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
         var writtenTranslations = (
@@ -108,7 +108,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _getActiveStateContentAvailabilityStatus = function(contentId) {
+    var _getActiveStateContentAvailabilityStatus = function (contentId) {
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
         var writtenTranslations = StateWrittenTranslationsService.displayed;
         return _getTranslationStatus(writtenTranslations, contentId);
@@ -118,7 +118,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _computeAllStatesStatus = function() {
+    var _computeAllStatesStatus = function () {
       stateNeedsUpdateWarnings = {};
       stateWiseStatusColor = {};
       explorationTranslationContentRequiredCount = 0;
@@ -127,7 +127,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       explorationVoiceoverContentNotAvailableCount = 0;
 
       if (ExplorationStatesService.isInitialized()) {
-        ExplorationStatesService.getStateNames().forEach(function(stateName) {
+        ExplorationStatesService.getStateNames().forEach(function (stateName) {
           var stateNeedsUpdate = false;
           var noTranslationCount = 0;
           var noVoiceoverCount = 0;
@@ -149,7 +149,7 @@ angular.module('oppia').factory('TranslationStatusService', [
             // content is left empty so the translation or voiceover is not
             // required.
             contentIdToRemove.push('default_outcome');
-            allContentIds = allContentIds.filter(function(contentId) {
+            allContentIds = allContentIds.filter(function (contentId) {
               return contentIdToRemove.indexOf(contentId) < 0;
             });
           }
@@ -164,12 +164,12 @@ angular.module('oppia').factory('TranslationStatusService', [
           explorationVoiceoverContentRequiredCount += (
             allContentIds.length - ruleInputContentIds.length);
           if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-            allContentIds = allContentIds.filter(function(contentId) {
+            allContentIds = allContentIds.filter(function (contentId) {
               return ruleInputContentIds.indexOf(contentId) < 0;
             });
           }
 
-          allContentIds.forEach(function(contentId) {
+          allContentIds.forEach(function (contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(
               stateName, contentId);
             if (!availabilityStatus.available) {
@@ -204,7 +204,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _getContentIdListRelatedToComponent = function(
+    var _getContentIdListRelatedToComponent = function (
         componentName, availableContentIds) {
       var contentIdList = [];
 
@@ -213,7 +213,7 @@ angular.module('oppia').factory('TranslationStatusService', [
           contentIdList.push(componentName);
         } else {
           var searchKey = componentName + '_';
-          availableContentIds.forEach(function(contentId) {
+          availableContentIds.forEach(function (contentId) {
             if (contentId.indexOf(searchKey) > -1) {
               contentIdList.push(contentId);
             }
@@ -227,12 +227,12 @@ angular.module('oppia').factory('TranslationStatusService', [
       return contentIdList;
     };
 
-    var _getActiveStateComponentStatus = function(componentName) {
+    var _getActiveStateComponentStatus = function (componentName) {
       var contentIdList = _getContentIdListRelatedToComponent(
         componentName, _getAvailableContentIds());
       var availableAudioCount = 0;
       if (contentIdList) {
-        contentIdList.forEach(function(contentId) {
+        contentIdList.forEach(function (contentId) {
           var availabilityStatus = _getActiveStateContentAvailabilityStatus(
             contentId);
           if (availabilityStatus.available) {
@@ -249,7 +249,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _getAvailableContentIds = function() {
+    var _getAvailableContentIds = function () {
       var availableContentIds = [];
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
         var writtenTranslations = StateWrittenTranslationsService.displayed;
@@ -262,7 +262,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       return availableContentIds;
     };
 
-    var _getActiveStateComponentNeedsUpdateStatus = function(componentName) {
+    var _getActiveStateComponentNeedsUpdateStatus = function (componentName) {
       var contentIdList = _getContentIdListRelatedToComponent(
         componentName, _getAvailableContentIds());
       var contentId = null;
@@ -279,7 +279,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       return false;
     };
 
-    var _getActiveStateContentIdStatusColor = function(contentId) {
+    var _getActiveStateContentIdStatusColor = function (contentId) {
       var availabilityStatus = _getActiveStateContentAvailabilityStatus(
         contentId);
       if (availabilityStatus.available) {
@@ -289,7 +289,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _getActiveStateContentIdNeedsUpdateStatus = function(contentId) {
+    var _getActiveStateContentIdNeedsUpdateStatus = function (contentId) {
       var availabilityStatus = _getActiveStateContentAvailabilityStatus(
         contentId);
       return availabilityStatus.needsUpdate;
@@ -312,31 +312,31 @@ angular.module('oppia').factory('TranslationStatusService', [
     };
 
     return {
-      refresh: function() {
+      refresh: function () {
         _computeAllStatesStatus();
       },
-      getAllStatesNeedUpdatewarning: function() {
+      getAllStatesNeedUpdatewarning: function () {
         return stateNeedsUpdateWarnings;
       },
-      getExplorationContentRequiredCount: function() {
+      getExplorationContentRequiredCount: function () {
         return _getExplorationContentRequiredCount();
       },
-      getExplorationContentNotAvailableCount: function() {
+      getExplorationContentNotAvailableCount: function () {
         return _getExplorationContentNotAvailableCount();
       },
-      getAllStateStatusColors: function() {
+      getAllStateStatusColors: function () {
         return stateWiseStatusColor;
       },
-      getActiveStateComponentStatusColor: function(componentName) {
+      getActiveStateComponentStatusColor: function (componentName) {
         return _getActiveStateComponentStatus(componentName);
       },
-      getActiveStateComponentNeedsUpdateStatus: function(componentName) {
+      getActiveStateComponentNeedsUpdateStatus: function (componentName) {
         return _getActiveStateComponentNeedsUpdateStatus(componentName);
       },
-      getActiveStateContentIdStatusColor: function(contentId) {
+      getActiveStateContentIdStatusColor: function (contentId) {
         return _getActiveStateContentIdStatusColor(contentId);
       },
-      getActiveStateContentIdNeedsUpdateStatus: function(contentId) {
+      getActiveStateContentIdNeedsUpdateStatus: function (contentId) {
         return _getActiveStateContentIdNeedsUpdateStatus(contentId);
       }
     };

@@ -28,9 +28,9 @@ angular.module('oppia').component('oppiaResponseRatioExpressionInput', {
   template: require('./ratio-expression-input-response.component.html'),
   controller: [
     '$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
+    function ($attrs, HtmlEscaperService) {
       var ctrl = this;
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.answer = Ratio.fromList(answer).toAnswerString();
       };

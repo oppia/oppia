@@ -19,10 +19,10 @@
 require('static/midi-js-c26ebb/build/MIDI.js');
 window.Base64Binary = require('static/midi-js-c26ebb/inc/shim/Base64binary.js');
 
-$(document).ready(function() {
+$(document).ready(function () {
   MIDI.loadPlugin({
     soundfontUrl: '/third_party/static/midi-js-c26ebb/examples/soundfont/',
     instrument: 'acoustic_grand_piano',
-    callback: function() {}
+    callback: function () {}
   });
 });

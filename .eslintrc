@@ -372,9 +372,9 @@
     "space-before-function-paren": [
       "error",
       {
-        "anonymous": "never",
-        "asyncArrow": "never",
-        "named": "never"
+        "anonymous": "always",
+        "asyncArrow": "always",
+        "named": "always"
       }
     ],
     "spaced-comment": [

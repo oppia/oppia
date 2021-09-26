@@ -40,23 +40,23 @@ export class EmailDashboardDataService {
   // Index of currently-shown page of query results.
   currentPageIndex: number = -1;
 
-  constructor(
+  constructor (
     private emailDashboardBackendApiService: EmailDashboardBackendApiService
   ) {}
 
-  getQueries(): EmailDashboardQuery[] {
+  getQueries (): EmailDashboardQuery[] {
     return this.queries;
   }
 
-  getCurrentPageIndex(): number {
+  getCurrentPageIndex (): number {
     return this.currentPageIndex;
   }
 
-  getLatestCursor(): string | null {
+  getLatestCursor (): string | null {
     return this.latestCursor;
   }
 
-  async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery[]> {
+  async submitQueryAsync (data: QueryData): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
@@ -68,7 +68,7 @@ export class EmailDashboardDataService {
     });
   }
 
-  async getNextQueriesAsync(): Promise<EmailDashboardQuery[]> {
+  async getNextQueriesAsync (): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -89,26 +89,26 @@ export class EmailDashboardDataService {
     }
   }
 
-  getPreviousQueries(): EmailDashboardQuery[] {
+  getPreviousQueries (): EmailDashboardQuery[] {
     var startQueryIndex = (this.currentPageIndex - 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     this.currentPageIndex = this.currentPageIndex - 1;
     return this.queries.slice(startQueryIndex, endQueryIndex);
   }
 
-  isNextPageAvailable(): boolean {
+  isNextPageAvailable (): boolean {
     var nextQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     return (this.queries.length > nextQueryIndex) || Boolean(this.latestCursor);
   }
 
-  isPreviousPageAvailable(): boolean {
+  isPreviousPageAvailable (): boolean {
     return (this.currentPageIndex > 0);
   }
 
-  async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
+  async fetchQueryAsync (queryId: string): Promise<EmailDashboardQuery> {
     return this.emailDashboardBackendApiService.fetchQueryAsync(queryId)
       .then(newQuery => {
-        this.queries.forEach(function(query, index, queries) {
+        this.queries.forEach(function (query, index, queries) {
           if (query.id === queryId) {
             queries[index] = newQuery;
           }

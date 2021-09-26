@@ -26,10 +26,10 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
   styleUrls: []
 })
 export class SkillEditorNavbarBreadcrumbComponent {
-  constructor(
+  constructor (
     private skillEditorStateService: SkillEditorStateService) {}
 
-  getTruncatedDescription(): string {
+  getTruncatedDescription (): string {
     const skill = this.skillEditorStateService.getSkill();
     const skillDescription = (
       skill ? skill.getDescription() : 'Skill description loading');

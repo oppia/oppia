@@ -31,7 +31,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
    templateUrl: './goals-tab.component.html'
  })
 export class GoalsTabComponent implements OnInit {
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
@@ -65,7 +65,7 @@ export class GoalsTabComponent implements OnInit {
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
@@ -95,11 +95,11 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  getTopicPageUrl(
+  getTopicPageUrl (
       topicUrlFragment: string, classroomUrlFragment: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
@@ -108,7 +108,7 @@ export class GoalsTabComponent implements OnInit {
       });
   }
 
-  getTopicClassification(topicId: string): number {
+  getTopicClassification (topicId: string): number {
     if (this.topicIdsInCurrentGoals.includes(topicId)) {
       return this.topicToIndexMapping.CURRENT;
     } else if (this.topicIdsInCompletedGoals.includes(topicId)) {
@@ -118,23 +118,23 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  doesTopicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
+  doesTopicBelongToLearntToPartiallyLearntTopics (topicName: string): boolean {
     if (this.learntToPartiallyLearntTopics.includes(topicName)) {
       return true;
     }
     return false;
   }
 
-  toggleStory(index: string): void {
+  toggleStory (index: string): void {
     this.currentGoalsStoryIsShown[index] = !(
       this.currentGoalsStoryIsShown[index]);
   }
 
-  async addToLearnerGoals(
+  async addToLearnerGoals (
       topic: LearnerTopicSummary, topicId: string,
       index: number): Promise<void> {
     var activityId = topicId;
@@ -166,7 +166,7 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
-  removeFromLearnerGoals(
+  removeFromLearnerGoals (
       topic: LearnerTopicSummary, topicId: string,
       topicName: string, index: number): void {
     var activityId = topicId;

@@ -51,10 +51,10 @@ export class MusicPhraseEditorComponent implements OnInit {
 
   _proxy!: string[];
 
-  get localValue(): string[] {
+  get localValue (): string[] {
     return this._proxy;
   }
-  set localValue(val: string[]) {
+  set localValue (val: string[]) {
     this._localValue = val;
     this._createProxy();
   }
@@ -77,16 +77,16 @@ export class MusicPhraseEditorComponent implements OnInit {
       max_value: this._MAX_NOTES_IN_PHRASE
     }]
   };
-  constructor(private alertsService: AlertsService) {
+  constructor (private alertsService: AlertsService) {
     this._createProxy();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
   }
 
-  private _createProxy(): void {
+  private _createProxy (): void {
     this._proxy = new Proxy(this._localValue, {
-      deleteProperty: function(target, property) {
+      deleteProperty: function (target, property) {
         return true;
       },
       set: (target, property, value, receiver) => {
@@ -102,7 +102,7 @@ export class MusicPhraseEditorComponent implements OnInit {
     });
   }
 
-  private _updateValue(newValue: string[]): void {
+  private _updateValue (newValue: string[]): void {
     if (newValue && this.value) {
       if (newValue.length > this._MAX_NOTES_IN_PHRASE) {
         this.alertsService.addWarning(
@@ -124,7 +124,7 @@ export class MusicPhraseEditorComponent implements OnInit {
     }
   }
 
-  updateValue(newValue: string[]): void {
+  updateValue (newValue: string[]): void {
     if (newValue.length !== this._localValue.length) {
       return;
     }
@@ -136,7 +136,7 @@ export class MusicPhraseEditorComponent implements OnInit {
     }
   }
 
-  getSchema(): MusicPhraseSchema {
+  getSchema (): MusicPhraseSchema {
     return this.schema;
   }
 }

@@ -44,37 +44,37 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
     'EditabilityService', 'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationWarningsService', 'InternetConnectivityService',
     'UserExplorationPermissionsService',
-    function(
+    function (
         $scope, $uibModal, ChangeListService,
         EditabilityService, ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService, InternetConnectivityService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.isPrivate = function() {
+      $scope.isPrivate = function () {
         return ExplorationRightsService.isPrivate();
       };
 
-      $scope.isExplorationLockedForEditing = function() {
+      $scope.isExplorationLockedForEditing = function () {
         return ChangeListService.isExplorationLockedForEditing();
       };
 
-      $scope.isEditableOutsideTutorialMode = function() {
+      $scope.isEditableOutsideTutorialMode = function () {
         return EditabilityService.isEditableOutsideTutorialMode() ||
           EditabilityService.isTranslatable();
       };
 
-      $scope.countWarnings = function() {
+      $scope.countWarnings = function () {
         return ExplorationWarningsService.countWarnings();
       };
 
-      $scope.discardChanges = function() {
+      $scope.discardChanges = function () {
         ExplorationSaveService.discardChanges();
       };
 
       let isModalDisplayed = false;
 
-      $scope.getChangeListLength = function() {
+      $scope.getChangeListLength = function () {
         var countChanges = ChangeListService.getChangeList().length;
 
         const MIN_CHANGES_DISPLAY_PROMPT = 50;
@@ -88,9 +88,9 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
               'exploration-save-prompt-modal.template.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
+          }).result.then(function () {
             $scope.saveChanges();
-          }, function() {
+          }, function () {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -99,11 +99,11 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         return ChangeListService.getChangeList().length;
       };
 
-      $scope.isExplorationSaveable = function() {
+      $scope.isExplorationSaveable = function () {
         return ExplorationSaveService.isExplorationSaveable();
       };
 
-      $scope.getPublishExplorationButtonTooltip = function() {
+      $scope.getPublishExplorationButtonTooltip = function () {
         if (!$scope.connectedToInternet) {
           return 'You can not publish the exploration when offline.';
         } else if ($scope.countWarnings() > 0) {
@@ -115,7 +115,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         }
       };
 
-      $scope.getSaveButtonTooltip = function() {
+      $scope.getSaveButtonTooltip = function () {
         if (!$scope.connectedToInternet) {
           return 'You can not save the exploration when offline.';
         } else if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
@@ -127,26 +127,26 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         }
       };
 
-      var showLoadingDots = function() {
+      var showLoadingDots = function () {
         $scope.loadingDotsAreShown = true;
       };
 
-      var hideLoadingAndUpdatePermission = function() {
+      var hideLoadingAndUpdatePermission = function () {
         $scope.loadingDotsAreShown = false;
         UserExplorationPermissionsService.fetchPermissionsAsync()
-          .then(function(permissions) {
+          .then(function (permissions) {
             $scope.explorationCanBePublished = permissions.canPublish;
             $scope.$applyAsync();
           });
       };
 
-      $scope.showPublishExplorationModal = function() {
+      $scope.showPublishExplorationModal = function () {
         $scope.publishIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.showPublishExplorationModal(
           showLoadingDots, hideLoadingAndUpdatePermission)
-          .then(function() {
+          .then(function () {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
@@ -154,20 +154,20 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.$applyAsync();
       };
 
-      $scope.saveChanges = function() {
+      $scope.saveChanges = function () {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.saveChanges(
           showLoadingDots, hideLoadingAndUpdatePermission)
-          .then(function() {
+          .then(function () {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
           });
         $scope.$applyAsync();
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.saveIsInProcess = false;
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
@@ -175,7 +175,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.connectedToInternet = true;
 
         UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
+          .then(function (permissions) {
             $scope.explorationCanBePublished = permissions.canPublish;
           });
         ctrl.directiveSubscriptions.add(
@@ -183,7 +183,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
             .subscribe(
               () => {
                 UserExplorationPermissionsService.getPermissionsAsync()
-                  .then(function(permissions) {
+                  .then(function (permissions) {
                     $scope.explorationCanBePublished = permissions.canPublish;
                     $scope.$applyAsync();
                   });
@@ -199,7 +199,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         );
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

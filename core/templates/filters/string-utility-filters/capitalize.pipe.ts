@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class CapitalizePipe {
-  transform(input: string): string {
+  transform (input: string): string {
     if (!input) {
       return input;
     }

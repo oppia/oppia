@@ -33,12 +33,12 @@ import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 export class AutosaveInfoModalsService {
   private _isModalOpen: boolean = false;
 
-  constructor(
+  constructor (
     private localStorageService: LocalStorageService,
     private ngbModal: NgbModal,
   ) {}
 
-  showNonStrictValidationFailModal(): void {
+  showNonStrictValidationFailModal (): void {
     const modelRef = this.ngbModal.open(
       SaveValidationFailModalComponent, {backdrop: true});
     modelRef.result.then(() => {
@@ -50,11 +50,11 @@ export class AutosaveInfoModalsService {
     this._isModalOpen = true;
   }
 
-  isModalOpen(): boolean {
+  isModalOpen (): boolean {
     return this._isModalOpen;
   }
 
-  showVersionMismatchModal(lostChanges: LostChange[]): void {
+  showVersionMismatchModal (lostChanges: LostChange[]): void {
     const modelRef = this.ngbModal.open(
       SaveVersionMismatchModalComponent, {
         backdrop: 'static',
@@ -70,7 +70,7 @@ export class AutosaveInfoModalsService {
     this._isModalOpen = true;
   }
 
-  showLostChangesModal(
+  showLostChangesModal (
       lostChanges: LostChange[], explorationId: string): void {
     const modelRef = this.ngbModal.open(
       LostChangesModalComponent, {

@@ -29,7 +29,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Unresolved Answers Overview Component', function() {
+describe('Unresolved Answers Overview Component', function () {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -55,12 +55,12 @@ describe('Unresolved Answers Overview Component', function() {
     });
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     editabilityService = TestBed.get(EditabilityService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
@@ -72,7 +72,7 @@ describe('Unresolved Answers Overview Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -95,13 +95,13 @@ describe('Unresolved Answers Overview Component', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.unresolvedAnswersOverviewIsShown).toBe(false);
       expect($scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
     });
 
   it('should check unresolved answers overview are shown when it has' +
-    ' state stats', function() {
+    ' state stats', function () {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
     spyOn(
       improvementsService,
@@ -112,7 +112,7 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   it('should check unresolved answers overview are not shown when it' +
-    ' has no state stats', function() {
+    ' has no state stats', function () {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(false);
     spyOn(
       improvementsService,
@@ -125,7 +125,7 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   it('should check unresolved answers overview are not shown when' +
-    ' the state is not forced to resolved unaddressed answers', function() {
+    ' the state is not forced to resolved unaddressed answers', function () {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
     spyOn(
       improvementsService,
@@ -136,7 +136,7 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   it('should check whenever the current interaction is trainable or not',
-    function() {
+    function () {
       stateInteractionIdService.init(stateName, 'CodeRepl');
       expect($scope.getCurrentInteractionId()).toBe('CodeRepl');
       expect($scope.isCurrentInteractionTrainable()).toBe(true);
@@ -147,7 +147,7 @@ describe('Unresolved Answers Overview Component', function() {
     });
 
   it('should check whenever the current interaction is linear or not',
-    function() {
+    function () {
       stateInteractionIdService.init(stateName, 'Continue');
       expect($scope.getCurrentInteractionId()).toBe('Continue');
       expect($scope.isCurrentInteractionLinear()).toBe(true);
@@ -157,7 +157,7 @@ describe('Unresolved Answers Overview Component', function() {
       expect($scope.isCurrentInteractionLinear()).toBe(false);
     });
 
-  it('should check editability when outside tutorial mode', function() {
+  it('should check editability when outside tutorial mode', function () {
     var editabilitySpy = spyOn(
       editabilityService, 'isEditableOutsideTutorialMode');
 
@@ -168,7 +168,7 @@ describe('Unresolved Answers Overview Component', function() {
     expect($scope.isEditableOutsideTutorialMode()).toBe(false);
   });
 
-  it('should open teach oppia modal', function() {
+  it('should open teach oppia modal', function () {
     spyOn($uibModal, 'open').and.callThrough();
 
     $scope.openTeachOppiaModal();
@@ -176,7 +176,7 @@ describe('Unresolved Answers Overview Component', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('should emit externalSave when closing the modal', function() {
+  it('should emit externalSave when closing the modal', function () {
     spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -189,7 +189,7 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   it('should broadcast externalSave flag when dismissing the modal',
-    function() {
+    function () {
       spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -201,7 +201,7 @@ describe('Unresolved Answers Overview Component', function() {
       expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
     });
 
-  it('should fetch unresolved state stats from backend', function() {
+  it('should fetch unresolved state stats from backend', function () {
     var unresolvedAnswers = [{
       answer: {},
       answerHtml: 'This is the answer html',

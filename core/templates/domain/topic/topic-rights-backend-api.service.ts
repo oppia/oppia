@@ -38,14 +38,14 @@ type TopicRightsCache = (
   providedIn: 'root'
 })
 export class TopicRightsBackendApiService {
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private httpClient: HttpClient
   ) {}
 
   topicRightsCache: TopicRightsCache = {};
 
-  private _fetchTopicRights(
+  private _fetchTopicRights (
       topicId: string,
       successCallback: (value: TopicRightsBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
@@ -62,7 +62,7 @@ export class TopicRightsBackendApiService {
       });
   }
 
-  private _setTopicStatus(
+  private _setTopicStatus (
       topicId: string,
       publishStatus: boolean,
       successCallback: (value: TopicRightsBackendResponse) => void,
@@ -86,7 +86,7 @@ export class TopicRightsBackendApiService {
     });
   }
 
-  private _sendMail(
+  private _sendMail (
       topicId: string,
       topicName: string,
       successCallback: (value?: void) => void,
@@ -107,11 +107,11 @@ export class TopicRightsBackendApiService {
     });
   }
 
-  private _isCached(topicId: string): boolean {
+  private _isCached (topicId: string): boolean {
     return this.topicRightsCache.hasOwnProperty(topicId);
   }
 
-  async fetchTopicRightsAsync(
+  async fetchTopicRightsAsync (
       topicId: string): Promise<TopicRightsBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchTopicRights(topicId, resolve, reject);
@@ -127,7 +127,7 @@ export class TopicRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  async loadTopicRightsAsync(
+  async loadTopicRightsAsync (
       topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(topicId)) {
@@ -147,7 +147,7 @@ export class TopicRightsBackendApiService {
    * local data cache or if it needs to be retrieved from the backend
    * upon a laod.
    */
-  isCached(topicId: string): boolean {
+  isCached (topicId: string): boolean {
     return this._isCached(topicId);
   }
 
@@ -155,7 +155,7 @@ export class TopicRightsBackendApiService {
    * Replaces the current topic rights in the cache given by the
    * specified topic ID with a new topic rights object.
    */
-  cacheTopicRights(
+  cacheTopicRights (
       topicId: string,
       topicRights: TopicRightsBackendResponse): void {
     this.topicRightsCache[topicId] = topicRights;
@@ -164,14 +164,14 @@ export class TopicRightsBackendApiService {
   /**
    * Publishes a topic.
    */
-  async publishTopicAsync(
+  async publishTopicAsync (
       topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, true, resolve, reject);
     });
   }
 
-  async sendMailAsync(
+  async sendMailAsync (
       topicId: string, topicName: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._sendMail(topicId, topicName, resolve, reject);
@@ -181,7 +181,7 @@ export class TopicRightsBackendApiService {
   /**
    * Unpublishes a topic.
    */
-  async unpublishTopicAsync(
+  async unpublishTopicAsync (
       topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, false, resolve, reject);

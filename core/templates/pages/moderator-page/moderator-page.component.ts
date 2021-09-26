@@ -62,7 +62,7 @@ export class ModeratorPageComponent {
     }
   };
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private dateTimeFormatService: DateTimeFormatService,
     private loaderService: LoaderService,
@@ -70,7 +70,7 @@ export class ModeratorPageComponent {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
-  updateDisplayedFeaturedActivityReferences(
+  updateDisplayedFeaturedActivityReferences (
       newValue: ActivityIdTypeDict[]): void {
     if (this.displayedFeaturedActivityReferences !== newValue) {
       this.displayedFeaturedActivityReferences = newValue;
@@ -78,7 +78,7 @@ export class ModeratorPageComponent {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('Loading');
     this.moderatorPageBackendApiService.getRecentCommitsAsync()
       .then((response) => {
@@ -110,20 +110,20 @@ export class ModeratorPageComponent {
       });
   }
 
-  getDatetimeAsString(millisSinceEpoch: number): string {
+  getDatetimeAsString (millisSinceEpoch: number): string {
     return this.dateTimeFormatService
       .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   }
 
-  isMessageFromExploration(message: ThreadMessage): boolean {
+  isMessageFromExploration (message: ThreadMessage): boolean {
     return message.entityType === AppConstants.ENTITY_TYPE.EXPLORATION;
   }
 
-  getExplorationCreateUrl(explorationId: string): string {
+  getExplorationCreateUrl (explorationId: string): string {
     return '/create/' + explorationId;
   }
 
-  getActivityCreateUrl(reference: ActivityIdTypeDict): string {
+  getActivityCreateUrl (reference: ActivityIdTypeDict): string {
     let path: string = (
           reference.type === AppConstants.ENTITY_TYPE.EXPLORATION ?
           '/create' :
@@ -131,13 +131,13 @@ export class ModeratorPageComponent {
     return path + '/' + reference.id;
   }
 
-  isSaveFeaturedActivitiesButtonDisabled(): boolean {
+  isSaveFeaturedActivitiesButtonDisabled (): boolean {
     return isEqual(
       this.displayedFeaturedActivityReferences,
       this.lastSavedFeaturedActivityReferences);
   }
 
-  saveFeaturedActivityReferences(): void {
+  saveFeaturedActivityReferences (): void {
     this.alertsService.clearWarnings();
 
     let activityReferencesToSave =
@@ -151,7 +151,7 @@ export class ModeratorPageComponent {
       });
   }
 
-  getSchema(): Schema {
+  getSchema (): Schema {
     return this.FEATURED_ACTIVITY_REFERENCES_SCHEMA;
   }
 }

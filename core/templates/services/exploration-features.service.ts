@@ -49,7 +49,7 @@ export class ExplorationFeaturesService {
    * @param explorationData - An ExplorationData object.
    * @param featuresData - An ExplorationFeatures object.
    */
-  init(
+  init (
       explorationData: ExplorationDataDict,
       featuresData: ExplorationFeatures): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
@@ -74,28 +74,28 @@ export class ExplorationFeaturesService {
   /**
    * @returns - Whether a service is initialized.
    */
-  isInitialized(): boolean {
+  isInitialized (): boolean {
     return ExplorationFeaturesService.serviceIsInitialized;
   }
 
   /**
    * @returns - Checks whether the parameters are enabled.
    */
-  areParametersEnabled(): boolean {
+  areParametersEnabled (): boolean {
     return ExplorationFeaturesService.settings.areParametersEnabled;
   }
 
   /**
    * @returns - Whether the play through recording is enabled.
    */
-  isPlaythroughRecordingEnabled(): boolean {
+  isPlaythroughRecordingEnabled (): boolean {
     return ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled;
   }
 
   /**
    * Enables the parameters feature.
    */
-  enableParameters(): void {
+  enableParameters (): void {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
 }

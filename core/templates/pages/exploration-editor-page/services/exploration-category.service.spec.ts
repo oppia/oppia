@@ -24,20 +24,20 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require(
   'pages/exploration-editor-page/services/exploration-category.service.ts');
 
-describe('Exploration Category Service', function() {
+describe('Exploration Category Service', function () {
   let ecs = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('oppia');
   });
   importAllAngularServices();
-  beforeEach(function() {
-    angular.mock.inject(function($injector) {
+  beforeEach(function () {
+    angular.mock.inject(function ($injector) {
       ecs = $injector.get('ExplorationCategoryService');
     });
   });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(ecs.propertyName).toBe('category');
     expect(ecs._isValid('Algorithms')).toBe(true);
     let NotNormalize = '   Exploration             Category Service     ';

@@ -55,38 +55,38 @@ angular.module('oppia').component('questionEditor', {
     'QuestionUpdateService', 'SolutionValidityService',
     'StateEditorService', 'StateInteractionIdService',
     'UrlInterpolationService',
-    function(
+    function (
         $uibModal, EditabilityService, LoaderService,
         QuestionUpdateService, SolutionValidityService,
         StateEditorService, StateInteractionIdService,
         UrlInterpolationService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.getStateContentPlaceholder = function() {
+      ctrl.getStateContentPlaceholder = function () {
         return 'Type your question here.';
       };
 
-      ctrl.getStateContentSaveButtonPlaceholder = function() {
+      ctrl.getStateContentSaveButtonPlaceholder = function () {
         return 'Save Question';
       };
 
-      ctrl.navigateToState = function() {
+      ctrl.navigateToState = function () {
         return;
       };
 
-      ctrl.addState = function() {
+      ctrl.addState = function () {
         return;
       };
 
-      ctrl.recomputeGraph = function() {
+      ctrl.recomputeGraph = function () {
         return;
       };
 
-      ctrl.refreshWarnings = function() {
+      ctrl.refreshWarnings = function () {
         return;
       };
 
-      var _init = function() {
+      var _init = function () {
         StateEditorService.setStateNames([]);
         StateEditorService.setCorrectnessFeedbackEnabled(true);
         StateEditorService.setInQuestionMode(true);
@@ -107,7 +107,7 @@ angular.module('oppia').component('questionEditor', {
         ctrl.stateEditorInitialized = true;
       };
 
-      var _updateQuestion = function(updateFunction) {
+      var _updateQuestion = function (updateFunction) {
         if (ctrl.questionChanged) {
           ctrl.questionChanged();
         }
@@ -115,65 +115,65 @@ angular.module('oppia').component('questionEditor', {
           ctrl.question, updateFunction);
       };
 
-      ctrl.saveStateContent = function(displayedValue) {
+      ctrl.saveStateContent = function (displayedValue) {
         // Show the interaction when the text content is saved, even if no
         // content is entered.
-        _updateQuestion(function() {
+        _updateQuestion(function () {
           var stateData = ctrl.question.getStateData();
           stateData.content = angular.copy(displayedValue);
           ctrl.interactionIsShown = true;
         });
       };
 
-      ctrl.saveInteractionId = function(displayedValue) {
-        _updateQuestion(function() {
+      ctrl.saveInteractionId = function (displayedValue) {
+        _updateQuestion(function () {
           StateEditorService.setInteractionId(angular.copy(displayedValue));
         });
       };
 
-      ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
-        _updateQuestion(function() {
+      ctrl.saveInteractionAnswerGroups = function (newAnswerGroups) {
+        _updateQuestion(function () {
           StateEditorService.setInteractionAnswerGroups(
             angular.copy(newAnswerGroups));
         });
       };
 
-      ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
-        _updateQuestion(function() {
+      ctrl.saveInteractionDefaultOutcome = function (newOutcome) {
+        _updateQuestion(function () {
           StateEditorService.setInteractionDefaultOutcome(
             angular.copy(newOutcome));
         });
       };
 
-      ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
-        _updateQuestion(function() {
+      ctrl.saveInteractionCustomizationArgs = function (displayedValue) {
+        _updateQuestion(function () {
           StateEditorService.setInteractionCustomizationArgs(
             angular.copy(displayedValue));
         });
       };
 
-      ctrl.saveNextContentIdIndex = function(displayedValue) {
-        _updateQuestion(function() {
+      ctrl.saveNextContentIdIndex = function (displayedValue) {
+        _updateQuestion(function () {
           var stateData = ctrl.question.getStateData();
           stateData.nextContentIdIndex = angular.copy(displayedValue);
         });
       };
 
-      ctrl.saveSolution = function(displayedValue) {
-        _updateQuestion(function() {
+      ctrl.saveSolution = function (displayedValue) {
+        _updateQuestion(function () {
           StateEditorService.setInteractionSolution(
             angular.copy(displayedValue));
         });
       };
 
-      ctrl.saveHints = function(displayedValue) {
-        _updateQuestion(function() {
+      ctrl.saveHints = function (displayedValue) {
+        _updateQuestion(function () {
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
         });
       };
 
-      ctrl.saveInapplicableSkillMisconceptionIds = function(
+      ctrl.saveInapplicableSkillMisconceptionIds = function (
           displayedValue) {
         StateEditorService.setInapplicableSkillMisconceptionIds(
           angular.copy(displayedValue));
@@ -181,7 +181,7 @@ angular.module('oppia').component('questionEditor', {
           ctrl.question, displayedValue);
       };
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function (
           contentIds) {
         var state = ctrl.question.getStateData();
         var recordedVoiceovers = state.recordedVoiceovers;
@@ -198,8 +198,8 @@ angular.module('oppia').component('questionEditor', {
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
-            updateQuestion(function() {
+          }).result.then(function () {
+            updateQuestion(function () {
               contentIds.forEach(contentId => {
                 if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
                   recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
@@ -214,14 +214,14 @@ angular.module('oppia').component('questionEditor', {
                 }
               });
             });
-          }, function() {
+          }, function () {
             // This callback is triggered when the Cancel button is
             // clicked. No further action is needed.
           });
         }
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           StateEditorService.onStateEditorDirectiveInitialized.subscribe(
             () => _init()
@@ -256,7 +256,7 @@ angular.module('oppia').component('questionEditor', {
         // in $scope.$on when some external events are triggered.
         _init();
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

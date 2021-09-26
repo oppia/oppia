@@ -75,17 +75,17 @@ describe('Preferences Page Component', () => {
 
   @Pipe({name: 'truncate'})
   class MockTruncatePipe {
-    transform(value: string, params: Object | undefined): string {
+    transform (value: string, params: Object | undefined): string {
       return value;
     }
   }
 
   class MockUserBackendApiService {
-    async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+    async getPreferencesAsync (): Promise<PreferencesBackendDict> {
       return Promise.resolve(preferencesData);
     }
 
-    async updatePreferencesDataAsync(
+    async updatePreferencesDataAsync (
         updateType: string,
         data: boolean | string | string[] | EmailPreferencesBackendDict
     ): Promise<UpdatePreferencesResponse> {

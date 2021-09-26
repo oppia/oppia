@@ -37,7 +37,7 @@ export class ExplorationPermissions {
   canEdit: boolean;
   canManageVoiceArtist: boolean;
 
-  constructor(
+  constructor (
       canUnpublish: boolean, canReleaseOwnership: boolean, canPublish: boolean,
       canVoiceover: boolean, canDelete: boolean, canModifyRoles: boolean,
       canEdit: boolean, canManageVoiceArtist: boolean) {
@@ -51,7 +51,7 @@ export class ExplorationPermissions {
     this.canManageVoiceArtist = canManageVoiceArtist;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ExplorationPermissionsBackendDict): ExplorationPermissions {
     return new ExplorationPermissions(
       backendDict.can_unpublish, backendDict.can_release_ownership,

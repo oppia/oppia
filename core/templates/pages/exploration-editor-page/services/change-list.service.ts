@@ -84,7 +84,7 @@ export class ChangeListService {
   changeListAddedTimeoutId = null;
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private alertsService: AlertsService,
     private autosaveInfoModalsService: AutosaveInfoModalsService,
@@ -110,7 +110,7 @@ export class ChangeListService {
       });
   }
 
-  private autosaveChangeListOnChange(explorationChangeList) {
+  private autosaveChangeListOnChange (explorationChangeList) {
     // Asynchronously send an autosave request, and check for errors in the
     // response:
     // If error is present -> Check for the type of error occurred
@@ -146,7 +146,7 @@ export class ChangeListService {
     );
   }
 
-  private addChange(changeDict: ExplorationChange) {
+  private addChange (changeDict: ExplorationChange) {
     if (this.loadingMessage) {
       return;
     }
@@ -172,7 +172,7 @@ export class ChangeListService {
    * @param {string} stateName - The name of the newly-added state
    */
 
-  addState(stateName: string): void {
+  addState (stateName: string): void {
     this.addChange({
       cmd: 'add_state',
       state_name: stateName
@@ -187,14 +187,14 @@ export class ChangeListService {
    * @param {string} stateName - The name of the deleted state.
    */
 
-  deleteState(stateName: string): void {
+  deleteState (stateName: string): void {
     this.addChange({
       cmd: 'delete_state',
       state_name: stateName
     });
   }
 
-  discardAllChanges(): Promise<void> {
+  discardAllChanges (): Promise<void> {
     this.explorationChangeList = [];
     this.undoneChangeStack = [];
     return this.explorationDataService.discardDraftAsync();
@@ -211,7 +211,7 @@ export class ChangeListService {
    * @param {string} oldValue - The previous value of the property
    */
 
-  editExplorationProperty(
+  editExplorationProperty (
       backendName: string, newValue: string, oldValue: string): void {
     if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning(
@@ -237,7 +237,7 @@ export class ChangeListService {
    * @param {string} oldValue - The previous value of the property
    */
 
-  editStateProperty(
+  editStateProperty (
       stateName: string, backendName: string,
       newValue: string, oldValue: string): void {
     if (!this.ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
@@ -253,11 +253,11 @@ export class ChangeListService {
     });
   }
 
-  getChangeList(): ExplorationChange[] {
+  getChangeList (): ExplorationChange[] {
     return angular.copy(this.explorationChangeList);
   }
 
-  isExplorationLockedForEditing(): boolean {
+  isExplorationLockedForEditing (): boolean {
     return this.explorationChangeList.length > 0;
   }
 
@@ -268,7 +268,7 @@ export class ChangeListService {
    * @param {object} changeList - Autosaved changeList data
    */
 
-  loadAutosavedChangeList(changeList: ExplorationChange[]): void {
+  loadAutosavedChangeList (changeList: ExplorationChange[]): void {
     this.explorationChangeList = changeList;
   }
 
@@ -282,7 +282,7 @@ export class ChangeListService {
    * @param {string} newStateName - The new name of the state
    * @param {string} oldStateName - The previous name of the state
    */
-  renameState(newStateName: string, oldStateName: string): void {
+  renameState (newStateName: string, oldStateName: string): void {
     this.addChange({
       cmd: 'rename_state',
       new_state_name: newStateName,
@@ -290,7 +290,7 @@ export class ChangeListService {
     });
   }
 
-  addWrittenTranslation(
+  addWrittenTranslation (
       contentId: string, dataFormat: string, languageCode: string,
       stateName: string, translationHtml: string): void {
   // Written translations submitted via the translation tab in the
@@ -319,7 +319,7 @@ export class ChangeListService {
    * @param {string} languageCode - The language code.
    * @param {string} stateName - The current state name.
    */
-  markTranslationAsNeedingUpdate(
+  markTranslationAsNeedingUpdate (
       contentId: string, languageCode: string, stateName: string): void {
     this.addChange({
       cmd: 'mark_written_translation_as_needing_update',
@@ -336,7 +336,7 @@ export class ChangeListService {
    * @param {string} contentId - The content id of the translated content.
    * @param {string} stateName - The current state name.
    */
-  markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {
+  markTranslationsAsNeedingUpdate (contentId: string, stateName: string): void {
     this.addChange({
       cmd: 'mark_written_translations_as_needing_update',
       content_id: contentId,
@@ -344,7 +344,7 @@ export class ChangeListService {
     });
   }
 
-  undoLastChange(): void {
+  undoLastChange (): void {
     if (this.explorationChangeList.length === 0) {
       this.alertsService.addWarning('There are no changes to undo.');
       return;
@@ -354,7 +354,7 @@ export class ChangeListService {
     this.autosaveChangeListOnChange(this.explorationChangeList);
   }
 
-  get autosaveIsInProgress$(): Observable<boolean> {
+  get autosaveIsInProgress$ (): Observable<boolean> {
     return this.autosaveInProgressEventEmitter.asObservable();
   }
 }

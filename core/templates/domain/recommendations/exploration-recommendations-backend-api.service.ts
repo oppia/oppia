@@ -46,10 +46,10 @@ export interface RecommendedExplorationSummariesBackendDict {
   providedIn: 'root'
 })
 export class ExplorationRecommendationsBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient) { }
 
-  async getRecommendedSummaryDictsAsync(
+  async getRecommendedSummaryDictsAsync (
       authorRecommendedExpIds: string[],
       includeSystemRecommendations: string,
       // 'collectionId', 'storyId' and 'currentNodeId' can be null

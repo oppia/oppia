@@ -71,7 +71,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   imageContainerStyle: { height: string; width?: string; };
   loadingIndicatorStyle: { height: string; width?: string; };
   allRegions: LabeledRegion[];
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
@@ -84,14 +84,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  private _getAttrs() {
+  private _getAttrs () {
     return {
       imageAndRegionsWithValue: this.imageAndRegionsWithValue,
       highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue
     };
   }
 
-  private _isMouseInsideRegion(regionArea): boolean {
+  private _isMouseInsideRegion (regionArea): boolean {
     return (
       this.mouseX >= regionArea[0][0] &&
       this.mouseX <= regionArea[1][0] &&
@@ -100,7 +100,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     );
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const {
       imageAndRegions,
       highlightRegionsOnHover
@@ -175,7 +175,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     this.currentInteractionService.registerCurrentInteraction(null, null);
   }
 
-  loadImage(): void {
+  loadImage (): void {
     this.imagePreloaderService.getImageUrlAsync(this.filepath)
       .then((objectUrl: string) => {
         this.isTryAgainShown = false;
@@ -187,7 +187,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       });
   }
 
-  updateCurrentlyHoveredRegions(): void {
+  updateCurrentlyHoveredRegions (): void {
     for (let i = 0; i < this.imageAndRegions.labeledRegions.length; i++) {
       const labeledRegion = this.imageAndRegions.labeledRegions[i];
       const regionArea = labeledRegion.region.area;
@@ -197,7 +197,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     }
   }
 
-  getRegionDimensions(index: number): RectangleRegion {
+  getRegionDimensions (index: number): RectangleRegion {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
     const image = images[0];
@@ -218,14 +218,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     return returnValue;
   }
 
-  getRegionDisplay(label: string): 'none' | 'inline' {
+  getRegionDisplay (label: string): 'none' | 'inline' {
     if (this.currentlyHoveredRegions.indexOf(label) === -1) {
       return 'none';
     }
     return 'inline';
   }
 
-  getDotDisplay(): 'none' | 'inline' {
+  getDotDisplay (): 'none' | 'inline' {
     if (this.contextService.getEditorTabContext() ===
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
       return 'none';
@@ -233,7 +233,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     return 'inline';
   }
 
-  getDotLocation(): ImagePoint {
+  getDotLocation (): ImagePoint {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
     const image: HTMLImageElement = images[0];
@@ -254,7 +254,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     return dotLocation;
   }
 
-  onMousemoveImage(event: MouseEvent): void {
+  onMousemoveImage (event: MouseEvent): void {
     if (!this.interactionIsActive) {
       return;
     }
@@ -269,7 +269,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     this.updateCurrentlyHoveredRegions();
   }
 
-  onClickImage(): void {
+  onClickImage (): void {
     const answer = {
       clickPosition: [this.mouseX, this.mouseY],
       clickedRegions: this.currentlyHoveredRegions
@@ -279,7 +279,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       this.imageClickInputRulesService as unknown as InteractionRulesService);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.componentSubscriptions.unsubscribe();
   }
 }

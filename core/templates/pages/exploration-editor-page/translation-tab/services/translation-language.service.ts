@@ -36,21 +36,21 @@ export class TranslationLanguageService {
     this.languageUtilService.getAllVoiceoverLanguageCodes());
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
 
-  constructor(
+  constructor (
     private languageUtilService: LanguageUtilService,
     private loggerService: LoggerService) {}
 
-  getActiveLanguageCode(): string {
+  getActiveLanguageCode (): string {
     return this.activeLanguageCode;
   }
 
-  getActiveLanguageDirection(): string {
+  getActiveLanguageDirection (): string {
     return this.languageUtilService.getLanguageDirection(
       this.getActiveLanguageCode());
   }
 
   // This function throws an error if 'newActiveLanguageCode' is invalid.
-  setActiveLanguageCode(newActiveLanguageCode: string): void {
+  setActiveLanguageCode (newActiveLanguageCode: string): void {
     if (newActiveLanguageCode &&
         this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
       this.loggerService.error(
@@ -62,7 +62,7 @@ export class TranslationLanguageService {
   }
 
   // Function returns null when active language code is not set.
-  getActiveLanguageDescription(): string | null {
+  getActiveLanguageDescription (): string | null {
     if (!this.activeLanguageCode) {
       return null;
     }
@@ -70,7 +70,7 @@ export class TranslationLanguageService {
       this.activeLanguageCode);
   }
 
-  get onActiveLanguageChanged(): EventEmitter<void> {
+  get onActiveLanguageChanged (): EventEmitter<void> {
     return this._activeLanguageChangedEventEmitter;
   }
 }

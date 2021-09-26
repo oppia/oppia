@@ -69,7 +69,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
   dimensions: ImageDimensions;
   imageContainerStyle: Dimension;
   loadingIndicatorStyle: Dimension;
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
@@ -79,7 +79,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  private _updateViewOnNewImage(): void {
+  private _updateViewOnNewImage (): void {
     if (
       !this.filepathWithValue || !this.altWithValue || !this.captionWithValue
     ) {
@@ -168,11 +168,11 @@ export class NoninteractiveImage implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateViewOnNewImage();
   }
 
-  loadImage(): void {
+  loadImage (): void {
     this.isLoadingIndicatorShown = true;
     this.isTryAgainShown = false;
     this.imagePreloaderService.getImageUrlAsync(
@@ -186,7 +186,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (
       changes.filepathWithValue ||
       changes.altWithValue ||

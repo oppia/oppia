@@ -59,7 +59,7 @@ var INTERACTIONS = {
   CodeRepl: require('./CodeRepl/protractor.js')
 };
 
-var getInteraction = function(interactionName) {
+var getInteraction = function (interactionName) {
   if (INTERACTIONS.hasOwnProperty(interactionName)) {
     return INTERACTIONS[interactionName];
   } else {

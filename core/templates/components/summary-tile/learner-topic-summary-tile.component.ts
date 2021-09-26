@@ -37,12 +37,12 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   topicTitle: string;
   thumbnailBgColor: string;
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
-  getTopicLink(): string {
+  getTopicLink (): string {
     if (!this.topicSummary.classroom || !this.topicSummary.urlFragment) {
       return '#';
     }
@@ -53,7 +53,7 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.topicSummary.getThumbnailFilename()) {
       this.thumbnailUrl = (
         this.assetsBackendApiService.getThumbnailUrlForPreview(

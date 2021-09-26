@@ -52,11 +52,11 @@ interface QuestionSummariesResponse {
   providedIn: 'root'
 })
 export class QuestionBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchQuestions(
+  private _fetchQuestions (
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
       successCallback: (value: QuestionBackendDict[]) => void,
@@ -85,7 +85,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchTotalQuestionCountForSkillIds(
+  private _fetchTotalQuestionCountForSkillIds (
       skillIds: string[],
       successCallback: (value: number) => void,
       errorCallback: (reason: string) => void): void {
@@ -105,7 +105,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchQuestionSummaries(
+  private _fetchQuestionSummaries (
       skillId: string, offset: number,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
@@ -137,7 +137,7 @@ export class QuestionBackendApiService {
   /**
    * Does basic validation on input.
    */
-  private validateRequestParameters(
+  private validateRequestParameters (
       skillIds: string[], questionCount: number,
       errorCallback: (reason: string) => void): boolean {
     if (!this.isListOfStrings(skillIds)) {
@@ -158,7 +158,7 @@ export class QuestionBackendApiService {
    */
   // The type of list is unknown because it can be anything
   // and if this function returns true. The type of list becomes string[].
-  private isListOfStrings(list: unknown): list is string[] {
+  private isListOfStrings (list: unknown): list is string[] {
     if (!Array.isArray(list)) {
       return false;
     }
@@ -172,7 +172,7 @@ export class QuestionBackendApiService {
    */
   // The type of n is unknown because it can be anything
   // and if this function returns true. The type of n becomes number.
-  private isInt(n: unknown): n is number {
+  private isInt (n: unknown): n is number {
     return typeof n === 'number' && n % 1 === 0;
   }
 
@@ -180,7 +180,7 @@ export class QuestionBackendApiService {
    * Returns a list of questions based on the list of skill ids and number
    * of questions requested.
    */
-  async fetchQuestionsAsync(
+  async fetchQuestionsAsync (
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
@@ -190,14 +190,14 @@ export class QuestionBackendApiService {
     });
   }
 
-  async fetchTotalQuestionCountForSkillIdsAsync(
+  async fetchTotalQuestionCountForSkillIdsAsync (
       skillIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
       this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
     });
   }
 
-  async fetchQuestionSummariesAsync(
+  async fetchQuestionSummariesAsync (
       skillId: string,
       offset: number = 0): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {

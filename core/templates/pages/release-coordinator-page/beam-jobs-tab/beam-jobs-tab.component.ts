@@ -55,13 +55,13 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   filteredBeamJobRuns: Observable<BeamJobRun[]>;
   beamJobRunsRefreshIntervalSubscription: Subscription;
 
-  constructor(
+  constructor (
       private backendApiService: ReleaseCoordinatorBackendApiService,
       private alertsService: AlertsService,
       private matDialog: MatDialog,
       private ngZone: NgZone) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const initialBeamJobs = this.backendApiService.getBeamJobs()
       .pipe(catchError(error => this.onError<BeamJob>(error)));
     const initialBeamJobRuns = this.backendApiService.getBeamJobRuns()
@@ -126,23 +126,23 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.jobNames.complete();
     this.beamJobRuns.complete();
     this.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }
 
-  onError<T>(error: Error): Observable<T[]> {
+  onError<T> (error: Error): Observable<T[]> {
     this.dataFailedToLoad = true;
     this.alertsService.addWarning(error.message);
     return of([]);
   }
 
-  onJobNameSelect(jobName: string): void {
+  onJobNameSelect (jobName: string): void {
     this.selectedJob = this.beamJobs.find(job => job.name === jobName);
   }
 
-  onStartNewClick(ev: Event): void {
+  onStartNewClick (ev: Event): void {
     // Don't trigger the input field, which is underneath the Start New button.
     ev.stopPropagation();
 
@@ -155,7 +155,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
       });
   }
 
-  onCancelClick(beamJobRun: BeamJobRun): void {
+  onCancelClick (beamJobRun: BeamJobRun): void {
     this.matDialog
       .open(CancelBeamJobDialogComponent, { data: beamJobRun })
       .afterClosed().pipe(first()).subscribe(cancelledBeamJobRun => {
@@ -165,22 +165,22 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
       });
   }
 
-  onViewOutputClick(beamJobRun: BeamJobRun): void {
+  onViewOutputClick (beamJobRun: BeamJobRun): void {
     this.matDialog.open(ViewBeamJobOutputDialogComponent, { data: beamJobRun });
   }
 
-  private filterJobNames(input: string, jobNames: string[]): string[] {
+  private filterJobNames (input: string, jobNames: string[]): string[] {
     const filterValue = input.toLowerCase();
     return jobNames.filter(n => n.toLowerCase().includes(filterValue));
   }
 
-  private addNewBeamJobRun(newRun: BeamJobRun): void {
+  private addNewBeamJobRun (newRun: BeamJobRun): void {
     const newBeamJobRuns = this.beamJobRuns.value.slice();
     newBeamJobRuns.unshift(newRun);
     this.beamJobRuns.next(newBeamJobRuns);
   }
 
-  private replaceBeamJobRun(oldRun: BeamJobRun, newRun: BeamJobRun): void {
+  private replaceBeamJobRun (oldRun: BeamJobRun, newRun: BeamJobRun): void {
     const newBeamJobRuns = this.beamJobRuns.value.slice();
     newBeamJobRuns.splice(newBeamJobRuns.indexOf(oldRun), 1, newRun);
     this.beamJobRuns.next(newBeamJobRuns);

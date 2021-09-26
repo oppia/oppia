@@ -43,11 +43,11 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   choices: Choice[];
   initValues: unknown[];
   eventBusGroup: EventBusGroup;
-  constructor(private eventBusService: EventBusService) {
+  constructor (private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  allowedChoices(): Choice[] {
+  allowedChoices (): Choice[] {
     const allowedList = [];
     for (var i = 1; i <= this.choices.length; i++) {
       allowedList.push(i);
@@ -55,7 +55,7 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
     return allowedList;
   }
 
-  selectItem(choiceListIndex: number): void {
+  selectItem (choiceListIndex: number): void {
     const choiceContentId = this.choices[choiceListIndex].val;
     const selectedRank = parseInt(
       this.choices[choiceListIndex].selectedRank) - 1;
@@ -102,7 +102,7 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
     this.validateOrdering();
   }
 
-  validateOrdering(): void {
+  validateOrdering (): void {
     const selectedRankList = [];
     for (let i = 0; i < this.choices.length; i++) {
       selectedRankList.push(+this.choices[i].selectedRank);
@@ -140,7 +140,7 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
     return;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.initValues = [];
     this.choices = this.initArgs.choices;
 

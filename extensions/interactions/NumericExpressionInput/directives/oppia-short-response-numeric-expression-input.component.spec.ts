@@ -20,7 +20,7 @@
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { ShortResponseNumericExpressionInput } from './oppia-short-response-numeric-expression-input.component';
 
-describe('ShortResponseNumericExpressionInput', function() {
+describe('ShortResponseNumericExpressionInput', function () {
   let component: ShortResponseNumericExpressionInput;
   let fixture: ComponentFixture<ShortResponseNumericExpressionInput>;
 
@@ -38,7 +38,7 @@ describe('ShortResponseNumericExpressionInput', function() {
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.displayAnswer).toBe('answer');
   });

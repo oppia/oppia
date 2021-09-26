@@ -364,12 +364,12 @@ describe('Image preloader service', () => {
   class mockReaderObject {
     result = null;
     onloadend = null;
-    constructor() {
+    constructor () {
       this.onloadend = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL (file) {
       this.onloadend();
       return 'The file is loaded';
     }

@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { Subscription } from 'rxjs';
 
-describe('Training Modal Service', function() {
+describe('Training Modal Service', function () {
   var TrainingModalService = null;
   var AlertsService = null;
   var ExternalSaveService = null;
@@ -32,14 +32,14 @@ describe('Training Modal Service', function() {
   var externalSaveSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     TrainingModalService = $injector.get(
       'TrainingModalService');
     AlertsService = $injector.get('AlertsService');
@@ -57,7 +57,7 @@ describe('Training Modal Service', function() {
     testSubscriptions.unsubscribe();
   });
 
-  it('should open $uibModal', function() {
+  it('should open $uibModal', function () {
     var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings')
       .and.callThrough();
     TrainingModalService.openTrainUnresolvedAnswerModal();

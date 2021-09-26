@@ -37,39 +37,39 @@ import { VoiceoverBackendDict, Voiceover } from
   'domain/exploration/voiceover.model';
 export class RecordedVoiceovers {
   voiceoversMapping: VoiceoverMapping;
-  constructor(
+  constructor (
       voiceoversMapping: VoiceoverMapping) {
     this.voiceoversMapping = voiceoversMapping;
   }
 
-  getAllContentIds(): string[] {
+  getAllContentIds (): string[] {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): BindableVoiceovers {
+  getBindableVoiceovers (contentId: string): BindableVoiceovers {
     return this.voiceoversMapping[contentId];
   }
 
-  getVoiceover(contentId: string, langCode: string): Voiceover {
+  getVoiceover (contentId: string, langCode: string): Voiceover {
     return this.voiceoversMapping[contentId][langCode];
   }
 
-  markAllVoiceoversAsNeedingUpdate(contentId: string): void {
+  markAllVoiceoversAsNeedingUpdate (contentId: string): void {
     let languageCodeToVoiceover = this.voiceoversMapping[contentId];
     for (let languageCode in languageCodeToVoiceover) {
       languageCodeToVoiceover[languageCode].markAsNeedingUpdate();
     }
   }
 
-  getLanguageCodes(contentId: string): string[] {
+  getLanguageCodes (contentId: string): string[] {
     return Object.keys(this.voiceoversMapping[contentId]);
   }
 
-  hasVoiceovers(contentId: string): boolean {
+  hasVoiceovers (contentId: string): boolean {
     return this.getLanguageCodes(contentId).length > 0;
   }
 
-  hasUnflaggedVoiceovers(contentId: string): boolean {
+  hasUnflaggedVoiceovers (contentId: string): boolean {
     let languageCodeToVoiceover = this.voiceoversMapping[contentId];
     for (let languageCode in languageCodeToVoiceover) {
       if (!languageCodeToVoiceover[languageCode].needsUpdate) {
@@ -79,21 +79,21 @@ export class RecordedVoiceovers {
     return false;
   }
 
-  addContentId(contentId: string): void {
+  addContentId (contentId: string): void {
     if (this.voiceoversMapping.hasOwnProperty(contentId)) {
       throw new Error('Trying to add duplicate content id.');
     }
     this.voiceoversMapping[contentId] = {};
   }
 
-  deleteContentId(contentId: string): void {
+  deleteContentId (contentId: string): void {
     if (!this.voiceoversMapping.hasOwnProperty(contentId)) {
       throw new Error('Unable to find the given content id.');
     }
     delete this.voiceoversMapping[contentId];
   }
 
-  addVoiceover(
+  addVoiceover (
       contentId: string, languageCode: string, filename: string,
       fileSizeBytes: number, durationSecs: number): void {
     let languageCodeToVoiceover = this.voiceoversMapping[contentId];
@@ -105,7 +105,7 @@ export class RecordedVoiceovers {
         filename, fileSizeBytes, durationSecs);
   }
 
-  deleteVoiceover(contentId: string, languageCode: string): void {
+  deleteVoiceover (contentId: string, languageCode: string): void {
     let languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
       throw new Error(
@@ -115,13 +115,13 @@ export class RecordedVoiceovers {
     delete languageCodeToVoiceover[languageCode];
   }
 
-  toggleNeedsUpdateAttribute(contentId: string, languageCode: string): void {
+  toggleNeedsUpdateAttribute (contentId: string, languageCode: string): void {
     let languageCodeToVoiceover = this.voiceoversMapping[contentId];
     languageCodeToVoiceover[languageCode].toggleNeedsUpdateAttribute();
   }
 
 
-  toBackendDict(): RecordedVoiceOverBackendDict {
+  toBackendDict (): RecordedVoiceOverBackendDict {
     let voiceoversMappingDict:
      Record<string, Record<string, VoiceoverBackendDict>> = {};
     for (let contentId in this.voiceoversMapping) {
@@ -139,7 +139,7 @@ export class RecordedVoiceovers {
     };
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       recordedVoiceoversDict: RecordedVoiceOverBackendDict):
       RecordedVoiceovers {
     let voiceoversMapping: VoiceoverMapping = {};
@@ -158,7 +158,7 @@ export class RecordedVoiceovers {
     return new RecordedVoiceovers(voiceoversMapping);
   }
 
-  static createEmpty(): RecordedVoiceovers {
+  static createEmpty (): RecordedVoiceovers {
     return new RecordedVoiceovers({});
   }
 }

@@ -28,7 +28,7 @@ import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
 require('pages/exploration-player-page/exploration-player-page.component.ts');
 
-describe('Exploration player page', function() {
+describe('Exploration player page', function () {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -44,13 +44,13 @@ describe('Exploration player page', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'KeyboardShortcutService',
       TestBed.get(KeyboardShortcutService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
@@ -66,7 +66,7 @@ describe('Exploration player page', function() {
 
   it('should load skill based on its id on url when component is initialized' +
     ' and set angular element content property based on the exploration',
-  function() {
+  function () {
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(ReadOnlyExplorationBackendApiService, 'fetchExplorationAsync').and
       .returnValue($q.resolve({

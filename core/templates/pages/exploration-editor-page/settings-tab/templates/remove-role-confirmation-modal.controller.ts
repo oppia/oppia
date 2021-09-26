@@ -23,7 +23,7 @@ require(
 angular.module('oppia').controller(
   'RemoveRoleConfirmationModalController', [
     '$controller', '$scope', '$uibModalInstance', 'role', 'username',
-    function(
+    function (
         $controller, $scope, $uibModalInstance, role, username) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,

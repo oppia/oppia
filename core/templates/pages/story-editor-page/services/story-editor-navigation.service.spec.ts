@@ -44,27 +44,27 @@ describe('Story editor navigation service', () => {
     sens = TestBed.get(StoryEditorNavigationService);
   });
 
-  it('should return the active tab', function() {
+  it('should return the active tab', function () {
     expect(sens.getActiveTab()).toEqual('story_editor');
   });
 
-  it('should set the chapter id', function() {
+  it('should set the chapter id', function () {
     sens.setChapterId('node_id_1');
     expect(sens.getChapterId()).toEqual('node_id_1');
   });
 
-  it('should navigate to chapter editor with the given id', function() {
+  it('should navigate to chapter editor with the given id', function () {
     sens.navigateToChapterEditorWithId('node_id_1', 1);
     expect(sens.getChapterId()).toEqual('node_id_1');
     expect(sens.getChapterIndex()).toEqual(1);
   });
 
-  it('should navigate to story editor', function() {
+  it('should navigate to story editor', function () {
     sens.navigateToStoryEditor();
     expect(sens.getActiveTab()).toEqual('story_editor');
   });
 
-  it('should return true if current tab is chapter editor tab', function() {
+  it('should return true if current tab is chapter editor tab', function () {
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation
     }));
@@ -76,7 +76,7 @@ describe('Story editor navigation service', () => {
   });
 
   it('should return false if the active tab is not chapter editor tab',
-    function() {
+    function () {
       spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
         location: mockLocation
       }));
@@ -87,7 +87,7 @@ describe('Story editor navigation service', () => {
       mockLocation.hash = '/chapter_editor/node_1';
     });
 
-  it('should return true if url is in story preview', function() {
+  it('should return true if url is in story preview', function () {
     mockLocation.hash = '/story_preview/';
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation
@@ -98,12 +98,12 @@ describe('Story editor navigation service', () => {
     expect(sens.checkIfPresentInStoryPreviewTab()).toEqual(false);
   });
 
-  it('should navigate to story preview tab', function() {
+  it('should navigate to story preview tab', function () {
     sens.navigateToStoryPreviewTab();
     expect(sens.getActiveTab()).toEqual('story_preview');
   });
 
-  it('should navigate to chapter editor', function() {
+  it('should navigate to chapter editor', function () {
     sens.navigateToChapterEditor();
     expect(sens.getActiveTab()).toEqual('chapter_editor');
   });

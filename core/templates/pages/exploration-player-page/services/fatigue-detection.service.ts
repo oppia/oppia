@@ -34,13 +34,13 @@ export class FatigueDetectionService {
   private windowStartTime!: number | undefined;
   private windowEndTime!: number;
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal) { }
 
-  recordSubmissionTimestamp(): void {
+  recordSubmissionTimestamp (): void {
     this.submissionTimesMsec.push((new Date()).getTime());
   }
-  isSubmittingTooFast(): boolean {
+  isSubmittingTooFast (): boolean {
     if (this.submissionTimesMsec.length >= this.SPAM_COUNT_THRESHOLD) {
       this.windowStartTime = this.submissionTimesMsec.shift();
       this.windowEndTime =
@@ -54,7 +54,7 @@ export class FatigueDetectionService {
     return false;
   }
 
-  displayTakeBreakMessage(): void {
+  displayTakeBreakMessage (): void {
     this.ngbModal.open(
       TakeBreakModalComponent,
       {
@@ -66,7 +66,7 @@ export class FatigueDetectionService {
     });
   }
 
-  reset(): void {
+  reset (): void {
     this.submissionTimesMsec = [];
   }
 }

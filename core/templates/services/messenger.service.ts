@@ -91,46 +91,46 @@ type HashDict = {
   providedIn: 'root'
 })
 export class MessengerService {
-  constructor(
+  constructor (
     private loggerService: LoggerService, private windowRef: WindowRef) {}
 
   SUPPORTED_HASHDICT_VERSIONS: Set<string> = (
     new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
 
   MESSAGE_VALIDATORS: MessageValidatorsType = {
-    heightChange(payload: HeightChangeData): boolean {
+    heightChange (payload: HeightChangeData): boolean {
       const {height, scroll} = payload;
       return (
         Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
     },
-    explorationLoaded(): boolean {
+    explorationLoaded (): boolean {
       return true;
     },
-    stateTransition(payload: StateTransitionData): boolean {
+    stateTransition (payload: StateTransitionData): boolean {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
-    explorationReset(payload: ExplorationResetData): boolean {
+    explorationReset (payload: ExplorationResetData): boolean {
       return Boolean(payload.stateName);
     },
-    explorationCompleted(): boolean {
+    explorationCompleted (): boolean {
       return true;
     }
   };
 
   getPayload: GetPayloadType = {
-    heightChange(data: HeightChangeData): HeightChangeData {
+    heightChange (data: HeightChangeData): HeightChangeData {
       return {
         height: data.height,
         scroll: data.scroll
       };
     },
-    explorationLoaded(data: ExplorationLoadedData): ExplorationLoadedData {
+    explorationLoaded (data: ExplorationLoadedData): ExplorationLoadedData {
       return {
         explorationVersion: data.explorationVersion,
         explorationTitle: data.explorationTitle
       };
     },
-    stateTransition(data: StateTransitionData): StateTransitionData {
+    stateTransition (data: StateTransitionData): StateTransitionData {
       return {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
@@ -138,14 +138,14 @@ export class MessengerService {
         newStateName: data.newStateName
       };
     },
-    explorationCompleted(
+    explorationCompleted (
         data: ExplorationCompletedData): ExplorationCompletedData {
       return {
         explorationVersion: data.explorationVersion
       };
     },
     // ---- DEPRECATED ----
-    explorationReset(data: string): ExplorationResetData {
+    explorationReset (data: string): ExplorationResetData {
       return {
         stateName: data
       };
@@ -158,7 +158,7 @@ export class MessengerService {
    * @param messageData - The data of the message. It is of type
    *   Object since it can have different properties based on the messageTitle.
    */
-  sendMessage(messageTitle: MessageTitles, messageData: Object): void {
+  sendMessage (messageTitle: MessageTitles, messageData: Object): void {
     // TODO(sll): For the stateTransition and explorationCompleted events,
     // we now send paramValues in the messageData. We should broadcast these
     // to the parent page as well.

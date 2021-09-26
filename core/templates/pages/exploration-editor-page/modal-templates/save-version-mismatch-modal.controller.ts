@@ -23,18 +23,18 @@ require(
 angular.module('oppia').controller('SaveVersionMismatchModalController', [
   '$log', '$scope', '$timeout', 'ExplorationDataService',
   'LostChangeObjectFactory', 'WindowRef', 'lostChanges',
-  function(
+  function (
       $log, $scope, $timeout, ExplorationDataService,
       LostChangeObjectFactory, WindowRef, lostChanges) {
     var MSECS_TO_REFRESH = 20;
-    var _refreshPage = function(delay) {
-      $timeout(function() {
+    var _refreshPage = function (delay) {
+      $timeout(function () {
         WindowRef.nativeWindow.location.reload();
       }, delay);
     };
     // When the user clicks on discard changes button, signal backend
     // to discard the draft and reload the page thereafter.
-    $scope.discardChanges = function() {
+    $scope.discardChanges = function () {
       ExplorationDataService.discardDraftAsync().then(() => {
         _refreshPage(MSECS_TO_REFRESH);
         $scope.$applyAsync();

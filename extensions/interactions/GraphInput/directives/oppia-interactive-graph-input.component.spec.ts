@@ -32,7 +32,7 @@ describe('InteractiveGraphInput', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         graph: {
           value: JSON.parse(attributes.graphWithValue)

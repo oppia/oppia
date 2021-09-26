@@ -24,7 +24,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  * @fileoverview Unit tests for the skill rubric editor.
  */
 
-describe('skillRubricsEditor', function() {
+describe('skillRubricsEditor', function () {
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;
@@ -40,7 +40,7 @@ describe('skillRubricsEditor', function() {
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillObjectFactory = $injector.get('SkillObjectFactory');
     skillUpdateService = $injector.get('SkillUpdateService');
@@ -83,7 +83,7 @@ describe('skillRubricsEditor', function() {
     });
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     // eslint-disable-next-line oppia/disallow-angularjs-properties
     $rootScope.$broadcast('$destroy');
   });

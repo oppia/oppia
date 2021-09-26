@@ -31,12 +31,12 @@ export class EmailDashboardQueryResults {
   cursor: string;
   recentQueries: EmailDashboardQuery[];
 
-  constructor(cursor: string, recentQueries: EmailDashboardQuery[]) {
+  constructor (cursor: string, recentQueries: EmailDashboardQuery[]) {
     this.cursor = cursor;
     this.recentQueries = recentQueries;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: EmailDashboardQueryResultsBackendDict):
       EmailDashboardQueryResults {
     let queryObjects: EmailDashboardQuery[] = [];

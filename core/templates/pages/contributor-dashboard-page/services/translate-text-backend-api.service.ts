@@ -25,9 +25,9 @@ import { ImagesData } from 'services/image-local-storage.service';
   providedIn: 'root'
 })
 export class TranslateTextBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  async getTranslatableTextsAsync(expId: string, languageCode: string):
+  async getTranslatableTextsAsync (expId: string, languageCode: string):
     Promise<TranslatableTexts> {
     return this.http.get<TranslatableTextsBackendDict>(
       '/gettranslatabletexthandler', {
@@ -40,7 +40,7 @@ export class TranslateTextBackendApiService {
     });
   }
 
-  async suggestTranslatedTextAsync(
+  async suggestTranslatedTextAsync (
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],

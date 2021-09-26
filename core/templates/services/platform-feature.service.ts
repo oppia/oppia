@@ -75,7 +75,7 @@ export class PlatformFeatureService {
   static _isInitializedWithError = false;
   static _isSkipped = false;
 
-  constructor(
+  constructor (
       private platformFeatureBackendApiService:
         PlatformFeatureBackendApiService,
       private windowRef: WindowRef,
@@ -92,7 +92,7 @@ export class PlatformFeatureService {
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
    */
-  async initialize(): Promise<void> {
+  async initialize (): Promise<void> {
     if (!PlatformFeatureService.initializationPromise) {
       PlatformFeatureService.initializationPromise = this._initialize();
     }
@@ -109,7 +109,7 @@ export class PlatformFeatureService {
    * @returns {FeatureStatusChecker} - Status checker object for feature flags.
    * @throws {Error} - If this method is called before inialization.
    */
-  get status(): FeatureStatusChecker {
+  get status (): FeatureStatusChecker {
     if (PlatformFeatureService.featureStatusSummary) {
       return PlatformFeatureService.featureStatusSummary.toStatusChecker();
     } else {
@@ -122,7 +122,7 @@ export class PlatformFeatureService {
    *
    * @returns {boolean} - True if there is any error during initialization.
    */
-  get isInitialzedWithError(): boolean {
+  get isInitialzedWithError (): boolean {
     return PlatformFeatureService._isInitializedWithError;
   }
 
@@ -131,7 +131,7 @@ export class PlatformFeatureService {
    *
    * @returns {boolean} - True if the loading is skipped.
    */
-  get isSkipped(): boolean {
+  get isSkipped (): boolean {
     return PlatformFeatureService._isSkipped;
   }
 
@@ -144,7 +144,7 @@ export class PlatformFeatureService {
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
    */
-  private async _initialize(): Promise<void> {
+  private async _initialize (): Promise<void> {
     try {
       const item = this.loadSavedResults();
       if (item && this.validateSavedResults(item)) {
@@ -181,7 +181,7 @@ export class PlatformFeatureService {
     }
   }
 
-  private async loadFeatureFlagsFromServer(): Promise<FeatureStatusSummary> {
+  private async loadFeatureFlagsFromServer (): Promise<FeatureStatusSummary> {
     const context = this.generateClientContext();
     return this.platformFeatureBackendApiService.fetchFeatureFlags(context);
   }
@@ -190,7 +190,7 @@ export class PlatformFeatureService {
    * Saves the results in sessionStorage, along with current timestamp and
    * the current session id.
    */
-  private saveResults(): void {
+  private saveResults (): void {
     const item = {
       timestamp: this.getCurrentTimestamp(),
       sessionId: this.getSessionIdFromCookie(),
@@ -204,7 +204,7 @@ export class PlatformFeatureService {
   /**
    * Clears results from the sessionStorage, if any.
    */
-  private clearSavedResults(): void {
+  private clearSavedResults (): void {
     this.windowRef.nativeWindow.sessionStorage.removeItem(
       PlatformFeatureService.SESSION_STORAGE_KEY);
   }
@@ -215,7 +215,7 @@ export class PlatformFeatureService {
    * @returns {FeatureFlagsCacheItem|null} - Saved results along with timestamp
    * and session id. Null if there isn't any saved result.
    */
-  private loadSavedResults(): FeatureFlagsCacheItem | null {
+  private loadSavedResults (): FeatureFlagsCacheItem | null {
     const savedStr = this.windowRef.nativeWindow.sessionStorage.getItem(
       PlatformFeatureService.SESSION_STORAGE_KEY);
     if (savedStr) {
@@ -244,7 +244,7 @@ export class PlatformFeatureService {
    *
    * @returns {boolean} - True if the result is valid and can be directly used.
    */
-  private validateSavedResults(item: FeatureFlagsCacheItem): boolean {
+  private validateSavedResults (item: FeatureFlagsCacheItem): boolean {
     if (this.getCurrentTimestamp() - item.timestamp >
         PlatformFeatureService.SESSION_STORAGE_CACHE_TTL) {
       return false;
@@ -276,7 +276,7 @@ export class PlatformFeatureService {
    * @returns {ClientContext} - The ClientContext instance containing required
    * client information.
    */
-  private generateClientContext(): ClientContext {
+  private generateClientContext (): ClientContext {
     const platformType = 'Web';
     const browserType = this.browserCheckerService.detectBrowserType();
 
@@ -288,7 +288,7 @@ export class PlatformFeatureService {
    *
    * @returns {string|null} - The value of the cookie representing session id.
    */
-  private getSessionIdFromCookie(): string | null {
+  private getSessionIdFromCookie (): string | null {
     const cookieStrs = this.windowRef.nativeWindow.document.cookie.split('; ');
     const cookieMap = new Map(
       cookieStrs.map(cookieStr => <[string, string]>cookieStr.split('=')));
@@ -312,14 +312,14 @@ export class PlatformFeatureService {
    *
    * @returns {number} - The current timestamp.
    */
-  private getCurrentTimestamp(): number {
+  private getCurrentTimestamp (): number {
     return Date.now();
   }
 }
 
 export const platformFeatureInitFactory = (
     service: PlatformFeatureService) => {
-  return async(): Promise<void> => service.initialize();
+  return async (): Promise<void> => service.initialize();
 };
 
 angular.module('oppia').factory(

@@ -34,11 +34,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class PencilCodeEditorValidationService {
-  constructor(
+  constructor (
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: PencilCodeEditorCustomizationArgs): Warning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance
@@ -54,7 +54,7 @@ export class PencilCodeEditorValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: PencilCodeEditorCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(

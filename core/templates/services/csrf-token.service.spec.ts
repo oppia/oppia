@@ -23,7 +23,7 @@ import $ from 'jquery';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Csrf Token Service', function() {
+describe('Csrf Token Service', function () {
   let csrfTokenService: CsrfTokenService;
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
@@ -47,7 +47,7 @@ describe('Csrf Token Service', function() {
   it('should correctly set the csrf token', (done) => {
     csrfTokenService.initializeToken();
 
-    csrfTokenService.getTokenAsync().then(function(token) {
+    csrfTokenService.getTokenAsync().then(function (token) {
       expect(token).toEqual('sample-csrf-token');
     }).then(done, done.fail);
   });

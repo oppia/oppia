@@ -36,7 +36,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   'QuestionValidationService', 'SiteAnalyticsService',
   'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
   'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
-  function(
+  function (
       $rootScope, $scope, $uibModal, $uibModalInstance, AlertsService,
       ContextService, ContributionAndReviewService, ImageLocalStorageService,
       QuestionSuggestionBackendApiService, QuestionUndoRedoService,
@@ -55,13 +55,13 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
     ContextService.setImageSaveDestinationToLocalStorage();
-    $scope.setDifficultyString = function(skillDifficulty) {
+    $scope.setDifficultyString = function (skillDifficulty) {
       $scope.skillDifficultyString = Object.entries(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
         entry => entry[1] === skillDifficulty)[0];
     };
     $scope.setDifficultyString(skillDifficulty);
-    $scope.done = function() {
+    $scope.done = function () {
       if (!$scope.isQuestionValid()) {
         return;
       }
@@ -100,12 +100,12 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     // Checking if Question contains all requirements to enable
     // Save and Publish Question.
-    $scope.isQuestionValid = function() {
+    $scope.isQuestionValid = function () {
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
     };
     $scope.skillId = $scope.skill.getId();
-    $scope.onClickChangeDifficulty = function() {
+    $scope.onClickChangeDifficulty = function () {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topic-editor-page/modal-templates/' +
@@ -116,18 +116,18 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
         },
         controller: (
           'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-      }).result.then(function(result) {
+      }).result.then(function (result) {
         if (AlertsService.warnings.length === 0) {
           $scope.skillDifficulty = result.skillDifficulty;
           $scope.setDifficultyString($scope.skillDifficulty);
         }
-      }, function() {
+      }, function () {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
       });
     };
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       if (QuestionUndoRedoService.hasChanges()) {
         $uibModal.open({
           templateUrl:
@@ -136,11 +136,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
               'confirm-question-modal-exit-modal.directive.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           $uibModalInstance.dismiss('cancel');
           ImageLocalStorageService.flushStoredImagesData();
           ContextService.resetImageSaveDestination();
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the cancel button is clicked.
           // No further action is needed.

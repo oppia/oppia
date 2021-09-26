@@ -26,7 +26,7 @@ import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Voiceover opportunities component', function() {
+describe('Voiceover opportunities component', function () {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
@@ -37,14 +37,14 @@ describe('Voiceover opportunities component', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'ContributionOpportunitiesBackendApiService',
       TestBed.get(ContributionOpportunitiesBackendApiService));
     $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
   }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -52,7 +52,7 @@ describe('Voiceover opportunities component', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
@@ -106,12 +106,12 @@ describe('Voiceover opportunities component', function() {
     ctrl.$onInit();
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     ctrl.$onDestroy();
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect(ctrl.opportunities.length).toBe(2);
       expect(ctrl.opportunitiesAreLoading).toBe(false);
       expect(ctrl.moreOpportunitiesAvailable).toBe(true);
@@ -119,7 +119,7 @@ describe('Voiceover opportunities component', function() {
     });
 
   it('should load more opportunities when opportunities are available',
-    function() {
+    function () {
       ctrl.onLoadMoreOpportunities();
       expect(ctrl.opportunitiesAreLoading).toBe(false);
       expect(ctrl.opportunities.length).toBe(3);
@@ -131,7 +131,7 @@ describe('Voiceover opportunities component', function() {
     });
 
   it('should get opportunities from new language when active language is' +
-    ' changed', function() {
+    ' changed', function () {
     ctrl.onLoadMoreOpportunities();
     expect(ctrl.opportunitiesAreLoading).toBe(false);
     expect(ctrl.opportunities.length).toBe(3);

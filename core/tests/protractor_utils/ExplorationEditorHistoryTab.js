@@ -21,7 +21,7 @@ var forms = require('./forms.js');
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorHistoryTab = function() {
+var ExplorationEditorHistoryTab = function () {
   /*
    * Interactive elements
    */
@@ -35,10 +35,10 @@ var ExplorationEditorHistoryTab = function() {
     by.css('.protractor-test-history-version-dropdown-first'));
   var secondVersionDropdown = element(
     by.css('.protractor-test-history-version-dropdown-second'));
-  var stateNodeBackground = function(nodeElement) {
+  var stateNodeBackground = function (nodeElement) {
     return nodeElement.element(nodeBackgroundLocator);
   };
-  var stateNodeLabel = function(nodeElement) {
+  var stateNodeLabel = function (nodeElement) {
     return nodeElement.element(nodeLabelLocator);
   };
 
@@ -73,7 +73,7 @@ var ExplorationEditorHistoryTab = function() {
    * This method checks if the commit dates are being displayed in
    * the "List of Changes" section of the history tab.
   */
-  this.expectCommitDatesToBeDisplayed = async function() {
+  this.expectCommitDatesToBeDisplayed = async function () {
     var numCommitDates = await datesCommitsWereSaved.count();
     for (var i = 0; i < numCommitDates; i++) {
       await waitFor.visibilityOf(
@@ -88,10 +88,10 @@ var ExplorationEditorHistoryTab = function() {
     }
   };
 
-  this.getHistoryGraph = function() {
+  this.getHistoryGraph = function () {
     return {
-      openStateHistory: async function(stateName) {
-        var listOfNames = await stateNodes.map(async function(stateElement) {
+      openStateHistory: async function (stateName) {
+        var listOfNames = await stateNodes.map(async function (stateElement) {
           await waitFor.visibilityOf(stateNodeLabel(
             stateElement), 'State Node Label taking too long to appear');
           return await stateNodeLabel(stateElement).getText();
@@ -109,7 +109,7 @@ var ExplorationEditorHistoryTab = function() {
             'State ' + stateName + ' not found by getHistoryGraph.');
         }
       },
-      closeStateHistory: async function() {
+      closeStateHistory: async function () {
         await waitFor.elementToBeClickable(
           closeStateHistoryButton,
           'Close State History button is not clickable');
@@ -120,7 +120,7 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
       },
-      deselectVersion: async function() {
+      deselectVersion: async function () {
         await waitFor.invisibilityOf(
           toastSuccessElement,
           'Toast message is taking too long to disappear after saving changes');
@@ -132,7 +132,7 @@ var ExplorationEditorHistoryTab = function() {
        *        versionNumber1 (int) : history version # 1
        *        versionNumber2 (int) : history version # 2
        */
-      selectTwoVersions: async function(versionNumber1, versionNumber2) {
+      selectTwoVersions: async function (versionNumber1, versionNumber2) {
         // Array starts at 0.
         var versionNumber1Button = firstVersionDropdown.element(
           by.cssContainingText('option', versionNumber1));
@@ -154,10 +154,10 @@ var ExplorationEditorHistoryTab = function() {
        *                            label should appear after a space. It
        *                            may be truncated.)
        */
-      expectHistoryStatesToMatch: async function(expectedStates) {
+      expectHistoryStatesToMatch: async function (expectedStates) {
         await waitFor.visibilityOf(
           historyGraph, 'History graph takes too long to be visible.');
-        var states = await stateNodes.map(async function(stateElement) {
+        var states = await stateNodes.map(async function (stateElement) {
           await waitFor.visibilityOf(stateNodeLabel(
             stateElement), 'State Node Label taking too long to appear');
           var label = await stateNodeLabel(stateElement).getText();
@@ -184,14 +184,14 @@ var ExplorationEditorHistoryTab = function() {
        *        addedLinks (int) : number of added links
        *        deletedLinks (int) : number of deleted links
        */
-      expectNumberOfLinksToMatch: async function(
+      expectNumberOfLinksToMatch: async function (
           totalLinks, addedLinks, deletedLinks) {
         var COLOR_ADDED = 'rgb(31, 125, 31)';
         var COLOR_DELETED = 'rgb(178, 34, 34)';
         var totalCount = 0;
         var addedCount = 0;
         var deletedCount = 0;
-        await historyGraphLink.map(async function(link) {
+        await historyGraphLink.map(async function (link) {
           var linkColor = await link.getCssValue('stroke');
           totalCount++;
           if (linkColor === COLOR_ADDED) {
@@ -222,7 +222,7 @@ var ExplorationEditorHistoryTab = function() {
        *                             line
        *                     - highlighted: true or false
        */
-      expectTextToMatch: async function(v1StateContents, v2StateContents) {
+      expectTextToMatch: async function (v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
           codeMirrorElement.first(),
           'first'
@@ -243,7 +243,7 @@ var ExplorationEditorHistoryTab = function() {
        *        dict key - text : extract of string of expected text
        *        dict key - highlighted : true or false
        */
-      expectTextWithHighlightingToMatch: async function(
+      expectTextWithHighlightingToMatch: async function (
           v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
           codeMirrorElement.first(),
@@ -259,7 +259,7 @@ var ExplorationEditorHistoryTab = function() {
 
   // This function assumes that the selected version is valid and found on the
   // first page of the exploration history.
-  this.revertToVersion = async function(version) {
+  this.revertToVersion = async function (version) {
     // Note: there is no 'revert' link next to the current version.
     await action.click(
       'History list options', historyListOptions.get(version - 1));

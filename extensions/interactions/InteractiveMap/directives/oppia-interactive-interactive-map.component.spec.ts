@@ -35,7 +35,7 @@ describe('InteractiveInteractiveMapComponent', () => {
   let mockNewCardAvailableEmitter = new EventEmitter();
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         latitude: {
           value: JSON.parse(attributes.latitudeWithValue)

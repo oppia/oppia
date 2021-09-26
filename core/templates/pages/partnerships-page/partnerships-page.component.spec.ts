@@ -23,7 +23,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 describe('Partnerships page', () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [PartnershipsPageComponent],
       providers: [

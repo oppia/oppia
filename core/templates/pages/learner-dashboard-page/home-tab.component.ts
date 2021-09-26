@@ -37,16 +37,16 @@ export class HomeTabComponent {
   widthConst: number = 233;
   width: number;
 
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.width = this.widthConst * (this.currentGoals.length);
   }
 
-  getTimeOfDay(): string {
+  getTimeOfDay (): string {
     let time = new Date().getHours();
 
     if (time <= 12) {
@@ -57,11 +57,11 @@ export class HomeTabComponent {
     return 'evening';
   }
 
-  isNonemptyObject(object: Object): boolean {
+  isNonemptyObject (object: Object): boolean {
     return Object.keys(object).length !== 0;
   }
 
-  getClassroomLink(classroomUrlFragment: string): string {
+  getClassroomLink (classroomUrlFragment: string): string {
     this.classroomUrlFragment = classroomUrlFragment;
     return this.urlInterpolationService.interpolateUrl(
       this.CLASSROOM_LINK_URL_TEMPLATE, {
@@ -70,11 +70,11 @@ export class HomeTabComponent {
     );
   }
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  getWidth(length: number): number {
+  getWidth (length: number): number {
     /**
      * If there are 3 or more topics for each untrackedTopic, the total
      * width of the section will be 662px in mobile view to enable scrolling.
@@ -91,7 +91,7 @@ export class HomeTabComponent {
     return (length + 1) * 164;
   }
 
-  changeActiveSection(): void {
+  changeActiveSection (): void {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS);
   }

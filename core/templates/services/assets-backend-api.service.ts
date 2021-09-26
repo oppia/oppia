@@ -53,7 +53,7 @@ export class AssetsBackendApiService {
   /** Map from asset filename to asset blob. */
   private assetsCache: Map<string, Blob> = new Map();
 
-  constructor(
+  constructor (
       private csrfTokenService: CsrfTokenService,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
@@ -68,14 +68,14 @@ export class AssetsBackendApiService {
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }
 
-  static get EMULATOR_MODE(): boolean {
+  static get EMULATOR_MODE (): boolean {
     return AppConstants.EMULATOR_MODE;
   }
-  static get GCS_RESOURCE_BUCKET_NAME(): string {
+  static get GCS_RESOURCE_BUCKET_NAME (): string {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
-  async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
+  async loadAudio (explorationId: string, filename: string): Promise<AudioFile> {
     let data = this.assetsCache.get(filename);
     if (this.isCached(filename) && data !== undefined) {
       return new AudioFile(filename, data);
@@ -85,7 +85,7 @@ export class AssetsBackendApiService {
       constants.ASSET_TYPE_AUDIO);
   }
 
-  async loadImage(
+  async loadImage (
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
     let data = this.assetsCache.get(filename);
@@ -96,7 +96,7 @@ export class AssetsBackendApiService {
       entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }
 
-  async saveAudio(
+  async saveAudio (
       explorationId: string, filename: string,
       rawAssetData: Blob): Promise<SaveAudioResponse> {
     const form = new FormData();
@@ -114,7 +114,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  async saveMathExpresionImage(
+  async saveMathExpresionImage (
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();
@@ -133,7 +133,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  postThumbnailFile(
+  postThumbnailFile (
       resampledFile: Blob, filename: string,
       entityType: string, entityId: string): Observable<{filename: string}> {
     let form = new FormData();
@@ -152,19 +152,19 @@ export class AssetsBackendApiService {
     return this.http.post<{filename: string}>(thumbnailFileUrl, form);
   }
 
-  isCached(filename: string): boolean {
+  isCached (filename: string): boolean {
     return this.assetsCache.has(filename);
   }
 
-  abortAllCurrentAudioDownloads(): void {
+  abortAllCurrentAudioDownloads (): void {
     this.abortAllCurrentDownloads(constants.ASSET_TYPE_AUDIO);
   }
 
-  abortAllCurrentImageDownloads(): void {
+  abortAllCurrentImageDownloads (): void {
     this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
   }
 
-  getAssetsFilesCurrentlyBeingRequested(): (
+  getAssetsFilesCurrentlyBeingRequested (): (
     {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {
       [constants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
@@ -172,25 +172,25 @@ export class AssetsBackendApiService {
     };
   }
 
-  getAudioDownloadUrl(
+  getAudioDownloadUrl (
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, constants.ASSET_TYPE_AUDIO);
   }
 
-  getImageUrlForPreview(
+  getImageUrlForPreview (
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }
 
-  getThumbnailUrlForPreview(
+  getThumbnailUrlForPreview (
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, constants.ASSET_TYPE_THUMBNAIL);
   }
 
-  private getDownloadUrl(
+  private getDownloadUrl (
       entityType: string, entityId: string, filename: string,
       assetType: string): string {
     let downloadUrl = this.urlInterpolationService.interpolateUrl(
@@ -203,7 +203,7 @@ export class AssetsBackendApiService {
     return downloadUrl;
   }
 
-  private getFileDownloadRequestsByAssetType(
+  private getFileDownloadRequestsByAssetType (
       assetType: string): FileDownloadRequest[] {
     if (assetType === constants.ASSET_TYPE_AUDIO) {
       return this.audioFileDownloadRequests;
@@ -212,7 +212,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  private async fetchFile(
+  private async fetchFile (
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
     let onResolve!: (_: Blob) => void;
@@ -249,14 +249,14 @@ export class AssetsBackendApiService {
     }
   }
 
-  private abortAllCurrentDownloads(assetType: string): void {
+  private abortAllCurrentDownloads (assetType: string): void {
     const fileDownloadRequests = (
       this.getFileDownloadRequestsByAssetType(assetType));
     fileDownloadRequests.forEach(r => r.subscription.unsubscribe());
     fileDownloadRequests.length = 0;
   }
 
-  private getAudioUploadUrl(explorationId: string): string {
+  private getAudioUploadUrl (explorationId: string): string {
     let audioUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
@@ -264,7 +264,7 @@ export class AssetsBackendApiService {
     return audioUploadUrl;
   }
 
-  private getImageUploadUrl(
+  private getImageUploadUrl (
       entityType: string, entityId: string): string {
     let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,

@@ -37,32 +37,32 @@ abstract class AuthServiceImpl {
 class NullAuthServiceImpl extends AuthServiceImpl {
   private error = new Error('AngularFireAuth is not available');
 
-  async signInWithRedirectAsync(): Promise<void> {
+  async signInWithRedirectAsync (): Promise<void> {
     throw this.error;
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+  async getRedirectResultAsync (): Promise<firebase.auth.UserCredential> {
     throw this.error;
   }
 
-  async signOutAsync(): Promise<void> {
+  async signOutAsync (): Promise<void> {
     throw this.error;
   }
 }
 
 class DevAuthServiceImpl extends AuthServiceImpl {
-  constructor(private angularFireAuth: AngularFireAuth) {
+  constructor (private angularFireAuth: AngularFireAuth) {
     super();
   }
 
-  async signInWithRedirectAsync(): Promise<void> {
+  async signInWithRedirectAsync (): Promise<void> {
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
+  async getRedirectResultAsync (): Promise<firebase.auth.UserCredential | null> {
     return null;
   }
 
-  async signOutAsync(): Promise<void> {
+  async signOutAsync (): Promise<void> {
     return this.angularFireAuth.signOut();
   }
 }
@@ -70,7 +70,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
 class ProdAuthServiceImpl extends AuthServiceImpl {
   private provider: firebase.auth.GoogleAuthProvider;
 
-  constructor(private angularFireAuth: AngularFireAuth) {
+  constructor (private angularFireAuth: AngularFireAuth) {
     super();
     this.provider = new firebase.auth.GoogleAuthProvider();
     // Oppia only needs an email address for account management.
@@ -80,15 +80,15 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
   }
 
   /** Returns a promise that never resolves or rejects. */
-  async signInWithRedirectAsync(): Promise<void> {
+  async signInWithRedirectAsync (): Promise<void> {
     return this.angularFireAuth.signInWithRedirect(this.provider);
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+  async getRedirectResultAsync (): Promise<firebase.auth.UserCredential> {
     return this.angularFireAuth.getRedirectResult();
   }
 
-  async signOutAsync(): Promise<void> {
+  async signOutAsync (): Promise<void> {
     return this.angularFireAuth.signOut();
   }
 }
@@ -100,7 +100,7 @@ export class AuthService {
   private authServiceImpl: AuthServiceImpl;
   creds!: firebase.auth.UserCredential;
 
-  constructor(
+  constructor (
       @Optional() private angularFireAuth: AngularFireAuth | null,
       private authBackendApiService: AuthBackendApiService) {
     if (!this.angularFireAuth) {
@@ -112,11 +112,11 @@ export class AuthService {
     }
   }
 
-  static get firebaseEmulatorIsEnabled(): boolean {
+  static get firebaseEmulatorIsEnabled (): boolean {
     return AppConstants.EMULATOR_MODE;
   }
 
-  static get firebaseConfig(): FirebaseOptions {
+  static get firebaseConfig (): FirebaseOptions {
     return {
       apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
       authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
@@ -127,12 +127,12 @@ export class AuthService {
     } as const;
   }
 
-  static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
+  static get firebaseEmulatorConfig (): readonly [string, number] | undefined {
     return AuthService.firebaseEmulatorIsEnabled ?
       ['localhost', 9099] : undefined;
   }
 
-  async handleRedirectResultAsync(): Promise<boolean> {
+  async handleRedirectResultAsync (): Promise<boolean> {
     const creds = await this.authServiceImpl.getRedirectResultAsync();
     if (creds?.user) {
       const idToken = await creds.user.getIdToken();
@@ -143,7 +143,7 @@ export class AuthService {
     }
   }
 
-  async signInWithEmail(email: string): Promise<void> {
+  async signInWithEmail (email: string): Promise<void> {
     if (!AuthService.firebaseEmulatorIsEnabled) {
       throw new Error('signInWithEmail can only be called in emulator mode');
     }
@@ -180,11 +180,11 @@ export class AuthService {
     }
   }
 
-  async signInWithRedirectAsync(): Promise<void> {
+  async signInWithRedirectAsync (): Promise<void> {
     return this.authServiceImpl.signInWithRedirectAsync();
   }
 
-  async signOutAsync(): Promise<void> {
+  async signOutAsync (): Promise<void> {
     await this.authServiceImpl.signOutAsync();
     await this.authBackendApiService.endSessionAsync();
   }

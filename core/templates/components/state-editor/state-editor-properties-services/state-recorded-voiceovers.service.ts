@@ -32,7 +32,7 @@ import { UtilsService } from 'services/utils.service';
 })
 export class StateRecordedVoiceoversService extends
   StatePropertyService<RecordedVoiceovers> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveRecordedVoiceovers';
   }

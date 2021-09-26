@@ -63,7 +63,7 @@ angular.module('oppia').factory('QuestionCreationService', [
   'SkillEditorStateService', 'UrlInterpolationService',
   'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
-  function(
+  function (
       $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
       QuestionObjectFactory,
@@ -82,24 +82,24 @@ angular.module('oppia').factory('QuestionCreationService', [
     var groupedSkillSummaries = null;
     var newQuestionSkillIds = [];
 
-    var populateMisconceptions = function() {
+    var populateMisconceptions = function () {
       SkillBackendApiService.fetchMultiSkillsAsync(
         newQuestionSkillIds).then(
-        function(skills) {
-          skills.forEach(function(skill) {
+        function (skills) {
+          skills.forEach(function (skill) {
             misconceptionsBySkill[skill.getId()] =
               skill.getMisconceptions();
           });
           $rootScope.$apply();
-        }, function(error) {
+        }, function (error) {
           AlertsService.addWarning();
         });
     };
 
-    var continueQuestionEditing = function(linkedSkillsWithDifficulty) {
+    var continueQuestionEditing = function (linkedSkillsWithDifficulty) {
       newQuestionSkillIds = [];
       newQuestionSkillDifficulties = [];
-      linkedSkillsWithDifficulty.forEach(function(linkedSkillWithDifficulty) {
+      linkedSkillsWithDifficulty.forEach(function (linkedSkillWithDifficulty) {
         newQuestionSkillIds.push(linkedSkillWithDifficulty.getId());
         newQuestionSkillDifficulties.push(
           linkedSkillWithDifficulty.getDifficulty());
@@ -111,7 +111,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
     };
 
-    var createQuestion = function() {
+    var createQuestion = function () {
       newQuestionSkillIds = [];
       skill = SkillEditorStateService.getSkill();
       skillId = SkillEditorStateService.getSkill().getId();
@@ -121,7 +121,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       var currentMode = MODE_SELECT_DIFFICULTY;
 
       var linkedSkillsWithDifficulty = [];
-      newQuestionSkillIds.forEach(function(skillId) {
+      newQuestionSkillIds.forEach(function (skillId) {
         linkedSkillsWithDifficulty.push(
           SkillDifficulty.create(
             skillId, '', DEFAULT_SKILL_DIFFICULTY));
@@ -134,7 +134,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       var countOfSkillsToPrioritize =
           groupedSkillSummaries.current.length;
       var allSkillSummaries = sortedSkillSummaries.map(
-        function(summary) {
+        function (summary) {
           return summary;
         });
 
@@ -159,9 +159,9 @@ angular.module('oppia').factory('QuestionCreationService', [
             skillIdToRubricsObject: () => skillIdToRubricsObject
           },
           controller: 'QuestionsListSelectSkillAndDifficultyModalController'
-        }).result.then(function(linkedSkillsWithDifficulty) {
+        }).result.then(function (linkedSkillsWithDifficulty) {
           continueQuestionEditing(linkedSkillsWithDifficulty);
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
@@ -179,7 +179,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
     };
 
-    var initializeNewQuestionCreation = function() {
+    var initializeNewQuestionCreation = function () {
       question =
           QuestionObjectFactory.createDefaultQuestion(newQuestionSkillIds);
       questionId = question.getId();
@@ -187,7 +187,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       openQuestionEditor(newQuestionSkillDifficulties[0]);
     };
 
-    var saveAndPublishQuestion = function() {
+    var saveAndPublishQuestion = function () {
       var validationErrors = question.getValidationErrorMessage();
       var unaddressedMisconceptions = (
         question.getUnaddressedMisconceptionNames(
@@ -208,7 +208,7 @@ angular.module('oppia').factory('QuestionCreationService', [
         question.toBackendDict(true), imagesData);
     };
 
-    var openQuestionEditor = function(questionDifficulty) {
+    var openQuestionEditor = function (questionDifficulty) {
       var canEditQuestion = true;
       var newQuestionIsBeingCreated = true;
 
@@ -242,7 +242,7 @@ angular.module('oppia').factory('QuestionCreationService', [
           skillName: () => skillName
         },
         controller: 'QuestionEditorModalController',
-      }).result.then(function() {
+      }).result.then(function () {
         $location.hash(null);
         saveAndPublishQuestion();
       }, () => {

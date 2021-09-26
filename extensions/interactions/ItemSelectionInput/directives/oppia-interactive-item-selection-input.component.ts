@@ -37,16 +37,16 @@ angular.module('oppia').component('oppiaInteractiveItemSelectionInput', {
     'CurrentInteractionService',
     'InteractionAttributesExtractorService',
     'ItemSelectionInputRulesService',
-    function(
+    function (
         $attrs, BrowserCheckerService,
         CurrentInteractionService,
         InteractionAttributesExtractorService,
         ItemSelectionInputRulesService) {
       var ctrl = this;
-      ctrl.onToggleCheckbox = function() {
+      ctrl.onToggleCheckbox = function () {
         ctrl.newQuestion = false;
         ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
-          function(obj) {
+          function (obj) {
             return ctrl.userSelections[obj];
           }
         ).length;
@@ -56,7 +56,7 @@ angular.module('oppia').component('oppiaInteractiveItemSelectionInput', {
           ctrl.selectionCount < ctrl.minAllowableSelectionCount);
       };
 
-      ctrl.submitMultipleChoiceAnswer = function(event, index) {
+      ctrl.submitMultipleChoiceAnswer = function (event, index) {
         // Deselect previously selected option.
         var selectedElement = (
           document.querySelector(
@@ -74,7 +74,7 @@ angular.module('oppia').component('oppiaInteractiveItemSelectionInput', {
         }
       };
 
-      ctrl.submitAnswer = function() {
+      ctrl.submitAnswer = function () {
         const getContentIdOfHtml = (html) => {
           const {
             choices
@@ -94,10 +94,10 @@ angular.module('oppia').component('oppiaInteractiveItemSelectionInput', {
           answers, ItemSelectionInputRulesService);
       };
 
-      var validityCheckFn = function() {
+      var validityCheckFn = function () {
         return !ctrl.notEnoughSelections;
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         const {
           choices,
           maxAllowableSelectionCount,

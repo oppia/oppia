@@ -25,7 +25,7 @@ var waitFor = require('./waitFor.js');
 var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 
-var dragAndDrop = async function(fromElement, toElement) {
+var dragAndDrop = async function (fromElement, toElement) {
   await waitFor.visibilityOf(
     fromElement,
     'fromElement taking too long to load');
@@ -35,7 +35,7 @@ var dragAndDrop = async function(fromElement, toElement) {
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
 };
 
-var scrollToTop = async function() {
+var scrollToTop = async function () {
   await browser.executeScript('window.scrollTo(0,0);');
 };
 
@@ -59,7 +59,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
     'load resource: net::ERR_CERT_DATE_INVALID'),
 ];
 
-var checkForConsoleErrors = async function(
+var checkForConsoleErrors = async function (
     errorsToIgnore, skipDebugging = true) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
@@ -76,7 +76,7 @@ var checkForConsoleErrors = async function(
   expect(browserErrors).toEqual([]);
 };
 
-var isInDevMode = function() {
+var isInDevMode = function () {
   return browser.params.devMode === 'true';
 };
 
@@ -93,7 +93,7 @@ var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
-var _getExplorationId = async function(currentUrlPrefix) {
+var _getExplorationId = async function (currentUrlPrefix) {
   var url = await browser.getCurrentUrl();
   expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
   var explorationId = url.slice(
@@ -104,17 +104,17 @@ var _getExplorationId = async function(currentUrlPrefix) {
 
 // If we are currently in the editor, this will return a promise with the
 // exploration ID.
-var getExplorationIdFromEditor = async function() {
+var getExplorationIdFromEditor = async function () {
   return await _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
 // Likewise for the player.
-var getExplorationIdFromPlayer = async function() {
+var getExplorationIdFromPlayer = async function () {
   return await _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = async function(explorationId, welcomeModalIsShown) {
+var openEditor = async function (explorationId, welcomeModalIsShown) {
   await browser.get(EDITOR_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -124,25 +124,25 @@ var openEditor = async function(explorationId, welcomeModalIsShown) {
   }
 };
 
-var openPlayer = async function(explorationId) {
+var openPlayer = async function (explorationId) {
   await browser.get(PLAYER_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
 // NOTE: we do not use the preview button because that will open a new window.
-var moveToPlayer = async function() {
+var moveToPlayer = async function () {
   var explorationId = await getExplorationIdFromEditor();
   await openPlayer(explorationId);
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = async function(welcomeModalIsShown) {
+var moveToEditor = async function (welcomeModalIsShown) {
   var explorationId = await getExplorationIdFromPlayer();
   await openEditor(explorationId, welcomeModalIsShown);
 };
 
-var expectErrorPage = async function(errorNum) {
+var expectErrorPage = async function (errorNum) {
   var errorContainer = element(
     by.css('.protractor-test-error-container'));
   await waitFor.visibilityOf(
@@ -153,7 +153,7 @@ var expectErrorPage = async function(errorNum) {
 };
 
 // Checks no untranslated values are shown in the page.
-var ensurePageHasNoTranslationIds = async function() {
+var ensurePageHasNoTranslationIds = async function () {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
@@ -183,7 +183,7 @@ var ensurePageHasNoTranslationIds = async function() {
       .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
 
-var acceptPrompt = async function(promptResponse) {
+var acceptPrompt = async function (promptResponse) {
   await waitFor.alertToBePresent();
   var alert = await browser.switchTo().alert();
   await alert.sendKeys(promptResponse);
@@ -191,18 +191,18 @@ var acceptPrompt = async function(promptResponse) {
   await waitFor.pageToFullyLoad();
 };
 
-var acceptAlert = async function() {
+var acceptAlert = async function () {
   await waitFor.alertToBePresent();
   await (await browser.switchTo().alert()).accept();
   await waitFor.pageToFullyLoad();
 };
 
-var closeCurrentTabAndSwitchTo = async function(destHandle) {
+var closeCurrentTabAndSwitchTo = async function (destHandle) {
   await browser.driver.close();
   await browser.switchTo().window(destHandle);
 };
 
-var _getUniqueLogMessages = function(logs) {
+var _getUniqueLogMessages = function (logs) {
   // Returns unique log messages.
   var logsDict = {};
   for (var i = 0; i < logs.length; i++) {
@@ -213,7 +213,7 @@ var _getUniqueLogMessages = function(logs) {
   return Object.keys(logsDict);
 };
 
-var checkConsoleErrorsExist = async function(expectedErrors) {
+var checkConsoleErrorsExist = async function (expectedErrors) {
   // Checks that browser logs match entries in expectedErrors array.
   var browserLogs = await browser.manage().logs().get('browser');
   // Some browsers such as chrome raise two errors for a missing resource.
@@ -232,13 +232,13 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
   }
 };
 
-var goToHomePage = async function() {
+var goToHomePage = async function () {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
   await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 
-var openProfileDropdown = async function() {
+var openProfileDropdown = async function () {
   var profileDropdown = element(
     by.css('.protractor-test-profile-dropdown'));
   await action.click(
@@ -246,23 +246,23 @@ var openProfileDropdown = async function() {
     profileDropdown);
 };
 
-var navigateToTopicsAndSkillsDashboardPage = async function() {
+var navigateToTopicsAndSkillsDashboardPage = async function () {
   await openProfileDropdown();
   var topicsAndSkillsDashboardLink = element(by.css(
     '.protractor-test-topics-and-skills-dashboard-link'));
-  await waitFor.clientSideRedirection(async() => {
+  await waitFor.clientSideRedirection(async () => {
     await action.click(
       'Topics and skills dashboard link from dropdown',
       topicsAndSkillsDashboardLink);
   }, (url) => {
     return /topics-and-skills-dashboard/.test(url);
   },
-  async() => {
+  async () => {
     await waitFor.pageToFullyLoad();
   });
 };
 
-var goOnline = async function() {
+var goOnline = async function () {
   // Download throughput refers to the maximum number of bytes that can be
   // downloaded in a given time.
   // Upload throughput refers to the maximum number of bytes that can be
@@ -279,7 +279,7 @@ var goOnline = async function() {
     });
 };
 
-var goOffline = async function() {
+var goOffline = async function () {
   // Download throughput refers to the maximum number of bytes that can be
   // downloaded in a given time.
   // Upload throughput refers to the maximum number of bytes that can be

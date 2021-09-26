@@ -40,7 +40,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private blogDashboardBackendService: BlogDashboardBackendApiService,
     private blogDashboardPageService: BlogDashboardPageService,
@@ -49,7 +49,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     private windowDimensionService: WindowDimensionsService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.activeTab = this.blogDashboardPageService.activeTab;
     if (this.activeTab === 'main') {
       this.initMainTab();
@@ -72,11 +72,11 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  initMainTab(): void {
+  initMainTab (): void {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
@@ -96,7 +96,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  createNewBlogPost(): void {
+  createNewBlogPost (): void {
     this.blogDashboardBackendService.createBlogPostAsync().then(
       (blogPostId) => {
         this.blogDashboardPageService.navigateToEditorTabWithId(blogPostId);
@@ -107,7 +107,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  unpublishedBlogPost(blogPostSummary: BlogPostSummary): void {
+  unpublishedBlogPost (blogPostSummary: BlogPostSummary): void {
     let summaryDicts = this.blogDashboardData.publishedBlogPostSummaryDicts;
     let index = summaryDicts.indexOf(
       blogPostSummary);
@@ -120,7 +120,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.blogDashboardData.numOfPublishedBlogPosts -= 1;
   }
 
-  removeBlogPost(
+  removeBlogPost (
       blogPostSummary: BlogPostSummary, blogPostWasPublished: boolean): void {
     let summaryDicts: BlogPostSummary[];
     if (blogPostWasPublished) {

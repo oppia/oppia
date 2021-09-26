@@ -30,7 +30,7 @@ require('services/questions-list.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -39,11 +39,11 @@ angular.module('oppia').directive('questionsTab', [
         'skill-questions-tab.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
-        function(
+        function (
             $scope, SkillEditorStateService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var _init = function() {
+          var _init = function () {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.groupedSkillSummaries = (
               SkillEditorStateService.getGroupedSkillSummaries());
@@ -51,7 +51,7 @@ angular.module('oppia').directive('questionsTab', [
             $scope.skillIdToRubricsObject[$scope.skill.getId()] =
               $scope.skill.getRubrics();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             _init();
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(
@@ -59,7 +59,7 @@ angular.module('oppia').directive('questionsTab', [
             );
           };
 
-          $scope.$on('$destroy', function() {
+          $scope.$on('$destroy', function () {
             ctrl.directiveSubscriptions.unsubscribe();
           });
         }

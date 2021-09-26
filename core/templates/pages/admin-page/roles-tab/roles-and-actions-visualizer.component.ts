@@ -41,16 +41,16 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
   roleToReadableActions = {};
   assignUsersToActiveRole: string[];
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private adminBackendApiService: AdminBackendApiService) {}
 
-  setActiveRole(role: string): void {
+  setActiveRole (role: string): void {
     this.activeRole = role;
     this.activeTab = this.TAB_ACTIONS;
   }
 
-  showAssignedUsers(): void {
+  showAssignedUsers (): void {
     this.loadingAssignedUsernames = true;
     this.adminBackendApiService.fetchUsersAssignedToRoleAsync(
       this.activeRole).then((response) => {
@@ -59,7 +59,7 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loadingAssignedUsernames = false;
     this.avatarPictureUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/user_blue_72px.png');

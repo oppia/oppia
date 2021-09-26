@@ -25,27 +25,27 @@ export class SkillRights {
   _skillId: string;
   _canEditSkillDescription: boolean;
 
-  constructor(skillId: string, canEditSkillDescription: boolean) {
+  constructor (skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       skillRightsBackendDict: SkillRightsBackendDict): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
       skillRightsBackendDict.can_edit_skill_description);
   }
 
-  getSkillId(): string {
+  getSkillId (): string {
     return this._skillId;
   }
 
-  canEditSkillDescription(): boolean {
+  canEditSkillDescription (): boolean {
     return this._canEditSkillDescription;
   }
 
-  copyFromSkillRights(otherSkillRights: SkillRights): void {
+  copyFromSkillRights (otherSkillRights: SkillRights): void {
     this._skillId = otherSkillRights.getSkillId();
     this._canEditSkillDescription =
       otherSkillRights.canEditSkillDescription();

@@ -26,7 +26,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
   providedIn: 'root'
 })
 export class FilterForMatchingSubstringPipe implements PipeTransform {
-  transform(input: string[], matcher: string): string[] {
+  transform (input: string[], matcher: string): string[] {
     return input.filter(val => {
       return val.toLowerCase().includes(matcher.toLowerCase());
     });

@@ -36,12 +36,12 @@ export class PromoBarComponent implements OnInit {
   promoBarIsEnabled!: boolean;
   promoBarMessage!: string;
 
-  constructor(
+  constructor (
     private promoBarBackendApiService: PromoBarBackendApiService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.promoBarBackendApiService.getPromoBarDataAsync()
       .then((promoBar) => {
         this.promoBarIsEnabled = promoBar.promoBarEnabled;
@@ -50,7 +50,7 @@ export class PromoBarComponent implements OnInit {
     this.promoIsVisible = !this.isPromoDismissed();
   }
 
-  isPromoDismissed(): boolean {
+  isPromoDismissed (): boolean {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
@@ -62,7 +62,7 @@ export class PromoBarComponent implements OnInit {
     return false;
   }
 
-  setPromoDismissed(promoIsDismissed: boolean): boolean {
+  setPromoDismissed (promoIsDismissed: boolean): boolean {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
@@ -71,7 +71,7 @@ export class PromoBarComponent implements OnInit {
     return true;
   }
 
-  isSessionStorageAvailable(): boolean {
+  isSessionStorageAvailable (): boolean {
     // This is to ensure sessionStorage is accessible.
     const testKey = 'Oppia';
     try {
@@ -83,7 +83,7 @@ export class PromoBarComponent implements OnInit {
     }
   }
 
-  dismissPromo(): void {
+  dismissPromo (): void {
     this.promoIsVisible = false;
     this.setPromoDismissed(true);
   }

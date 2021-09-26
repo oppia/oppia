@@ -43,7 +43,7 @@ angular.module('oppia').component('translatorOverview', {
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
     'DEFAULT_AUDIO_LANGUAGE',
-    function(
+    function (
         $scope, $window, ExplorationLanguageCodeService,
         FocusManagerService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
@@ -57,12 +57,12 @@ angular.module('oppia').component('translatorOverview', {
       var allAudioLanguageCodes = LanguageUtilService
         .getAllVoiceoverLanguageCodes();
 
-      $scope.canShowTabModeSwitcher = function() {
+      $scope.canShowTabModeSwitcher = function () {
         return ($scope.languageCode !== (
           ExplorationLanguageCodeService.displayed));
       };
 
-      var refreshDirectiveScope = function() {
+      var refreshDirectiveScope = function () {
         $scope.inTranslationMode = (
           TranslationTabActiveModeService.isTranslationModeActive());
         $scope.inVoiceoverMode = (
@@ -77,7 +77,7 @@ angular.module('oppia').component('translatorOverview', {
           }
         }
         $scope.languageCodesAndDescriptions = (
-          allAudioLanguageCodes.map(function(languageCode) {
+          allAudioLanguageCodes.map(function (languageCode) {
             return {
               id: languageCode,
               description: (
@@ -87,7 +87,7 @@ angular.module('oppia').component('translatorOverview', {
           }));
       };
 
-      $scope.changeActiveMode = function(modeName) {
+      $scope.changeActiveMode = function (modeName) {
         if (modeName === $scope.VOICEOVER_MODE) {
           TranslationTabActiveModeService.activateVoiceoverMode();
         } else if (modeName === $scope.TRANSLATION_MODE) {
@@ -97,7 +97,7 @@ angular.module('oppia').component('translatorOverview', {
         TranslationStatusService.refresh();
       };
 
-      $scope.getTranslationProgressStyle = function() {
+      $scope.getTranslationProgressStyle = function () {
         $scope.numberOfRequiredAudio = TranslationStatusService
           .getExplorationContentRequiredCount();
         $scope.numberOfAudioNotAvailable = TranslationStatusService
@@ -109,7 +109,7 @@ angular.module('oppia').component('translatorOverview', {
         return {width: progressPercent + '%', height: '100%'};
       };
 
-      $scope.changeTranslationLanguage = function() {
+      $scope.changeTranslationLanguage = function () {
         if (ctrl.isTranslationTabBusy) {
           $scope.languageCode = $window.localStorage.getItem(
             LAST_SELECTED_TRANSLATION_LANGUAGE);
@@ -124,7 +124,7 @@ angular.module('oppia').component('translatorOverview', {
           LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
       };
 
-      $scope.getTranslationProgressAriaLabel = function() {
+      $scope.getTranslationProgressAriaLabel = function () {
         if ($scope.numberOfRequiredAudio -
           $scope.numberOfAudioNotAvailable === 1) {
           return (
@@ -140,7 +140,7 @@ angular.module('oppia').component('translatorOverview', {
         }
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         if (RouterService.getActiveTabName() === 'translation') {
           FocusManagerService.setFocus('audioTranslationLanguageCodeField');
         }

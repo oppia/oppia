@@ -31,24 +31,24 @@ export class ThreadTableComponent {
   @Output() rowClick: EventEmitter<string> = (
     new EventEmitter());
   @Input() threads: SuggestionThread[] = [];
-  constructor(
+  constructor (
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService
   ) { }
 
-  onRowClick(threadId: string): void {
+  onRowClick (threadId: string): void {
     this.rowClick.emit(threadId);
   }
 
-  getLabelClass(status: string): string {
+  getLabelClass (status: string): string {
     return this.threadStatusDisplayService.getLabelClass(status);
   }
 
-  getHumanReadableStatus(status: string): string {
+  getHumanReadableStatus (status: string): string {
     return this.threadStatusDisplayService.getHumanReadableStatus(status);
   }
 
-  getLocaleAbbreviatedDateTimeString(millisSinceEpoch: number): string {
+  getLocaleAbbreviatedDateTimeString (millisSinceEpoch: number): string {
     return this.dateTimeFormatService
       .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   }

@@ -45,7 +45,7 @@ export class ThreadStatusDisplayService {
 
   STATUS_CHOICES = cloneDeep(ThreadStatusDisplayService._STATUS_CHOICES);
 
-  getLabelClass(status: string): string {
+  getLabelClass (status: string): string {
     if (status === 'open') {
       return 'badge badge-info';
     } else if (status === 'compliment') {
@@ -55,7 +55,7 @@ export class ThreadStatusDisplayService {
     }
   }
 
-  getHumanReadableStatus(status: string): string {
+  getHumanReadableStatus (status: string): string {
     for (
       var i = 0; i < ThreadStatusDisplayService._STATUS_CHOICES.length; i++) {
       if (ThreadStatusDisplayService._STATUS_CHOICES[i].id === status) {

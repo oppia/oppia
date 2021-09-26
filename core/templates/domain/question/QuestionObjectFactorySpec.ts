@@ -44,7 +44,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state/StateObjectFactory.ts');
 
-describe('Question object factory', function() {
+describe('Question object factory', function () {
   var QuestionObjectFactory = null;
   var StateObjectFactory = null;
   var sampleQuestion = null;
@@ -53,7 +53,7 @@ describe('Question object factory', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
@@ -78,15 +78,15 @@ describe('Question object factory', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(function() {
-    angular.mock.module(function($provide) {
+  beforeEach(function () {
+    angular.mock.module(function ($provide) {
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           can_have_solution: true
@@ -95,7 +95,7 @@ describe('Question object factory', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     StateObjectFactory = $injector.get('StateObjectFactory');
     // The injector is required because this service is directly used in this
@@ -197,7 +197,7 @@ describe('Question object factory', function() {
       sampleQuestionBackendDict);
   }));
 
-  it('should correctly get various fields of the question', function() {
+  it('should correctly get various fields of the question', function () {
     expect(sampleQuestion.getId()).toEqual('question_id');
     expect(sampleQuestion.getLanguageCode()).toEqual('en');
     sampleQuestion.setLanguageCode('cn');
@@ -226,7 +226,7 @@ describe('Question object factory', function() {
     expect(defaultOutcome.feedback.html).toEqual('Correct Answer');
   });
 
-  it('should correctly get backend dict', function() {
+  it('should correctly get backend dict', function () {
     var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
@@ -236,7 +236,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
-  it('should correctly report unaddressed misconceptions', function() {
+  it('should correctly report unaddressed misconceptions', function () {
     var interaction = sampleQuestion.getStateData().interaction;
     var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
@@ -254,7 +254,7 @@ describe('Question object factory', function() {
       misconceptionsDict)).toEqual(['name_2', 'name_3']);
   });
 
-  it('should correctly validate question', function() {
+  it('should correctly validate question', function () {
     var interaction = sampleQuestion.getStateData().interaction;
 
     expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
@@ -287,7 +287,7 @@ describe('Question object factory', function() {
       'Please enter a question.');
   });
 
-  it('should correctly create a Default Question', function() {
+  it('should correctly create a Default Question', function () {
     var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);
     var state = StateObjectFactory.createDefaultState(null);

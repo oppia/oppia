@@ -62,14 +62,14 @@ angular.module('oppia').component('ruleEditor', {
     'PopulateRuleContentIdsService', 'ResponsesService',
     'StateEditorService', 'StateInteractionIdService',
     'INTERACTION_SPECS',
-    function(
+    function (
         $scope, $timeout, EventBusService,
         PopulateRuleContentIdsService, ResponsesService,
         StateEditorService, StateInteractionIdService,
         INTERACTION_SPECS) {
       var ctrl = this;
       // This returns the rule description string.
-      var computeRuleDescriptionFragments = function() {
+      var computeRuleDescriptionFragments = function () {
         if (!ctrl.rule.type) {
           ctrl.ruleDescriptionFragments = [];
           return '';
@@ -130,7 +130,7 @@ angular.module('oppia').component('ruleEditor', {
               } else if (
                 finalInputArray[i + 2] === 'TranslatableHtmlContentId') {
                 ctrl.ruleDescriptionChoices = answerChoices.map(
-                  function(choice) {
+                  function (choice) {
                     return {
                       id: choice.label,
                       val: choice.val
@@ -144,7 +144,7 @@ angular.module('oppia').component('ruleEditor', {
               } else if (
                 finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
                 ctrl.ruleDescriptionChoices = answerChoices.map(
-                  function(choice) {
+                  function (choice) {
                     return {
                       id: choice.label,
                       val: choice.val
@@ -157,7 +157,7 @@ angular.module('oppia').component('ruleEditor', {
                 });
               } else {
                 ctrl.ruleDescriptionChoices = answerChoices.map(
-                  function(choice) {
+                  function (choice) {
                     return {
                       id: choice.val,
                       val: choice.label
@@ -194,14 +194,14 @@ angular.module('oppia').component('ruleEditor', {
         // interaction, where the rule inputs can sometimes be integers and
         // sometimes be lists of music notes.
         ctrl.ruleDescriptionFragments = [];
-        $timeout(function() {
+        $timeout(function () {
           ctrl.ruleDescriptionFragments = result;
         }, 10);
 
         return ruleDescription;
       };
 
-      ctrl.onSelectNewRuleType = function(newRuleType) {
+      ctrl.onSelectNewRuleType = function (newRuleType) {
         var oldRuleInputs = angular.copy(ctrl.rule.inputs) || {};
         var oldRuleInputTypes = angular.copy(ctrl.rule.inputTypes) || {};
 
@@ -253,16 +253,16 @@ angular.module('oppia').component('ruleEditor', {
         }
       };
 
-      ctrl.cancelThisEdit = function() {
+      ctrl.cancelThisEdit = function () {
         ctrl.onCancelRuleEdit();
       };
 
-      ctrl.saveThisRule = function() {
+      ctrl.saveThisRule = function () {
         PopulateRuleContentIdsService.populateNullRuleContentIds(ctrl.rule);
         ctrl.onSaveRule();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.isInvalid = false;
         /**
           * Rule editors are usually used in two ways. Inline or in a modal.
@@ -296,13 +296,13 @@ angular.module('oppia').component('ruleEditor', {
         computeRuleDescriptionFragments();
 
         $scope.$watch(
-          '$ctrl.ruleEditForm.form.$invalid', function(newValue) {
+          '$ctrl.ruleEditForm.form.$invalid', function (newValue) {
             StateEditorService.updateCurrentRuleInputIsValid(!newValue);
           }
         );
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         if (ctrl.eventBusGroup) {
           ctrl.eventBusGroup.unsubscribe();
         }

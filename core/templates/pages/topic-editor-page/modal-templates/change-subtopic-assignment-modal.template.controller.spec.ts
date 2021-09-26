@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the change subtopic assignment modal.
  */
 
-describe('Change subtopic assignment modal', function() {
+describe('Change subtopic assignment modal', function () {
   beforeEach(angular.mock.module('oppia'));
 
   var $scope = null;
   var $uibModalInstance = null;
   var subtopics = [];
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -36,12 +36,12 @@ describe('Change subtopic assignment modal', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.subtopics).toEqual(subtopics);
       expect($scope.selectedSubtopicId).toEqual(null);
     });
 
-  it('should change the selected subtopic index', function() {
+  it('should change the selected subtopic index', function () {
     $scope.changeSelectedSubtopic(10);
     expect($scope.selectedSubtopicId).toEqual(10);
     $scope.changeSelectedSubtopic(3);

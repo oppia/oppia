@@ -113,7 +113,7 @@ describe('Story playthrough model', () => {
         storyPlaythroughBackendObject);
   });
 
-  it('should correctly return all the values', function() {
+  it('should correctly return all the values', function () {
     expect(_samplePlaythroughObject.getInitialNode().getId()).toEqual('node_1');
     expect(_samplePlaythroughObject.getStoryNodeCount()).toEqual(2);
     expect(

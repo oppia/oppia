@@ -23,16 +23,16 @@
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseMusicNotesInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', function (HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       template: require('./music-notes-input-short-response.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
+      controller: ['$attrs', function ($attrs) {
         var ctrl = this;
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           var _notes = [];
           for (var i = 0; i < _answer.length; i++) {

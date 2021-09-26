@@ -38,12 +38,12 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
   'ExplorationStatesService', 'RouterService', 'StateEditorRefreshService',
   'StateObjectFactory', 'ThreadDataBackendApiService',
   'ACTION_ACCEPT_SUGGESTION',
-  function(
+  function (
       $log, $rootScope, $uibModal, ExplorationDataService,
       ExplorationStatesService, RouterService, StateEditorRefreshService,
       StateObjectFactory, ThreadDataBackendApiService,
       ACTION_ACCEPT_SUGGESTION) {
-    let showEditStateContentSuggestionModal = function(
+    let showEditStateContentSuggestionModal = function (
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
         setActiveThread = (threadId => {}), threadUibModalInstance = null) {
       return $uibModal.open({
@@ -104,7 +104,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
     };
 
     return {
-      showSuggestionModal: function(
+      showSuggestionModal: function (
           suggestionType, extraParams, threadUibModalInstance = null) {
         if (!extraParams.activeThread) {
           throw new Error(

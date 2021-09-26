@@ -38,11 +38,11 @@ export class StateTutorialFirstTimeService {
   private _openPostTutorialHelpPopoverEventEmitter = new EventEmitter();
   private _openTranslationTutorialEventEmitter = new EventEmitter();
 
-  constructor(
+  constructor (
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private tutorialEventsBackendApiService: TutorialEventsBackendApiService) {}
 
-  initEditor(firstTime: boolean, expId: string): void {
+  initEditor (firstTime: boolean, expId: string): void {
     // After the first call to it in a client session, this does nothing.
     if (!firstTime || !this._currentlyInEditorFirstVisit) {
       this._currentlyInEditorFirstVisit = false;
@@ -60,7 +60,7 @@ export class StateTutorialFirstTimeService {
     }
   }
 
-  markEditorTutorialFinished(): void {
+  markEditorTutorialFinished (): void {
     if (this._currentlyInEditorFirstVisit) {
       this._openPostTutorialHelpPopoverEventEmitter.emit();
       this.editorFirstTimeEventsService.registerEditorFirstEntryEvent();
@@ -69,11 +69,11 @@ export class StateTutorialFirstTimeService {
     this._currentlyInEditorFirstVisit = false;
   }
 
-  markTranslationTutorialNotSeenBefore(): void {
+  markTranslationTutorialNotSeenBefore (): void {
     this._translationTutorialNotSeenBefore = true;
   }
 
-  initTranslation(expId: string): void {
+  initTranslation (expId: string): void {
     // After the first call to it in a client session, this does nothing.
     if (!this._translationTutorialNotSeenBefore ||
         !this._currentlyInTranslationFirstVisit) {
@@ -91,7 +91,7 @@ export class StateTutorialFirstTimeService {
     }
   }
 
-  markTranslationTutorialFinished(): void {
+  markTranslationTutorialFinished (): void {
     if (this._currentlyInTranslationFirstVisit) {
       this._openPostTutorialHelpPopoverEventEmitter.emit();
       this.editorFirstTimeEventsService.registerEditorFirstEntryEvent();
@@ -100,23 +100,23 @@ export class StateTutorialFirstTimeService {
     this._currentlyInTranslationFirstVisit = false;
   }
 
-  get onEnterEditorForTheFirstTime(): EventEmitter<unknown> {
+  get onEnterEditorForTheFirstTime (): EventEmitter<unknown> {
     return this.enterEditorForTheFirstTimeEventEmitter;
   }
 
-  get onEnterTranslationForTheFirstTime(): EventEmitter<unknown> {
+  get onEnterTranslationForTheFirstTime (): EventEmitter<unknown> {
     return this.enterTranslationForTheFirstTimeEventEmitter;
   }
 
-  get onOpenEditorTutorial(): EventEmitter<unknown> {
+  get onOpenEditorTutorial (): EventEmitter<unknown> {
     return this._openEditorTutorialEventEmitter;
   }
 
-  get onOpenPostTutorialHelpPopover(): EventEmitter<unknown> {
+  get onOpenPostTutorialHelpPopover (): EventEmitter<unknown> {
     return this._openPostTutorialHelpPopoverEventEmitter;
   }
 
-  get onOpenTranslationTutorial(): EventEmitter<unknown> {
+  get onOpenTranslationTutorial (): EventEmitter<unknown> {
     return this._openTranslationTutorialEventEmitter;
   }
 }

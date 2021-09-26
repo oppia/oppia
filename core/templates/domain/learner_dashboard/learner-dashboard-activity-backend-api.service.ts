@@ -57,14 +57,14 @@ export class LearnerDashboardActivityBackendApiService {
   removeActivityModalStatus!: string;
   successfullyAdded: boolean = false;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private http: HttpClient,
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  addToLearnerPlaylist(activityId: string, activityType: string): boolean {
+  addToLearnerPlaylist (activityId: string, activityType: string): boolean {
     this.successfullyAdded = true;
     this.addToLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
@@ -103,7 +103,7 @@ export class LearnerDashboardActivityBackendApiService {
 
   // This function will open a modal to remove an exploration
   // from the 'Play Later' list in the Library Page.
-  removeFromLearnerPlaylistModal(
+  removeFromLearnerPlaylistModal (
       activityId: string, activityTitle: string, activityType: string,
       learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
     const modelRef = this.ngbModal.open(
@@ -127,7 +127,7 @@ export class LearnerDashboardActivityBackendApiService {
     });
   }
 
-  async addToLearnerGoals(
+  async addToLearnerGoals (
       activityId: string, activityType: string): Promise<boolean> {
     this.successfullyAdded = true;
     this.addToLearnerGoalsUrl = (
@@ -160,7 +160,7 @@ export class LearnerDashboardActivityBackendApiService {
   // from the given list either 'Play Later' or 'In Progress'
   // or remove a topic from the 'Current Goals' or 'In Progress'
   // in Learner Dashboard Page.
-  async removeActivityModalAsync(
+  async removeActivityModalAsync (
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
     const modelRef = this.ngbModal.open(

@@ -31,7 +31,7 @@ import constants from 'assets/constants';
 })
 export class ExplorationLanguageCodeService extends ExplorationPropertyService {
   propertyName: string = 'language_code';
-  constructor(
+  constructor (
     private contextService: ContextService,
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
@@ -40,14 +40,14 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     super(alertsService, changeListService, loggerService);
   }
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getSupportedContentLanguages() {
+  getSupportedContentLanguages () {
     if (this.contextService.isExplorationLinkedToStory()) {
       return constants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
     }
     return constants.SUPPORTED_CONTENT_LANGUAGES;
   }
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getCurrentLanguageDescription() {
+  getCurrentLanguageDescription () {
     for (var i = 0; i < constants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
       if (constants.SUPPORTED_CONTENT_LANGUAGES[i].code === this.displayed) {
         return constants.SUPPORTED_CONTENT_LANGUAGES[i].description;
@@ -55,7 +55,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     }
   }
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _isValid(value) {
+  _isValid (value) {
     return constants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
       return elt.code === value;
     });

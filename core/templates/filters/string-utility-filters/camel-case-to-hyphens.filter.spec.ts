@@ -23,22 +23,23 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   var filterName = 'camelCaseToHyphens';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  it('should have all expected filters', angular.mock.inject(function($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it('should have all expected filters',
+    angular.mock.inject(function ($filter) {
+      expect($filter(filterName)).not.toEqual(null);
+    }));
 
   it('should convert camelCase to hyphens properly', angular.mock.inject(
-    function($filter) {
+    function ($filter) {
       var filter = $filter('camelCaseToHyphens');
       expect(filter('test')).toEqual('test');
       expect(filter('testTest')).toEqual('test-test');

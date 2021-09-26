@@ -34,19 +34,19 @@ describe('Refresher Exploration Confirmation Modal', () => {
   let windowRef: WindowRef;
 
   class MockUrlService {
-    getUrlParams(): { 'collection_id': string } {
+    getUrlParams (): { 'collection_id': string } {
       return { collection_id: collectionId };
     }
 
-    getQueryFieldValuesAsList(feildName: string): string[] {
+    getQueryFieldValuesAsList (feildName: string): string[] {
       return ['parent_id_1', 'parent_id_2'];
     }
 
-    getPathname(): string {
+    getPathname (): string {
       return 'path_name';
     }
 
-    addField(url: string, fieldname: string, fieldvalue: string) {}
+    addField (url: string, fieldname: string, fieldvalue: string) {}
   }
 
   beforeEach(waitForAsync(() => {

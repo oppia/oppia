@@ -20,14 +20,14 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var SubTopicViewerPage = function() {
+var SubTopicViewerPage = function () {
   var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
   var conceptCardList = element.all(
     by.css('.protractor-test-concept-card-link'));
   var conceptCardExplanation = element(
     by.css('.protractor-test-concept-card-explanation'));
 
-  this.get = async function(subTopicName) {
+  this.get = async function (subTopicName) {
     await waitFor.pageToFullyLoad();
     var subTopicTile = element(by.cssContainingText(
       '.protractor-test-subtopic-tile', subTopicName));
@@ -37,7 +37,7 @@ var SubTopicViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectRevisionCardCountToBe = async function(count) {
+  this.expectRevisionCardCountToBe = async function (count) {
     if (count === 0) {
       expect(await subTopicTileList.count()).toEqual(0);
     } else {
@@ -48,7 +48,7 @@ var SubTopicViewerPage = function() {
     }
   };
 
-  this.expectConceptCardCountToBe = async function(count) {
+  this.expectConceptCardCountToBe = async function (count) {
     if (count === 0) {
       expect(await conceptCardList.count()).toEqual(0);
     } else {
@@ -59,13 +59,13 @@ var SubTopicViewerPage = function() {
     }
   };
 
-  this.getConceptCard = async function() {
+  this.getConceptCard = async function () {
     var conceptCardElement = conceptCardList.first();
     await action.click('Concept card link', conceptCardElement);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectConceptCardInformationToBe = async function(description) {
+  this.expectConceptCardInformationToBe = async function (description) {
     await waitFor.visibilityOf(
       conceptCardExplanation,
       'Concept card explanation takes too long to be visible.');

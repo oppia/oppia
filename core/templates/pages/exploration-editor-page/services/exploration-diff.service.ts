@@ -85,15 +85,15 @@ export class ExplorationDiffService {
   _maxId = 0;
 
   // Functions to assign ids to states.
-  _resetMaxId(): void {
+  _resetMaxId (): void {
     this._maxId = 0;
   }
-  _generateNewId(): number {
+  _generateNewId (): number {
     this._maxId++;
     return this._maxId;
   }
 
-  _generateInitialStateIdsAndData(
+  _generateInitialStateIdsAndData (
       statesDict: StateObjectsDict): StateIdsAndData {
     let result = {
       stateIds: {},
@@ -114,7 +114,7 @@ export class ExplorationDiffService {
     return result;
   }
 
-  _postprocessStateIdsAndData(
+  _postprocessStateIdsAndData (
       originalStateIds: StateIds,
       stateIds: StateIds,
       stateData: StateData,
@@ -193,7 +193,7 @@ export class ExplorationDiffService {
    * - directionForwards: true if changes are compared in increasing version
    * number, and false if changes are compared in decreasing version number.
    */
-  _getDiffGraphData(
+  _getDiffGraphData (
       v1States: StateObjectsDict,
       v2States: StateObjectsDict,
       changeListData: ExplorationGraphChangeList[]):
@@ -300,7 +300,7 @@ export class ExplorationDiffService {
    *     ids.
    * - maxId: the maximum id in states and stateIds.
    */
-  _getAdjMatrix(
+  _getAdjMatrix (
       states: StateObjectsDict,
       stateIds: StateIds, maxId: number): AdjMatrix {
     let adjMatrix = {};
@@ -334,7 +334,7 @@ export class ExplorationDiffService {
    *  - 'target': target state of link
    *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
    */
-  _compareLinks(
+  _compareLinks (
       v1States: StateObjectsDict,
       originalStateIds: StateIds,
       v2States: StateObjectsDict,
@@ -362,7 +362,7 @@ export class ExplorationDiffService {
     return links;
   }
 
-  getDiffGraphData(
+  getDiffGraphData (
       oldStates: StateObjectsDict, newStates: StateObjectsDict,
       changeListData: ExplorationGraphChangeList[]):
       ProcessedStateIdsAndData {

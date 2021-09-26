@@ -23,23 +23,23 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('components/forms/validators/is-nonempty.filter.ts');
 
-describe('Normalizer tests', function() {
+describe('Normalizer tests', function () {
   var filterName = 'isNonempty';
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  it('should have the relevant filters', angular.mock.inject(function($filter) {
+  it('should have the relevant filters', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
-  it('should validate non-emptiness', angular.mock.inject(function($filter) {
+  it('should validate non-emptiness', angular.mock.inject(function ($filter) {
     var filter = $filter('isNonempty');
     expect(filter('a')).toBe(true);
     expect(filter('')).toBe(false);

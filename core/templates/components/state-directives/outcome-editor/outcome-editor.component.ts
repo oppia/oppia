@@ -57,27 +57,27 @@ angular.module('oppia').component('outcomeEditor', {
     'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
-    function(
+    function (
         ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.isInQuestionMode = function() {
+      ctrl.isInQuestionMode = function () {
         return StateEditorService.isInQuestionMode();
       };
 
-      ctrl.isCorrectnessFeedbackEnabled = function() {
+      ctrl.isCorrectnessFeedbackEnabled = function () {
         return StateEditorService.getCorrectnessFeedbackEnabled();
       };
 
       // This returns false if the current interaction ID is null.
-      ctrl.isCurrentInteractionLinear = function() {
+      ctrl.isCurrentInteractionLinear = function () {
         var interactionId = ctrl.getCurrentInteractionId();
         return interactionId && INTERACTION_SPECS[interactionId].is_linear;
       };
 
-      var onExternalSave = function() {
+      var onExternalSave = function () {
         // The reason for this guard is because, when the editor page for an
         // exploration is first opened, the 'initializeAnswerGroups' event
         // (which fires an 'externalSave' event) only fires after the
@@ -106,17 +106,17 @@ angular.module('oppia').component('outcomeEditor', {
         }
       };
 
-      ctrl.isSelfLoop = function(outcome) {
+      ctrl.isSelfLoop = function (outcome) {
         return (
           outcome &&
           outcome.dest === StateEditorService.getActiveStateName());
       };
 
-      ctrl.getCurrentInteractionId = function() {
+      ctrl.getCurrentInteractionId = function () {
         return StateInteractionIdService.savedMemento;
       };
 
-      ctrl.isSelfLoopWithNoFeedback = function(outcome) {
+      ctrl.isSelfLoopWithNoFeedback = function (outcome) {
         if (outcome && typeof outcome === 'object' &&
           outcome.constructor.name === 'Outcome') {
           return ctrl.isSelfLoop(outcome) &&
@@ -125,31 +125,31 @@ angular.module('oppia').component('outcomeEditor', {
         return false;
       };
 
-      ctrl.invalidStateAfterFeedbackSave = function() {
+      ctrl.invalidStateAfterFeedbackSave = function () {
         var tmpOutcome = angular.copy(ctrl.savedOutcome);
         tmpOutcome.feedback = angular.copy(ctrl.outcome.feedback);
         return ctrl.isSelfLoopWithNoFeedback(tmpOutcome);
       };
 
-      ctrl.invalidStateAfterDestinationSave = function() {
+      ctrl.invalidStateAfterDestinationSave = function () {
         var tmpOutcome = angular.copy(ctrl.savedOutcome);
         tmpOutcome.dest = angular.copy(ctrl.outcome.dest);
         return ctrl.isSelfLoopWithNoFeedback(tmpOutcome);
       };
 
-      ctrl.openFeedbackEditor = function() {
+      ctrl.openFeedbackEditor = function () {
         if (ctrl.isEditable()) {
           ctrl.feedbackEditorIsOpen = true;
         }
       };
 
-      ctrl.openDestinationEditor = function() {
+      ctrl.openDestinationEditor = function () {
         if (ctrl.isEditable()) {
           ctrl.destinationEditorIsOpen = true;
         }
       };
 
-      ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
+      ctrl.saveThisFeedback = function (fromClickSaveFeedbackButton) {
         ctrl.feedbackEditorIsOpen = false;
         var contentHasChanged = (
           ctrl.savedOutcome.feedback.html !==
@@ -175,7 +175,7 @@ angular.module('oppia').component('outcomeEditor', {
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
       };
 
-      ctrl.saveThisDestination = function() {
+      ctrl.saveThisDestination = function () {
         StateEditorService.onSaveOutcomeDestDetails.emit();
         ctrl.destinationEditorIsOpen = false;
         ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
@@ -190,20 +190,20 @@ angular.module('oppia').component('outcomeEditor', {
         ctrl.getOnSaveDestFn()(ctrl.savedOutcome);
       };
 
-      ctrl.onChangeCorrectnessLabel = function() {
+      ctrl.onChangeCorrectnessLabel = function () {
         ctrl.savedOutcome.labelledAsCorrect = (
           ctrl.outcome.labelledAsCorrect);
 
         ctrl.getOnSaveCorrectnessLabelFn()(ctrl.savedOutcome);
       };
 
-      ctrl.cancelThisFeedbackEdit = function() {
+      ctrl.cancelThisFeedbackEdit = function () {
         ctrl.outcome.feedback = angular.copy(
           ctrl.savedOutcome.feedback);
         ctrl.feedbackEditorIsOpen = false;
       };
 
-      ctrl.cancelThisDestinationEdit = function() {
+      ctrl.cancelThisDestinationEdit = function () {
         ctrl.outcome.dest = angular.copy(ctrl.savedOutcome.dest);
         ctrl.outcome.refresherExplorationId = (
           ctrl.savedOutcome.refresherExplorationId);
@@ -212,7 +212,7 @@ angular.module('oppia').component('outcomeEditor', {
         ctrl.destinationEditorIsOpen = false;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(
             () => onExternalSave()
@@ -233,7 +233,7 @@ angular.module('oppia').component('outcomeEditor', {
         // ctrl.savedOutcome now being set in onExternalSave().
         ctrl.savedOutcome = angular.copy(ctrl.outcome);
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

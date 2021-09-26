@@ -32,9 +32,9 @@ type ReadableNoteNames = (
   providedIn: 'root'
 })
 export class MusicNotesInputRulesService {
-  constructor(private utilsService: UtilsService) {}
+  constructor (private utilsService: UtilsService) {}
 
-  static _getMidiNoteValue(note: MusicNotesAnswer): number {
+  static _getMidiNoteValue (note: MusicNotesAnswer): number {
     if (
       InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
         note.readableNoteName)) {
@@ -46,33 +46,33 @@ export class MusicNotesInputRulesService {
     }
   }
 
-  static _convertSequenceToMidi(sequence: MusicNotesAnswer[]): number[] {
+  static _convertSequenceToMidi (sequence: MusicNotesAnswer[]): number[] {
     return sequence.map((note) => {
       return MusicNotesInputRulesService._getMidiNoteValue(note);
     });
   }
 
-  Equals(
+  Equals (
       answer: MusicNotesAnswer[], inputs: {x: MusicNotesAnswer[]}): boolean {
     return this.utilsService.isEquivalent(
       MusicNotesInputRulesService._convertSequenceToMidi(answer),
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
   }
-  IsLongerThan(
+  IsLongerThan (
       answer: MusicNotesAnswer[],
       inputs: {k: number}): boolean {
     return MusicNotesInputRulesService._convertSequenceToMidi(
       answer).length > inputs.k;
   }
   // TODO(wxy): Validate that inputs.a <= inputs.b.
-  HasLengthInclusivelyBetween(
+  HasLengthInclusivelyBetween (
       answer: MusicNotesAnswer[],
       inputs: {a: number, b: number}): boolean {
     var answerLength: number = (
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
     return answerLength >= inputs.a && answerLength <= inputs.b;
   }
-  IsEqualToExceptFor(
+  IsEqualToExceptFor (
       answer: MusicNotesAnswer[],
       inputs: {x: MusicNotesAnswer[], k: number}): boolean {
     var targetSequence: number[] = (
@@ -84,14 +84,14 @@ export class MusicNotesInputRulesService {
     }
 
     var numWrongNotes: number = 0;
-    userSequence.map(function(noteValue, index) {
+    userSequence.map(function (noteValue, index) {
       if (noteValue !== targetSequence[index]) {
         numWrongNotes++;
       }
     });
     return numWrongNotes <= inputs.k;
   }
-  IsTranspositionOf(
+  IsTranspositionOf (
       answer: MusicNotesAnswer[],
       inputs: {x: MusicNotesAnswer[], y: number}): boolean {
     var targetSequence: number[] = (
@@ -105,7 +105,7 @@ export class MusicNotesInputRulesService {
       return targetSequence[index] + inputs.y === noteValue;
     });
   }
-  IsTranspositionOfExceptFor(
+  IsTranspositionOfExceptFor (
       answer: MusicNotesAnswer[],
       inputs: {x: MusicNotesAnswer[], y: number, k: number}): boolean {
     var targetSequence: number[] = (

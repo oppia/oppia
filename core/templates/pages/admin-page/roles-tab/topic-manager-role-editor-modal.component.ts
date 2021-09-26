@@ -36,19 +36,19 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   topicIdsForSelection = [];
   topicIdInUpdate = null;
 
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
     private adminBackendApiService: AdminBackendApiService,
     private alertsService: AlertsService
   ) {}
 
-  private updateTopicIdsForSelection(): void {
+  private updateTopicIdsForSelection (): void {
     this.topicIdsForSelection = Object.keys(this.topicIdToName).filter(
       topicId => !this.managedTopicIds.includes(topicId));
     this.newTopicId = this.topicIdsForSelection[0];
   }
 
-  addTopic(): void {
+  addTopic (): void {
     this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
@@ -64,7 +64,7 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     });
   }
 
-  removeTopicId(topicIdToRemove: string): void {
+  removeTopicId (topicIdToRemove: string): void {
     let topicIdIndex = this.managedTopicIds.indexOf(topicIdToRemove);
     this.topicIdInUpdate = topicIdToRemove;
     this.adminBackendApiService.deassignManagerFromTopicAsync(
@@ -78,11 +78,11 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     });
   }
 
-  close(): void {
+  close (): void {
     this.activeModal.close(this.managedTopicIds);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.updateTopicIdsForSelection();
   }
 }

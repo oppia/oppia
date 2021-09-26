@@ -21,20 +21,20 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Suggestion Modal For Creator View Controller', function() {
+describe('Suggestion Modal For Creator View Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('when suggestion is handled and it is accepted', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when suggestion is handled and it is accepted', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -61,7 +61,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.isNotHandled).toBe(false);
         expect($scope.canReject).toBe(false);
         expect($scope.canAccept).toBe(false);
@@ -86,7 +86,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.suggestionEditorIsShown).toBe(false);
       });
 
-    it('should accept suggestion', function() {
+    it('should accept suggestion', function () {
       $scope.acceptSuggestion();
 
       expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -96,7 +96,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
       });
     });
 
-    it('should reject suggestion', function() {
+    it('should reject suggestion', function () {
       $scope.rejectSuggestion();
 
       expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -106,7 +106,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
       });
     });
 
-    it('should toggle edit mode suggestion', function() {
+    it('should toggle edit mode suggestion', function () {
       expect($scope.suggestionEditorIsShown).toBe(false);
       $scope.editSuggestion();
       expect($scope.suggestionEditorIsShown).toBe(true);
@@ -114,25 +114,25 @@ describe('Suggestion Modal For Creator View Controller', function() {
       expect($scope.suggestionEditorIsShown).toBe(false);
     });
 
-    it('should cancel suggestion', function() {
+    it('should cancel suggestion', function () {
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should evalute if edit button is showing', function() {
+    it('should evalute if edit button is showing', function () {
       expect($scope.isEditButtonShown()).toBe(false);
     });
 
-    it('should evalute if resubmit button is showing', function() {
+    it('should evalute if resubmit button is showing', function () {
       expect($scope.isResubmitButtonShown()).toBe(false);
     });
 
-    it('should evalute when resubmit button is disabled', function() {
+    it('should evalute when resubmit button is disabled', function () {
       spyOn($scope, 'summaryMessage').and.returnValue('Message');
       expect($scope.isResubmitButtonDisabled()).toBe(true);
     });
 
-    it('should resubmit changes', function() {
+    it('should resubmit changes', function () {
       $scope.resubmitChanges();
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         action: 'resubmit',
@@ -147,8 +147,8 @@ describe('Suggestion Modal For Creator View Controller', function() {
     });
   });
 
-  describe('when suggestion is handled and it is rejected', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when suggestion is handled and it is rejected', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -175,7 +175,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.isNotHandled).toBe(false);
         expect($scope.canReject).toBe(false);
         expect($scope.canAccept).toBe(false);
@@ -199,7 +199,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.suggestionEditorIsShown).toBe(false);
       });
 
-    it('should toggle edit mode suggestion', function() {
+    it('should toggle edit mode suggestion', function () {
       expect($scope.suggestionEditorIsShown).toBe(false);
       expect($scope.isEditButtonShown()).toBe(true);
       expect($scope.isResubmitButtonShown()).toBe(false);
@@ -213,12 +213,12 @@ describe('Suggestion Modal For Creator View Controller', function() {
       expect($scope.isResubmitButtonShown()).toBe(false);
     });
 
-    it('should evalute when resubmit button is disabled', function() {
+    it('should evalute when resubmit button is disabled', function () {
       spyOn($scope, 'summaryMessage').and.returnValue('Message');
       expect($scope.isResubmitButtonDisabled()).toBe(true);
     });
 
-    it('should resubmit changes', function() {
+    it('should resubmit changes', function () {
       $scope.resubmitChanges();
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         action: 'resubmit',
@@ -233,8 +233,8 @@ describe('Suggestion Modal For Creator View Controller', function() {
     });
   });
 
-  describe('when suggestion is not handled', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when suggestion is not handled', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -261,7 +261,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.isNotHandled).toBe(true);
         expect($scope.canReject).toBe(true);
         expect($scope.canAccept).toBe(true);
@@ -284,20 +284,20 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.suggestionEditorIsShown).toBe(false);
       });
 
-    it('should evalute if edit button is showing', function() {
+    it('should evalute if edit button is showing', function () {
       expect($scope.isEditButtonShown()).toBe(false);
     });
 
-    it('should evalute if resubmit button is showing', function() {
+    it('should evalute if resubmit button is showing', function () {
       expect($scope.isResubmitButtonShown()).toBe(false);
     });
 
-    it('should evalute when resubmit button is disabled', function() {
+    it('should evalute when resubmit button is disabled', function () {
       spyOn($scope, 'summaryMessage').and.returnValue('Message');
       expect($scope.isResubmitButtonDisabled()).toBe(true);
     });
 
-    it('should resubmit changes', function() {
+    it('should resubmit changes', function () {
       $scope.resubmitChanges();
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         action: 'resubmit',

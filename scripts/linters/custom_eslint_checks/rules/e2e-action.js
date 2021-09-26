@@ -40,9 +40,9 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     return {
-      CallExpression: function checkExpression(node) {
+      CallExpression: function checkExpression (node) {
         if (node.callee.type !== 'MemberExpression') {
           return;
         }

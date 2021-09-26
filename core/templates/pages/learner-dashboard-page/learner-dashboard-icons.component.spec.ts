@@ -99,7 +99,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     const learnerDashboardSpy = spyOn(
       learnerDashboardIdsBackendApiService, 'fetchLearnerDashboardIdsAsync')
-      .and.callFake(async() => {
+      .and.callFake(async () => {
         return Promise.resolve(learnerDashboardActivityIds);
       });
 

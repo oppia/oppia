@@ -24,7 +24,7 @@ describe('Hint and Solution Modal Service', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
 
   class MockNgbModal {
-    open(): { componentInstance: { index: number } } {
+    open (): { componentInstance: { index: number } } {
       return {
         componentInstance: {
           index: 0

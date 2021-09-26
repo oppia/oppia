@@ -41,7 +41,7 @@ class MockRemoveActivityNgbModalRef {
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }

@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { PositiveIntEditorComponent } from './positive-int-editor.component';
 
-describe('PositiveInt', function() {
+describe('PositiveInt', function () {
   let component: PositiveIntEditorComponent;
 
   beforeEach(waitForAsync(() => {

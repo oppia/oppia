@@ -35,7 +35,7 @@ import { StateInteractionIdService }
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 
-describe('Add Or Update Solution Modal Controller', function() {
+describe('Add Or Update Solution Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
@@ -48,7 +48,7 @@ describe('Add Or Update Solution Modal Controller', function() {
   var answerEditorHtml = {};
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(function() {
+  beforeEach(function () {
     currentInteractionService = TestBed.get(CurrentInteractionService);
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService);
@@ -58,8 +58,8 @@ describe('Add Or Update Solution Modal Controller', function() {
     stateSolutionService = TestBed.get(StateSolutionService);
   });
 
-  describe('when solution is valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when solution is valid', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       ContextService = $injector.get('ContextService');
       spyOn(ContextService, 'getEntityType').and.returnValue('question');
@@ -94,7 +94,7 @@ describe('Add Or Update Solution Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         stateSolutionService.init('', answerEditorHtml);
         expect($scope.correctAnswerEditorHtml).toBe(null);
         expect($scope.data).toEqual({
@@ -107,13 +107,13 @@ describe('Add Or Update Solution Modal Controller', function() {
       });
 
     it('should update correct answer when submitting current interaction',
-      function() {
+      function () {
         var answer = {};
         currentInteractionService.onSubmit(answer);
         expect($scope.data.correctAnswer).toEqual(answer);
       });
 
-    it('should submit answer when clicking on submit button', function() {
+    it('should submit answer when clicking on submit button', function () {
       spyOn(currentInteractionService, 'submitAnswer');
       $scope.onSubmitFromSubmitButton();
 
@@ -121,7 +121,7 @@ describe('Add Or Update Solution Modal Controller', function() {
     });
 
     it('should check if additional submit button should be shown',
-      function() {
+      function () {
         stateInteractionIdService.init('', 'TextInput');
         expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(true);
         stateInteractionIdService.displayed = 'Continue';
@@ -129,7 +129,7 @@ describe('Add Or Update Solution Modal Controller', function() {
         expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(false);
       });
 
-    it('should save solution when closing the modal', function() {
+    it('should save solution when closing the modal', function () {
       stateSolutionService.init('', answerEditorHtml);
       currentInteractionService.onSubmit('answer');
       $scope.saveSolution();
@@ -141,10 +141,10 @@ describe('Add Or Update Solution Modal Controller', function() {
     });
   });
 
-  describe('when solution is not valid', function() {
+  describe('when solution is not valid', function () {
     answerEditorHtml = {};
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       ContextService = $injector.get('ContextService');
       spyOn(ContextService, 'getEntityType').and.returnValue('question');
@@ -168,8 +168,8 @@ describe('Add Or Update Solution Modal Controller', function() {
       });
     }));
 
-    it('should not save solution', function() {
-      expect(function() {
+    it('should not save solution', function () {
+      expect(function () {
         $scope.saveSolution();
       }).toThrowError('Cannot save invalid solution');
     });

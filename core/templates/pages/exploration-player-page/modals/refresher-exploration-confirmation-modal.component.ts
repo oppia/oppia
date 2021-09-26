@@ -32,7 +32,7 @@ export class RefresherExplorationConfirmationModal
   extends ConfirmOrCancelModal {
   confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();
   refresherExplorationId: string;
-  constructor(
+  constructor (
       private ngbActiveModal: NgbActiveModal,
       private windowRef: WindowRef,
       private explorationEngineService: ExplorationEngineService,
@@ -42,7 +42,7 @@ export class RefresherExplorationConfirmationModal
     super(ngbActiveModal);
   }
 
-  confirmRedirect(): void {
+  confirmRedirect (): void {
     this.confirmRedirectEventEmitter.emit();
 
     let collectionId: string = this.urlService.getUrlParams().collection_id;

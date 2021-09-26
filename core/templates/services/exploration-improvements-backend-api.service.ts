@@ -48,13 +48,13 @@ export interface ExplorationImprovementsHistoryResponseBackendDict {
 }
 
 export class ExplorationImprovementsResponse {
-  constructor(
+  constructor (
       public readonly openTasks: ExplorationTask[],
       public readonly resolvedTaskTypesByStateName: Map<string, string[]>) {}
 }
 
 export class ExplorationImprovementsHistoryResponse {
-  constructor(
+  constructor (
       public readonly results: ExplorationTask[],
       public readonly cursor: string,
       public readonly more: boolean) {}
@@ -62,11 +62,11 @@ export class ExplorationImprovementsHistoryResponse {
 
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsBackendApiService {
-  constructor(
+  constructor (
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async getTasksAsync(expId: string): Promise<ExplorationImprovementsResponse> {
+  async getTasksAsync (expId: string): Promise<ExplorationImprovementsResponse> {
     const explorationImprovementsUrl = (
       this.urlInterpolationService.interpolateUrl(
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
@@ -82,7 +82,7 @@ export class ExplorationImprovementsBackendApiService {
     );
   }
 
-  async postTasksAsync(expId: string, tasks: ExplorationTask[]): Promise<void> {
+  async postTasksAsync (expId: string, tasks: ExplorationTask[]): Promise<void> {
     if (tasks.length === 0) {
       return;
     }
@@ -96,7 +96,7 @@ export class ExplorationImprovementsBackendApiService {
     }).toPromise();
   }
 
-  async getHistoryPageAsync(
+  async getHistoryPageAsync (
       expId: string,
       cursor?: string): Promise<ExplorationImprovementsHistoryResponse> {
     const explorationImprovementsHistoryUrl = (
@@ -118,7 +118,7 @@ export class ExplorationImprovementsBackendApiService {
         backendDict.more));
   }
 
-  async getConfigAsync(
+  async getConfigAsync (
       expId: string): Promise<ExplorationImprovementsConfig> {
     const explorationImprovementsConfigUrl = (
       this.urlInterpolationService.interpolateUrl(

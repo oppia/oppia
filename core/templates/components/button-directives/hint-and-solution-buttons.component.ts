@@ -42,7 +42,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
 
-  constructor(
+  constructor (
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
@@ -53,7 +53,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     private statsReportingService: StatsReportingService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
     this.resetLocalHintsArray();
     this.directiveSubscriptions.add(
@@ -89,11 +89,11 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  resetLocalHintsArray(): void {
+  resetLocalHintsArray (): void {
     this.hintIndexes = [];
     let numHints = this.hintsAndSolutionManagerService.getNumHints();
     for (let index = 0; index < numHints; index++) {
@@ -101,7 +101,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     }
   }
 
-  isHintButtonVisible(index: number): boolean {
+  isHintButtonVisible (index: number): boolean {
     return (
       this.hintsAndSolutionManagerService.isHintViewable(index) &&
       this.displayedCard &&
@@ -109,11 +109,11 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   }
 
 
-  isSolutionButtonVisible(): boolean {
+  isSolutionButtonVisible (): boolean {
     return this.hintsAndSolutionManagerService.isSolutionViewable();
   }
 
-  displayHintModal(index: number): void {
+  displayHintModal (index: number): void {
     this.activeHintIndex = index;
     let promise = (
       this.hintAndSolutionModalService.displayHintModal(index));
@@ -123,7 +123,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     this.isVisible = false;
   }
 
-  onClickSolutionButton(): void {
+  onClickSolutionButton (): void {
     this.solutionModalIsActive = true;
     if (this.hintsAndSolutionManagerService.isSolutionConsumed()) {
       this.displaySolutionModal();
@@ -139,7 +139,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     }
   }
 
-  displaySolutionModal(): void {
+  displaySolutionModal (): void {
     this.solutionModalIsActive = true;
     let inQuestionMode = (
       this.explorationPlayerStateService.isInQuestionMode());
@@ -153,15 +153,15 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     });
   }
 
-  isTooltipVisible(): boolean {
+  isTooltipVisible (): boolean {
     return this.hintsAndSolutionManagerService.isHintTooltipOpen();
   }
 
-  isHintConsumed(hintIndex: number): boolean {
+  isHintConsumed (hintIndex: number): boolean {
     return this.hintsAndSolutionManagerService.isHintConsumed(hintIndex);
   }
 
-  isSolutionConsumed(): boolean {
+  isSolutionConsumed (): boolean {
     return this.hintsAndSolutionManagerService.isSolutionConsumed();
   }
 }

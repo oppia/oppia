@@ -29,14 +29,14 @@ import { CkEditorCopyContentService } from
   templateUrl: './ck-editor-copy-toolbar.component.html'
 })
 export class CkEditorCopyToolbarComponent {
-  constructor(
+  constructor (
       private ckEditorCopyContentService: CkEditorCopyContentService,
       @Inject(DOCUMENT) private document: Document
   ) {
     ckEditorCopyContentService.copyModeActive = false;
   }
 
-  toggleToolActive(): void {
+  toggleToolActive (): void {
     this.ckEditorCopyContentService.toggleCopyMode();
 
     if (this.ckEditorCopyContentService.copyModeActive) {
@@ -54,7 +54,7 @@ export class CkEditorCopyToolbarComponent {
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.document.body.style.cursor = '';
   }
 }

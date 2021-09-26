@@ -32,7 +32,7 @@ class MockEditableStoryBackendApiService {
   newBackendStoryObject = null;
   failure = null;
 
-  async fetchStoryAsync() {
+  async fetchStoryAsync () {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({
@@ -52,7 +52,7 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  async updateStoryAsync() {
+  async updateStoryAsync () {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.newBackendStoryObject);
@@ -62,7 +62,7 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  async changeStoryPublicationStatusAsync() {
+  async changeStoryPublicationStatusAsync () {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({});
@@ -72,7 +72,7 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  async doesStoryWithUrlFragmentExistAsync() {
+  async doesStoryWithUrlFragmentExistAsync () {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         console.error('test');
@@ -160,7 +160,7 @@ describe('Story editor state service', () => {
         storyReinitializedSpy));
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     storyUpdateService = $injector.get('StoryUpdateService');
   }));
 

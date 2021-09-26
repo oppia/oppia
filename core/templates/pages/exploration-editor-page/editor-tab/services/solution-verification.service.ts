@@ -33,12 +33,12 @@ import { InteractionRulesRegistryService } from
   providedIn: 'root'
 })
 export class SolutionVerificationService {
-  constructor(
+  constructor (
       private interactionRulesRegistryService: InteractionRulesRegistryService,
       private answerClassificationService: AnswerClassificationService,
       private stateEditorService: StateEditorService) {}
 
-  verifySolution(
+  verifySolution (
       stateName: string,
       interaction: Interaction,
       correctAnswer: InteractionAnswer): boolean {

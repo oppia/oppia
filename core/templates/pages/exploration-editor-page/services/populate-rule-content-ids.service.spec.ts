@@ -39,7 +39,7 @@ describe('Populate Rule Content Ids Service', () => {
           normalizedStrSet: []
         }
       },
-      toBackendDict(): RuleBackendDict {
+      toBackendDict (): RuleBackendDict {
         return {
           rule_type: this.type,
           inputs: this.inputs
@@ -61,7 +61,7 @@ describe('Populate Rule Content Ids Service', () => {
       inputTypes: {x: 'TranslatableSetOfNormalizedString'},
       inputs: {x: ruleInput},
       type: 'Equals',
-      toBackendDict(): RuleBackendDict {
+      toBackendDict (): RuleBackendDict {
         return {
           rule_type: this.type,
           inputs: this.inputs
@@ -78,7 +78,7 @@ describe('Populate Rule Content Ids Service', () => {
       type: 'HasNumberOfTermsEqualTo',
       inputTypes: {y: 'NonnegativeInt'},
       inputs: {y: 1},
-      toBackendDict(): RuleBackendDict {
+      toBackendDict (): RuleBackendDict {
         return {
           rule_type: this.type,
           inputs: this.inputs

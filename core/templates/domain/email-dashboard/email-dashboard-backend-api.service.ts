@@ -38,10 +38,10 @@ export class EmailDashboardBackendApiService {
   QUERY_DATA_URL: string = '/emaildashboarddatahandler';
   QUERY_STATUS_CHECK_URL: string = '/querystatuscheck';
 
-  constructor(
+  constructor (
     private http: HttpClient) {}
 
-  async fetchQueriesPageAsync(
+  async fetchQueriesPageAsync (
       pageSize: number, cursor: string | null
   ): Promise<EmailDashboardQueryResults> {
     // Here 'cursor' property is optional because it is present only if this
@@ -70,7 +70,7 @@ export class EmailDashboardBackendApiService {
     });
   }
 
-  async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
+  async fetchQueryAsync (queryId: string): Promise<EmailDashboardQuery> {
     return new Promise((resolve, reject) => {
       this.http.get<EmailDashboardQueryBackendDict>(
         this.QUERY_STATUS_CHECK_URL, {
@@ -86,7 +86,7 @@ export class EmailDashboardBackendApiService {
     });
   }
 
-  async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
+  async submitQueryAsync (data: QueryData): Promise<EmailDashboardQuery> {
     return new Promise((resolve, reject) => {
       this.http.post<EmailDashboardQueryBackendDict>(
         this.QUERY_DATA_URL, {

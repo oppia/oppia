@@ -55,12 +55,12 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     'independently and won\'t allow reordering of terms ' +
     'around the = sign.');
 
-  constructor(
+  constructor (
     private guppyInitializationService: GuppyInitializationService,
     private changeDetectorRef: ChangeDetectorRef
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let customOskLetters = (
       this.guppyInitializationService.getCustomOskLetters());
 
@@ -84,11 +84,11 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     }
   }
 
-  getSchema(): SetOfAlgebraicIdentifierEditorSchema {
+  getSchema (): SetOfAlgebraicIdentifierEditorSchema {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: string[]): void {
+  updateValue (newValue: string[]): void {
     if (this.value !== newValue) {
       this.value = newValue;
       this.valueChanged.emit(this.value);

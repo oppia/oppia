@@ -33,7 +33,7 @@ class MockWindowRef {
     open: (url: string) => {},
     gtag: () => {}
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }

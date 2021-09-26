@@ -34,14 +34,14 @@ angular.module('oppia').component('questionsTab', {
   controller: [
     '$scope', '$window', 'FocusManagerService', 'QuestionsListService',
     'TopicEditorStateService', 'TopicsAndSkillsDashboardBackendApiService',
-    function(
+    function (
         $scope, $window, FocusManagerService, QuestionsListService,
         TopicEditorStateService, TopicsAndSkillsDashboardBackendApiService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.getSkillsCategorizedByTopics = null;
 
-      var _initTab = function() {
+      var _initTab = function () {
         $scope.question = null;
         $scope.skillId = null;
         $scope.topic = TopicEditorStateService.getTopic();
@@ -59,7 +59,7 @@ angular.module('oppia').component('questionsTab', {
             subtopic.getSkillSummaries());
         }
         TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-          .then(function(response) {
+          .then(function (response) {
             $scope.getSkillsCategorizedByTopics = (
               response.categorizedSkillsDict);
             $scope.getUntriagedSkillSummaries = (
@@ -72,7 +72,7 @@ angular.module('oppia').component('questionsTab', {
         $scope.emptyMisconceptionsList = [];
       };
 
-      $scope.reinitializeQuestionsList = function(skillId) {
+      $scope.reinitializeQuestionsList = function (skillId) {
         $scope.selectedSkillId = skillId;
         QuestionsListService.resetPageNumber();
         QuestionsListService.getQuestionSummariesAsync(
@@ -80,9 +80,9 @@ angular.module('oppia').component('questionsTab', {
         );
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
       // To set autofocus when screen loads.
-        $window.onload = function() {
+        $window.onload = function () {
           FocusManagerService.setFocus('selectSkillField');
         };
         // To-set autofocus when user navigates to editor using
@@ -100,7 +100,7 @@ angular.module('oppia').component('questionsTab', {
         _initTab();
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

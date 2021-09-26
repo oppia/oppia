@@ -32,11 +32,11 @@ import { UrlService } from 'services/contextual/url.service';
 export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
   topicUrlFragment: string;
   topicUrl: string;
-  constructor(
+  constructor (
     private urlService: UrlService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.topicUrl = this.urlInterpolationService.interpolateUrl(

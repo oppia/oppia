@@ -29,11 +29,11 @@ import { CodeReplRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class CodeReplRulesService {
-  constructor(
+  constructor (
     private normalizeWhitespace: NormalizeWhitespacePipe,
     private codeNormalizer: CodeNormalizerService) {}
 
-  CodeEquals(
+  CodeEquals (
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
     var normalizedCode =
@@ -42,7 +42,7 @@ export class CodeReplRulesService {
       this.codeNormalizer.getNormalizedCode(inputs.x);
     return normalizedCode === normalizedExpectedCode;
   }
-  CodeContains(
+  CodeContains (
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
     var normalizedCode =
@@ -51,7 +51,7 @@ export class CodeReplRulesService {
       this.codeNormalizer.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
-  CodeDoesNotContain(
+  CodeDoesNotContain (
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
     var normalizedCode =
@@ -60,14 +60,14 @@ export class CodeReplRulesService {
       this.codeNormalizer.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
-  OutputContains(
+  OutputContains (
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
     var normalizedOutput = this.normalizeWhitespace.transform(answer.output);
     var normalizedSnippet = this.normalizeWhitespace.transform(inputs.x);
     return normalizedOutput.indexOf(normalizedSnippet) !== -1;
   }
-  OutputEquals(
+  OutputEquals (
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
     var normalizedOutput = this.normalizeWhitespace.transform(answer.output);
@@ -75,10 +75,10 @@ export class CodeReplRulesService {
       this.normalizeWhitespace.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  ResultsInError(answer: CodeReplAnswer): boolean {
+  ResultsInError (answer: CodeReplAnswer): boolean {
     return !!(answer.error.trim());
   }
-  ErrorContains(
+  ErrorContains (
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
     var normalizedError = this.normalizeWhitespace.transform(answer.error);

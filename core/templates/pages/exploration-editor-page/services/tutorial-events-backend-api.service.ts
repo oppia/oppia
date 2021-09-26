@@ -26,18 +26,18 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   providedIn: 'root'
 })
 export class TutorialEventsBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async recordStartedEditorTutorialEventAsync(expId: string): Promise<Object> {
+  async recordStartedEditorTutorialEventAsync (expId: string): Promise<Object> {
     return this.http.post(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/started_tutorial_event/<expId>', { expId: expId }), {}
     ).toPromise();
   }
 
-  async recordStartedTranslationTutorialEventAsync(
+  async recordStartedTranslationTutorialEventAsync (
       expId: string): Promise<Object> {
     return this.http.post(this.urlInterpolationService.interpolateUrl(
       '/createhandler/started_translation_tutorial_event/<expId>',

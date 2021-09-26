@@ -28,18 +28,18 @@ export interface StoryReferenceBackendDict {
 export class StoryReference {
   _storyId: string;
   _storyIsPublished: boolean;
-  constructor(storyId: string, storyIsPublished: boolean) {
+  constructor (storyId: string, storyIsPublished: boolean) {
     this._storyId = storyId;
     this._storyIsPublished = storyIsPublished;
   }
 
   // Returns the story id.
-  getStoryId(): string {
+  getStoryId (): string {
     return this._storyId;
   }
 
   // Returns whether the story is published.
-  isStoryPublished(): boolean {
+  isStoryPublished (): boolean {
     return this._storyIsPublished;
   }
 }
@@ -48,14 +48,14 @@ export class StoryReference {
   providedIn: 'root'
 })
 export class StoryReferenceObjectFactory {
-  createFromBackendDict(
+  createFromBackendDict (
       storyReferenceBackendDict: StoryReferenceBackendDict): StoryReference {
     return new StoryReference(
       storyReferenceBackendDict.story_id,
       storyReferenceBackendDict.story_is_published);
   }
 
-  createFromStoryId(storyId: string): StoryReference {
+  createFromStoryId (storyId: string): StoryReference {
     return new StoryReference(storyId, false);
   }
 }

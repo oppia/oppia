@@ -32,11 +32,11 @@ interface LearnerViewResposne {
   providedIn: 'root'
 })
 export class LearnerViewInfoBackendApiService {
-  constructor(
+  constructor (
         private http: HttpClient
   ) {}
 
-  async fetchLearnerInfoAsync(
+  async fetchLearnerInfoAsync (
       stringifiedExpIds: string,
       includePrivateExplorations: string): Promise<LearnerViewResposne> {
     return this.http.get<LearnerViewBackendDict>(

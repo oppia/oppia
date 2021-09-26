@@ -32,7 +32,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
   'TopicEditorStateService', 'TopicUpdateService', 'WindowRef',
   'topic', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
-  function(
+  function (
       $controller, $scope, $uibModalInstance,
       SubtopicValidationService,
       TopicEditorStateService, TopicUpdateService, WindowRef,
@@ -44,7 +44,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
     });
     var ctrl = this;
 
-    ctrl.$onInit = function() {
+    ctrl.$onInit = function () {
       ctrl.hostname = WindowRef.nativeWindow.location.hostname;
       ctrl.classroomUrlFragment = (
         TopicEditorStateService.getClassroomUrlFragment());
@@ -72,18 +72,18 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       TopicUpdateService.addSubtopic(ctrl.topic, ctrl.subtopicTitle);
     };
 
-    ctrl.showSchemaEditor = function() {
+    ctrl.showSchemaEditor = function () {
       ctrl.schemaEditorIsShown = true;
     };
 
-    ctrl.updateSubtopicThumbnailFilename = function(
+    ctrl.updateSubtopicThumbnailFilename = function (
         newThumbnailFilename) {
       ctrl.editableThumbnailFilename = newThumbnailFilename;
       TopicUpdateService.setSubtopicThumbnailFilename(
         ctrl.topic, ctrl.subtopicId, newThumbnailFilename);
     };
 
-    ctrl.updateSubtopicThumbnailBgColor = function(
+    ctrl.updateSubtopicThumbnailBgColor = function (
         newThumbnailBgColor) {
       ctrl.editableThumbnailBgColor = newThumbnailBgColor;
       TopicUpdateService.setSubtopicThumbnailBgColor(
@@ -91,10 +91,10 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       $scope.$applyAsync();
     };
 
-    ctrl.resetErrorMsg = function() {
+    ctrl.resetErrorMsg = function () {
       ctrl.errorMsg = null;
     };
-    ctrl.isSubtopicValid = function() {
+    ctrl.isSubtopicValid = function () {
       return Boolean(
         ctrl.editableThumbnailFilename &&
         ctrl.subtopicTitle &&
@@ -103,7 +103,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
         ctrl.isUrlFragmentValid());
     };
 
-    ctrl.cancel = function() {
+    ctrl.cancel = function () {
       TopicEditorStateService.deleteSubtopicPage(
         ctrl.topic.getId(), ctrl.subtopicId);
       TopicUpdateService.deleteSubtopic(ctrl.topic, ctrl.subtopicId);
@@ -111,18 +111,18 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       $uibModalInstance.dismiss('cancel');
     };
 
-    ctrl.isUrlFragmentValid = function() {
+    ctrl.isUrlFragmentValid = function () {
       return SubtopicValidationService.isUrlFragmentValid(
         ctrl.editableUrlFragment);
     };
 
-    ctrl.checkSubtopicExistence = function() {
+    ctrl.checkSubtopicExistence = function () {
       ctrl.subtopicUrlFragmentExists = (
         SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
           ctrl.editableUrlFragment));
     };
 
-    ctrl.save = function() {
+    ctrl.save = function () {
       if (!SubtopicValidationService.checkValidSubtopicName(
         ctrl.subtopicTitle)) {
         ctrl.errorMsg = 'A subtopic with this title already exists';

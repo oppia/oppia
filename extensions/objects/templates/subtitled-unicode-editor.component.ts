@@ -32,9 +32,9 @@ export class SubtitledUnicodeEditorComponent {
   schema: { type: string } ={
     type: 'unicode',
   };
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor (private changeDetectorRef: ChangeDetectorRef) { }
 
-  updateValue(val: string): void {
+  updateValue (val: string): void {
     if (this.value._unicode === val) {
       return;
     }
@@ -43,7 +43,7 @@ export class SubtitledUnicodeEditorComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string } {
+  getSchema (): { type: string } {
     return this.schema;
   }
 }

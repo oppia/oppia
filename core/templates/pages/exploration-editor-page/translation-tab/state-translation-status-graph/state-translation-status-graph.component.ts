@@ -48,22 +48,22 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
     '$scope', 'ExplorationStatesService', 'GraphDataService',
     'StateEditorService', 'StateRecordedVoiceoversService',
     'StateWrittenTranslationsService', 'TranslationStatusService',
-    function(
+    function (
         $scope, ExplorationStatesService, GraphDataService,
         StateEditorService, StateRecordedVoiceoversService,
         StateWrittenTranslationsService, TranslationStatusService) {
       var ctrl = this;
 
-      $scope.getGraphData = function() {
+      $scope.getGraphData = function () {
         return GraphDataService.getGraphData();
       };
-      $scope.nodeColors = function() {
+      $scope.nodeColors = function () {
         return TranslationStatusService.getAllStateStatusColors();
       };
-      $scope.getActiveStateName = function() {
+      $scope.getActiveStateName = function () {
         return StateEditorService.getActiveStateName();
       };
-      $scope.onClickStateInMap = function(newStateName) {
+      $scope.onClickStateInMap = function (newStateName) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;

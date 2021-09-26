@@ -26,38 +26,38 @@ import { WindowDimensionsService } from
   providedIn: 'root'
 })
 export class SidebarStatusService {
-  constructor(private wds: WindowDimensionsService) {}
+  constructor (private wds: WindowDimensionsService) {}
 
   private pendingSidebarClick: boolean = false;
   private sidebarIsShown: boolean = false;
 
-  private _openSidebar(): void {
+  private _openSidebar (): void {
     if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {
       this.sidebarIsShown = true;
       this.pendingSidebarClick = true;
     }
   }
 
-  private _closeSidebar(): void {
+  private _closeSidebar (): void {
     if (this.sidebarIsShown) {
       this.sidebarIsShown = false;
       this.pendingSidebarClick = false;
     }
   }
 
-  isSidebarShown(): boolean {
+  isSidebarShown (): boolean {
     return this.sidebarIsShown;
   }
 
-  openSidebar(): void {
+  openSidebar (): void {
     this._openSidebar();
   }
 
-  closeSidebar(): void {
+  closeSidebar (): void {
     this._closeSidebar();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar (): void {
     if (!this.sidebarIsShown) {
       this._openSidebar();
     } else {
@@ -65,7 +65,7 @@ export class SidebarStatusService {
     }
   }
 
-  onDocumentClick(): void {
+  onDocumentClick (): void {
     if (!this.pendingSidebarClick) {
       this.sidebarIsShown = false;
     } else {

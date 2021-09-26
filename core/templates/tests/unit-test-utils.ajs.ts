@@ -37,7 +37,7 @@ export const importAllAngularServices = (): void => {
       providers: [CookieService, {provide: AngularFireAuth, useValue: null}],
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     for (let [serviceName, serviceType] of angularServices) {
       $provide.value(serviceName, TestBed.inject(serviceType));
     }
@@ -86,7 +86,7 @@ export const multiTrim = (
  * @param {angular.IModule} ng1Module - The angularjs module to be included
  *  in angular zone.
  */
-export const bootstrapAsync = async(
+export const bootstrapAsync = async (
     platform: PlatformRef,
     Ng2Module: Type<{}>,
     element: Element,
@@ -128,7 +128,7 @@ export const bootstrapAsync = async(
  * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  */
-export const setupAndGetUpgradedComponentAsync = async(
+export const setupAndGetUpgradedComponentAsync = async (
     kebabCaseName: string,
     camelCaseName: string,
     upgradedComponentTypes: unknown): Promise<string> => {
@@ -151,7 +151,7 @@ export const setupAndGetUpgradedComponentAsync = async(
     imports: [BrowserModule, UpgradeModule]
   })
   class Ng2Module {
-    ngDoBootstrap() {}
+    ngDoBootstrap () {}
   }
 
   // Bootstrap.
@@ -169,11 +169,11 @@ export const setupAndGetUpgradedComponentAsync = async(
  *   http://angular-translate.github.io/docs/#/guide
  * (see the 'Unit Testing' section).
  */
-export const TranslatorProviderForTests = function(
+export const TranslatorProviderForTests = function (
     $provide: ng.auto.IProvideService,
     $translateProvider: ng.translate.ITranslateProvider): void {
-  $provide.factory('customLoader', ['$q', function($q) {
-    return function() {
+  $provide.factory('customLoader', ['$q', function ($q) {
+    return function () {
       return $q.resolve({});
     };
   }]);

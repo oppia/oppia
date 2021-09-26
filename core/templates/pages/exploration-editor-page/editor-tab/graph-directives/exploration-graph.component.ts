@@ -37,7 +37,7 @@ angular.module('oppia').component('explorationGraph', {
     'ExplorationStatesService', 'ExplorationWarningsService',
     'GraphDataService', 'LoggerService', 'RouterService',
     'StateEditorService',
-    function(
+    function (
         $uibModal, AlertsService, EditabilityService,
         ExplorationStatesService, ExplorationWarningsService,
         GraphDataService, LoggerService, RouterService,
@@ -45,27 +45,27 @@ angular.module('oppia').component('explorationGraph', {
       var ctrl = this;
       // We hide the graph at the outset in order not to confuse new
       // exploration creators.
-      ctrl.isGraphShown = function() {
+      ctrl.isGraphShown = function () {
         return Boolean(ExplorationStatesService.isInitialized());
       };
 
-      ctrl.deleteState = function(deleteStateName) {
+      ctrl.deleteState = function (deleteStateName) {
         ExplorationStatesService.deleteState(deleteStateName);
       };
 
-      ctrl.onClickStateInMinimap = function(stateName) {
+      ctrl.onClickStateInMinimap = function (stateName) {
         RouterService.navigateToMainTab(stateName);
       };
 
-      ctrl.getActiveStateName = function() {
+      ctrl.getActiveStateName = function () {
         return StateEditorService.getActiveStateName();
       };
 
-      ctrl.getCheckpointCount = function() {
+      ctrl.getCheckpointCount = function () {
         return ExplorationStatesService.getCheckpointCount();
       };
 
-      ctrl.openStateGraphModal = function() {
+      ctrl.openStateGraphModal = function () {
         AlertsService.clearWarnings();
 
         $uibModal.open({
@@ -74,13 +74,13 @@ angular.module('oppia').component('explorationGraph', {
             'modal-templates/exploration-graph-modal.template.html'),
           backdrop: true,
           resolve: {
-            isEditable: function() {
+            isEditable: function () {
               return ctrl.isEditable;
             }
           },
           windowClass: 'oppia-large-modal-window exploration-graph-modal',
           controller: 'ExplorationGraphModalController'
-        }).result.then(function(closeDict) {
+        }).result.then(function (closeDict) {
           if (closeDict.action === 'delete') {
             ctrl.deleteState(closeDict.stateName);
           } else if (closeDict.action === 'navigate') {
@@ -89,20 +89,20 @@ angular.module('oppia').component('explorationGraph', {
             LoggerService.error(
               'Invalid closeDict action: ' + closeDict.action);
           }
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      ctrl.getGraphData = function() {
+      ctrl.getGraphData = function () {
         return GraphDataService.getGraphData();
       };
 
-      ctrl.isEditable = function() {
+      ctrl.isEditable = function () {
         return EditabilityService.isEditable();
       };
 
-      ctrl.showCheckpointCountWarningSign = function() {
+      ctrl.showCheckpointCountWarningSign = function () {
         ctrl.checkpointCountWarning = (
           ExplorationWarningsService.getCheckpointCountWarning());
         return ctrl.checkpointCountWarning;

@@ -25,9 +25,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class DocumentAttributeCustomizationService {
-  constructor(private windowRef: WindowRef) {}
+  constructor (private windowRef: WindowRef) {}
 
-  addAttribute(attribute: string, value: string): void {
+  addAttribute (attribute: string, value: string): void {
     this.windowRef.nativeWindow.document.documentElement.setAttribute(
       attribute, value);
   }

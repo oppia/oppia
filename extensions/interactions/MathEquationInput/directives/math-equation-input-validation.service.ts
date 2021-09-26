@@ -38,11 +38,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class MathEquationInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: MathEquationInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
@@ -59,7 +59,7 @@ export class MathEquationInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: MathEquationInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {

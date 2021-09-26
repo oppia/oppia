@@ -47,32 +47,32 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
   ) {}
 
-  activateProfileDropdown(): boolean {
+  activateProfileDropdown (): boolean {
     return this.profileDropdownIsActive = true;
   }
 
-  deactivateProfileDropdown(): boolean {
+  deactivateProfileDropdown (): boolean {
     return this.profileDropdownIsActive = false;
   }
 
-  switchTab(tabName: string): void {
+  switchTab (tabName: string): void {
     if (tabName !== this.activeTab) {
       this.activeTabChange.emit(tabName);
       this.activeTab = tabName;
     }
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
+  async getProfileImageDataAsync (): Promise<void> {
     let dataUrl = await this.userService.getProfileImageDataUrlAsync();
     this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
 
-  async getUserInfoAsync(): Promise<void> {
+  async getUserInfoAsync (): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
@@ -83,7 +83,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
         }));
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
 

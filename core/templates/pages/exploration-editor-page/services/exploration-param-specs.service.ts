@@ -21,7 +21,7 @@ require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
 angular.module('oppia').factory('ExplorationParamSpecsService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
+  'ExplorationPropertyService', function (ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'param_specs';
     return child;

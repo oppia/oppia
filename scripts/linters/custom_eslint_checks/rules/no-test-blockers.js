@@ -38,13 +38,13 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var selector = (
       'CallExpression[callee.name=' +
       '/^(xdescribe|fdescribe|ddescribe|xit|fit|iit)$/]');
 
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         context.report({
           node: node,
           messageId: 'disallowMessage',

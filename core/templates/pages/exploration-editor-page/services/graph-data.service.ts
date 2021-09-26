@@ -25,11 +25,11 @@ require('services/compute-graph.service.ts');
 angular.module('oppia').factory('GraphDataService', [
   'ComputeGraphService', 'ExplorationInitStateNameService',
   'ExplorationStatesService',
-  function(
+  function (
       ComputeGraphService, ExplorationInitStateNameService,
       ExplorationStatesService) {
     var _graphData = null;
-    var _recomputeGraphData = function() {
+    var _recomputeGraphData = function () {
       if (!ExplorationInitStateNameService.savedMemento) {
         return;
       }
@@ -40,7 +40,7 @@ angular.module('oppia').factory('GraphDataService', [
     };
 
     return {
-      recompute: function() {
+      recompute: function () {
         _recomputeGraphData();
       },
       /**
@@ -53,7 +53,7 @@ angular.module('oppia').factory('GraphDataService', [
        * - initStateName: the name of the initial state.
        * - finalStateName: the name of the final state.
        */
-      getGraphData: function() {
+      getGraphData: function () {
         return angular.copy(_graphData);
       }
     };

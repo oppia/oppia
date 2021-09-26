@@ -43,7 +43,7 @@ export class UserInfo {
   _email: string | null;
   _isLoggedIn: boolean;
 
-  constructor(
+  constructor (
       roles: string[], isModerator: boolean, isCurriculumAdmin: boolean,
       isSuperAdmin: boolean, isTopicManager: boolean,
       canCreateCollections: boolean, preferredSiteLanguageCode: string | null,
@@ -60,7 +60,7 @@ export class UserInfo {
     this._isLoggedIn = isLoggedIn;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
       data.roles, data.is_moderator, data.is_curriculum_admin,
@@ -68,60 +68,60 @@ export class UserInfo {
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
   }
-  static createDefault(): UserInfo {
+  static createDefault (): UserInfo {
     return new UserInfo(
       ['GUEST'], false, false, false, false, false, null, null, null, false);
   }
 
-  isModerator(): boolean {
+  isModerator (): boolean {
     return this._isModerator;
   }
 
-  isBlogAdmin(): boolean {
+  isBlogAdmin (): boolean {
     return (this._roles.includes('BLOG_ADMIN'));
   }
 
-  isBlogPostEditor(): boolean {
+  isBlogPostEditor (): boolean {
     return (this._roles.includes('BLOG_POST_EDITOR'));
   }
 
-  isCurriculumAdmin(): boolean {
+  isCurriculumAdmin (): boolean {
     return this._isCurriculumAdmin;
   }
 
-  isTranslationAdmin(): boolean {
+  isTranslationAdmin (): boolean {
     return this._roles.includes('TRANSLATION_ADMIN');
   }
 
-  isQuestionAdmin(): boolean {
+  isQuestionAdmin (): boolean {
     return this._roles.includes('QUESTION_ADMIN');
   }
 
-  isTopicManager(): boolean {
+  isTopicManager (): boolean {
     return this._isTopicManager;
   }
 
-  isSuperAdmin(): boolean {
+  isSuperAdmin (): boolean {
     return this._isSuperAdmin;
   }
 
-  canCreateCollections(): boolean {
+  canCreateCollections (): boolean {
     return this._canCreateCollections;
   }
 
-  getPreferredSiteLanguageCode(): string | null {
+  getPreferredSiteLanguageCode (): string | null {
     return this._preferredSiteLanguageCode;
   }
 
-  getUsername(): string | null {
+  getUsername (): string | null {
     return this._username;
   }
 
-  getEmail(): string | null {
+  getEmail (): string | null {
     return this._email;
   }
 
-  isLoggedIn(): boolean {
+  isLoggedIn (): boolean {
     return this._isLoggedIn;
   }
 }

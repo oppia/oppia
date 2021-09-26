@@ -34,14 +34,14 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
 
-describe('Full exploration editor', function() {
+describe('Full exploration editor', function () {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -50,7 +50,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
-    async function() {
+    async function () {
       await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
@@ -63,7 +63,7 @@ describe('Full exploration editor', function() {
   );
 
   it('should generate warning message if card height limit is exceeded',
-    async function() {
+    async function () {
       await users.createUser('user@heightWarning.com', 'userHeightWarning');
       await users.login('user@heightWarning.com');
 
@@ -112,7 +112,7 @@ describe('Full exploration editor', function() {
 
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
-      'switching to preview mode', async function() {
+      'switching to preview mode', async function () {
     await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
     await users.login('user5@editorAndPlayer.com');
 
@@ -187,11 +187,11 @@ describe('Full exploration editor', function() {
 
     // Refreshing to prevent stale elements after backing from previous page.
     await browser.driver.navigate().refresh();
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+    await explorationEditorMainTab.setContent(async function (richTextEditor) {
       await richTextEditor.appendItalicText('Welcome');
     });
     await explorationEditorMainTab.expectContentToMatch(
-      async function(richTextChecker) {
+      async function (richTextChecker) {
         await richTextChecker.readItalicText('Welcome');
       }
     );
@@ -230,7 +230,7 @@ describe('Full exploration editor', function() {
     // Check editor preview tab.
     await explorationEditorPage.navigateToPreviewTab();
     await explorationPlayerPage.expectContentToMatch(
-      async function(richTextEditor) {
+      async function (richTextEditor) {
         await richTextEditor.readItalicText('Welcome');
       }
     );
@@ -247,7 +247,7 @@ describe('Full exploration editor', function() {
 
   it(
     'should handle multiple rules in an answer group and also disallow ' +
-      'editing of a read-only exploration', async function() {
+      'editing of a read-only exploration', async function () {
       await users.createUser(
         'user6@editorAndPlayer.com', 'user6EditorAndPlayer');
       await users.createUser(
@@ -362,7 +362,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should delete interactions cleanly', async function() {
+  it('should delete interactions cleanly', async function () {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
 
@@ -389,7 +389,7 @@ describe('Full exploration editor', function() {
     'should merge changes when the changes are not conflicting ' +
       'and the frontend version of an exploration is not equal to ' +
       'the backend version',
-    async function() {
+    async function () {
       await users.createUser('user9@editor.com', 'user9Editor');
       await users.createUser('user10@editor.com', 'user10Editor');
 
@@ -409,7 +409,7 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.navigateToMainTab();
 
       // Add a content change and does not save the draft.
-      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await explorationEditorMainTab.setContent(async function (richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
       });
       await action.waitForAutosave();
@@ -433,7 +433,7 @@ describe('Full exploration editor', function() {
       expect(await lostChangesModal.isPresent()).toBe(false);
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
-        async function(richTextChecker) {
+        async function (richTextChecker) {
           await richTextChecker.readPlainText('How are you feeling?');
         }
       );
@@ -448,7 +448,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

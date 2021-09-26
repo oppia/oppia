@@ -53,7 +53,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
-describe('Exploration save and publish buttons component', function() {
+describe('Exploration save and publish buttons component', function () {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -74,7 +74,7 @@ describe('Exploration save and publish buttons component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -90,7 +90,7 @@ describe('Exploration save and publish buttons component', function() {
       UserExplorationPermissionsService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
@@ -123,7 +123,7 @@ describe('Exploration save and publish buttons component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -169,13 +169,13 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should initialize $scope properties after controller initialization',
-    function() {
+    function () {
       expect($scope.saveIsInProcess).toBe(false);
       expect($scope.publishIsInProcess).toBe(false);
       expect($scope.loadingDotsAreShown).toBe(false);
     });
 
-  it('should save exploration when saving changes', function() {
+  it('should save exploration when saving changes', function () {
     $scope.saveChanges();
 
     expect($scope.saveIsInProcess).toBe(true);
@@ -187,7 +187,7 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should publish exploration when show publish exploration is shown',
-    function() {
+    function () {
       $scope.showPublishExplorationModal();
 
       expect($scope.publishIsInProcess).toBe(true);
@@ -199,34 +199,34 @@ describe('Exploration save and publish buttons component', function() {
     });
 
   it('should resolve the warnings before saving exploration when exploration' +
-    ' has critical warnings', function() {
+    ' has critical warnings', function () {
     spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(1);
     expect($scope.getSaveButtonTooltip()).toBe('Please resolve the warnings.');
   });
 
   it('should save exploration draft when it has no warnings and exploration' +
-    ' is private', function() {
+    ' is private', function () {
     spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(0);
     spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
     expect($scope.getSaveButtonTooltip()).toBe('Save Draft');
   });
 
   it('should publish exploration changes when it has no warnings and it is' +
-    ' public', function() {
+    ' public', function () {
     spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(0);
     spyOn(explorationRightsService, 'isPrivate').and.returnValue(false);
     expect($scope.getSaveButtonTooltip()).toBe('Publish Changes');
   });
 
   it('should ask user to resolve the warnings before publishing' +
-    ' exploration when exploration has warnings', function() {
+    ' exploration when exploration has warnings', function () {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(1);
     expect($scope.getPublishExplorationButtonTooltip()).toBe(
       'Please resolve the warnings before publishing.');
   });
 
   it('should save exploration changes before publishing it when trying to' +
-    ' publish a changed exploration without saving it first', function() {
+    ' publish a changed exploration without saving it first', function () {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(0);
     spyOn(changeListService, 'isExplorationLockedForEditing').and
       .returnValue(true);
@@ -234,7 +234,7 @@ describe('Exploration save and publish buttons component', function() {
       'Please save your changes before publishing.');
   });
 
-  it('should publish exploration when it is already saved', function() {
+  it('should publish exploration when it is already saved', function () {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(0);
     spyOn(changeListService, 'isExplorationLockedForEditing')
       .and.returnValue(false);
@@ -242,26 +242,26 @@ describe('Exploration save and publish buttons component', function() {
       'Publish to Oppia Library');
   });
 
-  it('should discard changes when exploration is changed', function() {
+  it('should discard changes when exploration is changed', function () {
     spyOn(explorationSaveService, 'discardChanges');
     $scope.discardChanges();
     expect(explorationSaveService.discardChanges).toHaveBeenCalled();
   });
 
-  it('should get whether exploration is saveable', function() {
+  it('should get whether exploration is saveable', function () {
     spyOn(explorationSaveService, 'isExplorationSaveable')
       .and.returnValue(true);
     expect($scope.isExplorationSaveable()).toBe(true);
   });
 
-  it('should count changes made in an exploration', function() {
+  it('should count changes made in an exploration', function () {
     spyOn(changeListService, 'getChangeList').and.returnValue(
       [{}, {}] as ExplorationChange[]);
     expect($scope.getChangeListLength()).toBe(2);
   });
 
   it('should save or publish exploration when editing outside tutorial mode' +
-    ' and exploration is translatable', function() {
+    ' and exploration is translatable', function () {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode').and
       .returnValue(false);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(true);
@@ -269,7 +269,7 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should save or publish exploration when editing outside tutorial mode' +
-    ' and exploration is not translatable', function() {
+    ' and exploration is not translatable', function () {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode').and
       .returnValue(true);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
@@ -277,7 +277,7 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should not save and publish exploration when editing inside tutorial' +
-    ' mode and exploration is not translatable', function() {
+    ' mode and exploration is not translatable', function () {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode').and
       .returnValue(false);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
@@ -285,7 +285,7 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should display publish button when the exploration is unpublished',
-    function() {
+    function () {
       $scope.explorationCanBePublished = false;
 
       userExplorationPermissionsService.
@@ -298,7 +298,7 @@ describe('Exploration save and publish buttons component', function() {
     });
 
   it('should fetch userExplorationPermissions when ' +
-    'showPublishExplorationModal is called', function() {
+    'showPublishExplorationModal is called', function () {
     var userPermissions = {
       canPublish: true
     };
@@ -316,7 +316,7 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.explorationCanBePublished).toBe(true);
   });
 
-  it('should unsubscribe when onDestroy runs', function() {
+  it('should unsubscribe when onDestroy runs', function () {
     spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
 
     ctrl.$onDestroy();
@@ -324,7 +324,7 @@ describe('Exploration save and publish buttons component', function() {
     expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 
-  it('should open a exploration save prompt modal', function() {
+  it('should open a exploration save prompt modal', function () {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -340,7 +340,7 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should open a exploration save prompt modal only once',
-    function() {
+    function () {
       spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -359,7 +359,7 @@ describe('Exploration save and publish buttons component', function() {
       expect($scope.saveChanges).not.toHaveBeenCalled();
     });
 
-  it('should open a confirmation modal with rejection', function() {
+  it('should open a confirmation modal with rejection', function () {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
@@ -374,7 +374,7 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.saveChanges).not.toHaveBeenCalled();
   });
 
-  it('should open a confirmation modal when save is in progress', function() {
+  it('should open a confirmation modal when save is in progress', function () {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()

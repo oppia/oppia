@@ -42,7 +42,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
   'SolutionObjectFactory', 'StateCustomizationArgsService',
   'StateInteractionIdService', 'StateSolutionService',
   'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
-  function(
+  function (
       $controller, $rootScope, $scope, $uibModalInstance, ContextService,
       CurrentInteractionService, ExplorationHtmlFormatterService,
       SolutionObjectFactory, StateCustomizationArgsService,
@@ -93,24 +93,24 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
           .contentId)
     } : angular.copy(EMPTY_SOLUTION_DATA);
 
-    $scope.onSubmitFromSubmitButton = function() {
+    $scope.onSubmitFromSubmitButton = function () {
       CurrentInteractionService.submitAnswer();
     };
 
     $scope.isSubmitButtonDisabled = (
       CurrentInteractionService.isSubmitButtonDisabled);
 
-    CurrentInteractionService.setOnSubmitFn(function(answer) {
+    CurrentInteractionService.setOnSubmitFn(function (answer) {
       $scope.data.correctAnswer = answer;
     });
 
-    $scope.shouldAdditionalSubmitButtonBeShown = function() {
+    $scope.shouldAdditionalSubmitButtonBeShown = function () {
       var interactionSpecs = INTERACTION_SPECS[
         StateInteractionIdService.savedMemento];
       return interactionSpecs.show_generic_submit_button;
     };
 
-    $scope.saveSolution = function() {
+    $scope.saveSolution = function () {
       if (typeof $scope.data.answerIsExclusive === 'boolean' &&
           $scope.data.correctAnswer !== null &&
           $scope.data.explanation !== '') {
@@ -126,7 +126,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
       }
     };
 
-    ctrl.$onInit = function() {
+    ctrl.$onInit = function () {
       $scope.directiveSubscriptions.add(
         // TODO(#11996): Remove when migrating to Angular2+.
         CurrentInteractionService.onAnswerChanged$.subscribe(() => {
@@ -135,7 +135,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
       );
     };
 
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
       $scope.directiveSubscriptions.unsubscribe();
     });
   }

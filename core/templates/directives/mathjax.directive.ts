@@ -29,9 +29,9 @@ export class MathJaxDirective implements OnChanges {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1 .
   @Input('oppiaMathJax') texExpression!: string;
 
-  constructor(private el: ElementRef) {}
+  constructor (private el: ElementRef) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.texExpression &&
       changes.texExpression.currentValue !==
       changes.texExpression.previousValue) {

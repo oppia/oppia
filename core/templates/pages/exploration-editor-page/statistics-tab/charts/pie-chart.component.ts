@@ -25,19 +25,19 @@ angular.module('oppia').component('pieChart', {
     // chartAreaWidth, colors, height, legendPosition, width.
     options: '&'
   },
-  controller: ['$element', '$scope', 'WindowDimensionsService', function(
+  controller: ['$element', '$scope', 'WindowDimensionsService', function (
       $element, $scope, WindowDimensionsService) {
     var ctrl = this;
     ctrl.resizeSubscription = null;
 
-    ctrl.$onInit = function() {
+    ctrl.$onInit = function () {
       if (!$.isArray(ctrl.data())) {
         return;
       }
       var options = ctrl.options();
       var chart = null;
 
-      var redrawChart = function() {
+      var redrawChart = function () {
         if (chart !== null) {
           chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
             title: options.title,
@@ -63,7 +63,7 @@ angular.module('oppia').component('pieChart', {
 
       // Need to wait for load statement in editor template to finish.
       // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function() {
+      google.charts.setOnLoadCallback(function () {
         if (!chart) {
           chart = new google.visualization.PieChart($element[0]);
           redrawChart();
@@ -80,7 +80,7 @@ angular.module('oppia').component('pieChart', {
         });
     };
 
-    ctrl.$onDestroy = function() {
+    ctrl.$onDestroy = function () {
       if (ctrl.resizeSubscription) {
         ctrl.resizeSubscription.unsubscribe();
       }

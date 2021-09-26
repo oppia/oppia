@@ -55,7 +55,7 @@ describe('Skills Mastery List Component', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');

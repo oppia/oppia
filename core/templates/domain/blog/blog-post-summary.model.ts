@@ -39,7 +39,7 @@ export class BlogPostSummary {
   _urlFragment: string;
   _lastUpdated?: string;
   _publishedOn?: string;
-  constructor(
+  constructor (
       id: string,
       authorUsername: string,
       title: string,
@@ -60,43 +60,43 @@ export class BlogPostSummary {
     this._publishedOn = publishedOn;
   }
 
-  get id(): string {
+  get id (): string {
     return this._id;
   }
 
-  get authorUsername(): string {
+  get authorUsername (): string {
     return this._authorUsername;
   }
 
-  get lastUpdated(): string | undefined {
+  get lastUpdated (): string | undefined {
     return this._lastUpdated;
   }
 
-  get publishedOn(): string | undefined {
+  get publishedOn (): string | undefined {
     return this._publishedOn;
   }
 
-  get title(): string {
+  get title (): string {
     return this._title;
   }
 
-  get tags(): string[] {
+  get tags (): string[] {
     return this._tags.slice();
   }
 
-  get urlFragment(): string {
+  get urlFragment (): string {
     return this._urlFragment;
   }
 
-  get summary(): string {
+  get summary (): string {
     return this._summary;
   }
 
-  get thumbnailFilename(): string | null {
+  get thumbnailFilename (): string | null {
     return this._thumbnailFilename;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       blogPostSummaryBackendDict: BlogPostSummaryBackendDict
   ): BlogPostSummary {
     return new BlogPostSummary (

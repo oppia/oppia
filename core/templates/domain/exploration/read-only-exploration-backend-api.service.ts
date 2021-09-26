@@ -59,11 +59,11 @@ export class ReadOnlyExplorationBackendApiService {
   private _explorationCache:
     Record<string, FetchExplorationBackendResponse> = {};
 
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private async _fetchExplorationAsync(
+  private async _fetchExplorationAsync (
       explorationId: string, version: number | null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
@@ -79,11 +79,11 @@ export class ReadOnlyExplorationBackendApiService {
     });
   }
 
-  private _isCached(explorationId: string): boolean {
+  private _isCached (explorationId: string): boolean {
     return this._explorationCache.hasOwnProperty(explorationId);
   }
 
-  private _getExplorationUrl(explorationId: string, version: number): string {
+  private _getExplorationUrl (explorationId: string, version: number): string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
@@ -110,7 +110,7 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  async fetchExplorationAsync(explorationId: string, version: number):
+  async fetchExplorationAsync (explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
     return this._fetchExplorationAsync(explorationId, version);
   }
@@ -125,7 +125,7 @@ export class ReadOnlyExplorationBackendApiService {
    * will store the exploration in the cache to avoid requests from the
    * backend in further function calls.
    */
-  async loadLatestExplorationAsync(explorationId: string):
+  async loadLatestExplorationAsync (explorationId: string):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
@@ -151,7 +151,7 @@ export class ReadOnlyExplorationBackendApiService {
    * cache. All previous data in the cache will still be retained after
    * this call.
    */
-  async loadExplorationAsync(explorationId: string, version: number):
+  async loadExplorationAsync (explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchExplorationAsync(explorationId, version).then(exploration => {
@@ -165,7 +165,7 @@ export class ReadOnlyExplorationBackendApiService {
    * data cache or if it needs to be retrieved from the backend upon a
    * load.
    */
-  isCached(explorationId: string): boolean {
+  isCached (explorationId: string): boolean {
     return this._isCached(explorationId);
   }
 
@@ -173,7 +173,7 @@ export class ReadOnlyExplorationBackendApiService {
    * Replaces the current exploration in the cache given by the specified
    * exploration ID with a new exploration object.
    */
-  cacheExploration(
+  cacheExploration (
       explorationId: string,
       exploration: FetchExplorationBackendResponse): void {
     this._explorationCache[explorationId] = exploration;
@@ -183,14 +183,14 @@ export class ReadOnlyExplorationBackendApiService {
    * Clears the local exploration data cache, forcing all future loads to
    * re-request the previously loaded explorations from the backend.
    */
-  clearExplorationCache(): void {
+  clearExplorationCache (): void {
     this._explorationCache = {};
   }
 
   /**
    * Deletes a specific exploration from the local cache
    */
-  deleteExplorationFromCache(explorationId: string): void {
+  deleteExplorationFromCache (explorationId: string): void {
     if (this._isCached(explorationId)) {
       delete this._explorationCache[explorationId];
     }

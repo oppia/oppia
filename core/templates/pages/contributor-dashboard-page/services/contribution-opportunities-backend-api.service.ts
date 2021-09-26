@@ -81,12 +81,12 @@ interface FeaturedTranslationLanguagesBackendDict {
 })
 export class ContributionOpportunitiesBackendApiService {
   urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
   ) {}
 
-  private _getExplorationOpportunityFromDict(
+  private _getExplorationOpportunityFromDict (
       opportunityDict: ExplorationOpportunitySummaryBackendDict):
       ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
@@ -95,14 +95,14 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityDict.content_count, opportunityDict.translation_counts);
   }
 
-  private _getSkillOpportunityFromDict(
+  private _getSkillOpportunityFromDict (
       opportunityDict: SkillOpportunityBackendDict): SkillOpportunity {
     return new SkillOpportunity(
       opportunityDict.id, opportunityDict.skill_description,
       opportunityDict.topic_name, opportunityDict.question_count);
   }
 
-  async fetchSkillOpportunitiesAsync(cursor: string):
+  async fetchSkillOpportunitiesAsync (cursor: string):
   Promise<SkillContributionOpportunities> {
     const params = {
       cursor: cursor
@@ -127,7 +127,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  async fetchTranslationOpportunitiesAsync(
+  async fetchTranslationOpportunitiesAsync (
       languageCode: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
     const params = {
@@ -154,7 +154,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  async fetchVoiceoverOpportunitiesAsync(languageCode: string, cursor: string):
+  async fetchVoiceoverOpportunitiesAsync (languageCode: string, cursor: string):
   Promise<VoiceoverContributionOpportunities> {
     const params = {
       language_code: languageCode,
@@ -180,7 +180,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  async fetchFeaturedTranslationLanguagesAsync():
+  async fetchFeaturedTranslationLanguagesAsync ():
   Promise<FeaturedTranslationLanguage[]> {
     try {
       const response = await this.http

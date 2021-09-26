@@ -29,13 +29,13 @@ export class CollectionPlaythrough {
 
   // Stores information about a current playthrough of a collection for a
   // user.
-  constructor(
+  constructor (
       nextExplorationId: string | null, completedExplorationIds: string[]) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   }
 
-  static createFromBackendObject(
+  static createFromBackendObject (
       collectionPlaythroughBackendObject: CollectionPlaythroughBackendDict):
       CollectionPlaythrough {
     return new CollectionPlaythrough(
@@ -43,7 +43,7 @@ export class CollectionPlaythrough {
       collectionPlaythroughBackendObject.completed_exploration_ids);
   }
 
-  static create(
+  static create (
       nextExplorationId: string | null,
       completedExplorationIds: string[]): CollectionPlaythrough {
     return new CollectionPlaythrough(
@@ -52,11 +52,11 @@ export class CollectionPlaythrough {
 
   // Returns the upcoming exploration ID. Changes to this are not
   // reflected in the collection.
-  getNextExplorationId(): string | null {
+  getNextExplorationId (): string | null {
     return this._nextExplorationId;
   }
 
-  getNextRecommendedCollectionNodeCount(): number {
+  getNextRecommendedCollectionNodeCount (): number {
     // As the collection is linear, only a single node would be available,
     // after any node.
     return 1;
@@ -64,15 +64,15 @@ export class CollectionPlaythrough {
 
   // Returns a list of explorations completed that are related to this
   // collection. Changes to this list are not reflected in this collection.
-  getCompletedExplorationIds(): string[] {
+  getCompletedExplorationIds (): string[] {
     return cloneDeep(this._completedExplorationIds);
   }
 
-  getCompletedExplorationNodeCount(): number {
+  getCompletedExplorationNodeCount (): number {
     return this._completedExplorationIds.length;
   }
 
-  hasStartedCollection(): boolean {
+  hasStartedCollection (): boolean {
     return this._completedExplorationIds.length !== 0;
   }
 
@@ -81,7 +81,7 @@ export class CollectionPlaythrough {
   // sessions of the collection player through this object (for example, the
   // editor would be able to fake which explorations were completed to see how
   // that particular configuration would look for a learner).
-  hasFinishedCollection(): boolean {
+  hasFinishedCollection (): boolean {
     return this._nextExplorationId === null;
   }
 }

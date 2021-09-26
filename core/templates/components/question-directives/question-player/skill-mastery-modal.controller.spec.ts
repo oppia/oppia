@@ -20,7 +20,7 @@
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Skill Mastery Modal Controller', function() {
+describe('Skill Mastery Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var masteryPerSkillMapping = {
@@ -32,7 +32,7 @@ describe('Skill Mastery Modal Controller', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -50,14 +50,14 @@ describe('Skill Mastery Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.userIsLoggedIn).toEqual(userIsLoggedIn);
       expect($scope.skillId).toEqual(skillId);
       expect($scope.masteryChange).toEqual('mastery change');
     });
 
   it('should open concept card with the skill id when clicking button to' +
-    ' open concept card', function() {
+    ' open concept card', function () {
     $scope.openConceptCardModal();
     expect(openConceptCardModal).toHaveBeenCalledWith([skillId]);
   });

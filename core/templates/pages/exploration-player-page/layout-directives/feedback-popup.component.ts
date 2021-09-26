@@ -40,7 +40,7 @@ export class FeedbackPopupComponent {
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   @Output() closePopover: EventEmitter<void> = new EventEmitter();
 
-  constructor(
+  constructor (
     private backgroundMaskService: BackgroundMaskService,
     private focusManagerService: FocusManagerService,
     private playerPositionService: PlayerPositionService,
@@ -49,7 +49,7 @@ export class FeedbackPopupComponent {
     private feedbackPopupBackendApiService: FeedbackPopupBackendApiService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.isLoggedIn = userInfo.isLoggedIn();
     });
@@ -66,7 +66,7 @@ export class FeedbackPopupComponent {
     this.focusManagerService.setFocus(this.feedbackPopoverId);
   }
 
-  saveFeedback(): void {
+  saveFeedback (): void {
     if (this.feedbackText) {
       this.feedbackPopupBackendApiService.submitFeedbackAsync(
         this.feedbackTitle,
@@ -82,11 +82,11 @@ export class FeedbackPopupComponent {
     }
   }
 
-  close(): void {
+  close (): void {
     this.closePopover.emit();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.backgroundMaskService.deactivateMask();
   }
 }

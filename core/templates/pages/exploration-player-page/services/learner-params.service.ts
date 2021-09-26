@@ -32,13 +32,13 @@ export interface ExplorationParams {
 export class LearnerParamsService {
   private _paramDict: ExplorationParams = {};
   // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-  init(initParamSpecs: ExplorationParams): void {
+  init (initParamSpecs: ExplorationParams): void {
     // The initParamSpecs arg is a dict mapping the parameter names used in
     // the exploration to their default values.
     this._paramDict = cloneDeep(initParamSpecs);
   }
 
-  getValue(paramName: string): string {
+  getValue (paramName: string): string {
     if (!this._paramDict.hasOwnProperty(paramName)) {
       throw new Error('Invalid parameter name: ' + paramName);
     } else {
@@ -46,7 +46,7 @@ export class LearnerParamsService {
     }
   }
 
-  setValue(paramName: string, newParamValue: string): void {
+  setValue (paramName: string, newParamValue: string): void {
     // TODO(sll): Currently, all parameters are strings. In the future, we
     // will need to maintain information about parameter types.
     if (!this._paramDict.hasOwnProperty(paramName)) {
@@ -56,7 +56,7 @@ export class LearnerParamsService {
     }
   }
 
-  getAllParams(): ExplorationParams {
+  getAllParams (): ExplorationParams {
     return cloneDeep(this._paramDict);
   }
 }

@@ -30,7 +30,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Library index page', function() {
+describe('Library index page', function () {
   var adminPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
@@ -38,7 +38,7 @@ describe('Library index page', function() {
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -52,13 +52,13 @@ describe('Library index page', function() {
     await adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean',
-      async function(elem) {
+      async function (elem) {
         await elem.setValue(false);
       });
     await users.logout();
   });
 
-  it('should display private and published explorations', async function() {
+  it('should display private and published explorations', async function () {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ARCHITECTURE = 'Architecture';
@@ -199,7 +199,7 @@ describe('Library index page', function() {
     await users.logout();
   });
 
-  it('should not have any non translated strings', async function() {
+  it('should not have any non translated strings', async function () {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ENVIRONMENT = 'Environment';
@@ -234,19 +234,19 @@ describe('Library index page', function() {
     await general.ensurePageHasNoTranslationIds();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
 
-describe('Permissions for private explorations', function() {
+describe('Permissions for private explorations', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var expectedConsoleErrors = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -256,7 +256,7 @@ describe('Permissions for private explorations', function() {
   });
 
   it('should not be changeable if title is not given to exploration',
-    async function() {
+    async function () {
       await users.createUser('checkFor@title.com', 'Thanos');
       await users.login('checkFor@title.com');
       await workflow.createExploration(true);
@@ -273,7 +273,7 @@ describe('Permissions for private explorations', function() {
     }
   );
 
-  it('should be correct for collaborators', async function() {
+  it('should be correct for collaborators', async function () {
     await users.createUser('alice@privileges.com', 'alicePrivileges');
     await users.createUser('bob@privileges.com', 'bobPrivileges');
     await users.createUser('eve@privileges.com', 'evePrivileges');
@@ -307,7 +307,7 @@ describe('Permissions for private explorations', function() {
       `The requested path /create/${explorationId} is not found.`);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors(expectedConsoleErrors);
   });
 });

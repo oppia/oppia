@@ -53,7 +53,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
   'StatesObjectFactory', 'ValidatorsService',
-  function(
+  function (
       $filter, $injector, $location, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
@@ -71,48 +71,48 @@ angular.module('oppia').factory('ExplorationStatesService', [
     // Properties that have a different backend representation from the
     // frontend and must be converted.
     var BACKEND_CONVERSIONS = {
-      answer_groups: function(answerGroups) {
-        return answerGroups.map(function(answerGroup) {
+      answer_groups: function (answerGroups) {
+        return answerGroups.map(function (answerGroup) {
           return answerGroup.toBackendDict();
         });
       },
-      content: function(content) {
+      content: function (content) {
         return content.toBackendDict();
       },
-      recorded_voiceovers: function(recordedVoiceovers) {
+      recorded_voiceovers: function (recordedVoiceovers) {
         return recordedVoiceovers.toBackendDict();
       },
-      default_outcome: function(defaultOutcome) {
+      default_outcome: function (defaultOutcome) {
         if (defaultOutcome) {
           return defaultOutcome.toBackendDict();
         } else {
           return null;
         }
       },
-      hints: function(hints) {
-        return hints.map(function(hint) {
+      hints: function (hints) {
+        return hints.map(function (hint) {
           return hint.toBackendDict();
         });
       },
-      param_changes: function(paramChanges) {
-        return paramChanges.map(function(paramChange) {
+      param_changes: function (paramChanges) {
+        return paramChanges.map(function (paramChange) {
           return paramChange.toBackendDict();
         });
       },
-      param_specs: function(paramSpecs) {
+      param_specs: function (paramSpecs) {
         return paramSpecs.toBackendDict();
       },
-      solution: function(solution) {
+      solution: function (solution) {
         if (solution) {
           return solution.toBackendDict();
         } else {
           return null;
         }
       },
-      written_translations: function(writtenTranslations) {
+      written_translations: function (writtenTranslations) {
         return writtenTranslations.toBackendDict();
       },
-      widget_customization_args: function(customizationArgs) {
+      widget_customization_args: function (customizationArgs) {
         return Interaction.convertCustomizationArgsToBackendDict(
           customizationArgs);
       }
@@ -140,9 +140,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
     };
 
     var CONTENT_ID_EXTRACTORS = {
-      answer_groups: function(answerGroups) {
+      answer_groups: function (answerGroups) {
         var contentIds = new Set();
-        answerGroups.forEach(function(answerGroup) {
+        answerGroups.forEach(function (answerGroup) {
           contentIds.add(answerGroup.outcome.feedback.contentId);
           answerGroup.rules.forEach(rule => {
             Object.keys(rule.inputs).forEach(inputName => {
@@ -154,52 +154,52 @@ angular.module('oppia').factory('ExplorationStatesService', [
         });
         return contentIds;
       },
-      default_outcome: function(defaultOutcome) {
+      default_outcome: function (defaultOutcome) {
         var contentIds = new Set();
         if (defaultOutcome) {
           contentIds.add(defaultOutcome.feedback.contentId);
         }
         return contentIds;
       },
-      hints: function(hints) {
+      hints: function (hints) {
         var contentIds = new Set();
-        hints.forEach(function(hint) {
+        hints.forEach(function (hint) {
           contentIds.add(hint.hintContent.contentId);
         });
         return contentIds;
       },
-      solution: function(solution) {
+      solution: function (solution) {
         var contentIds = new Set();
         if (solution) {
           contentIds.add(solution.explanation.contentId);
         }
         return contentIds;
       },
-      widget_customization_args: function(customizationArgs) {
+      widget_customization_args: function (customizationArgs) {
         return new Set(
           Interaction.getCustomizationArgContentIds(customizationArgs));
       }
     };
 
-    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      var diffList = Array.from(setA).filter(function(element) {
+    var _getElementsInFirstSetButNotInSecond = function (setA, setB) {
+      var diffList = Array.from(setA).filter(function (element) {
         return !setB.has(element);
       });
       return diffList;
     };
 
-    var _setState = function(stateName, stateData, refreshGraph) {
+    var _setState = function (stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
         refreshGraphEventEmitter.emit();
       }
     };
 
-    var getStatePropertyMemento = function(stateName, backendName) {
+    var getStatePropertyMemento = function (stateName, backendName) {
       var accessorList = PROPERTY_REF_DATA[backendName];
       var propertyRef = _states.getState(stateName);
       try {
-        accessorList.forEach(function(key) {
+        accessorList.forEach(function (key) {
           propertyRef = propertyRef[key];
         });
       } catch (e) {
@@ -218,7 +218,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       return angular.copy(propertyRef);
     };
 
-    var saveStateProperty = function(stateName, backendName, newValue) {
+    var saveStateProperty = function (stateName, backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
       var newBackendValue = angular.copy(newValue);
       var oldBackendValue = angular.copy(oldValue);
@@ -243,11 +243,11 @@ angular.module('oppia').factory('ExplorationStatesService', [
             oldContentIds, newContentIds);
           var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
             newContentIds, oldContentIds);
-          contentIdsToDelete.forEach(function(contentId) {
+          contentIdsToDelete.forEach(function (contentId) {
             newStateData.recordedVoiceovers.deleteContentId(contentId);
             newStateData.writtenTranslations.deleteContentId(contentId);
           });
-          contentIdsToAdd.forEach(function(contentId) {
+          contentIdsToAdd.forEach(function (contentId) {
             newStateData.recordedVoiceovers.addContentId(contentId);
             newStateData.writtenTranslations.addContentId(contentId);
           });
@@ -270,18 +270,18 @@ angular.module('oppia').factory('ExplorationStatesService', [
       }
     };
 
-    var convertToBackendRepresentation = function(frontendValue, backendName) {
+    var convertToBackendRepresentation = function (frontendValue, backendName) {
       var conversionFunction = BACKEND_CONVERSIONS[backendName];
       return conversionFunction(frontendValue);
     };
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
-      init: function(statesBackendDict) {
+      init: function (statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
-        _states.getStateNames().forEach(function(stateName) {
+        _states.getStateNames().forEach(function (stateName) {
           var solution = _states.getState(stateName).interaction.solution;
           if (solution) {
             var result = (
@@ -298,25 +298,25 @@ angular.module('oppia').factory('ExplorationStatesService', [
           }
         });
       },
-      getStates: function() {
+      getStates: function () {
         return angular.copy(_states);
       },
-      getStateNames: function() {
+      getStateNames: function () {
         return _states.getStateNames();
       },
-      hasState: function(stateName) {
+      hasState: function (stateName) {
         return _states.hasState(stateName);
       },
-      getState: function(stateName) {
+      getState: function (stateName) {
         return angular.copy(_states.getState(stateName));
       },
-      setState: function(stateName, stateData) {
+      setState: function (stateName, stateData) {
         _setState(stateName, stateData, true);
       },
-      getCheckpointCount: function() {
+      getCheckpointCount: function () {
         var count: number = 0;
         if (_states) {
-          _states.getStateNames().forEach(function(stateName) {
+          _states.getStateNames().forEach(function (stateName) {
             if (_states.getState(stateName).cardIsCheckpoint) {
               count++;
             }
@@ -324,7 +324,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         }
         return count;
       },
-      isNewStateNameValid: function(newStateName, showWarnings) {
+      isNewStateNameValid: function (newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
             AlertsService.addWarning('A state with this name already exists.');
@@ -334,108 +334,108 @@ angular.module('oppia').factory('ExplorationStatesService', [
         return (
           ValidatorsService.isValidStateName(newStateName, showWarnings));
       },
-      getStateContentMemento: function(stateName) {
+      getStateContentMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'content');
       },
-      saveStateContent: function(stateName, newContent) {
+      saveStateContent: function (stateName, newContent) {
         saveStateProperty(stateName, 'content', newContent);
       },
-      getStateParamChangesMemento: function(stateName) {
+      getStateParamChangesMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'param_changes');
       },
-      saveStateParamChanges: function(stateName, newParamChanges) {
+      saveStateParamChanges: function (stateName, newParamChanges) {
         saveStateProperty(stateName, 'param_changes', newParamChanges);
       },
-      getInteractionIdMemento: function(stateName) {
+      getInteractionIdMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'widget_id');
       },
-      saveInteractionId: function(stateName, newInteractionId) {
+      saveInteractionId: function (stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function (callback) {
           callback(_states.getState(stateName));
         });
       },
-      saveLinkedSkillId: function(stateName, newLinkedSkillId) {
+      saveLinkedSkillId: function (stateName, newLinkedSkillId) {
         saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
       },
-      saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
+      saveNextContentIdIndex: function (stateName, newNextContentIdIndex) {
         saveStateProperty(
           stateName, 'next_content_id_index', newNextContentIdIndex);
       },
-      getInteractionCustomizationArgsMemento: function(stateName) {
+      getInteractionCustomizationArgsMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
       },
-      saveInteractionCustomizationArgs: function(
+      saveInteractionCustomizationArgs: function (
           stateName, newCustomizationArgs) {
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function (callback) {
           callback(_states.getState(stateName));
         });
       },
-      getInteractionAnswerGroupsMemento: function(stateName) {
+      getInteractionAnswerGroupsMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
-      saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
+      saveInteractionAnswerGroups: function (stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function (callback) {
           callback(_states.getState(stateName));
         });
       },
-      getConfirmedUnclassifiedAnswersMemento: function(stateName) {
+      getConfirmedUnclassifiedAnswersMemento: function (stateName) {
         return getStatePropertyMemento(
           stateName, 'confirmed_unclassified_answers');
       },
-      saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
+      saveConfirmedUnclassifiedAnswers: function (stateName, newAnswers) {
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function (callback) {
           callback(_states.getState(stateName));
         });
       },
-      getInteractionDefaultOutcomeMemento: function(stateName) {
+      getInteractionDefaultOutcomeMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'default_outcome');
       },
-      saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
+      saveInteractionDefaultOutcome: function (stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
-      getHintsMemento: function(stateName) {
+      getHintsMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'hints');
       },
-      saveHints: function(stateName, newHints) {
+      saveHints: function (stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
       },
-      getSolutionMemento: function(stateName) {
+      getSolutionMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'solution');
       },
-      saveSolution: function(stateName, newSolution) {
+      saveSolution: function (stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
       },
-      getRecordedVoiceoversMemento: function(stateName) {
+      getRecordedVoiceoversMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'recorded_voiceovers');
       },
-      saveRecordedVoiceovers: function(stateName, newRecordedVoiceovers) {
+      saveRecordedVoiceovers: function (stateName, newRecordedVoiceovers) {
         saveStateProperty(
           stateName, 'recorded_voiceovers', newRecordedVoiceovers);
       },
-      getSolicitAnswerDetailsMemento: function(stateName) {
+      getSolicitAnswerDetailsMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'solicit_answer_details');
       },
-      saveSolicitAnswerDetails: function(stateName, newSolicitAnswerDetails) {
+      saveSolicitAnswerDetails: function (stateName, newSolicitAnswerDetails) {
         saveStateProperty(
           stateName, 'solicit_answer_details', newSolicitAnswerDetails);
       },
-      getCardIsCheckpointMemento: function(stateName) {
+      getCardIsCheckpointMemento: function (stateName) {
         return getStatePropertyMemento(stateName, 'card_is_checkpoint');
       },
-      saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
+      saveCardIsCheckpoint: function (stateName, newCardIsCheckpoint) {
         saveStateProperty(
           stateName, 'card_is_checkpoint', newCardIsCheckpoint);
       },
-      getWrittenTranslationsMemento: function(stateName) {
+      getWrittenTranslationsMemento: function (stateName) {
         return _states.getState(stateName).writtenTranslations;
       },
-      saveWrittenTranslation: function(
+      saveWrittenTranslation: function (
           contentId, dataFormat, languageCode, stateName, translationHtml) {
         ChangeListService.addWrittenTranslation(
           contentId, dataFormat, languageCode, stateName, translationHtml);
@@ -450,7 +450,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         }
         _states.setState(stateName, angular.copy(stateData));
       },
-      markWrittenTranslationAsNeedingUpdate: function(
+      markWrittenTranslationAsNeedingUpdate: function (
           contentId, languageCode, stateName) {
         ChangeListService.markTranslationAsNeedingUpdate(
           contentId, languageCode, stateName);
@@ -459,7 +459,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           languageCode].markAsNeedingUpdate();
         _states.setState(stateName, angular.copy(stateData));
       },
-      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
+      markWrittenTranslationsAsNeedingUpdate: function (contentId, stateName) {
         ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
         let stateData = _states.getState(stateName);
         const translationMapping = (
@@ -470,10 +470,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
         }
         _states.setState(stateName, angular.copy(stateData));
       },
-      isInitialized: function() {
+      isInitialized: function () {
         return _states !== null;
       },
-      addState: function(newStateName, successCallback) {
+      addState: function (newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!ValidatorsService.isValidStateName(newStateName, true)) {
           return;
@@ -488,7 +488,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
 
         ChangeListService.addState(newStateName);
         $rootScope.$applyAsync();
-        stateAddedCallbacks.forEach(function(callback) {
+        stateAddedCallbacks.forEach(function (callback) {
           callback(newStateName);
         });
         refreshGraphEventEmitter.emit();
@@ -496,7 +496,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           successCallback(newStateName);
         }
       },
-      deleteState: function(deleteStateName) {
+      deleteState: function (deleteStateName) {
         AlertsService.clearWarnings();
 
         var initStateName = ExplorationInitStateNameService.displayed;
@@ -518,7 +518,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
             deleteStateName: () => deleteStateName
           },
           controller: 'ConfirmDeleteStateModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           _states.deleteState(deleteStateName);
 
           ChangeListService.deleteState(deleteStateName);
@@ -529,7 +529,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
               ExplorationInitStateNameService.savedMemento);
           }
 
-          stateDeletedCallbacks.forEach(function(callback) {
+          stateDeletedCallbacks.forEach(function (callback) {
             callback(deleteStateName);
           });
           $location.path('/gui/' + StateEditorService.getActiveStateName());
@@ -537,11 +537,11 @@ angular.module('oppia').factory('ExplorationStatesService', [
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
           StateEditorRefreshService.onRefreshStateEditor.emit();
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       },
-      renameState: function(oldStateName, newStateName) {
+      renameState: function (oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!ValidatorsService.isValidStateName(newStateName, true)) {
           return;
@@ -570,24 +570,24 @@ angular.module('oppia').factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
-        stateRenamedCallbacks.forEach(function(callback) {
+        stateRenamedCallbacks.forEach(function (callback) {
           callback(oldStateName, newStateName);
         });
         refreshGraphEventEmitter.emit();
       },
-      registerOnStateAddedCallback: function(callback) {
+      registerOnStateAddedCallback: function (callback) {
         stateAddedCallbacks.push(callback);
       },
-      registerOnStateDeletedCallback: function(callback) {
+      registerOnStateDeletedCallback: function (callback) {
         stateDeletedCallbacks.push(callback);
       },
-      registerOnStateRenamedCallback: function(callback) {
+      registerOnStateRenamedCallback: function (callback) {
         stateRenamedCallbacks.push(callback);
       },
-      registerOnStateInteractionSavedCallback: function(callback) {
+      registerOnStateInteractionSavedCallback: function (callback) {
         stateInteractionSavedCallbacks.push(callback);
       },
-      get onRefreshGraph() {
+      get onRefreshGraph () {
         return refreshGraphEventEmitter;
       }
     };

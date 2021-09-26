@@ -19,7 +19,7 @@
 import { GetAbbreviatedTextPipe } from
   'filters/string-utility-filters/get-abbreviated-text.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let pipe: GetAbbreviatedTextPipe = null;
   beforeEach(() => {
     pipe = new GetAbbreviatedTextPipe();

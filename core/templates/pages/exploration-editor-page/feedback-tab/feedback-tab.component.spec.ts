@@ -36,7 +36,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 // ^^^ This block is to be removed.
 
-describe('Feedback Tab Component', function() {
+describe('Feedback Tab Component', function () {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -63,14 +63,14 @@ describe('Feedback Tab Component', function() {
       ]
     });
   });
-  beforeEach(function() {
+  beforeEach(function () {
     alertsService = TestBed.get(AlertsService);
     changeListService = TestBed.inject(ChangeListService);
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
     suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
@@ -83,7 +83,7 @@ describe('Feedback Tab Component', function() {
       'UserService', TestBed.get(UserService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -111,13 +111,13 @@ describe('Feedback Tab Component', function() {
   }));
 
   it('should throw an error when trying to active a non-existent thread',
-    function() {
-      expect(function() {
+    function () {
+      expect(function () {
         ctrl.setActiveThread('0');
       }).toThrowError('Trying to display a non-existent thread');
     });
 
-  it('should set active thread when it exists', function() {
+  it('should set active thread when it exists', function () {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'review',
       subject: '',
@@ -152,7 +152,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should add warning when trying to add a message in a thread with id' +
-    ' null', function() {
+    ' null', function () {
     var addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
     ctrl.addNewMessage(null, 'Text', 'Open');
     expect(addWarningSpy).toHaveBeenCalledWith(
@@ -160,7 +160,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should add warning when trying to add a invalid message in a thread',
-    function() {
+    function () {
       var addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
       ctrl.addNewMessage('0', 'Text', null);
       expect(addWarningSpy).toHaveBeenCalledWith(
@@ -168,8 +168,8 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should throw error when trying to add a message in an invalid thread',
-    function() {
-      expect(function() {
+    function () {
+      expect(function () {
         ctrl.addNewMessage('0', 'Text', 'Open');
       }).toThrowError('Trying to add message to a non-existent thread.');
       expect(ctrl.threadIsStale).toBe(true);
@@ -177,7 +177,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should add new message to a thread and then go back to feedback' +
-    ' threads list', function() {
+    ' threads list', function () {
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
         status: 'Open',
@@ -225,7 +225,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should use reject handler when trying to add a message in a thread fails',
-    function() {
+    function () {
       spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
         suggestionThreadObjectFactory.createFromBackendDicts({
           status: 'Open',
@@ -265,7 +265,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should evaluate suggestion button type to be default when a feedback' +
-    ' thread is selected', function() {
+    ' thread is selected', function () {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'open',
       subject: '',
@@ -299,7 +299,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should evaluate suggestion button type to be primary when a feedback' +
-    ' thread is selected', function() {
+    ' thread is selected', function () {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'review',
       subject: '',
@@ -336,13 +336,13 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should not open show suggestion modal when active thread is null',
-    function() {
-      expect(function() {
+    function () {
+      expect(function () {
         ctrl.showSuggestionModal();
       }).toThrowError('Trying to show suggestion of a non-existent thread');
     });
 
-  it('should open show suggestion modal when active thread exists', function() {
+  it('should open show suggestion modal when active thread exists', function () {
     var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
     getThreadSpy.and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
@@ -375,7 +375,7 @@ describe('Feedback Tab Component', function() {
     $scope.$apply();
 
     spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
-      .and.callFake(function(suggestionType, obj) {
+      .and.callFake(function (suggestionType, obj) {
         obj.setActiveThread('0');
       });
 
@@ -415,7 +415,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should create a new thread when closing create new thread modal',
-    function() {
+    function () {
       spyOn(alertsService, 'addSuccessMessage').and.callThrough();
       spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.
         returnValue($q.resolve());
@@ -438,7 +438,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should not create a new thread when dismissing create new thread modal',
-    function() {
+    function () {
       spyOn(threadDataBackendApiService, 'createNewThreadAsync');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -450,13 +450,13 @@ describe('Feedback Tab Component', function() {
         .toHaveBeenCalled();
     });
 
-  it('should get css classes based on status', function() {
+  it('should get css classes based on status', function () {
     expect(ctrl.getLabelClass('open')).toBe('badge badge-info');
     expect(ctrl.getLabelClass('compliment')).toBe('badge badge-success');
     expect(ctrl.getLabelClass('another')).toBe('badge badge-secondary');
   });
 
-  it('should get human readable status from provided status', function() {
+  it('should get human readable status from provided status', function () {
     expect(ctrl.getHumanReadableStatus('open')).toBe('Open');
     expect(ctrl.getHumanReadableStatus('compliment')).toBe('Compliment');
     expect(ctrl.getHumanReadableStatus('not_actionable')).toBe(
@@ -464,7 +464,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
-    function() {
+    function () {
       // This method is being spied to avoid any timezone issues.
       spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
         .returnValue('11/21/14');
@@ -474,7 +474,7 @@ describe('Feedback Tab Component', function() {
         '11/21/14');
     });
 
-  it('should evaluate if exploration is editable', function() {
+  it('should evaluate if exploration is editable', function () {
     var isEditableSpy = spyOn(editabilityService, 'isEditable');
 
     isEditableSpy.and.returnValue(true);

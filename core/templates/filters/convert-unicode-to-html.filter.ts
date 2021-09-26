@@ -20,8 +20,8 @@ require('services/html-escaper.service.ts');
 
 angular.module('oppia').filter('convertUnicodeToHtml', [
   '$sanitize', 'HtmlEscaperService',
-  function($sanitize, HtmlEscaperService) {
-    return function(text) {
+  function ($sanitize, HtmlEscaperService) {
+    return function (text) {
       return $sanitize(HtmlEscaperService.unescapedStrToEscapedStr(text));
     };
   }

@@ -40,7 +40,7 @@ export class LearnerAnswerInfoCard {
   interaction: Interaction;
   answerDetails: string;
 
-  constructor(
+  constructor (
     private explorationEngineService: ExplorationEngineService,
     private explorationHtmlFormatter: ExplorationHtmlFormatterService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
@@ -49,7 +49,7 @@ export class LearnerAnswerInfoCard {
     this.interaction = this.explorationEngineService.getState().interaction;
   }
 
-  submitLearnerAnswerInfo(): void {
+  submitLearnerAnswerInfo (): void {
     this.learnerAnswerInfoService.recordLearnerAnswerInfo(
       this.answerDetails);
     this.playerTranscriptService.addNewInput(this.answerDetails, false);
@@ -61,7 +61,7 @@ export class LearnerAnswerInfoCard {
       this.learnerAnswerInfoService.getCurrentInteractionRulesService()});
   }
 
-  displayCurrentAnswer(): string {
+  displayCurrentAnswer (): string {
     return this.explorationHtmlFormatter.getAnswerHtml(
       this.learnerAnswerInfoService.getCurrentAnswer(), this.interaction.id,
       this.interaction.customizationArgs);

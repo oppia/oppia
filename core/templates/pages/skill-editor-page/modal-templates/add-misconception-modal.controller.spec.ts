@@ -21,7 +21,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Add Misconception Modal Controller', function() {
+describe('Add Misconception Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var MisconceptionObjectFactory = null;
@@ -32,7 +32,7 @@ describe('Add Misconception Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
@@ -91,7 +91,7 @@ describe('Add Misconception Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.skill).toEqual(skillObject);
       expect($scope.misconceptionName).toBe('');
       expect($scope.misconceptionNotes).toBe('');
@@ -103,7 +103,7 @@ describe('Add Misconception Modal Controller', function() {
       );
     });
 
-  it('should save misconception when closing the modal', function() {
+  it('should save misconception when closing the modal', function () {
     $scope.saveMisconception();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       misconception: MisconceptionObjectFactory.create(
@@ -111,7 +111,7 @@ describe('Add Misconception Modal Controller', function() {
     });
   });
 
-  it('should not allow a misconception with a duplicate name', function() {
+  it('should not allow a misconception with a duplicate name', function () {
     // 'test name 2' is a duplicate name from a previous misconception.
     $scope.misconceptionName = 'test name 2';
     $scope.misconceptionNotes = 'unique notes';

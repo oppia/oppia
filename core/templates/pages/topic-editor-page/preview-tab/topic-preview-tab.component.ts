@@ -39,12 +39,12 @@ export class TopicPreviewTabComponent {
   cannonicalStorySummaries: StorySummary[];
   chapterCount: number = 0;
 
-  constructor(
+  constructor (
     private topicEditorStateService: TopicEditorStateService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.topic = this.topicEditorStateService.getTopic();
     this.topicName = this.topic.getName();
     this.subtopics = this.topic.getSubtopics();
@@ -56,11 +56,11 @@ export class TopicPreviewTabComponent {
     }
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  changePreviewTab(tabName: string): void {
+  changePreviewTab (tabName: string): void {
     switch (tabName) {
       case this._TAB_STORY:
         this.activeTab = this._TAB_STORY;

@@ -94,7 +94,7 @@ export class Interaction {
   hints: Hint[];
   id: string | null;
   solution: Solution | null;
-  constructor(
+  constructor (
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
@@ -109,31 +109,31 @@ export class Interaction {
     this.solution = solution;
   }
 
-  setId(newValue: string): void {
+  setId (newValue: string): void {
     this.id = newValue;
   }
 
-  setAnswerGroups(newValue: AnswerGroup[]): void {
+  setAnswerGroups (newValue: AnswerGroup[]): void {
     this.answerGroups = newValue;
   }
 
-  setDefaultOutcome(newValue: Outcome): void {
+  setDefaultOutcome (newValue: Outcome): void {
     this.defaultOutcome = newValue;
   }
 
-  setCustomizationArgs(newValue: InteractionCustomizationArgs): void {
+  setCustomizationArgs (newValue: InteractionCustomizationArgs): void {
     this.customizationArgs = newValue;
   }
 
-  setSolution(newValue: Solution): void {
+  setSolution (newValue: Solution): void {
     this.solution = newValue;
   }
 
-  setHints(newValue: Hint[]): void {
+  setHints (newValue: Hint[]): void {
     this.hints = newValue;
   }
 
-  copy(otherInteraction: Interaction): void {
+  copy (otherInteraction: Interaction): void {
     this.answerGroups = cloneDeep(otherInteraction.answerGroups);
     this.confirmedUnclassifiedAnswers =
       cloneDeep(otherInteraction.confirmedUnclassifiedAnswers);
@@ -144,7 +144,7 @@ export class Interaction {
     this.solution = cloneDeep(otherInteraction.solution);
   }
 
-  static convertCustomizationArgsToBackendDict(
+  static convertCustomizationArgsToBackendDict (
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
     const traverseSchemaAndConvertSubtitledToDicts = (
@@ -188,7 +188,7 @@ export class Interaction {
    *  arguments to get content ids for.
    * @returns {(string | null)[]} List of content ids in customization args.
    */
-  static getCustomizationArgContentIds(
+  static getCustomizationArgContentIds (
       customizationArgs: InteractionCustomizationArgs
   ): (string | null)[] {
     // A null 'content_id' indicates that the 'SubtitledHtml' or
@@ -223,9 +223,9 @@ export class Interaction {
     return contentIds;
   }
 
-  toBackendDict(): InteractionBackendDict {
+  toBackendDict (): InteractionBackendDict {
     return {
-      answer_groups: this.answerGroups.map(function(answerGroup) {
+      answer_groups: this.answerGroups.map(function (answerGroup) {
         return answerGroup.toBackendDict();
       }),
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
@@ -233,7 +233,7 @@ export class Interaction {
         this.customizationArgs),
       default_outcome:
         this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
-      hints: this.hints.map(function(hint) {
+      hints: this.hints.map(function (hint) {
         return hint.toBackendDict();
       }),
       id: this.id,
@@ -246,7 +246,7 @@ export class Interaction {
   providedIn: 'root'
 })
 export class InteractionObjectFactory {
-  constructor(
+  constructor (
       private answerGroupFactory: AnswerGroupObjectFactory,
       private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
@@ -254,7 +254,7 @@ export class InteractionObjectFactory {
       private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
   ) {}
 
-  _createFromContinueCustomizationArgsBackendDict(
+  _createFromContinueCustomizationArgsBackendDict (
       caBackendDict: ContinueCustomizationArgsBackendDict
   ): ContinueCustomizationArgs {
     const { buttonText } = caBackendDict;
@@ -266,7 +266,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromDragAndDropSortInputCustomizationArgsBackendDict(
+  _createFromDragAndDropSortInputCustomizationArgsBackendDict (
       caBackendDict: DragAndDropSortInputCustomizationArgsBackendDict
   ): DragAndDropSortInputCustomizationArgs {
     const { choices, allowMultipleItemsInSamePosition } = caBackendDict;
@@ -280,7 +280,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromFractionInputCustomizationArgsBackendDict(
+  _createFromFractionInputCustomizationArgsBackendDict (
       caBackendDict: FractionInputCustomizationArgsBackendDict
   ): FractionInputCustomizationArgs {
     const {
@@ -296,7 +296,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromItemSelectionInputCustomizationArgsBackendDict(
+  _createFromItemSelectionInputCustomizationArgsBackendDict (
       caBackendDict: ItemSelectionInputCustomizationArgsBackendDict
   ): ItemSelectionInputCustomizationArgs {
     const {
@@ -313,7 +313,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+  _createFromIMultipleChoiceInputCustomizationArgsBackendDict (
       caBackendDict: MultipleChoiceInputCustomizationArgsBackendDict
   ): MultipleChoiceInputCustomizationArgs {
     const {
@@ -329,7 +329,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromSetInputCustomizationArgsBackendDict(
+  _createFromSetInputCustomizationArgsBackendDict (
       caBackendDict: SetInputCustomizationArgsBackendDict
   ): SetInputCustomizationArgs {
     const { buttonText } = caBackendDict;
@@ -341,7 +341,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromTextInputCustomizationArgsBackendDict(
+  _createFromTextInputCustomizationArgsBackendDict (
       caBackendDict: TextInputCustomizationArgsBackendDict
   ): TextInputCustomizationArgs {
     const { rows, placeholder } = caBackendDict;
@@ -354,7 +354,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromNumericExpressionInputCustomizationArgsBackendDict(
+  _createFromNumericExpressionInputCustomizationArgsBackendDict (
       caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
   ): NumericExpressionInputCustomizationArgs {
     const { useFractionForDivision, placeholder } = caBackendDict;
@@ -367,7 +367,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromRatioExpressionInputCustomizationArgsBackendDict(
+  _createFromRatioExpressionInputCustomizationArgsBackendDict (
       caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
   ): RatioExpressionInputCustomizationArgs {
     const { numberOfTerms, placeholder } = caBackendDict;
@@ -380,14 +380,14 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromNumericInputCustomizationArgsBackendDict(
+  _createFromNumericInputCustomizationArgsBackendDict (
       caBackendDict: NumericInputCustomizationArgsBackendDict
   ): NumericInputCustomizationArgs {
     const { requireNonnegativeInput } = caBackendDict;
     return { requireNonnegativeInput };
   }
 
-  convertFromCustomizationArgsBackendDict(
+  convertFromCustomizationArgsBackendDict (
       interactionId: string | null,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
@@ -456,7 +456,7 @@ export class InteractionObjectFactory {
     }
   }
 
-  createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
+  createFromBackendDict (interactionDict: InteractionBackendDict): Interaction {
     return new Interaction(
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
@@ -472,7 +472,7 @@ export class InteractionObjectFactory {
         interactionDict.solution) : null);
   }
 
-  createAnswerGroupsFromBackendDict(
+  createAnswerGroupsFromBackendDict (
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
       interactionId: string | null
   ): AnswerGroup[] {
@@ -483,19 +483,19 @@ export class InteractionObjectFactory {
     });
   }
 
-  createHintsFromBackendDict(
+  createHintsFromBackendDict (
       hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
 
-  createOutcomeFromBackendDict(
+  createOutcomeFromBackendDict (
       outcomeBackendDict: OutcomeBackendDict): Outcome {
     return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
   }
 
-  createSolutionFromBackendDict(
+  createSolutionFromBackendDict (
       solutionBackendDict: SolutionBackendDict): Solution {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }

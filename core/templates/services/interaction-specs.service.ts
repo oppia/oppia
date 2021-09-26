@@ -23,7 +23,7 @@ import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 @Injectable({providedIn: 'root'})
 export class InteractionSpecsService {
-  isInteractionTrainable(interactionId: string): boolean {
+  isInteractionTrainable (interactionId: string): boolean {
     const _interactionId = (
       interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS
     );

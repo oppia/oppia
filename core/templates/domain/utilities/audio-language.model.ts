@@ -27,14 +27,14 @@ export class AudioLanguage {
   description: string;
   relatedLanguages: readonly string[];
 
-  constructor(
+  constructor (
       id: string, description: string, relatedLanguages: readonly string[]) {
     this.id = id;
     this.description = description;
     this.relatedLanguages = relatedLanguages;
   }
 
-  static createFromDict(
+  static createFromDict (
       audioLanguageDict: AudioLanguageBackendDict
   ): AudioLanguage {
     return new AudioLanguage(

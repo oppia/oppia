@@ -27,7 +27,7 @@ import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
@@ -65,7 +65,7 @@ describe('Keyboard Shortcuts', () => {
     }).compileComponents();
   }));
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     ngbModal = TestBed.get(NgbModal);
     windowRef = new WindowRef();
     appRef = TestBed.get(ApplicationRef);

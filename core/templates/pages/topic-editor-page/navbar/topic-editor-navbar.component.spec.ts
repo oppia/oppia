@@ -43,7 +43,7 @@ describe('topicEditorNavbar', () => {
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     let mockWindow = {
       location: '',
       open: () => {}
@@ -51,7 +51,7 @@ describe('topicEditorNavbar', () => {
     $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');

@@ -29,7 +29,7 @@ import { WindowDimensionsService } from
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 
-describe('Editor Navigation Component', function() {
+describe('Editor Navigation Component', function () {
   var ctrl = null;
   var $flushPendingTasks = null;
   var $q = null;
@@ -77,14 +77,14 @@ describe('Editor Navigation Component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     userService = TestBed.get(UserService);
     changeListService = TestBed.inject(ChangeListService);
   });
 
-  describe('when screen is large', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when screen is large', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
@@ -155,13 +155,13 @@ describe('Editor Navigation Component', function() {
           openEditorTutorialSpy));
     });
 
-    afterEach(function() {
+    afterEach(function () {
       testSubscriptions.unsubscribe();
       ctrl.$onDestroy();
     });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
         expect($scope.isPostTutorialHelpPopoverShown())
           .toBe(false);
@@ -171,7 +171,7 @@ describe('Editor Navigation Component', function() {
         expect($scope.showPublishButton()).toEqual(true);
       });
 
-    it('should get warnings whenever has one', function() {
+    it('should get warnings whenever has one', function () {
       var warnings = [{
         type: 'ERROR'
       }, {
@@ -197,7 +197,7 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should open editor tutorial after closing user help modal with mode' +
-      'editor', function() {
+      'editor', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('editor')
       });
@@ -208,7 +208,7 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should open editor tutorial after closing user help modal with mode' +
-      'translation', function() {
+      'translation', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('translation')
       });
@@ -218,12 +218,12 @@ describe('Editor Navigation Component', function() {
       expect(openTranslationTutorialSpy).toHaveBeenCalled();
     });
 
-    it('should return if exploration is private', function() {
+    it('should return if exploration is private', function () {
       spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
       expect($scope.isPrivate()).toEqual(true);
     });
 
-    it('should return if exploration is locked for editing', function() {
+    it('should return if exploration is locked for editing', function () {
       spyOn(
         changeListService,
         'isExplorationLockedForEditing').and.returnValue(true);
@@ -231,7 +231,7 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should return if exploration is editable outside tutorial mode',
-      function() {
+      function () {
         spyOn(
           editabilityService,
           'isEditableOutsideTutorialMode').and.returnValue(true);
@@ -239,13 +239,13 @@ describe('Editor Navigation Component', function() {
         expect($scope.isEditableOutsideTutorialMode()).toEqual(true);
       });
 
-    it('should call exploration save service to discard changes', function() {
+    it('should call exploration save service to discard changes', function () {
       var explorationSpy = spyOn(explorationSaveService, 'discardChanges');
       $scope.discardChanges();
       expect(explorationSpy).toHaveBeenCalled();
     });
 
-    it('should call exploration save service to save changes', function() {
+    it('should call exploration save service to save changes', function () {
       var deferred = $q.defer();
       deferred.resolve();
       var explorationSpy = spyOn(
@@ -256,20 +256,20 @@ describe('Editor Navigation Component', function() {
       expect(explorationSpy).toHaveBeenCalled();
     });
 
-    it('should show/hide the loading dots', function() {
+    it('should show/hide the loading dots', function () {
       $scope.showLoadingDots();
       expect($scope.loadingDotsAreShown).toEqual(true);
       $scope.hideLoadingDots();
       expect($scope.loadingDotsAreShown).toEqual(false);
     });
 
-    it('should return if exploration is saveable', function() {
+    it('should return if exploration is saveable', function () {
       spyOn(
         explorationSaveService, 'isExplorationSaveable').and.returnValue(true);
       expect($scope.isExplorationSaveable()).toEqual(true);
     });
 
-    it('should toggle mobile nav options', function() {
+    it('should toggle mobile nav options', function () {
       $scope.mobileNavOptionsAreShown = false;
       $scope.toggleMobileNavOptions();
       expect($scope.mobileNavOptionsAreShown).toEqual(true);
@@ -277,13 +277,13 @@ describe('Editor Navigation Component', function() {
       expect($scope.mobileNavOptionsAreShown).toEqual(false);
     });
 
-    it('should return the number of changes', function() {
+    it('should return the number of changes', function () {
       spyOn(
         changeListService, 'getChangeList').and.returnValue([]);
       expect($scope.getChangeListLength()).toEqual(0);
     });
 
-    it('should hide loading dots after publishing the exploration', function() {
+    it('should hide loading dots after publishing the exploration', function () {
       $scope.loadingDotsAreShown = true;
       var deferred = $q.defer();
       deferred.resolve();
@@ -295,19 +295,19 @@ describe('Editor Navigation Component', function() {
       expect($scope.loadingDotsAreShown).toEqual(false);
     });
 
-    it('should navigate to main tab when clicking on tab', function() {
+    it('should navigate to main tab when clicking on tab', function () {
       $scope.selectMainTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('main');
     });
 
-    it('should navigate to translation tab when clicking on tab', function() {
+    it('should navigate to translation tab when clicking on tab', function () {
       $scope.selectTranslationTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('translation');
     });
 
-    it('should navigate to preview tab when clicking on tab', function() {
+    it('should navigate to preview tab when clicking on tab', function () {
       $scope.selectPreviewTab();
       $rootScope.$apply();
       $flushPendingTasks();
@@ -315,19 +315,19 @@ describe('Editor Navigation Component', function() {
       expect($scope.getActiveTabName()).toBe('preview');
     });
 
-    it('should navigate to settings tab when clicking on tab', function() {
+    it('should navigate to settings tab when clicking on tab', function () {
       $scope.selectSettingsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('settings');
     });
 
-    it('should navigate to stats tab when clicking on tab', function() {
+    it('should navigate to stats tab when clicking on tab', function () {
       $scope.selectStatsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('stats');
     });
 
-    it('should navigate to improvements tab when clicking on tab', function() {
+    it('should navigate to improvements tab when clicking on tab', function () {
       spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
       isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
       $scope.selectImprovementsTab();
@@ -335,26 +335,26 @@ describe('Editor Navigation Component', function() {
       expect($scope.getActiveTabName()).toBe('improvements');
     });
 
-    it('should navigate to history tab when clicking on tab', function() {
+    it('should navigate to history tab when clicking on tab', function () {
       $scope.selectHistoryTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('history');
     });
 
-    it('should navigate to feedback tab when clicking on tab', function() {
+    it('should navigate to feedback tab when clicking on tab', function () {
       $scope.selectFeedbackTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('feedback');
     });
 
-    it('should get open thread count', function() {
+    it('should get open thread count', function () {
       spyOn(
         threadDataBackendApiService, 'getOpenThreadsCount').and.returnValue(5);
       expect($scope.getOpenThreadsCount()).toBe(5);
     });
 
     it('should toggle post tutorial help popover when resizing page',
-      function() {
+      function () {
         angular.element(window).triggerHandler('resize');
         mockOpenPostTutorialHelpPopover.emit();
 
@@ -382,8 +382,8 @@ describe('Editor Navigation Component', function() {
       });
   });
 
-  describe('when screen is not large', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when screen is not large', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
@@ -426,11 +426,11 @@ describe('Editor Navigation Component', function() {
       $scope.$apply();
     }));
 
-    afterEach(function() {
+    afterEach(function () {
       ctrl.$onDestroy();
     });
 
-    it('should hide post tutorial help popover when resizing page', function() {
+    it('should hide post tutorial help popover when resizing page', function () {
       angular.element(window).triggerHandler('resize');
       mockOpenPostTutorialHelpPopover.emit();
       expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);

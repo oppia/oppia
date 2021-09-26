@@ -29,7 +29,7 @@ describe('OppiaInteractiveContinue', () => {
   let contextService: ContextService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         buttonText: {
           value: {

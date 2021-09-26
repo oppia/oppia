@@ -39,15 +39,15 @@ angular.module('oppia').component('explorationPlayerPage', {
   controller: [
     '$rootScope', 'ContextService', 'KeyboardShortcutService',
     'PageTitleService', 'ReadOnlyExplorationBackendApiService',
-    function(
+    function (
         $rootScope, ContextService, KeyboardShortcutService,
         PageTitleService, ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         var explorationId = ContextService.getExplorationId();
         ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
           explorationId, null)
-          .then(function(response) {
+          .then(function (response) {
             PageTitleService.setDocumentTitle(
               response.exploration.title + ' - Oppia');
             angular.element('meta[itemprop="name"]').attr(

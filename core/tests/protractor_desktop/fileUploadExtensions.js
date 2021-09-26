@@ -26,25 +26,25 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('rich-text components', function() {
+describe('rich-text components', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display rte involving file upload correctly', async function() {
+  it('should display rte involving file upload correctly', async function () {
     await users.createUser(
       'richTextuser@fileUploadExtensions.com',
       'fileUploadRichTextuser');
     await users.login('richTextuser@fileUploadExtensions.com');
     await workflow.createExploration(true);
 
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+    await explorationEditorMainTab.setContent(async function (richTextEditor) {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText('This is a math expression');
       // TODO(Jacob): Add test for image RTE component.
@@ -59,7 +59,7 @@ describe('rich-text components', function() {
     await explorationEditorPage.navigateToPreviewTab();
 
     await explorationPlayerPage.expectContentToMatch(
-      async function(richTextChecker) {
+      async function (richTextChecker) {
         await richTextChecker.readBoldText('bold');
         await richTextChecker.readPlainText('This is a math expression');
         await richTextChecker.readRteComponent('Math', 'x^2 + y^2');
@@ -74,7 +74,7 @@ describe('rich-text components', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

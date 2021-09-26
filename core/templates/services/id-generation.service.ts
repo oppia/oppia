@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class IdGenerationService {
-  generateNewId(): string {
+  generateNewId (): string {
     // Generates random string using the last 10 digits of
     // the string for better entropy.
     let randomString = Math.random().toString(36).slice(2);

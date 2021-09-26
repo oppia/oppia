@@ -26,7 +26,7 @@ import { EventEmitter } from '@angular/core';
 
 require('pages/story-editor-page/story-editor-page.component.ts');
 
-describe('Story editor page', function() {
+describe('Story editor page', function () {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -59,13 +59,13 @@ describe('Story editor page', function() {
   };
   var story = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$window', mockedWindow);
   }));
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -118,7 +118,7 @@ describe('Story editor page', function() {
       url_fragment: 'story-url-fragment'
     });
     var MockEditableStoryBackendApiService = {
-      validateExplorationsAsync: async() => Promise.resolve([])
+      validateExplorationsAsync: async () => Promise.resolve([])
     };
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
 
@@ -131,10 +131,10 @@ describe('Story editor page', function() {
   }));
 
   it('should load story based on its id on url when component is initialized' +
-    ' and set page title', function() {
+    ' and set page title', function () {
     let storyInitializedEventEmitter = new EventEmitter();
     let storyReinitializedEventEmitter = new EventEmitter();
-    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function() {
+    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function () {
       storyInitializedEventEmitter.emit();
       storyReinitializedEventEmitter.emit();
     });
@@ -156,7 +156,7 @@ describe('Story editor page', function() {
   });
 
   it('should addListener by passing getChangeCount to ' +
-  'PreventPageUnloadEventService', function() {
+  'PreventPageUnloadEventService', function () {
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setDocumentTitle');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
@@ -170,7 +170,7 @@ describe('Story editor page', function() {
   });
 
   it('should return to topic editor page when closing confirmation modal',
-    function() {
+    function () {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -183,7 +183,7 @@ describe('Story editor page', function() {
     });
 
   it('should return to topic editor page when dismissing confirmation modal',
-    function() {
+    function () {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -196,7 +196,7 @@ describe('Story editor page', function() {
     });
 
   it('should open topic editor page when there is no change',
-    function() {
+    function () {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
       spyOn(mockedWindow, 'open').and.callThrough();
 
@@ -205,14 +205,14 @@ describe('Story editor page', function() {
         '/topic_editor/2', '_self');
     });
 
-  it('should return the active tab', function() {
+  it('should return the active tab', function () {
     MockStoryEditorNavigationService.activeTab = 'story_editor';
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     MockStoryEditorNavigationService.navigateToStoryEditor();
     expect(ctrl.getActiveTab()).toEqual('story_editor');
   });
 
-  it('should return warning count', function() {
+  it('should return warning count', function () {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
@@ -224,7 +224,7 @@ describe('Story editor page', function() {
   it('should report if story fragment already exists', () => {
     let storyInitializedEventEmitter = new EventEmitter();
     let storyReinitializedEventEmitter = new EventEmitter();
-    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function() {
+    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function () {
       storyInitializedEventEmitter.emit();
       storyReinitializedEventEmitter.emit();
     });
@@ -249,7 +249,7 @@ describe('Story editor page', function() {
     ctrl.$onDestroy();
   });
 
-  it('should toggle the display of warnings', function() {
+  it('should toggle the display of warnings', function () {
     ctrl.toggleWarnings();
     expect(ctrl.warningsAreShown).toEqual(true);
     ctrl.toggleWarnings();
@@ -258,7 +258,7 @@ describe('Story editor page', function() {
     expect(ctrl.warningsAreShown).toEqual(true);
   });
 
-  it('should return true if the main editor tab is select', function() {
+  it('should return true if the main editor tab is select', function () {
     MockStoryEditorNavigationService.activeTab = 'story_editor';
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     expect(ctrl.isMainEditorTabSelected()).toEqual(true);
@@ -268,7 +268,7 @@ describe('Story editor page', function() {
     expect(ctrl.isMainEditorTabSelected()).toEqual(false);
   });
 
-  it('should check if url contains story preview', function() {
+  it('should check if url contains story preview', function () {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
@@ -286,21 +286,21 @@ describe('Story editor page', function() {
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
   });
 
-  it('should navigate to story editor', function() {
+  it('should navigate to story editor', function () {
     MockStoryEditorNavigationService.activeTab = 'story_editor';
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     ctrl.navigateToStoryEditor();
     expect(ctrl.getActiveTab()).toEqual('story_editor');
   });
 
-  it('should navigate to story preview tab', function() {
+  it('should navigate to story preview tab', function () {
     MockStoryEditorNavigationService.activeTab = 'story_preview';
     MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
     ctrl.navigateToStoryPreviewTab();
     expect(ctrl.getActiveTab()).toEqual('story_preview');
   });
 
-  it('should return the navbar helper text', function() {
+  it('should return the navbar helper text', function () {
     MockStoryEditorNavigationService.activeTab = 'chapter_editor';
     MockStoryEditorNavigationService.getActiveTab = () => 'chapter_editor';
     expect(ctrl.getNavbarText()).toEqual('Chapter Editor');

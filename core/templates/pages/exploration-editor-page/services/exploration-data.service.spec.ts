@@ -29,7 +29,7 @@ import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
 
-describe('Exploration data service', function() {
+describe('Exploration data service', function () {
   let eds: ExplorationDataService = null;
   let eebas: EditableExplorationBackendApiService = null;
   let lss: LocalStorageService = null;
@@ -82,7 +82,7 @@ describe('Exploration data service', function() {
   } as unknown as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
     resolve: boolean = true;
-    async fetchApplyDraftExplorationAsync() {
+    async fetchApplyDraftExplorationAsync () {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
           resolve(sampleDataResults);
@@ -91,7 +91,7 @@ describe('Exploration data service', function() {
         }
       });
     }
-    async updateExplorationAsync() {
+    async updateExplorationAsync () {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
           resolve(sampleDataResults);
@@ -104,7 +104,7 @@ describe('Exploration data service', function() {
   const windowMock = {
     nativeWindow: {
       location: {
-        reload: function() {}
+        reload: function () {}
       }
     }
   };
@@ -131,12 +131,12 @@ describe('Exploration data service', function() {
     eebas = TestBed.inject(EditableExplorationBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     httpTestingController.verify();
   });
 
@@ -330,7 +330,7 @@ describe('Exploration data service', function() {
     let toBeResolved = false;
     // The data.exploration won't receive a value.
     spyOn(eebas, 'updateExplorationAsync').and.callFake(
-      async() => {
+      async () => {
         return new Promise((resolve, reject) => {
           if (toBeResolved) {
             resolve(sampleDataResults);
@@ -362,7 +362,7 @@ describe('Exploration data service', function() {
       spyOn(explorationDraft, 'isValid').and.callFake(() => true);
       spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
       const changeList = [];
-      eds.getDataAsync(errorCallback).then(function(data) {
+      eds.getDataAsync(errorCallback).then(function (data) {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
@@ -371,7 +371,7 @@ describe('Exploration data service', function() {
         '/createhandler/autosave_draft/0');
       req.flush(sampleDataResults);
       spyOn(eebas, 'updateExplorationAsync').and.callFake(
-        async() => {
+        async () => {
           return new Promise((resolve, reject) => {
             reject();
           });
@@ -385,7 +385,7 @@ describe('Exploration data service', function() {
     }));
 });
 
-describe('Exploration data service', function() {
+describe('Exploration data service', function () {
   var eds = null;
   var ls = null;
   var logErrorSpy;
@@ -414,7 +414,7 @@ describe('Exploration data service', function() {
       'Unexpected call to ExplorationDataService for pathname: ' + pathname);
 
     var errorCallback = jasmine.createSpy('error');
-    expect(function() {
+    expect(function () {
       eds.getData(errorCallback);
     }).toThrowError('eds.getData is not a function');
   });

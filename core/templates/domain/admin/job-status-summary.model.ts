@@ -25,12 +25,12 @@ export class JobStatusSummary {
   jobType: string;
   isQueuedOrRunning: boolean;
 
-  constructor(jobType: string, isQueuedOrRunning: boolean) {
+  constructor (jobType: string, isQueuedOrRunning: boolean) {
     this.jobType = jobType;
     this.isQueuedOrRunning = isQueuedOrRunning;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: JobStatusSummaryBackendDict): JobStatusSummary {
     return new JobStatusSummary(
       backendDict.job_type, backendDict.is_queued_or_running);

@@ -32,7 +32,7 @@ import { ExplorationPermissions } from
 export class UserExplorationPermissionsService {
   private userExplorationPermissionsFetched = new EventEmitter<void>();
 
-  constructor(
+  constructor (
     private explorationPermissionsBackendApiService:
     ExplorationPermissionsBackendApiService) {
   }
@@ -41,7 +41,7 @@ export class UserExplorationPermissionsService {
   // getPermissionsAsync().
   static permissionsPromise: Promise<ExplorationPermissions> | null = null;
 
-  async getPermissionsAsync(): Promise<ExplorationPermissions> {
+  async getPermissionsAsync (): Promise<ExplorationPermissions> {
     if (!UserExplorationPermissionsService.permissionsPromise) {
       UserExplorationPermissionsService.permissionsPromise = (
         this.fetchPermissionsAsync());
@@ -49,7 +49,7 @@ export class UserExplorationPermissionsService {
     return UserExplorationPermissionsService.permissionsPromise;
   }
 
-  async fetchPermissionsAsync(): Promise<ExplorationPermissions> {
+  async fetchPermissionsAsync (): Promise<ExplorationPermissions> {
     let permissionPromise = (
       this.explorationPermissionsBackendApiService.getPermissionsAsync());
     UserExplorationPermissionsService.permissionsPromise = permissionPromise;
@@ -64,7 +64,7 @@ export class UserExplorationPermissionsService {
     });
   }
 
-  get onUserExplorationPermissionsFetched(): EventEmitter<void> {
+  get onUserExplorationPermissionsFetched (): EventEmitter<void> {
     return this.userExplorationPermissionsFetched;
   }
 }

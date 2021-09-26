@@ -26,7 +26,7 @@ import { MultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class MultipleChoiceInputRulesService {
-  Equals(
+  Equals (
       answer: MultipleChoiceAnswer,
       inputs: MultipleChoiceRuleInputs): boolean {
     return answer === inputs.x;

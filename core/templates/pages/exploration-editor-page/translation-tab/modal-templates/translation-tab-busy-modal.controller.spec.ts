@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for TranslationTabBusyModalController.
  */
 
-describe('Translation Tab Busy Modal Controller', function() {
+describe('Translation Tab Busy Modal Controller', function () {
   let $scope = null;
   let $uibModalInstance = null;
   const message = 'This is a message';
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     const $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -37,7 +37,7 @@ describe('Translation Tab Busy Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.busyMessage).toBe(message);
     });
 });

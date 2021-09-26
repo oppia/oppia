@@ -19,13 +19,13 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = async function(modal, url) {
+var customizeComponent = async function (modal, url) {
   await objects.SanitizedUrlEditor(
     modal.element(by.tagName('sanitized-url-editor'))
   ).setValue(url);
 };
 
-var expectComponentDetailsToMatch = async function(elem, url) {
+var expectComponentDetailsToMatch = async function (elem, url) {
   expect(await elem.element(by.tagName('a')).getAttribute('href')).toBe(url);
   expect(
     await elem.element(by.tagName('a')).getAttribute('target')).toBe('_blank');

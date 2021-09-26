@@ -24,17 +24,17 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
 
-describe('Exploration Objective Service', function() {
+describe('Exploration Objective Service', function () {
   let eos = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     eos = $injector.get('ExplorationObjectiveService');
   }));
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(eos.propertyName).toBe('objective');
     let NotNormalize = '   Exploration         Objective Service     ';
     let Normalize = 'Exploration Objective Service';

@@ -36,7 +36,7 @@ describe('Create New Skill Modal Service', () => {
   let mockSkillCreationBackendApiService: MockSkillCreationBackendApiService;
 
   class MockNgbModal {
-    open(content, options) {
+    open (content, options) {
       return {
         result: {
           then: (callb) => {
@@ -57,7 +57,7 @@ describe('Create New Skill Modal Service', () => {
   class MockSkillCreationBackendApiService {
     throwError: boolean = false;
     message: string;
-    createSkillAsync(
+    createSkillAsync (
         description: string,
         rubrics,
         explanation: string,

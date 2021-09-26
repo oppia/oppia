@@ -23,7 +23,7 @@ import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
 import { UrlService } from 'services/contextual/url.service';
 
 class MockUrlService {
-  getUsernameFromProfileUrl() {
+  getUsernameFromProfileUrl () {
     return 'username1';
   }
 }
@@ -31,7 +31,7 @@ class MockUrlService {
 let component: ProfilePageNavbarComponent;
 let fixture: ComponentFixture<ProfilePageNavbarComponent>;
 
-describe('Profile Page Navbar Component', function() {
+describe('Profile Page Navbar Component', function () {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ProfilePageNavbarComponent],

@@ -35,13 +35,13 @@ export class LearnerDashboardSuggestionModalComponent
   @Input() oldContent!: string;
   @Input() description!: string;
 
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
   ) {
     super(activeModal);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss('cancel');
   }
 }

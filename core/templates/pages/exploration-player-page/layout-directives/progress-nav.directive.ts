@@ -37,7 +37,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('progressNav', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {
@@ -56,7 +56,7 @@ angular.module('oppia').directive('progressNav', [
         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
-        function(
+        function (
             $scope, $timeout, BrowserCheckerService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService,
@@ -70,7 +70,7 @@ angular.module('oppia').directive('progressNav', [
           var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
             'ItemSelectionInput', 'MultipleChoiceInput'];
 
-          var updateDisplayedCardInfo = function() {
+          var updateDisplayedCardInfo = function () {
             transcriptLength = PlayerTranscriptService.getNumCards();
             $scope.displayedCardIndex =
               PlayerPositionService.getDisplayedCardIndex();
@@ -99,7 +99,7 @@ angular.module('oppia').directive('progressNav', [
             $scope.helpCardHasContinueButton = false;
           };
 
-          var doesInteractionHaveNavSubmitButton = function() {
+          var doesInteractionHaveNavSubmitButton = function () {
             try {
               return (
                 Boolean($scope.interactionId) &&
@@ -114,7 +114,7 @@ angular.module('oppia').directive('progressNav', [
             }
           };
 
-          var doesInteractionHaveSpecialCaseForMobile = function() {
+          var doesInteractionHaveSpecialCaseForMobile = function () {
             // The submit button should be shown:
             // 1. In mobile mode, if the current interaction is either
             //    ItemSelectionInput or MultipleChoiceInput.
@@ -131,7 +131,7 @@ angular.module('oppia').directive('progressNav', [
             }
           };
 
-          $scope.changeCard = function(index) {
+          $scope.changeCard = function (index) {
             if (index >= 0 && index < transcriptLength) {
               PlayerPositionService.recordNavigationButtonClick();
               PlayerPositionService.setDisplayedCardIndex(index);
@@ -145,11 +145,11 @@ angular.module('oppia').directive('progressNav', [
 
           // Returns whether the screen is wide enough to fit two
           // cards (e.g., the tutor and supplemental cards) side-by-side.
-          $scope.canWindowShowTwoCards = function() {
+          $scope.canWindowShowTwoCards = function () {
             return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
           };
 
-          $scope.shouldGenericSubmitButtonBeShown = function() {
+          $scope.shouldGenericSubmitButtonBeShown = function () {
             if (doesInteractionHaveSpecialCaseForMobile()) {
               return true;
             }
@@ -160,7 +160,7 @@ angular.module('oppia').directive('progressNav', [
             ));
           };
 
-          $scope.shouldContinueButtonBeShown = function() {
+          $scope.shouldContinueButtonBeShown = function () {
             if ($scope.conceptCardIsBeingShown) {
               return true;
             }
@@ -170,10 +170,10 @@ angular.module('oppia').directive('progressNav', [
               $scope.displayedCard.getLastOppiaResponse());
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isIframed = UrlService.isIframed();
-            $scope.$watch(function() {
+            $scope.$watch(function () {
               return PlayerPositionService.getDisplayedCardIndex();
             }, updateDisplayedCardInfo);
 
@@ -185,7 +185,7 @@ angular.module('oppia').directive('progressNav', [
               )
             );
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

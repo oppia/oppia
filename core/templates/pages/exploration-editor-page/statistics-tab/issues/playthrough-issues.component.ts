@@ -33,27 +33,27 @@ angular.module('oppia').component('playthroughIssues', {
   template: require('./playthrough-issues.component.html'),
   controller: [
     '$scope', 'PlaythroughIssuesService',
-    function($scope, PlaythroughIssuesService) {
+    function ($scope, PlaythroughIssuesService) {
       var ctrl = this;
-      $scope.getIssueIndex = function(issue) {
+      $scope.getIssueIndex = function (issue) {
         return $scope.issues.indexOf(issue);
       };
 
       $scope.currentIssueIndex = -1;
 
-      $scope.isIssueOnInitDisplay = function(issue) {
+      $scope.isIssueOnInitDisplay = function (issue) {
         return $scope.getIssueIndex(issue) === 0;
       };
 
-      $scope.createIssueNavId = function(issue) {
+      $scope.createIssueNavId = function (issue) {
         return $scope.getIssueIndex(issue) + 1;
       };
 
-      $scope.isIssueDisplayed = function() {
+      $scope.isIssueDisplayed = function () {
         return $scope.currentIssueIndex > -1;
       };
 
-      $scope.makeVisible = function(nextIssueIndex) {
+      $scope.makeVisible = function (nextIssueIndex) {
         if ($scope.isIssueDisplayed()) {
           document.getElementById(
             'issue' + $scope.currentIssueIndex).style.display = 'none';
@@ -72,8 +72,8 @@ angular.module('oppia').component('playthroughIssues', {
           'issueNav' + nextIssueIndex).classList.add('bg-clr');
         $scope.currentIssueIndex = nextIssueIndex;
       };
-      ctrl.$onInit = function() {
-        PlaythroughIssuesService.getIssues().then(function(issues) {
+      ctrl.$onInit = function () {
+        PlaythroughIssuesService.getIssues().then(function (issues) {
           $scope.issues = issues;
         });
       };

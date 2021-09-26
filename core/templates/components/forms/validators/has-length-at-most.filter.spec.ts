@@ -21,18 +21,18 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('components/forms/validators/has-length-at-most.filter.ts');
 
-describe('hasLengthAtMost filter', function() {
+describe('hasLengthAtMost filter', function () {
   var filterName = 'hasLengthAtMost';
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  it('should have the relevant filter', angular.mock.inject(function($filter) {
+  it('should have the relevant filter', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should impose maximum length bounds', angular.mock.inject(
-    function($filter) {
+    function ($filter) {
       var filter = $filter('hasLengthAtMost');
       var args = {
         maxValue: 3

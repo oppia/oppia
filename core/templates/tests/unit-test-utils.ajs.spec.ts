@@ -27,7 +27,7 @@ import { async } from '@angular/core/testing';
   selector: 'mock-ng2-component'
 })
 export class MockNg2Component extends UpgradeComponent {
-  constructor(elementRef: ElementRef, injector: Injector) {
+  constructor (elementRef: ElementRef, injector: Injector) {
     super('mockNg2Component', elementRef, injector);
   }
 }
@@ -40,7 +40,7 @@ describe('setupAndGetUpgradedComponent function', () => {
       'mockNg2Component',
       [MockNg2Component]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
+      async (textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

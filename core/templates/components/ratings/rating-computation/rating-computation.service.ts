@@ -28,7 +28,7 @@ type ExplorationRatingsKey = keyof ExplorationRatings;
   providedIn: 'root'
 })
 export class RatingComputationService {
-  static areRatingsShown(ratingFrequencies: ExplorationRatings): boolean {
+  static areRatingsShown (ratingFrequencies: ExplorationRatings): boolean {
     let MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS: number = 1;
 
     let totalNumber: number = 0;
@@ -42,7 +42,7 @@ export class RatingComputationService {
   // Returns 'null' if the ratings are less than the
   // minimum acceptable number of ratings. The average should
   // not be computed in this case.
-  computeAverageRating(
+  computeAverageRating (
       ratingFrequencies: ExplorationRatings): number | null {
     if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
       return null;

@@ -50,13 +50,13 @@ export class ProgressTabComponent implements OnInit {
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private urlInterpolationService: UrlInterpolationService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
-  async ngOnInit(): Promise<void> {
+  async ngOnInit (): Promise<void> {
     this.width = this.widthConst * (this.completedStoriesList.length);
     this.topicsInSkillProficiency.push(
       ...this.partiallyLearntTopicsList, ...this.learntTopicsList);
@@ -93,20 +93,20 @@ export class ProgressTabComponent implements OnInit {
     this.getTopicMastery();
   }
 
-  showSkills(index: number): void {
+  showSkills (index: number): void {
     this.displaySkills[index] = !this.displaySkills[index];
     this.width = this.widthConst * (this.completedStoriesList.length);
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  getTopicMastery(): void {
+  getTopicMastery (): void {
     let keyArr = Object.keys(this.subtopicMastery);
     for (let i = 0; i < keyArr.length; i++) {
       let valArr = Object.values(this.subtopicMastery[
@@ -118,12 +118,12 @@ export class ProgressTabComponent implements OnInit {
           this.topicsInSkillProficiency[i]]);
     }
     this.topicMastery = this.topicMastery.sort(
-      function(a, b) {
+      function (a, b) {
         return b[0] - a[0];
       });
   }
 
-  calculateCircularProgress(i: number): string {
+  calculateCircularProgress (i: number): string {
     let degree = (90 + (360 * (this.topicMastery[i][0])) / 100);
     let cssStyle = (
       `linear-gradient(${degree}deg, transparent 50%, #CCCCCC 50%)` +

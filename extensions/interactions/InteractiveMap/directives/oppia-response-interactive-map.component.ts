@@ -45,12 +45,12 @@ export class ResponseInteractiveMapComponent implements OnInit {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService,
     private urlInterpolationService: UrlInterpolationService
   ) { }
 
-  private changeMarkerPosition(lat: number, lng: number) {
+  private changeMarkerPosition (lat: number, lng: number) {
     const newMarker = marker(
       [lat, lng],
       {
@@ -80,7 +80,7 @@ export class ResponseInteractiveMapComponent implements OnInit {
     this.mapMarkers = newMarker;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as number[];
     this.mapOptions = {

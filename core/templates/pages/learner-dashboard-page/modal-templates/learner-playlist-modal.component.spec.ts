@@ -23,22 +23,22 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  close(): void {
+  close (): void {
     return;
   }
 
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
 
 class MockUrlInterpolationService {
-  interpolateUrl(): void {
+  interpolateUrl (): void {
     return;
   }
 }
 
-describe('Learner Playlist Modal Component', function() {
+describe('Learner Playlist Modal Component', function () {
   let component: LearnerPlaylistModalComponent;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;

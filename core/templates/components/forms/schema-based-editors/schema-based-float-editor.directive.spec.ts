@@ -29,7 +29,7 @@ describe('Schema Based Float Editor Directive', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     SchemaFormSubmittedService = $injector.get('SchemaFormSubmittedService');
     $timeout = $injector.get('$timeout');

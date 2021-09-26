@@ -29,7 +29,7 @@ interface ValueGeneratorEditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('valueGeneratorEditor', [
-  '$compile', function($compile) {
+  '$compile', function ($compile) {
     return {
       restrict: 'E',
       scope: {
@@ -38,17 +38,17 @@ angular.module('oppia').directive('valueGeneratorEditor', [
         initArgs: '=',
         objType: '='
       },
-      link: function(scope: ValueGeneratorEditorCustomScope, element) {
-        scope.$watch('generatorId', function() {
+      link: function (scope: ValueGeneratorEditorCustomScope, element) {
+        scope.$watch('generatorId', function () {
           var directiveName = scope.generatorId.replace(
             /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-          scope.getGeneratorId = function() {
+          scope.getGeneratorId = function () {
             return scope.generatorId;
           };
-          scope.getInitArgs = function() {
+          scope.getInitArgs = function () {
             return scope.initArgs;
           };
-          scope.getObjType = function() {
+          scope.getObjType = function () {
             return scope.objType;
           };
           element.html(

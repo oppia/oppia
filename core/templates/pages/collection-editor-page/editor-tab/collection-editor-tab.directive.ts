@@ -30,7 +30,7 @@ require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
 angular.module('oppia').directive('collectionEditorTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,20 +41,20 @@ angular.module('oppia').directive('collectionEditorTab', [
       controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService', 'CollectionLinearizerService',
-        function(
+        function (
             CollectionEditorStateService, CollectionLinearizerService) {
           var ctrl = this;
           // Returns a list of collection nodes which represents a valid linear
           // path through the collection.
-          ctrl.getLinearlySortedNodes = function() {
+          ctrl.getLinearlySortedNodes = function () {
             return (
               CollectionLinearizerService.getCollectionNodesInPlayableOrder(
                 ctrl.collection));
           };
-          ctrl.hasLoadedCollection = function() {
+          ctrl.hasLoadedCollection = function () {
             return CollectionEditorStateService.hasLoadedCollection();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.collection = CollectionEditorStateService.getCollection();
           };
         }

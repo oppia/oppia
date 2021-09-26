@@ -23,13 +23,13 @@ import { UploadActivityModalComponent } from './upload-activity-modal.component'
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
 
 class MockAlertsService {
-  addWarning() {
+  addWarning () {
     return null;
   }
 }

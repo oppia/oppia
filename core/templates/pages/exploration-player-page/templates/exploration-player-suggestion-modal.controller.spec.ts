@@ -35,7 +35,7 @@ import {AudioTranslationLanguageService} from
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Exploration Player Suggestion Modal Controller', function() {
+describe('Exploration Player Suggestion Modal Controller', function () {
   importAllAngularServices();
 
   var $flushPendingTasks = null;
@@ -54,7 +54,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function() {
+  beforeEach(function () {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     playerPositionService = TestBed.get(PlayerPositionService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
@@ -65,7 +65,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       AudioTranslationLanguageService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
@@ -106,7 +106,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.originalHtml).toBe('Content html');
       expect($scope.description).toBe('');
       $scope.updateValue('Content html');
@@ -116,14 +116,14 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       expect($scope.showEditor).toBe(false);
     });
 
-  it('should show editor when flushing timeout task', function() {
+  it('should show editor when flushing timeout task', function () {
     expect($scope.showEditor).toBe(false);
     $flushPendingTasks();
     expect($scope.showEditor).toBe(true);
   });
 
   it('should cancel suggestion in suggestion modal when clicking cancel' +
-    ' suggestion button', function() {
+    ' suggestion button', function () {
     spyOn(suggestionModalService, 'cancelSuggestion').and.callThrough();
     $scope.cancelSuggestion();
 
@@ -131,7 +131,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       $uibModalInstance);
   });
 
-  it('should submit a suggestion when closing the modal', function() {
+  it('should submit a suggestion when closing the modal', function () {
     spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue('exp1');
     spyOn(ExplorationEngineService, 'getExplorationVersion').and.returnValue(
       '1');

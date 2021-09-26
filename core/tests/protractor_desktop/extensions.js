@@ -31,24 +31,24 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('rich-text components', function() {
+describe('rich-text components', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display correctly', async function() {
+  it('should display correctly', async function () {
     await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
 
     await workflow.createExploration(true);
 
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+    await explorationEditorMainTab.setContent(async function (richTextEditor) {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText(' ');
       // TODO(Jacob): Add test for image RTE component.
@@ -70,7 +70,7 @@ describe('rich-text components', function() {
 
     await explorationEditorPage.navigateToPreviewTab();
     await explorationPlayerPage.expectContentToMatch(
-      async function(richTextChecker) {
+      async function (richTextChecker) {
         await richTextChecker.readBoldText('bold');
         await richTextChecker.readPlainText(' ');
         await richTextChecker.readRteComponent(
@@ -96,7 +96,7 @@ describe('rich-text components', function() {
   // and tabs. Previous attempts at such a test intermittently fail with the
   // rich-text checker unable to read the formatted text.
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([
       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
@@ -111,14 +111,14 @@ describe('rich-text components', function() {
 });
 
 
-describe('Interactions', function() {
+describe('Interactions', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -126,7 +126,7 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should pass their own test suites', async function() {
+  it('should pass their own test suites', async function () {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
@@ -213,7 +213,7 @@ describe('Interactions', function() {
     await users.logout();
   });
 
-  it('should publish and play exploration successfully', async function() {
+  it('should publish and play exploration successfully', async function () {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.
      */
@@ -242,7 +242,7 @@ describe('Interactions', function() {
       'connected by an edge.'));
 
     await explorationEditorMainTab.moveToState('MathExp');
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+    await explorationEditorMainTab.setContent(async function (richTextEditor) {
       await richTextEditor.appendPlainText(
         'Please simplify the following expression: 16x^{12}/4x^2');
     });
@@ -300,7 +300,7 @@ describe('Interactions', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

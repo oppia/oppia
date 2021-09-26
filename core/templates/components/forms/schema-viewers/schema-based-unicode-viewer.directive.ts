@@ -20,7 +20,7 @@ require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('schemaBasedUnicodeViewer', [
-  function() {
+  function () {
     return {
       scope: {
         localValue: '='
@@ -31,8 +31,8 @@ angular.module('oppia').directive('schemaBasedUnicodeViewer', [
       restrict: 'E',
       controller: [
         '$filter', '$sce', '$scope',
-        function($filter, $sce, $scope) {
-          $scope.getDisplayedValue = function() {
+        function ($filter, $sce, $scope) {
+          $scope.getDisplayedValue = function () {
             return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
               $scope.localValue));
           };

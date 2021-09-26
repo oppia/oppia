@@ -35,7 +35,7 @@ require('services/stateful/focus-manager.service.ts');
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
 angular.module('oppia').directive('feedbackPopup', [
-  'ExplorationEngineService', function(ExplorationEngineService) {
+  'ExplorationEngineService', function (ExplorationEngineService) {
     return {
       restrict: 'E',
       scope: {},
@@ -44,7 +44,7 @@ angular.module('oppia').directive('feedbackPopup', [
         '$element', '$http', '$log', '$rootScope', '$scope', '$timeout',
         'BackgroundMaskService', 'FocusManagerService',
         'PlayerPositionService', 'UserService',
-        'WindowDimensionsService', function(
+        'WindowDimensionsService', function (
             $element, $http, $log, $rootScope, $scope, $timeout,
             BackgroundMaskService, FocusManagerService,
             PlayerPositionService, UserService,
@@ -54,7 +54,7 @@ angular.module('oppia').directive('feedbackPopup', [
             '/explorehandler/give_feedback/' +
             ExplorationEngineService.getExplorationId());
 
-          var getTriggerElt = function() {
+          var getTriggerElt = function () {
             // Find the popover trigger node (the one with a popover-template
             // attribute). This is also the DOM node that contains the state
             // name. Since the popover DOM node is inserted as a sibling to the
@@ -99,7 +99,7 @@ angular.module('oppia').directive('feedbackPopup', [
             return triggerElt;
           };
 
-          $scope.saveFeedback = function() {
+          $scope.saveFeedback = function () {
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
                 subject: $scope.feedbackTitle,
@@ -109,7 +109,7 @@ angular.module('oppia').directive('feedbackPopup', [
                 state_name: PlayerPositionService.getCurrentStateName()
               }).then(() => {
                 $scope.feedbackSubmitted = true;
-                $timeout(function() {
+                $timeout(function () {
                   var triggerElt = getTriggerElt();
                   if (triggerElt) {
                     triggerElt.trigger('click');
@@ -119,22 +119,22 @@ angular.module('oppia').directive('feedbackPopup', [
             }
           };
 
-          $scope.closePopover = function() {
+          $scope.closePopover = function () {
             // Closing the popover is done by clicking on the popover trigger.
             // The timeout is needed to postpone the click event to
             // the subsequent digest cycle. Otherwise, an "$apply already
             // in progress" error is raised.
-            $timeout(function() {
+            $timeout(function () {
               getTriggerElt().trigger('click');
             });
             BackgroundMaskService.deactivateMask();
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.feedbackText = '';
             $scope.isSubmitterAnonymized = false;
             $scope.isLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function (userInfo) {
               $scope.isLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
@@ -154,7 +154,7 @@ angular.module('oppia').directive('feedbackPopup', [
             }
 
             FocusManagerService.setFocus($scope.feedbackPopoverId);
-            $scope.$on('$destroy', function() {
+            $scope.$on('$destroy', function () {
               BackgroundMaskService.deactivateMask();
             });
           };

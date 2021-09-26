@@ -30,7 +30,7 @@ describe('InteractiveFractionInputComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         requireSimplestForm: {
           value: JSON.parse(attributes.requireSimplestFormWithValue)
@@ -289,7 +289,7 @@ describe('InteractiveFractionInputComponent', () => {
       .toBe(false);
   });
 
-  it('should unsubscribe when component is destroyed', function() {
+  it('should unsubscribe when component is destroyed', function () {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();
 
     expect(component.componentSubscriptions.closed).toBe(false);

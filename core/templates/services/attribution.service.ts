@@ -30,14 +30,14 @@ export class AttributionService {
   attributionModalIsShown: boolean = false;
   authors: string[] = [];
   explorationTitle: string = '';
-  constructor(
+  constructor (
     private applicationRef: ApplicationRef,
     private contextService: ContextService,
     private explorationSummaryBackendApiService: (
       ExplorationSummaryBackendApiService)
   ) {}
 
-  init(): void {
+  init (): void {
     this.explorationSummaryBackendApiService
       .loadPublicAndPrivateExplorationSummariesAsync(
         [this.contextService.getExplorationId()]).then(responseObject => {
@@ -62,27 +62,27 @@ export class AttributionService {
       }, () => {});
   }
 
-  isGenerateAttributionAllowed(): boolean {
+  isGenerateAttributionAllowed (): boolean {
     return this.contextService.isInExplorationPlayerPage();
   }
 
-  showAttributionModal(): void {
+  showAttributionModal (): void {
     this.attributionModalIsShown = true;
   }
 
-  hideAttributionModal(): void {
+  hideAttributionModal (): void {
     this.attributionModalIsShown = false;
   }
 
-  isAttributionModalShown(): boolean {
+  isAttributionModalShown (): boolean {
     return this.attributionModalIsShown;
   }
 
-  getAuthors(): string[] {
+  getAuthors (): string[] {
     return this.authors;
   }
 
-  getExplorationTitle(): string {
+  getExplorationTitle (): string {
     return this.explorationTitle;
   }
 }

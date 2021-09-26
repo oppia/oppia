@@ -30,11 +30,11 @@ export class ShortResponseFractionInput {
   @Input() answer: string = '';
   escapedAnswer: string = '';
 
-  constructor(
+  constructor (
     private readonly htmlEscaperService: HtmlEscaperService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const fraction: FractionAnswer = (
       this.htmlEscaperService.escapedJsonToObj(this.answer) as FractionAnswer);
     this.escapedAnswer = Fraction.fromDict(fraction).toString();

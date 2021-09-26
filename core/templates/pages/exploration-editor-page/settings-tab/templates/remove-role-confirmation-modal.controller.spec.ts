@@ -20,14 +20,14 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-describe('Remove Role Confirm Or Cancel Modal Controller ', function() {
+describe('Remove Role Confirm Or Cancel Modal Controller ', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var testUsername = 'testUsername';
   var testRole = 'testRoleEditor';
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
@@ -40,7 +40,7 @@ describe('Remove Role Confirm Or Cancel Modal Controller ', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.username).toBe(testUsername);
       expect($scope.role).toEqual(testRole);
     });

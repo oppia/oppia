@@ -19,7 +19,7 @@
 import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/task-entry.model';
 
-describe('Task entry model', function() {
+describe('Task entry model', function () {
   it('should use same values from backend dict', () => {
     const taskBackendDict: TaskEntryBackendDict = {
       entity_type: 'exploration',

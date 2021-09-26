@@ -22,7 +22,7 @@ describe('randomSelector', () => {
   let $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function(
+  beforeEach(angular.mock.inject(function (
       $injector, $componentController, $compile) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();

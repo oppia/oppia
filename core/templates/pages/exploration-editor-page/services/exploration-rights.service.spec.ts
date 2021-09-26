@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 
-describe('Exploration rights service', function() {
+describe('Exploration rights service', function () {
   var ers, als;
   var $httpBackend = null;
   var CsrfService = null;
@@ -43,7 +43,7 @@ describe('Exploration rights service', function() {
   var clearWarningsSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'ExplorationDataService', {
         explorationId: '12345',
@@ -52,19 +52,19 @@ describe('Exploration rights service', function() {
         }
       });
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function ($injector, $q) {
     ers = $injector.get('ExplorationRightsService');
     als = $injector.get('AlertsService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function () {
       var deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
@@ -73,7 +73,7 @@ describe('Exploration rights service', function() {
     clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
   }));
 
-  it('should correctly initializes the service', function() {
+  it('should correctly initializes the service', function () {
     expect(ers.ownerNames).toBeUndefined();
     expect(ers.editorNames).toBeUndefined();
     expect(ers.voiceArtistNames).toBeUndefined();
@@ -108,7 +108,7 @@ describe('Exploration rights service', function() {
       sampleDataResults.rights.viewable_if_private);
   });
 
-  it('should reports the correct cloning status', function() {
+  it('should reports the correct cloning status', function () {
     ers.init(['abc'], [], [], [], 'public', '1234', true);
     expect(ers.isCloned()).toBe(true);
     expect(ers.clonedFrom()).toEqual('1234');
@@ -118,7 +118,7 @@ describe('Exploration rights service', function() {
     expect(ers.clonedFrom()).toBeNull();
   });
 
-  it('should reports the correct community-owned status', function() {
+  it('should reports the correct community-owned status', function () {
     ers.init(['abc'], [], [], [], 'public', '1234', false);
     expect(ers.isCommunityOwned()).toBe(false);
 
@@ -126,7 +126,7 @@ describe('Exploration rights service', function() {
     expect(ers.isCommunityOwned()).toBe(true);
   });
 
-  it('should reports the correct derived statuses', function() {
+  it('should reports the correct derived statuses', function () {
     ers.init(['abc'], [], [], [], 'private', 'e1234', true);
     expect(ers.isPrivate()).toBe(true);
     expect(ers.isPublic()).toBe(false);
@@ -137,7 +137,7 @@ describe('Exploration rights service', function() {
   });
 
   it('should reports correcty if exploration rights is viewable when private',
-    function() {
+    function () {
       ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
       expect(ers.viewableIfPrivate()).toBe(true);
 
@@ -145,12 +145,12 @@ describe('Exploration rights service', function() {
       expect(ers.viewableIfPrivate()).toBe(false);
     });
 
-  it('should change community owned to true', function() {
+  it('should change community owned to true', function () {
     ers.init(['abc'], [], [], [], 'private', 'e1234', false, true);
 
     $httpBackend.expectPUT('/createhandler/rights/12345').respond(
       200, sampleDataResults);
-    ers.makeCommunityOwned().then(function() {
+    ers.makeCommunityOwned().then(function () {
       expect(clearWarningsSpy).toHaveBeenCalled();
       expect(ers.isCommunityOwned()).toBe(true);
     });
@@ -158,7 +158,7 @@ describe('Exploration rights service', function() {
   });
 
   it('should use reject handler when changing community owned to true fails',
-    function() {
+    function () {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
@@ -175,20 +175,20 @@ describe('Exploration rights service', function() {
       expect(failHandler).toHaveBeenCalled();
     });
 
-  it('should change exploration right viewability', function() {
+  it('should change exploration right viewability', function () {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.viewable_if_private = true;
 
     $httpBackend.expectPUT('/createhandler/rights/12345').respond(
       200, sampleDataResultsCopy);
-    ers.setViewability(true).then(function() {
+    ers.setViewability(true).then(function () {
       expect(ers.viewableIfPrivate()).toBe(true);
     });
     $httpBackend.flush();
   });
 
   it('should use reject when changing exploration right viewability fails',
-    function() {
+    function () {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
@@ -205,20 +205,20 @@ describe('Exploration rights service', function() {
       expect(failHandler).toHaveBeenCalled();
     });
 
-  it('should save a new member', function() {
+  it('should save a new member', function () {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.viewer_names.push('newUser');
 
     $httpBackend.expectPUT('/createhandler/rights/12345').respond(
       200, sampleDataResultsCopy);
-    ers.saveRoleChanges('newUser', 'viewer').then(function() {
+    ers.saveRoleChanges('newUser', 'viewer').then(function () {
       expect(ers.viewerNames).toEqual(
         sampleDataResultsCopy.rights.viewer_names);
     });
     $httpBackend.flush();
   });
 
-  it('should remove existing user', function() {
+  it('should remove existing user', function () {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.viewer_names.push('newUser');
 
@@ -239,7 +239,7 @@ describe('Exploration rights service', function() {
       sampleDataResultsCopy.rights.viewer_names);
   });
 
-  it('should save a new voice artist', function() {
+  it('should save a new voice artist', function () {
     ers.init(['abc'], [], [], [], 'public', '1234', true);
     expect(ers.voiceArtistNames).toEqual([]);
 
@@ -255,7 +255,7 @@ describe('Exploration rights service', function() {
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
   });
 
-  it('should remove existing voice artist', function() {
+  it('should remove existing voice artist', function () {
     ers.init(['abc'], [], ['voiceArtist'], [], 'public', '1234', true);
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
 
@@ -276,7 +276,7 @@ describe('Exploration rights service', function() {
     expect(ers.voiceArtistNames).toEqual([]);
   });
 
-  it('should check user already has roles', function() {
+  it('should check user already has roles', function () {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');
@@ -301,7 +301,7 @@ describe('Exploration rights service', function() {
     expect(ers.checkUserAlreadyHasRoles('notInAllUsersList')).toBeFalsy();
   });
 
-  it('should check oldrole of user', function() {
+  it('should check oldrole of user', function () {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');
@@ -325,7 +325,7 @@ describe('Exploration rights service', function() {
     expect(ers.getOldRole('newVoiceArtist')).toEqual('voice artist');
   });
 
-  it('should reject handler when saving a new member fails', function() {
+  it('should reject handler when saving a new member fails', function () {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -339,20 +339,20 @@ describe('Exploration rights service', function() {
     expect(failHandler).toHaveBeenCalled();
   });
 
-  it('should make exploration rights public', function() {
+  it('should make exploration rights public', function () {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.status = 'public';
 
     $httpBackend.expectPUT('/createhandler/status/12345').respond(
       200, sampleDataResultsCopy);
-    ers.publish(true).then(function() {
+    ers.publish(true).then(function () {
       expect(ers.isPublic()).toBe(true);
     });
     $httpBackend.flush();
   });
 
   it('should call reject handler when making exploration rights public fails',
-    function() {
+    function () {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
@@ -366,7 +366,7 @@ describe('Exploration rights service', function() {
       expect(failHandler).toHaveBeenCalled();
     });
 
-  it('should save moderator change to backend', function() {
+  it('should save moderator change to backend', function () {
     $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
       200, sampleDataResults);
     ers.saveModeratorChangeToBackendAsync();
@@ -387,7 +387,7 @@ describe('Exploration rights service', function() {
   });
 
   it('should reject handler when saving moderator change to backend fails',
-    function() {
+    function () {
       $httpBackend.expectPUT('/createhandler/moderatorrights/12345')
         .respond(500);
       ers.saveModeratorChangeToBackendAsync();

@@ -28,11 +28,11 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
   providedIn: 'root'
 })
 export class QuestionSuggestionBackendApiService {
-  constructor(
+  constructor (
     private httpClient: HttpClient
   ) {}
 
-  async submitSuggestionAsync(
+  async submitSuggestionAsync (
       question: Question,
       associatedSkill: Skill,
       skillDifficulty: SkillDifficulty,

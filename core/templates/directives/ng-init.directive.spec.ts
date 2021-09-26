@@ -25,7 +25,7 @@ import { NgInitDirective } from './ng-init.directive';
   template: '<div (oppiaNgInit)="divInitialized()"></div>'
 })
 class MockCompA {
-  divInitialized(): void {
+  divInitialized (): void {
     return;
   }
 }

@@ -69,13 +69,13 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 })
 class ContributorDashboardAdminPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+  ngDoBootstrap () {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ContributorDashboardAdminPageModule);
 };

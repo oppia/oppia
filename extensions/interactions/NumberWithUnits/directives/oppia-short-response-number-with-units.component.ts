@@ -24,10 +24,10 @@ angular.module('oppia').component('oppiaShortResponseNumberWithUnits', {
   controllerAs: '$ctrl',
   controller: [
     '$attrs', 'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
-    function(
+    function (
         $attrs, HtmlEscaperService, NumberWithUnitsObjectFactory) {
       var ctrl = this;
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
           answer).toString();

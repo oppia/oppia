@@ -50,14 +50,14 @@ export class InteractiveSetInputComponent implements OnInit {
   };
   buttonText: string;
 
-  constructor(
+  constructor (
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
     private setInputRulesService: SetInputRulesService
   ) { }
 
-  private hasDuplicates(answer) {
+  private hasDuplicates (answer) {
     for (var i = 0; i < answer.length; i++) {
       for (var j = 0; j < i; j++) {
         if (eq(answer[i], answer[j])) {
@@ -68,24 +68,24 @@ export class InteractiveSetInputComponent implements OnInit {
     return false;
   }
 
-  private hasBlankOption(answer) {
+  private hasBlankOption (answer) {
     return answer.some((element) => {
       return (element === '');
     });
   }
 
-  updateAnswer(answer: number[]): void {
+  updateAnswer (answer: number[]): void {
     if (this.answer === answer) {
       return;
     }
     this.answer = answer;
   }
 
-  getSchema(): Schema {
+  getSchema (): Schema {
     return this.schema as unknown as Schema;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const {
       buttonText
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
@@ -117,7 +117,7 @@ export class InteractiveSetInputComponent implements OnInit {
       () => this.submitAnswer(this.answer), () => this.isAnswerValid());
   }
 
-  submitAnswer(answer: unknown): void {
+  submitAnswer (answer: unknown): void {
     if (this.hasDuplicates(answer)) {
       this.errorMessage = (
         'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
@@ -129,7 +129,7 @@ export class InteractiveSetInputComponent implements OnInit {
     }
   }
 
-  isAnswerValid(): boolean {
+  isAnswerValid (): boolean {
     return (
       this.answer.length > 0 && !this.hasBlankOption(this.answer));
   }

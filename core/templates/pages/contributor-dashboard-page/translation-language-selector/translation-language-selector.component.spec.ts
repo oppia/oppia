@@ -43,7 +43,7 @@ describe('Translation language selector', () => {
 
   let contributionOpportunitiesBackendApiServiceStub:
     Partial<ContributionOpportunitiesBackendApiService> = {
-      fetchFeaturedTranslationLanguagesAsync: async() =>
+      fetchFeaturedTranslationLanguagesAsync: async () =>
         Promise.resolve(featuredLanguages)
     };
 

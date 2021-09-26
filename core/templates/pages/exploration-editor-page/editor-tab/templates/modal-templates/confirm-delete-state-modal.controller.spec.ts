@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for ConfirmDeleteStateModalController.
  */
 
-describe('Confirm Delete State Modal Controller', function() {
+describe('Confirm Delete State Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
 
   var deleteStateName = 'Introduction';
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -38,7 +38,7 @@ describe('Confirm Delete State Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.deleteStateWarningText).toBe(
         'Are you sure you want to delete the card "Introduction"?');
     });

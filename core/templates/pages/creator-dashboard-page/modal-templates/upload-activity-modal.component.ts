@@ -29,11 +29,11 @@ interface ExplorationObj {
   templateUrl: './upload-activity-modal.component.html',
 })
 export class UploadActivityModalComponent {
-  constructor(
+  constructor (
      private alertsService: AlertsService,
      private activeModal: NgbActiveModal
   ) {}
-  save(): void {
+  save (): void {
     let returnObj: ExplorationObj = {
       yamlFile: null
     };
@@ -54,7 +54,7 @@ export class UploadActivityModalComponent {
     this.activeModal.dismiss(returnObj);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 }

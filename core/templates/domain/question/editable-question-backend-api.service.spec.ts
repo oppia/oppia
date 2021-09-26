@@ -24,7 +24,7 @@ import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Editable question backend API service', function() {
+describe('Editable question backend API service', function () {
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
   let questionObjectFactory: QuestionObjectFactory = null;
   let sampleDataResults = null;
@@ -45,7 +45,7 @@ describe('Editable question backend API service', function() {
     questionObjectFactory = TestBed.get(QuestionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     csrfService = TestBed.get(CsrfTokenService);
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
     // Sample question object returnable from the backend.

@@ -40,7 +40,7 @@ describe('Start new beam job dialog', () => {
   let alertsService: AlertsService;
   let matDialogRef: MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun>;
 
-  beforeEach(waitForAsync(async() => {
+  beforeEach(waitForAsync(async () => {
     const mockDialogRef = { disableClose: false, close: () => {} };
 
     TestBed.configureTestingModule({
@@ -106,7 +106,7 @@ describe('Start new beam job dialog', () => {
     expect(closeDialogSpy).toHaveBeenCalledWith(newBeamJobRun);
   });
 
-  it('should show the error dialog if the operation failed', async() => {
+  it('should show the error dialog if the operation failed', async () => {
     const error = new Error();
     const startNewBeamJobSpy = spyOn(backendApiService, 'startNewBeamJob')
       .and.returnValue(throwError(error));

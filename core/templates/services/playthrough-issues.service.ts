@@ -29,28 +29,28 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
   'ImprovementModalService', 'PlaythroughIssuesBackendApiService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-  function(
+  function (
       ImprovementModalService, PlaythroughIssuesBackendApiService,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var explorationId = null;
     var explorationVersion = null;
 
-    var renderEarlyQuitIssueStatement = function() {
+    var renderEarlyQuitIssueStatement = function () {
       return 'Several learners exited the exploration in less than a minute.';
     };
 
-    var renderMultipleIncorrectIssueStatement = function(stateName) {
+    var renderMultipleIncorrectIssueStatement = function (stateName) {
       return 'Several learners submitted answers to card "' + stateName +
         '" several times, then gave up and quit.';
     };
 
-    var renderCyclicTransitionsIssueStatement = function(stateName) {
+    var renderCyclicTransitionsIssueStatement = function (stateName) {
       return 'Several learners ended up in a cyclic loop revisiting card "' +
         stateName + '" many times.';
     };
 
-    var renderEarlyQuitIssueSuggestions = function(stateName) {
+    var renderEarlyQuitIssueSuggestions = function (stateName) {
       var suggestions = [(
         'Review the cards up to and including "' + stateName +
         '" for errors, ' + 'ambiguities, or insufficient motivation.'),
@@ -58,7 +58,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       return suggestions;
     };
 
-    var renderMultipleIncorrectIssueSuggestions = function(stateName) {
+    var renderMultipleIncorrectIssueSuggestions = function (stateName) {
       var suggestions = [(
         'Check the wording of the card "' + stateName + '" to ensure it is ' +
         'not confusing.'), (
@@ -68,7 +68,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       return suggestions;
     };
 
-    var renderCyclicTransitionsIssueSuggestions = function(stateNames) {
+    var renderCyclicTransitionsIssueSuggestions = function (stateNames) {
       var finalIndex = stateNames.length - 1;
       var suggestions = [(
         'Check that the concept presented in "' + stateNames[0] + '" has ' +
@@ -87,19 +87,19 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
        * @param {number} newExplorationVersion - the version of the exploration
        *    the service will be targeting.
        */
-      initSession: function(newExplorationId, newExplorationVersion) {
+      initSession: function (newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
       },
-      getIssues: function() {
+      getIssues: function () {
         return PlaythroughIssuesBackendApiService.fetchIssuesAsync(
           explorationId, explorationVersion);
       },
-      getPlaythrough: function(playthroughId) {
+      getPlaythrough: function (playthroughId) {
         return PlaythroughIssuesBackendApiService.fetchPlaythroughAsync(
           explorationId, playthroughId);
       },
-      renderIssueStatement: function(issue) {
+      renderIssueStatement: function (issue) {
         var issueType = issue.issueType;
         if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueStatement();
@@ -111,7 +111,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
             issue.issueCustomizationArgs.state_names.value[0]);
         }
       },
-      renderIssueSuggestions: function(issue) {
+      renderIssueSuggestions: function (issue) {
         var issueType = issue.issueType;
         if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueSuggestions(
@@ -124,12 +124,12 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
             issue.issueCustomizationArgs.state_names.value);
         }
       },
-      resolveIssue: function(issue) {
+      resolveIssue: function (issue) {
         return PlaythroughIssuesBackendApiService.resolveIssueAsync(
           issue, explorationId, explorationVersion);
       },
-      openPlaythroughModal: function(playthroughId, index) {
-        this.getPlaythrough(playthroughId).then(function(playthrough) {
+      openPlaythroughModal: function (playthroughId, index) {
+        this.getPlaythrough(playthroughId).then(function (playthrough) {
           ImprovementModalService.openPlaythroughModal(playthrough, index);
         });
       },

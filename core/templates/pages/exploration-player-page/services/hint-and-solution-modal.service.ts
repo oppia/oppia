@@ -27,11 +27,11 @@ import { DisplaySolutionModalComponent } from '../modals/display-solution-modal.
   providedIn: 'root'
 })
 export class HintAndSolutionModalService {
-  constructor(
+  constructor (
     private ngbModal: NgbModal
   ) {}
 
-  displayHintModal(index: number): NgbModalRef {
+  displayHintModal (index: number): NgbModalRef {
     let modalRef: NgbModalRef = this.ngbModal.open(
       DisplayHintModalComponent, {
         backdrop: 'static'
@@ -40,13 +40,13 @@ export class HintAndSolutionModalService {
     return modalRef;
   }
 
-  displaySolutionModal(): NgbModalRef {
+  displaySolutionModal (): NgbModalRef {
     return this.ngbModal.open(DisplaySolutionModalComponent, {
       backdrop: 'static'
     });
   }
 
-  displaySolutionInterstitialModal(): NgbModalRef {
+  displaySolutionInterstitialModal (): NgbModalRef {
     return this.ngbModal.open(DisplaySolutionInterstititalModalComponent, {
       backdrop: 'static'
     });

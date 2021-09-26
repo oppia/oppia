@@ -38,12 +38,12 @@ export class RemoveActivityModalComponent implements OnInit {
   @Input() activityTitle!: string;
   removeActivityUrl!: string;
 
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let activityType = '';
     if (this.subsectionName ===
       LearnerDashboardPageConstants
@@ -92,11 +92,11 @@ export class RemoveActivityModalComponent implements OnInit {
         }));
   }
 
-  remove(): void {
+  remove (): void {
     this.activeModal.close(this.removeActivityUrl);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 }

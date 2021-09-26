@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/practice-session-page/practice-session-page.component.ts');
 
-describe('Practice session page', function() {
+describe('Practice session page', function () {
   var ctrl = null;
   var $httpBackend = null;
   var $scope = null;
@@ -31,14 +31,14 @@ describe('Practice session page', function() {
   var PageTitleService = null;
   var UrlService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $httpBackend = $injector.get('$httpBackend');
     var $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
@@ -56,7 +56,7 @@ describe('Practice session page', function() {
   }));
 
   it('should load topic based on its id on url when component is initialized' +
-    ' and set page title', function() {
+    ' and set page title', function () {
     spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'abbrev-topic');
     spyOn(UrlService, 'getSelectedSubtopicsFromUrl').and.returnValue(

@@ -40,7 +40,7 @@ export interface ExplorationOpportunitiesDict {
   providedIn: 'root'
 })
 export class ContributionOpportunitiesService {
-  constructor(
+  constructor (
     private readonly contributionOpportunitiesBackendApiService:
       ContributionOpportunitiesBackendApiService,
       private readonly modalService: NgbModal) {}
@@ -57,7 +57,7 @@ export class ContributionOpportunitiesService {
   private _moreTranslationOpportunitiesAvailable: boolean = true;
   private _moreVoiceoverOpportunitiesAvailable: boolean = true;
 
-  private async _getSkillOpportunitiesAsync(cursor: string):
+  private async _getSkillOpportunitiesAsync (cursor: string):
   Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor)
@@ -71,7 +71,7 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private async _getTranslationOpportunitiesAsync(
+  private async _getTranslationOpportunitiesAsync (
       languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(languageCode, cursor)
@@ -85,7 +85,7 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private async _getVoiceoverOpportunitiesAsync(
+  private async _getVoiceoverOpportunitiesAsync (
       languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
       .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
@@ -99,31 +99,31 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  showRequiresLoginModal(): void {
+  showRequiresLoginModal (): void {
     this.modalService.open(LoginRequiredModalContent);
   }
 
-  async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  async getSkillOpportunitiesAsync (): Promise<SkillOpportunitiesDict> {
     return this._getSkillOpportunitiesAsync('');
   }
 
-  async getTranslationOpportunitiesAsync(languageCode: string):
+  async getTranslationOpportunitiesAsync (languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     return this._getTranslationOpportunitiesAsync(languageCode, '');
   }
 
-  async getVoiceoverOpportunitiesAsync(languageCode: string):
+  async getVoiceoverOpportunitiesAsync (languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     return this._getVoiceoverOpportunitiesAsync(languageCode, '');
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  async getMoreSkillOpportunitiesAsync (): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
   }
 
-  async getMoreTranslationOpportunitiesAsync(languageCode: string):
+  async getMoreTranslationOpportunitiesAsync (languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
@@ -131,7 +131,7 @@ export class ContributionOpportunitiesService {
     }
   }
 
-  async getMoreVoiceoverOpportunitiesAsync(languageCode: string):
+  async getMoreVoiceoverOpportunitiesAsync (languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunitiesAsync(
@@ -139,11 +139,11 @@ export class ContributionOpportunitiesService {
     }
   }
 
-  get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
+  get reloadOpportunitiesEventEmitter (): EventEmitter<void> {
     return this._reloadOpportunitiesEventEmitter;
   }
 
-  get removeOpportunitiesEventEmitter(): EventEmitter<string[]> {
+  get removeOpportunitiesEventEmitter (): EventEmitter<string[]> {
     return this._removeOpportunitiesEventEmitter;
   }
 }

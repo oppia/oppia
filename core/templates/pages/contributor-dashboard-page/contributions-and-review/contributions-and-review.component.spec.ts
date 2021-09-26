@@ -23,7 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
-describe('Contributions and review component', function() {
+describe('Contributions and review component', function () {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
@@ -42,8 +42,8 @@ describe('Contributions and review component', function() {
 
   importAllAngularServices();
 
-  describe('when user is allowed to review questions', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when user is allowed to review questions', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -180,7 +180,7 @@ describe('Contributions and review component', function() {
     }));
 
     it('should initialize $scope properties after controller is' +
-      ' initialized', function() {
+      ' initialized', function () {
       expect(ctrl.activeTabType).toBe('reviews');
       expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
@@ -225,7 +225,7 @@ describe('Contributions and review component', function() {
     });
 
     it('should open show translation suggestion modal when clicking on' +
-      ' suggestion', function() {
+      ' suggestion', function () {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
           ctrl.loadContributions().then(() => {
@@ -241,7 +241,7 @@ describe('Contributions and review component', function() {
     });
 
     it('should resolve suggestion when closing show suggestion modal',
-      function() {
+      function () {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
             ctrl.loadContributions().then(() => {
@@ -263,7 +263,7 @@ describe('Contributions and review component', function() {
       });
 
     it('should not resolve suggestion when dismissing show suggestion modal',
-      function() {
+      function () {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
             ctrl.loadContributions().then(() => {
@@ -281,8 +281,8 @@ describe('Contributions and review component', function() {
       });
   });
 
-  describe('for the suggestion related to deleted opportunity', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('for the suggestion related to deleted opportunity', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
@@ -458,7 +458,7 @@ describe('Contributions and review component', function() {
       $scope.$apply();
     }));
 
-    it('should show correct heading for translation suggestions', function() {
+    it('should show correct heading for translation suggestions', function () {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
           ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
@@ -484,7 +484,7 @@ describe('Contributions and review component', function() {
           .emit).toHaveBeenCalled();
     });
 
-    it('should show correct heading for question suggestions', function() {
+    it('should show correct heading for question suggestions', function () {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
           ctrl.loadContributions();
@@ -508,8 +508,8 @@ describe('Contributions and review component', function() {
     });
   });
 
-  describe('when user is not allowed to review questions', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when user is not allowed to review questions', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
@@ -693,7 +693,7 @@ describe('Contributions and review component', function() {
     }));
 
     it('should initialize $scope properties after controller is' +
-      ' initialized', function() {
+      ' initialized', function () {
       expect(ctrl.activeTabType).toBe('contributions');
       expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
@@ -702,7 +702,7 @@ describe('Contributions and review component', function() {
     });
 
     it('should emit reload even when when switching to translation' +
-      ' in review tab', function() {
+      ' in review tab', function () {
       spyOn(
         contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
         'emit').and.callThrough();
@@ -716,10 +716,10 @@ describe('Contributions and review component', function() {
     });
 
     it('should open show view question modal when clicking on' +
-      ' question suggestion', function() {
+      ' question suggestion', function () {
       spyOn($uibModal, 'open').and.callThrough();
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      ctrl.loadContributions().then(function() {
+      ctrl.loadContributions().then(function () {
         ctrl.onClickViewSuggestion('suggestion_1');
         $scope.$apply();
 
@@ -728,7 +728,7 @@ describe('Contributions and review component', function() {
     });
 
     it('should resolve suggestion to skill when closing show question' +
-      ' suggestion modal', function() {
+      ' suggestion modal', function () {
       $httpBackend.expectPUT(
         '/suggestionactionhandler/skill/1/suggestion_1').respond(200);
       spyOn($uibModal, 'open').and.returnValue({
@@ -736,7 +736,7 @@ describe('Contributions and review component', function() {
       });
 
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      ctrl.loadContributions().then(function() {
+      ctrl.loadContributions().then(function () {
         expect(Object.keys(ctrl.contributions).length).toBe(1);
         ctrl.onClickViewSuggestion('suggestion_1');
         $scope.$apply();
@@ -747,14 +747,14 @@ describe('Contributions and review component', function() {
     });
 
     it('should not resolve suggestion to skill when dismissing show question' +
-      ' suggestion modal', function() {
+      ' suggestion modal', function () {
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
       spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
 
-      ctrl.loadContributions().then(function() {
+      ctrl.loadContributions().then(function () {
         ctrl.onClickViewSuggestion('suggestion_1');
         $scope.$apply();
 

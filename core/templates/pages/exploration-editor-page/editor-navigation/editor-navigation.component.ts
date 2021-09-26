@@ -53,7 +53,7 @@ angular.module('oppia').component('editorNavigation', {
     'ThreadDataBackendApiService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
-    function(
+    function (
         $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
         ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
@@ -95,47 +95,47 @@ angular.module('oppia').component('editorNavigation', {
       $scope.loadingDotsAreShown = false;
       $scope.connectedToInternet = true;
 
-      $scope.isPrivate = function() {
+      $scope.isPrivate = function () {
         return ExplorationRightsService.isPrivate();
       };
 
-      $scope.isExplorationLockedForEditing = function() {
+      $scope.isExplorationLockedForEditing = function () {
         return ChangeListService.isExplorationLockedForEditing();
       };
 
-      $scope.isEditableOutsideTutorialMode = function() {
+      $scope.isEditableOutsideTutorialMode = function () {
         return EditabilityService.isEditableOutsideTutorialMode() ||
             EditabilityService.isTranslatable();
       };
 
-      $scope.discardChanges = function() {
+      $scope.discardChanges = function () {
         ExplorationSaveService.discardChanges();
       };
 
-      $scope.getChangeListLength = function() {
+      $scope.getChangeListLength = function () {
         return ChangeListService.getChangeList().length;
       };
 
 
-      $scope.isExplorationSaveable = function() {
+      $scope.isExplorationSaveable = function () {
         return ExplorationSaveService.isExplorationSaveable();
       };
 
-      $scope.showLoadingDots = function() {
+      $scope.showLoadingDots = function () {
         $scope.loadingDotsAreShown = true;
       };
 
-      $scope.hideLoadingDots = function() {
+      $scope.hideLoadingDots = function () {
         $scope.loadingDotsAreShown = false;
       };
 
-      $scope.showPublishExplorationModal = function() {
+      $scope.showPublishExplorationModal = function () {
         $scope.publishIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.showPublishExplorationModal(
           $scope.showLoadingDots, $scope.hideLoadingDots)
-          .then(function() {
+          .then(function () {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
@@ -143,13 +143,13 @@ angular.module('oppia').component('editorNavigation', {
         $scope.$applyAsync();
       };
 
-      $scope.saveChanges = function() {
+      $scope.saveChanges = function () {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.saveChanges(
           $scope.showLoadingDots, $scope.hideLoadingDots)
-          .then(function() {
+          .then(function () {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
@@ -157,7 +157,7 @@ angular.module('oppia').component('editorNavigation', {
         $scope.$applyAsync();
       };
 
-      $scope.toggleMobileNavOptions = function() {
+      $scope.toggleMobileNavOptions = function () {
         $scope.mobileNavOptionsAreShown = !$scope.mobileNavOptionsAreShown;
       };
       $scope.countWarnings = () => ExplorationWarningsService.countWarnings();
@@ -182,8 +182,8 @@ angular.module('oppia').component('editorNavigation', {
         $scope.ExplorationRightsService = ExplorationRightsService;
 
         UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
-            $scope.showPublishButton = function() {
+          .then(function (permissions) {
+            $scope.showPublishButton = function () {
               return permissions.canPublish && (
                 ExplorationRightsService.isPrivate());
             };
@@ -241,7 +241,7 @@ angular.module('oppia').component('editorNavigation', {
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };
-      this.$onDestroy = function() {
+      this.$onDestroy = function () {
         this.directiveSubscriptions.unsubscribe();
       };
     }

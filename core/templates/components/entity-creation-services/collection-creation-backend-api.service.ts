@@ -32,9 +32,9 @@ interface CollectionCreationResponse {
   providedIn: 'root'
 })
 export class CollectionCreationBackendService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  private _createCollection(
+  private _createCollection (
       successCallback: (value: CollectionCreationResponse) => void,
       errorCallback: (reason: string) => void): void {
     this.http.post<CollectionCreationBackendDict>(
@@ -53,7 +53,7 @@ export class CollectionCreationBackendService {
   }
 
 
-  async createCollectionAsync(): Promise<CollectionCreationResponse> {
+  async createCollectionAsync (): Promise<CollectionCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createCollection(resolve, reject);
     });

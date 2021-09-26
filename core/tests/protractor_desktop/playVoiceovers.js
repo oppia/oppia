@@ -27,7 +27,7 @@ var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Voiceover player', function() {
+describe('Voiceover player', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
@@ -35,7 +35,7 @@ describe('Voiceover player', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab = (
@@ -68,7 +68,7 @@ describe('Voiceover player', function() {
     await workflow.publishExploration();
   });
 
-  it('should play voiceovers for multiple languages', async function() {
+  it('should play voiceovers for multiple languages', async function () {
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
     await explorationPlayerPage.expandAudioBar();
@@ -81,7 +81,7 @@ describe('Voiceover player', function() {
     await explorationPlayerPage.expectAudioToBePlaying();
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await general.checkForConsoleErrors(['The play()']);
     await users.logout();
   });

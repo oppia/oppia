@@ -26,7 +26,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Multiple Incorrect Submissions Issue Component', function() {
+describe('Multiple Incorrect Submissions Issue Component', function () {
   var ctrl = null;
   var explorationStatesService = null;
   var learnerActionObjectFactory = null;
@@ -35,16 +35,16 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
   }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     explorationStatesService = $injector.get('ExplorationStatesService');
 
     ctrl = $componentController('multipleIncorrectSubmissionsIssue', {
@@ -57,7 +57,7 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
     });
   }));
 
-  it('should check if action type is answer submit', function() {
+  it('should check if action type is answer submit', function () {
     expect(ctrl.isActionSubmit({
       actionType: 'AnswerSubmit'
     })).toBe(true);
@@ -66,14 +66,14 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
     })).toBe(false);
   });
 
-  it('should get learner action index based on action start index', function() {
+  it('should get learner action index based on action start index', function () {
     expect(ctrl.actionStartIndex).toBe(1);
     expect(ctrl.getLearnerActionIndex(0)).toBe(2);
     expect(ctrl.getLearnerActionIndex(1)).toBe(3);
     expect(ctrl.getLearnerActionIndex(2)).toBe(4);
   });
 
-  it('should get feedback from an action', function() {
+  it('should get feedback from an action', function () {
     var action = {
       actionCustomizationArgs: {
         feedback: {
@@ -98,7 +98,7 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
   });
 
   it('should render leaner action html according to action customization args',
-    function() {
+    function () {
       var learnerAction = learnerActionObjectFactory.createFromBackendDict({
         action_type: 'AnswerSubmit',
         action_customization_args: {

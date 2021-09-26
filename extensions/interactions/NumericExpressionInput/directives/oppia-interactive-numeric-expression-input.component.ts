@@ -46,7 +46,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
   hasBeenTouched: boolean = false;
   warningText: string = '';
 
-  constructor(
+  constructor (
     private mathInteractionsService: MathInteractionsService,
     public currentInteractionService: CurrentInteractionService,
     private deviceInfoService: DeviceInfoService,
@@ -58,14 +58,14 @@ export class InteractiveNumericExpressionInput implements OnInit {
       NumericExpressionInputRulesService
   ) {}
 
-  private _getAttributes() {
+  private _getAttributes () {
     return {
       placeholderWithValue: this.placeholderWithValue,
       useFractionForDivisionWithValue: this.useFractionForDivisionWithValue
     };
   }
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid (): boolean {
     let activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
     if (this.hasBeenTouched && activeGuppyObject === undefined) {
@@ -88,7 +88,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
     return true;
   }
 
-  submitAnswer(): void {
+  submitAnswer (): void {
     if (!this.isCurrentAnswerValid()) {
       return;
     }
@@ -97,12 +97,12 @@ export class InteractiveNumericExpressionInput implements OnInit {
     ) as unknown as InteractionRulesService);
   }
 
-  showOSK(): void {
+  showOSK (): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'NumericExpressionInput';
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
     const { useFractionForDivision, placeholder } = (

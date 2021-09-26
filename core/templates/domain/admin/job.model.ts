@@ -41,7 +41,7 @@ export class Job {
   timeStartedMsec: number;
   humanReadableTimeStarted: string;
 
-  constructor(
+  constructor (
       humanReadableTimeFinished: string, timeFinishedMsec: number,
       jobType: string, statusCode: string, error: string | null,
       canBeCanceled: boolean, isCancelable: boolean, id: string,
@@ -58,7 +58,7 @@ export class Job {
     this.humanReadableTimeStarted = humanReadableTimeStarted;
   }
 
-  static createFromBackendDict(backendDict: JobDataBackendDict): Job {
+  static createFromBackendDict (backendDict: JobDataBackendDict): Job {
     return new Job(
       backendDict.human_readable_time_finished, backendDict.time_finished_msec,
       backendDict.job_type, backendDict.status_code, backendDict.error,

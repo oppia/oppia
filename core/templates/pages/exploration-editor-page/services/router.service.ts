@@ -35,7 +35,7 @@ angular.module('oppia').factory('RouterService', [
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
   'ExplorationStatesService', 'ExternalSaveService',
   'StateEditorRefreshService', 'StateEditorService',
-  function(
+  function (
       $interval, $location, $q, $rootScope, $timeout, $window,
       ExplorationImprovementsService, ExplorationInitStateNameService,
       ExplorationStatesService, ExternalSaveService,
@@ -101,7 +101,7 @@ angular.module('oppia').factory('RouterService', [
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         activeTabName = TABS.TRANSLATION.name;
-        var waitForStatesToLoad = $interval(function() {
+        var waitForStatesToLoad = $interval(function () {
           if (ExplorationStatesService.isInitialized()) {
             $interval.cancel(waitForStatesToLoad);
             if (!StateEditorService.getActiveStateName()) {
@@ -149,10 +149,10 @@ angular.module('oppia').factory('RouterService', [
       }
     });
 
-    var _doNavigationWithState = function(path, pathType) {
+    var _doNavigationWithState = function (path, pathType) {
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
-      var waitForStatesToLoad = $interval(function() {
+      var waitForStatesToLoad = $interval(function () {
         if (ExplorationStatesService.isInitialized()) {
           $interval.cancel(waitForStatesToLoad);
           if (ExplorationStatesService.hasState(putativeStateName)) {
@@ -170,11 +170,11 @@ angular.module('oppia').factory('RouterService', [
       }, 300);
     };
 
-    var _savePendingChanges = function() {
+    var _savePendingChanges = function () {
       ExternalSaveService.onExternalSave.emit();
     };
 
-    var _getCurrentStateFromLocationPath = function() {
+    var _getCurrentStateFromLocationPath = function () {
       var location = $location.path();
       if (location.indexOf('/gui/') !== -1) {
         return location.substring('/gui/'.length);
@@ -183,7 +183,7 @@ angular.module('oppia').factory('RouterService', [
       }
     };
 
-    var _actuallyNavigate = function(pathType, newStateName) {
+    var _actuallyNavigate = function (pathType, newStateName) {
       if (newStateName) {
         StateEditorService.setActiveStateName(newStateName);
       }
@@ -193,13 +193,13 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var RouterService = {
-      savePendingChanges: function() {
+      savePendingChanges: function () {
         _savePendingChanges();
       },
-      getActiveTabName: function() {
+      getActiveTabName: function () {
         return activeTabName;
       },
-      isLocationSetToNonStateEditorTab: function() {
+      isLocationSetToNonStateEditorTab: function () {
         var currentPath = $location.path();
         return (
           currentPath === TABS.TRANSLATION.path ||
@@ -210,17 +210,17 @@ angular.module('oppia').factory('RouterService', [
           currentPath === TABS.HISTORY.path ||
           currentPath === TABS.FEEDBACK.path);
       },
-      getCurrentStateFromLocationPath: function() {
+      getCurrentStateFromLocationPath: function () {
         return _getCurrentStateFromLocationPath();
       },
-      navigateToMainTab: function(stateName) {
+      navigateToMainTab: function (stateName) {
         _savePendingChanges();
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;
         }
 
         if (activeTabName === TABS.MAIN.name) {
-          $('.oppia-editor-cards-container').fadeOut(function() {
+          $('.oppia-editor-cards-container').fadeOut(function () {
             _actuallyNavigate(SLUG_GUI, stateName);
             // We need to use $apply to update all our bindings. However we
             // can't directly use $apply, as there is already another $apply in
@@ -230,7 +230,7 @@ angular.module('oppia').factory('RouterService', [
             // link for more information -
             // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
             $rootScope.$applyAsync();
-            $timeout(function() {
+            $timeout(function () {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
           });
@@ -238,51 +238,51 @@ angular.module('oppia').factory('RouterService', [
           _actuallyNavigate(SLUG_GUI, stateName);
         }
       },
-      navigateToTranslationTab: function() {
+      navigateToTranslationTab: function () {
         _savePendingChanges();
         $location.path(TABS.TRANSLATION.path);
       },
-      navigateToPreviewTab: function() {
+      navigateToPreviewTab: function () {
         if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
-          $timeout(function() {
+          $timeout(function () {
             _actuallyNavigate(SLUG_PREVIEW, null);
           }, PREVIEW_TAB_WAIT_TIME_MSEC);
         }
       },
-      navigateToStatsTab: function() {
+      navigateToStatsTab: function () {
         _savePendingChanges();
         $location.path(TABS.STATS.path);
       },
-      navigateToImprovementsTab: function() {
+      navigateToImprovementsTab: function () {
         _savePendingChanges();
         $location.path(TABS.IMPROVEMENTS.path);
       },
-      navigateToSettingsTab: function() {
+      navigateToSettingsTab: function () {
         _savePendingChanges();
         $location.path(TABS.SETTINGS.path);
       },
-      navigateToHistoryTab: function() {
+      navigateToHistoryTab: function () {
         _savePendingChanges();
         $location.path(TABS.HISTORY.path);
       },
-      navigateToFeedbackTab: function() {
+      navigateToFeedbackTab: function () {
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
       },
-      get onCenterGraph() {
+      get onCenterGraph () {
         return centerGraphEventEmitter;
       },
-      get onRefreshSettingsTab() {
+      get onRefreshSettingsTab () {
         return refreshSettingsTabEventEmitter;
       },
-      get onRefreshStatisticsTab() {
+      get onRefreshStatisticsTab () {
         return refreshStatisticsTabEventEmitter;
       },
-      get onRefreshTranslationTab() {
+      get onRefreshTranslationTab () {
         return refreshTranslationTabEventEmitter;
       },
-      get onRefreshVersionHistory() {
+      get onRefreshVersionHistory () {
         return refreshVersionHistoryEventEmitter;
       }
     };

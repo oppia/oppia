@@ -22,7 +22,7 @@ import { CollectionNode } from 'domain/collection/collection-node.model';
 import { CollectionBackendDict, Collection } from 'domain/collection/collection.model';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 
-describe('Collection validation service', function() {
+describe('Collection validation service', function () {
   let collectionValidationService: CollectionValidationService;
   let sampleCollectionBackendObject: CollectionBackendDict;
   let _sampleCollection: Collection;

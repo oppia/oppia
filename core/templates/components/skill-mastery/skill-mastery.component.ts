@@ -38,11 +38,11 @@ export class SkillMasteryViewerComponent implements OnInit {
 
   skillMasteryDegree: number = 0;
 
-  constructor(
+  constructor (
     private skillMasteryBackendApiService: SkillMasteryBackendApiService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.skillMasteryDegree = 0.0;
 
     this.skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
@@ -50,11 +50,11 @@ export class SkillMasteryViewerComponent implements OnInit {
       degreesOfMastery.getMasteryDegree(this.skillId)));
   }
 
-  getSkillMasteryPercentage(): number {
+  getSkillMasteryPercentage (): number {
     return Math.round(this.skillMasteryDegree * 100);
   }
 
-  getMasteryChangePercentage(): string | number {
+  getMasteryChangePercentage (): string | number {
     if (this.masteryChange >= 0) {
       return '+' + Math.round(this.masteryChange * 100);
     } else {
@@ -62,7 +62,7 @@ export class SkillMasteryViewerComponent implements OnInit {
     }
   }
 
-  getLearningTips(): string {
+  getLearningTips (): string {
     if (this.masteryChange <= 0) {
       return (
         'Looks like your mastery of this skill has dropped. ' +

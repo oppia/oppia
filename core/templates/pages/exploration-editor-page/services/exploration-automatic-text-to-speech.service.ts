@@ -21,19 +21,19 @@ require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
 angular.module('oppia').factory('ExplorationAutomaticTextToSpeechService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
+  'ExplorationPropertyService', function (ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'auto_tts_enabled';
 
-    child._isValid = function(value) {
+    child._isValid = function (value) {
       return (typeof value === 'boolean');
     };
 
-    child.isAutomaticTextToSpeechEnabled = function() {
+    child.isAutomaticTextToSpeechEnabled = function () {
       return child.savedMemento;
     };
 
-    child.toggleAutomaticTextToSpeech = function() {
+    child.toggleAutomaticTextToSpeech = function () {
       child.displayed = !child.displayed;
       child.saveDisplayedValue();
     };

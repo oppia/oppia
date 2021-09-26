@@ -33,7 +33,7 @@ import { DisplayHintModalComponent } from './display-hint-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
-let MockAngularHtmlBindWrapperDirective = function(
+let MockAngularHtmlBindWrapperDirective = function (
     options: Component): Directive {
   const metadata: Directive = {
     selector: options.selector,

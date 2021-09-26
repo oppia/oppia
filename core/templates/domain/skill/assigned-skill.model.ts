@@ -24,13 +24,13 @@ export interface AssignedSkillBackendDict {
 }
 
 export class AssignedSkill {
-  constructor(
+  constructor (
     public topicId: string,
     public topicName: string,
     public topicVersion: number,
     public subtopicId: number) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: AssignedSkillBackendDict): AssignedSkill {
     return new AssignedSkill(
       backendDict.topic_id,

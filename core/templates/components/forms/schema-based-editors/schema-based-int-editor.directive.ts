@@ -22,7 +22,7 @@ require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedIntEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {
@@ -42,24 +42,24 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       controller: [
         '$scope', '$timeout', 'FocusManagerService',
         'SchemaFormSubmittedService',
-        function(
+        function (
             $scope, $timeout, FocusManagerService,
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.onKeypress = function(evt) {
+          ctrl.onKeypress = function (evt) {
             if (evt.keyCode === 13) {
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0;
             }
             // So that focus is applied after all the functions in
             // main thread have executed.
-            $timeout(function() {
+            $timeout(function () {
               FocusManagerService.setFocusWithoutScroll(labelForFocus);
             }, 50);
           };

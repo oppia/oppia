@@ -31,7 +31,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
-describe('Add Answer Group Modal Controller', function() {
+describe('Add Answer Group Modal Controller', function () {
   importAllAngularServices();
 
   var $scope = null;
@@ -52,7 +52,7 @@ describe('Add Answer Group Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function() {
+  beforeEach(function () {
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
     generateContentIdService = TestBed.get(GenerateContentIdService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
@@ -60,7 +60,7 @@ describe('Add Answer Group Modal Controller', function() {
     stateEditorService = TestBed.get(StateEditorService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -95,7 +95,7 @@ describe('Add Answer Group Modal Controller', function() {
   });
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect(true).toBe(true);
       expect($scope.feedbackEditorIsOpen).toBe(false);
       expect($scope.addState).toBe(addState);
@@ -104,7 +104,7 @@ describe('Add Answer Group Modal Controller', function() {
       expect($scope.addAnswerGroupForm).toEqual({});
     });
 
-  it('should update answer group feedback', function() {
+  it('should update answer group feedback', function () {
     expect($scope.feedbackEditorIsOpen).toBe(false);
 
     var feedback = 'New feedback';
@@ -119,7 +119,7 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.tmpOutcome.feedback).toBe(feedback);
   });
 
-  it('should update tagged misconception', function() {
+  it('should update tagged misconception', function () {
     expect($scope.tmpTaggedSkillMisconceptionId).toBe(null);
 
     var misconceptionId = 'mis_1';
@@ -129,17 +129,17 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.tmpTaggedSkillMisconceptionId).toBe('skill_1-mis_1');
   });
 
-  it('should check if correctness feedback is enabled', function() {
+  it('should check if correctness feedback is enabled', function () {
     spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and
       .returnValue(true);
     expect($scope.isCorrectnessFeedbackEnabled()).toBe(true);
   });
 
-  it('should check if current interaction is linear', function() {
+  it('should check if current interaction is linear', function () {
     expect($scope.isCurrentInteractionLinear()).toBe(true);
   });
 
-  it('should check if outcome has no feedback with self loop', function() {
+  it('should check if outcome has no feedback with self loop', function () {
     var outcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
     expect($scope.isSelfLoopWithNoFeedback(outcome)).toBe(true);
@@ -149,7 +149,7 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should save answer group response when closing the modal', function() {
+  it('should save answer group response when closing the modal', function () {
     $scope.saveResponse(null);
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();

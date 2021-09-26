@@ -37,17 +37,17 @@ export class AudioPreloaderService {
   private audioLoadedCallback: (_: string) => void = null;
   private mostRecentlyRequestedAudioFilename: string = null;
 
-  constructor(
+  constructor (
       private assetsBackendApiService: AssetsBackendApiService,
       private audioTranslationLanguageService: AudioTranslationLanguageService,
       private computeGraphService: ComputeGraphService,
       private contextService: ContextService) {}
 
-  init(exploration: Exploration): void {
+  init (exploration: Exploration): void {
     this.exploration = exploration;
   }
 
-  kickOffAudioPreloader(sourceStateName: string): void {
+  kickOffAudioPreloader (sourceStateName: string): void {
     this.filenamesOfAudioToBeDownloaded = (
       this.getAudioFilenamesInBfsOrder(sourceStateName));
     const numFilesToDownload = (
@@ -61,36 +61,36 @@ export class AudioPreloaderService {
     }
   }
 
-  isLoadingAudioFile(filename: string): boolean {
+  isLoadingAudioFile (filename: string): boolean {
     return this.filenamesOfAudioCurrentlyDownloading.indexOf(filename) !== -1;
   }
 
-  restartAudioPreloader(sourceStateName: string): void {
+  restartAudioPreloader (sourceStateName: string): void {
     this.cancelPreloading();
     this.kickOffAudioPreloader(sourceStateName);
   }
 
-  setAudioLoadedCallback(audioLoadedCallback: (_: string) => void): void {
+  setAudioLoadedCallback (audioLoadedCallback: (_: string) => void): void {
     this.audioLoadedCallback = audioLoadedCallback;
   }
 
-  setMostRecentlyRequestedAudioFilename(filename: string): void {
+  setMostRecentlyRequestedAudioFilename (filename: string): void {
     this.mostRecentlyRequestedAudioFilename = filename;
   }
 
-  clearMostRecentlyRequestedAudioFilename(): void {
+  clearMostRecentlyRequestedAudioFilename (): void {
     this.mostRecentlyRequestedAudioFilename = null;
   }
 
-  getMostRecentlyRequestedAudioFilename(): string {
+  getMostRecentlyRequestedAudioFilename (): string {
     return this.mostRecentlyRequestedAudioFilename;
   }
 
-  getFilenamesOfAudioCurrentlyDownloading(): string[] {
+  getFilenamesOfAudioCurrentlyDownloading (): string[] {
     return this.filenamesOfAudioCurrentlyDownloading;
   }
 
-  private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
+  private getAudioFilenamesInBfsOrder (sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
     const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
@@ -107,7 +107,7 @@ export class AudioPreloaderService {
     return audioFilenamesInBfsOrder;
   }
 
-  private loadAudio(audioFilename: string): void {
+  private loadAudio (audioFilename: string): void {
     this.assetsBackendApiService.loadAudio(
       this.contextService.getExplorationId(), audioFilename
     ).then(loadedAudio => {
@@ -129,7 +129,7 @@ export class AudioPreloaderService {
     });
   }
 
-  private cancelPreloading(): void {
+  private cancelPreloading (): void {
     this.assetsBackendApiService.abortAllCurrentAudioDownloads();
     this.filenamesOfAudioCurrentlyDownloading.length = 0;
   }

@@ -46,14 +46,14 @@ export class EmailDashboardPageComponent {
   customizationArgSpecs = AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION;
   isRequired: boolean = false;
 
-  constructor(
+  constructor (
     private changeDetectorRef: ChangeDetectorRef,
     private emailDashboardDataService: EmailDashboardDataService,
     private loaderService: LoaderService,
     private userService: UserService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.currentPageOfQueries = [];
     this.username = '';
 
@@ -70,37 +70,37 @@ export class EmailDashboardPageComponent {
     });
   }
 
-  updateQueryData(newValue: boolean | number, field: string): void {
+  updateQueryData (newValue: boolean | number, field: string): void {
     if (this.data[field] !== newValue) {
       this.data[field] = newValue;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  getSchema(customizationArgSpec: CustomizationArgSpec): () => Schema {
+  getSchema (customizationArgSpec: CustomizationArgSpec): () => Schema {
     let callb = () => {
       return customizationArgSpec.schema;
     };
     return callb.bind(this);
   }
 
-  isFieldRequired(): boolean {
+  isFieldRequired (): boolean {
     return this.isRequired;
   }
 
-  resetForm(): void {
+  resetForm (): void {
     this.data = {};
     AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
       this.data[predicate.backend_attr] = predicate.default_value;
     });
   }
 
-  areAllInputsEmpty(): boolean {
+  areAllInputsEmpty (): boolean {
     return Object.values(this.data).every(
       value => value === null || value === false);
   }
 
-  submitQueryAsync(): void {
+  submitQueryAsync (): void {
     this.emailDashboardDataService.submitQueryAsync(this.data)
       .then((queries) => {
         this.currentPageOfQueries = queries;
@@ -109,7 +109,7 @@ export class EmailDashboardPageComponent {
     this.showSuccessMessage = true;
   }
 
-  getNextPageOfQueries(): void {
+  getNextPageOfQueries (): void {
     if (this.emailDashboardDataService.isNextPageAvailable()) {
       this.emailDashboardDataService.getNextQueriesAsync().then(
         (queries) => {
@@ -119,23 +119,23 @@ export class EmailDashboardPageComponent {
     }
   }
 
-  getPreviousPageOfQueries(): void {
+  getPreviousPageOfQueries (): void {
     if (this.emailDashboardDataService.isPreviousPageAvailable()) {
       this.currentPageOfQueries = (
         this.emailDashboardDataService.getPreviousQueries());
     }
   }
 
-  showNextButton(): boolean {
+  showNextButton (): boolean {
     return this.emailDashboardDataService.isNextPageAvailable();
   }
 
-  showPreviousButton(): boolean {
+  showPreviousButton (): boolean {
     return this.emailDashboardDataService.isPreviousPageAvailable();
   }
 
 
-  recheckStatus(index: number): void {
+  recheckStatus (index: number): void {
     let query = this.currentPageOfQueries !== undefined ?
       this.currentPageOfQueries[index] : null;
     if (query) {
@@ -147,7 +147,7 @@ export class EmailDashboardPageComponent {
     }
   }
 
-  showLinkToResultPage(submitter: string, status: string): boolean {
+  showLinkToResultPage (submitter: string, status: string): boolean {
     return (submitter === this.username) && (status === 'completed');
   }
 }

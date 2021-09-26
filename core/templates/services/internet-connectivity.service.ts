@@ -38,7 +38,7 @@ export class InternetConnectivityService {
   private httpSubscription: Subscription;
 
 
-  constructor(
+  constructor (
       private windowRef: WindowRef,
       private _serverConnectionBackendApiService: (
         ServerConnectionBackendApiService),
@@ -47,7 +47,7 @@ export class InternetConnectivityService {
     this._connectedToNetwork = this.windowRef.nativeWindow.navigator.onLine;
   }
 
-  private checkInternetState(): void {
+  private checkInternetState (): void {
     // This function is used to check Internet connection status.
     // It sends a periodic GET request to the server to check if the
     // browser has Internet access and emits the current state of the
@@ -84,7 +84,7 @@ export class InternetConnectivityService {
     });
   }
 
-  private checkNetworkState(): void {
+  private checkNetworkState (): void {
     // This function is used to check Network connection status.
     // It checks if the browser is connected to the network or not
     // and then emits the current state of the connection.
@@ -100,12 +100,12 @@ export class InternetConnectivityService {
     };
   }
 
-  startCheckingConnection(): void {
+  startCheckingConnection (): void {
     this.checkInternetState();
     this.checkNetworkState();
   }
 
-  isOnline(): boolean {
+  isOnline (): boolean {
     return this._internetAccessible;
   }
 
@@ -113,7 +113,7 @@ export class InternetConnectivityService {
    * Monitor Network & Internet connection status by subscribing to this
    * observable.
    */
-  get onInternetStateChange(): EventEmitter<boolean> {
+  get onInternetStateChange (): EventEmitter<boolean> {
     return this._connectionStateChangeEventEmitter;
   }
 }

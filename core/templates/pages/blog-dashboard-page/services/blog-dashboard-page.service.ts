@@ -42,7 +42,7 @@ export class BlogDashboardPageService {
   private _updateNavTitleEventEmitter = new EventEmitter<string>();
   private _imageUploaderIsNarrow: boolean = false;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -55,7 +55,7 @@ export class BlogDashboardPageService {
     this.detectUrlChange();
   }
 
-  private _setActiveTab(hash: string) {
+  private _setActiveTab (hash: string) {
     if (hash.startsWith('#/blog_post_editor')) {
       this._activeTab = 'editor_tab';
       this._blogPostId = this.urlService.getBlogPostIdFromUrl();
@@ -66,14 +66,14 @@ export class BlogDashboardPageService {
     this.updateViewEventEmitter.emit();
   }
 
-  detectUrlChange(): void {
+  detectUrlChange (): void {
     this.windowRef.nativeWindow.onhashchange = () => {
       let newHash: string = this.windowRef.nativeWindow.location.hash;
       this._setActiveTab(newHash);
     };
   }
 
-  navigateToEditorTabWithId(blogPostId: string): void {
+  navigateToEditorTabWithId (blogPostId: string): void {
     let blogPostEditorUrl = this.urlInterpolationService.interpolateUrl(
       this._BLOG_POST_EDITOR_URL_TEMPLATE, {
         blog_post_id: blogPostId
@@ -81,63 +81,63 @@ export class BlogDashboardPageService {
     this.windowRef.nativeWindow.location.hash = blogPostEditorUrl;
   }
 
-  navigateToMainTab(): void {
+  navigateToMainTab (): void {
     this.windowRef.nativeWindow.location.href = '/blog-dashboard';
   }
 
-  set blogPostAction(action: string) {
+  set blogPostAction (action: string) {
     this._blogPostAction = action;
   }
 
-  get blogPostAction(): string {
+  get blogPostAction (): string {
     return this._blogPostAction;
   }
 
-  get activeTab(): string {
+  get activeTab (): string {
     return this._activeTab;
   }
 
-  get blogPostId(): string {
+  get blogPostId (): string {
     return this._blogPostId;
   }
 
-  set blogPostId(id: string) {
+  set blogPostId (id: string) {
     this._blogPostId = id;
   }
 
-  set blogPostData(data: BlogPostData | null) {
+  set blogPostData (data: BlogPostData | null) {
     this._blogPostData = data;
   }
 
-  get blogPostData(): BlogPostData | null {
+  get blogPostData (): BlogPostData | null {
     return this._blogPostData;
   }
 
-  get authorPictureUrl(): string {
+  get authorPictureUrl (): string {
     return this._authorPictureUrl;
   }
 
-  set authorPictureUrl(url: string) {
+  set authorPictureUrl (url: string) {
     this._authorPictureUrl = url;
   }
 
-  set imageUploaderIsNarrow(value: boolean) {
+  set imageUploaderIsNarrow (value: boolean) {
     this._imageUploaderIsNarrow = value;
   }
 
-  get imageUploaderIsNarrow(): boolean {
+  get imageUploaderIsNarrow (): boolean {
     return this._imageUploaderIsNarrow;
   }
 
-  get updateViewEventEmitter(): EventEmitter<void> {
+  get updateViewEventEmitter (): EventEmitter<void> {
     return this._updateViewEventEmitter;
   }
 
-  get updateNavTitleEventEmitter(): EventEmitter<string> {
+  get updateNavTitleEventEmitter (): EventEmitter<string> {
     return this._updateNavTitleEventEmitter;
   }
 
-  deleteBlogPost(): void {
+  deleteBlogPost (): void {
     this.blogPostEditorBackendService.deleteBlogPostAsync(this._blogPostId)
       .then(
         () => {
@@ -152,7 +152,7 @@ export class BlogDashboardPageService {
       );
   }
 
-  setNavTitle(
+  setNavTitle (
       blogPostIsPublished: boolean, title: string): void {
     if (title) {
       if (blogPostIsPublished) {

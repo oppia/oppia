@@ -51,9 +51,9 @@ export class NoninteractiveCollapsible implements OnInit, OnChanges {
   @Input() contentWithValue!: string;
   heading: string = '';
   content: string = '';
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor (private htmlEscaperService: HtmlEscaperService) {}
 
-  private _updateViewOnInputChange(): void {
+  private _updateViewOnInputChange (): void {
     if (!this.headingWithValue || !this.contentWithValue) {
       return;
     }
@@ -63,11 +63,11 @@ export class NoninteractiveCollapsible implements OnInit, OnChanges {
       this.contentWithValue) as string;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateViewOnInputChange();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.headingWithValue || changes.contentWithValue) {
       this._updateViewOnInputChange();
     }

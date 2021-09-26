@@ -28,7 +28,7 @@ angular.module('oppia').factory('CompareVersionsService', [
   '$q', 'ExplorationDataService', 'ExplorationDiffService',
   'ReadOnlyExplorationBackendApiService',
   'StatesObjectFactory', 'VersionTreeService',
-  function(
+  function (
       $q, ExplorationDataService, ExplorationDiffService,
       ReadOnlyExplorationBackendApiService,
       StatesObjectFactory, VersionTreeService) {
@@ -39,7 +39,7 @@ angular.module('oppia').factory('CompareVersionsService', [
      * directionForwards is true if changes are compared in increasing version
      * number, and false if changes are compared in decreasing version number.
      */
-    var _getCombinedChangeList = function(v1, v2, directionForwards) {
+    var _getCombinedChangeList = function (v1, v2, directionForwards) {
       var _treeParents = VersionTreeService.getVersionTree();
 
       // Stores the path of version numbers from v1 to v2.
@@ -54,7 +54,7 @@ angular.module('oppia').factory('CompareVersionsService', [
 
       // The full changelist that is applied to go from v1 to v2.
       var combinedChangeList = [];
-      versionPath.forEach(function(version) {
+      versionPath.forEach(function (version) {
         var changeListForVersion = VersionTreeService.getChangeList(version);
         if (!directionForwards) {
           changeListForVersion.reverse();
@@ -89,7 +89,7 @@ angular.module('oppia').factory('CompareVersionsService', [
        * Should be called after VersionTreeService.init() is called.
        * Should satisfy v1 < v2.
        */
-      getDiffGraphData: function(v1, v2) {
+      getDiffGraphData: function (v1, v2) {
         if (v1 > v2) {
           throw new Error('Tried to compare v1 > v2.');
         }
@@ -98,7 +98,7 @@ angular.module('oppia').factory('CompareVersionsService', [
             ExplorationDataService.explorationId, v1),
           v2Data: ReadOnlyExplorationBackendApiService.loadExplorationAsync(
             ExplorationDataService.explorationId, v2)
-        }).then(function(response) {
+        }).then(function (response) {
           var v1StatesDict = response.v1Data.exploration.states;
           var v2StatesDict = response.v2Data.exploration.states;
 

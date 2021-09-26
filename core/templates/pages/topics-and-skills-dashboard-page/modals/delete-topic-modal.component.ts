@@ -27,7 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class DeleteTopicModalComponent extends ConfirmOrCancelModal {
   topicName: string;
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);

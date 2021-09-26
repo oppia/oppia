@@ -30,7 +30,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Story node editor directive', function() {
+describe('Story node editor directive', function () {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -49,7 +49,7 @@ describe('Story node editor directive', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ngbModal = TestBed.inject(NgbModal);
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -146,38 +146,38 @@ describe('Story node editor directive', function() {
     ctrl.$onDestroy();
   });
 
-  it('should init the controller', function() {
+  it('should init the controller', function () {
     $scope.viewNodeEditor();
     expect($scope.chapterPreviewCardIsShown).toEqual(false);
     expect($scope.mainChapterCardIsShown).toEqual(true);
     expect($scope.explorationInputButtonsAreShown).toEqual(false);
   });
 
-  it('should return skill editor URL', function() {
+  it('should return skill editor URL', function () {
     expect($scope.getSkillEditorUrl('skill_1')).toEqual(
       '/skill_editor/skill_1');
   });
 
-  it('should check if exploration can be saved', function() {
+  it('should check if exploration can be saved', function () {
     $scope.checkCanSaveExpId();
     expect($scope.expIdCanBeSaved).toEqual(true);
   });
 
   it('should call StoryUpdate service remove prerequisite skill id',
-    function() {
+    function () {
       var skillSpy = spyOn(
         storyUpdateService, 'removePrerequisiteSkillIdFromNode');
       $scope.removePrerequisiteSkillId('skill_3');
       expect(skillSpy).toHaveBeenCalled();
     });
 
-  it('should call StoryUpdate service remove acquired skill id', function() {
+  it('should call StoryUpdate service remove acquired skill id', function () {
     var skillSpy = spyOn(storyUpdateService, 'removeAcquiredSkillIdFromNode');
     $scope.removeAcquiredSkillId();
     expect(skillSpy).toHaveBeenCalled();
   });
 
-  it('should toggle chapter preview card', function() {
+  it('should toggle chapter preview card', function () {
     $scope.chapterPreviewCardIsShown = false;
     $scope.togglePreview();
     $scope.chapterPreviewCardIsShown = true;
@@ -186,60 +186,60 @@ describe('Story node editor directive', function() {
     $scope.chapterPreviewCardIsShown = false;
   });
 
-  it('should toggle prereq skill list', function() {
+  it('should toggle prereq skill list', function () {
     $scope.prerequisiteSkillIsShown = true;
     $scope.togglePrerequisiteSkillsList();
     $scope.prerequisiteSkillIsShown = false;
   });
 
   it('should call StoryUpdate service to set story thumbnail filename',
-    function() {
+    function () {
       var storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailFilename');
       $scope.updateThumbnailFilename('new_file.png');
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to set story thumbnail filename',
-    function() {
+    function () {
       var storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailBgColor');
       $scope.updateThumbnailBgColor('#333');
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
-    function() {
+    function () {
       var storySpy = spyOn(storyUpdateService, 'unfinalizeStoryNodeOutline');
       $scope.unfinalizeOutline();
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
-    function() {
+    function () {
       var storySpy = spyOn(storyUpdateService, 'finalizeStoryNodeOutline');
       $scope.finalizeOutline();
       expect(storySpy).toHaveBeenCalled();
     });
 
-  it('should call StoryUpdate service to update outline', function() {
+  it('should call StoryUpdate service to update outline', function () {
     var storySpy = spyOn(storyUpdateService, 'setStoryNodeOutline');
     $scope.updateOutline('New outline');
     expect(storySpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate service to update description', function() {
+  it('should call StoryUpdate service to update description', function () {
     var storySpy = spyOn(storyUpdateService, 'setStoryNodeDescription');
     $scope.updateDescription('New description');
     expect(storySpy).toHaveBeenCalled();
   });
 
-  it('should open and close node title editor', function() {
+  it('should open and close node title editor', function () {
     $scope.openNodeTitleEditor();
     expect($scope.nodeTitleEditorIsShown).toEqual(true);
     $scope.closeNodeTitleEditor();
     expect($scope.nodeTitleEditorIsShown).toEqual(false);
   });
 
-  it('should open add skill modal for adding prerequisite skill', function() {
+  it('should open add skill modal for adding prerequisite skill', function () {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
@@ -251,7 +251,7 @@ describe('Story node editor directive', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should open add skill modal for adding acquired skill', function() {
+  it('should open add skill modal for adding acquired skill', function () {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
@@ -263,7 +263,7 @@ describe('Story node editor directive', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should toggle chapter outline', function() {
+  it('should toggle chapter outline', function () {
     $scope.chapterOutlineIsShown = false;
     $scope.toggleChapterOutline();
     expect($scope.chapterOutlineIsShown).toEqual(true);
@@ -272,7 +272,7 @@ describe('Story node editor directive', function() {
     expect($scope.chapterOutlineIsShown).toEqual(false);
   });
 
-  it('should toggle acquired skills list', function() {
+  it('should toggle acquired skills list', function () {
     $scope.acquiredSkillIsShown = false;
     $scope.toggleAcquiredSkillsList();
     expect($scope.acquiredSkillIsShown).toEqual(true);
@@ -281,7 +281,7 @@ describe('Story node editor directive', function() {
     expect($scope.acquiredSkillIsShown).toEqual(false);
   });
 
-  it('should toggle chapter card', function() {
+  it('should toggle chapter card', function () {
     $scope.mainChapterCardIsShown = true;
     $scope.toggleChapterCard();
     expect($scope.mainChapterCardIsShown).toEqual(false);
@@ -290,7 +290,7 @@ describe('Story node editor directive', function() {
     expect($scope.mainChapterCardIsShown).toEqual(true);
   });
 
-  it('should toggle chapter todo card', function() {
+  it('should toggle chapter todo card', function () {
     $scope.chapterTodoCardIsShown = false;
     $scope.toggleChapterTodoCard();
     expect($scope.chapterTodoCardIsShown).toEqual(true);
@@ -299,7 +299,7 @@ describe('Story node editor directive', function() {
     expect($scope.chapterTodoCardIsShown).toEqual(false);
   });
 
-  it('should toggle exploration input buttons', function() {
+  it('should toggle exploration input buttons', function () {
     $scope.explorationInputButtonsAreShown = false;
     $scope.toggleExplorationInputButtons();
     expect($scope.explorationInputButtonsAreShown).toEqual(true);
@@ -308,7 +308,7 @@ describe('Story node editor directive', function() {
     expect($scope.explorationInputButtonsAreShown).toEqual(false);
   });
 
-  it('should toggle chapter outline buttons', function() {
+  it('should toggle chapter outline buttons', function () {
     $scope.chapterOutlineButtonsAreShown = false;
     $scope.toggleChapterOutlineButtons();
     expect($scope.chapterOutlineButtonsAreShown).toEqual(true);
@@ -319,7 +319,7 @@ describe('Story node editor directive', function() {
 
   it('should call StoryUpdateService and ExplorationIdValidationService' +
       ' to set node exploration id if story is published',
-  function() {
+  function () {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(true);
@@ -336,7 +336,7 @@ describe('Story node editor directive', function() {
 
   it('should call StoryUpdateService to set node exploration id and set ' +
       'invalid exp error if story is published and exp id is invalid',
-  function() {
+  function () {
     $scope.invalidExpErrorIsShown = false;
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
@@ -354,7 +354,7 @@ describe('Story node editor directive', function() {
     expect($scope.invalidExpErrorIsShown).toEqual(true);
   });
 
-  it('should show error if story is published and exp id is null', function() {
+  it('should show error if story is published and exp id is null', function () {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
 
@@ -368,7 +368,7 @@ describe('Story node editor directive', function() {
 
   it('should call StoryUpdateService to set node exploration id and set ' +
       'invalid exp error if story is published and exp id is invalid',
-  function() {
+  function () {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(false);
     var deferred = $q.defer();
     deferred.resolve(false);
@@ -380,7 +380,7 @@ describe('Story node editor directive', function() {
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate service to set story node title', function() {
+  it('should call StoryUpdate service to set story node title', function () {
     var storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeTitle');
     $scope.updateTitle('Title 10');
@@ -388,7 +388,7 @@ describe('Story node editor directive', function() {
   });
 
   it('should not call StoryUpdate service to set story node title and ' +
-      'call AlertsService if the name is a duplicate', function() {
+      'call AlertsService if the name is a duplicate', function () {
     var storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeTitle');
     var alertsSpy = spyOn(AlertsService, 'addInfoMessage');

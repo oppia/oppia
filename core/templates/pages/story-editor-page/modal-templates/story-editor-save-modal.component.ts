@@ -25,15 +25,15 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class StoryEditorSaveModalComponent {
   bindedMessage;
-  constructor(
+  constructor (
      private activeModal: NgbActiveModal
   ) {}
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 
-  confirm(commitMessage: string): void {
+  confirm (commitMessage: string): void {
     this.activeModal.close(commitMessage);
   }
 }

@@ -27,9 +27,9 @@ import { ServicesConstants } from 'services/services.constants';
   providedIn: 'root'
 })
 export class PromoBarBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  async getPromoBarDataAsync(): Promise<PromoBar> {
+  async getPromoBarDataAsync (): Promise<PromoBar> {
     if (!ServicesConstants.ENABLE_PROMO_BAR) {
       return new Promise((resolve, reject) => {
         resolve(PromoBar.createEmpty());
@@ -47,7 +47,7 @@ export class PromoBarBackendApiService {
     });
   }
 
-  async updatePromoBarDataAsync(
+  async updatePromoBarDataAsync (
       promoBarEnabled: boolean, promoBarMessage: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<PromoBarBackendDict>(

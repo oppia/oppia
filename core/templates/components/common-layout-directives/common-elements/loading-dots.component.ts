@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class LoadingDotsComponent {
-  constructor() {}
+  constructor () {}
 }
 angular.module('oppia').directive(
   'loadingDots', downgradeComponent(

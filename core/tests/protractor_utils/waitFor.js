@@ -31,7 +31,7 @@ var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
 var loadingMessage = element(by.css('.protractor-test-loading-message'));
 
-var alertToBePresent = async function() {
+var alertToBePresent = async function () {
   await browser.wait(
     until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS,
     'Alert box took too long to appear.');
@@ -41,7 +41,7 @@ var alertToBePresent = async function() {
  * @param {Object} element - Clickable element such as button, link or tab.
  * @param {string} errorMessage - Error message when element is not clickable.
  */
-var elementToBeClickable = async function(element, errorMessage) {
+var elementToBeClickable = async function (element, errorMessage) {
   await browser.wait(
     until.elementToBeClickable(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
@@ -51,7 +51,7 @@ var elementToBeClickable = async function(element, errorMessage) {
  *                           have height or width.
  * @param {string} errorMessage - Error message when element is still visible.
  */
-var invisibilityOf = async function(element, errorMessage) {
+var invisibilityOf = async function (element, errorMessage) {
   await browser.wait(
     await until.invisibilityOf(element),
     DEFAULT_WAIT_TIME_MSECS, errorMessage);
@@ -60,7 +60,7 @@ var invisibilityOf = async function(element, errorMessage) {
 /**
  * Consider adding this method after each browser.get() call.
  */
-var pageToFullyLoad = async function() {
+var pageToFullyLoad = async function () {
   // Completely wait for page to load to avoid XMLHTTPReq error on page refresh:
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular's flakiness
@@ -77,7 +77,7 @@ var pageToFullyLoad = async function() {
  * @param {string} errorMessage - Error message when element does not contain
  *                                provided text.
  */
-var textToBePresentInElement = async function(element, text, errorMessage) {
+var textToBePresentInElement = async function (element, text, errorMessage) {
   await browser.wait(
     until.textToBePresentInElement(element, text), DEFAULT_WAIT_TIME_MSECS,
     errorMessage);
@@ -88,7 +88,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  *                           This does not mean that the element is visible.
  * @param {string} errorMessage - Error message when element is not present.
  */
-var presenceOf = async function(element, errorMessage) {
+var presenceOf = async function (element, errorMessage) {
   await browser.wait(
     await until.presenceOf(element),
     DEFAULT_WAIT_TIME_MSECS, errorMessage);
@@ -99,7 +99,7 @@ var presenceOf = async function(element, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = async function(element, errorMessage) {
+var visibilityOf = async function (element, errorMessage) {
   await browser.wait(
     await until.visibilityOf(element),
     DEFAULT_WAIT_TIME_MSECS, errorMessage);
@@ -112,10 +112,10 @@ var visibilityOf = async function(element, errorMessage) {
  * @param {Object} value - Value we are waiting attribute to have
  * @param {Object} errorMessage - Error message in case wait times out
  */
-var elementAttributeToBe = async function(
+var elementAttributeToBe = async function (
     element, attribute, value, errorMessage
 ) {
-  await browser.wait(async function() {
+  await browser.wait(async function () {
     return await element.getAttribute(attribute) === value;
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
@@ -123,8 +123,8 @@ var elementAttributeToBe = async function(
 /**
 * Wait for new tab is opened
 */
-var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  await browser.wait(async function() {
+var newTabToBeCreated = async function (errorMessage, urlToMatch) {
+  await browser.wait(async function () {
     var handles = await browser.driver.getAllWindowHandles();
     await browser.waitForAngularEnabled(false);
     await browser.switchTo().window(await handles.pop());
@@ -137,36 +137,36 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 /**
  * @param {string} url - URL to redirect
  */
-var urlRedirection = async function(url) {
+var urlRedirection = async function (url) {
   // Checks that the current URL matches the expected text.
   await browser.wait(
     until.urlIs(url), DEFAULT_WAIT_TIME_MSECS, 'URL redirection took too long');
 };
 
-var visibilityOfInfoToast = async function(errorMessage) {
+var visibilityOfInfoToast = async function (errorMessage) {
   await visibilityOf(toastInfoElement, errorMessage);
 };
 
-var invisibilityOfInfoToast = async function(errorMessage) {
+var invisibilityOfInfoToast = async function (errorMessage) {
   await invisibilityOf(toastInfoElement, errorMessage);
 };
 
-var invisibilityOfLoadingMessage = async function(errorMessage) {
+var invisibilityOfLoadingMessage = async function (errorMessage) {
   await invisibilityOf(loadingMessage, errorMessage);
 };
 
-var visibilityOfSuccessToast = async function(errorMessage) {
+var visibilityOfSuccessToast = async function (errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
-var fadeInToComplete = async function(element, errorMessage) {
+var fadeInToComplete = async function (element, errorMessage) {
   await visibilityOf(element, 'Editor taking too long to appear');
-  await browser.driver.wait(async function() {
+  await browser.driver.wait(async function () {
     return await element.getCssValue('opacity') === '1';
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
-var modalPopupToAppear = async function() {
+var modalPopupToAppear = async function () {
   await visibilityOf(
     element(by.css('.modal-body')), 'Modal taking too long to appear.');
 };
@@ -174,14 +174,14 @@ var modalPopupToAppear = async function() {
 /**
  * Check if a file has been downloaded
  */
-var fileToBeDownloaded = async function(filename) {
+var fileToBeDownloaded = async function (filename) {
   var name = Constants.DOWNLOAD_PATH + '/' + filename;
-  await browser.driver.wait(function() {
+  await browser.driver.wait(function () {
     return fs.existsSync(name);
   }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
 };
 
-var clientSideRedirection = async function(
+var clientSideRedirection = async function (
     action, check, waitForCallerSpecifiedConditions) {
   // Client side redirection is known to cause "both angularJS testability
   // and angular testability are undefined" flake.
@@ -194,7 +194,7 @@ var clientSideRedirection = async function(
 
   // The action only triggers the redirection but does not wait for it to
   // complete. Manually waiting for redirection here.
-  await browser.driver.wait(async() => {
+  await browser.driver.wait(async () => {
     var url = await browser.driver.getCurrentUrl();
     // Condition to wait on.
     return check(decodeURIComponent(url));

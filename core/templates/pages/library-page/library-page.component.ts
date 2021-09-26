@@ -68,7 +68,7 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow: boolean;
   resizeSubscription: Subscription;
 
-  constructor(
+  constructor (
     private loggerService: LoggerService,
     private windowRef: WindowRef,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -83,15 +83,15 @@ export class LibraryPageComponent {
     private pageTitleService: PageTitleService
   ) {}
 
-  setActiveGroup(groupIndex: number): void {
+  setActiveGroup (groupIndex: number): void {
     this.activeGroupIndex = groupIndex;
   }
 
-  clearActiveGroup(): void {
+  clearActiveGroup (): void {
     this.activeGroupIndex = null;
   }
 
-  initCarousels(): void {
+  initCarousels (): void {
     // This prevents unnecessary execution of this method immediately
     // after a window resize event is fired.
     if (!this.libraryGroups) {
@@ -124,7 +124,7 @@ export class LibraryPageComponent {
     }
   }
 
-  scroll(ind: number, isLeftScroll: boolean): void {
+  scroll (ind: number, isLeftScroll: boolean): void {
     if (this.isAnyCarouselCurrentlyScrolling) {
       return;
     }
@@ -175,7 +175,7 @@ export class LibraryPageComponent {
   // The carousels do not work when the width is 1 card long, so we need
   // to handle this case discretely and also prevent swiping past the
   // first and last card.
-  incrementLeftmostCardIndex(ind: number): void {
+  incrementLeftmostCardIndex (ind: number): void {
     let lastItem = ((
       this.libraryGroups[ind].activity_summary_dicts.length -
       this.tileDisplayCount) <= this.leftmostCardIndices[ind]);
@@ -184,7 +184,7 @@ export class LibraryPageComponent {
     }
   }
 
-  decrementLeftmostCardIndex(ind: number): void {
+  decrementLeftmostCardIndex (ind: number): void {
     this.leftmostCardIndices[ind] = (
       Math.max(this.leftmostCardIndices[ind] - 1, 0));
   }
@@ -193,7 +193,7 @@ export class LibraryPageComponent {
   // If fullResultsUrl is given it loads the page corresponding to
   // the url. Otherwise, it will initiate a search query for the
   // given list of categories.
-  showFullResultsPage(categories: string[], fullResultsUrl: string): void {
+  showFullResultsPage (categories: string[], fullResultsUrl: string): void {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
     } else {
@@ -209,11 +209,11 @@ export class LibraryPageComponent {
     }
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
     this.bannerImageFilename = this.possibleBannerFilenames[
       Math.floor(Math.random() * this.possibleBannerFilenames.length)];
@@ -359,7 +359,7 @@ export class LibraryPageComponent {
       });
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }

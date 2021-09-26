@@ -37,7 +37,7 @@ export class CollectionNodeEditorComponent implements OnInit {
   collection: Collection;
   hrefUrl: string;
 
-  constructor(
+  constructor (
     private collectionLinearizerService: CollectionLinearizerService,
     private alertsService: AlertsService,
     private collectionEditorStateService: CollectionEditorStateService
@@ -45,7 +45,7 @@ export class CollectionNodeEditorComponent implements OnInit {
 
   // Deletes this collection node from the frontend collection
   // object and also updates the changelist.
-  deleteNode(): void {
+  deleteNode (): void {
     this.explorationId = this.collectionNode.getExplorationId();
     if (!this.collectionLinearizerService.removeCollectionNode(
       this.collection, this.explorationId)) {
@@ -57,7 +57,7 @@ export class CollectionNodeEditorComponent implements OnInit {
 
   // Shifts this collection node left in the linearized list of the
   // collection, if possible.
-  shiftNodeLeft(): void {
+  shiftNodeLeft (): void {
     this.explorationId = this.collectionNode.getExplorationId();
     if (!this.collectionLinearizerService.shiftNodeLeft(
       this.collection, this.explorationId)) {
@@ -69,7 +69,7 @@ export class CollectionNodeEditorComponent implements OnInit {
 
   // Shifts this collection node right in the linearized list of the
   // collection, if possible.
-  shiftNodeRight(): void {
+  shiftNodeRight (): void {
     this.explorationId = this.collectionNode.getExplorationId();
     if (!this.collectionLinearizerService.shiftNodeRight(
       this.collection, this.explorationId)) {
@@ -79,7 +79,7 @@ export class CollectionNodeEditorComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.collection = this.collectionEditorStateService.getCollection();
     this.hrefUrl = '/create/' + this.collection.getExplorationIds();
   }

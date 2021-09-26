@@ -24,7 +24,7 @@ import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Review test page component', function() {
+describe('Review test page component', function () {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -35,17 +35,17 @@ describe('Review test page component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     pageTitleService = TestBed.get(PageTitleService);
     reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
     reviewTestEngineService = TestBed.get(ReviewTestEngineService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('ReviewTestBackendApiService', reviewTestBackendApiService);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     urlService = $injector.get('UrlService');
@@ -88,7 +88,7 @@ describe('Review test page component', function() {
   }));
 
   it('should initialize correctly controller properties after its' +
-  ' initialization and get skill details from backend', function() {
+  ' initialization and get skill details from backend', function () {
     expect(ctrl.questionPlayerConfig).toEqual({
       resultActionButtons: [{
         type: 'BOOST_SCORE',

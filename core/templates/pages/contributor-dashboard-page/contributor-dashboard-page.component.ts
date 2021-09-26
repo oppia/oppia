@@ -56,7 +56,7 @@ angular.module('oppia').component('contributorDashboardPage', {
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
-    function(
+    function (
         $rootScope, $timeout, FocusManagerService,
         LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
@@ -69,9 +69,9 @@ angular.module('oppia').component('contributorDashboardPage', {
       var allAudioLanguageCodes = (
         LanguageUtilService.getAllVoiceoverLanguageCodes());
 
-      var getLanguageDescriptions = function(languageCodes) {
+      var getLanguageDescriptions = function (languageCodes) {
         var languageDescriptions = [];
-        languageCodes.forEach(function(languageCode) {
+        languageCodes.forEach(function (languageCode) {
           languageDescriptions.push(
             LanguageUtilService.getAudioLanguageDescription(
               languageCode));
@@ -79,7 +79,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         return languageDescriptions;
       };
 
-      ctrl.onChangeLanguage = function(languageCode: string) {
+      ctrl.onChangeLanguage = function (languageCode: string) {
         ctrl.languageCode = languageCode;
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
         LocalStorageService.updateLastSelectedTranslationLanguageCode(
@@ -87,13 +87,13 @@ angular.module('oppia').component('contributorDashboardPage', {
         $rootScope.$applyAsync();
       };
 
-      ctrl.showLanguageSelector = function() {
+      ctrl.showLanguageSelector = function () {
         var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
         return (
           activeTabDetail.customizationOptions.indexOf('language') !== -1);
       };
 
-      ctrl.onTabClick = function(activeTabName) {
+      ctrl.onTabClick = function (activeTabName) {
         ctrl.activeTabName = activeTabName;
         // The $timeout is required to ensure that focus is applied only
         // after all the functions in main thread have executed.
@@ -104,7 +104,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         }
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.profilePictureDataUrl = null;
         ctrl.username = null;
         ctrl.userInfoIsLoading = true;
@@ -115,11 +115,11 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
 
-        WindowRef.nativeWindow.addEventListener('scroll', function() {
+        WindowRef.nativeWindow.addEventListener('scroll', function () {
           ctrl.scrollFunction();
         });
 
-        ctrl.scrollFunction = function() {
+        ctrl.scrollFunction = function () {
           if (WindowRef.nativeWindow.pageYOffset >= 5) {
             ctrl.defaultHeaderVisible = false;
           } else {
@@ -131,7 +131,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         };
 
         UserService.getProfileImageDataUrlAsync().then(
-          function(dataUrl) {
+          function (dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
@@ -139,7 +139,7 @@ angular.module('oppia').component('contributorDashboardPage', {
           });
 
         UserService.getUserContributionRightsDataAsync().then(
-          function(userContributionRights) {
+          function (userContributionRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
                 userContributionRights
@@ -167,7 +167,7 @@ angular.module('oppia').component('contributorDashboardPage', {
             $rootScope.$applyAsync();
           });
 
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function (userInfo) {
           ctrl.userInfoIsLoading = false;
           if (userInfo.isLoggedIn()) {
             ctrl.userIsLoggedIn = true;

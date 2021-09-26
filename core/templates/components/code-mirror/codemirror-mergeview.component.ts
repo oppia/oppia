@@ -36,12 +36,12 @@ export class CodemirrorMergeviewComponent implements
   @Input() rightValue!: string | undefined;
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
 
-  constructor(
+  constructor (
     private elementRef: ElementRef,
     private ngZone: NgZone,
     private windowRef: WindowRef) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     // Require CodeMirror.
     if (
       (this.windowRef.nativeWindow as typeof window).CodeMirror === undefined
@@ -50,7 +50,7 @@ export class CodemirrorMergeviewComponent implements
     }
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit (): void {
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {
@@ -66,7 +66,7 @@ export class CodemirrorMergeviewComponent implements
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     // Watch for changes and set value in left pane.
     if (changes.leftValue &&
       changes.leftValue.currentValue !==

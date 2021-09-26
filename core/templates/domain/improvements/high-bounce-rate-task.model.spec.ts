@@ -23,8 +23,8 @@ import { HighBounceRateTask } from
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 
-describe('High bounce rate task', function() {
-  describe('High bounce rate task model', function() {
+describe('High bounce rate task', function () {
+  describe('High bounce rate task model', function () {
     let config: ExplorationImprovementsConfig;
     let createFromExplorationStats: (
       expStats: ExplorationStats,

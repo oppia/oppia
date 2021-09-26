@@ -22,7 +22,7 @@ require(
 
 angular.module('oppia').controller('SkillsMasteryListConceptCardModal', [
   '$controller', '$scope', '$uibModalInstance', 'skillDescription', 'skillId',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, skillDescription, skillId) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

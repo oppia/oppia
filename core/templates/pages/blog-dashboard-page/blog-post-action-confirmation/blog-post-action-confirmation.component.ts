@@ -30,28 +30,28 @@ import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashb
 export class BlogPostActionConfirmationModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   blogPostAction: string;
-  constructor(
+  constructor (
       ngbActiveModal: NgbActiveModal,
       private blogDashboardPageService: BlogDashboardPageService,
   ) {
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.blogPostAction = this.blogDashboardPageService.blogPostAction;
   }
 
-  isActionDelete(): boolean {
+  isActionDelete (): boolean {
     return this.blogPostAction === (
       BlogDashboardPageConstants.BLOG_POST_ACTIONS.DELETE);
   }
 
-  isActionPublish(): boolean {
+  isActionPublish (): boolean {
     return this.blogPostAction === (
       BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH);
   }
 
-  isActionUnpublish(): boolean {
+  isActionUnpublish (): boolean {
     return this.blogPostAction === (
       BlogDashboardPageConstants.BLOG_POST_ACTIONS.UNPUBLISH);
   }

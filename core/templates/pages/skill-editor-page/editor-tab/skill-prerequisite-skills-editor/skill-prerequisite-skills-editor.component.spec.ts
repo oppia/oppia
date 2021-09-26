@@ -30,7 +30,7 @@ import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { AlertsService } from 'services/alerts.service';
 // ^^^ This block is to be removed.
 
-describe('Skill editor main tab directive', function() {
+describe('Skill editor main tab directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -57,7 +57,7 @@ describe('Skill editor main tab directive', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     ngbModal = TestBed.inject(NgbModal);
@@ -236,7 +236,7 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should fetch skill when initialized', function() {
+  it('should fetch skill when initialized', function () {
     spyOn(
       skillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
       current: [],
@@ -250,7 +250,7 @@ describe('Skill editor main tab directive', function() {
     expect($scope.skill).toEqual(sampleSkill);
   });
 
-  it('should remove skill id when calling \'removeSkillId\'', function() {
+  it('should remove skill id when calling \'removeSkillId\'', function () {
     let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
       .and.returnValue(null);
 
@@ -260,14 +260,14 @@ describe('Skill editor main tab directive', function() {
   });
 
   it('should return skill editor url when calling ' +
-    '\'getSkillEditorUrl\'', function() {
+    '\'getSkillEditorUrl\'', function () {
     let result = $scope.getSkillEditorUrl('skillId');
 
     expect(result).toBe('/skill_editor/skillId');
   });
 
   it('should toggle prerequisite skills ' +
-    '\'togglePrerequisiteSkills\'', function() {
+    '\'togglePrerequisiteSkills\'', function () {
     $scope.prerequisiteSkillsAreShown = false;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
@@ -279,9 +279,9 @@ describe('Skill editor main tab directive', function() {
     expect($scope.prerequisiteSkillsAreShown).toBe(false);
   });
 
-  describe('while adding a skill', function() {
+  describe('while adding a skill', function () {
     it('should show info message if we try ' +
-      'to add a prerequisite skill to itself', fakeAsync(function() {
+      'to add a prerequisite skill to itself', fakeAsync(function () {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return <NgbModalRef>({
           componentInstance: {},
@@ -302,7 +302,7 @@ describe('Skill editor main tab directive', function() {
     }));
 
     it('should show info message if we try to add a prerequisite ' +
-      'skill which has already been added', fakeAsync(function() {
+      'skill which has already been added', fakeAsync(function () {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return <NgbModalRef>({
           componentInstance: {},
@@ -323,7 +323,7 @@ describe('Skill editor main tab directive', function() {
     }));
 
     it('should add skill sucessfully when calling ' +
-      '\'addSkill\'', fakeAsync(function() {
+      '\'addSkill\'', fakeAsync(function () {
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return <NgbModalRef>({
           componentInstance: {},

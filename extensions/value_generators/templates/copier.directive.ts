@@ -25,10 +25,10 @@ interface CopierCustomScope extends ng.IScope {
   getTemplateUrl?: (() => string);
 }
 
-angular.module('oppia').directive('copier', ['$compile', function($compile) {
+angular.module('oppia').directive('copier', ['$compile', function ($compile) {
   return {
-    link: function(scope: CopierCustomScope, element) {
-      scope.getTemplateUrl = function() {
+    link: function (scope: CopierCustomScope, element) {
+      scope.getTemplateUrl = function () {
         return '/value_generator_handler/' + scope.generatorId;
       };
       $compile(element.contents())(scope);
@@ -41,17 +41,17 @@ angular.module('oppia').directive('copier', ['$compile', function($compile) {
       getObjType: '&',
     },
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
+    controller: ['$scope', function ($scope) {
       var ctrl = this;
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.generatorId = $scope.getGeneratorId();
         $scope.initArgs = $scope.getInitArgs();
         $scope.objType = $scope.getObjType();
-        $scope.$watch('initArgs', function() {
+        $scope.$watch('initArgs', function () {
           $scope.initArgs = $scope.getInitArgs();
         }, true);
 
-        $scope.$watch('objType', function() {
+        $scope.$watch('objType', function () {
           $scope.objType = $scope.getObjType();
         }, true);
       };

@@ -23,7 +23,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 })
 @Pipe({name: 'camelCaseToHyphens'})
 export class CamelCaseToHyphensPipe implements PipeTransform {
-  transform(input: string): string {
+  transform (input: string): string {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
     if (result[0] === '-') {
       result = result.substring(1);

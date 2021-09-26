@@ -25,9 +25,9 @@ import { PageHeadService } from 'services/page-head.service';
   templateUrl: './splash-page-root.component.html'
 })
 export class SplashPageRootComponent {
-  constructor(private pageHeadService: PageHeadService) {}
+  constructor (private pageHeadService: PageHeadService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH);
   }

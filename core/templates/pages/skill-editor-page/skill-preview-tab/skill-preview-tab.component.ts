@@ -47,7 +47,7 @@ angular.module('oppia').component('skillPreviewTab', {
     'ExplorationPlayerStateService',
     'QuestionBackendApiService', 'QuestionPlayerEngineService',
     'SkillEditorStateService', 'UrlService',
-    function(
+    function (
         $rootScope, $scope, ContextService, CurrentInteractionService,
         ExplorationPlayerStateService,
         QuestionBackendApiService, QuestionPlayerEngineService,
@@ -62,7 +62,7 @@ angular.module('oppia').component('skillPreviewTab', {
         ITEM_SELECTION: 'Item Selection'
       };
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.skillId = UrlService.getSkillIdFromUrl();
         SkillEditorStateService.loadSkill(ctrl.skillId);
         ctrl.questionTextFilter = '';
@@ -98,13 +98,13 @@ angular.module('oppia').component('skillPreviewTab', {
         });
       };
 
-      ctrl.initializeQuestionCard = function(card) {
+      ctrl.initializeQuestionCard = function (card) {
         ctrl.displayCardIsInitialized = true;
         ctrl.displayedCard = card;
         $scope.$applyAsync();
       };
 
-      ctrl.applyFilters = function() {
+      ctrl.applyFilters = function () {
         ctrl.displayedQuestions = ctrl.questionDicts.filter(
           questionDict => {
             var contentData = questionDict.question_state_data.content.html;
@@ -136,14 +136,14 @@ angular.module('oppia').component('skillPreviewTab', {
           });
       };
 
-      ctrl.selectQuestionToPreview = function(index) {
+      ctrl.selectQuestionToPreview = function (index) {
         QuestionPlayerEngineService.clearQuestions();
         ctrl.displayCardIsInitialized = false;
         QuestionPlayerEngineService.init(
           [ctrl.displayedQuestions[index]], ctrl.initializeQuestionCard);
       };
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         ContextService.clearQuestionPlayerIsOpen();
       });
     }]

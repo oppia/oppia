@@ -33,7 +33,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
   let resizeEvent = new Event('resize');
 
   class MockChangeDetectorRef {
-    detectChanges(): void { }
+    detectChanges (): void { }
   }
 
   beforeEach(waitForAsync(() => {
@@ -132,7 +132,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
   it('should confirm thumbnail picutre', () => {
     let pictureDataUrl = 'picture_data';
     componentInstance.cropper = {
-      getCroppedCanvas(options) {
+      getCroppedCanvas (options) {
         return {
           toDataURL: () => pictureDataUrl
         };

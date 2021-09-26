@@ -66,7 +66,7 @@ describe('Topic editor state service', () => {
   let subtopicPage: SubtopicPageBackendDict;
 
   class MockEditableTopicBackendApiService {
-    fetchTopicAsync(topicId: string): Promise<FetchTopicResponse> {
+    fetchTopicAsync (topicId: string): Promise<FetchTopicResponse> {
       return Promise.resolve({
         skillCreationIsAllowed: skillCreationIsAllowed,
         skillQuestionCountDict: skillQuestionCountDict,
@@ -78,16 +78,16 @@ describe('Topic editor state service', () => {
       } as unknown as FetchTopicResponse);
     }
 
-    fetchStoriesAsync(topicId: string): Promise<StorySummaryBackendDict[]> {
+    fetchStoriesAsync (topicId: string): Promise<StorySummaryBackendDict[]> {
       return Promise.resolve([storySummaryBackendDict]);
     }
 
-    fetchSubtopicPageAsync(
+    fetchSubtopicPageAsync (
         topicId: number, subtopicId: number): Promise<SubtopicPageBackendDict> {
       return Promise.resolve(subtopicPage);
     }
 
-    updateTopicAsync(
+    updateTopicAsync (
         topicId: string,
         version: number,
         commitMessage: string,
@@ -125,17 +125,17 @@ describe('Topic editor state service', () => {
       });
     }
 
-    doesTopicWithNameExistAsync(topicName: string): Promise<boolean> {
+    doesTopicWithNameExistAsync (topicName: string): Promise<boolean> {
       return Promise.resolve(true);
     }
 
-    doesTopicWithUrlFragmentExistAsync(topicName: string): Promise<boolean> {
+    doesTopicWithUrlFragmentExistAsync (topicName: string): Promise<boolean> {
       return Promise.resolve(true);
     }
   }
 
   class MockTopicRightsBackendApiService {
-    fetchTopicRightsAsync(topicId: string): Promise<TopicRightsBackendDict> {
+    fetchTopicRightsAsync (topicId: string): Promise<TopicRightsBackendDict> {
       return Promise.resolve({
         published: true,
         can_publish_topic: true,
@@ -145,7 +145,7 @@ describe('Topic editor state service', () => {
   }
 
   class MockEditableStoryBackendApiService {
-    deleteStoryAsync(storyId: string): Promise<Object> {
+    deleteStoryAsync (storyId: string): Promise<Object> {
       return Promise.resolve({});
     }
   }

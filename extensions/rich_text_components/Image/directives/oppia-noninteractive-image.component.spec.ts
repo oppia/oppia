@@ -50,13 +50,13 @@ describe('NoninteractiveImage', () => {
     'WVsbG93IiAvPjwvc3ZnPg==';
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(data): string {
+    escapedJsonToObj (data): string {
       return data;
     }
   }
 
   class MockSvgSanitizerService {
-    getTrustedSvgResourceUrl(str: string): string {
+    getTrustedSvgResourceUrl (str: string): string {
       return str;
     }
   }

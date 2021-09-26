@@ -31,7 +31,7 @@ export interface ExplorationStatsBackendDict {
 }
 
 export class ExplorationStats {
-  constructor(
+  constructor (
       public readonly expId: string,
       public readonly expVersion: number,
       public readonly numStarts: number,
@@ -41,7 +41,7 @@ export class ExplorationStats {
     this.stateStatsMapping = new Map(stateStatsMapping);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ExplorationStatsBackendDict): ExplorationStats {
     const stateStatsMapping = (
       new Map(Object.entries(backendDict.state_stats_mapping).map(
@@ -56,7 +56,7 @@ export class ExplorationStats {
       stateStatsMapping);
   }
 
-  getBounceRate(stateName: string): number {
+  getBounceRate (stateName: string): number {
     if (this.numStarts === 0) {
       throw new Error('Can not get bounce rate of an unplayed exploration');
     }
@@ -64,15 +64,15 @@ export class ExplorationStats {
     return (totalHitCount - numCompletions) / this.numStarts;
   }
 
-  getStateNames(): string[] {
+  getStateNames (): string[] {
     return [...this.stateStatsMapping.keys()];
   }
 
-  hasStateStates(stateName: string): boolean {
+  hasStateStates (stateName: string): boolean {
     return this.stateStatsMapping.has(stateName);
   }
 
-  getStateStats(stateName: string): StateStats {
+  getStateStats (stateName: string): StateStats {
     const stateStats = this.stateStatsMapping.get(stateName);
     if (!stateStats) {
       throw new Error('no stats exist for state: ' + stateName);
@@ -88,7 +88,7 @@ export class ExplorationStats {
    * providing users with an interface for reflecting changes made to an
    * exploration.
    */
-  createNewWithStateAdded(newStateName: string): ExplorationStats {
+  createNewWithStateAdded (newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.set(newStateName, new StateStats(0, 0, 0, 0, 0, 0));
     return new ExplorationStats(
@@ -104,7 +104,7 @@ export class ExplorationStats {
    * providing users with an interface for reflecting changes made to an
    * exploration.
    */
-  createNewWithStateDeleted(oldStateName: string): ExplorationStats {
+  createNewWithStateDeleted (oldStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.delete(oldStateName);
     return new ExplorationStats(
@@ -120,7 +120,7 @@ export class ExplorationStats {
    * providing users with an interface for reflecting changes made to an
    * exploration.
    */
-  createNewWithStateRenamed(
+  createNewWithStateRenamed (
       oldStateName: string, newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     const stateStats = this.getStateStats(oldStateName);

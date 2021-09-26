@@ -23,7 +23,7 @@ import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 
 @Injectable({providedIn: 'root'})
 export class SuggestionsService {
-  getThreadIdFromSuggestionBackendDict(
+  getThreadIdFromSuggestionBackendDict (
       suggestionBackendDict: SuggestionBackendDict): string {
     return suggestionBackendDict.suggestion_id;
   }

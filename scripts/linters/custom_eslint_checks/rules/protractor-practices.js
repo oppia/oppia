@@ -46,7 +46,7 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var elementAllSelector = (
       'CallExpression[callee.object.name=element][callee.property.name=all]');
     var invalidAwaitSelector = (
@@ -62,7 +62,7 @@ module.exports = {
       'CallExpression[callee.object.name=by][callee.property.name=css]');
     var elementAllIdName = [];
 
-    var reportDisallowInvalidAwait = function(node) {
+    var reportDisallowInvalidAwait = function (node) {
       if (node.type === 'CallExpression') {
         if (node.parent.type === 'VariableDeclarator') {
           elementAllIdName.push(node.parent.id.name);
@@ -92,7 +92,7 @@ module.exports = {
       }
     };
 
-    var reportDisallowedBrowserMethod = function(node) {
+    var reportDisallowedBrowserMethod = function (node) {
       context.report({
         node: node,
         loc: node.callee.loc,
@@ -103,7 +103,7 @@ module.exports = {
       });
     };
 
-    var checkConstName = function(node) {
+    var checkConstName = function (node) {
       var constantName = node.declarations[0].id.name;
       if ((node.declarations[0].id.type === 'Identifier') &&
         (constantName !== constantName.toUpperCase())) {
@@ -117,7 +117,7 @@ module.exports = {
       }
     };
 
-    var checkElementSelector = function(node) {
+    var checkElementSelector = function (node) {
       var thirdPartySelectorPrefixes = (
         ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
@@ -143,33 +143,33 @@ module.exports = {
     };
 
     return {
-      [elementAllSelector]: function(node) {
+      [elementAllSelector]: function (node) {
         reportDisallowInvalidAwait(node);
       },
-      [invalidAwaitSelector]: function(node) {
+      [invalidAwaitSelector]: function (node) {
         reportDisallowInvalidAwait(node);
       },
-      'VariableDeclaration[kind=const]': function(node) {
+      'VariableDeclaration[kind=const]': function (node) {
         checkConstName(node);
       },
-      [disallowedBrowserMethodsSelector]: function(node) {
+      [disallowedBrowserMethodsSelector]: function (node) {
         reportDisallowedBrowserMethod(node);
       },
-      'CallExpression[callee.property.name=\'then\']': function(node) {
+      'CallExpression[callee.property.name=\'then\']': function (node) {
         context.report({
           node: node.callee.property,
           loc: node.callee.property.loc,
           messageId: 'disallowThen'
         });
       },
-      'CallExpression[callee.property.name=forEach]': function(node) {
+      'CallExpression[callee.property.name=forEach]': function (node) {
         context.report({
           node: node.callee.property,
           loc: node.callee.property.loc,
           messageId: 'disallowForEach'
         });
       },
-      [byCssSelector]: function(node) {
+      [byCssSelector]: function (node) {
         checkElementSelector(node);
       }
     };

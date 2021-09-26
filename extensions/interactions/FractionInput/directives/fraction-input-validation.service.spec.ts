@@ -243,14 +243,14 @@ describe('FractionInputValidationService', () => {
     )];
   });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', function () {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch redundant rules', function() {
+  it('should catch redundant rules', function () {
     answerGroups[0].rules = [lessThanTwoRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -262,7 +262,7 @@ describe('FractionInputValidationService', () => {
     }]);
   });
 
-  it('should not catch equals followed by equivalent as redundant', function() {
+  it('should not catch equals followed by equivalent as redundant', function () {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -277,7 +277,7 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should catch equivalent followed by equals same value' +
-    'as redundant', function() {
+    'as redundant', function () {
     answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,

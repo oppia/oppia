@@ -21,7 +21,7 @@ angular.module('oppia').component('needsGuidingResponsesTask', {
   bindings: {task: '<', stats: '<'},
   controller: [
     'RouterService',
-    function(RouterService) {
+    function (RouterService) {
       this.$onInit = () => {
         this.sortedTilesData = this.stats.answerStats;
         this.sortedTilesOptions = {header: '', use_percentages: true};

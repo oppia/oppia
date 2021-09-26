@@ -32,7 +32,7 @@ require('services/alerts.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('collectionDetailsEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -44,14 +44,14 @@ angular.module('oppia').directive('collectionDetailsEditor', [
         'CollectionUpdateService', 'CollectionValidationService',
         'ALL_CATEGORIES', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         'SUPPORTED_CONTENT_LANGUAGES', 'TAG_REGEX',
-        function(
+        function (
             AlertsService, CollectionEditorStateService,
             CollectionUpdateService, CollectionValidationService,
             ALL_CATEGORIES, COLLECTION_TITLE_INPUT_FOCUS_LABEL,
             SUPPORTED_CONTENT_LANGUAGES, TAG_REGEX) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var refreshSettingsTab = function() {
+          var refreshSettingsTab = function () {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();
             ctrl.displayedCollectionObjective = (
               ctrl.collection.getObjective());
@@ -63,7 +63,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
               ctrl.collection.getTags());
 
             var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
-              function(categoryItem) {
+              function (categoryItem) {
                 return categoryItem.id === ctrl.collection.getCategory();
               }
             );
@@ -78,35 +78,35 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             }
           };
 
-          ctrl.updateCollectionTitle = function() {
+          ctrl.updateCollectionTitle = function () {
             CollectionUpdateService.setCollectionTitle(
               ctrl.collection, ctrl.displayedCollectionTitle);
           };
 
-          ctrl.updateCollectionObjective = function() {
+          ctrl.updateCollectionObjective = function () {
             CollectionUpdateService.setCollectionObjective(
               ctrl.collection, ctrl.displayedCollectionObjective);
           };
 
-          ctrl.updateCollectionCategory = function() {
+          ctrl.updateCollectionCategory = function () {
             CollectionUpdateService.setCollectionCategory(
               ctrl.collection, ctrl.displayedCollectionCategory);
           };
 
-          ctrl.updateCollectionLanguageCode = function() {
+          ctrl.updateCollectionLanguageCode = function () {
             CollectionUpdateService.setCollectionLanguageCode(
               ctrl.collection, ctrl.displayedCollectionLanguage);
           };
 
           // Normalize the tags for the collection.
-          var normalizeTags = function(tags) {
+          var normalizeTags = function (tags) {
             for (var i = 0; i < tags.length; i++) {
               tags[i] = tags[i].trim().replace(/\s+/g, ' ');
             }
             return tags;
           };
 
-          ctrl.updateCollectionTags = function() {
+          ctrl.updateCollectionTags = function () {
             ctrl.displayedCollectionTags = normalizeTags(
               ctrl.displayedCollectionTags);
             if (!CollectionValidationService.isTagValid(
@@ -119,10 +119,10 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             CollectionUpdateService.setCollectionTags(
               ctrl.collection, ctrl.displayedCollectionTags);
           };
-          ctrl.hasPageLoaded = function() {
+          ctrl.hasPageLoaded = function () {
             return CollectionEditorStateService.hasLoadedCollection();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
                 () => refreshSettingsTab()
@@ -132,7 +132,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
               COLLECTION_TITLE_INPUT_FOCUS_LABEL);
             ctrl.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
-              function(category) {
+              function (category) {
                 return {
                   id: category,
                   text: category
@@ -142,7 +142,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
             ctrl.TAG_REGEX = TAG_REGEX;
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }
@@ -156,7 +156,7 @@ import { UpgradeComponent } from '@angular/upgrade/static';
   selector: 'collection-details-editor'
 })
 export class CollectionDetailsEditor extends UpgradeComponent {
-  constructor(elementRef: ElementRef, injector: Injector) {
+  constructor (elementRef: ElementRef, injector: Injector) {
     super('collectionDetailsEditor', elementRef, injector);
   }
 }

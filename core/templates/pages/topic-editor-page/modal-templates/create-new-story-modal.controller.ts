@@ -33,7 +33,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
   'ImageLocalStorageService', 'StoryEditorStateService',
   'TopicEditorStateService', 'WindowRef', 'MAX_CHARS_IN_STORY_DESCRIPTION',
   'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
-  function(
+  function (
       $controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, StoryEditorStateService,
       TopicEditorStateService, WindowRef, MAX_CHARS_IN_STORY_DESCRIPTION,
@@ -56,23 +56,23 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       TopicEditorStateService.getClassroomUrlFragment());
     $scope.topicUrlFragment = (
       TopicEditorStateService.getTopic().getUrlFragment());
-    $scope.onStoryUrlFragmentChange = function() {
+    $scope.onStoryUrlFragmentChange = function () {
       if (!$scope.story.urlFragment) {
         return;
       }
       StoryEditorStateService.updateExistenceOfStoryUrlFragment(
-        $scope.story.urlFragment, function() {
+        $scope.story.urlFragment, function () {
           $scope.storyUrlFragmentExists = (
             StoryEditorStateService.getStoryWithUrlFragmentExists());
           $rootScope.$applyAsync();
         });
     };
 
-    $scope.updateView = function() {
+    $scope.updateView = function () {
       $scope.$applyAsync();
     };
 
-    $scope.isValid = function() {
+    $scope.isValid = function () {
       return Boolean(
         $scope.story.isValid() &&
         ImageLocalStorageService.getStoredImagesData().length > 0 &&

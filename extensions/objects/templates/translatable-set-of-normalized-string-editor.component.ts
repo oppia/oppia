@@ -42,9 +42,9 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
     }]
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor (private changeDetectorRef: ChangeDetectorRef) { }
 
-  updateValue(val: string): void {
+  updateValue (val: string): void {
     if (this.value.normalizedStrSet === val) {
       return;
     }
@@ -53,7 +53,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): {
+  getSchema (): {
     type: string;
     items: { type: string; };
     validators: { id: string; }[];

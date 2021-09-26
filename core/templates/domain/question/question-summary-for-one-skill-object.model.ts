@@ -38,7 +38,7 @@ export class QuestionSummaryForOneSkill {
   _skillDifficulty: number;
   _questionSummary: QuestionSummary;
 
-  constructor(
+  constructor (
       skillId: string, skillDescription: string, skillDifficulty: number,
       questionSummary: QuestionSummary) {
     this._skillId = skillId;
@@ -47,23 +47,23 @@ export class QuestionSummaryForOneSkill {
     this._questionSummary = questionSummary;
   }
 
-  getSkillDifficulty(): number {
+  getSkillDifficulty (): number {
     return this._skillDifficulty;
   }
 
-  getSkillId(): string {
+  getSkillId (): string {
     return this._skillId;
   }
 
-  getSkillDescription(): string {
+  getSkillDescription (): string {
     return this._skillDescription;
   }
 
-  getQuestionSummary(): QuestionSummary {
+  getQuestionSummary (): QuestionSummary {
     return this._questionSummary;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict:
     QuestionSummaryForOneSkillBackendDict): QuestionSummaryForOneSkill {
     var questionSummary =

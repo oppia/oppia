@@ -30,7 +30,7 @@ require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 
 angular.module('oppia').directive('schemaBasedViewer', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -41,6 +41,6 @@ angular.module('oppia').directive('schemaBasedViewer', [
       template: require(
         'components/forms/schema-viewers/schema-based-viewer.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [function () {}]
     };
   }]);

@@ -25,15 +25,15 @@ import { UrlService } from 'services/contextual/url.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 
 class MockUrlService {
-  getTopicUrlFragmentFromLearnerUrl() {
+  getTopicUrlFragmentFromLearnerUrl () {
     return 'topic_1';
   }
 
-  getClassroomUrlFragmentFromLearnerUrl() {
+  getClassroomUrlFragmentFromLearnerUrl () {
     return 'classroom_1';
   }
 
-  getStoryUrlFragmentFromLearnerUrl() {
+  getStoryUrlFragmentFromLearnerUrl () {
     return 'story';
   }
 }
@@ -50,7 +50,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
         {
           provide: StoryViewerBackendApiService,
           useValue: {
-            fetchStoryDataAsync: async() => (
+            fetchStoryDataAsync: async () => (
               new Promise((resolve) => {
                 resolve(
                   StoryPlaythrough.createFromBackendDict({

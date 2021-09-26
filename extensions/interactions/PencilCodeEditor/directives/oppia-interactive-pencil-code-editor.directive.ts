@@ -39,7 +39,7 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
   '$timeout', 'InteractionAttributesExtractorService', 'PlayerPositionService',
-  function(
+  function (
       $timeout, InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
@@ -52,33 +52,33 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
       controller: [
         '$attrs', '$element', '$uibModal', 'CurrentInteractionService',
         'FocusManagerService', 'PencilCodeEditorRulesService',
-        function(
+        function (
             $attrs, $element, $uibModal, CurrentInteractionService,
             FocusManagerService, PencilCodeEditorRulesService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var iframeDiv, pce;
-          ctrl.reset = function() {
+          ctrl.reset = function () {
             $uibModal.open({
               template: require(
                 './pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: 'ConfirmOrCancelModalController'
-            }).result.then(function() {
+            }).result.then(function () {
               pce.setCode(ctrl.initialCode);
-            }, function() {
+            }, function () {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          var getNormalizedCode = function() {
+          var getNormalizedCode = function () {
             // Converts tabs to spaces.
             return pce.getCode().replace(/\t/g, '  ');
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onNewCardAvailable.subscribe(
                 () => {
@@ -104,7 +104,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               ctrl.getLastAnswer().code;
 
             pce.beginLoad(ctrl.initialCode);
-            pce.on('load', function() {
+            pce.on('load', function () {
               // Hides the error console at the bottom right, and prevents it
               // from showing up even if the code has an error. Also, hides the
               // turtle, and redefines say() to also write the text on the
@@ -145,11 +145,11 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             var errorIsHappening = false;
             var hasSubmittedAnswer = false;
 
-            pce.on('startExecute', function() {
+            pce.on('startExecute', function () {
               hasSubmittedAnswer = false;
             });
 
-            pce.on('execute', function() {
+            pce.on('execute', function () {
               if (errorIsHappening || hasSubmittedAnswer) {
                 return;
               }
@@ -159,12 +159,12 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               // issue in this case.
               pce.eval(
                 'document.body.innerHTML', // disable-bad-pattern-check
-                function(pencilCodeHtml) {
+                function (pencilCodeHtml) {
                   var normalizedCode = getNormalizedCode();
 
                   // Get all the divs, and extract their textual content.
                   var output = $.map(
-                    $(pencilCodeHtml).filter('div'), function(elem) {
+                    $(pencilCodeHtml).filter('div'), function (elem) {
                       return $(elem).text();
                     }).join('\n');
 
@@ -178,7 +178,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 }, true);
             });
 
-            pce.on('error', function(error) {
+            pce.on('error', function (error) {
               if (hasSubmittedAnswer) {
                 return;
               }
@@ -195,14 +195,14 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 error: error.message
               }, PencilCodeEditorRulesService);
 
-              $timeout(function() {
+              $timeout(function () {
                 errorIsHappening = false;
               }, 1000);
             });
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

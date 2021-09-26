@@ -19,7 +19,7 @@
 import { TruncateAtFirstLinePipe } from
   'filters/string-utility-filters/truncate-at-first-line.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let truncateAtFirstLinePipe: TruncateAtFirstLinePipe;
   beforeEach(() => {
     truncateAtFirstLinePipe = new TruncateAtFirstLinePipe();

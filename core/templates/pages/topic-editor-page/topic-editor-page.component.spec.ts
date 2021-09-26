@@ -27,7 +27,7 @@ import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
-describe('Topic editor page', function() {
+describe('Topic editor page', function () {
   var ctrl = null;
   var $scope = null;
   var ContextService = null;
@@ -43,7 +43,7 @@ describe('Topic editor page', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     UndoRedoService = $injector.get('UndoRedoService');
@@ -80,12 +80,12 @@ describe('Topic editor page', function() {
   }));
 
   it('should load topic based on its id on url when component is initialized' +
-    ' and set page title', function() {
+    ' and set page title', function () {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
     let undoRedoChangeEventEmitter = new EventEmitter();
     let topicUpdateViewEmitter = new EventEmitter();
-    spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
+    spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function () {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
       undoRedoChangeEventEmitter.emit();
@@ -110,7 +110,7 @@ describe('Topic editor page', function() {
     ctrl.$onDestroy();
   });
 
-  it('should get active tab name', function() {
+  it('should get active tab name', function () {
     ctrl.selectQuestionsTab();
     spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions');
@@ -122,7 +122,7 @@ describe('Topic editor page', function() {
   });
 
   it('should addListener by passing getChangeCount to ' +
-  'PreventPageUnloadEventService', function() {
+  'PreventPageUnloadEventService', function () {
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
@@ -135,18 +135,18 @@ describe('Topic editor page', function() {
       .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
-  it('should return the change count', function() {
+  it('should return the change count', function () {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     expect(ctrl.getChangeListLength()).toBe(10);
   });
 
-  it('should get entity type from context service', function() {
+  it('should get entity type from context service', function () {
     spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
     expect(ctrl.getEntityType()).toBe('exploration');
   });
 
   it('should open subtopic preview tab if active tab is subtopic editor',
-    function() {
+    function () {
       spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
         'subtopic_editor');
       const topicPreviewSpy = spyOn(
@@ -155,7 +155,7 @@ describe('Topic editor page', function() {
       expect(topicPreviewSpy).toHaveBeenCalled();
     });
 
-  it('should open topic preview if active tab is topic editor', function() {
+  it('should open topic preview if active tab is topic editor', function () {
     spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'topic_editor');
     const topicPreviewSpy = spyOn(
@@ -165,7 +165,7 @@ describe('Topic editor page', function() {
   });
 
   it('should open subtopic preview tab if active tab is subtopic editor',
-    function() {
+    function () {
       spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
         'subtopic_editor');
       const topicPreviewSpy = spyOn(
@@ -174,7 +174,7 @@ describe('Topic editor page', function() {
       expect(topicPreviewSpy).toHaveBeenCalled();
     });
 
-  it('should navigate to topic editor tab in topic editor', function() {
+  it('should navigate to topic editor tab in topic editor', function () {
     spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'topic_preview');
     const topicPreviewSpy = spyOn(
@@ -184,7 +184,7 @@ describe('Topic editor page', function() {
   });
 
   it('should select navigate to the subtopic editor tab in subtopic editor',
-    function() {
+    function () {
       spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
         'subtopic_preview');
       const topicPreviewSpy = spyOn(
@@ -193,7 +193,7 @@ describe('Topic editor page', function() {
       expect(topicPreviewSpy).toHaveBeenCalled();
     });
 
-  it('should validate the topic and return validation issues', function() {
+  it('should validate the topic and return validation issues', function () {
     ctrl.topic = topic;
     spyOn(
       TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(true);
@@ -210,7 +210,7 @@ describe('Topic editor page', function() {
     expect(ctrl.getTotalWarningsCount()).toEqual(2);
   });
 
-  it('should return the navbar text', function() {
+  it('should return the navbar text', function () {
     ctrl.selectQuestionsTab();
     var routingSpy = spyOn(
       TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
@@ -227,7 +227,7 @@ describe('Topic editor page', function() {
   });
 
   it('should load topic based on its id on url when undo or redo action' +
-  ' is performed', function() {
+  ' is performed', function () {
     let mockUndoRedoChangeEventEmitter = new EventEmitter();
     spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
       mockUndoRedoChangeEventEmitter);

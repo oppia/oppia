@@ -41,7 +41,7 @@ export class PreferredLanguagesComponent {
   separatorKeysCodes: number[] = [ENTER];
   formCtrl = new FormControl();
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
         this.chipList.errorState = true;
@@ -51,7 +51,7 @@ export class PreferredLanguagesComponent {
     });
   }
 
-  validInput(value: string): boolean {
+  validInput (value: string): boolean {
     let availableLanguage = false;
     for (let i = 0; i < this.choices.length; i++) {
       if (this.choices[i].id === value) {
@@ -64,7 +64,7 @@ export class PreferredLanguagesComponent {
       this.preferredLanguages.indexOf(value) < 0 ? true : false;
   }
 
-  add(event: { value: string }): void {
+  add (event: { value: string }): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -77,7 +77,7 @@ export class PreferredLanguagesComponent {
     }
   }
 
-  remove(fruit: string): void {
+  remove (fruit: string): void {
     const index = this.preferredLanguages.indexOf(fruit);
 
     if (index >= 0) {
@@ -86,7 +86,7 @@ export class PreferredLanguagesComponent {
     }
   }
 
-  selected(event: { option: { value: string } }): void {
+  selected (event: { option: { value: string } }): void {
     if (this.preferredLanguages.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {

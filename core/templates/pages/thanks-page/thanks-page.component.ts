@@ -28,9 +28,9 @@ import { UrlInterpolationService } from
   styleUrls: []
 })
 export class ThanksPageComponent {
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor (private urlInterpolationService: UrlInterpolationService) {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }

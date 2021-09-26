@@ -37,7 +37,7 @@ export class ExpressionError extends Error {
   // 'message' is optional beacuse it is optional in the actual 'Error'
   // constructor object. Also, we may not want a custom error message
   // while throwing 'ExpressionError'.
-  constructor(message?: string) {
+  constructor (message?: string) {
     super(message);
     // NOTE TO DEVELOPERS: In order to properly extend Error, we must manually
     // rebuild the prototype chain because it is broken by the call to `super`.
@@ -48,13 +48,13 @@ export class ExpressionError extends Error {
 }
 
 export class ExprUndefinedVarError extends ExpressionError {
-  constructor(public varname: string, public envs: EnvDict[]) {
+  constructor (public varname: string, public envs: EnvDict[]) {
     super(varname + ' not found in ' + angular.toJson(envs));
   }
 }
 
 export class ExprWrongNumArgsError extends ExpressionError {
-  constructor(
+  constructor (
       public args: (number|string)[],
       public expectedMin: number, public expectedMax: number) {
     super(
@@ -63,7 +63,7 @@ export class ExprWrongNumArgsError extends ExpressionError {
 }
 
 export class ExprWrongArgTypeError extends ExpressionError {
-  constructor(
+  constructor (
       public arg: number|string,
       public actualType: string, public expectedType: string) {
     super(
@@ -76,19 +76,19 @@ export class ExprWrongArgTypeError extends ExpressionError {
 
 @Injectable({ providedIn: 'root' })
 export class ExpressionSyntaxTreeService {
-  constructor(private expressionParserService: ExpressionParserService) {}
+  constructor (private expressionParserService: ExpressionParserService) {}
 
   public ExpressionError = ExpressionError;
   public ExprUndefinedVarError = ExprUndefinedVarError;
   public ExprWrongNumArgsError = ExprWrongNumArgsError;
   public ExprWrongArgTypeError = ExprWrongArgTypeError;
 
-  public getParamsUsedInExpression(expression: string): string[] {
+  public getParamsUsedInExpression (expression: string): string[] {
     const parsedExpression = this.expressionParserService.parse(expression);
     return [...this.findParams(parsedExpression)].sort();
   }
 
-  public applyFunctionToParseTree(
+  public applyFunctionToParseTree (
       parsed: Expr | Expr[], envs: EnvDict[],
       func: (parsed: Expr | Expr[], envs: EnvDict[]) => Expr): Expr {
     return func(parsed, envs.concat(this.system));
@@ -96,7 +96,7 @@ export class ExpressionSyntaxTreeService {
 
   // Looks up a variable of the given name in the env. Here the variable can be
   // system or user-defined functions or parameters, including system operators.
-  public lookupEnvs(name: string, envs: EnvDict[]): Env {
+  public lookupEnvs (name: string, envs: EnvDict[]): Env {
     for (const env of envs) {
       if (env.hasOwnProperty(name)) {
         return env[name];
@@ -105,7 +105,7 @@ export class ExpressionSyntaxTreeService {
     throw new ExprUndefinedVarError(name, envs);
   }
 
-  private findParams(parseTree: string | string[]): Set<string> {
+  private findParams (parseTree: string | string[]): Set<string> {
     const paramsFound = new Set<string>();
     if (parseTree instanceof Array) {
       if (parseTree[0] === '#') {
@@ -122,7 +122,7 @@ export class ExpressionSyntaxTreeService {
   // Checks if the args array has the expectedMin number of elements and throws
   // an error if not. If optional expectedMax is specified, it verifies the
   // number of args is in the inclusive range: [expectedMin, expectedMax].
-  private verifyNumArgs(
+  private verifyNumArgs (
       args: string[],
       expectedMin: number, expectedMax: number = expectedMin): void {
     if (args.length < expectedMin || args.length > expectedMax) {
@@ -131,7 +131,7 @@ export class ExpressionSyntaxTreeService {
   }
 
   // Coerces the argument to a Number, and throws an error if the result is NaN.
-  private coerceToNumber(originalValue: string|number): number {
+  private coerceToNumber (originalValue: string|number): number {
     const coercedValue = +originalValue;
     if (isNaN(coercedValue)) {
       throw new ExprWrongArgTypeError(
@@ -140,7 +140,7 @@ export class ExpressionSyntaxTreeService {
     return coercedValue;
   }
 
-  private coerceAllArgsToNumber(args: (number|string)[]): number[] {
+  private coerceAllArgsToNumber (args: (number|string)[]): number[] {
     return args.map(this.coerceToNumber);
   }
 

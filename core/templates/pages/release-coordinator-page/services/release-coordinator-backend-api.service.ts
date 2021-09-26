@@ -68,11 +68,11 @@ export interface JobsData {
   providedIn: 'root'
 })
 export class ReleaseCoordinatorBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async getJobsDataAsync(): Promise<JobsData> {
+  async getJobsDataAsync (): Promise<JobsData> {
     return new Promise((resolve, reject) => {
       this.http.get<JobsDataBackendDict>(
         '/jobshandler').toPromise().then(response => {
@@ -93,13 +93,13 @@ export class ReleaseCoordinatorBackendApiService {
     });
   }
 
-  private async _postRequestAsync(
+  private async _postRequestAsync (
       payload?: Object, action?: string): Promise<void> {
     return this.http.post<void>(
       '/jobshandler', { action, ...payload }).toPromise();
   }
 
-  async startNewJobAsync(jobType: string): Promise<void> {
+  async startNewJobAsync (jobType: string): Promise<void> {
     let action = 'start_new_job';
     let payload = {
       job_type: jobType
@@ -107,7 +107,7 @@ export class ReleaseCoordinatorBackendApiService {
     return this._postRequestAsync(payload, action);
   }
 
-  async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
+  async cancelJobAsync (jobId: string, jobType: string): Promise<void> {
     let action = 'cancel_job';
     let payload = {
       job_id: jobId,
@@ -116,7 +116,7 @@ export class ReleaseCoordinatorBackendApiService {
     return this._postRequestAsync(payload, action);
   }
 
-  async fetchJobOutputAsync(jobId: string): Promise<string[]> {
+  async fetchJobOutputAsync (jobId: string): Promise<string[]> {
     let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
       '/joboutputhandler?job_id=<jobId>', {
         jobId: jobId
@@ -131,7 +131,7 @@ export class ReleaseCoordinatorBackendApiService {
     });
   }
 
-  async getMemoryCacheProfileAsync(): Promise<MemoryCacheProfileResponse> {
+  async getMemoryCacheProfileAsync (): Promise<MemoryCacheProfileResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<MemoryCacheProfileResponse>(
         '/memorycachehandler').toPromise().then(response => {
@@ -142,7 +142,7 @@ export class ReleaseCoordinatorBackendApiService {
     });
   }
 
-  async flushMemoryCacheAsync(): Promise<void> {
+  async flushMemoryCacheAsync (): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
         '/memorycachehandler').toPromise().then(response => {
@@ -153,31 +153,31 @@ export class ReleaseCoordinatorBackendApiService {
     });
   }
 
-  getBeamJobs(): Observable<BeamJob[]> {
+  getBeamJobs (): Observable<BeamJob[]> {
     return this.http.get<BeamJobsResponse>('/beam_job').pipe(
       map(r => r.jobs.map(BeamJob.createFromBackendDict))
     );
   }
 
-  getBeamJobRuns(): Observable<BeamJobRun[]> {
+  getBeamJobRuns (): Observable<BeamJobRun[]> {
     return this.http.get<BeamJobRunsResponse>('/beam_job_run').pipe(
       map(r => r.runs.map(BeamJobRun.createFromBackendDict))
     );
   }
 
-  startNewBeamJob(beamJob: BeamJob): Observable<BeamJobRun> {
+  startNewBeamJob (beamJob: BeamJob): Observable<BeamJobRun> {
     return this.http.put<BeamJobRunBackendDict>('/beam_job_run', {
       job_name: beamJob.name
     }).pipe(map(BeamJobRun.createFromBackendDict));
   }
 
-  cancelBeamJobRun(beamJobRun: BeamJobRun): Observable<BeamJobRun> {
+  cancelBeamJobRun (beamJobRun: BeamJobRun): Observable<BeamJobRun> {
     return this.http.delete<BeamJobRunBackendDict>('/beam_job_run', {
       params: { job_id: beamJobRun.jobId }
     }).pipe(map(BeamJobRun.createFromBackendDict));
   }
 
-  getBeamJobRunOutput(beamJobRun: BeamJobRun): Observable<BeamJobRunResult> {
+  getBeamJobRunOutput (beamJobRun: BeamJobRun): Observable<BeamJobRunResult> {
     return this.http.get<BeamJobRunResultBackendDict>('/beam_job_run_result', {
       params: { job_id: beamJobRun.jobId }
     }).pipe(map(BeamJobRunResult.createFromBackendDict));

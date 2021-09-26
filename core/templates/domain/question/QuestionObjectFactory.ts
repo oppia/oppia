@@ -42,7 +42,7 @@ export class Question {
   _linkedSkillIds: string[];
   _inapplicableSkillMisconceptionIds: string[];
 
-  constructor(
+  constructor (
       id: string, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
@@ -55,49 +55,49 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getId(): string {
+  getId (): string {
     return this._id;
   }
 
-  getStateData(): State {
+  getStateData (): State {
     return this._stateData;
   }
 
-  setStateData(newStateData: State): void {
+  setStateData (newStateData: State): void {
     this._stateData = angular.copy(newStateData);
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this._languageCode;
   }
 
-  setLanguageCode(languageCode: string): void {
+  setLanguageCode (languageCode: string): void {
     this._languageCode = languageCode;
   }
 
-  getVersion(): number {
+  getVersion (): number {
     return this._version;
   }
 
-  getLinkedSkillIds(): string[] {
+  getLinkedSkillIds (): string[] {
     return this._linkedSkillIds;
   }
 
-  setLinkedSkillIds(linkedSkillIds: string[]): void {
+  setLinkedSkillIds (linkedSkillIds: string[]): void {
     this._linkedSkillIds = linkedSkillIds;
   }
 
-  getInapplicableSkillMisconceptionIds(): string[] {
+  getInapplicableSkillMisconceptionIds (): string[] {
     return this._inapplicableSkillMisconceptionIds;
   }
 
-  setInapplicableSkillMisconceptionIds(
+  setInapplicableSkillMisconceptionIds (
       inapplicableSkillMisconceptionIds: string[]): void {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
 
-  getValidationErrorMessage(): string {
+  getValidationErrorMessage (): string {
     var interaction = this._stateData.interaction;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
@@ -133,7 +133,7 @@ export class Question {
     return null;
   }
 
-  getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
+  getUnaddressedMisconceptionNames (misconceptionsBySkill: {}): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds = {};
     for (var i = 0; i < answerGroups.length; i++) {
@@ -145,7 +145,7 @@ export class Question {
     }
     var unaddressedMisconceptionNames = [];
     var self = this;
-    Object.keys(misconceptionsBySkill).forEach(function(skillId) {
+    Object.keys(misconceptionsBySkill).forEach(function (skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
         var skillMisconceptionIdIsNotApplicable = (
           self._inapplicableSkillMisconceptionIds.includes(
@@ -166,7 +166,7 @@ export class Question {
     return unaddressedMisconceptionNames;
   }
 
-  toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
+  toBackendDict (isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
@@ -189,16 +189,16 @@ export class Question {
   providedIn: 'root'
 })
 export class QuestionObjectFactory {
-  constructor(
+  constructor (
     private stateObject: StateObjectFactory) {}
 
-  createDefaultQuestion(skillIds: string[]): Question {
+  createDefaultQuestion (skillIds: string[]): Question {
     return new Question(
       null, this.stateObject.createDefaultState(null),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 
-  createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
+  createFromBackendDict (questionBackendDict: QuestionBackendDict): Question {
     return new Question(
       questionBackendDict.id,
       this.stateObject.createFromBackendDict(

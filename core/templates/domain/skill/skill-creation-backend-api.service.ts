@@ -45,7 +45,7 @@ interface SkillCreationBackendResponse {
   providedIn: 'root'
 })
 export class SkillCreationBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
   /**
    * Sends POST request to create skill.
@@ -63,7 +63,7 @@ export class SkillCreationBackendApiService {
    * @param {string} imageData.filename - Filename of the image.
    * @param {Blob} imageData.imageBlob - Image data represented as a Blob.
    */
-  _createSkill(
+  _createSkill (
       successCallback: (value: SkillCreationBackendResponse) => void,
       errorCallback: (reason: string) => void,
       description: string, rubrics: RubricBackendDict, explanation: string,
@@ -97,7 +97,7 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  async createSkillAsync(
+  async createSkillAsync (
       description: string, rubrics: RubricBackendDict,
       explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
   ): Promise<SkillCreationBackendResponse> {

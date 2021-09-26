@@ -39,25 +39,25 @@ export class BlogAdminNavbarComponent implements OnInit {
   logoWebpImageSrc: string;
   logoPngImageSrc: string;
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
   ) {}
 
-  activateProfileDropdown(): boolean {
+  activateProfileDropdown (): boolean {
     return this.profileDropdownIsActive = true;
   }
 
-  deactivateProfileDropdown(): boolean {
+  deactivateProfileDropdown (): boolean {
     return this.profileDropdownIsActive = false;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
+  async getProfileImageDataAsync (): Promise<void> {
     let dataUrl = await this.userService.getProfileImageDataUrlAsync();
     this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
 
-  async getUserInfoAsync(): Promise<void> {
+  async getUserInfoAsync (): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
@@ -68,7 +68,7 @@ export class BlogAdminNavbarComponent implements OnInit {
         }));
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
 

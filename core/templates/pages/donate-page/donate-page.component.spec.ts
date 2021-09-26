@@ -30,7 +30,7 @@ describe('Donate page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [
         DonatePageComponent,

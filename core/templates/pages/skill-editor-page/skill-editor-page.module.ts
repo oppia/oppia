@@ -77,7 +77,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 })
 class SkillEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+  ngDoBootstrap () {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -85,7 +85,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(SkillEditorPageModule);
 };

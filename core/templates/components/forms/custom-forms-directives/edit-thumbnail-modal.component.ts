@@ -71,37 +71,37 @@ export class EditThumbnailModalComponent implements OnInit {
   invalidFilenameWarningIsShown = false;
   allowedImageFormats = ['svg'];
 
-  constructor(
+  constructor (
     private svgSanitizerService: SvgSanitizerService,
     private ngbActiveModal: NgbActiveModal,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.updateBackgroundColor(this.bgColor);
   }
 
-  setImageDimensions(height: number, width: number): void {
+  setImageDimensions (height: number, width: number): void {
     this.dimensions = {
       height: Math.round(height),
       width: Math.round(width)
     };
   }
 
-  isUploadedImageSvg(): boolean {
+  isUploadedImageSvg (): boolean {
     return this.uploadedImageMimeType === 'image/svg+xml';
   }
 
-  isValidFilename(file: File): boolean {
+  isValidFilename (file: File): boolean {
     const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
       constants.VALID_THUMBNAIL_FILENAME_REGEX);
     return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name);
   }
 
-  updateBackgroundColor(color: string): void {
+  updateBackgroundColor (color: string): void {
     this.bgColor = color;
   }
 
-  setUploadedFile(file: File): void {
+  setUploadedFile (file: File): void {
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
@@ -130,7 +130,7 @@ export class EditThumbnailModalComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  onFileChanged(file: File): void {
+  onFileChanged (file: File): void {
     this.uploadedImageMimeType = file.type;
     this.invalidImageWarningIsShown = false;
     this.invalidFilenameWarningIsShown = false;
@@ -150,17 +150,17 @@ export class EditThumbnailModalComponent implements OnInit {
     }
   }
 
-  reset(): void {
+  reset (): void {
     this.uploadedImage = null;
     this.openInUploadMode = true;
   }
 
-  onInvalidImageLoaded(): void {
+  onInvalidImageLoaded (): void {
     this.uploadedImage = null;
     this.invalidImageWarningIsShown = true;
   }
 
-  confirm(): void {
+  confirm (): void {
     this.ngbActiveModal.close({
       newThumbnailDataUrl: this.uploadedImage,
       newBgColor: this.bgColor,
@@ -169,7 +169,7 @@ export class EditThumbnailModalComponent implements OnInit {
     });
   }
 
-  cancel(): void {
+  cancel (): void {
     this.ngbActiveModal.dismiss();
   }
 }

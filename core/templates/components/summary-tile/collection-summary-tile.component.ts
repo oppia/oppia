@@ -52,13 +52,13 @@ export class CollectionSummaryTileComponent implements OnInit {
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
 
-  constructor(
+  constructor (
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
@@ -66,12 +66,12 @@ export class CollectionSummaryTileComponent implements OnInit {
     this.activityTypeCollection = constants.ACTIVITY_TYPE_COLLECTION;
   }
 
-  getLastUpdatedDatetime(): string {
+  getLastUpdatedDatetime (): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
       this.getLastUpdatedMsec);
   }
 
-  getCollectionLink(): string | null {
+  getCollectionLink (): string | null {
     let targetUrl = (
       this.isLinkedToEditorPage ?
         CollectionSummaryTileConstants.COLLECTION_EDITOR_URL :
@@ -84,16 +84,16 @@ export class CollectionSummaryTileComponent implements OnInit {
     );
   }
 
-  getCompleteThumbnailIconUrl(): string {
+  getCompleteThumbnailIconUrl (): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.getThumbnailIconUrl);
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setHoverState(hoverState: boolean): void {
+  setHoverState (hoverState: boolean): void {
     this.collectionIsCurrentlyHoveredOver = hoverState;
   }
 }

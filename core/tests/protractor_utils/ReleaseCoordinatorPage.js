@@ -20,7 +20,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ReleaseCoordinatorPage = function() {
+var ReleaseCoordinatorPage = function () {
   var oneOffJobRows = element.all(by.css('.protractor-test-one-off-jobs-rows'));
   var unfinishedOneOffJobRows = element.all(by.css(
     '.protractor-test-unfinished-one-off-jobs-rows'));
@@ -35,16 +35,16 @@ var ReleaseCoordinatorPage = function() {
   var unfinishedJobsCardElement = element(
     by.css('.protractor-test-unfinished-jobs-card'));
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get('/release-coordinator');
     await waitFor.pageToFullyLoad();
   };
 
-  this.startOneOffJob = async function(jobName) {
+  this.startOneOffJob = async function (jobName) {
     await this._startOneOffJob(jobName, 0);
   };
 
-  this._startOneOffJob = async function(jobName, i) {
+  this._startOneOffJob = async function (jobName, i) {
     await waitFor.visibilityOf(
       oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
@@ -60,11 +60,11 @@ var ReleaseCoordinatorPage = function() {
     }
   };
 
-  this.stopOneOffJob = async function(jobName) {
+  this.stopOneOffJob = async function (jobName) {
     await this._stopOneOffJob(jobName, 0);
   };
 
-  this._stopOneOffJob = async function(jobName, i) {
+  this._stopOneOffJob = async function (jobName, i) {
     await waitFor.visibilityOf(
       unfinishedOneOffJobRows.get(i),
       'Could not get Unfinished Off Job');
@@ -81,12 +81,12 @@ var ReleaseCoordinatorPage = function() {
     }
   };
 
-  this.expectNumberOfRunningOneOffJobs = async function(count) {
+  this.expectNumberOfRunningOneOffJobs = async function (count) {
     var len = await unfinishedOneOffJobsIdElements.count();
     expect(len).toEqual(count);
   };
 
-  this.expectJobToBeRunning = async function(jobName) {
+  this.expectJobToBeRunning = async function (jobName) {
     await browser.refresh();
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(

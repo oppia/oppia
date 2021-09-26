@@ -22,7 +22,7 @@ import MessageFormat from 'messageformat';
 
 export class TranslateCustomParser extends TranslateParser {
   private _messageFormat: MessageFormat;
-  constructor(
+  constructor (
     private translateDefaultParser: TranslateDefaultParser
   ) {
     super();
@@ -35,7 +35,7 @@ export class TranslateCustomParser extends TranslateParser {
     this._messageFormat = new MessageFormat(AppConstants.DEFAULT_LANGUAGE_CODE);
   }
 
-  interpolate(
+  interpolate (
       expr: string | Function,
       params?: { [key: string]: number | string | boolean }): string {
     let interpolatedValue = this.translateDefaultParser.interpolate(
@@ -56,11 +56,11 @@ export class TranslateCustomParser extends TranslateParser {
     return this._messageFormat.compile(interpolatedValue)(params);
   }
 
-  getValue(target: Object, key: string): string {
+  getValue (target: Object, key: string): string {
     return this.translateDefaultParser.getValue(target, key);
   }
 
-  get messageFormat(): MessageFormat {
+  get messageFormat (): MessageFormat {
     return this._messageFormat;
   }
 }

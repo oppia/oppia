@@ -50,20 +50,20 @@ export class NonnegativeIntEditorComponent implements OnInit {
       id: 'is_integer'
     }]
   };
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor (private changeDetectorRef: ChangeDetectorRef) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.value = 0;
       this.valueChanged.emit(this.value);
     }
   }
 
-  getSchema(): NonnegativeIntSchema {
+  getSchema (): NonnegativeIntSchema {
     return this.SCHEMA;
   }
 
-  updateValue(value: number): void {
+  updateValue (value: number): void {
     if (value === this.value) {
       return;
     }

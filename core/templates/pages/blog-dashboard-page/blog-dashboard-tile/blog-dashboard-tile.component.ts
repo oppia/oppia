@@ -35,29 +35,29 @@ export class BlogDashboardTileComponent implements OnInit {
   lastUpdatedDateString: string = '';
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
   @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
-  constructor(
+  constructor (
     private blogDashboardPageService: BlogDashboardPageService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.lastUpdatedDateString = this.getDateStringInWords(
       this.blogPostSummary.lastUpdated);
   }
 
-  getDateStringInWords(naiveDate: string): string {
+  getDateStringInWords (naiveDate: string): string {
     return dayjs(
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMM D, YYYY');
   }
 
-  editBlogPost(): void {
+  editBlogPost (): void {
     this.blogDashboardPageService.navigateToEditorTabWithId(
       this.blogPostSummary.id);
   }
 
-  deleteBlogPost(): void {
+  deleteBlogPost (): void {
     this.blogDashboardPageService.blogPostAction = 'delete';
     this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
       backdrop: 'static',
@@ -73,7 +73,7 @@ export class BlogDashboardTileComponent implements OnInit {
     });
   }
 
-  unpublishBlogPost(): void {
+  unpublishBlogPost (): void {
     this.blogDashboardPageService.blogPostAction = 'unpublish';
     this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
       backdrop: 'static',

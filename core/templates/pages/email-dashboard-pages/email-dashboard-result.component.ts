@@ -55,18 +55,18 @@ export class EmailDashboardResultComponent {
   emailCancelled: boolean = false;
   testEmailSentSuccesfully: boolean = false;
 
-  constructor(
+  constructor (
     private emailDashboardResultBackendApiService:
     EmailDashboardResultBackendApiService,
     private windowRef: WindowRef,
   ) {}
 
-  getQueryId(): string {
+  getQueryId (): string {
     return (
       this.windowRef.nativeWindow.location.pathname.split('/').slice(-1)[0]);
   }
 
-  validateEmailSubjectAndBody(): boolean {
+  validateEmailSubjectAndBody (): boolean {
     let dataIsValid = true;
     if (this.emailSubject.length === 0) {
       this.invalid.subject = true;
@@ -79,7 +79,7 @@ export class EmailDashboardResultComponent {
     return dataIsValid;
   }
 
-  submitEmail(): void {
+  submitEmail (): void {
     let dataIsValid = this.validateEmailSubjectAndBody();
 
     if (this.emailOption === 'custom' &&
@@ -114,13 +114,13 @@ export class EmailDashboardResultComponent {
     }
   }
 
-  resetForm(): void {
+  resetForm (): void {
     this.emailSubject = '';
     this.emailBody = '';
     this.emailOption = 'all';
   }
 
-  cancelEmail(): void {
+  cancelEmail (): void {
     this.submitIsInProgress = true;
 
     this.emailDashboardResultBackendApiService.cancelEmailAsync(
@@ -135,7 +135,7 @@ export class EmailDashboardResultComponent {
     });
   }
 
-  sendTestEmail(): void {
+  sendTestEmail (): void {
     let dataIsValid = this.validateEmailSubjectAndBody();
 
     if (dataIsValid) {

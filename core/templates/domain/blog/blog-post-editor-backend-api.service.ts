@@ -61,12 +61,12 @@ export interface BlogPostEditorData {
   providedIn: 'root'
 })
 export class BlogPostEditorBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  async fetchBlogPostEditorData(
+  async fetchBlogPostEditorData (
       blogPostId: string): Promise<BlogPostEditorData> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -90,7 +90,7 @@ export class BlogPostEditorBackendApiService {
     });
   }
 
-  async deleteBlogPostAsync(blogPostId: string): Promise<number> {
+  async deleteBlogPostAsync (blogPostId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
         BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
@@ -107,7 +107,7 @@ export class BlogPostEditorBackendApiService {
     });
   }
 
-  async updateBlogPostDataAsync(
+  async updateBlogPostDataAsync (
       blogPostId: string,
       newPublishStatus: boolean,
       changeDict: BlogPostChangeDict): Promise<BlogPostUpdatedData> {
@@ -134,7 +134,7 @@ export class BlogPostEditorBackendApiService {
     });
   }
 
-  async postThumbnailDataAsync(
+  async postThumbnailDataAsync (
       blogPostId: string, imagesData: ImageData[]): Promise<void> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(

@@ -34,7 +34,7 @@ import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '
 export class TranslationOpportunitiesComponent {
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
-  constructor(
+  constructor (
     private readonly contextService: ContextService,
     private readonly contributionOpportunitiesService:
       ContributionOpportunitiesService,
@@ -46,11 +46,11 @@ export class TranslationOpportunitiesComponent {
     private readonly injector: Injector
   ) {}
 
-  getOpportunitySummary(expId: string): TranslationOpportunity {
+  getOpportunitySummary (expId: string): TranslationOpportunity {
     return this.allOpportunities[expId];
   }
 
-  getPresentableOpportunitiesData(
+  getPresentableOpportunitiesData (
       {opportunities, more}: ExplorationOpportunitiesDict): {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
@@ -77,7 +77,7 @@ export class TranslationOpportunitiesComponent {
     return {opportunitiesDicts, more};
   }
 
-  onClickButton(expId: string): void {
+  onClickButton (expId: string): void {
     if (!this.userIsLoggedIn) {
       this.contributionOpportunitiesService.showRequiresLoginModal();
       return;
@@ -100,13 +100,13 @@ export class TranslationOpportunitiesComponent {
     modalRef.componentInstance.opportunity = opportunity;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
   }
 
-  async loadMoreOpportunitiesAsync(): Promise<{
+  async loadMoreOpportunitiesAsync (): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
@@ -116,7 +116,7 @@ export class TranslationOpportunitiesComponent {
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
-  async loadOpportunitiesAsync(): Promise<{
+  async loadOpportunitiesAsync (): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
