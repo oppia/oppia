@@ -49,7 +49,10 @@
         "core.controllers.suggestion_test",
         "core.controllers.voice_artist_test",
         "extensions.domain_test",
-        "core.controllers.learner_dashboard_test"
+        "core.controllers.learner_dashboard_test",
+        "core.storage.exploration.gae_models_test",
+        "scripts.release_scripts.repo_specific_changes_fetcher_test",
+        "scripts.docstrings_checker_test"
     ],
     "2": [
         "core.platform.storage.cloud_storage_emulator_test",
@@ -75,7 +78,12 @@
         "core.domain.question_domain_test",
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
-        "jobs.io.job_io_test"
+        "jobs.io.job_io_test",
+        "core.domain.moderator_services_test",
+        "jobs.batch_jobs.cron_jobs_test",
+        "scripts.build_test",
+        "scripts.install_third_party_libs_test",
+        "core.storage.statistics.gae_models_test"
     ],
     "3": [
         "core.domain.rights_manager_test",
@@ -104,7 +112,14 @@
         "core.domain.feedback_services_test",
         "core.domain.classroom_services_test",
         "core.domain.visualization_registry_test",
-        "core.domain.exp_services_test"
+        "core.domain.exp_services_test",
+        "core.domain.user_query_domain_test",
+        "core.storage.blog.gae_models_test",
+        "core.controllers.access_validators_test",
+        "main_test",
+        "core.storage.subtopic.gae_models_test",
+        "core.domain.user_domain_test",
+        "core.storage.opportunity.gae_models_test"
     ],
     "4": [
         "core.domain.app_feedback_report_services_test",
@@ -130,7 +145,12 @@
         "core.platform.auth.firebase_auth_services_test",
         "scripts.install_backend_python_libs_test",
         "scripts.common_test",
-        "jobs.batch_jobs.test_jobs_test"
+        "jobs.batch_jobs.test_jobs_test",
+        "core.platform.email.mailgun_email_services_test",
+        "core.storage.story.gae_models_test",
+        "core.storage.feedback.gae_models_test",
+        "scripts.pre_commit_hook_test",
+        "core.storage.activity.gae_models_test"
     ],
     "5": [
         "core.controllers.beam_jobs_test",
@@ -162,7 +182,10 @@
         "jobs.transforms.validation.story_validation_test",
         "core.tests.load_tests.feedback_thread_summaries_test",
         "core.tests.test_utils_test",
-        "core.tests.gae_suite_test"
+        "core.tests.gae_suite_test",
+        "core.platform.models_test",
+        "scripts.release_scripts.update_changelog_and_credits_test",
+        "scripts.setup_test"
     ],
     "6": [
         "core.controllers.incoming_app_feedback_report_test",
@@ -181,7 +204,12 @@
         "core.storage.job.gae_models_test",
         "core.storage.base_model.gae_models_test",
         "jobs.jobs_manager_test",
-        "schema_utils_test"
+        "schema_utils_test",
+        "core.storage.audit.gae_models_test",
+        "core.storage.classifier.gae_models_test",
+        "scripts.regenerate_requirements_test",
+        "scripts.install_third_party_test",
+        "scripts.check_frontend_test_coverage_test"
     ],
     "7": [
         "core.domain.story_services_test",
@@ -207,7 +235,12 @@
         "core.domain.learner_progress_services_test",
         "core.domain.config_services_test",
         "core.domain.subtopic_page_services_test",
-        "core.domain.calculation_registry_test"
+        "core.domain.calculation_registry_test",
+        "scripts.linters.js_ts_linter_test",
+        "scripts.pre_push_hook_test",
+        "core.domain.translation_services_test",
+        "core.storage.recommendations.gae_models_test",
+        "scripts.linters.other_files_linter_test"
     ],
     "8": [
         "core.domain.question_fetchers_test",
@@ -235,7 +268,12 @@
         "scripts.linters.html_linter_test",
         "scripts.script_import_test",
         "scripts.setup_gae_test",
-        "scripts.linters.general_purpose_linter_test"
+        "scripts.linters.general_purpose_linter_test",
+        "scripts.release_scripts.update_configs_test",
+        "core.storage.improvements.gae_models_test",
+        "core.storage.translation.gae_models_test",
+        "core.domain.translation_domain_test",
+        "core.domain.translation_fetchers_test"
     ],
     "9": [
         "core.storage.app_feedback_report.gae_models_test",
@@ -265,53 +303,11 @@
         "jobs.types.topic_validation_errors_test",
         "jobs.types.user_validation_errors_test",
         "jobs.types.feedback_validation_errors_test",
-        "jobs.types.improvements_validation_errors_test"
-    ],
-    "10": [
-        "core.domain.moderator_services_test",
-        "jobs.batch_jobs.cron_jobs_test",
+        "jobs.types.improvements_validation_errors_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
-        "scripts.linters.js_ts_linter_test",
-        "scripts.pre_push_hook_test",
-        "scripts.release_scripts.update_configs_test",
-        "core.storage.improvements.gae_models_test",
-        "core.platform.email.mailgun_email_services_test",
-        "core.storage.story.gae_models_test",
-        "core.storage.audit.gae_models_test",
-        "core.storage.classifier.gae_models_test",
-        "core.domain.user_query_domain_test",
-        "core.storage.blog.gae_models_test",
-        "core.controllers.access_validators_test",
-        "main_test"
-    ],
-    "11": [
         "core.platform.taskqueue.cloud_taskqueue_services_test",
         "core.platform.translate.cloud_translate_services_test",
-        "core.platform.translate.dev_mode_translate_services_test",
-        "core.storage.translation.gae_models_test",
-        "core.domain.translation_domain_test",
-        "core.domain.translation_fetchers_test",
-        "core.domain.translation_services_test",
-        "core.storage.recommendations.gae_models_test",
-        "scripts.linters.other_files_linter_test",
-        "scripts.regenerate_requirements_test",
-        "scripts.install_third_party_test",
-        "scripts.check_frontend_test_coverage_test",
-        "core.platform.models_test",
-        "scripts.release_scripts.update_changelog_and_credits_test",
-        "scripts.setup_test",
-        "core.storage.feedback.gae_models_test",
-        "scripts.pre_commit_hook_test",
-        "core.storage.activity.gae_models_test",
-        "core.storage.subtopic.gae_models_test",
-        "core.domain.user_domain_test",
-        "core.storage.opportunity.gae_models_test",
-        "scripts.build_test",
-        "scripts.install_third_party_libs_test",
-        "core.storage.statistics.gae_models_test",
-        "core.storage.exploration.gae_models_test",
-        "scripts.release_scripts.repo_specific_changes_fetcher_test",
-        "scripts.docstrings_checker_test"
+        "core.platform.translate.dev_mode_translate_services_test"
     ]
 }
