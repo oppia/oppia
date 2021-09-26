@@ -17,39 +17,17 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
-import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ConceptCardComponent } from './concept-card.component';
+import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 
 describe('ConceptCardComponent', () => {
-  let loadConceptCardsAsync: jasmine.Spy;
   let fixture: ComponentFixture<ConceptCardComponent>;
   let component: ConceptCardComponent;
-  let conceptCard: ConceptCard;
-  let example1: WorkedExample;
-  let example2: WorkedExample;
-  let workedExamples: WorkedExample[];
-
-  example1 = (new SubtitledHtml(
-    'worked example question 1',
-    'worked_example_q_1'
-  ), new SubtitledHtml(
-    'worked example explanation 1',
-    'worked_example_e_1'
-  )) as unknown as WorkedExample;
-
-  example2 = (new SubtitledHtml(
-    'worked example question 2',
-    'worked_example_q_2'
-  ), new SubtitledHtml(
-    'worked example explanation 2',
-    'worked_example_e_2'
-  )) as unknown as WorkedExample;
-  workedExamples = [example1, example2],
+  let conceptBackendApiService: ConceptCardBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -60,42 +38,35 @@ describe('ConceptCardComponent', () => {
         ConceptCardComponent,
         MockTranslatePipe
       ],
-      providers: [ConceptCard],
+      providers: [
+        ConceptCardBackendApiService,
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConceptCardComponent);
-    conceptCard = TestBed.inject(ConceptCard);
     component = fixture.componentInstance;
-    conceptCard._workedExamples = workedExamples;
+    conceptBackendApiService = TestBed.inject(ConceptCardBackendApiService);
   });
 
   it('should load concept cards', () => {
-    component.index = 0;
-    loadConceptCardsAsync.and.resolveTo([{
+    spyOn(conceptBackendApiService, 'loadConceptCardsAsync').and.resolveTo([{
       getWorkedExamples: () => {
         return ['1'];
       }
-    }]);
+    }] as unknown as ConceptCard[]);
+    component.index = 0;
 
-    spyOn(conceptCard, 'getWorkedExamples').and.returnValue(workedExamples);
+    component.conceptCards = [{
+      getWorkedExamples: () => {
+        return ['1'];
+      }
+    }] as unknown as ConceptCard[];
     component.ngOnInit();
 
-    expect(
-      component.currentConceptCard.getWorkedExamples()).toEqual(workedExamples);
-    expect(component.numberOfWorkedExamplesShown).toBe(1);
-  });
-
-  it('should show error message when adding concept card to' +
-    ' a deleted skill', () => {
-    loadConceptCardsAsync.and.returnValue(Promise.reject(''));
-
-    component.ngOnInit();
-
-    expect(component.skillDeletedMessage).toBe(
-      'Oops, it looks like this skill has been deleted.');
+    expect(component.numberOfWorkedExamplesShown).toBe(0);
   });
 
   it('should show more worked examples when user clicks on \'+ Worked ' +
@@ -110,8 +81,11 @@ describe('ConceptCardComponent', () => {
   });
 
   it('should check if worked example is the last one', () => {
-    spyOn(conceptCard, 'getWorkedExamples').and.returnValue(workedExamples);
-
+    component.currentConceptCard = {
+      getWorkedExamples: () => {
+        return ['1'];
+      }
+    } as unknown as ConceptCard;
     component.numberOfWorkedExamplesShown = 1;
 
     expect(component.isLastWorkedExample()).toBe(true);
@@ -119,5 +93,31 @@ describe('ConceptCardComponent', () => {
     component.numberOfWorkedExamplesShown = 2;
 
     expect(component.isLastWorkedExample()).toBe(false);
+  });
+
+  it('should update concept cards when index value' +
+  ' changes', () => {
+    component.index = 1;
+    let changes: SimpleChanges = {
+      index: {
+        currentValue: 0,
+        previousValue: 1,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    };
+    component.ngOnInit();
+
+    component.conceptCards = [{
+      getWorkedExamples: () => {
+        return ['1'];
+      }
+    }] as unknown as ConceptCard[];
+
+    expect(component.index).toEqual(1);
+
+    component.ngOnChanges(changes);
+
+    expect(component.numberOfWorkedExamplesShown).toEqual(1);
   });
 });
