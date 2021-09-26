@@ -338,8 +338,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         target ids.
 
         Args:
-            target_exp_ids: list(str). Exploration IDs matching the target ID of the
-                translation suggestions.
+            target_exp_ids: list(str). Exploration IDs matching the target ID
+                of the translation suggestions.
 
         Returns:
             list(str). A list of ids of translation suggestions in review
