@@ -952,7 +952,7 @@ def is_user_id_valid(
         bool. True when the ID is in a correct format or if the ID belongs to
         a system user, False otherwise.
     """
-    if allow_system_user_id and user_id in feconf.SYSTEM_USERS.keys():
+    if allow_system_user_id and user_id in feconf.SYSTEM_USERS:
         return True
 
     if allow_pseudonymous_id and is_pseudonymous_id(user_id):
