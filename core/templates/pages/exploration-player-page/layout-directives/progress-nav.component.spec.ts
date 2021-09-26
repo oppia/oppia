@@ -31,8 +31,7 @@ import { HelpCardEventResponse, PlayerPositionService } from '../services/player
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Progress nav component', () => {
+describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
   let componentInstance: ProgressNavComponent;
 
