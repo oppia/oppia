@@ -364,8 +364,8 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
-            PageTitleService.setPageTitleForMobileView('Subtopic Editor');
-            PageTitleService.setPageSubtitleForMobileView(subtopicName);
+            PageTitleService.setNavbarTitleForMobileView('Subtopic Editor');
+            PageTitleService.setNavbarSubtitleForMobileView(subtopicName);
             TopicEditorRoutingService.navigateToSubtopicEditorWithId(
               subtopicId);
           };

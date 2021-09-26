@@ -62,8 +62,10 @@ export class RatioExpressionEditorComponent implements OnInit {
         value: false
       }));
       return true;
-    } catch (parsingError) {
-      this.warningText = parsingError.message;
+    } catch (parsingError: unknown) {
+      if (parsingError instanceof Error) {
+        this.warningText = parsingError.message;
+      }
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         modalId: this.modalId,
         value: true

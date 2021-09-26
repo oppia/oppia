@@ -20,12 +20,11 @@
 </schema-based-int-editor>
 
 <schema-based-float-editor ng-if="$ctrl.schema().type === 'float' && !$ctrl.schema().choices"
-                           [local-value]="$ctrl.localValue" [disabled]="$ctrl.isDisabled()"
-                           [validators]="$ctrl.schema().validators"
-                           [label-for-focus-target]="$ctrl.labelForFocusTarget()"
-                           (local-value-change)="$ctrl.updateValue($event)"
-                           (input-blur)="$ctrl.onInputBlur()"
-                           (input-focus)="$ctrl.onInputFocus()">
+                           local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
+                           validators="$ctrl.schema().validators" ui-config="$ctrl.schema().ui_config"
+                           label-for-focus-target="$ctrl.labelForFocusTarget()"
+                           on-input-blur="$ctrl.onInputBlur"
+                           on-input-focus="$ctrl.onInputFocus">
 </schema-based-float-editor>
 
 <schema-based-unicode-editor ng-if="$ctrl.schema().type === 'unicode' && !$ctrl.schema().choices"
