@@ -66,6 +66,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'google-analytics.initializer.ts',
     'language-util.service.ts',
     'learner-answer-info.service.ts',
+    'learner-view-rating.service.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
@@ -103,6 +104,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
+    'worked-example-editor.directive.ts',
 ]
 
 
