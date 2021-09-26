@@ -262,19 +262,21 @@ describe('FractionInputValidationService', () => {
     }]);
   });
 
-  it('should not catch equals followed by equivalent as redundant', function () {
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+  it('should not catch equals followed by equivalent as redundant',
+    function () {
+      answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([]);
 
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-  });
+      answerGroups[0].rules =
+      [equalsOneRule, equivalentToOneAndSimplestFormRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+    });
 
   it('should catch equivalent followed by equals same value' +
     'as redundant', function () {

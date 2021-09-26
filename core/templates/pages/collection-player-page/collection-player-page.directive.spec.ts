@@ -337,19 +337,20 @@ describe('Collection player page directive', function () {
     expect(pathIconParameters).toEqual(collectionNodesList);
   }));
 
-  it('should check whether the exploration is completed', fakeAsync(function () {
-    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-      .and.resolveTo(sampleCollection);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+  it('should check whether the exploration is completed',
+    fakeAsync(function () {
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.resolveTo(sampleCollection);
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
-    // Loading collections.
-    ctrl.$onInit();
-    tick();
-    let result = ctrl.isCompletedExploration();
+      // Loading collections.
+      ctrl.$onInit();
+      tick();
+      let result = ctrl.isCompletedExploration();
 
-    expect(result).toEqual(false);
-  }));
+      expect(result).toEqual(false);
+    }));
 
   it('should trigger \'$watch\' when collection is ' +
     'updated', fakeAsync(function () {

@@ -115,7 +115,8 @@ export class AlertsService {
    * @param {string} message - Message content
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addMessage (type: string, message: string, timeoutMilliseconds: number): void {
+  addMessage (type: string, message: string, timeoutMilliseconds: number):
+  void {
     if (this.messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }

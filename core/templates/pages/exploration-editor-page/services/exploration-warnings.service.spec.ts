@@ -259,78 +259,81 @@ describe('Exploration Warnings Service', function () {
       });
     });
 
-    it('should update warnings when no interaction id is provided', function () {
-      ExplorationStatesService.init({
-        Hola: {
-          card_is_checkpoint: true,
-          content: {
-            content_id: 'content',
-            html: '{{HtmlValue}}'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
-          param_changes: [],
-          interaction: {
-            id: null,
-            answer_groups: [{
-              outcome: {
-                dest: '',
+    it('should update warnings when no interaction id is provided',
+      function () {
+        ExplorationStatesService.init({
+          Hola: {
+            card_is_checkpoint: true,
+            content: {
+              content_id: 'content',
+              html: '{{HtmlValue}}'
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+            param_changes: [],
+            interaction: {
+              id: null,
+              answer_groups: [{
+                outcome: {
+                  dest: '',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                },
+                rule_specs: [],
+                training_data: []
+              }],
+              default_outcome: {
+                dest: 'Hola',
                 feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
+                  content_id: '',
+                  html: '',
                 },
               },
-              rule_specs: [],
-              training_data: []
-            }],
-            default_outcome: {
-              dest: 'Hola',
-              feedback: {
-                content_id: '',
-                html: '',
+              customization_args: {},
+              hints: [],
+            },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
               },
             },
-            customization_args: {},
-            hints: [],
-          },
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
-        }
-      });
-      ExplorationWarningsService.updateWarnings();
+          }
+        });
+        ExplorationWarningsService.updateWarnings();
 
-      expect(ExplorationWarningsService.getWarnings()).toEqual([{
-        type: 'critical',
-        message: 'Please ensure the value of parameter "ParamChange2" is set' +
+        expect(ExplorationWarningsService.getWarnings()).toEqual([{
+          type: 'critical',
+          message:
+          'Please ensure the value of parameter "ParamChange2" is set' +
         ' before it is referred to in the initial list of parameter changes.'
-      }, {
-        type: 'critical',
-        message: 'Please ensure the value of parameter "HtmlValue" is set' +
+        }, {
+          type: 'critical',
+          message: 'Please ensure the value of parameter "HtmlValue" is set' +
         ' before using it in "Hola".'
-      }, {
-        type: 'error',
-        message: 'The following card has errors: Hola.'
-      }, {
-        type: 'error',
-        message: 'In \'Hola\', the following answer group has a classifier' +
+        }, {
+          type: 'error',
+          message: 'The following card has errors: Hola.'
+        }, {
+          type: 'error',
+          message: 'In \'Hola\', the following answer group has a classifier' +
         ' with no training data: 0'
-      }]);
-      expect(ExplorationWarningsService.countWarnings()).toBe(4);
-      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
-      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
-        Hola: [
-          'Please add an interaction to this card.',
-          'There\'s no way to complete the exploration starting from this' +
+        }]);
+        expect(ExplorationWarningsService.countWarnings()).toBe(4);
+        expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+        expect(ExplorationWarningsService.getAllStateRelatedWarnings()).
+          toEqual({
+            Hola: [
+              'Please add an interaction to this card.',
+              'There\'s no way to complete the exploration starting from this' +
           ' card. To fix this, make sure that the last card in the chain' +
           ' starting from this one has an \'End Exploration\' question type.'
-        ]
+            ]
+          });
       });
-    });
 
     it('should update warnings when there is a solution in the interaction',
       function () {
@@ -768,71 +771,73 @@ describe('Exploration Warnings Service', function () {
       });
     });
 
-    it('should update warning when first card is not a checkpoint', function () {
-      ExplorationStatesService.init({
-        Hola: {
-          card_is_checkpoint: false,
-          content: {
-            content_id: 'content',
-            html: '{{HtmlValue}}'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
-          param_changes: [],
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              outcome: {
-                dest: '',
+    it('should update warning when first card is not a checkpoint',
+      function () {
+        ExplorationStatesService.init({
+          Hola: {
+            card_is_checkpoint: false,
+            content: {
+              content_id: 'content',
+              html: '{{HtmlValue}}'
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+            param_changes: [],
+            interaction: {
+              id: 'TextInput',
+              answer_groups: [{
+                outcome: {
+                  dest: '',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                },
+                rule_specs: [],
+                training_data: []
+              }],
+              default_outcome: {
+                dest: 'Hola',
                 feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
+                  content_id: '',
+                  html: '',
                 },
               },
-              rule_specs: [],
-              training_data: []
-            }],
-            default_outcome: {
-              dest: 'Hola',
-              feedback: {
-                content_id: '',
-                html: '',
+              customization_args: {
+                rows: {
+                  value: true
+                },
+                placeholder: {
+                  value: 1
+                }
+              },
+              hints: [],
+            },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
               },
             },
-            customization_args: {
-              rows: {
-                value: true
-              },
-              placeholder: {
-                value: 1
-              }
-            },
-            hints: [],
-          },
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
-        }
-      });
+          }
+        });
 
-      ExplorationWarningsService.updateWarnings();
-      expect(ExplorationWarningsService.countWarnings()).toBe(4);
-      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
-      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
-        Hola: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'There\'s no way to complete the exploration starting from this' +
+        ExplorationWarningsService.updateWarnings();
+        expect(ExplorationWarningsService.countWarnings()).toBe(4);
+        expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+        expect(ExplorationWarningsService.getAllStateRelatedWarnings()).
+          toEqual({
+            Hola: [
+              'Placeholder text must be a string.',
+              'Number of rows must be integral.',
+              'There\'s no way to complete the exploration starting from this' +
           ' card. To fix this, make sure that the last card in the chain' +
           ' starting from this one has an \'End Exploration\' question type.',
-          'The first card of the lesson must be a checkpoint.'
-        ]
+              'The first card of the lesson must be a checkpoint.'
+            ]
+          });
       });
-    });
 
     it('should show warning if terminal card is a checkpoint', function () {
       ExplorationStatesService.init({

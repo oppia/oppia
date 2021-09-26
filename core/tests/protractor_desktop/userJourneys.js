@@ -188,15 +188,16 @@ describe('Site language', function () {
     await general.ensurePageHasNoTranslationIds();
   });
 
-  it('should use language selected in the Preferences page.', async function () {
-    await users.createUser('varda@example.com', 'Varda');
-    await users.login('varda@example.com');
-    await preferencesPage.get();
-    await preferencesPage.selectSystemLanguage('Español');
-    await preferencesPage.expectPageHeaderToBe('Preferencias');
-    await general.ensurePageHasNoTranslationIds();
-    await users.logout();
-  });
+  it('should use language selected in the Preferences page.',
+    async function () {
+      await users.createUser('varda@example.com', 'Varda');
+      await users.login('varda@example.com');
+      await preferencesPage.get();
+      await preferencesPage.selectSystemLanguage('Español');
+      await preferencesPage.expectPageHeaderToBe('Preferencias');
+      await general.ensurePageHasNoTranslationIds();
+      await users.logout();
+    });
 
   it('should set preferred audio language selected in the Preferences page.',
     async function () {

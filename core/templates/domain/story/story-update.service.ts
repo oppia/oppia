@@ -581,7 +581,8 @@ export class StoryUpdateService {
    * Removes a node of a story and records the change in the
    * undo/redo service.
    */
-  rearrangeNodeInStory (story: Story, fromIndex: number, toIndex: number): void {
+  rearrangeNodeInStory (story: Story, fromIndex: number, toIndex: number):
+  void {
     this._applyStoryContentsPropertyChange(
       story, StoryDomainConstants.NODE, fromIndex, toIndex,
       (changeDict, story) => {

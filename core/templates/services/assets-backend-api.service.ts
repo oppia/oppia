@@ -75,7 +75,8 @@ export class AssetsBackendApiService {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
-  async loadAudio (explorationId: string, filename: string): Promise<AudioFile> {
+  async loadAudio (explorationId: string, filename: string):
+  Promise<AudioFile> {
     let data = this.assetsCache.get(filename);
     if (this.isCached(filename) && data !== undefined) {
       return new AudioFile(filename, data);

@@ -66,7 +66,8 @@ export class ExplorationImprovementsBackendApiService {
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async getTasksAsync (expId: string): Promise<ExplorationImprovementsResponse> {
+  async getTasksAsync (expId: string):
+  Promise<ExplorationImprovementsResponse> {
     const explorationImprovementsUrl = (
       this.urlInterpolationService.interpolateUrl(
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
@@ -82,7 +83,8 @@ export class ExplorationImprovementsBackendApiService {
     );
   }
 
-  async postTasksAsync (expId: string, tasks: ExplorationTask[]): Promise<void> {
+  async postTasksAsync (expId: string, tasks: ExplorationTask[]):
+  Promise<void> {
     if (tasks.length === 0) {
       return;
     }

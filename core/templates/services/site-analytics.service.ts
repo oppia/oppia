@@ -277,11 +277,13 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardViewSuggestionForReview', 'click', contributionType);
   }
-  registerContributorDashboardAcceptSuggestion (contributionType: string): void {
+  registerContributorDashboardAcceptSuggestion (contributionType: string):
+  void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardAcceptSuggestion', 'click', contributionType);
   }
-  registerContributorDashboardRejectSuggestion (contributionType: string): void {
+  registerContributorDashboardRejectSuggestion (contributionType: string):
+  void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardRejectSuggestion', 'click', contributionType);
   }

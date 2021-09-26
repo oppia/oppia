@@ -342,77 +342,78 @@ describe('Feedback Tab Component', function () {
       }).toThrowError('Trying to show suggestion of a non-existent thread');
     });
 
-  it('should open show suggestion modal when active thread exists', function () {
-    var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
-    getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
-        status: 'Open',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '1',
-        last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '1',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: '',
-          old_value: '',
-        },
-        last_updated_msecs: 0
-      }));
-    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+  it('should open show suggestion modal when active thread exists',
+    function () {
+      var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
+      getThreadSpy.and.returnValue(
+        suggestionThreadObjectFactory.createFromBackendDicts({
+          status: 'Open',
+          subject: '',
+          summary: '',
+          original_author_username: 'Username1',
+          last_updated_msecs: 0,
+          message_count: 1,
+          thread_id: '1',
+          last_nonempty_message_author: 'Message 1',
+          last_nonempty_message_text: 'Message 2'
+        }, {
+          suggestion_type: 'edit_exploration_state_content',
+          suggestion_id: '1',
+          target_type: '',
+          target_id: '',
+          status: '',
+          author_name: '',
+          change: {
+            state_name: '',
+            new_value: '',
+            old_value: '',
+          },
+          last_updated_msecs: 0
+        }));
+      spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+        $q.resolve());
+      ctrl.setActiveThread('1');
+      $scope.$apply();
 
-    spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
-      .and.callFake(function (suggestionType, obj) {
-        obj.setActiveThread('0');
-      });
+      spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
+        .and.callFake(function (suggestionType, obj) {
+          obj.setActiveThread('0');
+        });
 
-    getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
-        status: 'Review',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '2',
-        last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '2',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: '',
-          old_value: '',
-        },
-        last_updated_msecs: 0
-      }));
-    ctrl.showSuggestionModal();
-    $scope.$apply();
+      getThreadSpy.and.returnValue(
+        suggestionThreadObjectFactory.createFromBackendDicts({
+          status: 'Review',
+          subject: '',
+          summary: '',
+          original_author_username: 'Username1',
+          last_updated_msecs: 0,
+          message_count: 1,
+          thread_id: '2',
+          last_nonempty_message_author: 'Message 1',
+          last_nonempty_message_text: 'Message 2'
+        }, {
+          suggestion_type: 'edit_exploration_state_content',
+          suggestion_id: '2',
+          target_type: '',
+          target_id: '',
+          status: '',
+          author_name: '',
+          change: {
+            state_name: '',
+            new_value: '',
+            old_value: '',
+          },
+          last_updated_msecs: 0
+        }));
+      ctrl.showSuggestionModal();
+      $scope.$apply();
 
-    expect(
-      suggestionModalForExplorationEditorService.showSuggestionModal)
-      .toHaveBeenCalled();
-    expect(ctrl.tmpMessage.status).toBe('Review');
-    expect(ctrl.tmpMessage.text).toBe('');
-  });
+      expect(
+        suggestionModalForExplorationEditorService.showSuggestionModal)
+        .toHaveBeenCalled();
+      expect(ctrl.tmpMessage.status).toBe('Review');
+      expect(ctrl.tmpMessage.text).toBe('');
+    });
 
   it('should create a new thread when closing create new thread modal',
     function () {

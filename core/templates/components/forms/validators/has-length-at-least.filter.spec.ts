@@ -27,9 +27,10 @@ describe('hasLengthAtLeast filter', function () {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  it('should have the relevant filters', angular.mock.inject(function ($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it('should have the relevant filters',
+    angular.mock.inject(function ($filter) {
+      expect($filter(filterName)).not.toEqual(null);
+    }));
 
   it('should impose minimum length bounds', angular.mock.inject(
     function ($filter) {

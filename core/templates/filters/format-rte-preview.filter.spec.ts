@@ -33,9 +33,10 @@ describe('Testing filters', function () {
     }
   }));
 
-  it('should have all expected filters', angular.mock.inject(function ($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it('should have all expected filters',
+    angular.mock.inject(function ($filter) {
+      expect($filter(filterName)).not.toEqual(null);
+    }));
 
   it('should get correct list of RTE components from HTML input',
     angular.mock.inject(function ($filter) {

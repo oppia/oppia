@@ -337,15 +337,17 @@ describe('Core exploration functionality', function () {
 
   it('should create content and multiple choice interactions',
     async function () {
-      await explorationEditorMainTab.setContent(async function (richTextEditor) {
-        await richTextEditor.appendBoldText('bold text');
-        await richTextEditor.appendPlainText(' ');
-        await richTextEditor.appendItalicText('italic text');
-        await richTextEditor.appendPlainText(' ');
-        await richTextEditor.appendPlainText(' ');
-        await richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
-        await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
-      });
+      await explorationEditorMainTab
+        .setContent(async function (richTextEditor) {
+          await richTextEditor.appendBoldText('bold text');
+          await richTextEditor.appendPlainText(' ');
+          await richTextEditor.appendItalicText('italic text');
+          await richTextEditor.appendPlainText(' ');
+          await richTextEditor.appendPlainText(' ');
+          await richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
+          await richTextEditor.appendUnorderedList(
+            ['an entry', 'another entry']);
+        });
       await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
         await forms.toRichText('option A'), await forms.toRichText('option B')
       ]);

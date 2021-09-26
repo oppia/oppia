@@ -60,7 +60,8 @@ export class CollectionLinearizerService {
 
   // Given a non linear collection input, the function will linearize it by
   // picking the first node it encounters on the branch and ignore the others.
-  _getCollectionNodesInPlayableOrder (collection: Collection): CollectionNode[] {
+  _getCollectionNodesInPlayableOrder
+  (collection: Collection): CollectionNode[] {
     return collection.getCollectionNodes();
   }
 
@@ -164,7 +165,8 @@ export class CollectionLinearizerService {
      * ID is contained within the linearly playable path of the specified
      * collection.
      */
-  removeCollectionNode (collection: Collection, explorationId: string): boolean {
+  removeCollectionNode
+  (collection: Collection, explorationId: string): boolean {
     if (!collection.containsCollectionNode(explorationId)) {
       return false;
     }

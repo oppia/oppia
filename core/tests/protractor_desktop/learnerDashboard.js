@@ -217,7 +217,8 @@ describe('Learner dashboard functionality', function () {
   });
 
   it('should display correct topics in edit goals, suggested for you section,' +
-    ' current goals and continue where you left off section', async function () {
+    ' current goals and continue where you left off section',
+  async function () {
     var TOPIC_NAME = 'Learner Dashboard Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';

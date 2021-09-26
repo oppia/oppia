@@ -126,7 +126,8 @@ var ContributorDashboardAdminPage = function () {
       languageDescription);
   };
 
-  this.assignVoiceoverReviewer = async function (username, languageDescription) {
+  this.assignVoiceoverReviewer =
+  async function (username, languageDescription) {
     await _assignContributionRights(
       username,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,

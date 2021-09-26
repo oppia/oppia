@@ -37,7 +37,8 @@ export class LearnerDashboardIdsBackendApiService {
   constructor (
     private http: HttpClient) {}
 
-  async _fetchLearnerDashboardIdsAsync (): Promise<LearnerDashboardActivityIds> {
+  async _fetchLearnerDashboardIdsAsync ():
+   Promise<LearnerDashboardActivityIds> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardIdsBackendResponse>(
         '/learnerdashboardidshandler/data').toPromise().then(response => {

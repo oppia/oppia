@@ -166,15 +166,16 @@ describe('Misconception Editor Directive', function () {
     expect($scope.notesEditorIsOpen).toBe(false);
   });
 
-  it('should close feedback editor when clicking on cancel button', function () {
-    expect($scope.feedbackEditorIsOpen).toBe(false);
-    $scope.openFeedbackEditor();
+  it('should close feedback editor when clicking on cancel button',
+    function () {
+      expect($scope.feedbackEditorIsOpen).toBe(false);
+      $scope.openFeedbackEditor();
 
-    expect($scope.feedbackEditorIsOpen).toBe(true);
-    $scope.cancelEditFeedback();
+      expect($scope.feedbackEditorIsOpen).toBe(true);
+      $scope.cancelEditFeedback();
 
-    expect($scope.feedbackEditorIsOpen).toBe(false);
-  });
+      expect($scope.feedbackEditorIsOpen).toBe(false);
+    });
 
   it('should address the misconception\'s updates', function () {
     let updatesSpy = spyOn(

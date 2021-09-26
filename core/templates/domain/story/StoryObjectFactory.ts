@@ -223,7 +223,8 @@ export class Story {
   providedIn: 'root'
 })
 export class StoryObjectFactory {
-  constructor (private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+  constructor
+  (private storyContentsObjectFactory: StoryContentsObjectFactory) {}
   createFromBackendDict (storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,

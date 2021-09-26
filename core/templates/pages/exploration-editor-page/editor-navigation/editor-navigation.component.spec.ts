@@ -283,17 +283,18 @@ describe('Editor Navigation Component', function () {
       expect($scope.getChangeListLength()).toEqual(0);
     });
 
-    it('should hide loading dots after publishing the exploration', function () {
-      $scope.loadingDotsAreShown = true;
-      var deferred = $q.defer();
-      deferred.resolve();
-      spyOn(
-        explorationSaveService,
-        'showPublishExplorationModal').and.returnValue(deferred.promise);
-      $scope.showPublishExplorationModal();
-      $rootScope.$apply();
-      expect($scope.loadingDotsAreShown).toEqual(false);
-    });
+    it('should hide loading dots after publishing the exploration',
+      function () {
+        $scope.loadingDotsAreShown = true;
+        var deferred = $q.defer();
+        deferred.resolve();
+        spyOn(
+          explorationSaveService,
+          'showPublishExplorationModal').and.returnValue(deferred.promise);
+        $scope.showPublishExplorationModal();
+        $rootScope.$apply();
+        expect($scope.loadingDotsAreShown).toEqual(false);
+      });
 
     it('should navigate to main tab when clicking on tab', function () {
       $scope.selectMainTab();
@@ -430,10 +431,11 @@ describe('Editor Navigation Component', function () {
       ctrl.$onDestroy();
     });
 
-    it('should hide post tutorial help popover when resizing page', function () {
-      angular.element(window).triggerHandler('resize');
-      mockOpenPostTutorialHelpPopover.emit();
-      expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
-    });
+    it('should hide post tutorial help popover when resizing page',
+      function () {
+        angular.element(window).triggerHandler('resize');
+        mockOpenPostTutorialHelpPopover.emit();
+        expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
+      });
   });
 });

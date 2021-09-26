@@ -192,7 +192,8 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  async fetchQuestionAsync (questionId: string): Promise<FetchQuestionResponse> {
+  async fetchQuestionAsync (questionId: string):
+  Promise<FetchQuestionResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestionAsync(questionId, resolve, reject);
     });

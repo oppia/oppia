@@ -228,7 +228,8 @@ angular.module('oppia').component('stateTranslation', {
         $scope.activatedTabId = tabId;
       };
 
-      $scope.getHumanReadableRuleInputValues = function (inputValue, inputType) {
+      $scope.getHumanReadableRuleInputValues =
+      function (inputValue, inputType) {
         if (inputType === 'TranslatableSetOfNormalizedString') {
           return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
         } else if (inputType === 'TranslatableSetOfUnicodeString') {

@@ -70,7 +70,8 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     });
   }
 
-  printResult (numSucceeded: number, numFailed: number, numTried: number): void {
+  printResult (numSucceeded: number, numFailed: number, numTried: number):
+  void {
     if (numTried < this.demoExplorationIds.length) {
       this.setStatusMessage.emit(
         'Processing...' + numTried + '/' +

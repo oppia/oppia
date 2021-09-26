@@ -91,11 +91,12 @@ describe('Auth service', function () {
     await expectAsync(authService.signOutAsync()).toBeRejectedWithError('fail');
   });
 
-  it('should throw if signOutAsync is called without angular fire', async () => {
-    await expectAsync(
-      new AuthService(null, authBackendApiService).signOutAsync()
-    ).toBeRejectedWithError('AngularFireAuth is not available');
-  });
+  it('should throw if signOutAsync is called without angular fire',
+    async () => {
+      await expectAsync(
+        new AuthService(null, authBackendApiService).signOutAsync()
+      ).toBeRejectedWithError('AngularFireAuth is not available');
+    });
 
   it('should throw if signInWithRedirectAsync is called without angular fire',
     async () => {
