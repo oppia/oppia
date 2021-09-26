@@ -141,7 +141,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateAddedCallback', function() {
       it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(changeListService, 'addState');
+        spyOn(changeListService, 'addState').and.returnValue(null);
 
         ExplorationStatesService.registerOnStateAddedCallback(spy);
         ExplorationStatesService.addState('Me Llamo');
@@ -155,7 +155,7 @@ describe('ExplorationStatesService', function() {
         spyOn($uibModal, 'open').and.callFake(function() {
           return {result: $q.resolve()};
         });
-        spyOn(changeListService, 'deleteState');
+        spyOn(changeListService, 'deleteState').and.returnValue(null);
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
@@ -170,7 +170,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateRenamedCallback', function() {
       it('should callback when a state is renamed', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(changeListService, 'renameState');
+        spyOn(changeListService, 'renameState').and.returnValue(null);
 
         explorationInitStateNameService.init('Hola');
         ExplorationStatesService.registerOnStateRenamedCallback(spy);
@@ -181,7 +181,7 @@ describe('ExplorationStatesService', function() {
 
       it('should not rename state when state name is invalid', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(changeListService, 'renameState');
+        spyOn(changeListService, 'renameState').and.returnValue(null);
         spyOn(validatorsService, 'isValidStateName')
           .and.returnValue(false);
 
@@ -194,7 +194,7 @@ describe('ExplorationStatesService', function() {
       it('should not rename state when new state name is ' +
         'old state name', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(changeListService, 'renameState');
+        spyOn(changeListService, 'renameState').and.returnValue(null);
 
         ExplorationStatesService.registerOnStateRenamedCallback(spy);
         ExplorationStatesService.renameState('Hola', 'Hola');
@@ -207,7 +207,7 @@ describe('ExplorationStatesService', function() {
       it('should callback when answer groups of a state are saved',
         function() {
           var spy = jasmine.createSpy('callback');
-          spyOn(changeListService, 'editStateProperty');
+          spyOn(changeListService, 'editStateProperty').and.returnValue(null);
 
           ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
           ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
@@ -222,7 +222,8 @@ describe('ExplorationStatesService', function() {
     expect(
       ExplorationStatesService.getSolicitAnswerDetailsMemento(
         'Hola', 'solicit_answer_details')).toEqual(false);
-    const changeListSpy = spyOn(changeListService, 'editStateProperty');
+    const changeListSpy = spyOn(
+      changeListService, 'editStateProperty').and.returnValue(null);
     ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
     expect(changeListSpy).toHaveBeenCalledWith(
       'Hola', 'solicit_answer_details', true, false);
