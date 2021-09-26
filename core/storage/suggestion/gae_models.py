@@ -316,7 +316,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_multiple_translation_suggestions_in_review(
             cls, thread_ids: List[str]
-    ) -> Sequence['GeneralSuggestionModel']:
+    ) -> List[Optional['GeneralSuggestionModel']]:
         """Returns translation suggestions which are in review from multiple
         thread ids.
 
@@ -325,7 +325,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 review.
 
         Returns:
-            list(SuggestionModel). A list of translation suggestions in review
+            list(SuggestionModel|None). A list of translation suggestions in review
             with given suggestion ids.
         """
         return GeneralSuggestionModel.get_multi(thread_ids)
