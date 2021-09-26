@@ -28,11 +28,22 @@ from core.platform import models
 from core.tests import test_utils
 from jobs import base_jobs
 from jobs import job_options
+from jobs.types import job_run_result
 import python_utils
 
+import apache_beam as beam
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
+
+from typing import Any, Iterator, Optional, Sequence, Type
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -50,27 +61,29 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(PipelinedTestBase, self).__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
             options=job_options.JobOptions(namespace=self.namespace))
-        self._pipeline_context_stack = None
+        self._pipeline_context_stack: Optional[contextlib.ExitStack] = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(PipelinedTestBase, self).setUp()
-        with python_utils.ExitStack() as pipeline_context_stack:
+        with contextlib.ExitStack() as pipeline_context_stack:
             pipeline_context_stack.enter_context(decorate_beam_errors())
             pipeline_context_stack.enter_context(self.pipeline)
             self._pipeline_context_stack = pipeline_context_stack.pop_all()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         try:
             self._exit_pipeline_context()
         finally:
             super(PipelinedTestBase, self).tearDown()
 
-    def assert_pcoll_equal(self, actual, expected):
+    def assert_pcoll_equal(
+        self, actual: beam.PCollection, expected: beam.PCollection
+    ) -> None:
         """Asserts that the given PCollections are equal.
         NOTE: At most one PCollection assertion can be called in a test. This is
         because running assertions on pipelines requires flushing it and waiting
@@ -90,7 +103,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
             actual, beam_testing_util.equal_to(expected))
         self._exit_pipeline_context()
 
-    def assert_pcoll_empty(self, actual):
+    def assert_pcoll_empty(self, actual: beam.PCollection) -> None:
         """Asserts that the given PCollection is empty.
         NOTE: At most one PCollection assertion can be called in a test. This is
         because running assertions on pipelines requires flushing it and waiting
@@ -108,7 +121,11 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         beam_testing_util.assert_that(actual, beam_testing_util.is_empty())
         self._exit_pipeline_context()
 
-    def create_model(self, model_class, **properties):
+    def create_model(
+        self,
+        model_class: Type[base_models.SELF_BASE_MODEL],
+        **properties: Any
+    ) -> base_models.SELF_BASE_MODEL:
         """Helper method for creating valid models with common default values.
 
         Args:
@@ -132,13 +149,13 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         property_values.update(properties)
         return model_class(**property_values)
 
-    def _assert_pipeline_context_is_acquired(self):
+    def _assert_pipeline_context_is_acquired(self) -> None:
         """Raises a RuntimeError when the pipeline context hasn't been entered.
 
         Raises:
             RuntimeError. The error.
         """
-        if not self._is_in_pipeline_context():
+        if self._pipeline_context_stack is None:
             raise RuntimeError(
                 'PCollection assertions must be run in the pipeline context.\n'
                 '\n'
@@ -150,13 +167,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
                 'multiple assertions, then split them into separate test '
                 'cases.')
 
-    def _is_in_pipeline_context(self):
-        """Returns whether the test is currently within the pipeline context."""
-        return self._pipeline_context_stack is not None
-
-    def _exit_pipeline_context(self):
+    def _exit_pipeline_context(self) -> None:
         """Flushes the pipeline and waits for it to finish running."""
-        if self._is_in_pipeline_context():
+        if self._pipeline_context_stack is not None:
             self._pipeline_context_stack.close()
             self._pipeline_context_stack = None
 
@@ -167,13 +180,13 @@ class JobTestBase(PipelinedTestBase):
     """
 
     # NOTE: run() raises a NotImplementedError.
-    JOB_CLASS = base_jobs.JobBase
+    JOB_CLASS: Type[base_jobs.JobBase] = base_jobs.JobBase
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(JobTestBase, self).__init__(*args, **kwargs)
         self.job = self.JOB_CLASS(self.pipeline)
 
-    def run_job(self):
+    def run_job(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs a new instance of self.JOB_CLASS and returns its output.
         Test authors should override this method if their jobs need arguments
         for their run() method, for example:
@@ -187,7 +200,7 @@ class JobTestBase(PipelinedTestBase):
         """
         return self.job.run()
 
-    def put_multi(self, model_list):
+    def put_multi(self, model_list: Sequence[base_models.BaseModel]) -> None:
         """Puts the input models into the datastore.
 
         Args:
@@ -197,7 +210,7 @@ class JobTestBase(PipelinedTestBase):
             model_list, update_last_updated_time=False)
         datastore_services.put_multi(model_list)
 
-    def assert_job_output_is(self, expected):
+    def assert_job_output_is(self, expected: beam.PCollection) -> None:
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
 
         Args:
@@ -205,13 +218,13 @@ class JobTestBase(PipelinedTestBase):
         """
         self.assert_pcoll_equal(self.run_job(), expected)
 
-    def assert_job_output_is_empty(self):
+    def assert_job_output_is_empty(self) -> None:
         """Asserts that the output of self.JOB_CLASS is an empty PCollection."""
         self.assert_pcoll_empty(self.run_job())
 
 
 @contextlib.contextmanager
-def decorate_beam_errors():
+def decorate_beam_errors() -> Iterator[None]:
     """Context manager to improve the readability of beam_testing_util errors.
     The beam_testing_util module raises exceptions with a single string of
     repr()'d lists as the message. The items end up appearing on one long line,
