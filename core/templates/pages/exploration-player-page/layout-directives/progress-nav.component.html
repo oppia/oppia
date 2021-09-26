@@ -21,7 +21,7 @@
     </button>
   </div>
   <div *ngIf="!hasNext">
-    <div *ngIf="submitButtonShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
+    <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
       <!-- Special case for the 'Continue' interaction. -->
       <button mat-button
               *ngIf="interactionId === 'Continue'"
@@ -55,6 +55,14 @@
 
   .oppia-nav-button .mat-button.oppia-autofocus:focus {
     background-color: #0D48A1;
+  }
+
+  .oppia-learner-confirm-button {
+    text-transform: uppercase;
+    line-height: 22px;
+    font-size: 16px;
+    border-radius: 2px;
+    outline: none;
   }
 
   .continue-button {

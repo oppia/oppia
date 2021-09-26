@@ -60,6 +60,7 @@ export class ProgressNavComponent {
   interactionId: string;
   helpCardHasContinueButton: boolean;
   isIframed: boolean;
+  lastDisplayedCard: StateCard;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -72,6 +73,39 @@ export class ProgressNavComponent {
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
+  ngOnChanges(): void {
+    if (this.lastDisplayedCard !== this.displayedCard) {
+      this.lastDisplayedCard = this.displayedCard;
+      this.updateDisplayedCardInfo();
+    }
+  }
+
+  ngOnInit(): void {
+    this.isIframed = this.urlService.isIframed();
+    this.directiveSubscriptions.add(
+      this.playerPositionService.displayedCardIndexChangedEventEmitter
+        .subscribe((index) => {
+          this.updateDisplayedCardInfo();
+        })
+    );
+
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onHelpCardAvailable.subscribe(
+        (helpCard) => {
+          this.helpCardHasContinueButton = helpCard.hasContinueButton;
+        }
+      )
+    );
+
+    if (this.playerPositionService.getDisplayedCardIndex() > -1) {
+      this.updateDisplayedCardInfo();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
   updateDisplayedCardInfo(): void {
     this.transcriptLength = this.playerTranscriptService.getNumCards();
     this.displayedCardIndex = (
@@ -79,6 +113,7 @@ export class ProgressNavComponent {
     this.hasPrevious = this.displayedCardIndex > 0;
     this.hasNext = !this.playerTranscriptService.isLastCard(
       this.displayedCardIndex);
+    this.explorationPlayerStateService.isInQuestionMode();
     this.conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
       !this.explorationPlayerStateService.isInQuestionMode());
@@ -165,35 +200,11 @@ export class ProgressNavComponent {
     if (this.conceptCardIsBeingShown) {
       return true;
     }
+
     return Boolean(
       this.interactionIsInline &&
       this.displayedCard.isCompleted() &&
       this.displayedCard.getLastOppiaResponse());
-  }
-
-  ngOnInit(): void {
-    this.isIframed = this.urlService.isIframed();
-
-    this.directiveSubscriptions.add(
-      this.playerPositionService.displayedCardIndexChangedEventEmitter
-        .subscribe(
-          () => {
-            this.updateDisplayedCardInfo();
-          }
-        )
-    );
-
-    this.directiveSubscriptions.add(
-      this.playerPositionService.onHelpCardAvailable.subscribe(
-        (helpCard) => {
-          this.helpCardHasContinueButton = helpCard.hasContinueButton;
-        }
-      )
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
   }
 }
 
