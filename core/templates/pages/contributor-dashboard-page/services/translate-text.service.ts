@@ -149,7 +149,8 @@ export class TranslateTextService {
     };
   }
 
-  init (expId: string, languageCode: string, successCallback: () => void): void {
+  init (expId: string, languageCode: string, successCallback: () => void):
+  void {
     this.stateWiseContentIds = {};
     this.stateNamesList = [];
     this.stateAndContent = [];

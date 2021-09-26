@@ -245,7 +245,8 @@ var LearnerDashboardPage = function () {
       explorationTitleInCompleteSection)).toMatch(explorationTitle);
   };
 
-  this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function (
+  this.navigateToCommunityLessonsAndCheckIncompleteCollections =
+  async function (
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInIncompleteSection = (

@@ -409,9 +409,10 @@ describe('Full exploration editor', function () {
       await explorationEditorPage.navigateToMainTab();
 
       // Add a content change and does not save the draft.
-      await explorationEditorMainTab.setContent(async function (richTextEditor) {
-        await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      await explorationEditorMainTab
+        .setContent(async function (richTextEditor) {
+          await richTextEditor.appendPlainText('How are you feeling?');
+        });
       await action.waitForAutosave();
       await users.logout();
 

@@ -269,10 +269,11 @@ describe('State Graph Visualization directive', function () {
           expect($scope.onDeleteFunction).toHaveBeenCalled();
         });
 
-      it('should call deleteFunction when deleting a initial node', function () {
-        $scope.onNodeDeletionClick('state_1');
-        expect($scope.onDeleteFunction).not.toHaveBeenCalled();
-      });
+      it('should call deleteFunction when deleting a initial node',
+        function () {
+          $scope.onNodeDeletionClick('state_1');
+          expect($scope.onDeleteFunction).not.toHaveBeenCalled();
+        });
 
       it('should get node complete title with its secondary label and' +
       ' warnings', function () {

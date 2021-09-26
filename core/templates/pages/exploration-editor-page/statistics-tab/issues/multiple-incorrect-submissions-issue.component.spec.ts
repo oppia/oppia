@@ -66,12 +66,13 @@ describe('Multiple Incorrect Submissions Issue Component', function () {
     })).toBe(false);
   });
 
-  it('should get learner action index based on action start index', function () {
-    expect(ctrl.actionStartIndex).toBe(1);
-    expect(ctrl.getLearnerActionIndex(0)).toBe(2);
-    expect(ctrl.getLearnerActionIndex(1)).toBe(3);
-    expect(ctrl.getLearnerActionIndex(2)).toBe(4);
-  });
+  it('should get learner action index based on action start index',
+    function () {
+      expect(ctrl.actionStartIndex).toBe(1);
+      expect(ctrl.getLearnerActionIndex(0)).toBe(2);
+      expect(ctrl.getLearnerActionIndex(1)).toBe(3);
+      expect(ctrl.getLearnerActionIndex(2)).toBe(4);
+    });
 
   it('should get feedback from an action', function () {
     var action = {

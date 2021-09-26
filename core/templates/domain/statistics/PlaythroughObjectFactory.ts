@@ -120,7 +120,8 @@ export type Playthrough = (
   providedIn: 'root'
 })
 export class PlaythroughObjectFactory {
-  constructor (private learnerActionObjectFactory: LearnerActionObjectFactory) {}
+  constructor
+  (private learnerActionObjectFactory: LearnerActionObjectFactory) {}
 
   createNewEarlyQuitPlaythrough (
       expId: string, expVersion: number,

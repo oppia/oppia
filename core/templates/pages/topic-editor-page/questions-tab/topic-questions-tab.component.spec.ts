@@ -246,20 +246,22 @@ describe('Topic questions tab', function () {
     expect(ctrl.directiveSubscriptions.closed).toBe(true);
   });
 
-  it('should reinitialize questions list when a skill is selected', function () {
-    spyOn(qls, 'resetPageNumber').and.callThrough();
-    spyOn(qls, 'getQuestionSummariesAsync');
-    qls.incrementPageNumber();
-    qls.incrementPageNumber();
+  it('should reinitialize questions list when a skill is selected',
+    function () {
+      spyOn(qls, 'resetPageNumber').and.callThrough();
+      spyOn(qls, 'getQuestionSummariesAsync');
+      qls.incrementPageNumber();
+      qls.incrementPageNumber();
 
-    expect($scope.selectedSkillId).toBeNull();
-    expect(qls.getCurrentPageNumber()).toBe(2);
+      expect($scope.selectedSkillId).toBeNull();
+      expect(qls.getCurrentPageNumber()).toBe(2);
 
-    $scope.reinitializeQuestionsList('1');
+      $scope.reinitializeQuestionsList('1');
 
-    expect($scope.selectedSkillId).toEqual('1');
-    expect(qls.resetPageNumber).toHaveBeenCalled();
-    expect(qls.getCurrentPageNumber()).toBe(0);
-    expect(qls.getQuestionSummariesAsync).toHaveBeenCalledWith('1', true, true);
-  });
+      expect($scope.selectedSkillId).toEqual('1');
+      expect(qls.resetPageNumber).toHaveBeenCalled();
+      expect(qls.getCurrentPageNumber()).toBe(0);
+      expect(qls.getQuestionSummariesAsync)
+        .toHaveBeenCalledWith('1', true, true);
+    });
 });

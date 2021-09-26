@@ -108,7 +108,8 @@ var ContributorDashboardPage = function () {
       'Review right element ' + reviewCategory + ' is not visible');
   };
 
-  this.expectUserToBeTranslationReviewer = async function (langaugeDescription) {
+  this.expectUserToBeTranslationReviewer =
+  async function (langaugeDescription) {
     await _expectUserToBeReviewer('translation', langaugeDescription);
   };
 

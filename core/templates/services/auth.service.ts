@@ -58,7 +58,8 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   async signInWithRedirectAsync (): Promise<void> {
   }
 
-  async getRedirectResultAsync (): Promise<firebase.auth.UserCredential | null> {
+  async getRedirectResultAsync ():
+  Promise<firebase.auth.UserCredential | null> {
     return null;
   }
 

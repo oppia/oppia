@@ -276,7 +276,8 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  async fetchStoriesAsync (topicId: string): Promise<StorySummaryBackendDict[]> {
+  async fetchStoriesAsync
+  (topicId: string): Promise<StorySummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });

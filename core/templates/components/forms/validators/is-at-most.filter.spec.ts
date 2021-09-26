@@ -36,9 +36,10 @@ describe('Normalizer tests', function () {
     }
   }));
 
-  it('should have the relevant filters', angular.mock.inject(function ($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it('should have the relevant filters',
+    angular.mock.inject(function ($filter) {
+      expect($filter(filterName)).not.toEqual(null);
+    }));
 
   it('should impose maximum bounds', angular.mock.inject(function ($filter) {
     var filter = $filter('isAtMost');

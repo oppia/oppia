@@ -199,7 +199,8 @@ export class ContentTranslationManagerService {
     }
   }
 
-  _swapContentInCustomizationArgs (card: StateCard, languageCode: string): void {
+  _swapContentInCustomizationArgs (card: StateCard, languageCode: string):
+  void {
     const interactionId = card.getInteractionId();
     const caValues = card.getInteraction().customizationArgs;
     const writtenTranslations = card.writtenTranslations;

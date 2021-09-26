@@ -180,60 +180,61 @@ describe('Testing apply-validation directive', function () {
       expect(Object.keys(testInput.$error).length).not.toEqual(0);
     }));
 
-  it('should apply isFloat validation', angular.mock.inject(function ($compile) {
-    scope.validators = function () {
-      return [{
-        id: 'isFloat'
-      }];
-    };
-    $compile(element)(scope);
-    testInput = scope.testForm.inputValue;
+  it('should apply isFloat validation',
+    angular.mock.inject(function ($compile) {
+      scope.validators = function () {
+        return [{
+          id: 'isFloat'
+        }];
+      };
+      $compile(element)(scope);
+      testInput = scope.testForm.inputValue;
 
-    testInput.$setViewValue(-3.5);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(-3.5);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('0.5');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('0.5');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('1.0');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('1.0');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(2);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(2);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(3);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(3);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(4);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(4);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('abc');
-    scope.$digest();
-    expect(testInput.$valid).toBeUndefined();
-    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+      testInput.$setViewValue('abc');
+      scope.$digest();
+      expect(testInput.$valid).toBeUndefined();
+      expect(Object.keys(testInput.$error).length).not.toEqual(0);
 
-    testInput.$setViewValue('1.2.3');
-    scope.$digest();
-    expect(testInput.$valid).toBeUndefined();
-    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+      testInput.$setViewValue('1.2.3');
+      scope.$digest();
+      expect(testInput.$valid).toBeUndefined();
+      expect(Object.keys(testInput.$error).length).not.toEqual(0);
 
-    testInput.$setViewValue('-3..5');
-    scope.$digest();
-    expect(testInput.$valid).toBeUndefined();
-    expect(Object.keys(testInput.$error).length).not.toEqual(0);
-  }));
+      testInput.$setViewValue('-3..5');
+      scope.$digest();
+      expect(testInput.$valid).toBeUndefined();
+      expect(Object.keys(testInput.$error).length).not.toEqual(0);
+    }));
 
   it('should not apply nonexistent validation', angular.mock.inject(
     function ($compile) {

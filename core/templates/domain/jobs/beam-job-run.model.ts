@@ -178,7 +178,8 @@ export class BeamJobRun {
     }
   }
 
-  static createFromBackendDict (backendDict: BeamJobRunBackendDict): BeamJobRun {
+  static createFromBackendDict
+  (backendDict: BeamJobRunBackendDict): BeamJobRun {
     return new BeamJobRun(
       backendDict.job_id, backendDict.job_name, backendDict.job_state,
       backendDict.job_started_on_msecs, backendDict.job_updated_on_msecs,

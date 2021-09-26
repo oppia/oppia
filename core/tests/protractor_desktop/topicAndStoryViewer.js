@@ -152,28 +152,29 @@ describe('Topic and Story viewer functionality', function () {
     await users.logout();
   });
 
-  it('should play through story and save progress on login.', async function () {
-    await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
-    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
-    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
-    await topicAndStoryViewerPage.goToChapterIndex(0);
-    await explorationPlayerPage.submitAnswer('Continue', null);
+  it('should play through story and save progress on login.',
+    async function () {
+      await topicAndStoryViewerPage.get(
+        'math', 'topic-tasv-one', 'story-player-tasv-one');
+      await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+      await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
+      await topicAndStoryViewerPage.goToChapterIndex(0);
+      await explorationPlayerPage.submitAnswer('Continue', null);
 
-    // Signing up with the login button should redirect the user back to the
-    // exploration.
-    var loginButton = element(by.css('.protractor-test-login-button'));
-    await action.click('Login button', loginButton);
-    await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
+      // Signing up with the login button should redirect the user back to the
+      // exploration.
+      var loginButton = element(by.css('.protractor-test-login-button'));
+      await action.click('Login button', loginButton);
+      await users.createAndLoginUser(
+        'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
 
-    await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
-    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
-    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
-    await users.logout();
-  });
+      await explorationPlayerPage.submitAnswer('Continue', null);
+      await topicAndStoryViewerPage.get(
+        'math', 'topic-tasv-one', 'story-player-tasv-one');
+      await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
+      await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
+      await users.logout();
+    });
 
   it(
     'should check for topic description, stories and revision cards',

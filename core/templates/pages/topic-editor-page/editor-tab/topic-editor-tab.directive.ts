@@ -282,7 +282,8 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.updateTopicThumbnailFilename = function (newThumbnailFilename) {
+          $scope.updateTopicThumbnailFilename =
+          function (newThumbnailFilename) {
             if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
               return;
             }

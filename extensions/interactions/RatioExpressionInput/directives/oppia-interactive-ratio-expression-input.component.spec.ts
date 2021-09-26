@@ -89,10 +89,11 @@ describe('RatioExpressionInputInteractive', function () {
       ).toHaveBeenCalled();
     });
 
-    it('should return valid answer before the form is initialized', function () {
-      ctrl.RatioExpressionInputForm = undefined;
-      expect(ctrl.isAnswerValid()).toBe(true);
-    });
+    it('should return valid answer before the form is initialized',
+      function () {
+        ctrl.RatioExpressionInputForm = undefined;
+        expect(ctrl.isAnswerValid()).toBe(true);
+      });
 
     it('should raise error if invalid answer is submitted', function () {
       ctrl.$onInit();

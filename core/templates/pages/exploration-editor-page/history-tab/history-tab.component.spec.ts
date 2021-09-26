@@ -234,15 +234,16 @@ describe('History tab component', function () {
         ' This is the commit message 2');
   });
 
-  it('should open a new tab for download exploration with version', function () {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      open: jasmine.createSpy('open', () => {})
-    });
-    ctrl.downloadExplorationWithVersion(1);
+  it('should open a new tab for download exploration with version',
+    function () {
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        open: jasmine.createSpy('open', () => {})
+      });
+      ctrl.downloadExplorationWithVersion(1);
 
-    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
-      '/createhandler/download/exp1?v=1', '&output_format=zip');
-  });
+      expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+        '/createhandler/download/exp1?v=1', '&output_format=zip');
+    });
 
   it('should open revert exploration modal', function () {
     spyOn($uibModal, 'open').and.callThrough();

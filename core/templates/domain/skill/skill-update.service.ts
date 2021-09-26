@@ -161,7 +161,8 @@ export class SkillUpdateService {
     );
   }
 
-  setConceptCardExplanation (skill: Skill, newExplanation: SubtitledHtml): void {
+  setConceptCardExplanation (skill: Skill, newExplanation: SubtitledHtml):
+  void {
     const oldExplanation = skill.getConceptCard().getExplanation();
     this._applySkillContentsPropertyChange(
       skill,
@@ -223,7 +224,8 @@ export class SkillUpdateService {
     );
   }
 
-  updateWorkedExamples (skill: Skill, newWorkedExamples: WorkedExample[]): void {
+  updateWorkedExamples (skill: Skill, newWorkedExamples: WorkedExample[]):
+  void {
     const oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
     this._applySkillContentsPropertyChange(
       skill,

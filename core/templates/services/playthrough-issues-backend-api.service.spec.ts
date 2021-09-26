@@ -221,7 +221,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
           .createFromBackendDict(backendIssues[0]);
 
         playthroughIssuesBackendApiService.fetchIssuesAsync('7', 1)
-          .then(async () => playthroughIssuesBackendApiService.resolveIssueAsync(
+          .then(async (
+          ) => playthroughIssuesBackendApiService.resolveIssueAsync(
             playthroughIssue, explorationId, 1))
           .then(successHandler, failHandler);
 

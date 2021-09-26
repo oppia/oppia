@@ -249,21 +249,22 @@ describe('StateTopAnswersStatsService', () => {
       .toEqual(['Hola']);
   }));
 
-  it('should return empty stats for a newly added state', fakeAsync(async () => {
-    const states = makeStates();
-    spyOnBackendApiFetchStatsAsync('Hola', []);
-    stateTopAnswersStatsService.initAsync(expId, states);
-    flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromiseAsync();
+  it('should return empty stats for a newly added state',
+    fakeAsync(async () => {
+      const states = makeStates();
+      spyOnBackendApiFetchStatsAsync('Hola', []);
+      stateTopAnswersStatsService.initAsync(expId, states);
+      flushMicrotasks();
+      await stateTopAnswersStatsService.getInitPromiseAsync();
 
-    expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
-      .toThrowError('Me Llamo does not exist.');
+      expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
+        .toThrowError('Me Llamo does not exist.');
 
-    stateTopAnswersStatsService.onStateAdded('Me Llamo');
+      stateTopAnswersStatsService.onStateAdded('Me Llamo');
 
-    expect(stateTopAnswersStatsService.getStateStats('Me Llamo'))
-      .toEqual([]);
-  }));
+      expect(stateTopAnswersStatsService.getStateStats('Me Llamo'))
+        .toEqual([]);
+    }));
 
   it('should throw when accessing a deleted state', fakeAsync(async () => {
     const states = makeStates();

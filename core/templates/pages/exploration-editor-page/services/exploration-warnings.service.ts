@@ -254,9 +254,11 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
       var statesWithAnswersThatMustBeResolved =
         _getStatesWithAnswersThatMustBeResolved();
-      angular.forEach(statesWithAnswersThatMustBeResolved, function (stateName) {
-        _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
-      });
+      angular.
+        forEach(statesWithAnswersThatMustBeResolved, function (stateName) {
+          _extendStateWarnings (
+            stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
+        });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
       angular.forEach(statesWithIncorrectSolution, function (state) {
@@ -398,7 +400,8 @@ angular.module('oppia').factory('ExplorationWarningsService', [
         return checkpointCountWarning;
       },
       hasCriticalWarnings: function () {
-        return hasCriticalStateWarning || _warningsList.some(function (warning) {
+        return hasCriticalStateWarning ||
+        _warningsList.some(function (warning) {
           return warning.type === WARNING_TYPES.CRITICAL;
         });
       },

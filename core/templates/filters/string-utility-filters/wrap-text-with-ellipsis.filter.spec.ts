@@ -33,9 +33,10 @@ describe('Testing filters', function () {
     }
   }));
 
-  it('should have all expected filters', angular.mock.inject(function ($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it('should have all expected filters',
+    angular.mock.inject(function ($filter) {
+      expect($filter(filterName)).not.toEqual(null);
+    }));
 
   it('should wrap text with ellipses based on its length', angular.mock.inject(
     function ($filter) {
