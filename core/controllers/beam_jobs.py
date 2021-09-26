@@ -38,9 +38,10 @@ class BeamJobHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        self.render_json({
-            'jobs': [j.to_dict() for j in beam_job_services.get_beam_jobs()]
-        })
+        sorted_beam_jobs = sorted(
+            beam_job_services.get_beam_jobs(),
+            key=lambda j: j.name)
+        self.render_json({'jobs': [j.to_dict() for j in sorted_beam_jobs]})
 
 
 class BeamJobRunHandler(base.BaseHandler):
@@ -76,27 +77,20 @@ class BeamJobRunHandler(base.BaseHandler):
             beam_job_services.get_beam_job_runs(),
             key=lambda j: j.job_updated_on,
             reverse=True)
-
-        self.render_json({
-            'runs': [r.to_dict() for r in sorted_beam_job_runs]
-        })
+        self.render_json({'runs': [r.to_dict() for r in sorted_beam_job_runs]})
 
     @acl_decorators.can_run_any_job
     def put(self) -> None:
-        job_name = (
+        job_name: str = (
             self.normalized_payload.get('job_name')
-            if self.normalized_payload else None)
-
+            if self.normalized_payload else '')
         beam_job_run = beam_job_services.run_beam_job(job_name)
-
         self.render_json(beam_job_run.to_dict())
 
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
         job_id = self.request.get('job_id')
-
         beam_job_run = beam_job_services.cancel_beam_job(job_id)
-
         self.render_json(beam_job_run.to_dict())
 
 
@@ -109,7 +103,11 @@ class BeamJobRunResultHandler(base.BaseHandler):
         'GET': {
             'job_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'[A-Za-z0-9]{22}'
+                    }]
                 }
             }
         }
@@ -118,5 +116,5 @@ class BeamJobRunResultHandler(base.BaseHandler):
     @acl_decorators.can_run_any_job
     def get(self) -> None:
         job_id = self.request.get('job_id')
-        result = beam_job_services.get_beam_job_run_result(job_id)
-        self.render_json(result.to_dict())
+        beam_job_run_result = beam_job_services.get_beam_job_run_result(job_id)
+        self.render_json(beam_job_run_result.to_dict())

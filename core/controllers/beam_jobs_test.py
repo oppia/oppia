@@ -115,9 +115,14 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
 class BeamJobRunResultHandlerTests(BeamHandlerTestBase):
 
     def test_get_returns_job_output(self) -> None:
-        beam_job_services.create_beam_job_run_result_model('123', 'o', '').put()
+        run_model = beam_job_services.create_beam_job_run_model('WorkingJob')
+        run_model.put()
+        result_model = beam_job_services.create_beam_job_run_result_model(
+            run_model.id, 'o', '')
+        result_model.put()
 
-        response = self.get_json('/beam_job_run_result?job_id=123')
+        response = (
+            self.get_json('/beam_job_run_result?job_id=%s' % run_model.id))
 
         self.assertEqual(response, {'stdout': 'o', 'stderr': ''})
 
