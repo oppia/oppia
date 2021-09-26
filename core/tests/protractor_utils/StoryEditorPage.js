@@ -443,7 +443,7 @@ var StoryEditorPage = function() {
         var selectedSkill = skillListItems.get(index);
         await waitFor.elementToBeClickable(
           selectedSkill, 'selectedSkill takes too long to be clickable.');
-        await selectedSkill.click();
+        await selectedSkill.action.click();
       },
 
       selectSkill: async function(name) {
