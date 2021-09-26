@@ -475,7 +475,7 @@ class ElasticSearchStub(python_utils.OBJECT):
                     values = v['query'].split(' ')
                     for doc in result_docs:
                         strs = [val for val in doc.values() if isinstance(
-                            val, python_utils.BASESTRING)]
+                            val, str)]
                         words = []
                         for s in strs:
                             words += s.split(' ')
@@ -925,7 +925,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         Returns:
             int. Number of successfully deleted keys.
         """
-        assert all(isinstance(key, python_utils.BASESTRING) for key in keys)
+        assert all(isinstance(key, str) for key in keys)
         keys_to_delete = [key for key in keys if key in self._CACHE_DICT]
         for key in keys_to_delete:
             del self._CACHE_DICT[key]

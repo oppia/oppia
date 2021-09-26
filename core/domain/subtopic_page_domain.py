@@ -367,7 +367,7 @@ class SubtopicPage(python_utils.OBJECT):
             ValidationError. One or more attributes of the subtopic page are
                 invalid.
         """
-        if not isinstance(self.topic_id, python_utils.BASESTRING):
+        if not isinstance(self.topic_id, str):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' %
                 self.topic_id)
@@ -391,7 +391,7 @@ class SubtopicPage(python_utils.OBJECT):
                     self.page_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

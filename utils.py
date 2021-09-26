@@ -392,7 +392,7 @@ def set_url_query_parameter(
         Exception. If the query parameter sent is not of string type,
             them this exception is raised.
     """
-    if not isinstance(param_name, python_utils.BASESTRING):
+    if not isinstance(param_name, str):
         raise Exception(
             'URL query parameter name must be a string, received %s'
             % param_name)
@@ -662,7 +662,7 @@ def require_valid_name(
         ValidationError. Adjacent whitespace in name_type isn't collapsed.
         ValidationError. Invalid character is present in name.
     """
-    if not isinstance(name, python_utils.BASESTRING):
+    if not isinstance(name, str):
         raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
@@ -707,7 +707,7 @@ def require_valid_url_fragment(
         ValidationError. The length of the name_type is not correct.
         ValidationError. Invalid character is present in the name.
     """
-    if not isinstance(name, python_utils.BASESTRING):
+    if not isinstance(name, str):
         raise ValidationError(
             '%s field must be a string. Received %s.' % (name_type, name))
 
@@ -742,7 +742,7 @@ def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
             ValidationError. Thumbnail filename extension is not svg.
         """
     if thumbnail_filename is not None:
-        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+        if not isinstance(thumbnail_filename, str):
             raise ValidationError(
                 'Expected thumbnail filename to be a string, received %s'
                 % thumbnail_filename)
@@ -779,7 +779,7 @@ def require_valid_image_filename(image_filename: str) -> None:
             ValidationError. Image filename does not include an extension.
         """
     if image_filename is not None:
-        if not isinstance(image_filename, python_utils.BASESTRING):
+        if not isinstance(image_filename, str):
             raise ValidationError(
                 'Expected image filename to be a string, received %s'
                 % image_filename)
@@ -805,7 +805,7 @@ def require_valid_meta_tag_content(meta_tag_content: str) -> None:
             ValidationError. Meta tag content is not a string.
             ValidationError. Meta tag content is longer than expected.
         """
-    if not isinstance(meta_tag_content, python_utils.BASESTRING):
+    if not isinstance(meta_tag_content, str):
         raise ValidationError(
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
@@ -829,7 +829,7 @@ def require_valid_page_title_fragment_for_web(
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
-    if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
+    if not isinstance(page_title_fragment_for_web, str):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
             % page_title_fragment_for_web)

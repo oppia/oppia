@@ -59,7 +59,7 @@ class ActivityReference(python_utils.OBJECT):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 

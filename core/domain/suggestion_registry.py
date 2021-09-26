@@ -168,7 +168,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -183,7 +183,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -195,7 +195,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'received %s' % self.author_id)
 
         if self.final_reviewer_id is not None:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
@@ -208,7 +208,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be in a valid user ID '
                     'format, received %s' % self.final_reviewer_id)
 
-        if not isinstance(self.score_category, python_utils.BASESTRING):
+        if not isinstance(self.score_category, str):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))
@@ -1050,7 +1050,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -1060,7 +1060,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -1070,13 +1070,13 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                     'Expected final_reviewer_id to be None as the '
                     'voiceover application is not yet handled.')
         else:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' % (
                         type(self.final_reviewer_id)))
             if self.status == suggestion_models.STATUS_REJECTED:
                 if not isinstance(
-                        self.rejection_message, python_utils.BASESTRING):
+                        self.rejection_message, str):
                     raise utils.ValidationError(
                         'Expected rejection_message to be a string for a '
                         'rejected application, received %s' % type(
@@ -1088,7 +1088,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                         'accepted voiceover application, received %s' % (
                             self.rejection_message))
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -1096,12 +1096,12 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.filename, python_utils.BASESTRING):
+        if not isinstance(self.filename, str):
             raise utils.ValidationError(
                 'Expected filename to be a string, received %s' % type(
                     self.filename))
 
-        if not isinstance(self.content, python_utils.BASESTRING):
+        if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected content to be a string, received %s' % type(
                     self.content))

@@ -25,7 +25,6 @@ import re
 
 from core.tests import test_utils
 from extensions.objects.models import objects
-import python_utils
 import schema_utils_test
 
 
@@ -933,11 +932,10 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                     # Comparing types here is necessary because 0 == False in
                     # Python. We handle the string case separately since Python
                     # treats str and unicode as different types.
-                    if isinstance(
-                            member.default_value, python_utils.BASESTRING):
+                    if isinstance(member.default_value, (str, bytes)):
                         self.assertIsInstance(
                             member.normalize(member.default_value),
-                            python_utils.BASESTRING, msg=type_error_message)
+                            (str, bytes), msg=type_error_message)
                     else:
                         self.assertIsInstance(
                             member.normalize(member.default_value),

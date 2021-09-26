@@ -27,7 +27,6 @@ from core.domain import html_cleaner
 from core.domain import role_services
 from core.platform import models
 import feconf
-import python_utils
 import utils
 
 (blog_models,) = models.Registry.import_models([models.NAMES.blog])
@@ -302,7 +301,7 @@ def does_blog_post_with_url_fragment_exist(url_fragment):
     Raises:
         Exception. Blog Post URL fragment is not a string.
     """
-    if not isinstance(url_fragment, python_utils.BASESTRING):
+    if not isinstance(url_fragment, str):
         raise utils.ValidationError(
             'Blog Post URL fragment should be a string. Recieved:'
             '%s' % url_fragment)

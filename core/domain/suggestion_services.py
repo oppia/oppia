@@ -1344,7 +1344,7 @@ def update_translation_suggestion(suggestion_id, translation_html):
     # Clean the translation HTML if not a list of strings.
     suggestion.change.translation_html = (
         html_cleaner.clean(translation_html)
-        if isinstance(translation_html, python_utils.BASESTRING)
+        if isinstance(translation_html, str)
         else translation_html
     )
     suggestion.edited_by_reviewer = True

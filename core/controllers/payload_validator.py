@@ -21,7 +21,6 @@ Also contains a list of handler class names which does not contain the schema.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
 import schema_utils
 
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -73,7 +72,7 @@ def validate(
         if (
                 allow_string_to_bool_conversion and
                 arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
-                and isinstance(handler_args[arg_key], python_utils.BASESTRING)
+                and isinstance(handler_args[arg_key], (str, bytes))
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
@@ -81,6 +80,7 @@ def validate(
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
+        # Yes this is the failing one.
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))

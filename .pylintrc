@@ -71,7 +71,6 @@ forbidden-imports=
 
 disallowed-functions-and-replacements-str=
   assertEquals=>self.assertEqual,
-  basestring=>python_utils.BASESTRING,
   contextlib2.ExitStack=>python_utils.ExitStack,
   contextlib2.nullcontext=>python_utils.nullcontext,
   contextlib2.redirect_stdout=>python_utils.redirect_stdout,

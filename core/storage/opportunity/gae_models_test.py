@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -81,7 +80,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_all_translation_opportunities_pagination(self) -> None:
         results, cursor, more = (
@@ -92,7 +91,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -102,7 +101,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(new_cursor, str))
 
     def test_get_all_voiceover_opportunities(self) -> None:
         results, cursor, more = (
@@ -114,7 +113,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_all_voiceover_opportunities_pagination(self) -> None:
         results, cursor, more = (
@@ -125,7 +124,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -135,7 +134,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(new_cursor, str))
 
     def test_get_by_topic(self) -> None:
         model_list = (
@@ -214,7 +213,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_skill_opportunities_pagination(self) -> None:
         results, cursor, more = (
@@ -225,7 +224,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
@@ -235,7 +234,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_delete_all_skill_opportunities(self) -> None:
         results, _, more = (

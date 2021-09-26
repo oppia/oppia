@@ -99,7 +99,7 @@ class GeneralFileSystem(python_utils.OBJECT):
                 entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
-        if not isinstance(entity_id, python_utils.BASESTRING):
+        if not isinstance(entity_id, str):
             raise utils.ValidationError(
                 'Invalid entity_id received: %s' % entity_id)
         if entity_id == '':

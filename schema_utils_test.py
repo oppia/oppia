@@ -382,16 +382,15 @@ def validate_schema(schema: Dict[str, Any]) -> None:
                 prop,
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION])
-            assert isinstance(prop[SCHEMA_KEY_NAME], python_utils.BASESTRING), (
-                'Expected %s, got %s' % (
-                    python_utils.BASESTRING, prop[SCHEMA_KEY_NAME]))
+            assert isinstance(prop[SCHEMA_KEY_NAME], (str, bytes)), (
+                'Expected %s or %s, got %s' % (
+                    str, bytes, prop[SCHEMA_KEY_NAME]))
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
                 assert isinstance(
-                    prop[SCHEMA_KEY_DESCRIPTION], python_utils.BASESTRING), (
-                        'Expected %s, got %s' % (
-                            python_utils.BASESTRING,
-                            prop[SCHEMA_KEY_DESCRIPTION]))
+                    prop[SCHEMA_KEY_DESCRIPTION], (str, bytes)), (
+                        'Expected %s or %s, got %s' % (
+                            str, bytes, prop[SCHEMA_KEY_DESCRIPTION]))
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         _validate_dict_keys(
             schema,
@@ -1365,7 +1364,7 @@ class ValidateClassForTesting(python_utils.OBJECT):
 
     def validate(self) -> None:
         """Method to validate the test object."""
-        if not isinstance(self.arg_a, python_utils.BASESTRING):
+        if not isinstance(self.arg_a, (str, bytes)):
             raise Exception('Invalid type arg_a.')
-        if not isinstance(self.arg_b, python_utils.BASESTRING):
+        if not isinstance(self.arg_b, (str, bytes)):
             raise Exception('Invalid type arg_b.')

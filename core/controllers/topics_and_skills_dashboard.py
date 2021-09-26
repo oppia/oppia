@@ -36,7 +36,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
-import python_utils
 import utils
 
 
@@ -199,12 +198,12 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         status = self.payload.get('status')
 
         if (classroom_name is not None and
-                not isinstance(classroom_name, python_utils.BASESTRING)):
+                not isinstance(classroom_name, str)):
             raise self.InvalidInputException(
                 'Classroom name should be a string.')
 
         if (urlsafe_start_cursor is not None and
-                not isinstance(urlsafe_start_cursor, python_utils.BASESTRING)):
+                not isinstance(urlsafe_start_cursor, str)):
             raise self.InvalidInputException(
                 'Next Cursor should be a string.')
 
@@ -215,18 +214,18 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 
         if (keywords is not None and (not isinstance(keywords, list) or (
                 not all(
-                    isinstance(keyword, python_utils.BASESTRING)
+                    isinstance(keyword, str)
                     for keyword in keywords)))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 
         if (sort_by is not None and
-                not isinstance(sort_by, python_utils.BASESTRING)):
+                not isinstance(sort_by, str)):
             raise self.InvalidInputException(
                 'The value of sort_by should be a string.')
 
         if (status is not None and
-                not isinstance(status, python_utils.BASESTRING)):
+                not isinstance(status, str)):
             raise self.InvalidInputException(
                 'Status should be a string.')
 

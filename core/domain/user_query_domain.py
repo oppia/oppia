@@ -84,7 +84,7 @@ class UserQuery(python_utils.OBJECT):
             ValidationError. Expected user ID in user_ids to be a valid user ID.
             ValidationError. Expected sent_email_model_id to be a string.
         """
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
@@ -93,7 +93,7 @@ class UserQuery(python_utils.OBJECT):
                 'Expected params to be of type tuple, received %s'
                 % type(self.params))
 
-        if not isinstance(self.submitter_id, python_utils.BASESTRING):
+        if not isinstance(self.submitter_id, str):
             raise utils.ValidationError(
                 'Expected submitter ID to be a string, received %s' %
                 self.submitter_id)
@@ -102,7 +102,7 @@ class UserQuery(python_utils.OBJECT):
                 'Expected submitter ID to be a valid user ID, received %s' %
                 self.submitter_id)
 
-        if not isinstance(self.status, python_utils.BASESTRING):
+        if not isinstance(self.status, str):
             raise utils.ValidationError(
                 'Expected status to be a string, received %s' % self.status)
         if self.status not in feconf.ALLOWED_USER_QUERY_STATUSES:
@@ -113,7 +113,7 @@ class UserQuery(python_utils.OBJECT):
                 'Expected user_ids to be a list, received %s' %
                 type(self.user_ids))
         for user_id in self.user_ids:
-            if not isinstance(user_id, python_utils.BASESTRING):
+            if not isinstance(user_id, str):
                 raise utils.ValidationError(
                     'Expected each user ID in user_ids to be a string, '
                     'received %s' % user_id)
@@ -124,7 +124,7 @@ class UserQuery(python_utils.OBJECT):
                     'received %s' % user_id)
 
         if self.sent_email_model_id and not isinstance(
-                self.sent_email_model_id, python_utils.BASESTRING):
+                self.sent_email_model_id, str):
             raise utils.ValidationError(
                 'Expected sent_email_model_id to be a string, received %s'
                 % self.sent_email_model_id)

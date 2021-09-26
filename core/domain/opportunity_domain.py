@@ -126,21 +126,21 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, python_utils.BASESTRING):
+        if not isinstance(self.topic_id, str):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, python_utils.BASESTRING):
+        if not isinstance(self.topic_name, str):
             raise utils.ValidationError(
                 'Expected topic_name to be a string, received %s' %
                 self.topic_name)
-        if not isinstance(self.story_id, python_utils.BASESTRING):
+        if not isinstance(self.story_id, str):
             raise utils.ValidationError(
                 'Expected story_id to be a string, received %s' % self.story_id)
-        if not isinstance(self.story_title, python_utils.BASESTRING):
+        if not isinstance(self.story_title, str):
             raise utils.ValidationError(
                 'Expected story_title to be a string, received %s' %
                 self.story_title)
-        if not isinstance(self.chapter_title, python_utils.BASESTRING):
+        if not isinstance(self.chapter_title, str):
             raise utils.ValidationError(
                 'Expected chapter_title to be a string, received %s' %
                 self.chapter_title)
@@ -225,7 +225,7 @@ class SkillOpportunity(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.skill_description, python_utils.BASESTRING):
+        if not isinstance(self.skill_description, str):
             raise utils.ValidationError(
                 'Expected skill_description to be a string, received %s' %
                 self.skill_description)

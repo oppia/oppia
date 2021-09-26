@@ -140,7 +140,7 @@ class UserAuthDetails(python_utils.OBJECT):
         if not self.user_id:
             raise utils.ValidationError('No user_id specified')
 
-        if not isinstance(self.user_id, python_utils.BASESTRING):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'user_id must be a string, but got %r' % self.user_id)
 
@@ -149,12 +149,12 @@ class UserAuthDetails(python_utils.OBJECT):
                 'user_id=%r has the wrong format' % self.user_id)
 
         if (self.gae_id is not None and
-                not isinstance(self.gae_id, python_utils.BASESTRING)):
+                not isinstance(self.gae_id, str)):
             raise utils.ValidationError(
                 'gae_id must be a string, but got %r' % self.gae_id)
 
         if (self.firebase_auth_id is not None and
-                not isinstance(self.firebase_auth_id, python_utils.BASESTRING)):
+                not isinstance(self.firebase_auth_id, str)):
             raise utils.ValidationError(
                 'firebase_auth_id must be a string, but got %r' %
                 self.firebase_auth_id)

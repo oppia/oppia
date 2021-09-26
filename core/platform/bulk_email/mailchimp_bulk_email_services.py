@@ -24,7 +24,6 @@ import hashlib
 import logging
 
 import feconf
-import python_utils
 
 import mailchimp3
 from mailchimp3 import mailchimpclient
@@ -42,7 +41,7 @@ def _get_subscriber_hash(email: str) -> str:
     Raises:
         Exception. Invalid type for email, expected string.
     """
-    if not isinstance(email, python_utils.BASESTRING):
+    if not isinstance(email, str):
         raise Exception(
             'Invalid type for email. Expected string, received %s' % email)
     md5_hash = hashlib.md5()

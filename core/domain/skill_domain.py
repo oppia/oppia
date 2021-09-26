@@ -259,7 +259,7 @@ class Misconception(python_utils.OBJECT):
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
-        if not isinstance(self.name, python_utils.BASESTRING):
+        if not isinstance(self.name, str):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
@@ -271,7 +271,7 @@ class Misconception(python_utils.OBJECT):
                 'Misconception name should be less than %d chars, received %s'
                 % (misconception_name_length_limit, self.name))
 
-        if not isinstance(self.notes, python_utils.BASESTRING):
+        if not isinstance(self.notes, str):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
@@ -281,7 +281,7 @@ class Misconception(python_utils.OBJECT):
                 'Expected must_be_addressed to be a bool, received %s' %
                 self.must_be_addressed)
 
-        if not isinstance(self.feedback, python_utils.BASESTRING):
+        if not isinstance(self.feedback, str):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
@@ -335,7 +335,7 @@ class Rubric(python_utils.OBJECT):
             ValidationError. One or more attributes of the rubric are
                 invalid.
         """
-        if not isinstance(self.difficulty, python_utils.BASESTRING):
+        if not isinstance(self.difficulty, str):
             raise utils.ValidationError(
                 'Expected difficulty to be a string, received %s' %
                 self.difficulty)
@@ -349,7 +349,7 @@ class Rubric(python_utils.OBJECT):
                 self.explanations)
 
         for explanation in self.explanations:
-            if not isinstance(explanation, python_utils.BASESTRING):
+            if not isinstance(explanation, str):
                 raise utils.ValidationError(
                     'Expected each explanation to be a string, received %s' %
                     explanation)
@@ -595,7 +595,7 @@ class Skill(python_utils.OBJECT):
         Args:
             skill_id: str. The skill id to validate.
         """
-        if not isinstance(skill_id, python_utils.BASESTRING):
+        if not isinstance(skill_id, str):
             raise utils.ValidationError('Skill id should be a string.')
 
         if len(skill_id) != 12:
@@ -608,7 +608,7 @@ class Skill(python_utils.OBJECT):
         Args:
             description: str. The description to validate.
         """
-        if not isinstance(description, python_utils.BASESTRING):
+        if not isinstance(description, str):
             raise utils.ValidationError('Description should be a string.')
 
         if description == '':
@@ -673,7 +673,7 @@ class Skill(python_utils.OBJECT):
                     self.skill_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -727,7 +727,7 @@ class Skill(python_utils.OBJECT):
                 'received %s' % self.prerequisite_skill_ids)
 
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each skill ID to be a string, '
                     'received %s' % skill_id)
@@ -1572,13 +1572,13 @@ class SkillSummary(python_utils.OBJECT):
             ValidationError. One or more attributes of skill summary are
                 invalid.
         """
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError('Description should be a string.')
 
         if self.description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

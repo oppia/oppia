@@ -28,7 +28,6 @@ from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
-import python_utils
 import utils
 
 
@@ -358,8 +357,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
             include_private_exps = False
 
         if (not isinstance(exp_ids, list) or not all(
-                isinstance(
-                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids)):
+                isinstance(exp_id, (str, bytes)) for exp_id in exp_ids)):
             raise self.PageNotFoundException
 
         if include_private_exps:

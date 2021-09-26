@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from core.domain import caching_domain
 import feconf
-import python_utils
 
 import redis
 
@@ -122,6 +121,6 @@ def delete_multi(keys: List[str]) -> int:
         int. Number of successfully deleted keys.
     """
     for key in keys:
-        assert isinstance(key, python_utils.BASESTRING)
+        assert isinstance(key, str)
     number_of_deleted_keys = OPPIA_REDIS_CLIENT.delete(*keys)
     return number_of_deleted_keys

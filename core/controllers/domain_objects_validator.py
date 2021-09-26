@@ -28,7 +28,6 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
-import python_utils
 
 from typing import Dict, Optional, Union
 
@@ -51,7 +50,7 @@ def validate_new_config_property_values(obj):
         obj: dict. Data that needs to be validated.
     """
     for (name, value) in obj.items():
-        if not isinstance(name, python_utils.BASESTRING):
+        if not isinstance(name, (str, bytes)):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)

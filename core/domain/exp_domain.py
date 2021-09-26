@@ -456,7 +456,7 @@ class ExpVersionReference(python_utils.OBJECT):
             ValidationError. One or more attributes of the ExpVersionReference
                 are invalid.
         """
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
+        if not isinstance(self.exp_id, str):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
@@ -799,25 +799,25 @@ class Exploration(python_utils.OBJECT):
             ValidationError. One or more attributes of the Exploration are
                 invalid.
         """
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
-        if not isinstance(self.category, python_utils.BASESTRING):
+        if not isinstance(self.category, str):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the exploration category', allow_empty=True)
 
-        if not isinstance(self.objective, python_utils.BASESTRING):
+        if not isinstance(self.objective, str):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -829,7 +829,7 @@ class Exploration(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received %s' % self.tags)
         for tag in self.tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+            if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
                     '\'%s\'' % tag)
@@ -855,11 +855,11 @@ class Exploration(python_utils.OBJECT):
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
 
-        if not isinstance(self.blurb, python_utils.BASESTRING):
+        if not isinstance(self.blurb, str):
             raise utils.ValidationError(
                 'Expected blurb to be a string, received %s' % self.blurb)
 
-        if not isinstance(self.author_notes, python_utils.BASESTRING):
+        if not isinstance(self.author_notes, str):
             raise utils.ValidationError(
                 'Expected author_notes to be a string, received %s' %
                 self.author_notes)
@@ -884,7 +884,7 @@ class Exploration(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
                 if not isinstance(
-                        answer_group.outcome.dest, python_utils.BASESTRING):
+                        answer_group.outcome.dest, str):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
@@ -894,7 +894,7 @@ class Exploration(python_utils.OBJECT):
                         'Every outcome should have a destination.')
                 if not isinstance(
                         state.interaction.default_outcome.dest,
-                        python_utils.BASESTRING):
+                        str):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
@@ -927,7 +927,7 @@ class Exploration(python_utils.OBJECT):
                 '%s' % self.correctness_feedback_enabled)
 
         for param_name in self.param_specs:
-            if not isinstance(param_name, python_utils.BASESTRING):
+            if not isinstance(param_name, str):
                 raise utils.ValidationError(
                     'Expected parameter name to be a string, received %s (%s).'
                     % (param_name, type(param_name)))
@@ -2478,25 +2478,25 @@ class ExplorationSummary(python_utils.OBJECT):
             ValidationError. One or more attributes of the ExplorationSummary
                 are invalid.
         """
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
-        if not isinstance(self.category, python_utils.BASESTRING):
+        if not isinstance(self.category, str):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the exploration category', allow_empty=True)
 
-        if not isinstance(self.objective, python_utils.BASESTRING):
+        if not isinstance(self.objective, str):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -2508,7 +2508,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received %s' % self.tags)
         for tag in self.tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+            if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
                     '\'%s\'' % tag)
@@ -2559,7 +2559,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
 
-        if not isinstance(self.status, python_utils.BASESTRING):
+        if not isinstance(self.status, str):
             raise utils.ValidationError(
                 'Expected status to be string, received %s' % self.status)
 
@@ -2572,7 +2572,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected owner_ids to be list, received %s' % self.owner_ids)
         for owner_id in self.owner_ids:
-            if not isinstance(owner_id, python_utils.BASESTRING):
+            if not isinstance(owner_id, str):
                 raise utils.ValidationError(
                     'Expected each id in owner_ids to '
                     'be string, received %s' % owner_id)
@@ -2581,7 +2581,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected editor_ids to be list, received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
-            if not isinstance(editor_id, python_utils.BASESTRING):
+            if not isinstance(editor_id, str):
                 raise utils.ValidationError(
                     'Expected each id in editor_ids to '
                     'be string, received %s' % editor_id)
@@ -2591,7 +2591,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected voice_artist_ids to be list, received %s' % (
                     self.voice_artist_ids))
         for voice_artist_id in self.voice_artist_ids:
-            if not isinstance(voice_artist_id, python_utils.BASESTRING):
+            if not isinstance(voice_artist_id, str):
                 raise utils.ValidationError(
                     'Expected each id in voice_artist_ids to '
                     'be string, received %s' % voice_artist_id)
@@ -2600,7 +2600,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected viewer_ids to be list, received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, python_utils.BASESTRING):
+            if not isinstance(viewer_id, str):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
@@ -2610,7 +2610,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected contributor_ids to be list, received %s' % (
                     self.contributor_ids))
         for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, python_utils.BASESTRING):
+            if not isinstance(contributor_id, str):
                 raise utils.ValidationError(
                     'Expected each id in contributor_ids to '
                     'be string, received %s' % contributor_id)

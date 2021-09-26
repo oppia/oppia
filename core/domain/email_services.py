@@ -22,7 +22,6 @@ import re
 from core.platform import models
 
 import feconf
-import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
@@ -37,7 +36,7 @@ def _is_email_valid(email_address):
     Returns:
         bool. Whether the specified email address is valid.
     """
-    if not isinstance(email_address, python_utils.BASESTRING):
+    if not isinstance(email_address, str):
         return False
 
     stripped_address = email_address.strip()
