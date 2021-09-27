@@ -43,7 +43,7 @@ export class PageHeadService {
 
   updateTitleAndMetaTags(pageMetadata: PageMetadata): void {
     // Update default title.
-    this.pageTitleService.setPageTitle(pageMetadata.TITLE);
+    this.pageTitleService.setDocumentTitle(pageMetadata.TITLE);
 
     let metaAttributes: MetaAttribute[] = [];
     for (let i = 0; i < pageMetadata.META.length; i++) {
