@@ -23,7 +23,6 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { WelcomeModalComponent } from './welcome-modal.component';
 
 @Component({

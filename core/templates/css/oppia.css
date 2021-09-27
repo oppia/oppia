@@ -4804,6 +4804,8 @@ div.oppia-issues-learner-action {
     margin: 1.75rem auto;
     max-width: 900px;
   }
+}
+
 .oppia-typeahead-form .dropdown-item.active {
   color: #212529;
 }
