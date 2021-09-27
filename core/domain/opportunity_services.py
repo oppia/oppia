@@ -95,7 +95,7 @@ def get_exploration_opportunity_summary_from_model(model):
         {})
 
 
-def get_exploration_opportunity_summary_with_in_review_translations_from_model(
+def get_exp_opportunity_summary_with_in_review_translations_from_model(
     model, translations_in_review):
     """Returns the ExplorationOpportunitySummary object out of the model when
     there are translations that are in review.
@@ -490,7 +490,7 @@ def get_translation_opportunities(language_code, cursor):
             .get_multiple_translation_suggestions_in_review(suggestion_ids))
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
-            get_exploration_opportunity_summary_with_in_review_translations_from_model( # pylint: disable=line-too-long
+            get_exp_opportunity_summary_with_in_review_translations_from_model(
                 exp_opportunity_summary_model, translations_in_review))
         opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
