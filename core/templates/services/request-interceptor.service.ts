@@ -71,8 +71,11 @@ export class RequestInterceptor implements HttpInterceptor {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();
-    } catch (e) {
-      if (e.message !== 'Token request has already been made') {
+    } catch (e: unknown) {
+      if (
+        e instanceof Error &&
+        e.message !== 'Token request has already been made'
+      ) {
         throw e;
       }
     }
