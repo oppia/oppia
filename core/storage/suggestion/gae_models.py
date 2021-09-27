@@ -346,6 +346,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             with given target_exp_ids.
         """
         suggestion_keys = GeneralSuggestionModel.query(
+            cls.status == STATUS_IN_REVIEW,
             GeneralSuggestionModel.target_id.IN(target_exp_ids)
             ).fetch(keys_only=True)
 

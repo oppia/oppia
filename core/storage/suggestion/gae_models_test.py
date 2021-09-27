@@ -352,7 +352,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             .get_translation_suggestions_in_review_ids_with_exp_id(
                 ['exp1']))
 
-        self.assertEqual(len(suggestion_ids), 7)
+        self.assertEqual(len(suggestion_ids), 3)
 
     def test_get_multiple_translation_suggestions_in_review(self) -> None:
         suggestion_models.GeneralSuggestionModel.create(
@@ -378,7 +378,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel
             .get_multiple_translation_suggestions_in_review(
                 suggestion_ids))
-        self.assertEqual(len(suggestions), 7)
+        self.assertEqual(len(suggestions), 3)
 
     def test_get_translation_suggestions_in_review_with_valid_exp(self) -> None:
         suggestion_models.GeneralSuggestionModel.create(
