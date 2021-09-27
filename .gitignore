@@ -3,6 +3,7 @@
 *.swp
 *.swo
 *.bak
+__pycache__/
 gae_runtime/*
 # Ignore the auto-generated protobuf python code.
 proto_files/*.py
