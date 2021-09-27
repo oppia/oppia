@@ -4804,4 +4804,14 @@ div.oppia-issues-learner-action {
     margin: 1.75rem auto;
     max-width: 900px;
   }
+.oppia-typeahead-form .dropdown-item.active {
+  color: #212529;
+}
+
+/*
+ * This ensures that when mat select is invoked from a modal, the mat options
+ * are not covered by the it.
+ */
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 10000 !important;
 }
