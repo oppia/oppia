@@ -69,7 +69,7 @@ export class MultiSelectionFieldComponent {
     this.readOnlySelections = cloneDeep(this.selections);
   }
 
-  validateInput(value: string): boolean {
+  validateInput (value: string): boolean {
     if (this.allowLowercaseOnly) {
       if (value.toLowerCase() !== value) {
         return false;

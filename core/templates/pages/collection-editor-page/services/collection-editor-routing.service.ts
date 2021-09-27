@@ -31,14 +31,14 @@ export class CollectionEditorRoutingService {
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
   private _activeTabName: string;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef
   ) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._changeTab(currentHash.substring(1, currentHash.length));
   }
 
-  private _changeTab(newHash: string) {
+  private _changeTab (newHash: string) {
     if (newHash === '/settings') {
       this._activeTabName = this._SETTINGS_TAB;
     } else if (newHash === '/history') {
@@ -53,27 +53,27 @@ export class CollectionEditorRoutingService {
     this._updateViewEventEmitter.emit();
   }
 
-  getActiveTabName(): string {
+  getActiveTabName (): string {
     return this._activeTabName;
   }
 
-  navigateToEditTab(): void {
+  navigateToEditTab (): void {
     this._changeTab('/edit');
   }
 
-  navigateToSettingsTab(): void {
+  navigateToSettingsTab (): void {
     this._changeTab('/settings');
   }
 
-  navigateToHistoryTab(): void {
+  navigateToHistoryTab (): void {
     this._changeTab('/history');
   }
 
-  navigateToStatsTab(): void {
+  navigateToStatsTab (): void {
     this._changeTab('/stats');
   }
 
-  get updateViewEventEmitter(): EventEmitter<void> {
+  get updateViewEventEmitter (): EventEmitter<void> {
     return this._updateViewEventEmitter;
   }
 }

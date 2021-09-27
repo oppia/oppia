@@ -38,7 +38,7 @@ export class CollectionNodeCreatorComponent {
   newExplorationTitle: string = '';
   searchQueryHasError: boolean = false;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private collectionEditorStateService: CollectionEditorStateService,
     private collectionLinearizerService: CollectionLinearizerService,
@@ -51,11 +51,11 @@ export class CollectionNodeCreatorComponent {
     private normalizeWhitespacePipe: NormalizeWhitespacePipe
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.collection = this.collectionEditorStateService.getCollection();
   }
 
-  addExplorationToCollection(newExplorationId: string): void {
+  addExplorationToCollection (newExplorationId: string): void {
     if (!newExplorationId) {
       this.alertsService.addWarning('Cannot add an empty exploration ID.');
       return;
@@ -93,7 +93,7 @@ export class CollectionNodeCreatorComponent {
   }
 
   // Creates a new exploration, then adds it to the collection.
-  createNewExploration(): void {
+  createNewExploration (): void {
     let title = (
       this.normalizeWhitespacePipe.transform(this.newExplorationTitle));
 
@@ -118,7 +118,7 @@ export class CollectionNodeCreatorComponent {
   // Checks whether the user has left a '#' at the end of their ID
   // by accident (which can happen if it's being copy/pasted from the
   // editor page.
-  isIdMalformed(typedExplorationId: string): boolean {
+  isIdMalformed (typedExplorationId: string): boolean {
     return (
       typedExplorationId &&
       typedExplorationId.lastIndexOf('#') ===
@@ -126,7 +126,7 @@ export class CollectionNodeCreatorComponent {
   }
 
 
-  addExploration(): void {
+  addExploration (): void {
     this.addExplorationToCollection(this.newExplorationId);
     this.newExplorationId = '';
   }

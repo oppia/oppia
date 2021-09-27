@@ -59,7 +59,7 @@ export class CollectionRights {
     });
   }
 
-  getCollectionId(): string | null {
+  getCollectionId (): string | null {
     return this._collectionId;
   }
 

@@ -29,7 +29,7 @@ export class CollectionEditorSaveModalComponent extends ConfirmOrCancelModal {
   collectionIsPrivate: boolean;
   MAX_COMMIT_MESSAGE_LENGTH = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
+  constructor (private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

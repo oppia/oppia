@@ -28,15 +28,15 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 export class CollectionPermissionsCardComponent {
   collectionRights: CollectionRights;
 
-  constructor(
+  constructor (
     private collectionEditorStateService: CollectionEditorStateService
   ) {}
 
-  hasPageLoaded(): boolean {
+  hasPageLoaded (): boolean {
     return this.collectionEditorStateService.hasLoadedCollection();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.collectionRights = (
       this.collectionEditorStateService.getCollectionRights());
   }

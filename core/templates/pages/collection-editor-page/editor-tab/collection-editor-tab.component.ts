@@ -29,21 +29,21 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
 export class CollectionEditorTabComponent {
   collection: Collection;
 
-  constructor(
+  constructor (
     private collectionEditorStateService: CollectionEditorStateService,
     private collectionLinearizerService: CollectionLinearizerService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.collection = this.collectionEditorStateService.getCollection();
   }
 
-  getLinearlySortedNodes(): CollectionNode[] {
+  getLinearlySortedNodes (): CollectionNode[] {
     return this.collectionLinearizerService.getCollectionNodesInPlayableOrder(
       this.collection);
   }
 
-  hasLoadedCollection(): boolean {
+  hasLoadedCollection (): boolean {
     return this.collectionEditorStateService.hasLoadedCollection();
   }
 }

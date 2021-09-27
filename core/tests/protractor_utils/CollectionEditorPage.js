@@ -123,7 +123,7 @@ var CollectionEditorPage = function () {
   };
 
   // Set collection category.
-  this.setCategory = async function(category) {
+  this.setCategory = async function (category) {
     await action.click('Category filter', categoryFilterDropdown);
     var dropdownOption = element(
       by.cssContainingText('mat-option .mat-option-text', category));

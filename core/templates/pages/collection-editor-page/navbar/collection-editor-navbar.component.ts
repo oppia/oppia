@@ -44,7 +44,7 @@ export class CollectionEditorNavbarComponent {
   editButtonHovering: boolean = false;
   playerButtonHovering: boolean = false;
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private collectionEditorRoutingService: CollectionEditorRoutingService,
     private collectionEditorStateService: CollectionEditorStateService,
@@ -55,7 +55,7 @@ export class CollectionEditorNavbarComponent {
     private urlService: UrlService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.collectionEditorStateService.onCollectionInitialized.subscribe(
         () => this._validateCollection()
@@ -76,19 +76,19 @@ export class CollectionEditorNavbarComponent {
     this.validationIssues = [];
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  onEditButtonHover(): void {
+  onEditButtonHover (): void {
     this.editButtonHovering = !this.editButtonHovering;
   }
 
-  onPlayerButtonHover(): void {
+  onPlayerButtonHover (): void {
     this.playerButtonHovering = !this.playerButtonHovering;
   }
 
-  private _validateCollection() {
+  private _validateCollection () {
     if (this.collectionRights.isPrivate()) {
       this.validationIssues = (
         this.collectionValidationService
@@ -100,7 +100,7 @@ export class CollectionEditorNavbarComponent {
     }
   }
 
-  private _makeCollectionPublic(): void {
+  private _makeCollectionPublic (): void {
     // TODO(bhenning): This also needs a confirmation of destructive
     // action since it is not reversible.
     this.collectionRightsBackendApiService.setCollectionPublicAsync(
@@ -112,28 +112,28 @@ export class CollectionEditorNavbarComponent {
       });
   }
 
-  getWarningsCount(): number {
+  getWarningsCount (): number {
     return this.validationIssues.length;
   }
 
-  getChangeListCount(): number {
+  getChangeListCount (): number {
     return this.undoRedoService.getChangeCount();
   }
 
-  isCollectionSaveable(): boolean {
+  isCollectionSaveable (): boolean {
     return (
       this.getChangeListCount() > 0 &&
       this.validationIssues.length === 0);
   }
 
-  isCollectionPublishable(): boolean {
+  isCollectionPublishable (): boolean {
     return (
       this.collectionRights.isPrivate() &&
       this.getChangeListCount() === 0 &&
       this.validationIssues.length === 0);
   }
 
-  saveChanges(): void {
+  saveChanges (): void {
     let modalRef: NgbModalRef = this.ngbModal.open(
       CollectionEditorSaveModalComponent, {
         backdrop: 'static'
@@ -151,7 +151,7 @@ export class CollectionEditorNavbarComponent {
     });
   }
 
-  publishCollection(): void {
+  publishCollection (): void {
     let additionalMetadataNeeded = (
       !this.collection.getTitle() ||
       !this.collection.getObjective() ||
@@ -173,31 +173,31 @@ export class CollectionEditorNavbarComponent {
     }
   }
 
-  isLoadingCollection(): boolean {
+  isLoadingCollection (): boolean {
     return this.collectionEditorStateService.isLoadingCollection();
   }
 
-  isSaveInProgress(): boolean {
+  isSaveInProgress (): boolean {
     return this.collectionEditorStateService.isSavingCollection();
   }
 
-  getActiveTabName(): string {
+  getActiveTabName (): string {
     return this.collectionEditorRoutingService.getActiveTabName();
   }
 
-  selectMainTab(): void {
+  selectMainTab (): void {
     this.collectionEditorRoutingService.navigateToEditTab();
   }
 
-  selectSettingsTab(): void {
+  selectSettingsTab (): void {
     this.collectionEditorRoutingService.navigateToSettingsTab();
   }
 
-  selectStatsTab(): void {
+  selectStatsTab (): void {
     this.collectionEditorRoutingService.navigateToStatsTab();
   }
 
-  selectHistoryTab(): void {
+  selectHistoryTab (): void {
     this.collectionEditorRoutingService.navigateToHistoryTab();
   }
 }

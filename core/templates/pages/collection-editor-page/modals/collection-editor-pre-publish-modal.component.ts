@@ -40,7 +40,7 @@ export class CollectionEditorPrePublishModalComponent
   newCategory: string;
   CATEGORY_LIST = AppConstants.ALL_CATEGORIES;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private collectionEditorStateService: CollectionEditorStateService,
     private collectionUpdateService: CollectionUpdateService,
@@ -49,7 +49,7 @@ export class CollectionEditorPrePublishModalComponent
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._collection = this.collectionEditorStateService.getCollection();
     this.requireTitleToBeSpecified = !this._collection.getTitle();
     this.requireObjectiveToBeSpecified = !this._collection.getObjective();
@@ -60,11 +60,11 @@ export class CollectionEditorPrePublishModalComponent
     this.newCategory = this._collection.getCategory();
   }
 
-  isSavingAllowed(): boolean {
+  isSavingAllowed (): boolean {
     return Boolean(this.newTitle && this.newObjective && this.newCategory);
   }
 
-  save(): void {
+  save (): void {
     if (!this.newTitle) {
       this.alertsService.addWarning('Please specify a title');
       return;
@@ -99,7 +99,7 @@ export class CollectionEditorPrePublishModalComponent
     this.ngbActiveModal.close(metadataList);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.ngbActiveModal.dismiss();
   }
 }

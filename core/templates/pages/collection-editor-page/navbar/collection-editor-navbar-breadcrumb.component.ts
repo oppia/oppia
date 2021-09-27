@@ -45,23 +45,23 @@ export class CollectionEditorNavbarBreadcrumbComponent {
   activeTabName: string;
   collection: Collection;
 
-  constructor(
+  constructor (
     private collectionEditorStateService: CollectionEditorStateService,
     private focusManagerService: FocusManagerService,
     private collectionEditorRoutingService: CollectionEditorRoutingService
   ) {}
 
-  getCurrentTabName(): string {
+  getCurrentTabName (): string {
     return this._TAB_NAMES_TO_HUMAN_READABLE_NAMES[this.activeTabName];
   }
 
-  editCollectionTitle(): void {
+  editCollectionTitle (): void {
     this.activeTabName = this._TAB_NAMES_TO_HUMAN_READABLE_NAMES.settings;
     this.focusManagerService.setFocus(
       CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.collection = this.collectionEditorStateService.getCollection();
     this.activeTabName = this.collectionEditorRoutingService.getActiveTabName();
   }

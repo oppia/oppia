@@ -39,7 +39,7 @@ export interface NewExplorationData {
 export class ExplorationCreationBackendApiService {
   constructor (private http: HttpClient) {}
 
-  private _createExploration(
+  private _createExploration (
       newExplorationData: NewExplorationData | {},
       successCallback: (value: ExplorationCreationResponse) => void,
       errorCallback: (reason: string) => void): void {
@@ -58,7 +58,7 @@ export class ExplorationCreationBackendApiService {
       });
   }
 
-  async registerNewExplorationAsync(
+  async registerNewExplorationAsync (
       newExplorationData: NewExplorationData | {}
   ): Promise<ExplorationCreationResponse> {
     return new Promise((resolve, reject) => {

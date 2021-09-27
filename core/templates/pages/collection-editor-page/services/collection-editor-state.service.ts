@@ -72,7 +72,7 @@ export class CollectionEditorStateService {
    * specified collection ID. See setCollection() for more information on
    * additional behavior of this function.
    */
-  loadCollection(collectionId: string): void {
+  loadCollection (collectionId: string): void {
     this._collectionIsLoading = true;
     this.editableCollectionBackendApiService.fetchCollectionAsync(
       collectionId).then(
@@ -168,7 +168,8 @@ export class CollectionEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setCollection(), when it succeeds.
    */
-  saveCollection(commitMessage: string, successCallback?: () => void): boolean {
+  saveCollection (commitMessage: string, successCallback?: () => void):
+  boolean {
     if (!this._collectionIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a collection before one is loaded.');

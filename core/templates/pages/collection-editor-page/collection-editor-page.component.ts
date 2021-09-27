@@ -31,14 +31,14 @@ import { CollectionEditorStateService } from './services/collection-editor-state
 export class CollectionEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  constructor(
+  constructor (
     private collectionEditorRoutingService: CollectionEditorRoutingService,
     private collectionEditorStateService: CollectionEditorStateService,
     private pageTitleService: PageTitleService,
     private urlService: UrlService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.collectionEditorStateService.onCollectionInitialized.subscribe(
         () => this.setTitle()
@@ -49,11 +49,11 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
       this.urlService.getCollectionIdFromEditorUrl());
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  setTitle(): void {
+  setTitle (): void {
     var title = (
       this.collectionEditorStateService.getCollection().getTitle());
     if (title) {
@@ -64,7 +64,7 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  getActiveTabName(): string {
+  getActiveTabName (): string {
     return this.collectionEditorRoutingService.getActiveTabName();
   }
 }

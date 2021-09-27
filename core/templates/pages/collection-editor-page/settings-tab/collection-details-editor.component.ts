@@ -46,14 +46,14 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   displayedCollectionLanguage: string;
   displayedCollectionTags: string[] = [];
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private collectionEditorStateService: CollectionEditorStateService,
     private collectionUpdateService: CollectionUpdateService,
     private collectionValidationService: CollectionValidationService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.collectionEditorStateService.onCollectionInitialized.subscribe(
         () => this.refreshSettingsTab()
@@ -61,7 +61,7 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
     this.collection = this.collectionEditorStateService.getCollection();
   }
 
-  refreshSettingsTab(): void {
+  refreshSettingsTab (): void {
     this.displayedCollectionTitle = this.collection.getTitle();
     this.displayedCollectionObjective = this.collection.getObjective();
     this.displayedCollectionCategory = this.collection.getCategory();
@@ -79,39 +79,39 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  hasPageLoaded(): boolean {
+  hasPageLoaded (): boolean {
     return this.collectionEditorStateService.hasLoadedCollection();
   }
 
   // Normalize the tags for the collection.
-  normalizeTags(tags: string[]): string[] {
+  normalizeTags (tags: string[]): string[] {
     for (let i = 0; i < tags.length; i++) {
       tags[i] = tags[i].trim().replace(/\s+/g, ' ');
     }
     return tags;
   }
 
-  updateCollectionTitle(): void {
+  updateCollectionTitle (): void {
     this.collectionUpdateService.setCollectionTitle(
       this.collection, this.displayedCollectionTitle);
   }
 
-  updateCollectionObjective(): void {
+  updateCollectionObjective (): void {
     this.collectionUpdateService.setCollectionObjective(
       this.collection, this.displayedCollectionObjective);
   }
 
-  updateCollectionCategory(): void {
+  updateCollectionCategory (): void {
     this.collectionUpdateService.setCollectionCategory(
       this.collection, this.displayedCollectionCategory);
   }
 
-  updateCollectionLanguageCode(): void {
+  updateCollectionLanguageCode (): void {
     this.collectionUpdateService.setCollectionLanguageCode(
       this.collection, this.displayedCollectionLanguage);
   }
 
-  updateCollectionTags(): void {
+  updateCollectionTags (): void {
     this.displayedCollectionTags = this.normalizeTags(
       this.displayedCollectionTags
     );
@@ -127,7 +127,7 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
       this.collection, this.displayedCollectionTags);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
