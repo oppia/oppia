@@ -203,6 +203,7 @@ var TopicEditorPage = function() {
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
     await action.click('Select skill dropdown', selectSkillDropdown);
+    await action.click('Select skill dropdown', selectSkillDropdown);
     var skillDescriptionButton = element(
       by.css('option[label="' + skillDescription + '"]'));
     await action.click('Skill Description Button', skillDescriptionButton);
