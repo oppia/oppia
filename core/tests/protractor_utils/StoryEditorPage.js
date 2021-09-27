@@ -155,7 +155,7 @@ var StoryEditorPage = function() {
   };
 
   this.unpublishStory = async function() {
-    await action.click('Unpublish Story Button', unpublishStoryButton)
+    await action.click('Unpublish Story Button', unpublishStoryButton);
     await action.click('Close Save Modal button', closeSaveModalButton);
     await waitFor.invisibilityOf(
       closeSaveModalButton,
