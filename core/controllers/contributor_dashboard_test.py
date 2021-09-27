@@ -17,7 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -32,8 +34,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 

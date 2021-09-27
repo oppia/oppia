@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import re
 
-import constants
+from core import constants
+from core import feconf
+from core import python_utils
+from core import utils
 from extensions.objects.models import objects
-import feconf
-import python_utils
-import utils
 
 import bs4
 

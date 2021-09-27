@@ -36,10 +36,10 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-import python_utils  # isort:skip  # pylint: disable=wrong-import-position
+from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
-FECONF_FILEPATH = os.path.join('.', 'feconf.py')
+FECONF_FILEPATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
 KEYS_UPDATED_IN_FECONF = [
     b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',

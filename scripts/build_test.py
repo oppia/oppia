@@ -29,8 +29,8 @@ import subprocess
 import tempfile
 import threading
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import build
 from . import common
