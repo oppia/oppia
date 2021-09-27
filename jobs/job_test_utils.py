@@ -29,7 +29,6 @@ from core.tests import test_utils
 from jobs import base_jobs
 from jobs import job_options
 from jobs.types import job_run_result
-import python_utils
 
 import apache_beam as beam
 from apache_beam import runners
