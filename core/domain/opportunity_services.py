@@ -83,7 +83,7 @@ def get_translation_opportunity_summary_from_model(
         if in_review_count > 0:
             translation_in_review_counts[
                 language_code['code']] = in_review_count
-    
+
     translation_opportunity.translation_in_review_counts = translation_in_review_counts
 
     return translation_opportunity
