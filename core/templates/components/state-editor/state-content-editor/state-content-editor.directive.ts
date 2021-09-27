@@ -71,7 +71,15 @@ angular.module('oppia').directive('stateContentEditor', [
               return false;
             }
             var content = StateContentService.displayed.html;
-            return (content.length > 10000);
+            return (content.length > 4500);
+          };
+
+          $scope.isCardHeightLimitReached = function() {
+            var shadowPreviewCard = $(
+              '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
+            );
+            var height = shadowPreviewCard.height();
+            return (height > 630);
           };
 
           $scope.hideCardHeightLimitWarning = function() {
