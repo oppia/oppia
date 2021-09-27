@@ -41,11 +41,6 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
 
     JOB_ID = '123'
 
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        super(PutResultsTests, self).tearDown()
-
     def test_single_output(self):
         messages = [
             job_run_result.JobRunResult(

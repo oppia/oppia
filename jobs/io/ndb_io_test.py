@@ -32,12 +32,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 class NdbIoTests(job_test_utils.PipelinedTestBase):
 
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything(namespace=self.namespace).iter(
-                keys_only=True))
-        super(NdbIoTests, self).tearDown()
-
     def get_everything(self):
         """Returns all models in the datastore.
 
