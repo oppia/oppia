@@ -29,7 +29,8 @@ export class FilteredChoicesFieldComponent {
   @Input() choices!: string[];
   @Input() selection!: string;
   @Input() placeholder: string;
-  @Input() searchLabel: string;
+  @Input() searchLabel: string = 'search';
+  @Input() noEntriesFoundLabel: string = 'No matches found';
   @Output() selectionChange: EventEmitter<string> = (
     new EventEmitter());
   filteredChoices!: string[];
