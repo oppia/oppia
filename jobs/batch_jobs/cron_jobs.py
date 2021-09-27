@@ -293,7 +293,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                 beam.window.Sessions(10 * 60))
             | 'Transform to opportunity domain object' >> beam.Map(
                 opportunity_services.
-                get_exploration_opportunity_summary_from_model, [])
+                get_exploration_opportunity_summary_from_model)
             | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
         )
 
