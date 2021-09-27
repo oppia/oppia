@@ -38,6 +38,7 @@ export class MultiSelectionFieldComponent {
   @Input() removable = true;
   @Input() separatorKeysCodes: number[] = [ENTER];
   @Input() validationErrorMessage = '';
+  @Input() allowLowercaseOnly: boolean = false;
 
   formCtrl = new FormControl();
   filteredSelections: Observable<string[] | string[]>;
@@ -59,7 +60,7 @@ export class MultiSelectionFieldComponent {
 
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
-      if (!this.validInput(value)) {
+      if (!this.validateInput(value)) {
         this.chipList.errorState = true;
       } else {
         this.chipList.errorState = false;
@@ -68,7 +69,13 @@ export class MultiSelectionFieldComponent {
     this.readOnlySelections = cloneDeep(this.selections);
   }
 
-  validInput(value: string): boolean {
+  validateInput(value: string): boolean {
+    if (this.allowLowercaseOnly) {
+      if (value.toLowerCase() !== value) {
+        return false;
+      }
+    }
+
     return this.selections.map(s => s.toLowerCase()).indexOf(
       value.toLowerCase()) < 0 ? true : false;
   }
@@ -79,7 +86,7 @@ export class MultiSelectionFieldComponent {
       return;
     }
 
-    if (this.validInput(value)) {
+    if (this.validateInput(value)) {
       this.selections.push(value);
       if (this.readOnlySelections.indexOf(value) < 0) {
         this.readOnlySelections.push(value);

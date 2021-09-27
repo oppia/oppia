@@ -52,6 +52,9 @@ describe('Learner dashboard functionality', function() {
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
+  var testExplorationId = null;
+  var collectionExplorationId = null;
+  var dummyExplorationId = null;
 
   var createDummyExplorationOnDesktop = async function(welcomeModalIsShown) {
     await creatorDashboardPage.get();
@@ -93,6 +96,7 @@ describe('Learner dashboard functionality', function() {
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
+    dummyExplorationId = await general.getExplorationIdFromEditor();
   };
 
   beforeAll(function() {
@@ -152,13 +156,13 @@ describe('Learner dashboard functionality', function() {
           'English',
           true
         );
+        testExplorationId = await general.getExplorationIdFromEditor();
         // Update the role of the user to admin since only admin users
         // can create a collection.
         await adminPage.get();
         await adminPage.addRole('expOfCollectionCreator', 'collection editor');
         await workflow.createCollectionAsAdmin();
-        await collectionEditorPage.searchForAndAddExistingExploration(
-          'Demo Exploration');
+        await collectionEditorPage.addExistingExploration(testExplorationId);
         await collectionEditorPage.saveDraft();
         await collectionEditorPage.closeSaveModal();
         await collectionEditorPage.publishCollection();
@@ -311,6 +315,7 @@ describe('Learner dashboard functionality', function() {
         'English',
         false
       );
+      collectionExplorationId = await general.getExplorationIdFromEditor();
       // Update the role of the user to collection editor since only collection
       // editors can create a collection.
       await adminPage.get();
@@ -318,8 +323,7 @@ describe('Learner dashboard functionality', function() {
       // Create new 'Test Collection' containing
       // exploration 'Dummy Exploration'.
       await workflow.createCollectionAsAdmin();
-      await collectionEditorPage.searchForAndAddExistingExploration(
-        'Dummy Exploration');
+      await collectionEditorPage.addExistingExploration(dummyExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.closeSaveModal();
       await collectionEditorPage.publishCollection();
@@ -427,8 +431,8 @@ describe('Learner dashboard functionality', function() {
       var collectionsTab = element(by.css('.protractor-test-collections-tab'));
       await action.click('Collections tab', collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
-      await collectionEditorPage.searchForAndAddExistingExploration(
-        'Collection Exploration');
+      await collectionEditorPage.addExistingExploration(
+        collectionExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();

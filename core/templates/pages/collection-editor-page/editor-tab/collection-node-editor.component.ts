@@ -40,7 +40,7 @@ export class CollectionNodeEditorComponent implements OnInit {
   constructor(
     private collectionLinearizerService: CollectionLinearizerService,
     private alertsService: AlertsService,
-    private collectionEditorStateService: CollectionEditorStateService
+    private collectionEditorStateService: CollectionEditorStateService,
   ) {}
 
   // Deletes this collection node from the frontend collection

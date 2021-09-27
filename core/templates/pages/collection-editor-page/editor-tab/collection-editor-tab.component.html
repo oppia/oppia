@@ -1,20 +1,20 @@
-<div ng-if="$ctrl.hasLoadedCollection()">
+<div *ngIf="hasLoadedCollection()">
   <div class="collection-editor-cards-container protractor-test-collection-editor-cards-container">
-    <md-card class="oppia-page-card oppia-long-text">
+    <mat-card class="oppia-page-card oppia-long-text">
       <!-- Collection node list graph -->
       <div class="collection-editor-node-list-container">
-        <div ng-if="$ctrl.collection.getCollectionNodeCount() === 0">
+        <div *ngIf="collection.getCollectionNodeCount() === 0">
           No explorations have been added to this collection yet.
         </div>
-        <div ng-if="$ctrl.collection.getCollectionNodeCount() > 0">
+        <div *ngIf="collection.getCollectionNodeCount() > 0">
           <div class="collection-editor-node-container"
-               ng-repeat="node in $ctrl.getLinearlySortedNodes() track by $index">
-            <oppia-collection-node-editor [collection-node]="node"
-                                          [linear-index]="$index"
-                                          ng-class="{true: 'collection-editor-last-node'} [$last]">
+               *ngFor="let node of getLinearlySortedNodes(); index as idx">
+            <oppia-collection-node-editor [collectionNode]="node"
+                                          [linearIndex]="idx"
+                                          [ngClass]="{'collection-editor-last-node': idx === (getLinearlySortedNodes().length - 1)}">
             </oppia-collection-node-editor>
 
-            <div ng-if="!$last"
+            <div *ngIf="!(idx === (getLinearlySortedNodes().length - 1))"
                  class="collection-editor-node-connector-container">
               <svg class="collection-editor-node-connector">
                 <defs>
@@ -33,8 +33,8 @@
         </div>
       </div>
 
-      <collection-node-creator></collection-node-creator>
-    </md-card>
+      <oppia-collection-node-creator></oppia-collection-node-creator>
+    </mat-card>
   </div>
 </div>
 

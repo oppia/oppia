@@ -29,6 +29,10 @@ export interface ExplorationCreationResponse {
   explorationId: string
 }
 
+export interface NewExplorationData {
+  title: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,10 +40,11 @@ export class ExplorationCreationBackendApiService {
   constructor(private http: HttpClient) {}
 
   private _createExploration(
+      newExplorationData: NewExplorationData | {},
       successCallback: (value: ExplorationCreationResponse) => void,
       errorCallback: (reason: string) => void): void {
     this.http.post<ExplorationCreationBackendDict>(
-      '/contributehandler/create_new', {}).toPromise()
+      '/contributehandler/create_new', newExplorationData).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback({
@@ -53,9 +58,11 @@ export class ExplorationCreationBackendApiService {
       });
   }
 
-  async registerNewExplorationAsync(): Promise<ExplorationCreationResponse> {
+  async registerNewExplorationAsync(
+      newExplorationData: NewExplorationData | {}
+  ): Promise<ExplorationCreationResponse> {
     return new Promise((resolve, reject) => {
-      this._createExploration(resolve, reject);
+      this._createExploration(newExplorationData, resolve, reject);
     });
   }
 }

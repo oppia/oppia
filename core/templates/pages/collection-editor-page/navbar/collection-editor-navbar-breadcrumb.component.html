@@ -1,0 +1,23 @@
+<div class="nav navbar-nav oppia-navbar-breadcrumb">
+  <span class="oppia-navbar-breadcrumb-separator"></span>
+  <span *ngIf="collection.getTitle()">
+    {{ collection.getTitle() }} (v{{ collection.getVersion()}})
+  </span>
+  <span *ngIf="!collection.getTitle()" class="oppia-untitled-collection-text"
+        (click)="editCollectionTitle()">
+    Untitled Collection (v{{ collection.getVersion() }})
+  </span>
+
+  <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-icon"></span>
+  <span>
+    {{ getCurrentTabName() }} (Beta)
+  </span>
+</div>
+<style>
+  .oppia-untitled-collection-text {
+    opacity: 0.6;
+  }
+  .oppia-navbar-breadcrumb-separator-icon {
+    margin-left: 5px;
+  }
+</style>

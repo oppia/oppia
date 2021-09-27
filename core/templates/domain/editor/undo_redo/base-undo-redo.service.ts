@@ -18,7 +18,6 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
 
 import { BackendChangeObject, Change, DomainObject } from './change.model';
 
@@ -153,7 +152,7 @@ export class BaseUndoRedo {
     this._dispatchMutation();
   }
 
-  onUndoRedoChangeApplied$(): Observable<void> {
-    return this._undoRedoChangeEventEmitter.asObservable();
+  getUndoRedoChangeEventEmitter(): EventEmitter<void> {
+    return this._undoRedoChangeEventEmitter;
   }
 }

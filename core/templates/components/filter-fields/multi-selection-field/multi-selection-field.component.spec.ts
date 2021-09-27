@@ -77,12 +77,16 @@ describe('Multi Selection Field Component', () => {
 
   it('should validate input', () => {
     componentInstance.selections = [];
-    expect(componentInstance.validInput('selection 1')).toBeTrue();
+    componentInstance.allowLowercaseOnly = true;
+    expect(componentInstance.validateInput('SELECTION 1')).toBeFalse();
+    componentInstance.allowLowercaseOnly = false;
+    expect(componentInstance.validateInput('SELECTION 1')).toBeTrue();
+    expect(componentInstance.validateInput('selection 1')).toBeTrue();
   });
 
   it('should add subject interest', () => {
     spyOn(componentInstance.selectionsChange, 'emit');
-    spyOn(componentInstance, 'validInput').and.returnValue(true);
+    spyOn(componentInstance, 'validateInput').and.returnValue(true);
     componentInstance.selections = [];
     componentInstance.readOnlySelections = [];
     componentInstance.newSelectionInput = {

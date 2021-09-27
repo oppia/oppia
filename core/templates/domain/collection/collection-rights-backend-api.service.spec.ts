@@ -51,7 +51,7 @@ describe('Collection rights backend API service', function() {
 
   beforeEach(() => {
     sampleDataResults = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: false,
       is_private: true,
