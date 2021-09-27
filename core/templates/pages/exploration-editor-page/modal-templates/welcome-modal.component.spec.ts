@@ -25,6 +25,7 @@ import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { WelcomeModalComponent } from './welcome-modal.component';
+
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
   template: ''
@@ -51,7 +52,6 @@ describe('Welcome Modal Component', () => {
   const explorationId = 'exp1';
   let siteAnalyticsServiceSpy: jasmine.Spy;
 
-  importAllAngularServices();
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [

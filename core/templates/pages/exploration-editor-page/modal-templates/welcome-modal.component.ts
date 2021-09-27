@@ -21,6 +21,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
 @Component({
   selector: 'oppia-welcome-modal',
   templateUrl: './welcome-modal.component.html'
@@ -29,6 +30,7 @@ export class WelcomeModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() explorationId: string;
   @Input() editorWelcomeImgUrl: string;
+
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
