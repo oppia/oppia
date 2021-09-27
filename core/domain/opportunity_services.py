@@ -56,42 +56,6 @@ def is_exploration_available_for_contribution(exp_id):
     return model is not None
 
 
-def get_translation_opportunity_summary_from_model(
-    model, translations_in_review):
-    """Returns the ExplorationOpportunitySummary object out of the model.
-
-    Args:
-        model: ExplorationOpportunitySummaryModel. The exploration opportunity
-            summary model.
-        translations_in_review: list(SuggestionModel). The list of translations
-            which are in review.
-
-    Returns:
-        ExplorationOpportunitySummary. The corresponding
-        ExplorationOpportunitySummary object.
-    """
-    translation_opportunity = get_exploration_opportunity_summary_from_model(
-        model)
-    translation_in_review_counts = {}
-
-    for language_code in constants.SUPPORTED_CONTENT_LANGUAGES:
-        in_review_count = 0
-        for suggestion in translations_in_review:
-            if (
-                suggestion is not None and
-                suggestion.language_code == language_code['code'] and
-                suggestion.target_id == model.id):
-                in_review_count = in_review_count + 1
-        if in_review_count > 0:
-            translation_in_review_counts[
-                language_code['code']] = in_review_count
-
-    translation_opportunity.translation_in_review_counts = (
-        translation_in_review_counts)
-
-    return translation_opportunity
-
-
 def get_exploration_opportunity_summary_from_model(model):
     """Returns the ExplorationOpportunitySummary object out of the model.
 
@@ -130,6 +94,41 @@ def get_exploration_opportunity_summary_from_model(model):
         model.language_codes_with_assigned_voice_artists,
         {})
 
+def get_exploration_opportunity_summary_with_in_review_translations_from_model(
+    model, translations_in_review):
+    """Returns the ExplorationOpportunitySummary object out of the model when
+    there are translations that are in review.
+
+    Args:
+        model: ExplorationOpportunitySummaryModel. The exploration opportunity
+            summary model.
+        translations_in_review: list(SuggestionModel). The list of translations
+            which are in review.
+
+    Returns:
+        ExplorationOpportunitySummary. The corresponding
+        ExplorationOpportunitySummary object.
+    """
+    translation_opportunity = get_exploration_opportunity_summary_from_model(
+        model)
+    translation_in_review_counts = {}
+
+    for language_code in constants.SUPPORTED_CONTENT_LANGUAGES:
+        in_review_count = 0
+        for suggestion in translations_in_review:
+            if (
+                suggestion is not None and
+                suggestion.language_code == language_code['code'] and
+                suggestion.target_id == model.id):
+                in_review_count = in_review_count + 1
+        if in_review_count > 0:
+            translation_in_review_counts[
+                language_code['code']] = in_review_count
+
+    translation_opportunity.translation_in_review_counts = (
+        translation_in_review_counts)
+
+    return translation_opportunity
 
 def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list):
@@ -489,7 +488,7 @@ def get_translation_opportunities(language_code, cursor):
             .get_multiple_translation_suggestions_in_review(suggestion_ids))
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
-            get_translation_opportunity_summary_from_model(
+            get_exploration_opportunity_summary_with_in_review_translations_from_model( # pylint: disable=line-too-long
                 exp_opportunity_summary_model, translations_in_review))
         opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
