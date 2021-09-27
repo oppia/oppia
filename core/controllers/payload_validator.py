@@ -80,7 +80,6 @@ def validate(
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
-        # Yes this is the failing one.
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
