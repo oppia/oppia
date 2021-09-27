@@ -94,6 +94,7 @@ def get_exploration_opportunity_summary_from_model(model):
         model.language_codes_with_assigned_voice_artists,
         {})
 
+
 def get_exploration_opportunity_summary_with_in_review_translations_from_model(
     model, translations_in_review):
     """Returns the ExplorationOpportunitySummary object out of the model when
@@ -129,6 +130,7 @@ def get_exploration_opportunity_summary_with_in_review_translations_from_model(
         translation_in_review_counts)
 
     return translation_opportunity
+
 
 def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list):
