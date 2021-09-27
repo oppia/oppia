@@ -55,6 +55,7 @@ def is_exploration_available_for_contribution(exp_id):
 
     return model is not None
 
+
 def get_translation_opportunity_summary_from_model(
     model, translations_in_review):
     """Returns the ExplorationOpportunitySummary object out of the model.
@@ -69,7 +70,8 @@ def get_translation_opportunity_summary_from_model(
         ExplorationOpportunitySummary. The corresponding
         ExplorationOpportunitySummary object.
     """
-    translation_opportunity = get_exploration_opportunity_summary_from_model(model)
+    translation_opportunity = get_exploration_opportunity_summary_from_model(
+        model)
     translation_in_review_counts = {}
 
     for language_code in constants.SUPPORTED_CONTENT_LANGUAGES:
@@ -84,7 +86,8 @@ def get_translation_opportunity_summary_from_model(
             translation_in_review_counts[
                 language_code['code']] = in_review_count
 
-    translation_opportunity.translation_in_review_counts = translation_in_review_counts
+    translation_opportunity.translation_in_review_counts = (
+        translation_in_review_counts)
 
     return translation_opportunity
 
