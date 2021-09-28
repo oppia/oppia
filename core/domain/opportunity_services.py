@@ -28,7 +28,6 @@ from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
-import utils
 
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
@@ -146,25 +145,22 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         ExplorationOpportunitySummary. The exploration opportunity summary
         object.
     """
-
-    audio_language_codes = set(
-        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
-
-    complete_translation_languages = set(
+    # TODO(#13903): Find a way to reduce runtime of computing the complete
+    # languages.
+    complete_translation_language_list = (
         exploration.get_languages_with_complete_translation())
-
+    # TODO(#13912): Revisit voiceover language logic.
+    language_codes_needing_voice_artists = set(
+        complete_translation_language_list)
     incomplete_translation_language_codes = (
-        audio_language_codes - complete_translation_languages)
-    language_codes_needing_voice_artists = complete_translation_languages
-
+        _compute_exploration_incomplete_translation_languages(
+            complete_translation_language_list))
     if exploration.language_code in incomplete_translation_language_codes:
-        # Removing exploration language from incomplete translation
-        # languages list as exploration does not need any translation in
-        # its own language.
-        incomplete_translation_language_codes.discard(
-            exploration.language_code)
-        # Adding exploration language to voiceover required languages
-        # list as exploration can be voiceovered in it's own language.
+        # Remove exploration language from incomplete translation languages list
+        # as an exploration does not need a translation in its own language.
+        incomplete_translation_language_codes.remove(exploration.language_code)
+        # Add exploration language to voiceover required languages list as an
+        # exploration can be voiceovered in its own language.
         language_codes_needing_voice_artists.add(exploration.language_code)
 
     content_count = exploration.get_content_count()
@@ -181,10 +177,29 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         opportunity_domain.ExplorationOpportunitySummary(
             exploration.id, topic.id, topic.name, story.id, story.title,
             story_node.title, content_count,
-            list(incomplete_translation_language_codes), translation_counts,
-            list(language_codes_needing_voice_artists), []))
+            incomplete_translation_language_codes,
+            translation_counts, list(language_codes_needing_voice_artists), []))
 
     return exploration_opportunity_summary
+
+
+def _compute_exploration_incomplete_translation_languages(
+        complete_translation_languages):
+    """Computes all languages that are not 100% translated in an exploration.
+
+    Args:
+        complete_translation_languages: list(str). List of complete translation
+            language codes in the exploration.
+
+    Returns:
+        list(str). List of incomplete translation language codes sorted
+        alphabetically.
+    """
+    audio_language_codes = set(
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+    incomplete_translation_language_codes = (
+        audio_language_codes - set(complete_translation_languages))
+    return sorted(list(incomplete_translation_language_codes))
 
 
 def add_new_exploration_opportunities(story_id, exp_ids):
@@ -235,6 +250,8 @@ def update_opportunity_with_updated_exploration(exp_id):
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     content_count = updated_exploration.get_content_count()
     translation_counts = updated_exploration.get_translation_counts()
+    # TODO(#13903): Find a way to reduce runtime of computing the complete
+    # languages.
     complete_translation_language_list = (
         updated_exploration.get_languages_with_complete_translation())
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
@@ -242,13 +259,18 @@ def update_opportunity_with_updated_exploration(exp_id):
         get_exploration_opportunity_summary_from_model(model))
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
+    incomplete_translation_language_codes = (
+        _compute_exploration_incomplete_translation_languages(
+            complete_translation_language_list))
+    if (
+            updated_exploration.language_code
+            in incomplete_translation_language_codes):
+        # Remove exploration language from incomplete translation languages list
+        # as an exploration does not need a translation in its own language.
+        incomplete_translation_language_codes.remove(
+            updated_exploration.language_code)
     exploration_opportunity_summary.incomplete_translation_language_codes = (
-        utils.compute_list_difference(
-            exploration_opportunity_summary
-            .incomplete_translation_language_codes,
-            complete_translation_language_list
-        )
-    )
+        incomplete_translation_language_codes)
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
         exploration_opportunity_summary.
