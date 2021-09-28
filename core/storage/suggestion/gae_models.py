@@ -314,11 +314,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_multiple_translation_suggestions_in_review(
+    def get_multiple_translation_suggestions_from_suggestion_ids(
             cls, suggestion_ids: List[str]
     ) -> List[Optional['GeneralSuggestionModel']]:
-        """Returns translation suggestions which are in review from multiple
-        suggestion ids.
+        """Returns translation suggestions matching the supplied suggestion
+        ids.
 
         Args:
             suggestion_ids: list(str). Suggestion ids of translations that are
@@ -326,7 +326,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel|None). A list of translation suggestions in
-            review with given suggestion ids.
+            matching the supplied suggestion ids.
         """
         return GeneralSuggestionModel.get_multi(suggestion_ids)
 

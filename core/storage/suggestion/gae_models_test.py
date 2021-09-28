@@ -376,7 +376,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 ['exp1']))
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-            .get_multiple_translation_suggestions_in_review(
+            .get_multiple_translation_suggestions_from_suggestion_ids(
                 suggestion_ids))
         self.assertEqual(len(suggestions), 3)
 
