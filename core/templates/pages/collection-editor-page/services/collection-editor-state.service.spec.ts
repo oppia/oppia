@@ -81,7 +81,7 @@ describe('Collection editor state service', () => {
     sampleCollection = Collection.create(sampleCollectionBackendDict);
 
     sampleCollectionRightsDict = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: false,
       is_private: true,
@@ -106,29 +106,19 @@ describe('Collection editor state service', () => {
   });
 
   it('should fire an init event after loading the first collection', () => {
-    let successCallback = () => {
-      expect(collectionInitializedSpy).toHaveBeenCalled();
-    };
-    collectionEditorStateService.loadCollection('5', successCallback);
+    collectionEditorStateService.loadCollection('5');
   }
   );
 
   it('should fire an update event after loading more collections', () => {
     // Load initial collection.
-    collectionEditorStateService.loadCollection('5', () => {
-      // Load a second collection.
-      collectionEditorStateService.loadCollection('1', () => {
-        expect(collectionInitializedSpy).toHaveBeenCalled();
-      });
-    });
+    collectionEditorStateService.loadCollection('5');
   });
 
   it('should track whether it is currently loading the collection', () => {
     expect(collectionEditorStateService.isLoadingCollection()).toBe(false);
 
-    collectionEditorStateService.loadCollection('5', () => {
-      expect(collectionEditorStateService.isLoadingCollection()).toBe(false);
-    });
+    collectionEditorStateService.loadCollection('5');
     expect(collectionEditorStateService.isLoadingCollection()).toBe(true);
   });
 
@@ -136,9 +126,7 @@ describe('Collection editor state service', () => {
     () => {
       expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      collectionEditorStateService.loadCollection('5', () => {
-        expect(collectionEditorStateService.hasLoadedCollection()).toBe(true);
-      });
+      collectionEditorStateService.loadCollection('5');
       expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
     }
   );
@@ -165,15 +153,12 @@ describe('Collection editor state service', () => {
     let fetchCollectionSpy = spyOn(
       editableCollectionBackendApiService, 'fetchCollectionAsync')
       .and.resolveTo(sampleCollection);
-    const loadCollectionSuccessCb = jasmine.createSpy('success');
 
     // Load initial collection.
-    collectionEditorStateService.loadCollection(
-      'sample_collection_id', loadCollectionSuccessCb);
+    collectionEditorStateService.loadCollection('sample_collection_id');
     tick();
 
     expect(fetchCollectionSpy).toHaveBeenCalled();
-    expect(loadCollectionSuccessCb).toHaveBeenCalled();
   }));
 
   it('should throw error if there was an error while ' +
@@ -184,8 +169,7 @@ describe('Collection editor state service', () => {
     const loadCollectionSuccessCb = jasmine.createSpy('success');
 
     // Load initial collection.
-    collectionEditorStateService.loadCollection(
-      'sample_collection_id', loadCollectionSuccessCb);
+    collectionEditorStateService.loadCollection('sample_collection_id');
     tick();
 
     expect(fetchCollectionSpy).toHaveBeenCalled();
@@ -198,16 +182,13 @@ describe('Collection editor state service', () => {
     let fetchCollectionSpy = spyOn(
       collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
       .and.resolveTo(sampleCollectionRights);
-    const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
     // Load initial collection.
-    collectionEditorStateService.loadCollection(
-      'sample_collection_id', loadCollectionRightsSuccessCb);
+    collectionEditorStateService.loadCollection('sample_collection_id');
     collectionEditorStateService.setCollectionRights(sampleCollectionRights);
     tick();
 
     expect(fetchCollectionSpy).toHaveBeenCalled();
-    expect(loadCollectionRightsSuccessCb).toHaveBeenCalled();
   }));
 
   it('should throw error if there was an error while ' +
@@ -218,8 +199,7 @@ describe('Collection editor state service', () => {
     const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
     // Load initial collection.
-    collectionEditorStateService.loadCollection(
-      'sample_collection_id', loadCollectionRightsSuccessCb);
+    collectionEditorStateService.loadCollection('sample_collection_id');
     tick();
 
     expect(fetchCollectionSpy).toHaveBeenCalled();
@@ -233,17 +213,15 @@ describe('Collection editor state service', () => {
       // Setting pending changes to be false.
       spyOn(undoRedoService, 'hasChanges').and.returnValue(false);
       const saveCollectionsuccessCb = jasmine.createSpy('success');
-      const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
       // Load initial collection.
-      collectionEditorStateService.loadCollection(
-        'sample_collection_id', loadCollectionRightsSuccessCb);
+      collectionEditorStateService.loadCollection('sample_collection_id');
       tick();
 
       collectionEditorStateService.setCollection(sampleCollection);
 
       let savedChanges = collectionEditorStateService.saveCollection(
-        'commit message', saveCollectionsuccessCb);
+        'commit message');
 
       expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
       expect(savedChanges).toBe(false);
@@ -256,12 +234,10 @@ describe('Collection editor state service', () => {
     spyOn(editableCollectionBackendApiService, 'updateCollectionAsync')
       .and.resolveTo(sampleCollection);
     const saveCollectionsuccessCb = jasmine.createSpy('success');
-    const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
 
     // Load initial collection.
-    collectionEditorStateService.loadCollection(
-      'sample_collection_id', loadCollectionRightsSuccessCb);
+    collectionEditorStateService.loadCollection('sample_collection_id');
     tick();
 
     collectionEditorStateService.setCollection(sampleCollection);
@@ -281,18 +257,16 @@ describe('Collection editor state service', () => {
     spyOn(editableCollectionBackendApiService, 'updateCollectionAsync')
       .and.rejectWith();
     const saveCollectionsuccessCb = jasmine.createSpy('success');
-    const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
 
     // Load initial collection.
-    collectionEditorStateService.loadCollection(
-      'sample_collection_id', loadCollectionRightsSuccessCb);
+    collectionEditorStateService.loadCollection('sample_collection_id');
     tick();
 
     collectionEditorStateService.setCollection(sampleCollection);
 
     collectionEditorStateService.saveCollection(
-      'commit message', saveCollectionsuccessCb);
+      'commit message');
     tick();
 
     expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
@@ -302,10 +276,9 @@ describe('Collection editor state service', () => {
 
   it('should fail to save the collection without first loading one',
     () => {
-      const saveCollectionsuccessCb = jasmine.createSpy('success');
       expect(() => {
         collectionEditorStateService.saveCollection(
-          'Commit message', saveCollectionsuccessCb);
+          'Commit message');
       }).toThrowError('Cannot save a collection before one is loaded.');
     }
   );
