@@ -64,7 +64,7 @@
     <div class="oppia-question-player-card question-player-results-footer"
          ng-if="$ctrl.showActionButtonsFooter()">
       <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
-            ng-click="$ctrl.performAction(actionButton)">
+            ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
           <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
             <div ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></div>
@@ -217,7 +217,7 @@
 
   .skill-score-description {
     padding-left: 10px;
-    text-align: left;
+    text-align: center;
   }
 
   .skill-score-description:hover {

@@ -1,6 +1,6 @@
 <a href="#"
    (click)="openConceptCard($event)"
-   class="protractor-test-concept-card-link"
+   class="protractor-test-concept-card-link concept-card-link"
    rel="noopener"
    ngbTooltip="Open Concept Card">{{ linkText }}
 </a>
@@ -13,5 +13,9 @@
   */
   .cke_widget_oppiaskillreview /deep/ {
     display: inline;
+  }
+  .concept-card-link {
+    display: inline-block;
+    padding-right: 4px;
   }
 </style>
