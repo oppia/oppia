@@ -63,7 +63,7 @@ export class StatsReportingBackendApiService {
     try {
       return this.urlInterpolationService.interpolateUrl(
         ExplorationPlayerConstants.STATS_REPORTING_URLS[
-          <StatsReportingUrlsKey> urlIdentifier], {
+          urlIdentifier as StatsReportingUrlsKey], {
           exploration_id: explorationId
         });
     } catch (e: unknown) {

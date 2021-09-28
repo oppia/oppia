@@ -50,7 +50,7 @@ angular.module('oppia').directive('angularHtmlBind', [
             // affect any other data.
             newValue = newValue.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
           }
-          elm.html(<string>newValue);
+          elm.html(newValue as string);
           $compile(elm.contents())(newScope);
         });
       }

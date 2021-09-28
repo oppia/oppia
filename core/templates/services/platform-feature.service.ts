@@ -257,7 +257,7 @@ export class PlatformFeatureService {
     const storedFeatures: string[] = Array.from(
       item.featureStatusSummary.featureNameToFlag.keys());
     const featureNamesKeys = (
-      <FeatureNamesKeys> Object.keys(FeatureNames)
+      Object.keys(FeatureNames) as FeatureNamesKeys
     );
     const requiredFeatures: string[] = featureNamesKeys.map(
       name => FeatureNames[name]
@@ -291,7 +291,7 @@ export class PlatformFeatureService {
   private getSessionIdFromCookie(): string | null {
     const cookieStrs = this.windowRef.nativeWindow.document.cookie.split('; ');
     const cookieMap = new Map(
-      cookieStrs.map(cookieStr => <[string, string]>cookieStr.split('=')));
+      cookieStrs.map(cookieStr => cookieStr.split('=') as [string, string]));
     const sessionId = (
       cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID)
     );

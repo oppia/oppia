@@ -161,7 +161,7 @@ export class NumberWithUnitsObjectFactory {
         }
 
         const keys = (
-          <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+        Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
         );
         for (let i = 0; i < keys.length; i++) {
           let unitLength = (
@@ -179,7 +179,7 @@ export class NumberWithUnitsObjectFactory {
       } else {
         let startsWithCorrectCurrencyUnit = false;
         const keys = (
-          <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+        Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
         );
         for (let i = 0; i < keys.length; i++) {
           let unitLength = (

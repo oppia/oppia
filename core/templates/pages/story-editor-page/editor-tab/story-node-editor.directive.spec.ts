@@ -242,10 +242,10 @@ describe('Story node editor directive', function() {
   it('should open add skill modal for adding prerequisite skill', function() {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
     });
     $scope.addPrerequisiteSkillId();
     expect(modalSpy).toHaveBeenCalled();
@@ -254,10 +254,10 @@ describe('Story node editor directive', function() {
   it('should open add skill modal for adding acquired skill', function() {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
     });
     $scope.addAcquiredSkillId();
     expect(modalSpy).toHaveBeenCalled();

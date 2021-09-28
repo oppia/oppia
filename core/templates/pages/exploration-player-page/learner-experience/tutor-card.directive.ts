@@ -63,14 +63,14 @@ angular.module('oppia').animation(
           done();
           return;
         }
-        element.hide().slideDown(400, <(this: HTMLElement) => void>done);
+        element.hide().slideDown(400, done as (this: HTMLElement) => void);
       },
       addClass: function(element, className, done) {
         if (className !== 'ng-hide') {
           done();
           return;
         }
-        element.slideUp(400, <(this: HTMLElement) => void>done);
+        element.slideUp(400, done as (this: HTMLElement) => void);
       }
     };
   });

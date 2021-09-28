@@ -85,7 +85,9 @@ export class LocalStorageService {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
-      (<Storage> this.storage).setItem(localSaveKey, JSON.stringify(draftDict));
+      (this.storage as Storage).setItem(
+        localSaveKey,
+        JSON.stringify(draftDict));
     }
   }
   /**
@@ -101,7 +103,7 @@ export class LocalStorageService {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
-      let draftDict = (<Storage> this.storage).getItem(
+      let draftDict = (this.storage as Storage).getItem(
         this._createExplorationDraftKey(explorationId));
       if (draftDict) {
         return (
@@ -122,7 +124,7 @@ export class LocalStorageService {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
-      (<Storage> this.storage).removeItem(
+      (this.storage as Storage).removeItem(
         this._createExplorationDraftKey(explorationId));
     }
   }
@@ -136,7 +138,7 @@ export class LocalStorageService {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
-      (<Storage> this.storage).setItem(
+      (this.storage as Storage).setItem(
         this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
     }
   }
@@ -151,7 +153,7 @@ export class LocalStorageService {
         // It is possible that storage does not exist or the user does not have
         // permission to access it but this condition is already being checked
         // by calling 'isStorageAvailable()' so the typecast is safe.
-        (<Storage> this.storage).getItem(
+        (this.storage as Storage).getItem(
           this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
     }
     return null;

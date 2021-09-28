@@ -102,7 +102,7 @@ describe('Change domain objects model', () => {
         backendChangeObject, () => {}, () => {});
 
       const returnedBackendObject = changeDomainObject.getBackendChangeObject();
-      (<typeof backendChangeObject> returnedBackendObject)
+      (returnedBackendObject as typeof backendChangeObject)
         .property_name = 'language_code';
 
       expect(changeDomainObject.getBackendChangeObject()).toEqual({
