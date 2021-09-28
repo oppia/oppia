@@ -25,6 +25,7 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
       scope: {},
       bindToController: {
         htmlData: '<',
+        parentScope: '<',
         classStr: '<'
       },
       template:
@@ -32,10 +33,15 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
         'html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope',
-        function($rootScope) {
+        '$rootScope', '$scope',
+        function($rootScope, $scope) {
           var ctrl = this;
           ctrl.$onInit = function() {
+            if (ctrl.parentScope) {
+              for (let key of Object.keys(ctrl.parentScope)) {
+                $scope[key] = ctrl.parentScope[key];
+              }
+            }
             $rootScope.$applyAsync();
           };
           // Manually implementing the OnChanges lifecycle hook to trigger the
@@ -67,6 +73,7 @@ export const ScopeProvider = {
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
+  @Input() parentScope;
   @Input() classStr = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);

@@ -23,7 +23,7 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 
-interface HelpCardEventResponse {
+export interface HelpCardEventResponse {
   helpCardHtml: string;
   hasContinueButton: boolean;
 }
