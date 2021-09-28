@@ -174,7 +174,6 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                     self.language_codes_with_assigned_voice_artists))
 
         self._validate_translation_counts(self.translation_counts)
-
         self._validate_translation_counts(self.translation_in_review_counts)
 
         expected_set_of_all_languages = set(

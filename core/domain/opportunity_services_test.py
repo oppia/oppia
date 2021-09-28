@@ -185,7 +185,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.topic_name, 'topic')
         self.assertEqual(opportunity.story_title, 'A story')
 
-    def test_get_translation_opportunities_with_no_translations_in_review(
+    def test_get_translation_opportunities_with_translations_in_review(
         self):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -202,7 +202,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity.translation_in_review_counts.keys())
         self.assertEqual(len(languages_of_translations_in_review), 1)
 
-    def test_get_translation_opportunities_with_translations_in_review(self):
+    def test_get_translation_opportunities_with_no_translations_in_review(self):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)

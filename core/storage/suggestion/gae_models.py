@@ -318,7 +318,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls, suggestion_ids: List[str]
     ) -> List[Optional['GeneralSuggestionModel']]:
         """Returns translation suggestions which are in review from multiple
-        thread ids.
+        suggestion ids.
 
         Args:
             suggestion_ids: list(str). Suggestion ids of translations that are
@@ -334,8 +334,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_translation_suggestions_in_review_ids_with_exp_id(
             cls, target_exp_ids: List[str]
     ) -> List[str]:
-        """Returns ids of translation suggestions which are in review with
-        target ids.
+        """Returns IDs of in review translation suggestions matching the
+        supplied target IDs.
 
         Args:
             target_exp_ids: list(str). Exploration IDs matching the target ID
