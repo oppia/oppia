@@ -153,7 +153,6 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
-
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
@@ -161,7 +160,16 @@ class PreferencesHandler(base.BaseHandler):
             'update_type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': ['user_bio', 'subject_interests', 'preferred_language_codes', 'preferred_site_language_code', 'preferred_audio_language_code', 'profile_picture_data_url', 'default_dashboard', 'email_preferences']
+                    'choices': [
+                        'user_bio',
+                        'subject_interests',
+                        'preferred_language_codes',
+                        'preferred_site_language_code',
+                        'preferred_audio_language_code',
+                        'profile_picture_data_url',
+                        'default_dashboard',
+                        'email_preferences'
+                    ]
                 }
             },
             'data': {
