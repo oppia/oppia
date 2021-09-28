@@ -84,6 +84,9 @@ import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
+import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 
 // Pipes.
@@ -100,8 +103,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
-import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 
 @NgModule({
   imports: [
@@ -179,6 +180,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     WrapTextWithEllipsisPipe,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -233,6 +235,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -280,6 +283,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
     InputResponsePairComponent,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
+    ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
@@ -295,6 +299,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,

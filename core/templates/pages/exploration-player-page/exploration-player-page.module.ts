@@ -39,6 +39,8 @@ import { FeedbackPopupComponent } from './layout-directives/feedback-popup.compo
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 
+import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
+import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -55,24 +57,29 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     MaterialModule,
     NgbPopoverModule,
     SharedComponentsModule,
+    NgbPopoverModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
+    LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
+    LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
