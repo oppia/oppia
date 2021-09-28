@@ -181,7 +181,7 @@ export class UnitsObjectFactory {
 
   createCurrencyUnits(): void {
     var keys = (
-      bject.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
+      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
     );
     for (var i = 0; i < keys.length; i++) {
       let baseUnitValue = (
