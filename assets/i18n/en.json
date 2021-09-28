@@ -737,7 +737,7 @@
     "I18N_TOPIC_VIEWER_MASTER_SKILLS": "Master Skills for <[topicName]>",
     "I18N_TOPIC_VIEWER_PRACTICE": "Practice",
     "I18N_TOPIC_VIEWER_REVISION": "Revision",
-    "I18N_TOPIC_VIEWER_SELECT_SKILLS": "Select skills to practice your <[topicName]> knowledge on.",
+    "I18N_TOPIC_VIEWER_SELECT_SKILLS": "Select the skills from the <[topicName]> lessons you would like to practice.",
     "I18N_TOPIC_VIEWER_SKILL": "Skill",
     "I18N_TOPIC_VIEWER_SKILLS": "Skills",
     "I18N_TOPIC_VIEWER_START_PRACTICE": "Start",
