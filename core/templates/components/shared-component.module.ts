@@ -84,6 +84,8 @@ import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
+import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
+import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 
 // Pipes.
@@ -100,7 +102,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 
 @NgModule({
   imports: [
@@ -178,6 +179,7 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     WrapTextWithEllipsisPipe,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -231,6 +233,7 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
@@ -276,6 +279,7 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
     InputResponsePairComponent,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
+    ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RubricsEditorComponent,
@@ -292,6 +296,7 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
