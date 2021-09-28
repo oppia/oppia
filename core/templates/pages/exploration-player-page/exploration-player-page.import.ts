@@ -49,4 +49,4 @@ require(
   'learner-local-nav.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'learner-view-info.directive.ts');
+  'learner-view-info.component.ts');
