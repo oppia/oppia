@@ -368,11 +368,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: ['Translation1', 'Translation2'],
+      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected'
     };
     const suggestion2 = {
