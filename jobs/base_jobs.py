@@ -113,7 +113,7 @@ class JobMetaclass(type):
         job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
 
         if name == 'JobBase':
-            return cast(Type[JobBase], job_cls)
+            return cast(JobMetaclass, job_cls)
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
