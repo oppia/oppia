@@ -54,9 +54,11 @@ describe('Angular Html Bind Wrapper Directive', () => {
       $componentController = _$componentController_;
       $scope = $rootScope.$new();
       $scope.htmlData = '<div></div>';
+      $scope.parentScope = { key: 'value'};
 
       elem = angular.element(
-        '<angular-html-bind-wrapper html-data=htmlData>' +
+        '<angular-html-bind-wrapper html-data=htmlData ' +
+        'parent-scope=parentScope>' +
         '</angular-html-bind-wrapper>');
 
       compiledElement = $compile(elem)($scope);
