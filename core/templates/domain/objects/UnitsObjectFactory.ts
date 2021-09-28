@@ -20,10 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { createUnit, unit } from 'mathjs';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { Unit } from
-  'interactions/answer-defs';
+import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
+import { Unit } from 'interactions/answer-defs';
 
 interface UnitsBackendDict {
   units: Unit[];
@@ -254,11 +252,7 @@ export class UnitsObjectFactory {
 
     var compatibleUnits = this.toMathjsCompatibleString(units);
     if (compatibleUnits !== '') {
-      try {
-        unit(compatibleUnits);
-      } catch (err) {
-        throw new Error(err);
-      }
+      unit(compatibleUnits);
     }
     return new Units(this.fromStringToList(units));
   }

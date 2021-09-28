@@ -237,6 +237,11 @@ class ProfilePictureHandler(base.BaseHandler):
     picture is uploaded.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
@@ -255,6 +260,20 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, username):
@@ -377,6 +396,11 @@ class SignupHandler(base.BaseHandler):
 
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def delete(self):

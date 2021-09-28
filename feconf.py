@@ -228,7 +228,7 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The maximum number of days a feedback report can be saved in storage before it
 # must be scrubbed.
-APP_FEEDBACK_REPORT_MAXIMUM_DAYS = datetime.timedelta(days=90)
+APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN = datetime.timedelta(days=90)
 
 # The minimum version of the Android feedback report info blob schema.
 MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
@@ -260,7 +260,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 47
+CURRENT_STATE_SCHEMA_VERSION = 49
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -272,13 +272,13 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 4
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 5
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 4
+CURRENT_RUBRIC_SCHEMA_VERSION = 5
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
@@ -287,7 +287,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -494,6 +494,11 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
+# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
+# buckets. It's OK for them to be the same.
+DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
+DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
+
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
@@ -630,6 +635,14 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
+# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
+# datetime that a report could be received.
+EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
+    1614556800)
+
+# The minimum and maximum package version codes for Oppia Android.
+MINIMUM_ANDROID_PACKAGE_VERSION_CODE = 1
+
 # We generate images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
 MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
@@ -672,6 +685,11 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
+# User id for scrubber bot. This bot is used to represent the cron job that
+# scrubs expired app feedback reports.
+APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID = 'AppFeedbackReportScrubberBot'
+APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME = 'AppFeedbackReportScrubberBot'
+
 # User id and username for suggestion bot. This bot will be used to accept
 # suggestions automatically after a threshold time.
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
@@ -684,7 +702,9 @@ SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 SYSTEM_USERS = {
     SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
     MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
-    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME
+    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME,
+    APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID: (
+        APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME)
 }
 
 # Ids and locations of the permitted extensions.

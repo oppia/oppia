@@ -30,8 +30,7 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
 
     def test_get_new_id_raises_error_after_too_many_failed_attempts(self):
         model = beam_job_models.BeamJobRunModel(
-            id=beam_job_models.BeamJobRunModel.get_new_id(),
-            job_name='FooJob', job_arguments=[],
+            id=beam_job_models.BeamJobRunModel.get_new_id(), job_name='FooJob',
             latest_job_state=beam_job_models.BeamJobState.RUNNING.value)
         model.update_timestamps()
         model.put()
@@ -62,9 +61,6 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
         self.assertEqual(
             export_policy['job_name'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['job_arguments'],
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
         self.assertEqual(
             export_policy['latest_job_state'],
