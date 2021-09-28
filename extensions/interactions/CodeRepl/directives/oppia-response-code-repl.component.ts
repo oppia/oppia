@@ -24,7 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-interface Dimension {
+interface Answer {
   error: string;
 }
 
@@ -38,7 +38,7 @@ export class ResponseCodeReplComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  answer!: Dimension;
+  answer!: Answer;
   errorFocusLabel!: string;
   constructor(
     private htmlEscaperService: HtmlEscaperService,
@@ -47,7 +47,7 @@ export class ResponseCodeReplComponent implements OnInit {
 
   ngOnInit(): void {
     this.answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answerWithValue) as Dimension;
+      this.answerWithValue) as Answer;
     if (this.answer.error) {
       this.errorFocusLabel = this.focusManagerService.generateFocusLabel();
       this.focusManagerService.setFocus(this.errorFocusLabel);
