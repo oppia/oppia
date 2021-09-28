@@ -113,15 +113,15 @@ class JobMetaclass(type):
         job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
 
         if name == 'JobBase':
-            return job_cls
+            return cast(JobMetaclass, job_cls)
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
-                cls._JOB_REGISTRY[name] = cast(Type[JobBase], job_cls)
+                cls._JOB_REGISTRY[name] = job_cls
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
-        return job_cls
+        return cast(JobMetaclass, job_cls)
 
     @classmethod
     def get_all_jobs(cls) -> List[Type[JobBase]]:

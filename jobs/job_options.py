@@ -24,10 +24,10 @@ import feconf
 
 from apache_beam.options import pipeline_options
 
-from typing import List, Optional # isort: skip
+from typing import List, Optional
 
 
-class JobOptions(pipeline_options.PipelineOptions):
+class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {

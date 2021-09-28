@@ -25,6 +25,13 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -32,35 +39,25 @@ datastore_services = models.Registry.import_datastore_services()
 
 class NdbIoTests(job_test_utils.PipelinedTestBase):
 
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything(namespace=self.namespace).iter(
-                keys_only=True))
-        super(NdbIoTests, self).tearDown()
-
-    def get_everything(self):
+    def get_base_models(self) -> List[base_models.BaseModel]:
         """Returns all models in the datastore.
 
         Returns:
             list(Model). All of the models in the datastore.
         """
-        return list(
-            datastore_services.query_everything(namespace=self.namespace).iter()
-        )
+        return list(base_models.BaseModel.get_all())
 
-    def put_multi(self, model_list, update_last_updated_time=False):
+    def put_multi(self, model_list: List[base_models.BaseModel]) -> None:
         """Puts the given models into the datastore.
 
         Args:
             model_list: list(Model). The models to put into the datastore.
-            update_last_updated_time: bool. Whether to update the last updated
-                time before putting the model into storage.
         """
         datastore_services.update_timestamps_multi(
-            model_list, update_last_updated_time=update_last_updated_time)
+            model_list, update_last_updated_time=False)
         datastore_services.put_multi(model_list)
 
-    def test_read_from_datastore(self):
+    def test_read_from_datastore(self) -> None:
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
@@ -68,31 +65,29 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         ]
         self.put_multi(model_list)
 
-        self.assertItemsEqual(self.get_everything(), model_list)
+        self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
 
         model_pcoll = (
-            self.pipeline
-            | ndb_io.GetModels(
-                datastore_services.query_everything(namespace=self.namespace))
+            self.pipeline | ndb_io.GetModels(base_models.BaseModel.get_all())
         )
 
         self.assert_pcoll_equal(model_pcoll, model_list)
 
-    def test_write_to_datastore(self):
+    def test_write_to_datastore(self) -> None:
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
             self.create_model(base_models.BaseModel, id='c'),
         ]
 
-        self.assertItemsEqual(self.get_everything(), [])
+        self.assertItemsEqual(self.get_base_models(), []) # type: ignore[no-untyped-call]
 
         self.assert_pcoll_empty(
             self.pipeline | beam.Create(model_list) | ndb_io.PutModels())
 
-        self.assertItemsEqual(self.get_everything(), model_list)
+        self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
 
-    def test_delete_from_datastore(self):
+    def test_delete_from_datastore(self) -> None:
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
@@ -100,11 +95,11 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         ]
         self.put_multi(model_list)
 
-        self.assertItemsEqual(self.get_everything(), model_list)
+        self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
 
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([model.key for model in model_list])
             | ndb_io.DeleteModels())
 
-        self.assertItemsEqual(self.get_everything(), [])
+        self.assertItemsEqual(self.get_base_models(), []) # type: ignore[no-untyped-call]

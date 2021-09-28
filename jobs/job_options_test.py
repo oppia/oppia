@@ -19,26 +19,22 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import re
-
 from core.tests import test_utils
 from jobs import job_options
 
 
 class JobOptionsTests(test_utils.TestBase):
 
-    def test_default_values(self):
+    def test_default_values(self) -> None:
         options = job_options.JobOptions()
 
         self.assertIsNone(options.namespace)
 
-    def test_overwritten_values(self):
+    def test_overwritten_values(self) -> None:
         options = job_options.JobOptions(namespace='abc')
 
-        self.assertIs(options.namespace, 'abc')
+        self.assertEqual(options.namespace, 'abc')
 
-    def test_unsupported_values(self):
-        with self.assertRaisesRegexp(
-            ValueError, re.escape('Unsupported option(s): a, b'),
-        ):
-            job_options.JobOptions(a=1, b=2)
+    def test_unsupported_values(self) -> None:
+        with self.assertRaisesRegexp(ValueError, r'Unsupported option\(s\)'): # type: ignore[no-untyped-call]
+            job_options.JobOptions(a='a', b='b')

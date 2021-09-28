@@ -29,45 +29,53 @@ import python_utils
 import apache_beam as beam
 from apache_beam.testing import util as beam_testing_util
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
-    def test_assert_pcoll_empty_raises_immediately(self):
+    def test_assert_pcoll_empty_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
-        with self.assertRaisesRegexp(AssertionError, 'failed'):
+        with self.assertRaisesRegexp(AssertionError, 'failed'): # type: ignore[no-untyped-call]
             self.assert_pcoll_empty(output)
 
-    def test_assert_pcoll_equal_raises_immediately(self):
+    def test_assert_pcoll_equal_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce an empty PCollection.
         output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
 
-        with self.assertRaisesRegexp(AssertionError, 'failed'):
+        with self.assertRaisesRegexp(AssertionError, 'failed'): # type: ignore[no-untyped-call]
             self.assert_pcoll_equal(output, [123])
 
-    def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(self):
+    def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(
+        self
+    ) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
 
         self.assert_pcoll_empty(output)
 
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             RuntimeError, 'must be run in the pipeline context',
             lambda: self.assert_pcoll_empty(output))
 
-    def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(self):
+    def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(
+        self
+    ) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
 
         self.assert_pcoll_equal(output, [123])
 
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             RuntimeError, 'must be run in the pipeline context',
             lambda: self.assert_pcoll_equal(output, [123]))
 
-    def test_create_model_sets_date_properties(self):
+    def test_create_model_sets_date_properties(self) -> None:
         model = self.create_model(base_models.BaseModel)
 
         self.assertEqual(model.created_on, self.YEAR_AGO)
@@ -78,24 +86,24 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = mock.Mock()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.JOB_CLASS.reset_mock()
         super(JobTestBaseTests, self).tearDown()
 
-    def test_run_job(self):
+    def test_run_job(self) -> None:
         self.run_job()
 
-        self.job.run.assert_called()
+        self.job.run.assert_called() # type: ignore[attr-defined]
 
-    def test_job_output_is(self):
-        self.job.run.return_value = (
+    def test_job_output_is(self) -> None:
+        self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
             self.pipeline | beam.Create([123]) | beam.Map(lambda x: x))
 
         self.assert_job_output_is([123])
 
-    def test_job_output_is_empty(self):
-        self.job.run.return_value = (
+    def test_job_output_is_empty(self) -> None:
+        self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce an empty PCollection.
             self.pipeline | beam.Create([]) | beam.Map(lambda x: x))
 
@@ -104,7 +112,9 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
 class DecorateBeamErrorsTests(test_utils.TestBase):
 
-    def assert_error_is_decorated(self, actual_msg, decorated_msg):
+    def assert_error_is_decorated(
+        self, actual_msg: str, decorated_msg: str
+    ) -> None:
         """Asserts that decorate_beam_errors() raises with the right message.
 
         Args:
@@ -118,7 +128,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
         except AssertionError as e:
             self.assertMultiLineEqual(python_utils.UNICODE(e), decorated_msg)
 
-    def test_decorates_message_with_both_unexpected_and_missing(self):
+    def test_decorates_message_with_both_unexpected_and_missing(self) -> None:
         actual_msg = (
             'Error, unexpected elements ["abc", "def"], '
             'missing elements ["123", "456"] [while running FooJob]')
@@ -136,7 +146,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
         self.assert_error_is_decorated(actual_msg, decorated_msg)
 
-    def test_decorates_message_with_only_unexpected(self):
+    def test_decorates_message_with_only_unexpected(self) -> None:
         actual_msg = (
             'Error, unexpected elements ["abc", "def"] [while running FooJob]')
         decorated_msg = (
@@ -149,7 +159,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
         self.assert_error_is_decorated(actual_msg, decorated_msg)
 
-    def test_decorates_message_with_only_missing(self):
+    def test_decorates_message_with_only_missing(self) -> None:
         actual_msg = (
             'Error, missing elements ["abc", "def"] [while running FooJob]')
         decorated_msg = (
@@ -162,7 +172,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
         self.assert_error_is_decorated(actual_msg, decorated_msg)
 
-    def test_decorates_message_with_comparison_to_empty_list(self):
+    def test_decorates_message_with_comparison_to_empty_list(self) -> None:
         actual_msg = (
             'Error [] == ["abc", "def"] [while running FooJob]')
         decorated_msg = (
@@ -175,23 +185,25 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
         self.assert_error_is_decorated(actual_msg, decorated_msg)
 
-    def test_does_not_decorate_message_without_element_info(self):
+    def test_does_not_decorate_message_without_element_info(self) -> None:
         actual_msg = 'Error something went wrong [while running FooJob]'
 
         self.assert_error_is_decorated(actual_msg, actual_msg)
 
-    def test_does_not_decorate_message_with_invalid_unexpected_value(self):
+    def test_does_not_decorate_message_with_invalid_unexpected_value(
+        self
+    ) -> None:
         actual_msg = (
             'Error, unexpected elements [abc, def] [while running FooJob]')
 
         self.assert_error_is_decorated(actual_msg, actual_msg)
 
-    def test_does_not_decorate_message_with_invalid_missing_value(self):
+    def test_does_not_decorate_message_with_invalid_missing_value(self) -> None:
         actual_msg = 'Error, missing elements [abc, def] [while running FooJob]'
 
         self.assert_error_is_decorated(actual_msg, actual_msg)
 
-    def test_does_not_decorate_message_with_non_beam_type(self):
-        with self.assertRaisesRegexp(Exception, 'Error coming through!'):
+    def test_does_not_decorate_message_with_non_beam_type(self) -> None:
+        with self.assertRaisesRegexp(Exception, 'Error coming through!'): # type: ignore[no-untyped-call]
             with job_test_utils.decorate_beam_errors():
                 raise Exception('Error coming through!')
