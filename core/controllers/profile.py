@@ -160,7 +160,8 @@ class PreferencesHandler(base.BaseHandler):
         'PUT': {
             'update_type': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': ['user_bio', 'subject_interests', 'preferred_language_codes', 'preferred_site_language_code', 'preferred_audio_language_code', 'profile_picture_data_url', 'default_dashboard', 'email_preferences']
                 }
             },
             'data': {
@@ -359,19 +360,22 @@ class SignupHandler(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': None
+                'default_value': True
             },
             'default_dashboard': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': [
+                        constants.DASHBOARD_TYPE_LEARNER,
+                        constants.DASHBOARD_TYPE_CREATOR
+                    ]
                 },
-                'default_value': None
             },
             'can_receive_email_updates': {
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': None
+                'default_value': True
             }
         }
     }
