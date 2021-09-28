@@ -372,6 +372,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
+      exploration_content_html: ['Translation1', 'Translation2'],
       status: 'rejected'
     };
     const suggestion2 = {
@@ -383,7 +384,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         content_html: 'Translation',
         translation_html: 'Tradução',
         state_name: 'StateName'
-      }
+      },
+      exploration_content_html: 'Translation'
     };
 
     const contribution1 = {
@@ -428,6 +430,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.subheading).toBe('subheading_title');
+        // Suggestion 1's exploration_content_html does not match its
+        // content_html.
+        expect($scope.hasExplorationContentChanged()).toBe(true);
 
         var messages = [{
           author_username: '',
