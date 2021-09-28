@@ -27,7 +27,6 @@ from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import html_cleaner
-from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
