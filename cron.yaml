@@ -14,3 +14,6 @@ cron:
 - description: daily email about bottlenecks on the Contributor Dashboard
   url: /cron/mail/admins/contributor_dashboard_bottlenecks
   schedule: every day 17:00
+- description: daily scrubber to scrub expiring feedback reports
+  url: /cron/app_feedback_report/scrub_expiring_reports
+  schedule: every day 1:00
