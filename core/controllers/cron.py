@@ -202,6 +202,7 @@ class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
 class CronDashboardStatsHandler(base.BaseHandler):
     """Handler for appending dashboard stats to a list."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -216,6 +217,7 @@ class CronDashboardStatsHandler(base.BaseHandler):
 class CronExplorationRecommendationsHandler(base.BaseHandler):
     """Handler for computing exploration recommendations."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -230,6 +232,7 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
 class CronActivitySearchRankHandler(base.BaseHandler):
     """Handler for computing activity search ranks."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -244,6 +247,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
 class CronTranslationContributionStatsHandler(base.BaseHandler):
     """Handler for running the translation contribution stats populate job."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
