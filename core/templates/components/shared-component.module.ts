@@ -100,6 +100,7 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 @NgModule({
   imports: [
@@ -176,6 +177,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     WrapTextWithEllipsisPipe,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -228,6 +230,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
@@ -288,6 +291,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
