@@ -22,13 +22,19 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import recommendations_services
 from core.domain import search_services
+from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -48,16 +54,20 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import recommendations_models
+    from mypy_imports import story_models
     from mypy_imports import suggestion_models
+    from mypy_imports import topic_models
     from mypy_imports import user_models
 
 
 (
     exp_models, opportunity_models,
-    recommendations_models, suggestion_models, user_models
+    recommendations_models, story_models, suggestion_models,
+    topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.recommendations, models.NAMES.suggestion, models.NAMES.user
+    models.NAMES.recommendations, models.NAMES.story, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()
@@ -639,3 +649,213 @@ class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
                             'exp_id': compared_exp_summary_model.id
                         }
                     )
+
+
+class DeleteExplorationOpportunitySummaries(base_jobs.JobBase):
+    """Job that deletes ExplorationOpportunitySummaryModels."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        deleting ExplorationOpportunitySummaryModel.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            deleting ExplorationOpportunitySummaryModel.
+        """
+        exp_opportunity_summary_model = (
+            self.pipeline
+            | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                    include_deleted=False))
+        )
+
+        unused_delete_result = (
+            exp_opportunity_summary_model
+            | beam.Map(lambda model: model.key)
+            | 'Delete all models' >> ndb_io.DeleteModels()
+        )
+
+        return (
+            exp_opportunity_summary_model
+            | 'Count all new models' >> beam.combiners.Count.Globally()
+            | 'Only create result for new models when > 0' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Create result for new models' >> beam.Map(
+            lambda x: job_run_result.JobRunResult(
+                stdout='SUCCESS %s' % x))
+        )
+
+
+class GenerateExplorationOpportunitySummaries(base_jobs.JobBase):
+    """Job that regenerates ExplorationOpportunitySummaryModel.
+    Note: The ExplorationOpportunitySummaryModelDeletionJob has to be run
+    before this job.
+    """
+
+    @staticmethod
+    def _generate_opportunities_related_to_topic(
+        topic: topic_domain.Topic,
+        stories_dict: Dict[str, story_domain.Story],
+        exploration_dict: Dict[str, exp_domain.Exploration]
+    ) -> Dict[str, Union[
+        str,
+        job_run_result.JobRunResult,
+        List[opportunity_models.ExplorationOpportunitySummaryModel]]
+    ]:
+        """Generate opportunities related to topic.
+
+        Args:
+            topic: todo. Todo.
+            stories_dict: todo. Todo.
+            exploration_dict: todo. Todo.
+
+        Returns:
+            todo. Todo.
+        """
+        try:
+            story_ids = topic.get_canonical_story_ids() # type: ignore[no-untyped-call]
+            stories = [
+                stories_dict[id] for id in story_ids if id in stories_dict]
+            exp_ids = []
+            non_existing_story_ids: List[str]  = []
+
+            for index, story_id in enumerate(story_ids):
+                if story_id not in stories_dict:
+                    non_existing_story_ids.append(story_id)
+                else:
+                    exp_ids += (
+                        stories_dict[
+                            story_id
+                        ].story_contents.get_all_linked_exp_ids()
+                    )
+
+            exp_ids_to_exp = {
+                eid: exploration_dict[eid] for eid in exp_ids
+                if exploration_dict.get(eid) is not None
+            }
+            non_existing_exp_ids = set(exp_ids) - set(exp_ids_to_exp.keys())
+
+            if len(non_existing_exp_ids) > 0 or len(non_existing_story_ids) > 0:
+                raise Exception(
+                    'Failed to regenerate opportunities for topic id: %s, '
+                    'missing_exp_with_ids: %s, missing_story_with_ids: %s' % (
+                        topic.id,
+                        list(non_existing_exp_ids),
+                        non_existing_story_ids
+                    )
+                )
+
+            exploration_opportunity_summary_list = []
+            for story in stories:
+                for exp_id in story.story_contents.get_all_linked_exp_ids():
+                    exploration_opportunity_summary_list.append(
+                        opportunity_services.create_exp_opportunity_summary( # type: ignore[no-untyped-call]
+                            topic, story, exp_ids_to_exp[exp_id])
+                    )
+
+            exploration_opportunity_summary_model_list = []
+            for opportunity in exploration_opportunity_summary_list:
+                model = opportunity_models.ExplorationOpportunitySummaryModel(
+                    id=opportunity.id,
+                    topic_id=opportunity.topic_id,
+                    topic_name=opportunity.topic_name,
+                    story_id=opportunity.story_id,
+                    story_title=opportunity.story_title,
+                    chapter_title=opportunity.chapter_title,
+                    content_count=opportunity.content_count,
+                    incomplete_translation_language_codes=(
+                        opportunity.incomplete_translation_language_codes),
+                    translation_counts=opportunity.translation_counts,
+                    language_codes_needing_voice_artists=(
+                        opportunity.language_codes_needing_voice_artists),
+                    language_codes_with_assigned_voice_artists=(
+                        opportunity.language_codes_with_assigned_voice_artists)
+                )
+                model.update_timestamps()
+                exploration_opportunity_summary_model_list.append(model)
+
+            return {
+                'status': 'SUCCESS',
+                'job_result': job_run_result.JobRunResult(stdout='SUCCESS'),
+                'models': exploration_opportunity_summary_model_list
+            }
+        except Exception as e:
+            return {
+                'status': 'FAILURE',
+                'job_result': job_run_result.JobRunResult(
+                    stderr='FAILURE: %s' % e),
+                'models': []
+            }
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        generating ExplorationOpportunitySummaryModel.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            generating ExplorationOpportunitySummaryModel.
+        """
+
+        topics = (
+            self.pipeline
+            | 'Get all non-deleted topic models' >> (
+                ndb_io.GetModels(
+                    topic_models.TopicModel.get_all(include_deleted=False)))
+            | 'Get topic from model' >> beam.Map(
+                topic_fetchers.get_topic_from_model)
+        )
+
+        story_ids_to_story = (
+            self.pipeline
+            | 'Get all non-deleted story models' >> ndb_io.GetModels(
+                story_models.StoryModel.get_all(include_deleted=False))
+            | 'Get story from model' >> beam.Map(
+                story_fetchers.get_story_from_model)
+            | 'Combine stories and ids' >> beam.Map(
+                lambda story: (story.id, story))
+        )
+
+        exp_ids_to_exp = (
+            self.pipeline
+            | 'Get all non-deleted exp models' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False))
+            | 'Get exploration from model' >> beam.Map(
+                exp_fetchers.get_exploration_from_model)
+            | 'Combine exploration and ids' >> beam.Map(
+                lambda exp: (exp.id, exp))
+        )
+
+        stories_dict = beam.pvalue.AsDict(story_ids_to_story)
+        exploration_dict = beam.pvalue.AsDict(exp_ids_to_exp)
+
+        opportunities_results = (
+            topics
+            | beam.Map(
+                self._generate_opportunities_related_to_topic,
+                stories_dict=stories_dict,
+                exploration_dict=exploration_dict)
+        )
+
+        models_to_put = (
+            opportunities_results
+            | 'Filter the results with SUCCESS status' >> beam.Filter(
+                lambda result: result['status'] == 'SUCCESS')
+            | 'Fetch the models to be put' >> beam.FlatMap(
+                lambda result: result['models'])
+        )
+
+        unused_put_result = (
+            models_to_put
+            | 'Print models' >> beam.Map(print)
+        )
+
+        unused_put_result = (
+            models_to_put
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            opportunities_results
+            | 'Fetch the job results' >> beam.Map(
+                lambda result: result['job_result'])
+        )
