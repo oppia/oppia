@@ -76,7 +76,7 @@ var CreatorDashboardPage = function() {
       if (
         text.startsWith(explorationTitle + '\n') || text === explorationTitle
       ) {
-        filteredExplorationCards.push(text);
+        filteredExplorationCards.push(allExplorationCards[i]);
       }
     }
     return filteredExplorationCards;

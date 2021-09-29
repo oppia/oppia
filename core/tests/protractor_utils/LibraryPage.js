@@ -67,10 +67,10 @@ var LibraryPage = function() {
       var tileTitle = await allExplorationSummaryTile[i].element(
         expSummaryTileTitleLocator).getText();
       if (tileTitle === name) {
-        filteredExplorationSummaryTiles.push(tileTitle);
+        filteredExplorationSummaryTiles.push(allExplorationSummaryTile[i]);
       }
     }
-    return filteredExplorationSummaryTiles
+    return filteredExplorationSummaryTiles;
   };
 
   var _submitSearchQuery = async function(searchQuery) {
