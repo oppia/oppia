@@ -1489,6 +1489,82 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
             opportunity_model.language_codes_needing_voice_artists, ['en']
         )
 
+    def test_generation_job_fails_when_story_id_is_not_available(self) -> None:
+        self.topic_model.canonical_story_references.append({
+            'story_id': 'missing_id',
+            'story_is_published': False
+        })
+        self.topic_model.update_timestamps()
+        datastore_services.put_multi([self.topic_model])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stderr=(
+                'FAILURE: Failed to regenerate opportunities for topic id: '
+                'topic_1_id, missing_exp_with_ids: [], '
+                'missing_story_with_ids: [\'missing_id\']'
+            ))
+        ])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+    def test_generation_job_fails_when_exp_id_is_not_available(self) -> None:
+        self.topic_model.canonical_story_references.append({
+            'story_id': self.STORY_2_ID,
+            'story_is_published': False
+        })
+        self.topic_model.update_timestamps()
+
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_2_ID,
+            title='story 2 title',
+            language_code='cs',
+            story_contents_schema_version=1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node 2 title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': 'missing_id',
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note'
+        )
+        story_model.update_timestamps()
+
+        datastore_services.put_multi([self.topic_model, story_model])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stderr=(
+                'FAILURE: Failed to regenerate opportunities for topic id: '
+                'topic_1_id, missing_exp_with_ids: [\'missing_id\'], '
+                'missing_story_with_ids: []'
+            ))
+        ])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
     def test_generation_job_returns_multiple_opportunities_for_multiple_topics(
         self
     ) -> None:

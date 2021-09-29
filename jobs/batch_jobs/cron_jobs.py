@@ -696,61 +696,53 @@ class GenerateExplorationOpportunitySummaries(base_jobs.JobBase):
     def _generate_opportunities_related_to_topic(
         topic: topic_domain.Topic,
         stories_dict: Dict[str, story_domain.Story],
-        exploration_dict: Dict[str, exp_domain.Exploration]
+        exps_dict: Dict[str, exp_domain.Exploration]
     ) -> Dict[str, Union[
         str,
         job_run_result.JobRunResult,
         List[opportunity_models.ExplorationOpportunitySummaryModel]]
     ]:
-        """Generate opportunities related to topic.
+        """Generate opportunities related to a topic.
 
         Args:
-            topic: todo. Todo.
-            stories_dict: todo. Todo.
-            exploration_dict: todo. Todo.
+            topic: Topic. Topic for which to generate the opportunities.
+            stories_dict: dict(str, Story). All stories in the datastore.
+            exps_dict: dict(str, Exploration). All explorations in
+                the datastore.
 
         Returns:
-            todo. Todo.
+            dict(str, *). Todo.
         """
         try:
             story_ids = topic.get_canonical_story_ids() # type: ignore[no-untyped-call]
-            stories = [
-                stories_dict[id] for id in story_ids if id in stories_dict]
-            exp_ids = []
-            non_existing_story_ids: List[str] = []
+            existing_story_ids = set(stories_dict.keys()) & set(story_ids)
+            exp_ids: List[str] = sum([
+                stories_dict[story_id].story_contents.get_all_linked_exp_ids()
+                for story_id in existing_story_ids
+            ], [])
+            existing_exp_ids = set(exps_dict.keys()) & set(exp_ids)
 
-            for story_id in story_ids:
-                if story_id not in stories_dict:
-                    non_existing_story_ids.append(story_id)
-                else:
-                    exp_ids += (
-                        stories_dict[
-                            story_id
-                        ].story_contents.get_all_linked_exp_ids()
-                    )
-
-            exp_ids_to_exp = {
-                eid: exploration_dict[eid] for eid in exp_ids
-                if exploration_dict.get(eid) is not None
-            }
-            non_existing_exp_ids = set(exp_ids) - set(exp_ids_to_exp.keys())
-
+            non_existing_story_ids = set(story_ids) - set(existing_story_ids)
+            non_existing_exp_ids = set(exp_ids) - set(existing_exp_ids)
             if len(non_existing_exp_ids) > 0 or len(non_existing_story_ids) > 0:
                 raise Exception(
                     'Failed to regenerate opportunities for topic id: %s, '
                     'missing_exp_with_ids: %s, missing_story_with_ids: %s' % (
                         topic.id,
                         list(non_existing_exp_ids),
-                        non_existing_story_ids
+                        list(non_existing_story_ids)
                     )
                 )
 
             exploration_opportunity_summary_list = []
+            stories = [
+                stories_dict[story_id] for story_id in existing_story_ids
+            ]
             for story in stories:
                 for exp_id in story.story_contents.get_all_linked_exp_ids():
                     exploration_opportunity_summary_list.append(
                         opportunity_services.create_exp_opportunity_summary( # type: ignore[no-untyped-call]
-                            topic, story, exp_ids_to_exp[exp_id])
+                            topic, story, exps_dict[exp_id])
                     )
 
             exploration_opportunity_summary_model_list = []
@@ -826,14 +818,14 @@ class GenerateExplorationOpportunitySummaries(base_jobs.JobBase):
         )
 
         stories_dict = beam.pvalue.AsDict(story_ids_to_story)
-        exploration_dict = beam.pvalue.AsDict(exp_ids_to_exp)
+        exps_dict = beam.pvalue.AsDict(exp_ids_to_exp)
 
         opportunities_results = (
             topics
             | beam.Map(
                 self._generate_opportunities_related_to_topic,
                 stories_dict=stories_dict,
-                exploration_dict=exploration_dict)
+                exps_dict=exps_dict)
         )
 
         models_to_put = (
