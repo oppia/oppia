@@ -40,14 +40,24 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {}
+      reload: () => {},
+      toString() {
+        return 'http://localhost/community';
+      }
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
-    gtag: () => {}
+    gtag: () => {},
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
   };
+}
+
+class mockURL extends URL {
+  reload: () => {};
 }
 
 describe('TopNavigationBarComponent', () => {
@@ -398,7 +408,7 @@ describe('TopNavigationBarComponent', () => {
       isLoggedIn: () => true
     } as UserInfo);
     spyOn(userBackendApiService, 'updatePreferredSiteLanguageAsync').and.stub();
-
+    mockWindowRef.nativeWindow.location = new mockURL('http://localhost/community?lang=es');
     component.currentLanguageCode = 'en';
     component.currentLanguageText = 'English';
 
@@ -460,6 +470,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.ngOnInit();
     tick();
+    tick(101);
 
     expect(component.isModerator).toBe(true);
     expect(component.isCurriculumAdmin).toBe(false);

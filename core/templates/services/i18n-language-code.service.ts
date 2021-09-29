@@ -84,7 +84,7 @@ export class I18nLanguageCodeService {
       });
       this.alertsService.addWarning(
         `Loading in "${currentLanguageText}" because the language code ` +
-        'given in the URL is invalid');
+        'given in the URL is invalid.');
       I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
       this.setUrlLanguageParam(code);
     }

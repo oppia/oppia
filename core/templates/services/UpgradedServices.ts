@@ -558,7 +558,8 @@ export class UpgradedServices {
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
-    upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
+    upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService(
+      upgradedServices['WindowRef'], upgradedServices['AlertsService']);
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageClickInputRulesService'] =
       new ImageClickInputRulesService();
