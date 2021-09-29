@@ -28,19 +28,22 @@ import apache_beam as beam
 
 from typing import Optional
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import beam_job_models
+    from mypy_imports import datastore_services
+
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 datastore_services = models.Registry.import_datastore_services()
 
 
-@beam.typehints.with_input_types(job_run_result.JobRunResult)
-@beam.typehints.with_output_types(beam.pvalue.PDone)
-class PutResults(beam.PTransform):
+class PutResults(beam.PTransform): # type: ignore[misc]
     """Writes Job Results into the NDB datastore."""
 
     _MAX_RESULT_INSTANCES_PER_MODEL = 1000
 
-    def __init__(self, job_id: str, label: Optional[str] = None):
+    def __init__(self, job_id: str, label: Optional[str] = None) -> None:
         """Initializes the GetModels PTransform.
 
         Args:

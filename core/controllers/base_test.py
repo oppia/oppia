@@ -376,7 +376,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '/splash', expected_status_int=302)
             self.assertEqual(
                 response.location,
-                'http://localhost/logout?redirect_url=http://localhost/splash')
+                'http://localhost/logout?redirect_url=/splash')
 
     def test_no_partially_logged_in_redirect_from_logout(self):
         login_context = self.login_context(
