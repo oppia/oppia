@@ -266,7 +266,7 @@ describe('Question Editor Modal Controller', function() {
           return (
             { componentInstance: MockNgbModalRef,
               result: Promise.resolve(summary)
-            }) as NgbModalRef;
+            } as NgbModalRef);
         });
         $scope.addSkill();
         $scope.$apply();
