@@ -188,12 +188,16 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         if (
           this.windowRef.nativeWindow.location.pathname === ('/search/find')) {
           let url = new URL(this.windowRef.nativeWindow.location.toString());
+          let siteLangCode = url.searchParams.get('lang');
           url.search = '?q=' + searchUrlQueryString;
+          url.searchParams.append('lang', siteLangCode);
           this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
         } else {
           let url = new URL(this.windowRef.nativeWindow.location.toString());
+          let siteLangCode = url.searchParams.get('lang');
           url.pathname = '/search/find';
           url.search = '?q=' + searchUrlQueryString;
+          url.searchParams.append('lang', siteLangCode);
           this.windowRef.nativeWindow.location.href = url.toString();
         }
       });

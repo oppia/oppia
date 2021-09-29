@@ -19,7 +19,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { WindowRef } from './contextual/window-ref.service';
+import { AlertsService } from './alerts.service';
 
+interface LanguageInfo {
+  id: string;
+  text: string;
+  direction: string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -35,11 +42,20 @@ export class I18nLanguageCodeService {
    */
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
-
+  static supportedSiteLanguagesCodes: string[] = (
+    AppConstants.SUPPORTED_SITE_LANGUAGES.map(
+      (languageInfo: LanguageInfo) => {
+        return languageInfo.id;
+      }
+    )
+  );
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
-  constructor() {}
+  constructor(
+    private windowRef: WindowRef,
+    private alertsService: AlertsService,
+  ) {}
 
   getCurrentI18nLanguageCode(): string {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
@@ -53,8 +69,33 @@ export class I18nLanguageCodeService {
 
   setI18nLanguageCode(code: string): void {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
-    I18nLanguageCodeService.languageCode = code;
-    I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
+    if (
+      I18nLanguageCodeService.supportedSiteLanguagesCodes.includes(code)) {
+      I18nLanguageCodeService.languageCode = code;
+      I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
+      this.setUrlLanguageParam(code);
+    } else {
+      let currentLanguageText: string;
+      let code = this.getCurrentI18nLanguageCode();
+      AppConstants.SUPPORTED_SITE_LANGUAGES.forEach(element => {
+        if (element.id === code) {
+          currentLanguageText = element.text;
+        }
+      });
+      this.alertsService.addWarning(
+        `Loading in "${currentLanguageText}" because the language code ` +
+        'given in the URL is invalid');
+      I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
+      this.setUrlLanguageParam(code);
+    }
+  }
+
+  setUrlLanguageParam(code: string): void {
+    let url = new URL(this.windowRef.nativeWindow.location.toString());
+    if (url.searchParams.get('lang') !== code) {
+      url.searchParams.set('lang', code);
+      this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
+    }
   }
 
   get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {

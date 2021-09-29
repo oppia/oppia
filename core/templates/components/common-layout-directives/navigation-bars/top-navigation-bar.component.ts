@@ -171,17 +171,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
 
     this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.getPreferredSiteLanguageCode()) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(
-          userInfo.getPreferredSiteLanguageCode());
-      }
-      this.currentLanguageCode = (
-        this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-      this.supportedSiteLanguages.forEach(element => {
-        if (element.id === this.currentLanguageCode) {
-          this.currentLanguageText = element.text;
+      setTimeout(() => {
+        if (userInfo.getPreferredSiteLanguageCode()) {
+          this.i18nLanguageCodeService.setI18nLanguageCode(
+            userInfo.getPreferredSiteLanguageCode());
         }
-      });
+        this.currentLanguageCode = (
+          this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+        this.supportedSiteLanguages.forEach(element => {
+          if (element.id === this.currentLanguageCode) {
+            this.currentLanguageText = element.text;
+          }
+        });
+      }, 100);
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
@@ -232,6 +234,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         (code) => {
           if (this.currentLanguageCode !== code) {
             this.currentLanguageCode = code;
+            this.supportedSiteLanguages.forEach(element => {
+              if (element.id === this.currentLanguageCode) {
+                this.currentLanguageText = element.text;
+              }
+            });
             this.changeDetectorRef.detectChanges();
           }
         })

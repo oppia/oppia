@@ -95,6 +95,7 @@ import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 const componentMap = {
   Collapsible: {
@@ -162,6 +163,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private translateCacheService: TranslateCacheService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
+    private windowRef: WindowRef,
     private injector: Injector
   ) {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
@@ -269,10 +271,20 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     this.translateCacheService.init();
 
     const cachedLanguage = this.translateCacheService.getCachedLanguage();
-    if (cachedLanguage) {
-      this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+    let url = new URL(this.windowRef.nativeWindow.location.toString());
+    if (url.searchParams.has('lang') && (
+      url.searchParams.get('lang') !== cachedLanguage)) {
+      // This timeout is required to ensure that site language is changed after
+      // translateCacheService is completely intialized.
+      setTimeout(() => {
+        this.i18nLanguageCodeService.setI18nLanguageCode(
+          url.searchParams.get('lang'));
+      }, 150);
+    } else {
+      if (cachedLanguage) {
+        this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+      }
     }
-
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }
