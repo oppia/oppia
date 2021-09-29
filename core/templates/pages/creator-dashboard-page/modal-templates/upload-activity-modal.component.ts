@@ -38,7 +38,7 @@ export class UploadActivityModalComponent {
       yamlFile: null
     };
     let label =
-     document.getElementById('newFileInput') as HTMLInputElement;
+      document.getElementById('newFileInput') as HTMLInputElement;
     if (label === null) {
       throw new Error('No label found for uploading files.');
     }
