@@ -64,7 +64,7 @@ class JobOptions(pipeline_options.PipelineOptions):
             temp_location=feconf.DATAFLOW_TEMP_LOCATION,
             staging_location=feconf.DATAFLOW_STAGING_LOCATION,
             experiments=['use_runner_v2'],
-            setup_file='./setup.py',
+            extra_packages=['./dist/oppia-beam-job-0.0.1.tar.gz'],
             **job_options)
 
     @classmethod
