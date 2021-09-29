@@ -717,9 +717,9 @@ class GenerateExplorationOpportunitySummaries(base_jobs.JobBase):
             stories = [
                 stories_dict[id] for id in story_ids if id in stories_dict]
             exp_ids = []
-            non_existing_story_ids: List[str]  = []
+            non_existing_story_ids: List[str] = []
 
-            for index, story_id in enumerate(story_ids):
+            for story_id in story_ids:
                 if story_id not in stories_dict:
                     non_existing_story_ids.append(story_id)
                 else:
