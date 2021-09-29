@@ -32,7 +32,10 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-from jobs.batch_jobs import cron_jobs
+from jobs.batch_jobs import exp_recommendation_computation_jobs
+from jobs.batch_jobs import exp_search_indexing_jobs
+from jobs.batch_jobs import exp_stats_computation_jobs
+from jobs.batch_jobs import user_stats_computation_jobs
 import main
 
 import webtest
@@ -675,7 +678,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.ComputeExplorationRecommendations,
+                'job_class': (
+                    exp_recommendation_computation_jobs
+                    .ComputeExplorationRecommendations),
                 'run_synchronously': False,
             }]
         )
@@ -687,7 +692,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.IndexExplorationsInSearch,
+                'job_class': exp_search_indexing_jobs.IndexExplorationsInSearch,
                 'run_synchronously': False,
             }]
         )
@@ -699,7 +704,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.CollectWeeklyDashboardStats,
+                'job_class': (
+                    user_stats_computation_jobs.CollectWeeklyDashboardStats),
                 'run_synchronously': False,
             }]
         )
@@ -711,7 +717,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.GenerateTranslationContributionStats,
+                'job_class': (
+                    exp_stats_computation_jobs
+                    .GenerateTranslationContributionStats),
                 'run_synchronously': False,
             }]
         )

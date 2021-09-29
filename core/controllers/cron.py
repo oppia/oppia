@@ -28,7 +28,10 @@ from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 import feconf
-from jobs.batch_jobs import cron_jobs
+from jobs.batch_jobs import exp_recommendation_computation_jobs
+from jobs.batch_jobs import exp_search_indexing_jobs
+from jobs.batch_jobs import exp_stats_computation_jobs
+from jobs.batch_jobs import user_stats_computation_jobs
 
 
 class CronModelsCleanupHandler(base.BaseHandler):
@@ -210,7 +213,7 @@ class CronDashboardStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.CollectWeeklyDashboardStats,
+            job_class=user_stats_computation_jobs.CollectWeeklyDashboardStats,
             run_synchronously=False)
 
 
@@ -225,7 +228,9 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.ComputeExplorationRecommendations,
+            job_class=(
+                exp_recommendation_computation_jobs
+                .ComputeExplorationRecommendations),
             run_synchronously=False)
 
 
@@ -240,7 +245,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.IndexExplorationsInSearch,
+            job_class=exp_search_indexing_jobs.IndexExplorationsInSearch,
             run_synchronously=False)
 
 
@@ -255,5 +260,7 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.GenerateTranslationContributionStats,
+            job_class=(
+                exp_stats_computation_jobs
+                .GenerateTranslationContributionStats),
             run_synchronously=False)
