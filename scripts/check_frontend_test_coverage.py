@@ -46,7 +46,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-editor-navbar-breadcrumb.directive.ts',
+    'collection-editor-navbar-breadcrumb.component.ts',
     'collection-footer.component.ts',
     'collection-navbar.component.ts',
     'collection-player-page.directive.ts',
