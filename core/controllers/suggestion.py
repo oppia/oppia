@@ -40,7 +40,6 @@ class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'suggestion_type': {
@@ -63,7 +62,7 @@ class SuggestionHandler(base.BaseHandler):
                 'schema': {
                     'type': 'int'
                 }
-            }, 
+            },
             'change': {
                'schema': {
                    'type': 'dict',
@@ -112,7 +111,7 @@ class SuggestionHandler(base.BaseHandler):
                         }
                        }
                    ] 
-               } 
+               }
             },
             'description': {
                 'schema': {
