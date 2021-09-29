@@ -58,7 +58,7 @@ def run_beam_job(
         BeamJobRun. Metadata about the run's execution.
     """
     if job_class is None and job_name is None:
-        raise ValueError('Must specify the job class to run')
+        raise ValueError('Must specify the job class or name to run')
     if job_class is None:
         # MyPy is wrong. We know job_name is not None in this branch because if
         # it were, the ValueError above would have been raised.
