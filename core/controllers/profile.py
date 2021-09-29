@@ -368,7 +368,7 @@ class SignupHandler(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': True
+                'default_value': False
             },
             'default_dashboard': {
                 'schema': {
@@ -383,7 +383,7 @@ class SignupHandler(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': True
+                'default_value': False
             }
         }
     }
