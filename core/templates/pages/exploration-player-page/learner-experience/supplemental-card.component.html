@@ -1,26 +1,31 @@
 <div class="conversation-skin-supplemental-card">
-  <div ng-if="helpCardHtml" class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
-       ng-style="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}">
-    <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-       ng-href="<[OPPIA_AVATAR_LINK_URL]>"
+  <div *ngIf="helpCardHtml"
+       class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
+       [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
+       #helpCard>
+    <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+       [href]="OPPIA_AVATAR_LINK_URL"
        target="_blank"
        rel="noopener">
       <img class="conversation-skin-oppia-avatar"
-           ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
+           [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
     </a>
     <button type="button" class="conversation-skin-close-help-card-button protractor-test-close-help-card-button"
-            ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+            (click)="clearHelpCard()" *ngIf="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind class="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()">
-      </angular-html-bind>
+      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback"
+                                 [htmlData]="helpCardHtml"
+                                 [parentScope]="this"
+                                 [ngClass]="getFeedbackAudioHighlightClass()">
+      </angular-html-bind-wrapper>
     </div>
     <br>
-    <oppia-continue-button ng-if="helpCardHasContinueButton"
+    <oppia-continue-button *ngIf="helpCardHasContinueButton"
                            [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
-                           [is-learn-again-button]="$ctrl.isLearnAgainButton()"
-                           (click-continue-button)="$ctrl.onClickContinueButton()"
+                           [isLearnAgainButton]="isLearnAgainButton"
+                           (clickContinueButton)="clickContinueButton.emit()"
                            class="d-inline-block">
     </oppia-continue-button>
   </div>
@@ -28,10 +33,11 @@
   <!--This CSS class is essential for auto-scrolling in Drag and drop interaction to work
   correctly. More details about the class can be found in extensions/interactions/
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
-  <div class="conversation-skin-interaction-container">
-    <angular-html-bind class="protractor-test-conversation-input"
-                       html-data="displayedCard.getInteractionHtml()">
-    </angular-html-bind>
+  <div class="conversation-skin-interaction-container" #interactionContainer>
+    <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+                               [parentScope]="this"
+                               [htmlData]="currentDisplayedCard.getInteractionHtml()">
+    </angular-html-bind-wrapper>
   </div>
 </div>
 
@@ -70,12 +76,6 @@
   .conversation-skin-help-card .conversation-skin-oppia-avatar {
     left: -15px;
     top: 12px;
-  }
-
-  .conversation-skin-help-card-content {
-    max-height: 235px;
-    overflow-y: auto;
-    width: 270px;
   }
 
   .conversation-skin-close-help-card-button {
