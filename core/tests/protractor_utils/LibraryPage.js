@@ -61,15 +61,16 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    var filteredExplorationSummaryTile = [];
+    var filteredExplorationSummaryTiles = [];
 
     for (i = 0; i < allExplorationSummaryTile.length; i++) {
       var tileTitle = await allExplorationSummaryTile[i].element(
         expSummaryTileTitleLocator).getText();
       if (tileTitle === name) {
-        filteredExplorationSummaryTile.push(tileTitle);
+        filteredExplorationSummaryTiles.push(tileTitle);
       }
     }
+    return filteredExplorationSummaryTiles
   };
 
   var _submitSearchQuery = async function(searchQuery) {
