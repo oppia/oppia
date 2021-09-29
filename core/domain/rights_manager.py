@@ -986,6 +986,7 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
     activity_rights.owner_ids = []
     activity_rights.editor_ids = []
     activity_rights.viewer_ids = []
+    activity_rights.voice_artist_ids = []
     commit_cmds = [{
         'cmd': rights_domain.CMD_RELEASE_OWNERSHIP,
     }]
