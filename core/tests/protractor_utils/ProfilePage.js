@@ -106,7 +106,7 @@ var ProfilePage = function() {
         'Card Title is not present or taking too long to display');
       var title = await cardTitle.getText();
       if (title === explorationName) {
-        explorationsCardByName.push(title);
+        explorationsCardByName.push(allExplorationCardElements[i]);
       }
     }
 
