@@ -145,7 +145,8 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       rubricExplanationEditorElement,
       'Rubric explanation editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    var activeExplanation = await browser.switchTo().activeElement();
+    await action.sendKeys('Explanation Field', activeExplanation, explanation);
     await action.click(
       'Save Rubric Explanation Button', saveRubricExplanationButton);
     await waitFor.invisibilityOf(
@@ -186,7 +187,8 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       rubricExplanationEditorElement,
       'Rubric explanation editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    var activeExplanation = browser.switchTo().activeElement();
+    await action.sendKeys('Explanation Field', activeExplanation, explanation);
     await action.click(
       'Save Rubric Explanation Button', saveRubricExplanationButton);
   };
@@ -265,7 +267,8 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       conceptCardTextElement,
       'Concept card text Editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    var activeExplanation = await browser.switchTo().activeElement();
+    await action.sendKeys('Explanation Field', activeExplanation, explanation);
 
     await action.click(
       'Save Concept Card Explanation Button',
@@ -289,10 +292,12 @@ var SkillEditorPage = function() {
       'Add Worked Example Modal takes too long to appear');
 
     await action.click('Worked Example Question', workedExampleQuestion);
-    await browser.switchTo().activeElement().sendKeys(question);
+    await action.sendKeys(
+      'Question Field', browser.switchTo().activeElement(), question);
 
     await action.click('Worked Example Explanation', workedExampleExplanation);
-    await browser.switchTo().activeElement().sendKeys(explanation);
+    await action.sendKeys(
+      'Explanation Field', browser.switchTo().activeElement(), explanation);
 
     await action.click(
       'Save worked example', saveWorkedExampleButton);
@@ -348,14 +353,17 @@ var SkillEditorPage = function() {
       'Add Misconception Modal takes too long to appear');
 
     await action.click('Misconception name field', misconceptionNameField);
-    await browser.switchTo().activeElement().sendKeys(name);
+    await action.sendKeys(
+      'Name field', browser.switchTo().activeElement(), name);
 
     await action.click('Misconception notes field', misconceptionNotesField);
-    await browser.switchTo().activeElement().sendKeys(notes);
+    await action.sendKeys(
+      'Notes field', browser.switchTo().activeElement(), notes);
 
     await action.click(
       'Misconception feedback field', misconceptionFeedbackField);
-    await browser.switchTo().activeElement().sendKeys(feedback);
+    await action.sendKeys(
+      'Feedback field', browser.switchTo().activeElement(), feedback);
 
     await action.click('Confirm add misconception', confirmAddMisconception);
 
