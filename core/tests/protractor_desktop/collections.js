@@ -36,6 +36,9 @@ describe('Collections', function() {
   var thirdExplorationId = null;
   var fourthExplorationId = null;
   var libraryPage = null;
+  var lazyExplorationId = null;
+  var linearExplorationId = null;
+  var testExplorationId = null;
 
   beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -92,6 +95,8 @@ describe('Collections', function() {
       'English',
       false
     );
+    lazyExplorationId = await general.getExplorationIdFromEditor();
+
     await workflow.createAndPublishExploration(
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
@@ -99,6 +104,8 @@ describe('Collections', function() {
       'English',
       false
     );
+    linearExplorationId = await general.getExplorationIdFromEditor();
+
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',
@@ -106,6 +113,8 @@ describe('Collections', function() {
       'English',
       false
     );
+    testExplorationId = await general.getExplorationIdFromEditor();
+
     await users.logout();
     await users.login('player@collections.com');
     await creatorDashboardPage.get();
@@ -123,8 +132,7 @@ describe('Collections', function() {
     await collectionEditorPage.saveChanges();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // In the url a # is added at the end that is not part of collection ID.
-    collectionId = pathname[5].slice(0, -1);
+    collectionId = pathname[5];
     await users.logout();
   });
 
@@ -138,9 +146,9 @@ describe('Collections', function() {
     await collectionEditorPage.addExistingExploration(secondExplorationId);
     await collectionEditorPage.addExistingExploration(thirdExplorationId);
     // Search and add existing explorations.
-    await collectionEditorPage.searchForAndAddExistingExploration('Lazy');
-    await collectionEditorPage.searchForAndAddExistingExploration('Linear');
-    await collectionEditorPage.searchForAndAddExistingExploration('Test');
+    await collectionEditorPage.addExistingExploration(lazyExplorationId);
+    await collectionEditorPage.addExistingExploration(linearExplorationId);
+    await collectionEditorPage.addExistingExploration(testExplorationId);
     // Shifting nodes in the node graph.
     await collectionEditorPage.shiftNodeLeft(1);
     await collectionEditorPage.shiftNodeRight(1);
