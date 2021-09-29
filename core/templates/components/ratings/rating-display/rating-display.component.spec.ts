@@ -40,42 +40,57 @@ describe('Rating display component', () => {
     componentInstance = fixture.componentInstance;
   });
 
-  it('should initialize', () => {
+  it('should initialize component properties correctly', () => {
     spyOn(componentInstance, 'displayValue');
+
     componentInstance.ngOnInit();
+
     expect(componentInstance.status).toEqual(componentInstance.STATUS_INACTIVE);
   });
 
-  it('should display value', () => {
+  it('should display value when user reaches end of exploration', () => {
     componentInstance.ngOnInit();
+
     componentInstance.status = componentInstance.STATUS_ACTIVE;
+
     componentInstance.displayValue(4);
+
+
+    expect(componentInstance.stars).toBeDefined();
   });
 
-  it('should click star', () => {
+  it('should update rating value when user provides new rating', () => {
     componentInstance.isEditable = true;
     componentInstance.status = componentInstance.STATUS_ACTIVE;
+
     spyOn(componentInstance, 'displayValue');
     spyOn(componentInstance.edit, 'emit');
+
     componentInstance.clickStar(4);
+
     expect(componentInstance.status).toEqual(
       componentInstance.STATUS_RATING_SET);
     expect(componentInstance.ratingValue).toEqual(4);
     expect(componentInstance.edit.emit).toHaveBeenCalled();
   });
 
-  it('should enter star', () => {
+  it('should highlight star when user hovers over it', () => {
     componentInstance.isEditable = true;
     componentInstance.status = componentInstance.STATUS_ACTIVE;
+
     spyOn(componentInstance, 'displayValue');
+
     componentInstance.enterStar(2);
+
     expect(componentInstance.status).toEqual(componentInstance.STATUS_ACTIVE);
     expect(componentInstance.displayValue).toHaveBeenCalledWith(2);
   });
 
-  it('should leave area', () => {
+  it('should stop highlighting star if user is not hovering anymore', () => {
     spyOn(componentInstance, 'displayValue');
+
     componentInstance.leaveArea();
+
     expect(componentInstance.displayValue).toHaveBeenCalled();
   });
 });
