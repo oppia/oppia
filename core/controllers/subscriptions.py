@@ -25,9 +25,11 @@ import feconf
 
 class SubscribeHandler(base.BaseHandler):
     """Handles operations relating to new subscriptions."""
-
+    
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON 
+    
     URL_PATH_ARGS_SCHEMAS = {}
+    
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'creator_username': {
@@ -47,9 +49,12 @@ class SubscribeHandler(base.BaseHandler):
 
 
 class UnsubscribeHandler(base.BaseHandler):
-    """Handles operations related to unsubscriptions."""
+    """Handles operations related to unsubscriptions."""    
+    
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    
     URL_PATH_ARGS_SCHEMAS = {} 
+    
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'creator_username': {
