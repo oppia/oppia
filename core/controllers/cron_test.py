@@ -34,7 +34,7 @@ from core.tests import test_utils
 import feconf
 from jobs.batch_jobs import exp_recommendation_computation_jobs
 from jobs.batch_jobs import exp_search_indexing_jobs
-from jobs.batch_jobs import exp_stats_computation_jobs
+from jobs.batch_jobs import suggestion_stats_computation_jobs
 from jobs.batch_jobs import user_stats_computation_jobs
 import main
 
@@ -718,7 +718,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
                 'job_class': (
-                    exp_stats_computation_jobs
+                    suggestion_stats_computation_jobs
                     .GenerateTranslationContributionStats),
                 'run_synchronously': False,
             }]

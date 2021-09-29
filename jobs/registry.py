@@ -47,7 +47,7 @@ from typing import List, Type
 from jobs.batch_jobs import blog_validation_jobs                # pylint: disable=unused-import  # isort: skip
 from jobs.batch_jobs import exp_recommendation_computation_jobs # pylint: disable=unused-import  # isort: skip
 from jobs.batch_jobs import exp_search_indexing_jobs            # pylint: disable=unused-import  # isort: skip
-from jobs.batch_jobs import exp_stats_computation_jobs          # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: disable=unused-import  # isort: skip
 from jobs.batch_jobs import model_validation_jobs               # pylint: disable=unused-import  # isort: skip
 from jobs.batch_jobs import test_jobs                           # pylint: disable=unused-import  # isort: skip
 from jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip

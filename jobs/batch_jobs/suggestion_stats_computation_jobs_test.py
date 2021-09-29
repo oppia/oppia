@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.exp_stats_computation_jobs."""
+"""Unit tests for jobs.batch_jobs.suggestion_stats_computation_jobs."""
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -25,7 +25,7 @@ from core.domain import exp_domain
 from core.platform import models
 import feconf
 from jobs import job_test_utils
-from jobs.batch_jobs import exp_stats_computation_jobs
+from jobs.batch_jobs import suggestion_stats_computation_jobs
 from jobs.types import job_run_result
 
 MYPY = False
@@ -39,7 +39,8 @@ if MYPY:
 
 class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_stats_computation_jobs.GenerateTranslationContributionStats
+    JOB_CLASS = (
+        suggestion_stats_computation_jobs.GenerateTranslationContributionStats)
 
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)

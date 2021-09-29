@@ -30,7 +30,7 @@ from core.domain import user_services
 import feconf
 from jobs.batch_jobs import exp_recommendation_computation_jobs
 from jobs.batch_jobs import exp_search_indexing_jobs
-from jobs.batch_jobs import exp_stats_computation_jobs
+from jobs.batch_jobs import suggestion_stats_computation_jobs
 from jobs.batch_jobs import user_stats_computation_jobs
 
 
@@ -261,6 +261,6 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
-                exp_stats_computation_jobs
+                suggestion_stats_computation_jobs
                 .GenerateTranslationContributionStats),
             run_synchronously=False)

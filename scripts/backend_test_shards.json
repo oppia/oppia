@@ -271,7 +271,7 @@
         "core.domain.moderator_services_test",
         "jobs.batch_jobs.exp_recommendation_computation_jobs",
         "jobs.batch_jobs.exp_search_indexing_jobs",
-        "jobs.batch_jobs.exp_stats_computation_jobs",
+        "jobs.batch_jobs.suggestion_stats_computation_jobs",
         "jobs.batch_jobs.user_stats_computation_jobs",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
