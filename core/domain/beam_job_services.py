@@ -47,7 +47,7 @@ def run_beam_job(job_name: str) -> beam_job_domain.BeamJobRun:
         BeamJobRun. Metadata about the run's execution.
     """
     job_class = jobs_registry.get_job_class_by_name(job_name)
-    run_synchronously = False
+    run_synchronously = constants.EMULATOR_MODE
 
     run_model = jobs_manager.run_job(job_class, run_synchronously)
 
