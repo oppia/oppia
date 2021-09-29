@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import os
 import re
 
 from core import constants
@@ -37,9 +38,9 @@ class BaseRteComponent(python_utils.OBJECT):
     Image and Video.
     """
 
-    with python_utils.open_file(
-        feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
-        rich_text_component_specs = constants.parse_json_from_js(f)
+    package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
+    rich_text_component_specs = constants.parse_json_from_ts(
+        python_utils.get_package_file_contents(package, filepath))
 
     obj_types_to_obj_classes = {
         'unicode': objects.UnicodeString,

@@ -25,13 +25,15 @@ when running the workflow for remote execution.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import pkg_resources
+import os
 import setuptools
 
 # Configure the required packages and scripts to install.
-with open('./requirements.txt', encoding='utf-8') as requirements_file: # pylint: disable=replace-disallowed-function-calls
+with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
     REQUIRED_PACKAGES = [
-        line for line in requirements_file
-        if line.strip() and not line.strip().startswith('#')
+        str(requirement)
+        for requirement in pkg_resources.parse_requirements(requirements_txt)
     ]
 
 setuptools.setup(
@@ -39,5 +41,6 @@ setuptools.setup(
     version='0.0.1',
     description='Oppia Apache Beam package',
     install_requires=REQUIRED_PACKAGES,
-    packages=setuptools.find_packages()
+    packages=setuptools.find_packages(),
+    include_package_data=True,
 )

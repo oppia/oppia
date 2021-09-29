@@ -24,6 +24,7 @@ import inspect
 import io
 import itertools
 import os
+import pkgutil
 import sys
 
 from typing import Any, Callable, List # isort: skip
@@ -216,6 +217,23 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
         return io.open(filename, mode, encoding=encoding, newline=newline)
     except:
         raise IOError('Unable to open file: %s' % filename)
+
+
+def get_package_file_contents(package: str, filepath: str) -> str:
+    """Open file and return a corresponding file object.
+
+    Args:
+        package: str. The file to be opened.
+        filepath: str. The file to be opened.
+
+    Returns:
+        _io.TextIOWrapper. The file object.
+    """
+    try:
+        file = io.open(os.path.join(package, filepath), 'r', encoding='utf-8')
+        return file.read()
+    except FileNotFoundError:
+        return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
 def url_join(base_url, relative_url):

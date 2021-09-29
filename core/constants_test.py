@@ -36,7 +36,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         """Test if the constants file is valid json file."""
         with python_utils.open_file( # type: ignore[no-untyped-call]
             os.path.join('assets', 'constants.ts'), 'r') as f:
-            json = constants.parse_json_from_js(f)
+            json = constants.parse_json_from_ts(f)
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
 

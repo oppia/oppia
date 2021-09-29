@@ -20,12 +20,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import json
-import os
 import re
 
 from core import python_utils
 
-from typing import Any, Dict, TextIO
+from typing import Any, Dict
 
 CONSTANTS = {
     'CAN_SEND_ANALYTICS_EVENTS': False,
@@ -6192,6 +6191,39 @@ CONSTANTS = {
 }
 
 
+# Here we use Dict[str, Any] as return type because we need to parse and return
+# generic JSON objects.
+def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
+    """Extracts JSON object from TS file.
+
+    Args:
+        ts_file_contents: str. The contents of the TS file containing JSON that
+            needs to be parsed.
+
+    Returns:
+        dict. The dict representation of JSON object in the TS file.
+    """
+    text_without_comments = remove_comments(ts_file_contents)
+    json_start = text_without_comments.find('{\n')
+    # Add 1 to index returned because the '}' is part of the JSON object.
+    json_end = text_without_comments.rfind('}') + 1
+    json_dict: Dict[str, Any] = (
+        json.loads(text_without_comments[json_start:json_end]))
+    return json_dict
+
+
+def remove_comments(text: str) -> str:
+    """Removes comments from given text.
+
+    Args:
+        text: str. The text from which comments should be removed.
+
+    Returns:
+        str. Text with all its comments removed.
+    """
+    return re.sub(r'  //.*\n', r'', text)
+
+
 class Constants(dict):  # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
@@ -6209,5 +6241,9 @@ class Constants(dict):  # type: ignore[type-arg]
 
 constants = Constants(CONSTANTS)  # pylint:disable=invalid-name
 
-with python_utils.open_file('release_constants.json', 'r') as f:  # type: ignore[no-untyped-call]
-    release_constants = Constants(json.loads(f.read()))  # pylint:disable=invalid-name
+release_constants = Constants( # pylint:disable=invalid-name
+    json.loads(
+        python_utils.get_package_file_contents(
+            'assets', 'release_constants.json')
+    )
+)

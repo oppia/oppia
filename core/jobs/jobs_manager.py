@@ -139,6 +139,7 @@ def run_job(
                 'Failed to deploy %s to the Dataflow service. Please try again '
                 'after a few minutes.' % job_name)
 
+    print(run_model.latest_job_state)
     return run_model
 
 

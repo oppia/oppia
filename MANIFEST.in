@@ -1,0 +1,4 @@
+include requirements.txt
+include assets/constants.ts
+include assets/release_constants.json
+include assets/rich_text_components_definitions.ts

@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 
 import re
 
-from constants import constants
+from core.constants import constants
 
 
 # These are the valid interactions that are allowed in an exploration
