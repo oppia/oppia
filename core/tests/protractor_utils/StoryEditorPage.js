@@ -155,7 +155,7 @@ var StoryEditorPage = function() {
   };
 
   this.unpublishStory = async function() {
-    await unpublishStoryButton.click();
+    await action.click('Unpublish Story Button', unpublishStoryButton);
     await action.click('Close Save Modal button', closeSaveModalButton);
     await waitFor.invisibilityOf(
       closeSaveModalButton,
@@ -441,9 +441,7 @@ var StoryEditorPage = function() {
       _selectSkillBasedOnIndex: async function(index) {
         await waitFor.visibilityOf(skillListItems.get(0));
         var selectedSkill = skillListItems.get(index);
-        await waitFor.elementToBeClickable(
-          selectedSkill, 'selectedSkill takes too long to be clickable.');
-        await selectedSkill.click();
+        await action.click('Selected Skill', selectedSkill);
       },
 
       selectSkill: async function(name) {
