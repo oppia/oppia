@@ -40,82 +40,83 @@ class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS={
+
+    HANDLER_ARGS_SCHEMAS = {
         'POST':{
-            'suggestion_type':{
-                'schema':{
-                    'type':'basestring'
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring'
                 }
             },
-            'target_type':{
-                'schema':{
-                    'type':'basestring'
+            'target_type': {
+                'schema': {
+                    'type': 'basestring'
                 }
             },
-            'target_id':{
-                'schema':{
+            'target_id': {
+                'schema': {
                     'type':'basestring'
                 }
             },
             'target_version_at_submission':
             {
-                'schema':{
-                    'type':'int'
+                'schema': {
+                    'type': 'int'
                 }
             }, 
-            'change':{
-               'schema':{
-                   'type':'dict',
-                   'properties':[
+            'change': {
+               'schema': {
+                   'type': 'dict',
+                   'properties': [
                        {
-                        'name':'cmd',
-                        'schema':{
-                            'type':'basestring'
+                        'name': 'cmd',
+                        'schema': {
+                            'type': 'basestring'
                         }
                        },
                        {
-                        'name':'state_name',
-                        'schema':{
-                            'type':'basestring'
+                        'name': 'state_name',
+                        'schema': {
+                            'type': 'basestring'
                         }
                        },
                        {
-                        'name':'content_id',
-                        'schema':{
-                            'type':'basestring'
+                        'name': 'content_id',
+                        'schema': {
+                            'type': 'basestring'
                         }
                        },
                        {
-                        'name':'language_code',
-                         'schema':{
-                             'type':'basestring'
+                        'name': 'language_code',
+                         'schema': {
+                             'type': 'basestring'
                          },
-                         'default':None
+                         'default': None
                        },
                        {
-                        'name':'content_html',
-                        'schema':{
-                            'type':'html'
+                        'name': 'content_html',
+                        'schema': {
+                            'type': 'html'
                         }
                        },
                        {
-                        'name':'translation_html',
-                        'schema':{
-                            'type':'html'
+                        'name': 'translation_html',
+                        'schema': {
+                            'type': 'html'
                         }
                        } ,
                        {
-                        'name':'data_format',
-                        'schema':{
-                            'type':'basestring'
+                        'name': 'data_format',
+                        'schema': {
+                            'type': 'basestring'
                         }
                        }
                    ] 
                } 
             },
-            'description':{
-                'schema':{
-                    'type':'basestring'
+            'description': {
+                'schema': {
+                    'type': 'basestring'
                 }
             }
         }
