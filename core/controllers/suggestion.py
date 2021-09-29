@@ -42,7 +42,7 @@ class SuggestionHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
 
     HANDLER_ARGS_SCHEMAS = {
-        'POST':{
+        'POST': {
             'suggestion_type': {
                 'schema': {
                     'type': 'basestring'
@@ -55,7 +55,7 @@ class SuggestionHandler(base.BaseHandler):
             },
             'target_id': {
                 'schema': {
-                    'type':'basestring'
+                    'type': 'basestring'
                 }
             },
             'target_version_at_submission':
@@ -104,7 +104,7 @@ class SuggestionHandler(base.BaseHandler):
                         'schema': {
                             'type': 'html'
                         }
-                       } ,
+                       },
                        {
                         'name': 'data_format',
                         'schema': {
@@ -133,7 +133,8 @@ class SuggestionHandler(base.BaseHandler):
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.normalized_payload.get('suggestion_type'),
-                self.normalized_payload.get('target_type'), self.normalized_payload.get('target_id'),
+                self.normalized_payload.get('target_type'), 
+                self.normalized_payload.get('target_id'),
                 self.normalized_payload.get('target_version_at_submission'),
                 self.user_id, self.normalized_payload.get('change'),
                 self.normalized_payload.get('description'))
@@ -165,6 +166,7 @@ class SuggestionHandler(base.BaseHandler):
 
 class SuggestionToExplorationActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to explorations."""
+    
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
@@ -363,6 +365,7 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
 
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
+    
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
