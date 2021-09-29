@@ -277,7 +277,7 @@ def open_new_tab_in_browser_if_possible(url):
         python_utils.PRINT(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
-        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+        USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
         python_utils.PRINT(
             'Please open the following link in browser: %s' % url)
@@ -300,7 +300,7 @@ def open_new_tab_in_browser_if_possible(url):
     python_utils.PRINT(
         'the function open_new_tab_in_browser_if_possible() to work on your')
     python_utils.PRINT('system.')
-    python_utils.INPUT()
+    input()
 
 
 def get_remote_alias(remote_url):
@@ -501,7 +501,7 @@ def ask_user_to_confirm(message):
             '******************************************************')
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
+        answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
