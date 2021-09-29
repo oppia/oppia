@@ -276,6 +276,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
     InputResponsePairComponent,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
+    ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
