@@ -16,13 +16,27 @@
   </div>
   <div class="oppia-opportunities-progress oppia-animate-fadein" *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
-      <div [hidden]="opportunityDataIsLoading" class="progress">
+      <div [hidden]="opportunityDataIsLoading" *ngIf="!isTranslationProgressBar" class="progress">
         <div class="progress-bar bg-success" role="progressbar" [ngStyle]="progressBarStyle"></div>
+      </div>
+      <div [hidden]="opportunityDataIsLoading"  *ngIf="isTranslationProgressBar" class="progress">
+        <div class="progress-bar bg-success" role="progressbar" [ngStyle]="translatedProgressStyle" ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light-green" role="progressbar" [ngStyle]="inReviewProgressStyle" ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light" role="progressbar" [ngStyle]="untranslatedProgressStyle" ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards untranslated" container="body" placement="bottom"></div>
       </div>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-progress-label">
       <span class="protractor-test-opportunity-list-item-progress-percentage"
+            *ngIf="isTranslationProgressBar"
+            [hidden]="opportunityDataIsLoading"
+            [disableTooltip]="!isTranslationProgressBar"
+            ngbTooltip="Percentage of accepted translated cards. {{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards remaining."
+            placement="bottom">
+        ({{ progressPercentage }})
+      </span>
+      <span class="protractor-test-opportunity-list-item-progress-percentage"
+            *ngIf="!isTranslationProgressBar"
             [hidden]="opportunityDataIsLoading">
         ({{ progressPercentage }})
       </span>
@@ -44,6 +58,9 @@
   </div>
 </div>
 <style>
+  .bg-light-green {
+    background-color: rgb(172, 197, 172);
+  }
   .oppia-opportunities-button {
     background-color: #fff;
     border: 2px solid #009688;

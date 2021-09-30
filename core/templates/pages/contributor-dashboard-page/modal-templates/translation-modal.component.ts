@@ -53,6 +53,9 @@ export interface TranslationOpportunity {
   subheading: string;
   progressPercentage: string;
   actionButtonTitle: string;
+  inReviewCount: number;
+  totalCount: number;
+  translationsCount: number;
 }
 export interface HTMLSchema {
     'type': string;

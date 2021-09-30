@@ -40,6 +40,7 @@ export class OpportunitiesListComponent {
     new EventEmitter()
   );
   @Input() opportunityHeadingTruncationLength: number;
+  @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
   lastPageNumber: number = 1000;
