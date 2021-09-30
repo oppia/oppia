@@ -63,7 +63,7 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             temp_location=feconf.DATAFLOW_TEMP_LOCATION,
             staging_location=feconf.DATAFLOW_STAGING_LOCATION,
-            experiments=['use_runner_v2'],
+            experiments=['use_runner_v2', 'enable_recommendations'],
             extra_packages=['./build/oppia-beam-job-0.0.1.tar.gz'],
             **job_options)
 
