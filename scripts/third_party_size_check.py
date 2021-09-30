@@ -44,7 +44,7 @@ def _get_skip_files_list():
         IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with python_utils.open_file('.gcloudignore', 'r') as gcloudignore:
+        with open('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
 
             skip_files_list = [

@@ -2434,7 +2434,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question_state_dict = self._create_valid_question_data(
             'default_state').to_dict()
         question_state_dict['content']['html'] = html_content
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()

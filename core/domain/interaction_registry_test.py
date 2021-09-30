@@ -118,7 +118,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         spec_file = os.path.join(
             'extensions', 'interactions', 'interaction_specs.json')
-        with python_utils.open_file(spec_file, 'r') as f:
+        with open(spec_file, 'r') as f:
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(all_specs, specs_from_json)

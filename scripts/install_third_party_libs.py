@@ -293,7 +293,7 @@ def main() -> None:
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with python_utils.open_file(
+            with open(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.

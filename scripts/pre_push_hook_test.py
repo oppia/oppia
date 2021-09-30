@@ -392,9 +392,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_refs(self):
         temp_stdin_file = tempfile.NamedTemporaryFile().name
-        with python_utils.open_file(temp_stdin_file, 'w') as f:
+        with open(temp_stdin_file, 'w') as f:
             f.write('local_ref local_sha1 remote_ref remote_sha1')
-        with python_utils.open_file(temp_stdin_file, 'r') as f:
+        with open(temp_stdin_file, 'r') as f:
             with self.swap(sys, 'stdin', f):
                 self.assertEqual(
                     pre_push_hook.get_refs(),

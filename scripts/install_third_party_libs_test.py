@@ -483,13 +483,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'ConverterMapping,\nLine ending with '
             '"ConverterMapping",\nOther Line\n')
         temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
-        with python_utils.open_file(temp_py_config_file, 'w') as f:
+        with open(temp_py_config_file, 'w') as f:
             f.write(py_actual_text)
 
         pq_actual_text = (
             'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
         temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
-        with python_utils.open_file(temp_pq_config_file, 'w') as f:
+        with open(temp_pq_config_file, 'w') as f:
             f.write(pq_actual_text)
 
         with ensure_pip_install_swap, check_call_swap, self.Popen_swap:

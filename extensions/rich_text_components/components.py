@@ -37,7 +37,7 @@ class BaseRteComponent(python_utils.OBJECT):
     Image and Video.
     """
 
-    with python_utils.open_file(
+    with open(
         feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
         rich_text_component_specs = constants.parse_json_from_js(f)
 

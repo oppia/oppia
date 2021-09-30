@@ -37,7 +37,7 @@ class Registry(python_utils.OBJECT):
     def _refresh(cls):
         """Repopulate the registry."""
         cls._rte_components.clear()
-        with python_utils.open_file(
+        with open(
             feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
             cls._rte_components = constants.parse_json_from_js(f)
 

@@ -140,10 +140,10 @@ class CustomLintChecksManager(python_utils.OBJECT):
         failed = False
         error_messages = []
 
-        manifest = json.load(python_utils.open_file(
+        manifest = json.load(open(
             MANIFEST_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
 
-        package = json.load(python_utils.open_file(
+        package = json.load(open(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
 
         files_in_typings_dir = os.listdir(
@@ -262,7 +262,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
         failed = False
         error_messages = []
 
-        with python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
+        with open(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
             strict_ts_config = json.load(f)
 
         # Remove .ts extension from filepath for sorting to ensure that

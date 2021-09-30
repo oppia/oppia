@@ -48,7 +48,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.TSCONFIG_FILEPATH)
             out_dir = ''
-            with python_utils.open_file(
+            with open(
                 typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
                 config_data = json.load(f)
                 out_dir = os.path.join(

@@ -161,7 +161,7 @@ def mock_load_template(filename):
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
-    with python_utils.open_file(filepath, 'r') as f:
+    with open(filepath, 'r') as f:
         return f.read()
 
 

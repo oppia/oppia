@@ -342,7 +342,7 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             if name != '__pycache__' and
                os.path.isdir(os.path.join(rich_text_components_dir, name))
         ]
-        with python_utils.open_file(test_file, 'r') as f:
+        with open(test_file, 'r') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.
             text = re.sub(r' ', r'', text)

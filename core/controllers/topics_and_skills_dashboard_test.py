@@ -506,7 +506,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'url_fragment': 'name-one'
         }
 
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None
         ) as f:
@@ -544,7 +544,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'url_fragment': 'name-three'
         }
 
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb', encoding=None
         ) as f:
@@ -565,7 +565,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def setUp(self):
         super(NewSkillHandlerTests, self).setUp()
         self.url = feconf.NEW_SKILL_URL
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -709,7 +709,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'thumbnail_filename': 'image.svg'
         }
 
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:

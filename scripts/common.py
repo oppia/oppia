@@ -604,7 +604,7 @@ def create_readme(dir_path, readme_content):
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with open(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
 
@@ -626,11 +626,11 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
     new_contents = []
     try:
         regex = re.compile(regex_pattern)
-        with python_utils.open_file(backup_filename, 'r') as f:
+        with open(backup_filename, 'r') as f:
             for line in f:
                 new_contents.append(regex.sub(replacement_string, line))
 
-        with python_utils.open_file(filename, 'w') as f:
+        with open(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
         os.remove(backup_filename)
@@ -661,9 +661,9 @@ def inplace_replace_file_context(filename, regex_pattern, replacement_string):
     shutil.copyfile(filename, backup_filename)
 
     try:
-        with python_utils.open_file(backup_filename, 'r') as f:
+        with open(backup_filename, 'r') as f:
             new_contents = [regex.sub(replacement_string, line) for line in f]
-        with python_utils.open_file(filename, 'w') as f:
+        with open(filename, 'w') as f:
             f.write(''.join(new_contents))
         yield
     finally:

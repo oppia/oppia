@@ -125,7 +125,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'extensions', relative_icon_data_url)
             self.assertEqual(generated_image_filepath, defined_image_filepath)
 
-            with python_utils.open_file(
+            with open(
                 generated_image_filepath, 'rb', encoding=None) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
@@ -213,7 +213,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')
-        with python_utils.open_file(rtc_ts_file, 'r') as f:
+        with open(rtc_ts_file, 'r') as f:
             rtc_require_file_contents = f.read()
 
         for rtc_ts_filename in rtc_ts_filenames:
