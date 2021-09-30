@@ -536,7 +536,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" ng-if="$ctrl.EditabilityService.isEditable()">
+  <md-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" ng-if="$ctrl.canDelete || $ctrl.canReleaseOwnership">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('controls')">
       <h3>Controls</h3>
       <i class="fa fa-caret-down"
