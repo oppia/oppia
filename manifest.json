@@ -208,11 +208,11 @@
         "files": ["angular-simple-logger.min.js"]
       },
       "guppy": {
-        "version": "7509f31c3f6e1205763d605ab41098cf6ac9d738",
+        "version": "6f2ecdeb12b92071c993243599e551485c451a6e",
         "downloadFormat": "zip",
-        "url": "https://github.com/oppia/guppy/archive/7509f31c3f6e1205763d605ab41098cf6ac9d738.zip",
+        "url": "https://github.com/oppia/guppy/archive/6f2ecdeb12b92071c993243599e551485c451a6e.zip",
         "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-7509f3"
+        "targetDir": "guppy-6f2ecd"
       },
       "jquery": {
         "version": "3.5.1",
