@@ -149,7 +149,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 0',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
 
         self.expected_opportunity_dict_2 = {
@@ -158,7 +159,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 1',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
