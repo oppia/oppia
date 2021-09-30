@@ -28,6 +28,7 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
+from core.domain import question_domain
 import python_utils
 
 from typing import Dict, Optional, Union
@@ -145,3 +146,14 @@ def validate_task_entries(task_entries):
     status = task_entries.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
+
+
+def validate_question_change(obj):
+    """Validates question change.
+
+    Args:
+        obj: dict. Data that needs to be validated.
+    """
+    # No explicit call to validate_dict method is necessary, because
+    # QuestionChange calls validate method while initialization.
+    question_domain.QuestionChange(obj) # type: ignore[no-untyped-call]

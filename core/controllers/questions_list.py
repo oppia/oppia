@@ -43,12 +43,28 @@ class QuestionsListHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'offset': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
         try:
-            offset = int(self.request.get('offset'))
+            offset = int(self.normalized_request.get('offset'))
         except Exception:
             raise self.InvalidInputException('Invalid offset')
 
@@ -118,6 +134,16 @@ class QuestionCountDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):

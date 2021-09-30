@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import logging
 
 from constants import constants
-from core.controllers import acl_decorators
+from core.controllers import acl_decorators, domain_objects_validator
 from core.controllers import base
 from core.domain import fs_services
 from core.domain import html_cleaner
@@ -183,6 +183,43 @@ class EditableQuestionDataHandler(base.BaseHandler):
     """A data handler for questions which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'question_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'change_list': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'validation_method': (
+                            domain_objects_validator.validate_question_change)
+                    }
+                },
+            }
+        },
+        'DELETE': {}
+    }
 
     @acl_decorators.can_view_question_editor
     def get(self, question_id):
@@ -203,22 +240,11 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_question
     def put(self, question_id):
         """Updates properties of the given question."""
-        commit_message = self.payload.get('commit_message')
+        commit_message = self.normalized_payload.get('commit_message')
 
-        if not commit_message:
-            raise self.PageNotFoundException
-
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        if not self.payload.get('change_list'):
-            raise self.PageNotFoundException
         change_list = [
             question_domain.QuestionChange(change)
-            for change in self.payload.get('change_list')
+            for change in self.normalized_payload.get('change_list')
         ]
 
         for change in change_list:
