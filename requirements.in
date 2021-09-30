@@ -4,43 +4,38 @@
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
 apache-beam[gcp]==2.33.0rc1
-backports.functools-lru-cache==1.6.1
-beautifulsoup4==4.9.3
-bleach==3.3.0
-callbacks==0.3.0
-contextlib2==0.6.0.post1
+beautifulsoup4==4.10.0
+bleach==4.1.0
 defusedxml==0.7.1
-firebase-admin==5.0.0
+elasticsearch==7.14.1
+firebase-admin==5.0.1
 future==0.18.2
+googledatastore==7.0.2
+google-cloud-storage==1.42.1
+google-auth==1.35.0
+google-cloud-dataflow-client==0.1.3
+google-cloud-ndb==1.10.3
+google-cloud-tasks==2.5.1
+google-cloud-translate==3.4.0
 gunicorn==20.1.0
-google-cloud-storage==1.37.1
-GoogleAppEnginePipeline==1.9.22.1
-Graphy==1.0.0
-html5lib==1.0.1
-mailchimp3==3.0.14
-mutagen==1.43.0
-packaging==20.4
-pylatexenc==2.6
-simplejson==3.17.0
-six==1.15.0
-soupsieve==1.9.5
-webencodings==0.5.1
-pillow==8.2.0
+html5lib==1.1
+mailchimp3==3.0.15
+mutagen==1.45.1
+pillow==8.3.2
+pylatexenc==2.10
+pytest==6.2.5
 redis==3.5.3
 requests==2.26.0
-requests-mock==1.5.2
+requests-mock==1.9.3
 requests-toolbelt==0.9.1
-rsa==4.7
-googledatastore==7.0.2
-google-auth==1.34.0
-google-cloud-ndb==1.8.0
-google-cloud-tasks==1.5.0
-google-cloud-translate==2.0.1
-pytest==6.2.3
+rsa==4.7.2
+simplejson==3.17.5
+six==1.16.0
+soupsieve==2.2.1
 typing_extensions==3.10.0.2
-webapp2==3.0.0b1
-elasticsearch==7.14.0
 urllib3==1.26.6
+webapp2==3.0.0b1
+webencodings==0.5.1
 # TODO(#13506): Remove these after we refactor the Python library
 # handling process.
 # These libraries are already in oppia_tools folder, but are also needed here
@@ -49,4 +44,3 @@ urllib3==1.26.6
 # them earlier than we are able to install the libraries from this file.
 PyYAML==5.4.1
 certifi==2021.5.30
-google-cloud-dataflow-client==0.1.3

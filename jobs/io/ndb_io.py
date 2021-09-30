@@ -23,17 +23,24 @@ from core.platform import models
 import feconf
 
 import apache_beam as beam
+from apache_beam import pvalue
 from apache_beam.io.gcp.datastore.v1new import datastoreio
+
+from typing import Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 
 
-@beam.typehints.with_input_types(beam.pvalue.PBegin)
-@beam.typehints.with_output_types(datastore_services.Model)
-class GetModels(beam.PTransform):
+class GetModels(beam.PTransform): # type: ignore[misc]
     """Reads NDB models from the datastore using a query."""
 
-    def __init__(self, query, label=None):
+    def __init__(
+        self, query: datastore_services.Query, label: Optional[str] = None
+    ) -> None:
         """Initializes the GetModels PTransform.
 
         Args:
@@ -43,13 +50,15 @@ class GetModels(beam.PTransform):
         super(GetModels, self).__init__(label=label)
         self.query = query
 
-    def expand(self, initial_pipeline):
+    def expand(
+        self, pbegin: pvalue.PBegin
+    ) -> beam.PCollection[datastore_services.Model]:
         """Returns a PCollection with models matching the corresponding query.
 
         This overrides the expand() method from the parent class.
 
         Args:
-            initial_pipeline: PValue. The initial pipeline. This pipeline
+            pbegin: PValue. The initial pipeline. This pipeline
                 is used to anchor the models to itself.
 
         Returns:
@@ -58,9 +67,9 @@ class GetModels(beam.PTransform):
         from jobs import job_utils
 
         query = job_utils.get_beam_query_from_ndb_query(
-            self.query, namespace=initial_pipeline.pipeline.options.namespace)
+            self.query, namespace=pbegin.pipeline.options.namespace)
         return (
-            initial_pipeline.pipeline
+            pbegin.pipeline
             | 'Reading %r from the datastore' % self.query >> (
                 datastoreio.ReadFromDatastore(query))
             | 'Transforming %r into NDB models' % self.query >> (
@@ -68,12 +77,12 @@ class GetModels(beam.PTransform):
         )
 
 
-@beam.typehints.with_input_types(datastore_services.Model)
-@beam.typehints.with_output_types(beam.pvalue.PDone)
-class PutModels(beam.PTransform):
+class PutModels(beam.PTransform): # type: ignore[misc]
     """Writes NDB models to the datastore."""
 
-    def expand(self, entities):
+    def expand(
+        self, entities: beam.PCollection[datastore_services.Model]
+    ) -> pvalue.PDone:
         """Writes the given models to the datastore.
 
         This overrides the expand() method from the parent class.
@@ -97,12 +106,12 @@ class PutModels(beam.PTransform):
         )
 
 
-@beam.typehints.with_input_types(datastore_services.Key)
-@beam.typehints.with_output_types(beam.pvalue.PDone)
-class DeleteModels(beam.PTransform):
+class DeleteModels(beam.PTransform): # type: ignore[misc]
     """Deletes NDB models from the datastore."""
 
-    def expand(self, entities):
+    def expand(
+        self, entities: beam.PCollection[datastore_services.Key]
+    ) -> pvalue.PDone:
         """Deletes the given models from the datastore.
 
         This overrides the expand() method from the parent class.

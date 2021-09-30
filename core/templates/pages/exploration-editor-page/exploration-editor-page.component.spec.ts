@@ -297,7 +297,7 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
@@ -515,7 +515,7 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
@@ -577,7 +577,7 @@ describe('Exploration editor page component', function() {
         mockExplorationPropertyChangedEventEmitter);
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
@@ -641,7 +641,7 @@ describe('Exploration editor page component', function() {
       ets.init('Exploration Title');
       mockExplorationPropertyChangedEventEmitter.emit();
 
-      expect(pts.setPageTitle).toHaveBeenCalledWith(
+      expect(pts.setDocumentTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
     });
 
@@ -649,7 +649,7 @@ describe('Exploration editor page component', function() {
       ets.init('');
       mockExplorationPropertyChangedEventEmitter.emit();
 
-      expect(pts.setPageTitle).toHaveBeenCalledWith(
+      expect(pts.setDocumentTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
     });
 
@@ -747,7 +747,7 @@ describe('Exploration editor page component', function() {
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync')
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
