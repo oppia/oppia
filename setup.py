@@ -12,14 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Setup.py module for Apache Beam workflows' worker utilities.
+"""This file is used to build a Python package that can then by used by
+Google Cloud Dataflow workers (Apache Beam).
 
-All the workflow related code is gathered in a package that will be built as a
-source distribution, staged in the staging area for the workflow being run and
-then installed in the workers when they start running.
-
-This behavior is triggered by specifying the --setup_file command line option
-when running the workflow for remote execution.
+The package is build by running 'python setup.py sdist' in the build.py.
 """
 
 from __future__ import absolute_import
