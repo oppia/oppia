@@ -638,12 +638,6 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
-        content_html = exploration.get_content_html(
-            self.change.state_name, self.change.content_id)
-        if content_html != self.change.content_html:
-            raise utils.ValidationError(
-                'The Exploration content has changed since this translation '
-                'was submitted.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.

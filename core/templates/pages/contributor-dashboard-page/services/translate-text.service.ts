@@ -202,21 +202,21 @@ export class TranslateTextService {
   }
 
   getTextToTranslate(): TranslatableItem {
+    const text = this._getNextText();
     const {
       status = this.PENDING,
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
-    const text = this._getNextText();
     return this._getUpdatedTextToTranslate(
       text, this._isMoreTextAvailableForTranslation(), status, translation);
   }
 
   getPreviousTextToTranslate(): TranslatableItem {
+    const text = this._getPreviousText();
     const {
       status = this.PENDING,
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
-    const text = this._getPreviousText();
     return this._getUpdatedTextToTranslate(
       text, this._isPreviousTextAvailableForTranslation(), status, translation);
   }
