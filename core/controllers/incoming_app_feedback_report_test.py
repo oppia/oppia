@@ -25,11 +25,11 @@ from core import android_validation_constants
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Any, Dict, Sequence
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
-
-from typing import Any, Dict, Sequence
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
