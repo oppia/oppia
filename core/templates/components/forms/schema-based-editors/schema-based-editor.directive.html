@@ -18,7 +18,7 @@
 
 <schema-based-float-editor ng-if="$ctrl.schema().type === 'float' && !$ctrl.schema().choices"
                            local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
-                           validators="$ctrl.schema().validators"
+                           validators="$ctrl.schema().validators" ui-config="$ctrl.schema().ui_config"
                            label-for-focus-target="$ctrl.labelForFocusTarget()"
                            on-input-blur="$ctrl.onInputBlur"
                            on-input-focus="$ctrl.onInputFocus">

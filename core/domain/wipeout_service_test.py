@@ -186,6 +186,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.add_user_role(
             self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -434,6 +436,26 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'exp_id',
             self.user_2_id,
             feconf.ROLE_EDITOR)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertFalse(exp_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertTrue(exp_summary_model.community_owned)
+
+    def test_pre_delete_user_exploration_ownership_is_released_with_voice_art(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            self.user_1_actions,
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST)
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertFalse(exp_summary_model.community_owned)
@@ -708,7 +730,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
@@ -729,6 +751,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -750,6 +773,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -771,6 +795,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -906,7 +931,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
@@ -928,6 +953,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -949,6 +975,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -983,6 +1010,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
