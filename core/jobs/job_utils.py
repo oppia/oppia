@@ -88,9 +88,12 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
         KindError. Internally raised by _lookup_model when the kind is invalid.
     """
     # All storage model classes are imported
-    # using 'get_all_storage_model_classes', this is needed because
+    # using 'get_all_storage_model_classes'. This is needed because
     # sometimes '_lookup_model' fails to find the model class even when it is
-    # imported in the file when the Beam job resides.
+    # imported in the file when the Beam job resides. This issue only occurs
+    # on Dataflow and not locally, because on Dataflow the jobs are split onto
+    # separate workers and some parts of the jobs are probably not available
+    # to all the workers.
     models.Registry.get_all_storage_model_classes()
     return datastore_services.Model._lookup_model(kind)  # pylint: disable=protected-access
 

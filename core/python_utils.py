@@ -220,14 +220,19 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
 
 
 def get_package_file_contents(package: str, filepath: str) -> str:
-    """Open file and return a corresponding file object.
+    """Open file and return its contents. This needs to be used for files that
+    are loaded by the Python code directly, like constants.ts or
+    rich_text_components.json. This function is needed to make loading these
+    files work even when Oppia is packaged.
 
     Args:
-        package: str. The file to be opened.
-        filepath: str. The file to be opened.
+        package: str. The package where the file is located.
+            For Oppia the package is usually the folder in the root folder,
+            like 'core' or 'extensions'.
+        filepath: str. The path to the file in the package.
 
     Returns:
-        _io.TextIOWrapper. The file object.
+        str. The contents of the file.
     """
     try:
         file = io.open(os.path.join(package, filepath), 'r', encoding='utf-8')

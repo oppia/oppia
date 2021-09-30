@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import ast
 import builtins
 import io
+import os
 import sys
 import tempfile
 import unittest
@@ -46,7 +47,9 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(args_list, ['arg1', 'arg2'])
 
     def test_open_file(self):
-        with python_utils.open_file('core/python_utils.py', 'r') as f:
+        with python_utils.open_file(
+                os.path.join('core', 'python_utils.py'), 'r'
+        ) as f:
             file_content = f.readlines()
             self.assertIsNotNone(file_content)
 

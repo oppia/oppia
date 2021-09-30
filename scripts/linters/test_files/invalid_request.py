@@ -21,9 +21,9 @@ python_linter_test. This file is using request() which is not allowed.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
-
 import urllib2
+
+from core import python_utils
 
 
 class FakeClass(python_utils.OBJECT):

@@ -15,7 +15,7 @@
 """This file is used to build a Python package that can then by used by
 Google Cloud Dataflow workers (Apache Beam).
 
-The package is build by running 'python setup.py sdist' in the build.py.
+The package is built by running 'python setup.py sdist' in the build.py.
 """
 
 from __future__ import absolute_import

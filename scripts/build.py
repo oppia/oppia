@@ -1318,12 +1318,10 @@ def generate_build_directory(hashes):
 
 
 def generate_python_package():
-    """Generates hashes for files. Minifies files and interpolates paths
-    in HTMLs to include hashes. Renames the files to include hashes and copies
-    them into build directory.
-    """
+    """Generates Python package using setup.py."""
     python_utils.PRINT('Building Oppia package...')
-    subprocess.check_call('python setup.py sdist -d build', shell=True)
+    subprocess.check_call(
+        ['python', 'setup.py', 'sdist', '-d', 'build'], shell=True)
     python_utils.PRINT('Oppia package build completed.')
 
 
