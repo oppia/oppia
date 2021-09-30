@@ -1427,12 +1427,6 @@ angular.module('oppia').directive('conversationSkin', [
                 .onStateCardContentUpdate.subscribe(
                   () => $rootScope.$applyAsync())
             );
-            ctrl.directiveSubscriptions.add(
-              PlayerPositionService.displayedCardIndexChangedEventEmitter
-                .subscribe(
-                  () => $rootScope.$applyAsync()
-                )
-            );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
                 return;
