@@ -44,10 +44,11 @@ from typing import List, Type
 # We need this to happen for every job in this registry file, because the
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
-from jobs.batch_jobs import blog_validation_jobs  # pylint: disable=unused-import  # isort: skip
-from jobs.batch_jobs import cron_jobs             # pylint: disable=unused-import  # isort: skip
-from jobs.batch_jobs import test_jobs             # pylint: disable=unused-import  # isort: skip
-from jobs.batch_jobs import validation_jobs       # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import blog_validation_jobs        # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import cron_jobs                   # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import opportunity_management_jobs # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import test_jobs                   # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import validation_jobs             # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
