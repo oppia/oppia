@@ -34,6 +34,7 @@ from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
+import urllib
 import feconf
 import python_utils
 
@@ -332,7 +333,7 @@ class Normalizers(python_utils.OBJECT):
             return obj
         url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
         quoted_url_components = (
-            python_utils.url_quote(component) for component in url_components) # type: ignore[no-untyped-call]
+            urrlib.quote(component) for component in url_components) # type: ignore[no-untyped-call]
         raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
 
         acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]

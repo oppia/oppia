@@ -25,6 +25,7 @@ import io
 import sys
 import tempfile
 import unittest
+import urllib
 
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
@@ -58,7 +59,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_quote(self):
         self.assertEqual(
-            python_utils.url_quote('/~connolly/'), '/~connolly/')
+            urrlib.quote('/~connolly/'), '/~connolly/')
 
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}
