@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import logging
 
-from core import utils
 from core.constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
