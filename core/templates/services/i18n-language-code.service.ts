@@ -75,7 +75,7 @@ export class I18nLanguageCodeService {
       I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
       this.setUrlLanguageParam(code);
     } else {
-      let currentLanguageText: string;
+      let currentLanguageText: string = '';
       let code = this.getCurrentI18nLanguageCode();
       AppConstants.SUPPORTED_SITE_LANGUAGES.forEach(element => {
         if (element.id === code) {

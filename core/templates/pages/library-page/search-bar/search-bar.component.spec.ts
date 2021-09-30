@@ -274,15 +274,15 @@ describe('Search bar component', () => {
     spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
       'search_query');
     spyOn(windowRef.nativeWindow.history, 'pushState');
-    windowRef.nativeWindow.location = new URL('http://localhost/search/find');
+    windowRef.nativeWindow.location = new URL('http://localhost/search/find?lang=en');
 
     component.onSearchQueryChangeExec();
 
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
-    windowRef.nativeWindow.location = new URL('http://localhost/not/search/find');
+    windowRef.nativeWindow.location = new URL('http://localhost/not/search/find?lang=en');
     component.onSearchQueryChangeExec();
     expect(windowRef.nativeWindow.location.href).toEqual(
-      'http://localhost/search/find?q=search_query');
+      'http://localhost/search/find?q=search_query&lang=en');
   });
 
   it('should update search fields based on url query', () => {
