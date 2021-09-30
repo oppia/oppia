@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core.domain import beam_job_services
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
@@ -31,6 +32,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+from jobs.batch_jobs import cron_jobs
 import main
 
 import webtest
@@ -667,3 +669,48 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self._assert_reviewable_suggestion_email_infos_are_equal(
             self.reviewable_suggestion_email_infos[2],
             self.expected_reviewable_suggestion_email_infos[2])
+
+    def test_cron_exploration_recommendations_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': cron_jobs.ComputeExplorationRecommendations
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/explorations/recommendations')
+
+    def test_cron_activity_search_rank_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': cron_jobs.IndexExplorationsInSearch
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/explorations/search_rank')
+
+    def test_cron_dashboard_stats_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': cron_jobs.CollectWeeklyDashboardStats
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/users/dashboard_stats')
+
+    def test_cron_translation_contribution_stats_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': cron_jobs.GenerateTranslationContributionStats
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response(
+                '/cron/suggestions/translation_contribution_stats')
