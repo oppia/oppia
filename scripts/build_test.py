@@ -916,7 +916,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
-        def mock_generate_python_package(unused_first_dir, unused_second_dir):
+        def mock_generate_python_package():
             check_function_calls['generate_python_package_called'] = True
 
         ensure_files_exist_swap = self.swap(
