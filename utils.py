@@ -91,7 +91,7 @@ class ExplorationConversionError(Exception):
 
 def get_file_contents(
         filepath: str, raw_bytes: bool = False, mode: str = 'r'
-) -> str:
+) -> bytes:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -117,7 +117,7 @@ def get_file_contents(
 
 def get_exploration_components_from_dir(
         dir_path: str
-) -> Tuple[str, List[Tuple[str, str]]]:
+) -> Tuple[bytes, List[Tuple[str, bytes]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -311,7 +311,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
         raise Exception('The given string does not represent a PNG data URL.')
 
 
-def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
+def convert_png_binary_to_data_url(content: bytes) -> str:
     """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
@@ -323,10 +323,6 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    # We accept unicode but imghdr.what(file, h) accepts 'h' of type bytes.
-    # So we have casted content to be bytes.
-    if isinstance(content, str):
-        content = content.encode('utf-8')
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
