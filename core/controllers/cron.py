@@ -210,8 +210,7 @@ class CronDashboardStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.CollectWeeklyDashboardStats,
-            run_synchronously=False)
+            job_class=cron_jobs.CollectWeeklyDashboardStats)
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
@@ -225,8 +224,7 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.ComputeExplorationRecommendations,
-            run_synchronously=False)
+            job_class=cron_jobs.ComputeExplorationRecommendations)
 
 
 class CronActivitySearchRankHandler(base.BaseHandler):
@@ -240,8 +238,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.IndexExplorationsInSearch,
-            run_synchronously=False)
+            job_class=cron_jobs.IndexExplorationsInSearch)
 
 
 class CronTranslationContributionStatsHandler(base.BaseHandler):
@@ -255,5 +252,4 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.GenerateTranslationContributionStats,
-            run_synchronously=False)
+            job_class=cron_jobs.GenerateTranslationContributionStats)
