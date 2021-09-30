@@ -222,10 +222,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            entity_type: The type of the Entity, to which the draft change list
-                belongs to.
-            entity_id: The ID of the Entity, to which the draft change list
-                belongs to.
+            entity_type: str. The type of the Entity, to which the draft change
+                list belongs to.
+            entity_id: str. The ID of the Entity, to which the draft change
+                list belongs to.
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
@@ -274,7 +274,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                       new_value is not None):
                     new_value = (
-                        state_domain.Outcome.update_image_sizes_in_bytes_in_outcome(
+                        state_domain.Outcome.
+                            update_image_sizes_in_bytes_in_outcome(
                             new_value,
                             entity_type,
                             entity_id))
@@ -296,9 +297,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             entity_id))
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    html_field_types_to_rule_specs = (
-                        rules_registry.Registry.get_html_field_types_to_rule_specs(
-                            state_schema_version=41))
                     new_value = [
                         state_domain.AnswerGroup.
                             update_image_sizes_in_bytes_in_answer_group(

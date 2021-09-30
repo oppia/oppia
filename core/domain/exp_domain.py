@@ -1958,15 +1958,18 @@ class Exploration(python_utils.OBJECT):
                 html_validation_service.fix_incorrectly_encoded_chars)
         return states_dict
 
+    @classmethod
     def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
         """Converts from version 48 to 49. Version 49 adds
         requireNonnegativeInput customization arg to NumericInput
         interaction which allows creators to set input should be greater
         than or equal to zero.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -2207,9 +2210,11 @@ class Exploration(python_utils.OBJECT):
         """Converts a v53 exploration dict into a v54 exploration dict.
         Adds a new customization arg to NumericInput interaction
         which allows creators to set input greator than or equal to zero.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v53.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v54.
@@ -2326,6 +2331,7 @@ class Exploration(python_utils.OBJECT):
         if exploration_schema_version == 54:
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
                 exp_id, exploration_dict)
+            exploration_schema_version = 55
 
         return exploration_dict
 
