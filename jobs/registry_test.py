@@ -23,14 +23,18 @@ from core.tests import test_utils
 from jobs import base_jobs
 from jobs import registry
 
+from typing import Type
+
 
 class RegistryTests(test_utils.TestBase):
 
-    def test_get_all_jobs_returns_value_from_job_metaclass(self):
+    def test_get_all_jobs_returns_value_from_job_metaclass(self) -> None:
         unique_obj = object()
 
-        @classmethod
-        def get_all_jobs_mock(unused_cls):
+        @classmethod # type: ignore[misc]
+        def get_all_jobs_mock(
+            unused_cls: Type[base_jobs.JobMetaclass]
+        ) -> object:
             """Returns the unique_obj."""
             return unique_obj
 
@@ -40,14 +44,16 @@ class RegistryTests(test_utils.TestBase):
         with get_all_jobs_swap:
             self.assertIs(registry.get_all_jobs(), unique_obj)
 
-    def test_get_all_jobs_never_returns_an_empty_list(self):
+    def test_get_all_jobs_never_returns_an_empty_list(self) -> None:
         self.assertNotEqual(registry.get_all_jobs(), [])
 
-    def test_get_all_job_names_returns_value_from_job_metaclass(self):
+    def test_get_all_job_names_returns_value_from_job_metaclass(self) -> None:
         unique_obj = object()
 
-        @classmethod
-        def get_all_job_names_mock(unused_cls):
+        @classmethod # type: ignore[misc]
+        def get_all_job_names_mock(
+            unused_cls: Type[base_jobs.JobMetaclass]
+        ) -> object:
             """Returns the unique_obj."""
             return unique_obj
 
@@ -58,14 +64,19 @@ class RegistryTests(test_utils.TestBase):
         with get_all_job_names_swap:
             self.assertIs(registry.get_all_job_names(), unique_obj)
 
-    def test_get_all_job_names_never_returns_an_empty_list(self):
+    def test_get_all_job_names_never_returns_an_empty_list(self) -> None:
         self.assertNotEqual(registry.get_all_job_names(), [])
 
-    def test_get_job_class_by_name_returns_value_from_job_metaclass(self):
+    def test_get_job_class_by_name_returns_value_from_job_metaclass(
+        self
+    ) -> None:
         unique_obj = object()
 
-        @classmethod
-        def get_job_class_by_name_mock(unused_cls, unused_name):
+        @classmethod # type: ignore[misc]
+        def get_job_class_by_name_mock(
+            unused_cls: Type[base_jobs.JobMetaclass],
+            unused_name: str
+        ) -> object:
             """Returns the unique_obj."""
             return unique_obj
 
