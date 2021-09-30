@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        shard: [1, 2, 3, 4, 5]
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -102,17 +102,11 @@ jobs:
         with:
           name: backend_test_coverage_shard_4
           path: coverage/coverage_4
-      - name: Download coverage report for shard 5
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_5
-          path: coverage/coverage_5
       - name: Move coverage reports from artifact folders to coverage folder
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
         run: |
-          for i in {1..5}; do cp coverage/coverage_$i/.coverage coverage/.coverage.$i; done
+          for i in {1..4}; do cp coverage/coverage_$i/.coverage coverage/.coverage.$i; done
       - name: Combine coverage reports
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
