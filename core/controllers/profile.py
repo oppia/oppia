@@ -484,7 +484,7 @@ class UsernameCheckHandler(base.BaseHandler):
 
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
-   
+    
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
