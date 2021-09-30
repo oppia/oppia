@@ -23,6 +23,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 import feconf
 
+
 class SubscribeHandler(base.BaseHandler):
     """Handles operations relating to new subscriptions."""
 
@@ -44,6 +45,7 @@ class SubscribeHandler(base.BaseHandler):
         self.normalized_payload.get('creator_username'))
         subscription_services.subscribe_to_creator(self.user_id, creator_id)
         self.render_json(self.values)
+
 
 class UnsubscribeHandler(base.BaseHandler):
     """Handles operations related to unsubscriptions."""

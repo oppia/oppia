@@ -67,7 +67,7 @@ class SuggestionHandler(base.BaseHandler):
                'schema': {
                    'type': 'dict',
                    'properties': 
-                    [
+                [
                        {
                         'name': 'cmd',
                         'schema': {
@@ -111,7 +111,7 @@ class SuggestionHandler(base.BaseHandler):
                             'type': 'basestring'
                         }
                        }
-                    ] 
+                ] 
                }
             },
             'description': {
@@ -133,7 +133,7 @@ class SuggestionHandler(base.BaseHandler):
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.normalized_payload.get('suggestion_type'),
-                self.normalized_payload.get('target_type'), 
+                self.normalized_payload.get('target_type'),
                 self.normalized_payload.get('target_id'),
                 self.normalized_payload.get('target_version_at_submission'),
                 self.user_id, self.normalized_payload.get('change'),
@@ -367,7 +367,7 @@ class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
