@@ -937,6 +937,16 @@ URLS.extend((
     get_redirect_route(
         r'/cron/app_feedback_report/scrub_expiring_reports',
         cron.CronAppFeedbackReportsScrubberHandlerPage),
+    get_redirect_route(
+        r'/cron/explorations/recommendations',
+        cron.CronExplorationRecommendationsHandler),
+    get_redirect_route(
+        r'/cron/explorations/search_rank', cron.CronActivitySearchRankHandler),
+    get_redirect_route(
+        r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
+    get_redirect_route(
+        r'/cron/suggestions/translation_contribution_stats',
+        cron.CronTranslationContributionStatsHandler),
 ))
 
 # Add tasks urls.

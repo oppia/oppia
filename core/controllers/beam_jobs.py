@@ -84,7 +84,7 @@ class BeamJobRunHandler(base.BaseHandler):
         job_name: str = (
             self.normalized_payload.get('job_name')
             if self.normalized_payload else '')
-        beam_job_run = beam_job_services.run_beam_job(job_name)
+        beam_job_run = beam_job_services.run_beam_job(job_name=job_name)
         self.render_json(beam_job_run.to_dict())
 
     @acl_decorators.can_run_any_job
