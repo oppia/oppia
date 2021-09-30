@@ -44,10 +44,6 @@
 /scripts/ @DubeySandeep
 
 
-# Android team
-/android_validation_constants*.py @seanlip @BenHenning
-
-
 # Angular Migration team
 /core/controllers/oppia_root*.py @srijanreddy98 @darksun27
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
@@ -708,6 +704,11 @@
 /core/domain/taskqueue*.py @vojtechjelinek
 /core/templates/services/auth.service*.ts @vojtechjelinek
 /core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
+
+
+# Android team
+/android_validation_constants*.py @seanlip @BenHenning
+/extensions/interactions/rule_templates.json @seanlip @BenHenning
 
 
 # Critical files.
