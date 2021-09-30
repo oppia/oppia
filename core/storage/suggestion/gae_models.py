@@ -341,7 +341,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 of the translation suggestions.
 
         Returns:
-            list(str). A list of ids of translation suggestions in review
+            list(str). A list of IDs of translation suggestions in review
             with given target_exp_ids.
         """
         suggestion_keys = GeneralSuggestionModel.query(
