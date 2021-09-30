@@ -85,14 +85,6 @@ _PARSER.add_argument(
          'https://www.protractortest.org/#/debugging#disabled-control-flow',
     action='store_true')
 _PARSER.add_argument(
-    '--deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env. '
-         'This flag is required for tests to run on CircleCI, since CircleCI '
-         'sometimes flakes when parallelism is used. It is not required in the '
-         'local dev environment. See https://discuss.circleci.com/t/'
-         'build-fails-with-error-spawn-enomem/30537/10',
-    action='store_true')
-_PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
          'set to error.',
@@ -213,14 +205,12 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def build_js_files(dev_mode, deparallelize_terser=False, source_maps=False):
+def build_js_files(dev_mode, source_maps=False):
     """Build the javascript files.
 
     Args:
         dev_mode: bool. Represents whether to run the related commands in dev
             mode.
-        deparallelize_terser: bool. Represents whether to use webpack
-            compilation config that disables parallelism on terser plugin.
         source_maps: bool. Represents whether to use source maps while
             building webpack.
     """
@@ -228,8 +218,6 @@ def build_js_files(dev_mode, deparallelize_terser=False, source_maps=False):
         python_utils.PRINT('Generating files for production mode...')
 
         build_args = ['--prod_env']
-        if deparallelize_terser:
-            build_args.append('--deparallelize_terser')
         if source_maps:
             build_args.append('--source_maps')
         build.main(args=build_args)
@@ -252,9 +240,7 @@ def run_tests(args):
         if args.skip_build:
             build.modify_constants(prod_env=args.prod_env)
         else:
-            build_js_files(
-                dev_mode, deparallelize_terser=args.deparallelize_terser,
-                source_maps=args.source_maps)
+            build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())

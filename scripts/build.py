@@ -85,7 +85,6 @@ WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
-WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
@@ -155,12 +154,6 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--minify_third_party_libs_only', action='store_true', default=False,
     dest='minify_third_party_libs_only')
-_PARSER.add_argument(
-    '--deparallelize_terser',
-    action='store_true',
-    default=False,
-    dest='deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env.')
 _PARSER.add_argument(
     '--maintenance_mode',
     action='store_true',
@@ -1354,13 +1347,7 @@ def main(args=None):
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        if options.deparallelize_terser:
-            if options.source_maps:
-                raise Exception(
-                    'source_maps flag shouldn\'t be used with '
-                    'deparallelize_terser flag.')
-            build_using_webpack(WEBPACK_TERSER_CONFIG)
-        elif options.source_maps:
+        if options.source_maps:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)

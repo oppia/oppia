@@ -196,17 +196,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         run_e2e_tests.build_js_files(False)
 
-    def test_build_js_files_in_prod_mode_with_deparallelize_terser(self):
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[
-                {'args': ['--prod_env', '--deparallelize_terser']},
-            ]))
-
-        run_e2e_tests.build_js_files(False, deparallelize_terser=True)
-
     def test_build_js_files_in_prod_mode_with_source_maps(self):
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'run_cmd', lambda *_: None, called=False))
