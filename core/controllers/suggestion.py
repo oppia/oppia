@@ -66,7 +66,8 @@ class SuggestionHandler(base.BaseHandler):
             'change': {
                'schema': {
                    'type': 'dict',
-                   'properties': [
+                   'properties': 
+                    [
                        {
                         'name': 'cmd',
                         'schema': {
@@ -110,7 +111,7 @@ class SuggestionHandler(base.BaseHandler):
                             'type': 'basestring'
                         }
                        }
-                   ] 
+                    ] 
                }
             },
             'description': {
@@ -165,7 +166,7 @@ class SuggestionHandler(base.BaseHandler):
 
 class SuggestionToExplorationActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to explorations."""
-    
+
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
@@ -364,8 +365,9 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
 
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
-    
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""

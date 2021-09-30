@@ -25,7 +25,7 @@ import feconf
 
 class SubscribeHandler(base.BaseHandler):
     """Handles operations relating to new subscriptions."""
-    
+
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -47,7 +47,7 @@ class SubscribeHandler(base.BaseHandler):
 
 class UnsubscribeHandler(base.BaseHandler):
     """Handles operations related to unsubscriptions."""
-    
+
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -59,7 +59,7 @@ class UnsubscribeHandler(base.BaseHandler):
             }
         }
     }
-    
+
     @acl_decorators.can_subscribe_to_users
     def post(self):
         creator_id = user_services.get_user_id_from_username(
