@@ -54,7 +54,7 @@
       </div>
       <div ng-if="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
-                            [is-learn-again-button]="isLearnAgainButton()"
+                            [is-learn-again-button]="isLearnAgainButton"
                             [submit-button-is-disabled]="isSubmitButtonDisabled()"
                             [displayed-card]="displayedCard"
                             [submit-button-is-shown]="!answerIsBeingProcessed"

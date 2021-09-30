@@ -36,7 +36,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './progress-nav.component.html'
 })
 export class ProgressNavComponent {
-  @Input() isLearnAgainButton: boolean;
+  @Input() isLearnAgainButton: () => void;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
   @Input() submitButtonIsDisabled: boolean;
