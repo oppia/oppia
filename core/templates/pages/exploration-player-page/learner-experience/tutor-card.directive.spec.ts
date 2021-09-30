@@ -396,9 +396,16 @@ describe('Tutor Card directive', function() {
   });
 
   it('should check whether the window can show two cards', function() {
+    // Window can't show 2 cards if width is less than 960.
+    let getWidthSpy = spyOn(windowDimensionsService, 'getWidth');
+    getWidthSpy.and.returnValue(500);
     let result = $scope.canWindowShowTwoCards();
-
     expect(result).toBe(false);
+
+    getWidthSpy.and.returnValue(1000);
+    result = $scope.canWindowShowTwoCards();
+
+    expect(result).toBe(true);
   });
 
   it('should check whether the window is narrow', function() {
