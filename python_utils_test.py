@@ -59,7 +59,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_quote(self):
         self.assertEqual(
-            urrlib.quote('/~connolly/'), '/~connolly/')
+            urllib.quote('/~connolly/'), '/~connolly/')
 
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}

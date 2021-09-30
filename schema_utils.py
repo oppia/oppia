@@ -333,7 +333,7 @@ class Normalizers(python_utils.OBJECT):
             return obj
         url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
         quoted_url_components = (
-            urrlib.quote(component) for component in url_components) # type: ignore[no-untyped-call]
+            urllib.quote(component) for component in url_components) # type: ignore[no-untyped-call]
         raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
 
         acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
