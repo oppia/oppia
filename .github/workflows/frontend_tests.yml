@@ -39,7 +39,7 @@ jobs:
       - name: Run frontend tests
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
       - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "A frontend test failed on the upstream develop branch."
