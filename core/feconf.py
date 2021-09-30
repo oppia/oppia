@@ -499,6 +499,8 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
+# The path to the package contains version number but we don't increment
+# the version number.
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-0.0.1.tar.gz'
 
 # Committer id for system actions. The username for the system committer

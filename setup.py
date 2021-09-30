@@ -26,6 +26,8 @@ import setuptools
 
 # Configure the required packages and scripts to install.
 with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
+    # The 'parse_requirements' returns list of 'Requirement' objects and we need
+    # to transform it to string by using str function.
     REQUIRED_PACKAGES = [
         str(requirement)  # pylint: disable=replace-disallowed-function-calls
         for requirement in pkg_resources.parse_requirements(requirements_txt)

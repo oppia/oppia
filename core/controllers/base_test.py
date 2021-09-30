@@ -316,6 +316,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
+            # This reloads the feconf module so that all the checks in
+            # the module are reexecuted.
             importlib.reload(feconf)  # pylint: disable-all
 
     def test_frontend_error_handler(self):
