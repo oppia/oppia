@@ -1324,6 +1324,16 @@ def generate_build_directory(hashes):
     python_utils.PRINT('Build completed.')
 
 
+def generate_python_package():
+    """Generates hashes for files. Minifies files and interpolates paths
+    in HTMLs to include hashes. Renames the files to include hashes and copies
+    them into build directory.
+    """
+    python_utils.PRINT('Building Oppia package...')
+    subprocess.check_call('python setup.py sdist -d build', shell=True)
+    python_utils.PRINT('Oppia package build completed.')
+
+
 def main(args=None):
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
@@ -1354,6 +1364,7 @@ def main(args=None):
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
+        generate_python_package()
         if options.deparallelize_terser:
             if options.source_maps:
                 raise Exception(
