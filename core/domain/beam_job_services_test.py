@@ -25,9 +25,12 @@ from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.platform import models
 from core.tests import test_utils
+from jobs import base_jobs
 from jobs import jobs_manager
 from jobs import registry as jobs_registry
 import python_utils
+
+import apache_beam as beam
 
 from typing import List, Optional
 
@@ -36,6 +39,13 @@ if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+
+
+class NoOpJob(base_jobs.JobBase):
+    """Simple job that returns an empty PCollection."""
+
+    def run(self) -> beam.PCollection:
+        return beam.Create([])
 
 
 class BeamJobServicesTests(test_utils.TestBase):
@@ -112,31 +122,41 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     run.job_is_synchronous, model.dataflow_job_id is None)
 
-    def test_run_beam_job(self) -> None:
-        run_model = beam_job_services.create_beam_job_run_model('WorkingJob')
-        get_job_class_by_name_swap = self.swap_to_always_return(
-            jobs_registry, 'get_job_class_by_name')
-        run_job_swap = self.swap_to_always_return(
-            jobs_manager, 'run_job', value=run_model)
+    def test_run_beam_job_using_job_name(self) -> None:
+        model = beam_job_services.create_beam_job_run_model('NoOpJob')
 
-        with get_job_class_by_name_swap, run_job_swap:
-            run = beam_job_services.run_beam_job('WorkingJob')
+        with self.swap_to_always_return(jobs_manager, 'run_job', value=model):
+            run = beam_job_services.run_beam_job(job_name='NoOpJob')
 
         self.assertEqual(
-            beam_job_services.get_beam_job_run_from_model(run_model).to_dict(),
+            beam_job_services.get_beam_job_run_from_model(model).to_dict(),
             run.to_dict())
 
+    def test_run_beam_job_using_job_class(self) -> None:
+        model = beam_job_services.create_beam_job_run_model('NoOpJob')
+
+        with self.swap_to_always_return(jobs_manager, 'run_job', value=model):
+            run = beam_job_services.run_beam_job(job_class=NoOpJob)
+
+        self.assertEqual(
+            beam_job_services.get_beam_job_run_from_model(model).to_dict(),
+            run.to_dict())
+
+    def test_run_beam_job_without_args_raises_an_exception(self) -> None:
+        with self.assertRaisesRegexp(ValueError, 'Must specify the job'): # type: ignore[no-untyped-call]
+            beam_job_services.run_beam_job()
+
     def test_cancel_beam_job(self) -> None:
-        run_model = beam_job_services.create_beam_job_run_model(
-            'WorkingJob', dataflow_job_id='123')
-        run_model.put()
+        model = beam_job_services.create_beam_job_run_model(
+            'NoOpJob', dataflow_job_id='123')
+        model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            run = beam_job_services.cancel_beam_job(run_model.id)
+            run = beam_job_services.cancel_beam_job(model.id)
 
         self.assertEquals(
             run.to_dict(),
-            beam_job_services.get_beam_job_run_from_model(run_model).to_dict())
+            beam_job_services.get_beam_job_run_from_model(model).to_dict())
 
     def test_cancel_beam_job_which_does_not_exist_raises_an_error(self) -> None:
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
@@ -147,14 +167,14 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
     def test_cancel_beam_job_which_has_no_dataflow_job_id_raises_an_error(
         self
     ) -> None:
-        run_model = beam_job_services.create_beam_job_run_model(
-            'WorkingJob', dataflow_job_id=None)
-        run_model.put()
+        model = beam_job_services.create_beam_job_run_model(
+            'NoOpJob', dataflow_job_id=None)
+        model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
             self.assertRaisesRegexp( # type: ignore[no-untyped-call]
                 ValueError, 'cannot be cancelled',
-                lambda: beam_job_services.cancel_beam_job(run_model.id))
+                lambda: beam_job_services.cancel_beam_job(model.id))
 
     def test_get_beam_job_runs(self) -> None:
         beam_job_run_models = [
