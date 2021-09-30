@@ -166,7 +166,7 @@ def get_stanzas_from_lcov_file():
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = python_utils.open_file(LCOV_FILE_PATH, 'r')
+    f = open(LCOV_FILE_PATH, 'r')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 

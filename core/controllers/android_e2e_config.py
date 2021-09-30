@@ -116,7 +116,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -175,7 +175,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         )
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -231,7 +231,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         AssetDevHandler.
         """
 
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             image_content = f.read()

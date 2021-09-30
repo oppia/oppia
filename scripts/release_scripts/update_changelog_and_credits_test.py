@@ -64,7 +64,7 @@ def read_from_file(filepath):
     Returns:
         list(str). The list of lines in the file.
     """
-    with python_utils.open_file(filepath, 'r') as f:
+    with open(filepath, 'r') as f:
         return f.readlines()
 
 
@@ -75,7 +75,7 @@ def write_to_file(filepath, filelines):
         filepath: str. The path of the file to write to.
         filelines: list(str). The lines to write to the file.
     """
-    with python_utils.open_file(filepath, 'w') as f:
+    with open(filepath, 'w') as f:
         for line in filelines:
             f.write(line)
 
@@ -262,7 +262,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             write_to_file(MOCK_CONTRIBUTORS_FILEPATH, contributors_filelines)
 
     def test_update_developer_names(self):
-        with python_utils.open_file(
+        with open(
             update_changelog_and_credits.ABOUT_PAGE_CONSTANTS_FILEPATH, 'r'
         ) as f:
             about_page_lines = f.readlines()
@@ -274,7 +274,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
         tmp_file = tempfile.NamedTemporaryFile()
         tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
-        with python_utils.open_file(
+        with open(
             MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
         ) as f:
             for line in about_page_lines:
@@ -297,7 +297,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.update_developer_names(
                 release_summary_lines)
 
-        with python_utils.open_file(tmp_file.name, 'r') as f:
+        with open(tmp_file.name, 'r') as f:
             about_page_lines = f.readlines()
             start_index = about_page_lines.index(
                 update_changelog_and_credits.CREDITS_START_LINE) + 1
@@ -444,7 +444,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                         update_changelog_and_credits.main()
 
     def test_get_release_summary_lines(self):
-        with python_utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
+        with open(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
             correct_lines = f.readlines()
             wrong_lines = []
             for line in correct_lines:
@@ -567,7 +567,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         package_json_swap = self.swap(
             update_changelog_and_credits, 'PACKAGE_JSON_FILEPATH',
             MOCK_PACKAGE_JSON_PATH)
-        package_json_content = python_utils.open_file(
+        package_json_content = open(
             MOCK_PACKAGE_JSON_PATH, 'r').read()
         regex = re.compile('"version": ".*"')
         expected_package_json_content = regex.sub(
@@ -575,7 +575,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         try:
             with self.branch_name_swap, package_json_swap:
                 update_changelog_and_credits.update_package_json()
-            updated_package_json_content = python_utils.open_file(
+            updated_package_json_content = open(
                 MOCK_PACKAGE_JSON_PATH, 'r').read()
             self.assertEqual(
                 updated_package_json_content, expected_package_json_content)

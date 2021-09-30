@@ -75,7 +75,7 @@ def make_graph():
                 if filename.endswith(SERVICE_FILES_SUFFICES):
                     nodes_set.add(filename)
                     filepath = os.path.join(root, filename)
-                    with python_utils.open_file(filepath, 'r') as f:
+                    with open(filepath, 'r') as f:
                         file_lines = f.readlines()
 
                     dep_lines = ''

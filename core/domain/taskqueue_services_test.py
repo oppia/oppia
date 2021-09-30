@@ -91,7 +91,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         """
         queue_name_dict = {}
         # Parse the queue.yaml file for the correct queue names.
-        with python_utils.open_file('queue.yaml', 'r') as f:
+        with open('queue.yaml', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 if 'name' in line:

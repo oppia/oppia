@@ -183,7 +183,7 @@ class RedirectStoutTest(test_utils.GenericTestBase):
     def test_redirect_stdout(self):
         temp_file = tempfile.NamedTemporaryFile()
 
-        with python_utils.open_file(temp_file.name, 'r+') as temp_file_contents:
+        with open(temp_file.name, 'r+') as temp_file_contents:
             with linter_utils.redirect_stdout(temp_file_contents):
                 python_utils.PRINT('This is a test')
             temp_file_contents.seek(0)

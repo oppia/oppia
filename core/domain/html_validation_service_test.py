@@ -884,7 +884,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -912,7 +912,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
@@ -944,7 +944,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()

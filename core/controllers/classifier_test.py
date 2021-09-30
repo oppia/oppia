@@ -52,7 +52,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.category = 'Test'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with python_utils.open_file(yaml_path, 'r') as yaml_file:
+        with open(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')

@@ -74,7 +74,7 @@ def _get_process_command_line(pid):
         str. The command that started the process.
     """
     try:
-        with python_utils.open_file(
+        with open(
             '/proc/{}/cmdline'.format(pid), 'rt'
         ) as f:
             return f.read()
@@ -92,7 +92,7 @@ def _get_process_start_time(pid):
         str. The time when the process started.
     """
     try:
-        with python_utils.open_file(
+        with open(
             '/proc/{}/stat'.format(pid), 'rt'
         ) as f:
             return int(f.readline().split()[21])

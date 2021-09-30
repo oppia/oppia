@@ -199,7 +199,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
@@ -224,7 +224,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
@@ -251,7 +251,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""\"\"\"Some multiline
                 docstring.
@@ -277,7 +277,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json(  # Random comment
                 '(',
@@ -298,7 +298,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json(func(  # Random comment
                 '(',
@@ -319,7 +319,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json([  # Random comment
                 '(',
@@ -350,7 +350,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -378,7 +378,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -408,7 +408,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -438,7 +438,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(
@@ -467,7 +467,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(
@@ -492,7 +492,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -516,7 +516,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -539,7 +539,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -565,7 +565,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -1925,7 +1925,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n"""             # pylint: disable=backslash-continuation
@@ -2212,7 +2212,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""c = 'something dummy'
                 """)
@@ -2235,7 +2235,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(u"""1""")
         node_single_char_file.file = filename
         node_single_char_file.path = filename
@@ -2256,7 +2256,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(u"""x = 'something dummy'""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
@@ -2321,7 +2321,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# This is a multiline
                 # comment/
@@ -2348,7 +2348,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""#Something.
                 """)
@@ -2372,7 +2372,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2398,7 +2398,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
                 # pylint: disable
@@ -2420,7 +2420,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""a = 1 + 2  # type: ignore[some-rule]
                 """)
@@ -2441,7 +2441,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
                 """)
@@ -2462,7 +2462,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""a = 1 + 2  # not_a_valid_pragma
                 """)
@@ -2487,7 +2487,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2509,7 +2509,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2531,7 +2531,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2553,7 +2553,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
                     \"\"\"# str. variable is type of str.\"\"\"
@@ -2576,7 +2576,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2610,7 +2610,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"
@@ -2638,7 +2638,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
 
@@ -2669,7 +2669,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     #this comment has a unicode character \u2713
@@ -2699,7 +2699,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     #this comment has a unicode character \u2713
@@ -2728,7 +2728,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"
@@ -2753,7 +2753,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     import something
@@ -2775,7 +2775,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"   """)
@@ -2810,7 +2810,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint: disable=invalid-name
@@ -2843,7 +2843,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint: disable=single-line-pragma
@@ -2873,7 +2873,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint: disable=invalid-name, single-line-pragma
@@ -2904,7 +2904,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     def funcName():  # pylint: disable=single-line-pragma
@@ -2925,7 +2925,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint:disable=single-line-pragma
@@ -2966,7 +2966,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                 if(False):
@@ -3007,7 +3007,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                 if  False:
@@ -3048,7 +3048,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w') as tmp:
             tmp.write(
                 u"""
                 if False:

@@ -46,14 +46,14 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(args_list, ['arg1', 'arg2'])
 
     def test_open_file(self):
-        with python_utils.open_file('python_utils.py', 'r') as f:
+        with open('python_utils.py', 'r') as f:
             file_content = f.readlines()
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self):
         with self.assertRaisesRegexp(
             IOError, 'Unable to open file: invalid_file.py'):
-            with python_utils.open_file('invalid_file.py', 'r') as f:
+            with open('invalid_file.py', 'r') as f:
                 f.readlines()
 
     def test_url_quote(self):
@@ -75,7 +75,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         python_utils.url_retrieve(
             'http://www.google.com', filename='temp_file.txt')
 
-        with python_utils.open_file('temp_file.txt', 'rb', encoding=None) as f:
+        with open('temp_file.txt', 'rb', encoding=None) as f:
             content = f.read()
 
         self.assertIn(b'<title>Google</title>', content)
@@ -303,7 +303,7 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
         self.assertIsInstance(
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
-        with python_utils.open_file(
+        with open(
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
             self.assertIsInstance(file_content, python_utils.UNICODE)
@@ -325,7 +325,7 @@ class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
         self.assertIsInstance(
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
-        with python_utils.open_file(
+        with open(
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
             self.assertIsInstance(file_content, str)

@@ -136,7 +136,7 @@ class Registry(python_utils.OBJECT):
                 feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 
             try:
-                with python_utils.open_file(spec_file, 'r') as f:
+                with open(spec_file, 'r') as f:
                     specs_from_json = json.loads(f.read())
             except IOError:
                 raise IOError(

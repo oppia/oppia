@@ -355,7 +355,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         payload = {
             'thumbnail_filename': 'test_svg.svg'
         }
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:
@@ -376,7 +376,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'cafe.flac'
         }
 
-        with python_utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
             encoding=None
         ) as f:

@@ -79,7 +79,7 @@ def read_protractor_conf_file():
     Returns:
         str. The contents of protractor.conf.js, as a string.
     """
-    protractor_config_file_content = python_utils.open_file(
+    protractor_config_file_content = open(
         PROTRACTOR_CONF_FILE_PATH, 'r').read()
     return protractor_config_file_content
 
@@ -93,7 +93,7 @@ def read_and_parse_ci_config_files():
     ci_dicts = []
     for filepath in os.listdir(CI_PATH):
         if re.search(r'e2e_.*\.yml', filepath):
-            ci_file_content = python_utils.open_file(
+            ci_file_content = open(
                 os.path.join(CI_PATH, filepath), 'r').read()
             ci_dicts.append(ci_file_content)
     return ci_dicts

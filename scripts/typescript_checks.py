@@ -46,7 +46,7 @@ STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 def validate_compiled_js_dir():
     """Validates that compiled js dir matches out dir in tsconfig."""
-    with python_utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
+    with open(TSCONFIG_FILEPATH, 'r') as f:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:
