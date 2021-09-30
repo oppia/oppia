@@ -67,8 +67,7 @@ class DeleteExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
             incomplete_translation_language_codes=['cs'],
             translation_counts=321,
             language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=['fr']
-        )
+            language_codes_with_assigned_voice_artists=['fr'])
         opportunity_model_1.update_timestamps()
         opportunity_model_1.put()
         opportunity_model_2 = self.create_model(
@@ -83,8 +82,7 @@ class DeleteExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
             incomplete_translation_language_codes=['cs'],
             translation_counts=321,
             language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=['fr']
-        )
+            language_codes_with_assigned_voice_artists=['fr'])
         opportunity_model_2.update_timestamps()
         opportunity_model_2.put()
 
@@ -131,12 +129,10 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
             canonical_story_references=[{
                 'story_id': self.STORY_1_ID,
                 'story_is_published': False
-            }]
-        )
+            }])
         self.topic_model.update_timestamps()
         topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel, id=self.TOPIC_1_ID
-        )
+            topic_models.TopicRightsModel, id=self.TOPIC_1_ID)
         topic_rights_model.update_timestamps()
 
         story_model = self.create_model(
@@ -162,8 +158,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'initial_node_id': 'abc',
                 'next_node_id': 'efg'
             },
-            notes='note'
-        )
+            notes='note')
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -179,8 +174,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state', is_initial_state=True
                 ).to_dict()
-            }
-        )
+            })
         exp_model.update_timestamps()
         datastore_services.put_multi([
             exp_model, story_model, self.topic_model, topic_rights_model
@@ -212,15 +206,10 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
         self.assertEqual(opportunity_model.content_count, 1)
         self.assertItemsEqual( # type: ignore[no-untyped-call]
             opportunity_model.incomplete_translation_language_codes,
-            list(
-                {lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES} -
-                {'cs'}
-            )
-        )
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['cs']
-        )
+            opportunity_model.language_codes_needing_voice_artists, ['cs'])
 
     def test_generation_job_returns_multiple_opportunities_for_one_topic(
         self
@@ -254,8 +243,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'initial_node_id': 'abc',
                 'next_node_id': 'efg'
             },
-            notes='note'
-        )
+            notes='note')
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -274,8 +262,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state2'
                 ).to_dict()
-            }
-        )
+            })
         exp_model.update_timestamps()
         datastore_services.put_multi([self.topic_model, exp_model, story_model])
 
@@ -304,15 +291,10 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
         self.assertEqual(opportunity_model.content_count, 2)
         self.assertItemsEqual( # type: ignore[no-untyped-call]
             opportunity_model.incomplete_translation_language_codes,
-            list(
-                {lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES} -
-                {'en'}
-            )
-        )
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['en']
-        )
+            opportunity_model.language_codes_needing_voice_artists, ['en'])
 
     def test_generation_job_fails_when_story_id_is_not_available(self) -> None:
         self.topic_model.canonical_story_references.append({
@@ -368,8 +350,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'initial_node_id': 'abc',
                 'next_node_id': 'efg'
             },
-            notes='note'
-        )
+            notes='note')
         story_model.update_timestamps()
 
         datastore_services.put_multi([self.topic_model, story_model])
@@ -406,12 +387,10 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
             canonical_story_references=[{
                 'story_id': self.STORY_2_ID,
                 'story_is_published': False
-            }]
-        )
+            }])
         topic_model.update_timestamps()
         topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel, id=self.TOPIC_2_ID
-        )
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
         topic_rights_model.update_timestamps()
 
         story_model = self.create_model(
@@ -437,8 +416,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'initial_node_id': 'abc',
                 'next_node_id': 'efg'
             },
-            notes='note'
-        )
+            notes='note')
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -457,8 +435,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state2'
                 ).to_dict()
-            }
-        )
+            })
         exp_model.update_timestamps()
         datastore_services.put_multi([
             exp_model, story_model, topic_model, topic_rights_model
@@ -490,12 +467,7 @@ class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
         self.assertEqual(opportunity_model.content_count, 2)
         self.assertItemsEqual( # type: ignore[no-untyped-call]
             opportunity_model.incomplete_translation_language_codes,
-            list(
-                {lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES} -
-                {'en'}
-            )
-        )
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['en']
-        )
+            opportunity_model.language_codes_needing_voice_artists, ['en'])
