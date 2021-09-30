@@ -41,6 +41,7 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 describe('Tutor Card directive', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -62,6 +63,7 @@ describe('Tutor Card directive', function() {
   let userService: UserService = null;
   let urlInterpolationService: UrlInterpolationService = null;
   let interactionObjectFactory = null;
+  let windowDimensionsService: WindowDimensionsService;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory = null;
 
   let testSubscriptions: Subscription = null;
@@ -102,6 +104,7 @@ describe('Tutor Card directive', function() {
     urlInterpolationService = $injector.get('UrlInterpolationService');
     writtenTranslationsObjectFactory = $injector.get(
       'WrittenTranslationsObjectFactory');
+    windowDimensionsService = $injector.get('WindowDimensionsService');
     playerPositionService = $injector.get('PlayerPositionService');
     interactionObjectFactory = $injector.get('InteractionObjectFactory');
 
@@ -399,7 +402,15 @@ describe('Tutor Card directive', function() {
   });
 
   it('should check whether the window is narrow', function() {
+    // Window is narrow if width is less than 768.
+    let getWidthSpy = spyOn(windowDimensionsService, 'getWidth');
+    getWidthSpy.and.returnValue(500);
     let result = $scope.isWindowNarrow();
+
+    expect(result).toBe(true);
+
+    getWidthSpy.and.returnValue(1000);
+    result = $scope.isWindowNarrow();
 
     expect(result).toBe(false);
   });
