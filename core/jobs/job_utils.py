@@ -87,6 +87,7 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     Raises:
         KindError. Internally raised by _lookup_model when the kind is invalid.
     """
+    models.Registry.get_all_storage_model_classes()
     return datastore_services.Model._lookup_model(kind)  # pylint: disable=protected-access
 
 
