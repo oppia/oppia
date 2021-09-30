@@ -266,7 +266,7 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
-        self.assertEqual(beam_query.filters, [('prop', '>=', 3)])
+        self.assertEqual(beam_query.filters, (('prop', '>=', 3),))
 
     def test_query_with_range_like_filter(self) -> None:
         query = datastore_services.Query(filters=datastore_services.all_of(
@@ -275,7 +275,7 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(
-            beam_query.filters, [('prop', '>=', 3), ('prop', '<', 6)])
+            beam_query.filters, (('prop', '>=', 3), ('prop', '<', 6)))
 
     def test_query_with_or_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=datastore_services.any_of(

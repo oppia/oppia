@@ -39,7 +39,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        uiConfig: '&'
       },
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
@@ -53,13 +54,18 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.validate = function(localValue) {
+          ctrl.validate = function(localValue, customizationArg) {
+            let { checkRequireNonnegativeInput } = customizationArg || {};
+            let checkRequireNonnegativeInputValue = (
+            checkRequireNonnegativeInput === undefined ? false :
+            checkRequireNonnegativeInput);
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
-                NumericInputValidationService.getErrorString(localValue)));
+                NumericInputValidationService.getErrorString(
+                  localValue, checkRequireNonnegativeInputValue)));
           };
 
           ctrl.onFocus = function() {
@@ -95,7 +101,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
 
           ctrl.generateErrors = function() {
             ctrl.errorString = (
-              NumericInputValidationService.getErrorString(ctrl.localValue));
+              NumericInputValidationService.getErrorString(
+                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
           };
 
           ctrl.onKeypress = function(evt) {
@@ -122,6 +129,15 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
+            // To check checkRequireNonnegativeInput customization argument
+            // Value of numeric input interaction.
+            let { checkRequireNonnegativeInput } = ctrl.uiConfig() || {};
+            ctrl.checkRequireNonnegativeInputValue = (
+            checkRequireNonnegativeInput === undefined ? false :
+            checkRequireNonnegativeInput);
+            // If customization argument of numeric input interaction is true
+            // Set Min value as 0 to not let down key go below 0.
+            ctrl.minValue = checkRequireNonnegativeInput && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {

@@ -295,7 +295,7 @@ describe('Story editor navbar component', () => {
       let mockUndoRedoChangeEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
-      spyOn(undoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
+      spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter').and.returnValue(
         mockUndoRedoChangeEventEmitter);
 
       component.ngOnInit();

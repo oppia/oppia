@@ -66,28 +66,28 @@ export class StatsReportingBackendApiService {
           <StatsReportingUrlsKey> urlIdentifier], {
           exploration_id: explorationId
         });
-    } catch (e) {
-      let additionalInfo = (
-        '\nUndefined exploration id error debug logs:' +
-        '\nThe event being recorded: ' + urlIdentifier +
-        '\nExploration ID: ' + this.contextService.getExplorationId()
-      );
-      if (currentStateName) {
-        additionalInfo += (
-          '\nCurrent State name: ' + currentStateName);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        let additionalInfo = (
+          '\nUndefined exploration id error debug logs:' +
+          '\nThe event being recorded: ' + urlIdentifier +
+          '\nExploration ID: ' + this.contextService.getExplorationId()
+        );
+        if (currentStateName) {
+          additionalInfo += (
+            '\nCurrent State name: ' + currentStateName);
+        }
+        if (nextExpId) {
+          additionalInfo += (
+            '\nRefresher exp id: ' + nextExpId);
+        }
+        if (previousStateName && nextStateName) {
+          additionalInfo += (
+            '\nOld State name: ' + previousStateName +
+            '\nNew State name: ' + nextStateName);
+        }
+        e.message += additionalInfo;
       }
-      if (nextExpId) {
-        additionalInfo += (
-          '\nRefresher exp id: ' + nextExpId);
-      }
-      if (
-        previousStateName &&
-        nextStateName) {
-        additionalInfo += (
-          '\nOld State name: ' + previousStateName +
-          '\nNew State name: ' + nextStateName);
-      }
-      e.message += additionalInfo;
       throw e;
     }
   }
