@@ -328,6 +328,23 @@ def urllib_unquote(content) -> str:
     return urlparse.unquote(content)
 
 
+def url_quote(content):
+    """Quotes a string using urllib.quote if run under Python 2 and
+    urllib.parse.quote if run under Python 3.
+
+    Args:
+        content: str. The string to be quoted.
+
+    Returns:
+        str. The quoted string.
+    """
+    try:
+        import urllib.parse as urlparse
+    except ImportError:
+        import urllib as urlparse
+    return urlparse.quote(content)
+
+
 def url_unquote_plus(content):
     """Unquotes a string and replace plus signs by spaces, as required for
     unquoting HTML form values using urllib.unquote_plus if run under Python 2

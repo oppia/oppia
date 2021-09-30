@@ -29,7 +29,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import utils
-import urllib
 
 from typing import Any, Dict, List
 
@@ -734,7 +733,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary(self) -> None:
         image_data_url = '%s%s' % (
             utils.PNG_DATA_URL_PREFIX,
-            urllib.quote(base64.b64encode(b'test123'))) # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(b'test123'))) # type: ignore[no-untyped-call]
 
         self.assertEqual(
             utils.convert_png_data_url_to_binary(image_data_url), b'test123')
@@ -742,7 +741,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
             self
     ) -> None:
-        image_data_url = urllib.quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
+        image_data_url = python_utils.url_quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG data URL.',

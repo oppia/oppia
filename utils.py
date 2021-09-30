@@ -32,7 +32,6 @@ import sys
 import time
 import unicodedata
 import zlib
-import urllib
 
 from constants import constants
 import feconf
@@ -330,7 +329,7 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            urllib.quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')

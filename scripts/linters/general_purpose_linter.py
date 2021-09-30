@@ -213,7 +213,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': re.compile(r'urllib\..*quote\('),
-        'message': 'Please use urllib.quote().',
+        'message': 'Please use python_utils.url_quote().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
