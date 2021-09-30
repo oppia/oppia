@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import builtins
 import getpass
 import os
 import re
@@ -676,7 +677,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             mock_get_release_summary_lines)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
         get_org_repo_swap = self.swap(
             github.Organization.Organization, 'get_repo', mock_get_repo)

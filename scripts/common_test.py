@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import builtins
 import contextlib
 import errno
 import getpass
@@ -151,7 +152,7 @@ class CommonTests(test_utils.GenericTestBase):
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -180,7 +181,7 @@ class CommonTests(test_utils.GenericTestBase):
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -209,7 +210,7 @@ class CommonTests(test_utils.GenericTestBase):
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -479,7 +480,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_ask_user_to_confirm(self):
         def mock_input():
             return 'Y'
-        with self.swap(python_utils, 'INPUT', mock_input):
+        with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self):

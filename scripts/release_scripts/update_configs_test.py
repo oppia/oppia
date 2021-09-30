@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import builtins
 import getpass
 import os
 import tempfile
@@ -98,7 +99,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_print(msg):
             if 'Invalid Input' in msg:
                 print_msgs.append(msg)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, print_swap:
@@ -116,7 +117,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 attributes={
                     'commit': {'committer': {'date': '2016-11-15T3:41:01Z'}}},
                 completed='')
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         get_commit_swap = self.swap(
             github.Repository.Repository, 'get_commit', mock_get_commit)
 
