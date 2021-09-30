@@ -16,7 +16,7 @@
  * @fileoverview Component for the topic viewer practice tab.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subtopic } from 'domain/topic/subtopic.model';
@@ -32,6 +32,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',
+  encapsulation: ViewEncapsulation.None,
   styleUrls: []
 })
 export class PracticeTabComponent implements OnInit {
