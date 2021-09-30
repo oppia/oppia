@@ -94,7 +94,7 @@ var GraphEditor = function(graphInputContainer) {
       await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await action.click(`Vertex Element ${i}`, vertexElement);
+        await vertexElement(i).click();
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -190,22 +190,23 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = by.css(
     '.protractor-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  var rteElementFirst = await rteElements.first();
-  await action.click('rte Element First', rteElementFirst);
+  await waitFor.elementToBeClickable(rteElements.first());
+  await (await rteElements.first()).click();
 
   var _appendContentText = async function(text) {
-    await action.sendKeys('First rte Element ', rteElementFirst, text);
+    await (await rteElements.first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
-    await action.click(
-      'Toolbar Button',
-      elem.element(by.css('.' + buttonName)));
+    await waitFor.elementToBeClickable(
+      elem.element(by.css('.' + buttonName)),
+      'Toolbar button takes too long to be clickable.');
+    await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
     expect(
       await (await rteElements.first()).isPresent()
     ).toBe(true);
-    await action.click('First rte Element', rteElementFirst);
+    await (await rteElements.first()).clear();
   };
 
   return {
@@ -568,8 +569,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      expect(await action.getText('Read Rte Component Elem', elem))
-        .toBe(arrayOfTexts[arrayPointer]);
+      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
@@ -613,7 +613,7 @@ var toRichText = async function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
-var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
+ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   var lineContentElements = elem.all(by.css('.CodeMirror-line'));
   var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
   var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
