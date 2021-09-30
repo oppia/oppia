@@ -27,8 +27,8 @@ from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
-from core.domain import state_domain
 from core.domain import question_domain
+from core.domain import state_domain
 import python_utils
 
 from typing import Dict, Optional, Union

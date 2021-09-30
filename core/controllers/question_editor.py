@@ -22,8 +22,9 @@ from __future__ import unicode_literals
 import logging
 
 from constants import constants
-from core.controllers import acl_decorators, domain_objects_validator
+from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import image_validation_services
