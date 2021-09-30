@@ -46,7 +46,7 @@ class SubscribeHandler(base.BaseHandler):
         self.render_json(self.values)
 
 class UnsubscribeHandler(base.BaseHandler):
-    """Handles operations related to unsubscriptions."""    
+    """Handles operations related to unsubscriptions."""
     
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
