@@ -186,6 +186,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.add_user_role(
             self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -434,6 +436,26 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'exp_id',
             self.user_2_id,
             feconf.ROLE_EDITOR)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertFalse(exp_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertTrue(exp_summary_model.community_owned)
+
+    def test_pre_delete_user_exploration_ownership_is_released_with_voice_art(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            self.user_1_actions,
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST)
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertFalse(exp_summary_model.community_owned)
