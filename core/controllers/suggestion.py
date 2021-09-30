@@ -66,8 +66,8 @@ class SuggestionHandler(base.BaseHandler):
             'change': {
                'schema': {
                    'type': 'dict',
-                   'properties': 
-                [
+                   'properties':
+                    [
                        {
                         'name': 'cmd',
                         'schema': {
@@ -111,7 +111,7 @@ class SuggestionHandler(base.BaseHandler):
                             'type': 'basestring'
                         }
                        }
-                ] 
+                    ]
                }
             },
             'description': {
