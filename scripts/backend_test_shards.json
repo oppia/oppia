@@ -210,7 +210,6 @@
         "core.storage.email.gae_models_test",
         "core.storage.user.gae_models_test",
         "core.storage.job.gae_models_test",
-        "core.storage.base_model.gae_models_test",
         "jobs.jobs_manager_test",
         "schema_utils_test",
         "core.storage.audit.gae_models_test",
@@ -300,6 +299,7 @@
         "scripts.linters.other_files_linter_test",
         "core.storage.app_feedback_report.gae_models_test",
         "jobs.transforms.validation.config_validation_test",
-        "jobs.transforms.validation.collection_validation_test"
+        "jobs.transforms.validation.collection_validation_test",
+        "core.storage.base_model.gae_models_test"
     ]
 }
