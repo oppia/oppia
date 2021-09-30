@@ -26,7 +26,7 @@ from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
-from typing import Dict, Optional, List, Any, cast # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

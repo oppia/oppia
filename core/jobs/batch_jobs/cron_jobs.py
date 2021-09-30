@@ -270,8 +270,6 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                     include_deleted=False))
             # We need to window the models so that CoGroupByKey below
             # works properly.
-            | 'Window the suggestions' >> beam.WindowInto(
-                beam.window.Sessions(10 * 60))
             | 'Filter translate suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
@@ -288,8 +286,6 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                     include_deleted=False))
             # We need to window the models so that CoGroupByKey below
             # works properly.
-            | 'Window the opportunities' >> beam.WindowInto(
-                beam.window.Sessions(10 * 60))
             | 'Transform to opportunity domain object' >> beam.Map(
                 opportunity_services.
                 get_exploration_opportunity_summary_from_model)
@@ -306,10 +302,10 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
             | 'Generate stats' >> beam.ParDo(
                 lambda x: self._generate_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
-                    x['opportunity'][0][0] if len(x['opportunity']) else None
+                    list(x['opportunity'][0])[0]
+                    if len(x['opportunity']) else None
                 ))
-            | 'Group by key' >> beam.GroupByKey()
-            | 'Combine the stats' >> beam.CombineValues(CombineStats())
+            | 'Combine the stats' >> beam.CombinePerKey(CombineStats())
             | 'Generate models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )

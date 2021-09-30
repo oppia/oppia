@@ -33,7 +33,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Set, Tuple, Unionn # isort:skip
+from typing import Dict, List, Set, Tuple, Union # isort:skip
 
 MYPY = False
 if MYPY:
@@ -280,10 +280,10 @@ class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
         ])
 
-        new_user_stats_model = cast(
-            user_models.UserStatsModel,
+        new_user_stats_model = (
             user_models.UserStatsModel.get(self.VALID_USER_ID_1))
-        self.assertIsNotNone(new_user_stats_model)
+        # Ruling out the possibility of None for mypy type checking.
+        assert new_user_stats_model is not None
         self.assertEqual(
             new_user_stats_model.weekly_creator_stats_list,
             [{
@@ -316,10 +316,10 @@ class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
             ])
 
-        new_user_stats_model = cast(
-            user_models.UserStatsModel,
+        new_user_stats_model = (
             user_models.UserStatsModel.get(self.VALID_USER_ID_1))
-        self.assertIsNotNone(new_user_stats_model)
+        # Ruling out the possibility of None for mypy type checking.
+        assert new_user_stats_model is not None
         self.assertEqual(new_user_stats_model.weekly_creator_stats_list, [])
 
     def test_updates_existing_stats_model_when_values_are_provided(
@@ -342,10 +342,10 @@ class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
         ])
 
-        new_user_stats_model = cast(
-            user_models.UserStatsModel,
+        new_user_stats_model = (
             user_models.UserStatsModel.get(self.VALID_USER_ID_1))
-        self.assertIsNotNone(new_user_stats_model)
+        # Ruling out the possibility of None for mypy type checking.
+        assert new_user_stats_model is not None
         self.assertEqual(
             new_user_stats_model.weekly_creator_stats_list,
             [{

@@ -24,7 +24,7 @@ from core.platform import models
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_feedback_report_models # pylint: disable=unused-import
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])

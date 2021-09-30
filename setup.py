@@ -26,13 +26,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import pkg_resources
-import os
 import setuptools
 
 # Configure the required packages and scripts to install.
 with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
     REQUIRED_PACKAGES = [
-        str(requirement)
+        str(requirement)  # pylint: disable=replace-disallowed-function-calls
         for requirement in pkg_resources.parse_requirements(requirements_txt)
     ]
 
