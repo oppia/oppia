@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 
 import re
 
+from core import python_utils
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (
     base_models, collection_models, email_models,
