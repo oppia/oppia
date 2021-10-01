@@ -910,8 +910,7 @@ def can_users_receive_thread_email(
     users_exploration_prefs = (
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
-    zipped_preferences = list(
-        zip(users_global_prefs, users_exploration_prefs))
+    zipped_preferences = list(zip(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:

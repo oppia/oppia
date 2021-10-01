@@ -161,8 +161,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         user_ids, include_deleted=include_marked_deleted)
 
     if strict:
-        for user_id, user_settings_model in zip(
-                user_ids, user_settings_models):
+        for user_id, user_settings_model in zip(user_ids, user_settings_models):
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
     result = []

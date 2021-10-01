@@ -95,7 +95,6 @@ disallowed-functions-and-replacements-str=
   urlparse.urlparse=>python_utils.url_parse,
   urlparse.urlsplit=>python_utils.url_split,
   urlparse.urlunsplit=>python_utils.url_unsplit,
-  zip=>python_utils.ZIP
 
 disallowed-functions-and-replacements-regex=
   \.put_async\(=>put,
