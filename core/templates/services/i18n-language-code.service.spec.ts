@@ -94,7 +94,7 @@ describe('I18nLanguageCodeService', () => {
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Loading in "English" because the language code ' +
-      'given in the URL is invalid.');
+      'provided is invalid.');
     expect(mockWindowRef.nativeWindow.history.pushState).toHaveBeenCalled();
   });
 

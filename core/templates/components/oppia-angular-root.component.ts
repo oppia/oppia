@@ -60,6 +60,11 @@
  *       variables and emitting an event to inform that angular has finished
  *       loading
  */
+ interface LanguageInfo {
+  id: string;
+  text: string;
+  direction: string;
+}
 
 import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
@@ -96,6 +101,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { AlertsService } from 'services/alerts.service';
 
 const componentMap = {
   Collapsible: {
@@ -130,6 +136,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
 
+  static alertsService: AlertsService;
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
@@ -143,10 +150,12 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static translateService: TranslateService;
   static translateCacheService: TranslateCacheService;
+  static windowRef: WindowRef;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
   constructor(
+    private alertsService: AlertsService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
@@ -192,6 +201,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         this.ngZone
       );
     });
+    OppiaAngularRootComponent.alertsService = (
+      this.alertsService);
     OppiaAngularRootComponent.classroomBackendApiService = (
       this.classroomBackendApiService);
     OppiaAngularRootComponent.i18nLanguageCodeService = (
@@ -209,6 +220,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.translateService = this.translateService;
     OppiaAngularRootComponent.translateCacheService = (
       this.translateCacheService);
+    OppiaAngularRootComponent.windowRef = this.windowRef;
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
@@ -268,22 +280,34 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         this.documentAttributeCustomizationService.addAttribute('lang', code);
       }
     );
-    this.translateCacheService.init();
-
     const cachedLanguage = this.translateCacheService.getCachedLanguage();
     let url = new URL(this.windowRef.nativeWindow.location.toString());
-    if (url.searchParams.has('lang') && (
-      url.searchParams.get('lang') !== cachedLanguage)) {
-      // This timeout is required to ensure that site language is changed after
-      // translateCacheService is completely intialized.
-      setTimeout(() => {
-        this.i18nLanguageCodeService.setI18nLanguageCode(
-          url.searchParams.get('lang'));
-      }, 150);
-    } else {
-      if (cachedLanguage) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+    let i18nLanguage = url.searchParams.get('lang') || cachedLanguage;
+
+    if (i18nLanguage) {
+      let supportedSiteLanguagesCodes: string[] = (
+        AppConstants.SUPPORTED_SITE_LANGUAGES.map(
+          (languageInfo: LanguageInfo) => {
+            return languageInfo.id;
+          }
+        )
+      );
+      if (supportedSiteLanguagesCodes.includes(i18nLanguage)) {
+        this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguage);
+      } else {
+        let currentLanguageText: string = '';
+        i18nLanguage = cachedLanguage || AppConstants.DEFAULT_LANGUAGE_CODE;
+        AppConstants.SUPPORTED_SITE_LANGUAGES.forEach(element => {
+          if (element.id === i18nLanguage) {
+            currentLanguageText = element.text;
+          }
+          this.alertsService.addWarning(
+            `Loading in ${currentLanguageText} because the language code ` +
+            'provided is invalid.');
+          this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguage);
+        });
       }
+      this.translateCacheService.init();
     }
     // This emit triggers ajs to start its app.
     this.initialized.emit();

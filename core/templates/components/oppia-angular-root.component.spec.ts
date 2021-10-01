@@ -31,27 +31,19 @@ import { RichTextComponentsModule } from 'rich_text_components/rich-text-compone
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-class MockWindowRef {
-  nativeWindow = {
-    location: {
-      pathname: '/',
-      href: '',
-      toString() {
-        return 'http://localhost/community';
-      }
-    },
-    history: {
-      pushState(data: {}, title: string, url?: string | null) {}
-    }
-  };
-}
-
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
 
+class mockURL extends URL {
+  readonly ancestorOrigins: DOMStringList;
+  reload: () => {};
+  replace: () => {};
+  assign: () => {};
+}
+
 describe('OppiaAngularRootComponent', function() {
   let emitSpy: jasmine.Spy;
-  let windowRef: MockWindowRef;
+  let windowRef: WindowRef;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -77,10 +69,6 @@ describe('OppiaAngularRootComponent', function() {
             use: () => {}
           }
         },
-        {
-          provide: WindowRef,
-          useClass: MockWindowRef
-        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -109,8 +97,8 @@ describe('OppiaAngularRootComponent', function() {
   it('should set site language according to URL', fakeAsync(() => {
     let i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowRef = TestBed.inject(WindowRef);
-    windowRef.nativeWindow.location = new URL('http://localhost/search/find?lang=es');
     spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
+    windowRef.nativeWindow.location = new mockURL('http://localhost/search/find?lang=es');
     component.ngAfterViewInit();
     tick(151);
 

@@ -470,7 +470,6 @@ describe('TopNavigationBarComponent', () => {
 
     component.ngOnInit();
     tick();
-    tick(101);
 
     expect(component.isModerator).toBe(true);
     expect(component.isCurriculumAdmin).toBe(false);
