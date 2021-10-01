@@ -59,7 +59,10 @@ class UnsubscribeHandler(base.BaseHandler):
         'POST': {
             'creator_username': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
                 }
             }
         }
