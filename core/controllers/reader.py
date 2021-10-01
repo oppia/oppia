@@ -21,7 +21,9 @@ import json
 import logging
 import random
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
@@ -43,8 +45,6 @@ from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
-import feconf
-import utils
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 

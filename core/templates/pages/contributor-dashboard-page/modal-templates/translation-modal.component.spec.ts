@@ -54,7 +54,10 @@ describe('Translation Modal Component', () => {
     heading: 'Heading',
     subheading: 'subheading',
     progressPercentage: '20',
-    actionButtonTitle: 'Action Button'
+    actionButtonTitle: 'Action Button',
+    inReviewCount: 12,
+    totalCount: 50,
+    translationsCount: 20
   };
   const getContentTranslatableItemWithText = (text) => {
     return {
