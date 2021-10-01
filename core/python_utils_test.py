@@ -63,15 +63,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             python_utils.url_quote('/~connolly/'), '/~connolly/')
 
-    def test_url_encode(self):
-        url_dict = {'url': 'http://myapp/my%20test/'}
-        self.assertEqual(
-            python_utils.url_encode(url_dict, doseq=True),
-            'url=http%3A%2F%2Fmyapp%2Fmy%2520test%2F')
-        self.assertEqual(
-            python_utils.url_encode(url_dict, doseq=False),
-            'url=http%3A%2F%2Fmyapp%2Fmy%2520test%2F')
-
     def test_url_retrieve(self):
         tmp_file = tempfile.NamedTemporaryFile()
         tmp_file.name = 'temp_file.txt'
