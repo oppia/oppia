@@ -27,8 +27,9 @@ import re
 import sys
 import tokenize
 
+from core import python_utils
 from core.controllers import payload_validator
-import python_utils
+
 from .. import docstrings_checker
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -1389,14 +1390,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         if node.modname in self.EXCLUDED_IMPORT_MODULES:
             return
 
-        if node.level is None:
-            modname = node.modname
-        else:
-            modname = '.' * node.level + node.modname
-
+        modname = node.modname
         for (name, _) in node.names:
-            if name == 'constants':
-                continue
             try:
                 imported_module.import_module(name, True)
             except astroid.AstroidImportError:
