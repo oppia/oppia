@@ -85,8 +85,8 @@ export class ExtensionTagAssemblerService {
       customizationArgs: InteractionCustomizationArgs
   ): JQuery {
     const caBackendDict = (
-      this._convertCustomizationArgsToBackendDict(customizationArgs)) as
-       Record<string, Record<string, Object>>;
+      this._convertCustomizationArgsToBackendDict(customizationArgs)
+      ) as Record<string, Record<string, Object>>;
     for (const caName in customizationArgs) {
       const caBackendDictValue = caBackendDict[caName].value;
       element.attr(

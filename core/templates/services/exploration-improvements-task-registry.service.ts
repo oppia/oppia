@@ -307,7 +307,8 @@ export class ExplorationImprovementsTaskRegistryService {
 
   getOpenSuccessiveIncorrectAnswersTasks(): SiaTask[] {
     return this.openTasksByType.get(
-      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS) as
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS
+    ) as
        SiaTask[];
   }
 

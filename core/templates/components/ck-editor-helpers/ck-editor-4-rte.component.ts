@@ -301,7 +301,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     const sharedSpaces = {
       top: (
-          this.elementRef.nativeElement.children[0].children[0] as HTMLElement)
+        this.elementRef.nativeElement.children[0].children[0] as HTMLElement)
     };
 
     const ckConfig = this._createCKEditorConfig(
@@ -310,10 +310,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     // Initialize CKEditor.
     var ck = CKEDITOR.inline(
-              (
-              this.elementRef.nativeElement.children[0].children[1]
-              ) as HTMLElement,
-              ckConfig
+      (
+        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
+      ),
+      ckConfig
     );
 
     // Hide the editor until it is fully loaded after `instanceReady`

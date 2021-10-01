@@ -140,7 +140,9 @@ export class InteractionRulesRegistryService {
     }
     return (
       this.rulesServiceRegistry.get(
-        rulesServiceName) as InteractionRulesService);
+        rulesServiceName
+      ) as InteractionRulesService
+    );
   }
 }
 

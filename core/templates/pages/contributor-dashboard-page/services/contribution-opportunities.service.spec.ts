@@ -99,7 +99,7 @@ describe('Contribution Opportunities Service', () => {
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
         }
-        ) as NgbModalRef;
+      ) as NgbModalRef;
     });
 
     contributionOpportunitiesService.showRequiresLoginModal();

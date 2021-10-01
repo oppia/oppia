@@ -466,8 +466,8 @@ describe('Content translation manager service', () => {
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          newInteraction.id as string
-          , newInteraction.customizationArgs,
+          newInteraction.id as string,
+          newInteraction.customizationArgs,
           true,
           '',
           null),

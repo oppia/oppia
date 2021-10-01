@@ -189,7 +189,8 @@ export class DragAndDropSortInputValidationService {
             }
             if (
               !choiceContentIdToHtml.hasOwnProperty(inputs.x as string) ||
-              !choiceContentIdToHtml.hasOwnProperty(inputs.y as string)) {
+              !choiceContentIdToHtml.hasOwnProperty(inputs.y as string)
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (

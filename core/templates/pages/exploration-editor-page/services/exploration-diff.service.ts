@@ -211,14 +211,12 @@ export class ExplorationDiffService {
 
         if ((directionForwards && change.cmd === 'add_state') ||
             (!directionForwards && change.cmd === 'delete_state')) {
-          if (!stateIds.hasOwnProperty(
-            (explorationChangeAddState).state_name)
-          ) {
+          if (!stateIds.hasOwnProperty(explorationChangeAddState.state_name)) {
             let newId = this._generateNewId();
             stateIds[(explorationChangeAddState).state_name] = newId;
           }
           let currentStateId = (
-            stateIds[(explorationChangeAddState).state_name]);
+            stateIds[explorationChangeAddState.state_name]);
           if (stateData.hasOwnProperty(currentStateId) &&
               stateData[currentStateId].stateProperty ===
               this.STATE_PROPERTY_DELETED) {

@@ -248,13 +248,13 @@ describe('Exploration improvements task registrar service', () => {
   };
   const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.
-        createFromBackendDict(dict)) as CyclicStateTransitionsPlaythroughIssue;
+      playthroughIssueObjectFactory.createFromBackendDict(dict)
+    ) as CyclicStateTransitionsPlaythroughIssue;
   };
   const makeEqPlaythroughIssue = (dict = eqPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.
-        createFromBackendDict(dict))as EarlyQuitPlaythroughIssue;
+      playthroughIssueObjectFactory.createFromBackendDict(dict)
+    ) as EarlyQuitPlaythroughIssue;
   };
   const makeMisPlaythroughIssue = (dict = misPlaythroughIssueBackendDict) => {
     return (
@@ -425,7 +425,8 @@ describe('Exploration improvements task registrar service', () => {
       'same state', () => {
       const resolvedTaskTypesByStateName = new Map([
         ['Introduction',
-          ['high_bounce_rate', 'high_bounce_rate'] as ExplorationTaskType[]],
+          ['high_bounce_rate', 'high_bounce_rate'] as ExplorationTaskType[]
+        ],
       ]);
       expect(
         () => taskRegistryService.initialize(

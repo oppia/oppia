@@ -397,9 +397,10 @@ export class InteractionObjectFactory {
     switch (interactionId) {
       case 'AlgebraicExpressionInput':
         return (
-        cloneDeep(caBackendDict) as AlgebraicExpressionInputCustomizationArgs);
+          cloneDeep(caBackendDict as AlgebraicExpressionInputCustomizationArgs)
+        );
       case 'CodeRepl':
-        return cloneDeep(caBackendDict) as CodeReplCustomizationArgs;
+        return cloneDeep(caBackendDict as CodeReplCustomizationArgs);
       case 'Continue':
         return this._createFromContinueCustomizationArgsBackendDict(
           caBackendDict as ContinueCustomizationArgsBackendDict);
@@ -441,7 +442,7 @@ export class InteractionObjectFactory {
             caBackendDict as NumericInputCustomizationArgsBackendDict)
         );
       case 'PencilCodeEditor':
-        return cloneDeep(caBackendDict) as PencilCodeEditorCustomizationArgs;
+        return cloneDeep(caBackendDict as PencilCodeEditorCustomizationArgs);
       case 'RatioExpressionInput':
         return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
           caBackendDict as RatioExpressionInputCustomizationArgsBackendDict);

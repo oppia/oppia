@@ -139,7 +139,8 @@ export class SvgSanitizerService {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
           if (constants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
-            nodeAttrName as nodeAttr) === -1) {
+            nodeAttrName as nodeAttr) === -1
+          ) {
             invalidAttrs.push(
               node.tagName + ':' + node.attributes[i].name);
           }

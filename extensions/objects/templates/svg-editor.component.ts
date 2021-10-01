@@ -1119,7 +1119,7 @@ export class SvgEditorComponent implements OnInit {
         };
         //  $scope.$apply();
       };
-      img.src = (reader.result) as string;
+      img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   }

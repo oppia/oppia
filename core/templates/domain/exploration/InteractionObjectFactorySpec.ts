@@ -676,7 +676,7 @@ describe('Interaction object factory', () => {
     expect(testInteraction).toEqual(otherInteraction);
     const args = (
       otherInteraction.customizationArgs
-      ) as MultipleChoiceInputCustomizationArgs;
+    ) as MultipleChoiceInputCustomizationArgs;
     args.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,

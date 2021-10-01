@@ -81,8 +81,8 @@ export class StateInteractionStatsService {
       return Fraction.fromDict(answer as FractionAnswer).toString();
     } else if (state.interaction.id === 'MultipleChoiceInput') {
       const customizationArgs = (
-        state.interaction.customizationArgs as
-         MultipleChoiceInputCustomizationArgs);
+        state.interaction.customizationArgs
+      ) as MultipleChoiceInputCustomizationArgs;
       return customizationArgs.choices.value[
         answer as MultipleChoiceAnswer].html;
     }
