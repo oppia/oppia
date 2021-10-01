@@ -58,8 +58,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 f.readlines()
 
     def test_url_quote(self):
-        self.assertEqual(
-            urllib.quote('/~connolly/'), '/~connolly/')
+        self.assertEqual(urllib.quote('/~connolly/'), '/~connolly/')
 
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}

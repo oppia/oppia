@@ -742,7 +742,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
             self
     ) -> None:
-        image_data_url = urllib.quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
+        image_data_url = urllib.quote(base64.b64encode(b'test123'))
 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG data URL.',

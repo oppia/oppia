@@ -178,9 +178,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_QUOTE_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 44: Please use urllib.quote().'
-            ], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
