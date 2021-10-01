@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import json
 
+from core import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
@@ -28,7 +29,6 @@ from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
-import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 

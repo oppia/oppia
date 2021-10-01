@@ -17,7 +17,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_fetchers
@@ -27,9 +30,6 @@ from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
-import feconf
-import python_utils
-import utils
 
 
 class OldLearnerDashboardRedirectPage(base.BaseHandler):
@@ -66,9 +66,8 @@ class LearnerDashboardHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        (
-            learner_progress, number_of_nonexistent_activities) = (
-                learner_progress_services.get_activity_progress(self.user_id))
+        (learner_progress, number_of_nonexistent_activities) = (
+            learner_progress_services.get_activity_progress(self.user_id))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(

@@ -68,7 +68,7 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -399,10 +399,6 @@ def main(args=None):
             concurrent_task_utils.execute_tasks(tasks, semaphore)
         except Exception:
             task_execution_failed = True
-
-        for task in tasks:
-            if task.exception:
-                concurrent_task_utils.log(task.exception.args[0])
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
