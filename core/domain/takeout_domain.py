@@ -19,7 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
+from core import python_utils
 
 
 class TakeoutData(python_utils.OBJECT):
