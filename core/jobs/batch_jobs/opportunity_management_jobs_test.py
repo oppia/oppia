@@ -19,13 +19,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import state_domain
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import opportunity_management_jobs
+from core.jobs.types import job_run_result
 from core.platform import models
-import feconf
-from jobs import job_test_utils
-from jobs.batch_jobs import opportunity_management_jobs
-from jobs.types import job_run_result
 
 MYPY = False
 if MYPY: # pragma: no cover

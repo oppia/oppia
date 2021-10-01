@@ -29,10 +29,10 @@ from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
-from jobs import base_jobs
-from jobs.io import ndb_io
-from jobs.types import job_run_result
 
 import apache_beam as beam
 
