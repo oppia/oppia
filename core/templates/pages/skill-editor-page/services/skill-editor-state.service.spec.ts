@@ -24,6 +24,7 @@ import { SkillRights } from 'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import {
+  Skill,
   SkillBackendDict,
   SkillObjectFactory,
 } from 'domain/skill/SkillObjectFactory';
@@ -196,6 +197,7 @@ class FakeSkillRightsBackendApiService {
 describe('Skill editor state service', () => {
   let fakeSkillBackendApiService = null;
   let fakeSkillRightsBackendApiService = null;
+  let skill: Skill = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillObjectFactory: SkillObjectFactory = null;
   let skillRightsObject = null;
@@ -219,6 +221,7 @@ describe('Skill editor state service', () => {
       ],
     }).compileComponents();
 
+    skill = TestBed.inject(Skill);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     skillUpdateService = TestBed.inject(SkillUpdateService);
@@ -406,6 +409,12 @@ describe('Skill editor state service', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should get validation issues for skill', () => {
+    const validationIssues = ["issue 1", "issue 2"];
+    spyOn(skill, 'getValidationIssues').and.returnValue(validationIssues);
+    expect(skillEditorStateService.getSkillValidationIssues()).toBe(
+      validationIssues);
+  });
 
   it('should be able to set a new skill rights with an in-place copy', () => {
     skillEditorStateService.setSkillRights(SkillRights.createFromBackendDict({

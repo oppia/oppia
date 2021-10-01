@@ -90,13 +90,11 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should set properties when initialized', function() {
     expect($scope.activeTab).toBe(undefined);
-    expect(ctrl.skill).toEqual(undefined);
 
     ctrl.$onInit();
     mockEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
-    expect(ctrl.skill).toEqual(sampleSkill);
   });
 
   it('should get current active tab name when ' +
@@ -143,11 +141,14 @@ describe('Skill Editor Navbar Directive', function() {
     '\'discardChanges\'', function() {
     let discardSpy = spyOn(undoRedoService, 'clearChanges')
       .and.returnValue(null);
+    let loadSkillSpy = spyOn(skillEditorStateService, 'loadSkill')
+      .and.returnValue(null);
 
     ctrl.$onInit();
     $scope.discardChanges();
 
     expect(discardSpy).toHaveBeenCalled();
+    expect(loadSkillSpy).toHaveBeenCalled();
   });
 
   it('should get change list count when calling ' +
