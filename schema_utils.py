@@ -669,10 +669,10 @@ class _Validators(python_utils.OBJECT):
     def is_at_most_char(obj: str, max_value: int) -> bool:
         """Returns True iff the given object (a string) has at most
         `max_value` characters.
-        
+
         Args:
             obj: str. The string to verify.
-            max_value: int. The max number of characters that `obj` should contain.
+            max_value: int. The maximum allowed value for `obj`.
 
         Returns:
             bool. Whether the given object has at most `max_value` characters.

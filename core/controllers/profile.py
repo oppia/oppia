@@ -239,7 +239,7 @@ class PreferencesHandler(base.BaseHandler):
         update_type = self.normalized_payload.get('update_type')
         data = self.normalized_payload.get('data')
         bulk_email_signup_message_should_be_shown = False
-        if update_type == 'user_bio':            
+        if update_type == 'user_bio':
             user_services.update_user_bio(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
