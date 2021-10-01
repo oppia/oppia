@@ -93,8 +93,9 @@ export class OpportunitiesListItemComponent {
             width: inReviewTranslationsPercentage + '%'
           };
           this.isOpportunityButtonDisabled = (
-            this.opportunity.translationsCount + this.opportunity.inReviewCount
-            >= this.opportunity.totalCount);
+            this.opportunity.translationsCount +
+            this.opportunity.inReviewCount >=
+            this.opportunity.totalCount);
         } else {
           this.progressBarStyle = { width: this.progressPercentage };
         }
