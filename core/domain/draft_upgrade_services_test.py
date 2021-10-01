@@ -19,15 +19,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import state_domain
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -163,6 +163,33 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
+
+    def test_convert_states_v48_dict_to_v49_dict(self):
+        draft_change_list_v48 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'NumericInput'
+            })
+        ]
+        # Migrate exploration to state schema version 48.
+        self.create_and_migrate_new_exploration('48', '49')
+        migrated_draft_change_list_v49 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v48, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v48_dict_list = [
+            change.to_dict() for change in draft_change_list_v48
+        ]
+        migrated_draft_change_list_v49_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v49
+        ]
+        self.assertEqual(
+            draft_change_list_v48_dict_list,
+            migrated_draft_change_list_v49_dict_list)
 
     def test_convert_states_v47_dict_to_v48_dict(self):
         draft_change_list_v47 = [

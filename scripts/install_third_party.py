@@ -26,7 +26,7 @@ import sys
 import tarfile
 import zipfile
 
-import python_utils
+from core import python_utils
 
 from . import common
 from . import install_backend_python_libs
