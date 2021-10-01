@@ -73,5 +73,5 @@ class UnsubscribeHandler(base.BaseHandler):
         creator_id = user_services.get_user_id_from_username(
         self.normalized_payload.get('creator_username'))
         subscription_services.unsubscribe_from_creator(
-        self.user_id, creator_id)
+            self.user_id, creator_id)
         self.render_json(self.values)
