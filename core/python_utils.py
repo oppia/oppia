@@ -20,14 +20,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import inspect
 import io
 import itertools
 import os
 import pkgutil
 import sys
-
-from typing import Any, Callable, List # isort: skip
 
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)

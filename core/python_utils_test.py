@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import ast
 import builtins
+import inspect
 import io
 import os
 import sys
 import tempfile
 import unittest
-import inspect
 
 from core import python_utils
 from core.tests import test_utils
