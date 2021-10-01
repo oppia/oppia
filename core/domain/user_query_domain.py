@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import collections
 
-from constants import constants
-import feconf
-import python_utils
-import utils
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 
 attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (
