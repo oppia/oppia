@@ -38,10 +38,12 @@ describe('datetimeformatter', () => {
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
     // doesn't seem to be a good way to set the timezone locale directly).
+
     // This throws "Argument of type '(millisSinceEpoch?: number) => Date' is
-    // not assignable to parameter of type 'DateConstructor'." This is because
-    // the actual 'Date' has more properties than 'MockDateContructor'. We have
-    // only defined the properties we need in 'MockDateContructor'.
+    // not assignable to parameter of type 'DateConstructor'.". We need to
+    // suppress this error because the actual 'Date' has more properties than
+    // 'MockDateContructor'. We have only defined the properties we need in
+    // 'MockDateContructor'.
     // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
@@ -71,9 +73,17 @@ describe('datetimeformatter', () => {
         NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
   });
 
-  it('should provide date time hour string', function() {
+  it('should provide date time hour in MMM D, h:mm A format', () => {
     expect(df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
-      dayjs(new Date(NOW_MILLIS)).format('MMM D hh:mm A')
+      dayjs(new Date(NOW_MILLIS)).format('MMM D, h:mm A')
+    );
+  });
+
+  it('should provide date time hour in MMM D, YYYY format', () => {
+    // This is a date that is 1 year before NOW_MILLIS.
+    let dateFromPreviousYear = NOW_MILLIS - 365 * 24 * 60 * 60 * 1000;
+    expect(df.getLocaleDateTimeHourString(dateFromPreviousYear)).toBe(
+      dayjs(new Date(dateFromPreviousYear)).format('MMM D, YYYY')
     );
   });
 

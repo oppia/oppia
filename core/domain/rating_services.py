@@ -16,17 +16,17 @@
 
 """System for assigning and displaying ratings of explorations."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
 from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
-import feconf
-import python_utils
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
@@ -61,7 +61,8 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     if exploration is None:
         raise ValueError('Invalid exploration id %s' % exploration_id)
 
-    def _update_user_rating():
+    @transaction_services.run_in_transaction_wrapper
+    def _update_user_rating_transactional():
         """Updates the user rating of the exploration. Returns the old rating
         before updation.
         """
@@ -78,7 +79,8 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exp_user_data_model.update_timestamps()
         exp_user_data_model.put()
         return old_rating
-    old_rating = transaction_services.run_in_transaction(_update_user_rating)
+
+    old_rating = _update_user_rating_transactional()
 
     exploration_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id)

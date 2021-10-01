@@ -44,7 +44,7 @@
         <div>
           <strong>Explanation of the subtopic*</strong>
         </div>
-        <div class="description-editor" ng-if="$ctrl.schemaEditorIsShown">
+        <div class="description-editor protractor-test-subtopic-description-editor" ng-if="$ctrl.schemaEditorIsShown">
           <div class="oppia-editor-card-body" >
             <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
                                  class="protractor-test-create-subtopic-page-content"
@@ -61,19 +61,17 @@
         </div>
       </div>
 
-      <div class="thumbnail-editor create-new-subtopic-input-field">
+      <div class="thumbnail-editor protractor-test-thumbnail-editor create-new-subtopic-input-field">
         <strong>Thubmnail Image*</strong>
-        <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
-                            update-filename="$ctrl.updateSubtopicThumbnailFilename"
-                            bg-color="$ctrl.editableThumbnailBgColor"
-                            update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
-                            allowed-bg-colors="$ctrl.allowedBgColors"
-                            aspect-ratio="'4:3'"
-                            preview-title="$ctrl.subtopicTitle"
-                            preview-description=""
-                            preview-description-bg-color="'#BE563C'"
-                            preview-footer="">
-        </thumbnail-uploader>
+        <oppia-thumbnail-uploader [filename]="$ctrl.editableThumbnailFilename"
+                                  (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
+                                  [bg-color]="$ctrl.editableThumbnailBgColor"
+                                  (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
+                                  [allowed-bg-colors]="$ctrl.allowedBgColors"
+                                  [aspect-ratio]="'4:3'"
+                                  [preview-title]="$ctrl.subtopicTitle"
+                                  preview-description-bg-color="#BE563C">
+        </oppia-thumbnail-uploader>
       </div>
     </div>
   </div>
@@ -97,7 +95,7 @@
     margin: 10px 0 0;
   }
   .new-subtopic-editor .error-msg {
-    color: #ff0000;
+    color: #f00;
     font-size: smaller;
     margin: 10px 0 0;
   }
@@ -127,13 +125,13 @@
       display: flex;
     }
     .create-new-subtopic .modal-header h3 {
-      color: #FFFFFF;
+      color: #FFF;
     }
     .create-new-subtopic .create-new-subtopic-input-field {
       margin: 25px 0;
     }
     .create-new-subtopic .modal-close-button {
-      color: #FFFFFF;
+      color: #FFF;
       display: block;
       font-size: 20px;
     }

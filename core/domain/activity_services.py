@@ -16,15 +16,15 @@
 
 """Commands for operating on lists of activity references."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import activity_domain
 from core.platform import models
-import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 

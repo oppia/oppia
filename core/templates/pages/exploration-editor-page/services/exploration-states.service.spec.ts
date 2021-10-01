@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,39 +16,10 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// exploration-states.service.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ChangeListService } from './change-list.service';
+import { TestBed } from '@angular/core/testing';
+
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -59,59 +30,31 @@ describe('ExplorationStatesService', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var ChangeListService = null;
+  let changeListService: ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
   importAllAngularServices();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ChangeListService
+      ]
+    });
+  });
+
+  beforeEach(() => {
+    changeListService = TestBed.inject(ChangeListService);
+  });
+
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
-      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
+      _$q_, _$rootScope_, _$uibModal_, _ContextService_,
+      _ExplorationStatesService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
   }));
@@ -171,6 +114,7 @@ describe('ExplorationStatesService', function() {
           id: 'TextInput',
           solution: null,
         },
+        linked_skill_id: null,
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
@@ -189,7 +133,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateAddedCallback', function() {
       it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'addState');
+        spyOn(changeListService, 'addState');
 
         ExplorationStatesService.registerOnStateAddedCallback(spy);
         ExplorationStatesService.addState('Me Llamo');
@@ -203,7 +147,7 @@ describe('ExplorationStatesService', function() {
         spyOn($uibModal, 'open').and.callFake(function() {
           return {result: $q.resolve()};
         });
-        spyOn(ChangeListService, 'deleteState');
+        spyOn(changeListService, 'deleteState');
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
@@ -218,7 +162,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateRenamedCallback', function() {
       it('should callback when a state is renamed', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'renameState');
+        spyOn(changeListService, 'renameState');
 
         ExplorationStatesService.registerOnStateRenamedCallback(spy);
         ExplorationStatesService.renameState('Hola', 'Bonjour');
@@ -231,7 +175,7 @@ describe('ExplorationStatesService', function() {
       it('should callback when answer groups of a state are saved',
         function() {
           var spy = jasmine.createSpy('callback');
-          spyOn(ChangeListService, 'editStateProperty');
+          spyOn(changeListService, 'editStateProperty');
 
           ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
           ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
@@ -246,9 +190,9 @@ describe('ExplorationStatesService', function() {
     expect(
       ExplorationStatesService.getSolicitAnswerDetailsMemento(
         'Hola', 'solicit_answer_details')).toEqual(false);
-    spyOn(ChangeListService, 'editStateProperty');
+    const changeListSpy = spyOn(changeListService, 'editStateProperty');
     ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
-    expect(ChangeListService.editStateProperty).toHaveBeenCalledWith(
+    expect(changeListSpy).toHaveBeenCalledWith(
       'Hola', 'solicit_answer_details', true, false);
     expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(
       'Hola', 'solicit_answer_details')).toEqual(true);

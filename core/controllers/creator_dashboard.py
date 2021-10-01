@@ -16,12 +16,15 @@
 activities.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
@@ -34,28 +37,18 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
-from core.domain import topic_services
-from core.domain import user_jobs_continuous
+from core.domain import topic_fetchers
 from core.domain import user_services
-import feconf
-import python_utils
-import utils
 
 EXPLORATION_ID_KEY = 'exploration_id'
 COLLECTION_ID_KEY = 'collection_id'
 
 
-class OldNotificationsDashboardRedirectPage(base.BaseHandler):
-    """Redirects the old notifications dashboard URL to the new one."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
-
-
 class OldContributorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old contributor dashboard URL to the new one."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -63,63 +56,11 @@ class OldContributorDashboardRedirectPage(base.BaseHandler):
         self.redirect('/contributor-dashboard', permanent=True)
 
 
-class NotificationsDashboardPage(base.BaseHandler):
-    """Page with notifications for the user."""
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        self.render_template(
-            'notifications-dashboard-page.mainpage.html')
-
-
-class NotificationsDashboardHandler(base.BaseHandler):
-    """Provides data for the user notifications dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        """Handles GET requests."""
-        job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
-
-        # Replace author_ids with their usernames.
-        author_ids = [
-            notification['author_id'] for notification in recent_notifications
-            if notification['author_id']]
-        author_usernames = user_services.get_usernames(author_ids)
-
-        author_id_to_username = {
-            None: '',
-        }
-        for ind, author_id in enumerate(author_ids):
-            author_id_to_username[author_id] = author_usernames[ind]
-        for notification in recent_notifications:
-            notification['author_username'] = (
-                author_id_to_username[notification['author_id']])
-            del notification['author_id']
-
-        subscription_services.record_user_has_seen_notifications(
-            self.user_id, job_queued_msec if job_queued_msec else 0.0)
-
-        self.values.update({
-            # This may be None if no job has ever run for this user.
-            'job_queued_msec': job_queued_msec,
-            # This may be None if this is the first time the user has seen
-            # the dashboard.
-            'last_seen_msec': last_seen_msec,
-            'recent_notifications': recent_notifications,
-        })
-        self.render_json(self.values)
-
-
 class OldCreatorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old creator dashboard URL to the new one."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -131,6 +72,8 @@ class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
     ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
@@ -142,6 +85,21 @@ class CreatorDashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'display_preference': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': (
+                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS
+                        .values()
+                    )
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
@@ -189,7 +147,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
@@ -217,9 +175,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
-        dashboard_stats = (
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.user_id))
+        dashboard_stats = user_services.get_dashboard_stats(self.user_id)
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)
@@ -232,7 +188,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             user_services.get_last_week_dashboard_stats(self.user_id))
 
         if last_week_stats and len(list(last_week_stats.keys())) != 1:
-            logging.error(
+            logging.exception(
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
                 ' datetime string.')
@@ -322,44 +278,32 @@ class CreatorDashboardHandler(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def post(self):
-        creator_dashboard_display_pref = self.payload.get('display_preference')
+        creator_dashboard_display_pref = (
+            self.normalized_payload.get('display_preference'))
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
         self.render_json({})
 
 
-class NotificationsHandler(base.BaseHandler):
-    """Provides data about unseen notifications."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        """Handles GET requests."""
-        num_unseen_notifications = 0
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
-        _, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-        for notification in recent_notifications:
-            if (notification['last_updated_ms'] > last_seen_msec and
-                    notification['author_id'] != self.user_id):
-                num_unseen_notifications += 1
-
-        self.render_json({
-            'num_unseen_notifications': num_unseen_notifications,
-        })
-
-
 class NewExplorationHandler(base.BaseHandler):
     """Creates a new exploration."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'title': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': feconf.DEFAULT_EXPLORATION_TITLE
+            }
+        }
+    }
 
     @acl_decorators.can_create_exploration
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
+        title = self.normalized_payload.get('title')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -373,6 +317,11 @@ class NewExplorationHandler(base.BaseHandler):
 
 class NewCollectionHandler(base.BaseHandler):
     """Creates a new collection."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
 
     @acl_decorators.can_create_collection
     def post(self):
@@ -390,10 +339,22 @@ class NewCollectionHandler(base.BaseHandler):
 class UploadExplorationHandler(base.BaseHandler):
     """Uploads a new exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'yaml_file': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
-        yaml_content = self.request.get('yaml_file')
+        yaml_content = self.normalized_payload.get('yaml_file')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:

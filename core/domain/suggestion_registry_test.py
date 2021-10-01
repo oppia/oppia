@@ -14,12 +14,15 @@
 
 """Tests for suggestion registry classes."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -33,9 +36,6 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -148,7 +148,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             },
             'score_category': 'content.Algebra',
             'language_code': None,
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
 
     def test_create_suggestion_edit_state_content(self):
@@ -161,7 +162,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -176,7 +177,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
@@ -190,7 +191,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'content')
         self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
@@ -204,13 +205,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
         with self.assertRaisesRegexp(
-            Exception, 'Expected suggestion_type to be among allowed choices'):
+            utils.ValidationError,
+            'Expected suggestion_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_type(self):
@@ -222,13 +225,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_type to be among allowed choices'):
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_id(self):
@@ -240,13 +245,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.target_id = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_id to be a string'):
+            utils.ValidationError, 'Expected target_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_target_version_at_submission(self):
@@ -258,13 +264,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.target_version_at_submission = 'invalid_version'
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_version_at_submission to be an int'):
+            utils.ValidationError,
+            'Expected target_version_at_submission to be an int'
+        ):
             suggestion.validate()
 
     def test_validate_status(self):
@@ -276,13 +284,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
         with self.assertRaisesRegexp(
-            Exception, 'Expected status to be among allowed choices'):
+            utils.ValidationError, 'Expected status to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_author_id(self):
@@ -294,13 +303,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.author_id = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_id to be a string'):
+            utils.ValidationError, 'Expected author_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_author_id_format(self):
@@ -312,7 +322,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
@@ -321,7 +331,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.author_id = ''
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_id to be in a valid user ID format'):
+            utils.ValidationError,
+            'Expected author_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id(self):
@@ -333,13 +345,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.final_reviewer_id = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected final_reviewer_id to be a string'):
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id_format(self):
@@ -351,7 +364,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
@@ -360,8 +373,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected final_reviewer_id to be in a valid user ID format'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_score_category(self):
@@ -373,13 +387,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected score_category to be a string'):
+            utils.ValidationError, 'Expected score_category to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_score_category_format(self):
@@ -391,22 +406,24 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected score_category to be of the form'
-            ' score_type.score_sub_type'):
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected score_category to be of the form'
-            ' score_type.score_sub_type'):
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
     def test_validate_score_type(self):
@@ -418,15 +435,16 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the first part of score_category to be among allowed'
-            ' choices'):
+            ' choices'
+        ):
             suggestion.validate()
 
     def test_validate_change(self):
@@ -438,13 +456,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change = {}
         with self.assertRaisesRegexp(
-            Exception, 'Expected change to be an ExplorationChange'):
+            utils.ValidationError, 'Expected change to be an ExplorationChange'
+        ):
             suggestion.validate()
 
     def test_validate_score_type_content(self):
@@ -456,14 +475,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected the first part of score_category to be content'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be content'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd(self):
@@ -475,12 +495,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
         with self.assertRaisesRegexp(
-            Exception, 'Expected cmd to be edit_state_property'):
+            utils.ValidationError, 'Expected cmd to be edit_state_property'
+        ):
             suggestion.validate()
 
     def test_validate_change_property_name(self):
@@ -492,13 +513,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change.property_name = 'invalid_property'
         with self.assertRaisesRegexp(
-            Exception, 'Expected property_name to be content'):
+            utils.ValidationError, 'Expected property_name to be content'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
@@ -511,14 +533,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
         suggestion.language_code = 'wrong_language_code'
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected language_code to be None, received wrong_language_code'):
+            utils.ValidationError,
+            'Expected language_code to be None, received wrong_language_code'
+        ):
             suggestion.validate()
 
     def test_pre_accept_validate_state_name(self):
@@ -531,7 +554,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         exp_services.update_exploration(
             self.author_id, 'exp1', [
@@ -546,7 +569,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change.state_name = 'invalid_state_name'
         with self.assertRaisesRegexp(
-            Exception, 'Expected invalid_state_name to be a valid state name'):
+            utils.ValidationError,
+            'Expected invalid_state_name to be a valid state name'
+        ):
             suggestion.pre_accept_validate()
 
     def test_populate_old_value_of_change_with_invalid_state(self):
@@ -559,7 +584,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.change.state_name = 'invalid_state_name'
 
@@ -578,7 +603,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
             'cmd': exp_domain.CMD_ADD_STATE,
@@ -588,9 +613,10 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegexp(
-            Exception, (
-                'The following extra attributes are present: new_value, '
-                'old_value, property_name')):
+            utils.ValidationError,
+            'The following extra attributes are present: new_value, '
+            'old_value, property_name'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_property_name(self):
@@ -602,7 +628,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -612,7 +638,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegexp(
-            Exception, 'The new change property_name must be equal to content'):
+            utils.ValidationError,
+            'The new change property_name must be equal to content'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_state_name(self):
@@ -624,7 +652,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -634,7 +662,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegexp(
-            Exception, 'The new change state_name must be equal to state_1'):
+            utils.ValidationError,
+            'The new change state_name must be equal to state_1'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_new_value(self):
@@ -646,7 +676,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new suggestion html</p>').to_dict()
 
@@ -660,7 +690,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegexp(
-            Exception, 'The new html must not match the old html'):
+            utils.ValidationError, 'The new html must not match the old html'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_non_equal_change_cmd(self):
@@ -672,11 +703,12 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         with self.assertRaisesRegexp(
-            Exception,
-            'The new change cmd must be equal to edit_state_property'):
+            utils.ValidationError,
+            'The new change cmd must be equal to edit_state_property'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -701,7 +733,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, change_dict,
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [u'new suggestion content']
@@ -737,7 +769,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, change,
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.convert_html_in_suggestion_change(
             html_validation_service.
@@ -766,7 +798,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, change_dict,
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_target_entity_html_strings()
         expected_outcome_list = [u'Old content.']
@@ -790,7 +822,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, change_dict,
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_target_entity_html_strings()
         self.assertEqual(actual_outcome_list, [])
@@ -822,17 +854,118 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
             'change': {
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p>This is a content.</p>',
-                'translation_html': '<p>This is translated html.</p>'
+                'translation_html': '<p>This is translated html.</p>',
+                'data_format': 'html'
             },
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
+
+    def test_pre_update_validate_fails_for_invalid_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+
+        change = {
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'Introduction'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change cmd must be equal to %s' % (
+                exp_domain.CMD_ADD_WRITTEN_TRANSLATION)
+        ):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_state_name(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+        change = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change state_name must be equal to Introduction'
+        ):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_language_code(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+        change = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'en',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The language code must be equal to hi'
+        ):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_content_html(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+        change = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'en',
+            'content_html': '<p>This is the changed content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change content_html must be equal to <p>This is a ' +
+            'content.</p>'
+        ):
+            suggestion.pre_update_validate(
+                exp_domain.ExplorationChange(change))
 
     def test_create_suggestion_add_translation(self):
         expected_suggestion_dict = self.suggestion_dict
@@ -844,7 +977,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -859,7 +992,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
@@ -873,7 +1006,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'translation')
         self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
@@ -887,13 +1020,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
         with self.assertRaisesRegexp(
-            Exception, 'Expected suggestion_type to be among allowed choices'):
+            utils.ValidationError,
+            'Expected suggestion_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_type(self):
@@ -905,13 +1040,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_type to be among allowed choices'):
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_id(self):
@@ -923,13 +1060,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.target_id = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_id to be a string'):
+            utils.ValidationError, 'Expected target_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_target_version_at_submission(self):
@@ -941,13 +1079,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.target_version_at_submission = 'invalid_version'
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_version_at_submission to be an int'):
+            utils.ValidationError,
+            'Expected target_version_at_submission to be an int'
+        ):
             suggestion.validate()
 
     def test_validate_status(self):
@@ -959,13 +1099,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
         with self.assertRaisesRegexp(
-            Exception, 'Expected status to be among allowed choices'):
+            utils.ValidationError, 'Expected status to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_author_id(self):
@@ -977,13 +1118,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.author_id = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_id to be a string'):
+            utils.ValidationError, 'Expected author_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_author_id_format(self):
@@ -995,14 +1137,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.author_id = ''
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected author_id to be in a valid user ID format.'):
+            utils.ValidationError,
+            'Expected author_id to be in a valid user ID format.'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id(self):
@@ -1014,13 +1157,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.final_reviewer_id = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected final_reviewer_id to be a string'):
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id_format(self):
@@ -1032,14 +1176,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected final_reviewer_id to be in a valid user ID format.'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_score_category(self):
@@ -1051,13 +1196,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected score_category to be a string'):
+            utils.ValidationError, 'Expected score_category to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_score_category_format(self):
@@ -1069,22 +1215,24 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected score_category to be of the form'
-            ' score_type.score_sub_type'):
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected score_category to be of the form'
-            ' score_type.score_sub_type'):
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
     def test_validate_score_type(self):
@@ -1096,15 +1244,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the first part of score_category to be among allowed'
-            ' choices'):
+            ' choices'
+        ):
             suggestion.validate()
 
     def test_validate_change(self):
@@ -1116,13 +1265,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change = {}
         with self.assertRaisesRegexp(
-            Exception, 'Expected change to be an ExplorationChange'):
+            utils.ValidationError, 'Expected change to be an ExplorationChange'
+        ):
             suggestion.validate()
 
     def test_validate_score_type_translation(self):
@@ -1134,14 +1284,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected the first part of score_category to be translation'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be translation'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd(self):
@@ -1153,13 +1304,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
         with self.assertRaisesRegexp(
-            Exception, 'Expected cmd to be add_translation'):
+            utils.ValidationError, 'Expected cmd to be add_written_translation'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
@@ -1172,7 +1324,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         expected_language_code = (
             expected_suggestion_dict['change']['language_code']
         )
@@ -1181,9 +1333,10 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.language_code = 'wrong_language_code'
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected language_code to be %s, received wrong_language_code' % (
-                expected_language_code)):
+            utils.ValidationError,
+            'Expected language_code to be %s, '
+            'received wrong_language_code' % expected_language_code
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
@@ -1196,13 +1349,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
         suggestion.language_code = None
 
         with self.assertRaisesRegexp(
-            Exception, 'language_code cannot be None'):
+            utils.ValidationError, 'language_code cannot be None'
+        ):
             suggestion.validate()
 
     def test_validate_change_with_invalid_language_code_fails_validation(self):
@@ -1214,13 +1368,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change.language_code = 'invalid_code'
         with self.assertRaisesRegexp(
-            Exception, 'Invalid language_code: invalid_code'):
+            utils.ValidationError, 'Invalid language_code: invalid_code'
+        ):
             suggestion.validate()
 
     def test_pre_accept_validate_state_name(self):
@@ -1233,7 +1388,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         exp_services.update_exploration(
             self.author_id, 'exp1', [
@@ -1257,69 +1412,58 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change.state_name = 'invalid_state_name'
         with self.assertRaisesRegexp(
-            Exception, 'Expected invalid_state_name to be a valid state name'):
-            suggestion.pre_accept_validate()
-
-    def test_pre_accept_validate_content_html(self):
-        self.save_new_default_exploration('exp1', self.author_id)
-        expected_suggestion_dict = self.suggestion_dict
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
-
-        exp_services.update_exploration(
-            self.author_id, 'exp1', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'new_value': {
-                        'content_id': 'content',
-                        'html': '<p>This is a content.</p>'
-                    },
-                    'state_name': 'State A',
-                })
-            ], 'Added state')
-        suggestion.change.state_name = 'State A'
-
-        suggestion.pre_accept_validate()
-
-        suggestion.change.content_html = 'invalid content_html'
-        with self.assertRaisesRegexp(
-            Exception,
-            'The given content_html does not match the content of the'
-            ' exploration.'):
+            utils.ValidationError,
+            'Expected invalid_state_name to be a valid state name'
+        ):
             suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self):
         self.save_new_default_exploration('exp1', self.author_id)
-
         exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {})
-
-        expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
 
+    def test_accept_suggestion_with_set_of_string_adds_translation(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
@@ -1338,7 +1482,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.PSEUDONYMOUS_ID,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
@@ -1357,11 +1501,37 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, self.suggestion_dict['change'],
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
+
         expected_outcome_list = [
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_all_html_content_strings_for_content_lists(self):
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+
+        expected_outcome_list = [
+            'translated text1', 'translated text2', 'text1', 'text2']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_target_entity_html_strings_returns_expected_strings(self):
@@ -1372,7 +1542,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, self.suggestion_dict['change'],
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_target_entity_html_strings()
         expected_outcome_list = [self.suggestion_dict['change']['content_html']]
@@ -1388,12 +1558,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': html_content,
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
@@ -1402,7 +1573,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, change_dict,
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
         suggestion.convert_html_in_suggestion_change(
             html_validation_service.add_math_content_to_math_rte_components)
         self.assertEqual(
@@ -1449,7 +1620,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'score_category': 'question.topic_1',
             'language_code': 'en',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
 
     def test_create_suggestion_add_question(self):
@@ -1462,7 +1634,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -1477,7 +1649,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
@@ -1491,7 +1663,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'question')
         self.assertEqual(suggestion.get_score_sub_type(), 'topic_1')
@@ -1506,15 +1678,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.score_category = 'content.score_sub_type'
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected the first part of score_category to be "question"'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be "question"'
+        ):
             suggestion.validate()
 
     def test_validate_change_type(self):
@@ -1527,15 +1700,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change = 'invalid_change'
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected change to be an instance of QuestionSuggestionChange'):
+            utils.ValidationError,
+            'Expected change to be an instance of QuestionSuggestionChange'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd(self):
@@ -1548,14 +1722,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change.cmd = None
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected change to contain cmd'):
+            utils.ValidationError, 'Expected change to contain cmd'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd_type(self):
@@ -1568,15 +1743,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected cmd to be create_new_fully_specified_question'):
+            utils.ValidationError,
+            'Expected cmd to be create_new_fully_specified_question'
+        ):
             suggestion.validate()
 
     def test_validate_change_question_dict(self):
@@ -1589,14 +1765,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.change.question_dict = None
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected change to contain question_dict'):
+            utils.ValidationError, 'Expected change to contain question_dict'
+        ):
             suggestion.validate()
 
     def test_validate_change_question_state_data_schema_version(self):
@@ -1609,7 +1786,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
@@ -1622,9 +1799,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change.question_dict = question_dict
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected question state schema version to be %s, received 0' % (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)):
+            utils.ValidationError,
+            'Expected question state schema version to be %s, '
+            'received 0' % feconf.CURRENT_STATE_SCHEMA_VERSION
+        ):
             suggestion.validate()
 
     def test_validate_change_skill_difficulty_none(self):
@@ -1636,13 +1814,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
         suggestion.change.skill_difficulty = None
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected change to contain skill_difficulty'):
+            utils.ValidationError, 'Expected change to contain skill_difficulty'
+        ):
             suggestion.validate()
 
     def test_validate_change_skill_difficulty_invalid_value(self):
@@ -1654,14 +1833,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
         suggestion.change.skill_difficulty = 0.4
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected change skill_difficulty to be one of '):
+            utils.ValidationError,
+            'Expected change skill_difficulty to be one of '
+        ):
             suggestion.validate()
 
     def test_pre_accept_validate_change_skill_id(self):
@@ -1674,7 +1854,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
@@ -1685,7 +1865,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change.skill_id = None
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected change to contain skill_id'):
+            utils.ValidationError, 'Expected change to contain skill_id'
+        ):
             suggestion.pre_accept_validate()
 
     def test_pre_accept_validate_change_invalid_skill_id(self):
@@ -1698,7 +1879,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
@@ -1709,7 +1890,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change.skill_id = skill_services.get_new_skill_id()
 
         with self.assertRaisesRegexp(
-            Exception, 'The skill with the given id doesn\'t exist.'):
+            utils.ValidationError, 'The skill with the given id doesn\'t exist.'
+        ):
             suggestion.pre_accept_validate()
 
     def test_get_change_list_for_accepting_suggestion(self):
@@ -1722,7 +1904,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertIsNone(suggestion.get_change_list_for_accepting_suggestion())
 
@@ -1736,7 +1918,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         self.assertIsNone(suggestion.populate_old_value_of_change())
 
@@ -1750,12 +1932,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.change.skill_id = skill_services.get_new_skill_id()
 
         with self.assertRaisesRegexp(
-            Exception, 'The skill with the given id doesn\'t exist.'):
+            utils.ValidationError,
+            'The skill with the given id doesn\'t exist.'
+        ):
             suggestion.accept('commit message')
 
     def test_pre_update_validate_change_cmd(self):
@@ -1768,7 +1952,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
             'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
@@ -1777,9 +1961,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'old_value': 'en'
         }
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'The new change cmd must be equal to '
-            'create_new_fully_specified_question'):
+            'create_new_fully_specified_question'
+        ):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
@@ -1793,7 +1978,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
@@ -1808,11 +1993,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         }
 
         with self.assertRaisesRegexp(
-            Exception, 'The new change skill_id must be equal to skill_1'):
+            utils.ValidationError,
+            'The new change skill_id must be equal to skill_1'
+        ):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
-    def test_pre_update_validate_change_question_dict(self):
+    def test_pre_update_validate_complains_if_nothing_changed(self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1832,12 +2019,100 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', self.fake_date)
 
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
         with self.assertRaisesRegexp(
-            Exception,
-            'The new change question_dict must not be equal to the '
-            'old question_dict'):
+            utils.ValidationError,
+            'At least one of the new skill_difficulty or question_dict '
+            'should be changed.'):
             suggestion.pre_update_validate(
-                question_domain.QuestionSuggestionChange(change))
+                question_domain.QuestionSuggestionChange(new_change))
+
+    def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
+            self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.6
+        }
+
+        self.assertEqual(
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change)), None)
+
+    def test_pre_update_validate_accepts_a_change_in_state_data_only(self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'hi',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        self.assertEqual(
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change)), None)
 
     def test_validate_author_id(self):
         expected_suggestion_dict = self.suggestion_dict
@@ -1848,13 +2123,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.author_id = 0
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_id to be a string'):
+            utils.ValidationError, 'Expected author_id to be a string'):
             suggestion.validate()
 
     def test_validate_author_id_format(self):
@@ -1866,13 +2141,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.author_id = ''
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected author_id to be in a valid user ID format.'):
             suggestion.validate()
 
@@ -1885,13 +2160,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.final_reviewer_id = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected final_reviewer_id to be a string'):
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'):
             suggestion.validate()
 
     def test_validate_final_reviewer_id_format(self):
@@ -1903,14 +2178,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegexp(
-            Exception,
-            'Expected final_reviewer_id to be in a valid user ID format.'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be in a valid user ID format'):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
@@ -1923,7 +2198,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         expected_question_dict = (
             expected_suggestion_dict['change']['question_dict']
         )
@@ -1931,9 +2206,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         expected_question_dict['language_code'] = 'wrong_language_code'
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected question language_code.wrong_language_code. to be same '
-            'as suggestion language_code.en.'):
+            'as suggestion language_code.en.'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
@@ -1946,13 +2222,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
         suggestion.language_code = None
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected language_code to be en, received None'):
             suggestion.validate()
 
@@ -2102,7 +2378,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change'], suggestion_dict['score_category'],
-            suggestion_dict['language_code'], self.fake_date)
+            suggestion_dict['language_code'], False, self.fake_date)
         suggestion.convert_html_in_suggestion_change(
             html_validation_service.add_math_content_to_math_rte_components)
         self.assertEqual(
@@ -2159,7 +2435,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change'], suggestion_dict['score_category'],
-            suggestion_dict['language_code'], self.fake_date)
+            suggestion_dict['language_code'], False, self.fake_date)
         suggestion.accept('commit_message')
 
     def test_contructor_updates_state_shema_in_change_cmd(self):
@@ -2185,7 +2461,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             'suggestionId', 'target_id', 1, suggestion_models.STATUS_IN_REVIEW,
-            self.author_id, None, change, score_category, 'en', self.fake_date)
+            self.author_id, None, change, score_category, 'en', False,
+            self.fake_date)
         self.assertEqual(
             suggestion.change.question_dict[
                 'question_state_data_schema_version'],
@@ -2201,7 +2478,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
                 'question_state_data': self.VERSION_27_STATE_DICT,
-                'question_state_data_schema_version': None,
+                'question_state_data_schema_version': 23,
                 'language_code': 'en',
                 'linked_skill_ids': ['skill_id'],
                 'inapplicable_skill_misconception_ids': []
@@ -2210,14 +2487,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
         self.assertEqual(
-            change['question_dict']['question_state_data_schema_version'], None)
+            change['question_dict']['question_state_data_schema_version'], 23)
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected state schema version to be in between 25'):
+            utils.ValidationError,
+            'Expected state schema version to be in between 25'
+        ):
             suggestion_registry.SuggestionAddQuestion(
                 'suggestionId', 'target_id', 1,
                 suggestion_models.STATUS_IN_REVIEW, self.author_id, None,
-                change, score_category, 'en', self.fake_date)
+                change, score_category, 'en', False, self.fake_date)
 
 
 class MockInvalidVoiceoverApplication(
@@ -2276,8 +2555,10 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.target_type = 'invalid_target'
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_type to be among allowed choices, '
-            'received invalid_target'):
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices, '
+            'received invalid_target'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_target_id_raise_exception(self):
@@ -2285,7 +2566,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.target_id = 123
         with self.assertRaisesRegexp(
-            Exception, 'Expected target_id to be a string'):
+            utils.ValidationError, 'Expected target_id to be a string'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_status_raise_exception(self):
@@ -2293,8 +2575,10 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.status = 'invalid_status'
         with self.assertRaisesRegexp(
-            Exception, 'Expected status to be among allowed choices, '
-            'received invalid_status'):
+            utils.ValidationError,
+            'Expected status to be among allowed choices, '
+            'received invalid_status'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_author_id_raise_exception(self):
@@ -2302,7 +2586,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.author_id = 123
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_id to be a string'):
+            utils.ValidationError, 'Expected author_id to be a string'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_final_reviewer_id_raise_exception(self):
@@ -2314,8 +2599,10 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.final_reviewer_id = 123
         with self.assertRaisesRegexp(
-            Exception, 'Expected final_reviewer_id to be None as the '
-            'voiceover application is not yet handled.'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be None as the '
+            'voiceover application is not yet handled.'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_for_handled_application_with_invalid_final_review(self):
@@ -2327,7 +2614,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
         with self.assertRaisesRegexp(
-            Exception, 'Expected final_reviewer_id to be a string'):
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_for_rejected_application_with_no_message(self):
@@ -2340,8 +2628,10 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.final_reviewer_id = 'reviewer_id'
         self.voiceover_application.status = suggestion_models.STATUS_REJECTED
         with self.assertRaisesRegexp(
-            Exception, 'Expected rejection_message to be a string for a '
-            'rejected application'):
+            utils.ValidationError,
+            'Expected rejection_message to be a string for a '
+            'rejected application'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_for_accepted_application_with_message(self):
@@ -2355,8 +2645,10 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
         self.voiceover_application.rejection_message = 'Invalid message'
         with self.assertRaisesRegexp(
-            Exception, 'Expected rejection_message to be None for the accepted '
-            'voiceover application, received Invalid message'):
+            utils.ValidationError,
+            'Expected rejection_message to be None for the accepted '
+            'voiceover application, received Invalid message'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_language_code_type_raise_exception(self):
@@ -2365,7 +2657,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.language_code = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected language_code to be a string'):
+            utils.ValidationError, 'Expected language_code to be a string'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_language_code_raise_exception(self):
@@ -2374,7 +2667,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.language_code = 'invalid language'
         with self.assertRaisesRegexp(
-            Exception, 'Invalid language_code: invalid language'):
+            utils.ValidationError, 'Invalid language_code: invalid language'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_filename_type_raise_exception(self):
@@ -2383,7 +2677,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.filename = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected filename to be a string'):
+            utils.ValidationError, 'Expected filename to be a string'
+        ):
             self.voiceover_application.validate()
 
     def test_validation_with_invalid_content_type_raise_exception(self):
@@ -2392,7 +2687,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.content = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected content to be a string'):
+            utils.ValidationError, 'Expected content to be a string'
+        ):
             self.voiceover_application.validate()
 
     def test_to_dict_returns_correct_dict(self):
@@ -2828,10 +3124,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the translation reviewer count to be non-negative for '
             '%s language code, received: %s.' % (
-                self.sample_language_code, self.negative_count)):
+                self.sample_language_code, self.negative_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_negative_counts(
@@ -2846,10 +3143,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the translation suggestion count to be non-negative for '
             '%s language code, received: %s.' % (
-                self.sample_language_code, self.negative_count)):
+                self.sample_language_code, self.negative_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_question_reviewer_count_fails_for_negative_count(self):
@@ -2861,10 +3159,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the question reviewer count to be non-negative, '
             'received: %s.' % (
-                community_contribution_stats.question_reviewer_count)):
+                community_contribution_stats.question_reviewer_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_question_suggestion_count_fails_for_negative_count(self):
@@ -2876,10 +3175,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the question suggestion count to be non-negative, '
             'received: %s.' % (
-                community_contribution_stats.question_suggestion_count)):
+                community_contribution_stats.question_suggestion_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_reviewer_counts_fails_for_non_integer_counts(
@@ -2894,10 +3194,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the translation reviewer count to be an integer for '
             '%s language code, received: %s.' % (
-                self.sample_language_code, self.non_integer_count)):
+                self.sample_language_code, self.non_integer_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_non_integer_count(
@@ -2912,10 +3213,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the translation suggestion count to be an integer for '
             '%s language code, received: %s.' % (
-                self.sample_language_code, self.non_integer_count)):
+                self.sample_language_code, self.non_integer_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_question_reviewer_count_fails_for_non_integer_count(
@@ -2928,10 +3230,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the question reviewer count to be an integer, '
             'received: %s.' % (
-                community_contribution_stats.question_reviewer_count)):
+                community_contribution_stats.question_reviewer_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_question_suggestion_count_fails_for_non_integer_count(
@@ -2944,10 +3247,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Expected the question suggestion count to be an integer, '
             'received: %s.' % (
-                community_contribution_stats.question_suggestion_count)):
+                community_contribution_stats.question_suggestion_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_reviewer_counts_fails_for_invalid_lang_code(
@@ -2962,9 +3266,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Invalid language code for the translation reviewer counts: '
-            '%s.' % self.invalid_language_code):
+            '%s.' % self.invalid_language_code
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_invalid_lang_code(
@@ -2979,9 +3284,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            Exception,
+            utils.ValidationError,
             'Invalid language code for the translation suggestion counts: '
-            '%s.' % self.invalid_language_code):
+            '%s.' % self.invalid_language_code
+        ):
             community_contribution_stats.validate()
 
 

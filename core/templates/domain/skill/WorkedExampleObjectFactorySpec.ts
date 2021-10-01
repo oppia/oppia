@@ -18,21 +18,17 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtitledHtmlObjectFactory} from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { WorkedExampleObjectFactory} from
-  'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {
-  let workedExampleDict;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
+  let workedExampleBackendDict: WorkedExampleBackendDict;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
-    workedExampleDict = {
+    workedExampleBackendDict = {
       question: {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
@@ -45,19 +41,21 @@ describe('Worked example object factory', () => {
   });
 
   it('should create a new worked example from a backend dictionary', () => {
-    let workedExample =
-          workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
+    let workedExample = (
+      workedExampleObjectFactory.createFromBackendDict(
+        workedExampleBackendDict));
     expect(workedExample.getQuestion()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'worked example question 1', 'worked_example_q_1'));
     expect(workedExample.getExplanation()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'worked example explanation 1', 'worked_example_e_1'));
   });
 
   it('should convert to a backend dictionary', () => {
-    let workedExample =
-        workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
-    expect(workedExample.toBackendDict()).toEqual(workedExampleDict);
+    let workedExample = (
+      workedExampleObjectFactory.createFromBackendDict(
+        workedExampleBackendDict));
+    expect(workedExample.toBackendDict()).toEqual(workedExampleBackendDict);
   });
 });

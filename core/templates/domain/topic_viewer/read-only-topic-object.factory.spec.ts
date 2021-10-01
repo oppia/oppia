@@ -18,19 +18,14 @@
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
 import { StoryNode } from 'domain/story/story-node.model';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
 describe('Read only topic object Factory', () => {
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
-  let _sampleReadOnlyTopic: ReadOnlyTopic = null;
+  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
+  let _sampleReadOnlyTopic: ReadOnlyTopic;
 
   beforeEach(() => {
-    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
-      new ShortSkillSummaryObjectFactory());
+    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
 
     let nodeDict = {
       id: 'node_1',
@@ -60,7 +55,7 @@ describe('Read only topic object Factory', () => {
         story_is_published: true,
         completed_node_titles: ['Chapter 1'],
         url_fragment: 'story-title',
-        pending_node_dicts: [nodeDict]
+        all_node_dicts: [nodeDict]
       }],
       additional_story_dicts: [{
         id: '1',
@@ -72,7 +67,7 @@ describe('Read only topic object Factory', () => {
         story_is_published: true,
         completed_node_titles: ['Chapter 1'],
         url_fragment: 'story-title-one',
-        pending_node_dicts: [nodeDict]
+        all_node_dicts: [nodeDict]
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -147,7 +142,7 @@ describe('Read only topic object Factory', () => {
     expect(expectedStorySummary.getDescription()).toEqual('Story Description');
     expect(expectedStorySummary.getNodeTitles()).toEqual(['Chapter 1']);
     expect(expectedStorySummary.isNodeCompleted('Chapter 1')).toEqual(true);
-    expect(expectedStorySummary.getPendingNodes()).toEqual([
+    expect(expectedStorySummary.getAllNodes()).toEqual([
       StoryNode.createFromBackendDict({
         id: 'node_1',
         thumbnail_filename: 'image.png',

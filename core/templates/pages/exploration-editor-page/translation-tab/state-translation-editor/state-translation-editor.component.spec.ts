@@ -37,7 +37,7 @@ import { ReadOnlyExplorationBackendApiService } from
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 describe('State Translation Editor Component', function() {
@@ -108,6 +108,7 @@ describe('State Translation Editor Component', function() {
         }
       }
     },
+    linked_skill_id: null,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {
@@ -174,7 +175,7 @@ describe('State Translation Editor Component', function() {
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
       stateObj = stateObjectFactory.createFromBackendDict(stateName, state);
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
-      spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
+      spyOn(explorationStatesService, 'saveWrittenTranslation').and.callFake(
         () => {});
 
       spyOn(
@@ -345,7 +346,7 @@ describe('State Translation Editor Component', function() {
 
       expect(
         stateWrittenTranslationsService.displayed.getWrittenTranslation()
-          .getHtml()
+          .getTranslation()
       ).toBe('This is a html');
     });
 
@@ -390,7 +391,7 @@ describe('State Translation Editor Component', function() {
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
       stateObj = stateObjectFactory.createFromBackendDict(stateName, state);
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
-      spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
+      spyOn(explorationStatesService, 'saveWrittenTranslation').and.callFake(
         () => {});
       spyOn(
         translationTabActiveContentIdService, 'getActiveDataFormat'
@@ -433,6 +434,30 @@ describe('State Translation Editor Component', function() {
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createNew('html', ''));
+    });
+
+    it('should open translation editor when it is editable and with a ' +
+       'Translatable object as data format', function() {
+      $scope.dataFormat = 'set_of_unicode_string';
+      $scope.openTranslationEditor();
+      expect($scope.translationEditorIsOpen).toBe(true);
+      expect($scope.activeWrittenTranslation).toEqual(
+        writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
+    });
+
+    it('should mark translation as needing update', function() {
+      spyOn(
+        explorationStatesService, 'markWrittenTranslationAsNeedingUpdate');
+      $scope.activeWrittenTranslation = (
+        writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
+      expect($scope.activeWrittenTranslation.needsUpdate).toBeFalse();
+
+      $scope.markAsNeedingUpdate();
+
+      expect(
+        explorationStatesService.markWrittenTranslationAsNeedingUpdate
+      ).toHaveBeenCalled();
+      expect($scope.activeWrittenTranslation.needsUpdate).toBeTrue();
     });
 
     it('should add written translation html when clicking on save' +

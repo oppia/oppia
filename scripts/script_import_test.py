@@ -22,8 +22,8 @@ in start, then adding the same import statement in a test function
 (as done in this file) creates a conflict.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import subprocess
@@ -46,7 +46,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                     self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
-                    return '', 'can\'t combine user with prefix'
+                    return b'', b'can\'t combine user with prefix'
             return Ret()
         def mock_check_call(cmd_tokens):
             self.commands.extend(cmd_tokens)
@@ -60,11 +60,11 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with self.Popen_swap, self.check_call_swap, exists_swap:
-            from scripts import install_third_party_libs # pylint: disable=unused-variable
+            from scripts import install_third_party_libs  # isort:skip pylint: disable=unused-import,line-too-long
         self.assertEqual(
             self.commands, [
-                sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2',
-                '--target', '../oppia_tools/pyyaml-5.1.2',
+                sys.executable, '-m', 'pip', 'install', 'pyyaml==5.4.1',
+                '--target', '../oppia_tools/pyyaml-5.4.1',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
                 'future==0.18.2', '--target',
@@ -73,5 +73,9 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 sys.executable, '-m', 'pip', 'install',
                 'six==1.15.0', '--target',
                 'third_party/python_libs',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'certifi==2021.5.30', '--target',
+                '../oppia_tools/certifi-2021.5.30',
                 '--user', '--prefix=', '--system',
             ])

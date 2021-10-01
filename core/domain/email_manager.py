@@ -16,13 +16,17 @@
 
 """Config properties and functions for managing email notifications."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
@@ -30,10 +34,6 @@ from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
@@ -49,7 +49,7 @@ def log_new_error(*args, **kwargs):
 
 
 NEW_REVIEWER_EMAIL_DATA = {
-    constants.REVIEW_CATEGORY_TRANSLATION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translations',
         'to_check': 'translation suggestions',
         'description_template': '%s language translations',
@@ -57,7 +57,7 @@ NEW_REVIEWER_EMAIL_DATA = {
             'review translation suggestions made by contributors in the %s '
             'language')
     },
-    constants.REVIEW_CATEGORY_VOICEOVER: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'review_category': 'voiceovers',
         'to_check': 'voiceover applications',
         'description_template': '%s language voiceovers',
@@ -65,7 +65,7 @@ NEW_REVIEWER_EMAIL_DATA = {
             'review voiceover applications made by contributors in the %s '
             'language')
     },
-    constants.REVIEW_CATEGORY_QUESTION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'review_category': 'questions',
         'to_check': 'question suggestions',
         'description': 'questions',
@@ -74,7 +74,7 @@ NEW_REVIEWER_EMAIL_DATA = {
 }
 
 REMOVED_REVIEWER_EMAIL_DATA = {
-    constants.REVIEW_CATEGORY_TRANSLATION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translation',
         'role_description_template': (
             'translation reviewer role in the %s language'),
@@ -83,7 +83,7 @@ REMOVED_REVIEWER_EMAIL_DATA = {
             'language'),
         'contribution_allowed': 'translations'
     },
-    constants.REVIEW_CATEGORY_VOICEOVER: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'review_category': 'voiceover',
         'role_description_template': (
             'voiceover reviewer role in the %s language'),
@@ -92,7 +92,7 @@ REMOVED_REVIEWER_EMAIL_DATA = {
             'language'),
         'contribution_allowed': 'voiceovers'
     },
-    constants.REVIEW_CATEGORY_QUESTION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'review_category': 'question',
         'role_description': 'question reviewer role',
         'rights_message': 'review question suggestions made by contributors',
@@ -323,8 +323,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-        user_services.is_at_least_moderator),
+    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
@@ -337,9 +336,9 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_MARKETING: user_services.is_admin,
-    feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-        user_services.is_at_least_moderator),
+    feconf.EMAIL_INTENT_MARKETING: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
@@ -358,14 +357,20 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_MARKETING: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
+        user_services.is_curriculum_admin),
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
+        user_services.is_curriculum_admin),
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_TEST: user_services.is_admin
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
 
@@ -399,8 +404,7 @@ def require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None,
-        recipient_email=None):
+        sender_email, bcc_admin=False, sender_name=None, recipient_email=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -420,8 +424,6 @@ def _send_email(
             email address.
         sender_name: str or None. The name to be shown in the "sender" field of
             the email.
-        reply_to_id: str or None. The unique reply-to id used in reply-to email
-            address sent to recipient.
         recipient_email: str or None. Override for the recipient email.
             This should only be used when the user with user_id equal to
             recipient_id does not exist or is deleted and their email cannot be
@@ -455,20 +457,19 @@ def _send_email(
             'Details:\n%s %s\n%s\n\n' %
             (recipient_id, email_subject, cleaned_plaintext_body))
         return
-
-    def _send_email_in_transaction():
+    @transaction_services.run_in_transaction_wrapper
+    def _send_email_transactional():
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
-            reply_to_id=reply_to_id)
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    transaction_services.run_in_transaction(_send_email_in_transaction)
+    _send_email_transactional()
 
 
 def _send_bulk_mail(
@@ -504,7 +505,8 @@ def _send_bulk_mail(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
-    def _send_bulk_mail_in_transaction(instance_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _send_bulk_mail_transactional(instance_id):
         """Sends the emails in bulk to the recipients.
 
         Args:
@@ -520,8 +522,7 @@ def _send_bulk_mail(
             instance_id, recipient_ids, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    transaction_services.run_in_transaction(
-        _send_bulk_mail_in_transaction, instance_id)
+    _send_bulk_mail_transactional(instance_id)
 
 
 def send_job_failure_email(job_id):
@@ -983,7 +984,7 @@ def send_suggestion_email(
 
 def send_instant_feedback_message_email(
         recipient_id, sender_id, message, email_subject, exploration_title,
-        exploration_id, thread_title, reply_to_id=None):
+        exploration_id, thread_title):
     """Send an email when a new message is posted to a feedback thread, or when
     the thread's status is changed.
 
@@ -995,8 +996,6 @@ def send_instant_feedback_message_email(
         exploration_title: str. The title of the exploration.
         exploration_id: str. ID of the exploration the feedback thread is about.
         thread_title: str. The title of the feedback thread.
-        reply_to_id: str or None. The unique reply-to id used in reply-to email
-            sent to recipient.
     """
 
     email_body_template = (
@@ -1029,7 +1028,7 @@ def send_instant_feedback_message_email(
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
-            email_body, feconf.NOREPLY_EMAIL_ADDRESS, reply_to_id=reply_to_id)
+            email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_flag_exploration_email(
@@ -1181,7 +1180,7 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
     _send_email(
-        tester_id, tester_id, feconf.BULK_EMAIL_INTENT_TEST,
+        tester_id, feconf.SYSTEM_COMMITTER_ID, feconf.BULK_EMAIL_INTENT_TEST,
         email_subject, email_body, tester_email, sender_name=tester_name)
 
 
@@ -1326,7 +1325,8 @@ def _create_html_for_reviewable_suggestion_email_info(
 
 
 def send_mail_to_notify_admins_suggestions_waiting_long(
-        admin_ids, reviewable_suggestion_email_infos):
+        admin_ids, translation_admin_ids, question_admin_ids,
+        reviewable_suggestion_email_infos):
     """Sends an email to admins to inform them about the suggestions that have
     been waiting longer than
     suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for a
@@ -1337,6 +1337,10 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
 
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
+        translation_admin_ids: list(str). The user ids of the translation
+            admins to notify.
+        question_admin_ids: list(str). The user ids of the question admins
+            to notify.
         reviewable_suggestion_email_infos: list(ReviewableSuggestionEmailInfo).
             list(ReviewableSuggestionEmailContentInfo). A list of suggestion
             email content info objects that represent suggestions
@@ -1345,13 +1349,6 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             content and review submission date. The objects are sorted in
             descending order based on review wait time.
     """
-    email_subject = (
-        ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
-            'email_subject'])
-    email_body_template = (
-        ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
-            'email_body_template'])
-
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
@@ -1376,20 +1373,65 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         log_new_error('There were no admins to notify.')
         return
 
-    suggestion_descriptions = []
+    translation_suggestion_descriptions = []
+    question_suggestion_descriptions = []
     # Get the html for the list of suggestions that have been waiting too long
     # for a review.
     for reviewable_suggestion_email_info in reviewable_suggestion_email_infos:
-        suggestion_descriptions.append(
-            _create_html_for_reviewable_suggestion_email_info(
-                reviewable_suggestion_email_info))
+        if (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT ==
+                reviewable_suggestion_email_info.suggestion_type
+            ):
+            translation_suggestion_descriptions.append(
+                _create_html_for_reviewable_suggestion_email_info(
+                    reviewable_suggestion_email_info))
+        if (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION ==
+                reviewable_suggestion_email_info.suggestion_type
+            ):
+            question_suggestion_descriptions.append(
+                _create_html_for_reviewable_suggestion_email_info(
+                    reviewable_suggestion_email_info))
 
-    list_of_suggestion_descriptions = ''.join(
-        suggestion_descriptions)
+    list_of_translation_suggestion_descriptions = ''.join(
+        translation_suggestion_descriptions)
+    if list_of_translation_suggestion_descriptions:
+        user_ids = []
+        user_ids.extend(admin_ids)
+        user_ids.extend(translation_admin_ids)
+        _send_suggestions_waiting_too_long_email(
+            user_ids,
+            list_of_translation_suggestion_descriptions)
+    list_of_question_suggestion_descriptions = ''.join(
+        question_suggestion_descriptions)
+    if list_of_question_suggestion_descriptions:
+        user_ids = []
+        user_ids.extend(admin_ids)
+        user_ids.extend(question_admin_ids)
+        _send_suggestions_waiting_too_long_email(
+            user_ids,
+            list_of_question_suggestion_descriptions)
 
+
+def _send_suggestions_waiting_too_long_email(
+        admin_ids, list_of_suggestion_descriptions):
+    """Helper method for send_mail_to_notify_admins_suggestions_waiting_long
+    that allows sending of emails to the list of admin ids provided.
+
+    Args:
+        admin_ids: list(str). The user ids of the admins to notify.
+        list_of_suggestion_descriptions: str. Suggestion descriptions HTML to
+            send in the email.
+    """
+    email_subject = (
+        ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
+            'email_subject'])
+    email_body_template = (
+        ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
+            'email_body_template'])
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1402,7 +1444,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             continue
         else:
             email_body = email_body_template % (
-                admin_usernames[index], feconf.OPPIA_SITE_URL,
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL,
                 suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
@@ -1416,7 +1458,8 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
 
 
 def send_mail_to_notify_admins_that_reviewers_are_needed(
-        admin_ids, suggestion_types_needing_reviewers):
+        admin_ids, translation_admin_ids, question_admin_ids,
+        suggestion_types_needing_reviewers):
     """Sends an email to admins to notify them that there are specific
     suggestion types on the Contributor Dashboard that need more reviewers.
 
@@ -1427,6 +1470,10 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
 
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
+        translation_admin_ids: list(str). The user ids of the translation
+            admins to notify.
+        question_admin_ids: list(str). The user ids of the question admins
+            to notify.
         suggestion_types_needing_reviewers: dict. A dictionary where the keys
             are suggestion types and each value corresponds to a set that
             contains the language codes within the suggestion type that need
@@ -1434,11 +1481,6 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-    email_subject = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
-        'email_subject']
-    email_body_template = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
-        'email_body_template']
-
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
@@ -1463,18 +1505,16 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         log_new_error('There were no admins to notify.')
         return
 
-    # Create the html for the suggestion types that need more reviewers for the
-    # email body html.
-    suggestion_types_needing_reviewers_paragraphs = []
     if feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
             suggestion_types_needing_reviewers):
+        translation_suggestions_needing_reviewers_paragraphs = []
         language_codes_that_need_reviewers = (
             suggestion_types_needing_reviewers[
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT])
         # There are different templates to handle whether multiple languages
         # need more reviewers or just one language.
         if len(language_codes_that_need_reviewers) == 1:
-            suggestion_types_needing_reviewers_paragraphs.append(
+            translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'one_language_template'] % (
                         utils.get_supported_audio_language_description(
@@ -1488,28 +1528,57 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     '<li><b>%s</b></li><br>' % (
                         utils.get_supported_audio_language_description(
                             language_code)) for language_code in
-                    language_codes_that_need_reviewers
+                    sorted(language_codes_that_need_reviewers)
                 ]
             )
-            suggestion_types_needing_reviewers_paragraphs.append(
+            translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
                         feconf.OPPIA_SITE_URL,
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
                         html_for_languages_that_need_more_reviewers))
+        translation_suggestions_needing_reviewers_html = ''.join(
+            translation_suggestions_needing_reviewers_paragraphs)
+        user_ids = []
+        user_ids.extend(admin_ids)
+        user_ids.extend(translation_admin_ids)
+        _send_reviews_needed_email_to_admins(
+            user_ids,
+            translation_suggestions_needing_reviewers_html)
 
     if feconf.SUGGESTION_TYPE_ADD_QUESTION in (
             suggestion_types_needing_reviewers):
-        suggestion_types_needing_reviewers_paragraphs.append(
+        question_suggestions_needing_reviewers_paragraphs = []
+        question_suggestions_needing_reviewers_paragraphs.append(
             ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                 'question_template'])
+        question_suggestions_needing_reviewers_html = ''.join(
+            question_suggestions_needing_reviewers_paragraphs)
+        user_ids = []
+        user_ids.extend(admin_ids)
+        user_ids.extend(question_admin_ids)
+        _send_reviews_needed_email_to_admins(
+            user_ids,
+            question_suggestions_needing_reviewers_html)
 
-    suggestion_types_needing_reviewers_html = ''.join(
-        suggestion_types_needing_reviewers_paragraphs)
 
-    # Get the emails and usernames of the admins.
+def _send_reviews_needed_email_to_admins(
+        admin_ids, suggestions_needing_reviewers_html):
+    """Helper function for send_mail_to_notify_admins_that_reviewers_are_needed
+    that allows sending email to the provided admin ids.
+
+    Args:
+        admin_ids: list(str). The user ids of the admins to notify.
+        suggestions_needing_reviewers_html: str. The HTML representing
+            the suggestion needing reviewers.
+    """
+    email_subject = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
+        'email_subject']
+    email_body_template = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
+        'email_body_template']
+    # Get the emails and usernames of the users.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1522,8 +1591,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             continue
         else:
             email_body = email_body_template % (
-                admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                suggestion_types_needing_reviewers_html)
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+                feconf.ADMIN_URL, suggestions_needing_reviewers_html)
 
             _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,
@@ -1767,8 +1836,8 @@ def send_email_to_new_contribution_reviewer(
         review_category_data['review_category'])
 
     if review_category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         review_category_description = (
@@ -1831,8 +1900,8 @@ def send_email_to_removed_contribution_reviewer(
         review_category_data['review_category'])
 
     if review_category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (
@@ -1873,3 +1942,35 @@ def send_email_to_removed_contribution_reviewer(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_not_mergeable_change_list_to_admin_for_review(
+        exp_id, frontend_version, backend_version, change_list_dict):
+    """Sends an email to the admin to review the not mergeable change list
+    to improve the functionality in future if possible.
+
+    Args:
+        exp_id: str. The ID of an exploration on which the change list was
+            to be applied.
+        frontend_version: int. Version of an exploration from frontend on
+            which a user is working.
+        backend_version: int. Latest version of an exploration on which the
+            change list can not be applied.
+        change_list_dict: dict. Dict of the changes made by the
+            user on the frontend, which are not mergeable.
+    """
+    email_subject = 'Some changes were rejected due to a conflict'
+    email_body_template = (
+        'Hi Admin,<br><br>'
+        'Some draft changes were rejected in exploration %s because the '
+        'changes were conflicting and could not be saved. Please see the '
+        'rejected change list below:<br>'
+        'Discarded change list: %s <br><br>'
+        'Frontend Version: %s<br>'
+        'Backend Version: %s<br><br>'
+        'Thanks!')
+
+    if feconf.CAN_SEND_EMAILS:
+        email_body = email_body_template % (
+            exp_id, change_list_dict, frontend_version, backend_version)
+        send_mail_to_admin(email_subject, email_body)

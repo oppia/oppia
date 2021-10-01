@@ -22,7 +22,6 @@ describe('Skill Editor Routing Service', function() {
   var sers = null;
   var $rootScope = null;
   var $location = null;
-
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
     sers = $injector.get('SkillEditorRoutingService');
@@ -58,5 +57,12 @@ describe('Skill Editor Routing Service', function() {
     $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
+  });
+
+  it('should open the question-editor directly', function() {
+    sers.creatingNewQuestion(true);
+    expect(sers.navigateToQuestionEditor()).toBe(true);
+    sers.creatingNewQuestion(false);
+    expect(sers.navigateToQuestionEditor()).toBe(false);
   });
 });

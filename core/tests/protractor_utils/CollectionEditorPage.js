@@ -27,10 +27,10 @@ var CollectionEditorPage = function() {
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
   var collectionEditorObjectiveInput = element(
-    by.css('.protractor-collection-editor-objective-input'));
+    by.css('.protractor-test-collection-editor-objective-input'));
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
-  var editorCategoryDropdown = element.all(
+  var categoryFilterDropdown = element(
     by.css('.protractor-test-collection-editor-category-dropdown'));
   var editorDeleteNode = element.all(
     by.css('.protractor-test-editor-delete-node'));
@@ -41,7 +41,7 @@ var CollectionEditorPage = function() {
   var editorShiftRight = element.all(
     by.css('.protractor-test-editor-shift-right'));
   var editorTitleInput = element(
-    by.css('.protractor-collection-editor-title-input'));
+    by.css('.protractor-test-collection-editor-title-input'));
   var saveChangesButton = element(
     by.css('.protractor-test-collection-save-changes-button'));
   var saveDraftButton = element(
@@ -60,39 +60,6 @@ var CollectionEditorPage = function() {
       addExplorationButton,
       'Unable to find exploration ID: ' + explorationId);
     await action.click('Add Exploration Button', addExplorationButton);
-  };
-
-  // Search and add existing exploration to the node graph.
-  this.searchForAndAddExistingExploration = async function(query) {
-    await waitFor.visibilityOf(
-      addExplorationInput, 'Add Exploration Input is not visible');
-    await action.sendKeys(
-      'Add Exploration Input', addExplorationInput, query);
-    // Need to wait for result to appear.
-    await waitFor.elementToBeClickable(
-      addExplorationButton, 'Unable to find exploration: ' + query);
-
-    var matched = false;
-    var dropdownResultElement = element(
-      by.cssContainingText('.dropdown-menu', new RegExp(query)));
-    if (await dropdownResultElement.isPresent()) {
-      await action.click('DropDown Result Element', dropdownResultElement);
-      matched = true;
-    }
-    if (!matched) {
-      // Press Tab to fill in the default result should one appear when
-      // none of the answer matches the given query.
-      await action.sendKeys(
-        'Add Exploration Input', addExplorationInput, protractor.Key.TAB);
-      // If query gets zero result, hitting Tab would not enable the
-      // addExplorationButton.
-    }
-    var isEnabled = await addExplorationButton.isEnabled();
-    if (isEnabled) {
-      await action.click('Add Exploration Button', addExplorationButton);
-    } else {
-      throw new Error ('Add Exploration Button is not clickable');
-    }
   };
 
   // Shift a node left in the node graph.
@@ -157,13 +124,11 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = async function(category) {
+    await action.click('Category filter', categoryFilterDropdown);
+    var dropdownOption = element(
+      by.cssContainingText('mat-option .mat-option-text', category));
     await action.click(
-      'Editor Category Drop Down', editorCategoryDropdown.first());
-    // TODO(#11289): sendKeys statement cannot be
-    // converted to action.sendKeys(..)
-    // because doing so causes the e2e test to fail with the error
-    // "Failed: Cannot read property 'bind' of undefined".
-    await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+      'category option: ' + category, dropdownOption);
   };
 
   // Saves changes and publishes collection.

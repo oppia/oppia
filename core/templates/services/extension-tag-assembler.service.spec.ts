@@ -21,10 +21,10 @@ import { ExtensionTagAssemblerService } from
   './extension-tag-assembler.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Extension Tag Assembler Service', () => {
-  let etas;
+  let etas: ExtensionTagAssemblerService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -32,7 +32,7 @@ describe('Extension Tag Assembler Service', () => {
         CamelCaseToHyphensPipe
       ]
     });
-    etas = TestBed.get(ExtensionTagAssemblerService);
+    etas = TestBed.inject(ExtensionTagAssemblerService);
   });
 
   it('should not format element without customization', () => {

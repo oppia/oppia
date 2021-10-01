@@ -25,15 +25,16 @@ import {
 } from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe.ts';
-import { SolutionObjectFactory } from
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
+import { Interaction } from './InteractionObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
-    let sof, solution;
+    let sof: SolutionObjectFactory, solution: Solution;
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
@@ -43,7 +44,7 @@ describe('Solution object factory', () => {
           FormatRtePreviewPipe
         ]
       });
-      sof = TestBed.get(SolutionObjectFactory);
+      sof = TestBed.inject(SolutionObjectFactory);
       solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
@@ -114,15 +115,14 @@ describe('Solution object factory', () => {
         'One solution is "1/6". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
-        correct: true
-      });
-      expect(solution.getSummary('LogicProof')).toEqual(
-        'One solution is "true". This is the explanation to the answer.');
-
-      solution.setCorrectAnswer({
         type: 'real',
         real: 1,
-        fraction: '',
+        fraction: {
+          isNegative: false,
+          wholeNumber: 0,
+          numerator: 0,
+          denominator: 1
+        },
         units: []
       });
       expect(solution.getSummary('NumberWithUnits')).toEqual(
@@ -138,14 +138,11 @@ describe('Solution object factory', () => {
     });
 
     it('should get oppia short answer', () => {
-      const interaction = {
-        id: '0',
-        customizationArgs: {
-          choices: {
-            value: [new SubtitledHtml('This is a choice', '')]
-          }
+      const interaction = new Interaction([], [], {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')]
         }
-      };
+      }, null, [], '0', null);
       const expectedShortAnswerHtml = {
         prefix: 'One',
         answer: '<oppia-short-response-0 ' +
@@ -156,6 +153,18 @@ describe('Solution object factory', () => {
 
       expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
         expectedShortAnswerHtml);
+    });
+
+    it('should throw an error if Interaction\'s id is null', () => {
+      const interaction = new Interaction([], [], {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')]
+        }
+      }, null, [], null, null);
+
+      expect(() => {
+        solution.getOppiaShortAnswerResponseHtml(interaction);
+      }).toThrowError('Interaction id is possibly null.');
     });
 
     it('should handle when answer exclusivity is true', () => {

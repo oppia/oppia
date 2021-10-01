@@ -23,7 +23,8 @@ import { Ratio } from 'domain/objects/ratio.model';
 import { RatioInputAnswer } from 'interactions/answer-defs';
 import {
   RatioInputEqualRuleInputs,
-  RatioInputHasNumberOfTermsEqualToRuleInputs
+  RatioInputHasNumberOfTermsEqualToRuleInputs,
+  RatioInputHasSpecificTermEqualToRuleInputs
 } from 'interactions/rule-input-defs';
 
 @Injectable({
@@ -39,6 +40,12 @@ export class RatioExpressionInputRulesService {
       answer: RatioInputAnswer,
       inputs: RatioInputHasNumberOfTermsEqualToRuleInputs): boolean {
     return answer.length === inputs.y;
+  }
+
+  HasSpecificTermEqualTo(
+      answer: RatioInputAnswer,
+      inputs: RatioInputHasSpecificTermEqualToRuleInputs): boolean {
+    return answer[inputs.x - 1] === inputs.y;
   }
 
   IsEquivalent(

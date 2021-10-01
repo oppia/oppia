@@ -32,7 +32,7 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-exploration-dashboard-card'));
   var collectionCard = element(by.css('.protractor-test-collection-card'));
   var collectionEditorContainer = element(
-    by.css('.collection-editor-cards-container'));
+    by.css('.protractor-test-collection-editor-cards-container'));
   var subscriptionTab = element(by.css('.protractor-test-subscription-tab'));
   var createActivityButton =
     element(by.css('.protractor-test-create-activity'));
@@ -43,11 +43,28 @@ var CreatorDashboardPage = function() {
   var createNewExplorationButton =
     element(by.css('.protractor-test-create-new-exploration-button'));
   var listViewButton = element(by.css('.protractor-test-oppia-list-view-btn'));
+  var titleMaskLocator = by.css('.protractor-test-title-mask');
+  var expSummaryTileTitleElements = element.all(
+    by.css('.protractor-test-exp-summary-tile-title'));
+  var expSummaryTileRatingElements = element.all(
+    by.css('.protractor-test-exp-summary-tile-rating'));
+  var expSummaryTileViewsElements = element.all(
+    by.css('.protractor-test-exp-summary-tile-num-views'));
+  var expSummaryRowTitleElements = element.all(
+    by.css('.protractor-test-exp-summary-row-title'));
+  var expSummaryRowRatingElements = element.all(
+    by.css('.protractor-test-exp-summary-row-rating'));
+  var expSummaryRowViewsElements = element.all(
+    by.css('.protractor-test-exp-summary-row-num-views'));
+  var expSummaryTileFeedbackElements = element.all(
+    by.css('.protractor-test-exp-summary-tile-open-feedback'));
   // Dashboard stat elements.
   var averageRating = element(by.css('.protractor-test-oppia-average-rating'));
   var totalPlays = element(by.css('.protractor-test-oppia-total-plays'));
   var openFeedbacks = element(by.css('.protractor-test-oppia-open-feedback'));
   var subscribers = element(by.css('.protractor-test-oppia-total-subscribers'));
+  var expSummaryRowFeedbackElements = element.all(
+    by.css('.protractor-test-exp-summary-row-open-feedback'));
 
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
@@ -117,8 +134,7 @@ var CreatorDashboardPage = function() {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
-    var explorationElement = elems[0].element(
-      by.css('.protractor-test-title-mask'));
+    var explorationElement = elems[0].element(titleMaskLocator);
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };
@@ -155,80 +171,64 @@ var CreatorDashboardPage = function() {
 
   // Returns titles of each explorations in grid view.
   this.getExpSummaryTileTitles = async function() {
-    var expSummaryTileTitleElements = element.all(
-      by.css('.protractor-test-exp-summary-tile-title'));
     await waitFor.visibilityOf(
-      await expSummaryTileTitleElements.first(),
+      expSummaryTileTitleElements.first(),
       'Unable to find exploration titles');
     return expSummaryTileTitleElements;
   };
 
   // Returns ratings of each explorations in grid view.
   this.getExpSummaryTileRatings = async function() {
-    var expSummaryTileRatingElements = element.all(
-      by.css('.protractor-test-exp-summary-tile-rating'));
     await waitFor.visibilityOf(
-      await expSummaryTileRatingElements.first(),
+      expSummaryTileRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryTileRatingElements;
   };
 
   // Returns open feedback count of each exploration in grid view.
   this.getExpSummaryTileOpenFeedbackCount = async function() {
-    var expSummaryTileFeedbackElements = element.all(
-      by.css('.protractor-test-exp-summary-tile-open-feedback'));
     await waitFor.visibilityOf(
-      await expSummaryTileFeedbackElements.first(),
+      expSummaryTileFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryTileFeedbackElements;
   };
 
   // Returns total views count of each exploration in grid view.
   this.getExpSummaryTileViewsCount = async function() {
-    var expSummaryTileViewsElements = element.all(
-      by.css('.protractor-test-exp-summary-tile-num-views'));
     await waitFor.visibilityOf(
-      await expSummaryTileViewsElements.first(),
+      expSummaryTileViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryTileViewsElements;
   };
 
   // Returns titles of each explorations in list view.
   this.getExpSummaryRowTitles = async function() {
-    var expSummaryRowTitleElements = element.all(
-      by.css('.protractor-test-exp-summary-row-title'));
     await waitFor.visibilityOf(
-      await expSummaryRowTitleElements.first(),
+      expSummaryRowTitleElements.first(),
       'Unable to find exploration titles');
     return expSummaryRowTitleElements;
   };
 
   // Returns ratings of each explorations in list view.
   this.getExpSummaryRowRatings = async function() {
-    var expSummaryRowRatingElements = element.all(
-      by.css('.protractor-test-exp-summary-row-rating'));
     await waitFor.visibilityOf(
-      await expSummaryRowRatingElements.first(),
+      expSummaryRowRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryRowRatingElements;
   };
 
   // Returns open feedback count of each exploration in list view.
   this.getExpSummaryRowOpenFeedbackCount = async function() {
-    var expSummaryRowFeedbackElements = element.all(
-      by.css('.protractor-test-exp-summary-row-open-feedback'));
     await waitFor.visibilityOf(
-      await expSummaryRowFeedbackElements.first(),
+      expSummaryRowFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryRowFeedbackElements;
   };
 
   // Returns total views count of each exploration in list view.
   this.getExpSummaryRowViewsCount = async function() {
-    var expSummaryRowViewsElements = element.all(
-      by.css('.protractor-test-exp-summary-row-num-views'));
     await waitFor.visibilityOf(
-      await expSummaryRowViewsElements.first(),
+      expSummaryRowViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryRowViewsElements;
   };

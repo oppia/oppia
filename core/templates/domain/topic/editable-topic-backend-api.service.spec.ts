@@ -21,16 +21,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Editable topic backend API service', () => {
   let httpTestingController = null;
   let editableTopicBackendApiService = null;
   let sampleDataResults = null;
   let csrfService = null;
-
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,7 +37,7 @@ describe('Editable topic backend API service', () => {
       EditableTopicBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
 
@@ -108,7 +104,7 @@ describe('Editable topic backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      editableTopicBackendApiService.fetchTopic('0').then(
+      editableTopicBackendApiService.fetchTopicAsync('0').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne('/topic_editor_handler/data/0');
       expect(req.request.method).toEqual('GET');
@@ -134,7 +130,7 @@ describe('Editable topic backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      editableTopicBackendApiService.fetchTopic('1').then(
+      editableTopicBackendApiService.fetchTopicAsync('1').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
@@ -154,7 +150,7 @@ describe('Editable topic backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      editableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+      editableTopicBackendApiService.fetchSubtopicPageAsync('topicId', 1).then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/subtopic_page_editor_handler/data/topicId/1');
@@ -173,7 +169,7 @@ describe('Editable topic backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    editableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+    editableTopicBackendApiService.fetchSubtopicPageAsync('topicId', 1).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/subtopic_page_editor_handler/data/topicId/1');
@@ -196,7 +192,7 @@ describe('Editable topic backend API service', () => {
       let topic = null;
 
       // Loading a topic the first time should fetch it from the backend.
-      editableTopicBackendApiService.fetchTopic('0').then(
+      editableTopicBackendApiService.fetchTopicAsync('0').then(
         function(data) {
           topic = data.topicDict;
         });
@@ -217,7 +213,7 @@ describe('Editable topic backend API service', () => {
       };
 
       // Send a request to update topic.
-      editableTopicBackendApiService.updateTopic(
+      editableTopicBackendApiService.updateTopicAsync(
         topic.id, topic.version, 'Name is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne('/topic_editor_handler/data/0');
@@ -240,7 +236,7 @@ describe('Editable topic backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       // Loading a topic the first time should fetch it from the backend.
-      editableTopicBackendApiService.updateTopic(
+      editableTopicBackendApiService.updateTopicAsync(
         '1', '1', 'Update an invalid topic.', []
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
@@ -327,7 +323,7 @@ describe('Editable topic backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    editableTopicBackendApiService.fetchStories('0').then(
+    editableTopicBackendApiService.fetchStoriesAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/topic_editor_story_handler/' + '0');
@@ -346,7 +342,7 @@ describe('Editable topic backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    editableTopicBackendApiService.fetchStories('0').then(
+    editableTopicBackendApiService.fetchStoriesAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/topic_editor_story_handler/' + '0');
@@ -367,7 +363,7 @@ describe('Editable topic backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    editableTopicBackendApiService.deleteTopic('0').then(
+    editableTopicBackendApiService.deleteTopicAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/topic_editor_handler/data/' + '0');
@@ -387,7 +383,7 @@ describe('Editable topic backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      editableTopicBackendApiService.deleteTopic('1').then(
+      editableTopicBackendApiService.deleteTopicAsync('1').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/topic_editor_handler/data/' + '1');

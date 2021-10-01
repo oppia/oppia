@@ -16,8 +16,10 @@
 
 """Test calculations to get interaction answer views."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import re
 
 from core.domain import calculation_registry
 from core.domain import exp_domain
@@ -31,8 +33,10 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
     def test_requires_override_for_calculation(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'Subclasses of BaseCalculation should implement the '
-            r'calculate_from_state_answers_dict\(state_answers_dict\) method.'):
+            re.escape(
+                'Subclasses of BaseCalculation should implement the '
+                'calculate_from_state_answers_dict(state_answers_dict) '
+                'method.')):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
                 {})
 

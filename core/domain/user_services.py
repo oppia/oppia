@@ -16,8 +16,8 @@
 
 """Services for user data."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import hashlib
@@ -25,15 +25,15 @@ import imghdr
 import logging
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 import requests
 
@@ -42,7 +42,7 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
-current_user_services = models.Registry.import_current_user_services()
+bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -56,375 +56,6 @@ LABEL_FOR_USER_BEING_DELETED = '[User being deleted]'
 USERNAME_FOR_USER_BEING_DELETED = 'UserBeingDeleted'
 
 
-class UserSettings(python_utils.OBJECT):
-    """Value object representing a user's settings.
-
-    Attributes:
-        user_id: str. The unique ID of the user.
-        email: str. The user email.
-        role: str. Role of the user. This is used in conjunction with
-            PARENT_ROLES to determine which actions the user can perform.
-        username: str or None. Identifiable username to display in the UI.
-        last_agreed_to_terms: datetime.datetime or None. When the user last
-            agreed to the terms of the site.
-        last_started_state_editor_tutorial: datetime.datetime or None. When
-            the user last started the state editor tutorial.
-        last_started_state_translation_tutorial: datetime.datetime or None. When
-            the user last started the state translation tutorial.
-        last_logged_in: datetime.datetime or None. When the user last logged in.
-        last_created_an_exploration: datetime.datetime or None. When the user
-            last created an exploration.
-        last_edited_an_exploration: datetime.datetime or None. When the user
-            last edited an exploration.
-        profile_picture_data_url: str or None. User uploaded profile picture as
-            a dataURI string.
-        default_dashboard: str or None. The default dashboard of the user.
-        user_bio: str. User-specified biography.
-        subject_interests: list(str) or None. Subject interests specified by
-            the user.
-        first_contribution_msec: float or None. The time in milliseconds when
-            the user first contributed to Oppia.
-        preferred_language_codes: list(str) or None. Exploration language
-            preferences specified by the user.
-        preferred_site_language_code: str or None. System language preference.
-        preferred_audio_language_code: str or None. Audio language preference.
-        pin: str or None. The PIN of the user's profile for android.
-        display_alias: str or None. Display name of a user who is logged
-            into the Android app. None when the request is coming from web
-            because we don't use it there.
-    """
-
-    def __init__(
-            self, user_id, email, role, username=None,
-            last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
-            last_started_state_translation_tutorial=None, last_logged_in=None,
-            last_created_an_exploration=None, last_edited_an_exploration=None,
-            profile_picture_data_url=None, default_dashboard=None,
-            creator_dashboard_display_pref=(
-                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
-            user_bio='', subject_interests=None, first_contribution_msec=None,
-            preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, pin=None, display_alias=None,
-            deleted=False, created_on=None):
-        """Constructs a UserSettings domain object.
-
-        Args:
-            user_id: str. The unique ID of the user.
-            email: str. The user email.
-            role: str. Role of the user. This is used in conjunction with
-                PARENT_ROLES to determine which actions the user can perform.
-            username: str or None. Identifiable username to display in the UI.
-            last_agreed_to_terms: datetime.datetime or None. When the user
-                last agreed to the terms of the site.
-            last_started_state_editor_tutorial: datetime.datetime or None. When
-                the user last started the state editor tutorial.
-            last_started_state_translation_tutorial: datetime.datetime or None.
-                When the user last started the state translation tutorial.
-            last_logged_in: datetime.datetime or None. When the user last
-                logged in.
-            last_created_an_exploration: datetime.datetime or None. When the
-                user last created an exploration.
-            last_edited_an_exploration: datetime.datetime or None. When the
-                user last edited an exploration.
-            profile_picture_data_url: str or None. User uploaded profile
-                picture as a dataURI string.
-            default_dashboard: str|None. The default dashboard of the user.
-            creator_dashboard_display_pref: str. The creator dashboard of the
-                user.
-            user_bio: str. User-specified biography.
-            subject_interests: list(str) or None. Subject interests specified by
-                the user.
-            first_contribution_msec: float or None. The time in milliseconds
-                when the user first contributed to Oppia.
-            preferred_language_codes: list(str) or None. Exploration language
-                preferences specified by the user.
-            preferred_site_language_code: str or None. System language
-                preference.
-            preferred_audio_language_code: str or None. Default language used
-                for audio translations preference.
-            pin: str or None. The PIN of the user's profile for android.
-            display_alias: str or None. Display name of a user who is logged
-                into the Android app. None when the request is coming from
-                web because we don't use it there.
-            deleted: bool. Whether the user has requested removal of their
-                account.
-            created_on: datetime.datetime. When the user was created on.
-        """
-        self.user_id = user_id
-        self.email = email
-        self.role = role
-        self.username = username
-        self.last_agreed_to_terms = last_agreed_to_terms
-        self.last_started_state_editor_tutorial = (
-            last_started_state_editor_tutorial)
-        self.last_started_state_translation_tutorial = (
-            last_started_state_translation_tutorial)
-        self.last_logged_in = last_logged_in
-        self.last_edited_an_exploration = last_edited_an_exploration
-        self.last_created_an_exploration = last_created_an_exploration
-        self.profile_picture_data_url = profile_picture_data_url
-        self.default_dashboard = default_dashboard
-        self.creator_dashboard_display_pref = creator_dashboard_display_pref
-        self.user_bio = user_bio
-        self.subject_interests = (
-            subject_interests if subject_interests else [])
-        self.first_contribution_msec = first_contribution_msec
-        self.preferred_language_codes = (
-            preferred_language_codes if preferred_language_codes else [])
-        self.preferred_site_language_code = preferred_site_language_code
-        self.preferred_audio_language_code = preferred_audio_language_code
-        self.pin = pin
-        self.display_alias = display_alias
-        self.deleted = deleted
-        self.created_on = created_on
-
-    def validate(self):
-        """Checks that the user_id, email, role, pin and display_alias
-        fields of this UserSettings domain object are valid.
-
-        Raises:
-            ValidationError. The user_id is not str.
-            ValidationError. The email is not str.
-            ValidationError. The email is invalid.
-            ValidationError. The role is not str.
-            ValidationError. Given role does not exist.
-            ValidationError. The pin is not str.
-            ValidationError. The display alias is not str.
-        """
-        if not isinstance(self.user_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
-        if not self.user_id:
-            raise utils.ValidationError('No user id specified.')
-        if not utils.is_user_id_valid(self.user_id):
-            raise utils.ValidationError('The user ID is in a wrong format.')
-
-        if not isinstance(self.role, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected role to be a string, received %s' % self.role)
-        if self.role not in role_services.PARENT_ROLES:
-            raise utils.ValidationError('Role %s does not exist.' % self.role)
-
-        if self.pin is not None:
-            if not isinstance(self.pin, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected PIN to be a string, received %s' %
-                    self.pin
-                )
-            elif (len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
-                  len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH):
-                raise utils.ValidationError(
-                    'User PIN can only be of length %s or %s' %
-                    (
-                        feconf.FULL_USER_PIN_LENGTH,
-                        feconf.PROFILE_USER_PIN_LENGTH
-                    )
-                )
-            else:
-                for character in self.pin:
-                    if character < '0' or character > '9':
-                        raise utils.ValidationError(
-                            'Only numeric characters are allowed in PIN.'
-                        )
-
-        if (self.display_alias is not None and
-                not isinstance(self.display_alias, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected display_alias to be a string, received %s' %
-                self.display_alias
-            )
-
-        if not isinstance(self.email, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected email to be a string, received %s' % self.email)
-        if not self.email:
-            raise utils.ValidationError('No user email specified.')
-        if ('@' not in self.email or self.email.startswith('@')
-                or self.email.endswith('@')):
-            raise utils.ValidationError(
-                'Invalid email address: %s' % self.email)
-
-        if not isinstance(
-                self.creator_dashboard_display_pref, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected dashboard display preference to be a string, '
-                'received %s' % self.creator_dashboard_display_pref)
-        if (self.creator_dashboard_display_pref not in
-                list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
-                    ))):
-            raise utils.ValidationError(
-                '%s is not a valid value for the dashboard display '
-                'preferences.' % (self.creator_dashboard_display_pref))
-
-    def populate_from_modifiable_user_data(self, modifiable_user_data):
-        """Populate the UserSettings domain object using the user data in
-            modifiable_user_data.
-
-        Args:
-            modifiable_user_data: ModifiableUserData. The modifiable user
-                data object with the information to be updated.
-
-        Raises:
-            ValidationError. None or empty value is provided for display alias
-                attribute.
-        """
-        if (not modifiable_user_data.display_alias or
-                not isinstance(
-                    modifiable_user_data.display_alias,
-                    python_utils.BASESTRING
-                )
-           ):
-            raise utils.ValidationError(
-                'Expected display_alias to be a string, received %s.' %
-                modifiable_user_data.display_alias
-            )
-        self.display_alias = modifiable_user_data.display_alias
-        self.preferred_language_codes = (
-            modifiable_user_data.preferred_language_codes)
-        self.preferred_site_language_code = (
-            modifiable_user_data.preferred_site_language_code)
-        self.preferred_audio_language_code = (
-            modifiable_user_data.preferred_audio_language_code)
-        self.pin = modifiable_user_data.pin
-
-    def to_dict(self):
-        """Convert the UserSettings domain instance into a dictionary form
-        with its keys as the attributes of this class.
-
-        Rerurns:
-            dict. A dictionary containing the UserSettings class information
-            in a dictionary form.
-        """
-        return {
-            'email': self.email,
-            'role': self.role,
-            'username': self.username,
-            'normalized_username': self.normalized_username,
-            'last_agreed_to_terms': self.last_agreed_to_terms,
-            'last_started_state_editor_tutorial': (
-                self.last_started_state_editor_tutorial),
-            'last_started_state_translation_tutorial': (
-                self.last_started_state_translation_tutorial),
-            'last_logged_in': self.last_logged_in,
-            'last_edited_an_exploration': (
-                self.last_edited_an_exploration),
-            'last_created_an_exploration': (
-                self.last_created_an_exploration),
-            'profile_picture_data_url': self.profile_picture_data_url,
-            'default_dashboard': self.default_dashboard,
-            'creator_dashboard_display_pref': (
-                self.creator_dashboard_display_pref),
-            'user_bio': self.user_bio,
-            'subject_interests': self.subject_interests,
-            'first_contribution_msec': self.first_contribution_msec,
-            'preferred_language_codes': self.preferred_language_codes,
-            'preferred_site_language_code': (
-                self.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                self.preferred_audio_language_code),
-            'pin': self.pin,
-            'display_alias': self.display_alias,
-            'deleted': self.deleted,
-            'created_on': self.created_on
-        }
-
-    @property
-    def truncated_email(self):
-        """Returns truncated email by replacing last two characters before @
-        with period.
-
-        Returns:
-            str. The truncated email address of this UserSettings
-            domain object.
-        """
-
-        first_part = self.email[: self.email.find('@')]
-        last_part = self.email[self.email.find('@'):]
-        if len(first_part) <= 1:
-            first_part = '..'
-        elif len(first_part) <= 3:
-            first_part = '%s..' % first_part[0]
-        else:
-            first_part = first_part[:-3] + '..'
-        return '%s%s' % (first_part, last_part)
-
-    @property
-    def normalized_username(self):
-        """Returns username in lowercase or None if it does not exist.
-
-        Returns:
-            str or None. If this object has a 'username' property, returns
-            the normalized version of the username. Otherwise, returns None.
-        """
-
-        return self.normalize_username(self.username)
-
-    @classmethod
-    def normalize_username(cls, username):
-        """Returns the normalized version of the given username,
-        or None if the passed-in 'username' is None.
-
-        Args:
-            username: str. Identifiable username to display in the UI.
-
-        Returns:
-            str or None. The normalized version of the given username,
-            or None if the passed-in username is None.
-        """
-
-        return username.lower() if username else None
-
-    @classmethod
-    def require_valid_username(cls, username):
-        """Checks if the given username is valid or not.
-
-        Args:
-            username: str. The username to validate.
-
-        Raises:
-            ValidationError. An empty username is supplied.
-            ValidationError. The given username exceeds the maximum allowed
-                number of characters.
-            ValidationError. The given username contains non-alphanumeric
-                characters.
-            ValidationError. The given username contains reserved substrings.
-        """
-        if not username:
-            raise utils.ValidationError('Empty username supplied.')
-        elif len(username) > constants.MAX_USERNAME_LENGTH:
-            raise utils.ValidationError(
-                'A username can have at most %s characters.'
-                % constants.MAX_USERNAME_LENGTH)
-        elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
-            raise utils.ValidationError(
-                'Usernames can only have alphanumeric characters.')
-        else:
-            # Disallow usernames that contain the system usernames or the
-            # strings "admin" or "oppia".
-            reserved_usernames = set(feconf.SYSTEM_USERS.values()) | set([
-                'admin', 'oppia'])
-            for reserved_username in reserved_usernames:
-                if reserved_username in username.lower().strip():
-                    raise utils.ValidationError(
-                        'This username is not available.')
-
-
-def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
-    """Verify that the user ID is in a correct format or it is in correct
-    pseudonymous ID format.
-
-    Args:
-        user_or_pseudonymous_id: str. The user or pseudonymous ID to be checked.
-
-    Returns:
-        bool. True when the ID is in a correct user ID or pseudonymous ID
-        format, False otherwise.
-    """
-    return (
-        utils.is_user_id_valid(user_or_pseudonymous_id) or
-        utils.is_pseudonymous_id(user_or_pseudonymous_id))
-
-
 def is_username_taken(username):
     """Returns whether the given username has already been taken.
 
@@ -435,7 +66,7 @@ def is_username_taken(username):
         bool. Whether the given username is taken.
     """
     return user_models.UserSettingsModel.is_normalized_username_taken(
-        UserSettings.normalize_username(username))
+        user_domain.UserSettings.normalize_username(username))
 
 
 def get_email_from_user_id(user_id):
@@ -465,7 +96,7 @@ def get_user_id_from_username(username):
         None. Otherwise return the user_id corresponding to given username.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
-        UserSettings.normalize_username(username))
+        user_domain.UserSettings.normalize_username(username))
     if user_model is None:
         return None
     else:
@@ -483,7 +114,24 @@ def get_user_settings_from_username(username):
         to the given username, or None if no such model was found.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
-        UserSettings.normalize_username(username))
+        user_domain.UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
+def get_user_settings_from_email(email):
+    """Gets the user settings for a given email.
+
+    Args:
+        email: str. Email of the user.
+
+    Returns:
+        UserSettingsModel or None. The UserSettingsModel instance corresponding
+        to the given email, or None if no such model was found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_email(email)
     if user_model is None:
         return None
     else:
@@ -511,6 +159,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=include_marked_deleted)
+
     if strict:
         for user_id, user_settings_model in python_utils.ZIP(
                 user_ids, user_settings_models):
@@ -519,10 +168,14 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     result = []
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
-            result.append(UserSettings(
+            result.append(user_domain.UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ID_ADMIN,
+                roles=[
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_CURRICULUM_ADMIN,
+                    feconf.ROLE_ID_MODERATOR],
+                banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -557,9 +210,10 @@ def get_gravatar_url(email):
     Returns:
         str. The gravatar url for the specified email.
     """
+    # The md5 accepts only bytes, so we first need to encode the email to bytes.
     return (
         'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' %
-        (hashlib.md5(email).hexdigest(), GRAVATAR_SIZE_PX))
+        (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
 def fetch_gravatar(email):
@@ -646,19 +300,19 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
         return None
 
 
-def get_user_role_from_id(user_id):
-    """Returns role of the user with given user_id.
+def get_user_roles_from_id(user_id):
+    """Returns roles of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        str. Role of the user with given id.
+        list(str). Roles of the user with given id.
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
-        return feconf.ROLE_ID_GUEST
-    return user_settings.role
+        return [feconf.ROLE_ID_GUEST]
+    return user_settings.roles
 
 
 def _create_user_contribution_rights_from_model(user_contribution_rights_model):
@@ -685,9 +339,10 @@ def _create_user_contribution_rights_from_model(user_contribution_rights_model):
                 user_contribution_rights_model
                 .can_review_voiceover_for_language_codes
             ),
-            user_contribution_rights_model.can_review_questions)
+            user_contribution_rights_model.can_review_questions,
+            user_contribution_rights_model.can_submit_questions)
     else:
-        return user_domain.UserContributionRights('', [], [], False)
+        return user_domain.UserContributionRights('', [], [], False, False)
 
 
 def get_user_contribution_rights(user_id):
@@ -793,7 +448,9 @@ def _save_user_contribution_rights(user_contribution_rights):
         can_review_voiceover_for_language_codes=(
             user_contribution_rights.can_review_voiceover_for_language_codes),
         can_review_questions=(
-            user_contribution_rights.can_review_questions)).put()
+            user_contribution_rights.can_review_questions),
+        can_submit_questions=(
+            user_contribution_rights.can_submit_questions)).put()
 
 
 def _update_user_contribution_rights(user_contribution_rights):
@@ -810,6 +467,7 @@ def _update_user_contribution_rights(user_contribution_rights):
         remove_contribution_reviewer(user_contribution_rights.id)
 
 
+@transaction_services.run_in_transaction_wrapper
 def _update_reviewer_counts_in_community_contribution_stats_transactional(
         future_user_contribution_rights):
     """Updates the reviewer counts in the community contribution stats based
@@ -846,6 +504,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
     if not past_user_contribution_rights.can_review_questions and (
             future_user_contribution_rights.can_review_questions):
         stats_model.question_reviewer_count += 1
+
     # Update translation reviewer counts.
     for language_code in languages_that_reviewer_can_no_longer_review:
         stats_model.translation_reviewer_counts_by_lang_code[
@@ -879,8 +538,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
         user_contribution_rights: UserContributionRights. The user contribution
             rights.
     """
-    transaction_services.run_in_transaction(
-        _update_reviewer_counts_in_community_contribution_stats_transactional,
+    _update_reviewer_counts_in_community_contribution_stats_transactional(
         user_contribution_rights)
 
 
@@ -910,46 +568,18 @@ def get_user_ids_by_role(role):
     return [user.id for user in user_settings]
 
 
-class UserActionsInfo(python_utils.OBJECT):
-    """A class representing information of user actions.
+def get_user_actions_info(user_id):
+    """Gets user actions info for a user.
 
-    Attributes:
-        user_id: str. The unique ID of the user.
-        role: str. The role ID of the user.
-        actions: list(str). A list of actions accessible to the role.
+    Args:
+        user_id: str|None. The user ID of the user we want to get actions for.
+
+    Returns:
+        UserActionsInfo. User object with system committer user id.
     """
-
-    def __init__(self, user_id=None):
-        self._user_id = user_id
-        self._role = get_user_role_from_id(user_id)
-        self._actions = role_services.get_all_actions(self._role)
-
-    @property
-    def user_id(self):
-        """Returns the unique ID of the user.
-
-        Returns:
-            user_id: str. The unique ID of the user.
-        """
-        return self._user_id
-
-    @property
-    def role(self):
-        """Returns the role ID of user.
-
-        Returns:
-            role: str. The role ID of the user.
-        """
-        return self._role
-
-    @property
-    def actions(self):
-        """Returns list of actions accessible to a user.
-
-        Returns:
-            actions: list(str). List of actions accessible to a user ID.
-        """
-        return self._actions
+    roles = get_user_roles_from_id(user_id)
+    actions = role_services.get_all_actions(roles)
+    return user_domain.UserActionsInfo(user_id, roles, actions)
 
 
 def get_system_user():
@@ -958,8 +588,7 @@ def get_system_user():
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
-    return system_user
+    return get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
 
 
 def _save_user_settings(user_settings):
@@ -977,13 +606,12 @@ def _save_user_settings(user_settings):
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
-        user_model.update_timestamps()
-        user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        model = user_models.UserSettingsModel(**user_settings_dict)
-        model.update_timestamps()
-        model.put()
+        user_model = user_models.UserSettingsModel(**user_settings_dict)
+
+    user_model.update_timestamps()
+    user_model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
@@ -995,10 +623,11 @@ def _get_user_settings_from_model(user_settings_model):
     Returns:
         UserSettings. Domain object for user settings.
     """
-    return UserSettings(
+    return user_domain.UserSettings(
         user_id=user_settings_model.id,
         email=user_settings_model.email,
-        role=user_settings_model.role,
+        roles=user_settings_model.roles,
+        banned=user_settings_model.banned,
         username=user_settings_model.username,
         last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
@@ -1123,8 +752,8 @@ def create_new_user(auth_id, email):
         raise Exception('User %s already exists for auth_id %s.' % (
             user_settings.user_id, auth_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
-    user_settings = UserSettings(
-        user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
+    user_settings = user_domain.UserSettings(
+        user_id, email, [feconf.ROLE_ID_FULL_USER], False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -1178,8 +807,8 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
         if modifiable_user_data.user_id is not None:
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id()
-        user_settings = UserSettings(
-            user_id, email, feconf.ROLE_ID_LEARNER,
+        user_settings = user_domain.UserSettings(
+            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
@@ -1255,6 +884,7 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
+
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
@@ -1428,7 +1058,7 @@ def set_username(user_id, new_username):
     """
     user_settings = get_user_settings(user_id, strict=True)
 
-    UserSettings.require_valid_username(new_username)
+    user_domain.UserSettings.require_valid_username(new_username)
     if is_username_taken(new_username):
         raise utils.ValidationError(
             'Sorry, the username \"%s\" is already taken! Please pick '
@@ -1600,8 +1230,8 @@ def update_preferred_audio_language_code(
     _save_user_settings(user_settings)
 
 
-def update_user_role(user_id, role):
-    """Updates the role of the user with given user_id.
+def add_user_role(user_id, role):
+    """Updates the roles of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user whose role is to be updated.
@@ -1610,14 +1240,42 @@ def update_user_role(user_id, role):
     Raises:
         Exception. The given role does not exist.
     """
-    if role not in role_services.PARENT_ROLES:
-        raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
-    if user_settings.role == feconf.ROLE_ID_LEARNER:
-        raise Exception('The role of a Learner cannot be changed.')
-    if role == feconf.ROLE_ID_LEARNER:
-        raise Exception('Updating to a Learner role is not allowed.')
-    user_settings.role = role
+    if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
+        raise Exception('The role of a Mobile Learner cannot be changed.')
+    if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
+        raise Exception('Adding a %s role is not allowed.' % role)
+
+    user_settings.roles.append(role)
+    role_services.log_role_query(
+        user_id, feconf.ROLE_ACTION_ADD, role=role,
+        username=user_settings.username)
+
+    _save_user_settings(user_settings)
+
+
+def remove_user_role(user_id, role):
+    """Updates the roles of the user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user whose role is to be updated.
+        role: str. The role to be assigned to user with given id.
+
+    Raises:
+        Exception. The given role does not exist.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
+        raise Exception('The role of a Mobile Learner cannot be changed.')
+    if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
+        raise Exception('Removing a default role is not allowed.')
+
+    user_settings.roles.remove(role)
+
+    role_services.log_role_query(
+        user_id, feconf.ROLE_ACTION_REMOVE, role=role,
+        username=user_settings.username)
+
     _save_user_settings(user_settings)
 
 
@@ -1731,20 +1389,6 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
-def update_last_logged_in(user_settings, new_last_logged_in):
-    """Updates last_logged_in to the new given datetime for the user with
-    given user_settings. Should only be used by tests.
-
-    Args:
-        user_settings: UserSettings. The UserSettings domain object.
-        new_last_logged_in: datetime or None. The new datetime of the last
-            logged in session.
-    """
-
-    user_settings.last_logged_in = new_last_logged_in
-    _save_user_settings(user_settings)
-
-
 def record_user_edited_an_exploration(user_id):
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
@@ -1773,7 +1417,8 @@ def record_user_created_an_exploration(user_id):
 
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
-        can_receive_feedback_email, can_receive_subscription_email):
+        can_receive_feedback_email, can_receive_subscription_email,
+        bulk_email_db_already_updated=False):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -1789,6 +1434,14 @@ def update_email_preferences(
             emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
+        bulk_email_db_already_updated: bool. Whether the bulk email provider's
+            database is already updated. This is set to true only when calling
+            from the webhook controller since in that case, the external update
+            to the bulk email provider's database initiated the update here.
+
+    Returns:
+        bool. Whether to send a mail to the user to complete bulk email service
+        signup.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -1796,15 +1449,28 @@ def update_email_preferences(
         email_preferences_model = user_models.UserEmailPreferencesModel(
             id=user_id)
 
-    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email = get_email_from_user_id(user_id)
+    # Mailchimp database should not be updated in servers where sending
+    # emails is not allowed.
+    if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
+        user_creation_successful = (
+            bulk_email_services.add_or_update_user_status(
+                email, can_receive_email_updates))
+        if not user_creation_successful:
+            email_preferences_model.site_updates = False
+            email_preferences_model.update_timestamps()
+            email_preferences_model.put()
+            return True
+    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
+    return False
 
 
 def get_email_preferences(user_id):
@@ -1943,75 +1609,6 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     return result
 
 
-class UserContributions(python_utils.OBJECT):
-    """Value object representing a user's contributions.
-
-    Attributes:
-        user_id: str. The unique ID of the user.
-        created_exploration_ids: list(str). IDs of explorations that this
-            user has created.
-        edited_exploration_ids: list(str). IDs of explorations that this
-            user has edited.
-    """
-
-    def __init__(
-            self, user_id, created_exploration_ids, edited_exploration_ids):
-        """Constructs a UserContributions domain object.
-
-        Args:
-            user_id: str. The unique ID of the user.
-            created_exploration_ids: list(str). IDs of explorations that this
-                user has created.
-            edited_exploration_ids: list(str). IDs of explorations that this
-                user has edited.
-        """
-        self.user_id = user_id
-        self.created_exploration_ids = created_exploration_ids
-        self.edited_exploration_ids = edited_exploration_ids
-
-    def validate(self):
-        """Checks that user_id, created_exploration_ids and
-        edited_exploration_ids fields of this UserContributions
-        domain object are valid.
-
-        Raises:
-            ValidationError. The user_id is not str.
-            ValidationError. The created_exploration_ids is not a list.
-            ValidationError. The exploration_id in created_exploration_ids
-                is not str.
-            ValidationError. The edited_exploration_ids is not a list.
-            ValidationError. The exploration_id in edited_exploration_ids
-                is not str.
-        """
-        if not isinstance(self.user_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
-        if not self.user_id:
-            raise utils.ValidationError('No user id specified.')
-
-        if not isinstance(self.created_exploration_ids, list):
-            raise utils.ValidationError(
-                'Expected created_exploration_ids to be a list, received %s'
-                % self.created_exploration_ids)
-        for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected exploration_id in created_exploration_ids '
-                    'to be a string, received %s' % (
-                        exploration_id))
-
-        if not isinstance(self.edited_exploration_ids, list):
-            raise utils.ValidationError(
-                'Expected edited_exploration_ids to be a list, received %s'
-                % self.edited_exploration_ids)
-        for exploration_id in self.edited_exploration_ids:
-            if not isinstance(exploration_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected exploration_id in edited_exploration_ids '
-                    'to be a string, received %s' % (
-                        exploration_id))
-
-
 def get_user_contributions(user_id, strict=False):
     """Gets domain object representing the contributions for the given user_id.
 
@@ -2027,7 +1624,7 @@ def get_user_contributions(user_id, strict=False):
     """
     model = user_models.UserContributionsModel.get(user_id, strict=strict)
     if model is not None:
-        result = UserContributions(
+        result = user_domain.UserContributions(
             model.id, model.created_exploration_ids,
             model.edited_exploration_ids)
     else:
@@ -2064,7 +1661,7 @@ def create_user_contributions(
         raise Exception(
             'User contributions model for user %s already exists.' % user_id)
     else:
-        user_contributions = UserContributions(
+        user_contributions = user_domain.UserContributions(
             user_id, created_exploration_ids, edited_exploration_ids)
         _save_user_contributions(user_contributions)
     return user_contributions
@@ -2149,7 +1746,7 @@ def _save_user_contributions(user_contributions):
     ).put()
 
 
-def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
+def migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
     """Holds responsibility of updating the structure of dashboard stats.
 
     Args:
@@ -2249,7 +1846,6 @@ def get_weekly_dashboard_stats(user_id):
         If the user doesn't exist, then this function returns None.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
-
     if model and model.weekly_creator_stats_list:
         return model.weekly_creator_stats_list
     else:
@@ -2290,7 +1886,7 @@ def update_dashboard_stats_log(user_id):
     model = user_models.UserStatsModel.get_or_create(user_id)
 
     if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
-        _migrate_dashboard_stats_to_latest_schema(model)
+        migrate_dashboard_stats_to_latest_schema(model)
 
     weekly_dashboard_stats = {
         get_current_date_as_string(): {
@@ -2304,23 +1900,19 @@ def update_dashboard_stats_log(user_id):
     model.put()
 
 
-def is_at_least_moderator(user_id):
-    """Checks if a user with given user_id is at least a moderator.
+def is_moderator(user_id):
+    """Checks if a user with given user_id is a moderator.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        bool. True if user is atleast a moderator, False otherwise.
+        bool. True if user is a moderator, False otherwise.
     """
-    user_role = get_user_role_from_id(user_id)
-    if (user_role == feconf.ROLE_ID_MODERATOR or
-            user_role == feconf.ROLE_ID_ADMIN):
-        return True
-    return False
+    return feconf.ROLE_ID_MODERATOR in get_user_roles_from_id(user_id)
 
 
-def is_admin(user_id):
+def is_curriculum_admin(user_id):
     """Checks if a user with given user_id is an admin.
 
     Args:
@@ -2329,10 +1921,7 @@ def is_admin(user_id):
     Returns:
         bool. True if user is an admin, False otherwise.
     """
-    user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_ADMIN:
-        return True
-    return False
+    return feconf.ROLE_ID_CURRICULUM_ADMIN in get_user_roles_from_id(user_id)
 
 
 def is_topic_manager(user_id):
@@ -2344,10 +1933,7 @@ def is_topic_manager(user_id):
     Returns:
         bool. Whether the user is a topic manager.
     """
-    user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
-        return True
-    return False
+    return feconf.ROLE_ID_TOPIC_MANAGER in get_user_roles_from_id(user_id)
 
 
 def can_review_translation_suggestions(user_id, language_code=None):
@@ -2413,6 +1999,19 @@ def can_review_question_suggestions(user_id):
     return user_contribution_rights.can_review_questions
 
 
+def can_submit_question_suggestions(user_id):
+    """Checks whether the user can submit question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. Whether the user can submit question suggestions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    return user_contribution_rights.can_submit_questions
+
+
 def allow_user_to_review_translation_in_language(user_id, language_code):
     """Allows the user with the given user id to review translation in the given
     language_code.
@@ -2432,19 +2031,22 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
     _save_user_contribution_rights(user_contribution_rights)
 
 
-def remove_translation_review_rights_in_language(user_id, language_code):
+def remove_translation_review_rights_in_language(
+        user_id, language_code_to_remove):
     """Removes the user's review rights to translation suggestions in the given
     language_code.
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language. Callers should ensure that
-            the user already has rights to review translations in the given
-            language code.
+        language_code_to_remove: str. The code of the language. Callers should
+            ensure that the user already has rights to review translations in
+            the given language code.
     """
     user_contribution_rights = get_user_contribution_rights(user_id)
-    user_contribution_rights.can_review_translation_for_language_codes.remove(
-        language_code)
+    user_contribution_rights.can_review_translation_for_language_codes = [
+        lang_code for lang_code
+        in user_contribution_rights.can_review_translation_for_language_codes
+        if lang_code != language_code_to_remove]
     _update_user_contribution_rights(user_contribution_rights)
 
 
@@ -2507,6 +2109,30 @@ def remove_question_review_rights(user_id):
     _update_user_contribution_rights(user_contribution_rights)
 
 
+def allow_user_to_submit_question(user_id):
+    """Allows the user with the given user id to submit question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user does not have rights to submit questions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_questions = True
+    _save_user_contribution_rights(user_contribution_rights)
+
+
+def remove_question_submit_rights(user_id):
+    """Removes the user's submit rights to question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user already has rights to submit questions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_questions = False
+    _update_user_contribution_rights(user_contribution_rights)
+
+
 def remove_contribution_reviewer(user_id):
     """Deletes the UserContributionRightsModel corresponding to the given
     user_id.
@@ -2528,12 +2154,12 @@ def remove_contribution_reviewer(user_id):
         user_contribution_rights_model.delete()
 
 
-def get_contribution_reviewer_usernames(review_category, language_code=None):
-    """Returns a list of usernames of users who has rights to review item of
-    given review category.
+def get_contributor_usernames(category, language_code=None):
+    """Returns a list of usernames of users who has contribution rights of given
+    category.
 
     Args:
-        review_category: str. The review category to find the list of reviewers
+        category: str. The review category to find the list of reviewers
             for.
         language_code: None|str. The language code for translation or voiceover
             review category.
@@ -2541,26 +2167,30 @@ def get_contribution_reviewer_usernames(review_category, language_code=None):
     Returns:
         list(str). A list of usernames.
     """
-    reviewer_ids = []
-    if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
-        reviewer_ids = (
+    user_ids = []
+    if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
-        reviewer_ids = (
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
-    elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
-        reviewer_ids = (
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
+        user_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_submitter_user_ids())
     else:
-        raise Exception('Invalid review category: %s' % review_category)
+        raise Exception('Invalid category: %s' % category)
 
-    return get_usernames(reviewer_ids)
+    return get_usernames(user_ids)
 
 
 def log_username_change(committer_id, old_username, new_username):
@@ -2579,13 +2209,74 @@ def log_username_change(committer_id, old_username, new_username):
         new_username=new_username).put()
 
 
-def create_login_url(target_url):
+def create_login_url(return_url):
     """Creates a login url.
 
     Args:
-        target_url: str. The URL to redirect to after login.
+        return_url: str. The URL to redirect to after login.
 
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    return current_user_services.create_login_url(target_url)
+    return '/login?%s' % python_utils.url_encode({'return_url': return_url})
+
+
+def mark_user_banned(user_id):
+    """Marks a user banned.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
+    user_settings = get_user_settings(user_id)
+    user_settings.mark_banned()
+    _save_user_settings(user_settings)
+
+
+def unmark_user_banned(user_id):
+    """Unmarks a banned user.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
+    user_auth_details = auth_services.get_user_auth_details_from_model(
+        auth_models.UserAuthDetailsModel.get(user_id))
+
+    user_settings = get_user_settings(user_id)
+    user_settings.unmark_banned(
+        feconf.ROLE_ID_FULL_USER if user_auth_details.is_full_user() else (
+            feconf.ROLE_ID_MOBILE_LEARNER
+        ))
+
+    _save_user_settings(user_settings)
+
+
+def get_dashboard_stats(user_id):
+    """Returns the dashboard stats associated with the given user_id.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        dict. Has the keys:
+            total_plays: int. Number of times the user's explorations were
+                played.
+            num_ratings: int. Number of times the explorations have been
+                rated.
+            average_ratings: float. Average of average ratings across all
+                explorations.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        total_plays = 0
+        num_ratings = 0
+        average_ratings = None
+    else:
+        total_plays = user_stats_model.total_plays
+        num_ratings = user_stats_model.num_ratings
+        average_ratings = user_stats_model.average_ratings
+
+    return {
+        'total_plays': total_plays,
+        'num_ratings': num_ratings,
+        'average_ratings': average_ratings
+    }

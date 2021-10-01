@@ -22,18 +22,21 @@ describe('Text Input tokenizer', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('Test text input tokenizer', () => {
-    var tokenizer: TextInputTokenizer;
+    let tokenizer: TextInputTokenizer;
     beforeEach(() => {
       tokenizer = new TextInputTokenizer();
     });
     it('should generate correct tokens for a text', () => {
-      var textInput = 'I don\'t know the answer to this question';
-      var expectedTokens = [
+      const textInput = 'I don\'t know the answer to this question';
+      const expectedTokens = [
         'don', 'know', 'the', 'answer', 'to', 'this', 'question'];
-
-      var tokens = tokenizer.generateTokens(textInput);
-      expect(tokens.length).toEqual(expectedTokens.length);
+      const tokens = tokenizer.generateTokens(textInput);
+      expect(tokens?.length).toEqual(expectedTokens.length);
       expect(tokens).toEqual(expectedTokens);
+      const emptyInput = '';
+      const invalidInput = 'I';
+      expect(tokenizer.generateTokens(emptyInput)).toEqual(null);
+      expect(tokenizer.generateTokens(invalidInput)).toEqual(null);
     });
   });
 });

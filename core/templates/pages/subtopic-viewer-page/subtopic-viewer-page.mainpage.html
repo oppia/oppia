@@ -5,8 +5,8 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
           <navbar-pre-logo-action>
             <subtopic-viewer-navbar-pre-logo-action>
             </subtopic-viewer-navbar-pre-logo-action>
@@ -18,11 +18,11 @@
           </navbar-breadcrumb>
 
           <content>
-            <subtopic-viewer-page></subtopic-viewer-page>
+            <oppia-subtopic-viewer-page></oppia-subtopic-viewer-page>
           </content>
 
           <page-footer></page-footer>
-        </base-content>
+        </oppia-base-content>
       </div>
 
     </oppia-root>

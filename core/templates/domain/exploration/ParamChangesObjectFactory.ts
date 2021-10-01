@@ -24,7 +24,7 @@ import {
   ParamChangeBackendDict,
   ParamChange,
   ParamChangeObjectFactory
-} from 'domain/exploration/ParamChangeObjectFactory.ts';
+} from 'domain/exploration/ParamChangeObjectFactory';
 
 @Injectable({
   providedIn: 'root'

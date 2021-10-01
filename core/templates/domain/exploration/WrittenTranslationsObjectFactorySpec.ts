@@ -17,20 +17,20 @@
  */
 import { TestBed } from '@angular/core/testing';
 
-import { WrittenTranslationsObjectFactory } from
+import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Written Translations Object Factory', () => {
-  let writtenTranslationsObjectFactory;
-  let writtenTranslationObjectFactory;
-  let writtenTranslationsBackendDict;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
+  let writtenTranslationsBackendDict: WrittenTranslations;
 
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.get(
+    writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
-    writtenTranslationObjectFactory = TestBed.get(
+    writtenTranslationObjectFactory = TestBed.inject(
       WrittenTranslationObjectFactory);
 
     writtenTranslationsBackendDict = (
@@ -135,7 +135,8 @@ describe('Written Translations Object Factory', () => {
         writtenTranslationsBackendDict.updateWrittenTranslation(
           'content_1', 'en', 'This is the new HTML');
       }).toThrowError('Unable to find the given language code.');
-      expect(writtenTranslationsBackendDict.hasWrittenTranslation('en'))
+      expect(
+        writtenTranslationsBackendDict.hasWrittenTranslation('', 'en'))
         .toBe(false);
     });
 

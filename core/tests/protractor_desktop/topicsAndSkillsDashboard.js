@@ -43,13 +43,12 @@ describe('Topics and skills dashboard functionality', function() {
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAdmin(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDB');
   });
 
   beforeEach(async function() {
-    await users.login('creator@topicsAndSkillsDashboard.com');
     await topicsAndSkillsDashboardPage.get();
   });
 
@@ -143,7 +142,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
 
-    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('Math');
+    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('math');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
@@ -231,6 +230,9 @@ describe('Topics and skills dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
     await users.logout();
   });
 });

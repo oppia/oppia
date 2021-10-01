@@ -2,7 +2,7 @@
   <div>
     <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header" ng-click="toggleInteractionEditor()">
       <h3 class="oppia-exp-interaction-card-header">
-        Interaction
+        Interaction <span ng-if="getCurrentInteractionName()">(<[getCurrentInteractionName()]>)</span>
       </h3>
       <i class="fa fa-caret-down"
          ng-if="!interactionEditorIsShown"
@@ -34,7 +34,7 @@
               <i class="material-icons md-18">&#xE5CD;</i>
             </button>
 
-            <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': EditabilityService.isEditable()}">
+            <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': EditabilityService.isEditable() && !interactionIsDisabled}">
               <div class="oppia-interaction-preview oppia-transition-200"
                    ng-click="openInteractionCustomizerModal()"
                    ng-if="EditabilityService.isEditable()"

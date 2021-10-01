@@ -57,39 +57,6 @@ describe('Navigation features on mobile', function() {
         'http://localhost:9001/about');
     });
 
-  it('should navigate to Get Started page using the sidebar menu',
-    async function() {
-      var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
-      await waitFor.elementToBeClickable(
-        navbarButton, 'Could not click navbar button');
-      await navbarButton.click();
-      var getStartedLink = element(
-        by.css('.protractor-mobile-test-get-started-link'));
-      await waitFor.elementToBeClickable(
-        getStartedLink, 'Could not click get started link');
-      await getStartedLink.click();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get-started');
-    });
-
-  it('should navigate to Teach with Oppia page using the sidebar menu',
-    async function() {
-      var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
-      await waitFor.elementToBeClickable(
-        navbarButton, 'Could not click navbar button');
-      await navbarButton.click();
-      var teachLink = element(
-        by.css('.protractor-mobile-test-teach-link'));
-      await waitFor.elementToBeClickable(
-        teachLink, 'Could not click teach link');
-      await teachLink.click();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/teach');
-    });
-
   it('should navigate to Donate page using the sidebar menu',
     async function() {
       var navbarButton = element(
@@ -107,23 +74,6 @@ describe('Navigation features on mobile', function() {
         'http://localhost:9001/donate');
     });
 
-  it('should navigate to Contact page using the sidebar menu',
-    async function() {
-      var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
-      await waitFor.elementToBeClickable(
-        navbarButton, 'Could not click navbar button');
-      await navbarButton.click();
-      var contactLink = element(
-        by.css('.protractor-mobile-test-contact-link'));
-      await waitFor.elementToBeClickable(
-        contactLink, 'Could not click contact link');
-      await contactLink.click();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/contact');
-    });
-
   it('should navigate to Library page using the sidebar menu',
     async function() {
       var navbarButton = element(
@@ -138,6 +88,27 @@ describe('Navigation features on mobile', function() {
       await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/community-library');
+    });
+
+  it('should navigate to Classroom page using the sidebar menu',
+    async function() {
+      var navbarButton = element(
+        by.css('.protractor-mobile-test-navbar-button'));
+      await waitFor.elementToBeClickable(
+        navbarButton, 'Could not click navbar button');
+      await navbarButton.click();
+      var classroomLink = element(
+        by.css('.protractor-mobile-test-classroom'));
+      await waitFor.elementToBeClickable(
+        classroomLink, 'Could not click classroom link');
+      await classroomLink.click();
+      var mathematicsLink = element(
+        by.css('.protractor-mobile-test-mathematics-link'));
+      await waitFor.elementToBeClickable(
+        mathematicsLink, 'Could not click mathematics link');
+      await mathematicsLink.click();
+      await waitFor.pageToFullyLoad();
+      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/learn/math');
     });
 
   it('should navigate to Home page by clicking on the Oppia logo',
@@ -170,7 +141,7 @@ describe('Navigation features on mobile', function() {
       // We should not wait for angular here since
       // the login page is non-angular.
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/_ah/login?continue=http%3A//localhost%3A9001/signup%3Freturn_url%3Dhttp%253A%252F%252Flocalhost%253A9001%252Flibrary');
+        'http://localhost:9001/login?return_url=http%253A%252F%252Flocalhost%253A9001%252Flibrary');
       // As soon as this page loads up, we are again
       // setting browser.ignoreSynchronization = false
       // to prevent any flakiness.

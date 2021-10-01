@@ -32,7 +32,7 @@
       </div>
       <div class="filter-container">
         <span>Filter</span>
-        <input class="form-control" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user">
+        <input class="form-control oppia-autofocus" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user" focus-on="usernameInputField">
         <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
@@ -62,7 +62,7 @@
         <div class="history-table-profile">
           <strong><profile-link-text [username]="metadata.committerId"></profile-link-text></strong>
         </div>
-        <div class="history-table-version">
+        <div class="history-table-version" title="<[metadata.tooltipText]>">
           <em class="protractor-test-history-tab-commit-date"><[metadata.createdOnMsecsStr]></em>
         </div>
         <div class="history-table-options protractor-test-history-list-options">
@@ -184,7 +184,7 @@
     padding: 0 10px;
   }
   history-tab .pagination-page a {
-    color: #333333;
+    color: #333;
     font-size: 14px;
     font-weight: bold;
   }

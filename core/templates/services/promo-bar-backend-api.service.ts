@@ -46,6 +46,22 @@ export class PromoBarBackendApiService {
       });
     });
   }
+
+  async updatePromoBarDataAsync(
+      promoBarEnabled: boolean, promoBarMessage: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<PromoBarBackendDict>(
+        ServicesConstants.PROMO_BAR_URL, {
+          promo_bar_enabled: promoBarEnabled,
+          promo_bar_message: promoBarMessage
+        }
+      ).toPromise().then(() => {
+        resolve();
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
 }
 
 angular.module('oppia').factory(

@@ -31,7 +31,12 @@ export interface StorySummaryBackendDict {
   'story_is_published': boolean;
   'completed_node_titles': string[],
   'url_fragment': string,
-  'pending_node_dicts': StoryNodeBackendDict[]
+  'all_node_dicts': StoryNodeBackendDict[],
+  // This property is optional because it is only present in the
+  // story summary dict of learner dashboard page.
+  'topic_name'?: string;
+  'topic_url_fragment'?: string,
+  'classroom_url_fragment'?: string
 }
 
 export class StorySummary {
@@ -45,7 +50,10 @@ export class StorySummary {
     private _storyIsPublished: boolean,
     private _completedNodeTitles: string[],
     private _urlFragment: string,
-    private _pendingNodes: StoryNode[]
+    private _allNodes: StoryNode[],
+    private _topicName: string | undefined,
+    private _topicUrlFragment: string | undefined,
+    private _classroomUrlFragment: string | undefined
   ) {}
 
   getId(): string {
@@ -72,8 +80,16 @@ export class StorySummary {
     return this._thumbnailBgColor;
   }
 
-  getDescription(): string {
+  getDescription(): string | undefined {
     return this._description;
+  }
+
+  getCompletedNodeTitles(): string[] {
+    return this._completedNodeTitles;
+  }
+
+  getTopicName(): string | undefined {
+    return this._topicName;
   }
 
   isStoryPublished(): boolean {
@@ -84,14 +100,22 @@ export class StorySummary {
     return this._urlFragment;
   }
 
-  getPendingNodes(): StoryNode[] {
-    return this._pendingNodes;
+  getAllNodes(): StoryNode[] {
+    return this._allNodes;
+  }
+
+  getTopicUrlFragment(): string | undefined {
+    return this._topicUrlFragment;
+  }
+
+  getClassroomUrlFragment(): string | undefined {
+    return this._classroomUrlFragment;
   }
 
   static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
-    let pendingNodes = (
-      storySummaryBackendDict.pending_node_dicts.map(storyNodeDict => {
+    let allNodes = (
+      storySummaryBackendDict.all_node_dicts.map(storyNodeDict => {
         return StoryNode.createFromBackendDict(
           storyNodeDict);
       }));
@@ -105,7 +129,10 @@ export class StorySummary {
       storySummaryBackendDict.story_is_published,
       storySummaryBackendDict.completed_node_titles,
       storySummaryBackendDict.url_fragment,
-      pendingNodes
+      allNodes,
+      storySummaryBackendDict.topic_name,
+      storySummaryBackendDict.topic_url_fragment,
+      storySummaryBackendDict.classroom_url_fragment
     );
   }
 }

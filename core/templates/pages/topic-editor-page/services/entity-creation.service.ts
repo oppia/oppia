@@ -18,20 +18,19 @@
  * an entity.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
     'background-banner.component.ts');
 require(
-  'components/review-material-editor/review-material-editor.directive.ts');
+  'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
-require('domain/skill/RubricObjectFactory.ts');
-require('components/rubrics-editor/rubrics-editor.directive.ts');
+require('components/rubrics-editor/rubrics-editor.component.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/' +
-  'create-new-skill-modal.controller.ts');
+  'pages/topics-and-skills-dashboard-page/modals/' +
+  'create-new-skill-modal.component.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(
@@ -39,19 +38,18 @@ require(
   'create-new-subtopic-modal.controller.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
+require('pages/topic-editor-page/services/create-new-skill-modal.service');
 
 angular.module('oppia').factory('EntityCreationService', [
-  '$uibModal', 'SkillCreationService',
+  '$uibModal', 'CreateNewSkillModalService',
   'TopicEditorRoutingService', 'TopicEditorStateService',
-  'UrlInterpolationService',
   function(
-      $uibModal, SkillCreationService,
-      TopicEditorRoutingService, TopicEditorStateService,
-      UrlInterpolationService) {
+      $uibModal, CreateNewSkillModalService,
+      TopicEditorRoutingService, TopicEditorStateService) {
     var createSubtopic = function(topic) {
       $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topic-editor-page/modal-templates/' +
+        template: require(
+          'pages/topic-editor-page/modal-templates/' +
           'create-new-subtopic-modal.template.html'),
         backdrop: 'static',
         resolve: {
@@ -71,7 +69,7 @@ angular.module('oppia').factory('EntityCreationService', [
 
     var createSkill = function() {
       var topicId = TopicEditorStateService.getTopic().getId();
-      SkillCreationService.createNewSkill([topicId]);
+      CreateNewSkillModalService.createNewSkill([topicId]);
     };
 
     return {

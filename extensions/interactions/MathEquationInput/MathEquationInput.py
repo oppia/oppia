@@ -16,8 +16,8 @@
 
 """Python configuration for MathEquationInput interaction."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from extensions.interactions import base
 
@@ -45,4 +45,12 @@ class MathEquationInput(base.BaseInteraction):
             'obj_type': 'CustomOskLetters',
         },
         'default_value': []
+    }, {
+        'name': 'useFractionForDivision',
+        'description': (
+            'Represent division using fractions (rather than ÷).'),
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False
     }]

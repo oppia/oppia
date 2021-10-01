@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for GraphDataService.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
@@ -87,6 +87,7 @@ describe('Graph Data Service', function() {
           id: 'TextInput',
           solution: null,
         },
+        linked_skill_id: null,
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {

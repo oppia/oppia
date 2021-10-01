@@ -16,18 +16,18 @@
 
 """Unit tests for core.domain.customization_args_utils."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import re
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 
 class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
@@ -369,7 +369,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'choices': {'value': ['']}
         }
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Could not convert unicode to int: 1b'
+            utils.ValidationError, 'Could not convert str to int: 1b'
         ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',

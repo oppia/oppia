@@ -11,7 +11,7 @@
       <div class="float-right">
         <ul>
           <li>
-            <h4 [innerHTML]="'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate" class="oppia-share-collection-footer"></h4>
+            <h4 [innerHTML]="'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate" class="oppia-share-collection-footer protractor-test-share-collection-footer"></h4>
           </li>
           <li>
             <sharing-links (click)="$event.stopPropagation()"
@@ -30,6 +30,12 @@
 </div>
 
 <style>
+  .oppia-collection-footer-sharing-links {
+    left: -5px;
+    position: relative;
+    top: 7px;
+  }
+
   .oppia-collection-footer {
     background-color: #094142;
     color: #FFF;
@@ -60,7 +66,7 @@
   .oppia-collection-footer .oppia-share-collection-footer {
     line-height: 0.6;
     padding-right: 20px;
-    padding-top: 20px;
+    padding-top: 16px;
     text-transform: uppercase;
   }
 

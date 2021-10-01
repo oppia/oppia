@@ -16,13 +16,14 @@
 
 """Common utilities for test classes."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import ast
 import collections
 import contextlib
 import copy
+import datetime
+import functools
 import inspect
 import itertools
 import json
@@ -31,7 +32,11 @@ import os
 import re
 import unittest
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.controllers import base
 from core.domain import auth_domain
 from core.domain import caching_domain
@@ -49,45 +54,37 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
-import feconf
 import main
-import main_mail
-import main_taskqueue
-from proto import text_classifier_pb2
-import python_utils
-import requests_mock
-import schema_utils
-import utils
+from proto_files import text_classifier_pb2
 
-import contextlib2
 import elasticsearch
-from google.appengine.api import mail
-from google.appengine.ext import deferred
-from google.appengine.ext import testbed
+import requests_mock
 import webtest
 
-(
-    auth_models, exp_models, feedback_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models,) = (
-        models.Registry.import_models([
-            models.NAMES.auth, models.NAMES.exploration, models.NAMES.feedback,
-            models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic]))
+from typing import Any, Dict, Optional # isort: skip
 
-current_user_services = models.Registry.import_current_user_services()
+(
+    auth_models, base_models, exp_models,
+    feedback_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models
+) = models.Registry.import_models([
+    models.NAMES.auth, models.NAMES.base_model, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic
+])
+
 datastore_services = models.Registry.import_datastore_services()
+storage_services = models.Registry.import_storage_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_auth_services = models.Registry.import_auth_services()
@@ -118,12 +115,12 @@ def get_filepath_from_filename(filename, rootdir):
     the function returns the complete path of the filename by using
     os.path.join(root, filename).
 
-    For example signup-page.mainpage.html is present in
-    core/templates/pages/signup-page and error-page.mainpage.html is present in
-    core/templates/pages/error-pages. So we walk through core/templates/pages
-    and a match for signup-page.component.html is found in signup-page
-    subdirectory and a match for error-page.directive.html is found in
-    error-pages subdirectory.
+    For example exploration-editor-page.mainpage.html is present in
+    core/templates/pages/exploration-editor-page and error-page.mainpage.html
+    is present in core/templates/pages/error-pages. So we walk through
+    core/templates/pages and a match for exploration-editor-page.component.html
+    is found in exploration-editor-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
 
     Args:
         filename: str. The name of the file.
@@ -184,9 +181,8 @@ def get_storage_model_module_names():
     """Get all module names in storage."""
     # As models.NAMES is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES.__dict__:
-        if '__' not in name:
-            yield name
+    for name in models.NAMES:
+        yield name
 
 
 def get_storage_model_classes():
@@ -336,7 +332,7 @@ class ElasticSearchStub(python_utils.OBJECT):
         """
         if index_name not in self._DB:
             raise self._generate_index_not_found_error(index_name)
-        return any([d['id'] == doc_id for d in self._DB[index_name]])
+        return any(d['id'] == doc_id for d in self._DB[index_name])
 
     def mock_delete(self, index_name, doc_id):
         """Deletes a document from an index in the mock database. Does nothing
@@ -408,7 +404,7 @@ class ElasticSearchStub(python_utils.OBJECT):
             AssertionError. The query is not in the correct form.
             elasticsearch.NotFoundError. The given index name was not found.
         """
-        assert query.keys() == ['query']
+        assert list(query.keys()) == ['query']
         assert query['query'] == {
             'match_all': {}
         }
@@ -483,7 +479,7 @@ class ElasticSearchStub(python_utils.OBJECT):
                         words = []
                         for s in strs:
                             words += s.split(' ')
-                        if all([value in words for value in values]):
+                        if all(value in words for value in values):
                             filtered_docs.append(doc)
             result_docs = filtered_docs
 
@@ -531,14 +527,20 @@ class AuthServicesStub(python_utils.OBJECT):
         """Installs a new instance of the stub onto the given test instance.
 
         Args:
-            test: AppEngineTestBase. The test instance to install the stub on.
+            test: GenericTestBase. The test instance to install the stub on.
 
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stub = cls()
 
+            stack.enter_context(test.swap(
+                platform_auth_services, 'establish_auth_session',
+                stub.establish_auth_session))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'destroy_auth_session',
+                stub.destroy_auth_session))
             stack.enter_context(test.swap(
                 platform_auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
@@ -579,6 +581,28 @@ class AuthServicesStub(python_utils.OBJECT):
             # in reverse order.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
+
+    @classmethod
+    def establish_auth_session(cls, unused_request, unused_response):
+        """Sets login cookies to maintain a user's sign-in session.
+
+        Args:
+            unused_request: webapp2.Request. Unused because os.environ handles
+                sessions.
+            unused_response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        pass
+
+    @classmethod
+    def destroy_auth_session(cls, unused_response):
+        """Clears login cookies from the given response headers.
+
+        Args:
+            unused_response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        pass
 
     @classmethod
     def get_auth_claims_from_request(cls, unused_request):
@@ -751,7 +775,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         functionality of core.platform.taskqueue.
 
         Args:
-            test_base: AppEngineTestBase. The current test base.
+            test_base: GenericTestBase. The current test base.
         """
         self._test_base = test_base
         self._client = cloud_tasks_emulator.Emulator(
@@ -767,12 +791,13 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             queue_name: str. The name of the queue to add the task to.
             task_name: str|None. Optional. The name of the task.
         """
+        # Header values need to be bytes, thus we encode our strings to bytes.
         headers = {
-            'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
+            'X-AppEngine-Fake-Is-Admin': b'1',
+            'X-Appengine-QueueName': queue_name.encode('utf-8'),
+            # Maps empty strings to None so the output can become 'None'.
             'X-Appengine-TaskName': (
-                # Maps empty strings to None so the output can become 'None'.
-                python_utils.convert_to_bytes(task_name or None)),
-            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes(1),
+                task_name.encode('utf-8') if task_name else b'None')
         }
         csrf_token = self._test_base.get_new_csrf_token()
         self._test_base.post_task(url, payload, headers, csrf_token=csrf_token)
@@ -859,7 +884,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         """
         return caching_domain.MemoryCacheStats(0, 0, len(self._CACHE_DICT))
 
-    def flush_cache(self):
+    def flush_caches(self):
         """Wipes the cache dictionary clean."""
         self._CACHE_DICT.clear()
 
@@ -915,6 +940,33 @@ class TestBase(unittest.TestCase):
     # A test unicode string.
     UNICODE_TEST_STRING = 'unicode ¡马!'
 
+    @property
+    def namespace(self):
+        """Returns a namespace for isolating the NDB operations of each test.
+
+        Returns:
+            str. The namespace.
+        """
+        return self.id()[-100:]
+
+    def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        Reference URL:
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        GenericTestBase's override of run() wraps super().run() in swap
+        contexts to mock out the cache and taskqueue services.
+
+        Args:
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
+        """
+
+        with datastore_services.get_ndb_context(namespace=self.namespace):
+            super(TestBase, self).run(result=result)
+
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
         given suffix. This is used to test that functions behave correctly when
@@ -940,7 +992,7 @@ class TestBase(unittest.TestCase):
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         python_utils.PRINT(
-            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
+            b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
@@ -1070,8 +1122,41 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
+        """Swap obj.attr with a CallCounter instance.
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raises: Exception|None. The exception raised by the swapped
+                function. If None, then no exception is raised.
+            returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
+
+        Yields:
+            CallCounter. A CallCounter instance that's installed as obj.attr's
+            implementation while within the context manager returned.
+        """
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
+        with self.swap(obj, attr, call_counter):
+            yield call_counter
+
+    @contextlib.contextmanager
     def swap_with_checks(
-            self, obj, attr, new_value, expected_args=None,
+            self, obj, attr, new_function, expected_args=None,
             expected_kwargs=None, called=True):
         """Swap an object's function value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -1097,7 +1182,7 @@ class TestBase(unittest.TestCase):
         Args:
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
-            new_value: function. The new function you want to use.
+            new_function: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you want
                 this function to be invoked with. When its value is None, args
                 will not be checked. If the value type is list, the function
@@ -1111,70 +1196,124 @@ class TestBase(unittest.TestCase):
         Yields:
             context. The context with function replaced.
         """
-        original = getattr(obj, attr)
-        # The actual error message will also include detail assert error message
-        # via the `self.longMessage` below.
-        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+        original_function = getattr(obj, attr)
+        original_long_message_value = self.longMessage
+        msg = '%s.%s() failed the expectations of swap_with_checks()' % (
             obj.__name__, attr)
 
-        def wrapper(*args, **kwargs):
-            """Wrapper function for the new value. This function will do the
-            check before the wrapped function is invoked. After the function
-            finished, the wrapper will update how many times this function is
-            invoked.
+        expected_args_iter = iter(expected_args or ())
+        expected_kwargs_iter = iter(expected_kwargs or ())
+
+        @functools.wraps(original_function)
+        def new_function_with_checks(*args, **kwargs):
+            """Wrapper function for the new value which keeps track of how many
+            times this function is invoked.
 
             Args:
                 *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                *. Result of `new_value`.
+                *. Result of `new_function`.
             """
-            wrapper.called = True
-            if expected_args is not None:
-                self.assertEqual(args, expected_args[0], msg=msg)
-                expected_args.pop(0)
-            if expected_kwargs is not None:
-                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
-                expected_kwargs.pop(0)
-            result = new_value(*args, **kwargs)
-            return result
+            new_function_with_checks.call_num += 1
 
-        wrapper.called = False
-        setattr(obj, attr, wrapper)
-        error_occurred = False
-        try:
-            # This will show the detailed assert message.
+            # Includes assertion error information in addition to the message.
             self.longMessage = True
+
+            if expected_args:
+                next_args = python_utils.NEXT(expected_args_iter, None)
+                self.assertEqual(
+                    args, next_args, msg='*args to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            if expected_kwargs:
+                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                self.assertEqual(
+                    kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            # Reset self.longMessage just in case `new_function()` raises.
+            self.longMessage = original_long_message_value
+
+            return new_function(*args, **kwargs)
+
+        new_function_with_checks.call_num = 0
+        setattr(obj, attr, new_function_with_checks)
+
+        try:
             yield
-        except Exception:
-            error_occurred = True
-            # Raise issues thrown by the called function or assert error.
-            raise
+            # Includes assertion error information in addition to the message.
+            self.longMessage = True
+
+            self.assertEqual(
+                new_function_with_checks.call_num > 0, called, msg=msg)
+            pretty_unused_args = [
+                ', '.join(itertools.chain(
+                    (repr(a) for a in args),
+                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                for args, kwargs in python_utils.zip_longest(
+                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+            ]
+            if pretty_unused_args:
+                num_expected_calls = (
+                    new_function_with_checks.call_num + len(pretty_unused_args))
+                missing_call_summary = '\n'.join(
+                    '\tCall %d of %d: %s(%s)' % (
+                        i, num_expected_calls, attr, call_args)
+                    for i, call_args in enumerate(
+                        pretty_unused_args,
+                        start=new_function_with_checks.call_num + 1))
+                self.fail(
+                    msg='Only %d of the %d expected calls were made.\n'
+                    '\n'
+                    'Missing:\n'
+                    '%s : %s' % (
+                        new_function_with_checks.call_num, num_expected_calls,
+                        missing_call_summary, msg))
         finally:
-            setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
+            self.longMessage = original_long_message_value
+            setattr(obj, attr, original_function)
 
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
             'self.assertRaisesRegexp instead.')
 
-    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
-            self, expected_exception, expected_regexp, callable_obj=None,
-            *args, **kwargs):
-        if not expected_regexp:
+    def assertRaisesRegexp(  # pylint: disable=invalid-name
+            self, expected_exception, expected_regex, *args, **kwargs):
+        """Asserts that the message in a raised exception matches a regex.
+        This is a wrapper around assertRaisesRegex in unittest that enforces
+        strong regex.
+
+        Args:
+            expected_exception: Exception. Exception class expected
+                to be raised.
+            expected_regex: re.Pattern|str. Regex expected to be found in
+                error message.
+            *args: list(*). Function to be called and extra positional args.
+            **kwargs: dict(str, Any). Extra kwargs.
+
+        Returns:
+            bool. Whether the code raised exception in the expected format.
+        """
+        if not expected_regex:
             raise Exception(
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
         return super(TestBase, self).assertRaisesRegexp(
-            expected_exception, expected_regexp,
-            callable_obj=callable_obj, *args, **kwargs)
+            expected_exception, expected_regex, *args, **kwargs)
+
+    def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
+        """Compares unordered sequences if they contain the same elements,
+        regardless of order. If the same element occurs more than once,
+        it verifies that the elements occur the same number of times.
+
+        Returns:
+            bool. Whether the items are equal.
+        """
+        return super().assertCountEqual(*args, **kwargs)
 
     def assert_matches_regexps(self, items, regexps, full_match=False):
         """Asserts that each item matches the corresponding regexp.
@@ -1198,7 +1337,7 @@ class TestBase(unittest.TestCase):
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
             for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
-            if get_match(regexp, item, re.DOTALL) is None
+            if get_match(regexp, item, flags=re.DOTALL) is None
         ]
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]
@@ -1217,30 +1356,144 @@ class TestBase(unittest.TestCase):
 
 
 class AppEngineTestBase(TestBase):
-    """Base class for tests requiring App Engine services."""
+    """Minimal base class for tests that need Google App Engine functionality.
 
-    # This is the value that gets returned by default when
-    # app_identity.get_application_id() is called during tests.
-    EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
+    This class is primarily designed for unit tests in core.platform, where we
+    write adapters around Oppia's third-party dependencies. Generally, our unit
+    tests depend on stub implementations of these adapters to protect them from
+    platform-specific behavior. Such stubs are installed in the
+    GenericTestBase.run() method.
 
-    # Environment values our tests assume to have.
+    Most of the unit tests in our code base do, and should, inherit from
+    `GenericTestBase` to stay platform-agnostic. The platform layer itself,
+    however, can _not_ mock out platform-specific behavior. Those unit tests
+    need to interact with a real implementation. This base class provides the
+    bare-minimum functionality and stubs necessary to do so.
+    """
+
+    # Environment values that our tests depend on.
     AUTH_DOMAIN = 'example.com'
     HTTP_HOST = 'localhost'
     SERVER_NAME = 'localhost'
     SERVER_PORT = '8080'
     DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        # Defined outside of setUp() because we access it from methods, but can
+        # only install it during the run() method. Defining it in __init__
+        # satisfies pylint's attribute-defined-outside-init warning.
+        self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
+
+    def setUp(self) -> None:
+        super(AppEngineTestBase, self).setUp()
+        # Initialize namespace for the storage emulator.
+        storage_services.CLIENT.namespace = self.id()
+        # Set up apps for testing.
+        self.testapp = webtest.TestApp(main.app_without_context)
+
+    def tearDown(self) -> None:
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
+        storage_services.CLIENT.reset()
+        super(AppEngineTestBase, self).tearDown()
+
+    def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        Reference URL:
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        AppEngineTestBase's override of run() wraps super().run() in "swap"
+        contexts which stub out the platform taskqueue services.
+
+        Args:
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
+        """
+        platform_taskqueue_services_swap = self.swap(
+            platform_taskqueue_services, 'create_http_task',
+            self._platform_taskqueue_services_stub.create_http_task)
+        with platform_taskqueue_services_swap:
+            super(AppEngineTestBase, self).run(result=result)
+
+    def count_jobs_in_taskqueue(self, queue_name):
+        """Returns the total number of tasks in a single queue if a queue name
+        is specified or the entire taskqueue if no queue name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            int. The total number of tasks in a single queue or in the entire
+            taskqueue.
+        """
+        return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
+            queue_name=queue_name)
+
+    def process_and_flush_pending_tasks(self, queue_name=None):
+        """Executes all of the tasks in a single queue if a queue name is
+        specified or all of the tasks in the taskqueue if no queue name is
+        specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+        """
+        self._platform_taskqueue_services_stub.process_and_flush_tasks(
+            queue_name=queue_name)
+
+    def get_pending_tasks(self, queue_name=None):
+        """Returns a list of the tasks in a single queue if a queue name is
+        specified or a list of all of the tasks in the taskqueue if no queue
+        name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            list(Task). List of tasks in a single queue or in the entire
+            taskqueue.
+        """
+        return self._platform_taskqueue_services_stub.get_pending_tasks(
+            queue_name=queue_name)
+
+
+class GenericTestBase(AppEngineTestBase):
+    """Base test class with common/generic helper methods.
+
+    Unless a class is testing for "platform"-specific behavior (e.g., testing
+    third-party library code or database model implementations), always inherit
+    from this base class. Otherwise, inherit from unittest.TestCase (preferred)
+    or AppEngineTestBase if Google App Engine services/behavior is needed.
+
+    TODO(#12135): Split this enormous test base into smaller, focused pieces.
+    """
+
+    # NOTE: For tests that do not/can not use the default super admin, authors
+    # can override the following class-level constant.
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
+
     SUPER_ADMIN_EMAIL = 'tmpsuperadmin@example.com'
     SUPER_ADMIN_USERNAME = 'tmpsuperadm1n'
 
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
-    ADMIN_EMAIL = 'admin@example.com'
+    CURRICULUM_ADMIN_EMAIL = 'admin@example.com'
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
-    ADMIN_USERNAME = 'adm'
+    CURRICULUM_ADMIN_USERNAME = 'adm'
+    BLOG_ADMIN_EMAIL = 'blogadmin@example.com'
+    BLOG_ADMIN_USERNAME = 'blogadm'
+    BLOG_EDITOR_EMAIL = 'blogeditor@example.com'
+    BLOG_EDITOR_USERNAME = 'blogeditor'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
+    RELEASE_COORDINATOR_EMAIL = 'releasecoordinator@example.com'
+    RELEASE_COORDINATOR_USERNAME = 'releasecoordinator'
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
@@ -1249,6 +1502,8 @@ class AppEngineTestBase(TestBase):
     TOPIC_MANAGER_USERNAME = 'topicmanager'
     VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
     VOICE_ARTIST_USERNAME = 'voiceartist'
+    VOICEOVER_ADMIN_EMAIL = 'voiceoveradm@example.com'
+    VOICEOVER_ADMIN_USERNAME = 'voiceoveradm'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -1329,76 +1584,6 @@ class AppEngineTestBase(TestBase):
             }],
         },
         'classifier_model_id': None,
-    }
-
-    VERSION_21_STATE_DICT = {
-        'END': {
-            'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': 'Congratulations, you have finished!',
-            },
-            'content_ids_to_audio_translations': {'content': {}},
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'recommendedExplorationIds': {'value': []},
-                },
-                'default_outcome': None,
-                'hints': [],
-                'id': 'EndExploration',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
-        'Introduction': {
-            'classifier_model_id': None,
-            'content': {'content_id': 'content', 'html': ''},
-            'content_ids_to_audio_translations': {
-                'content': {},
-                'default_outcome': {},
-                'feedback_1': {},
-            },
-            'interaction': {
-                'answer_groups': [{
-                    'outcome': {
-                        'dest': 'END',
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Correct!</p>',
-                        },
-                        'labelled_as_correct': False,
-                        'missing_prerequisite_skill_id': None,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                    },
-                    'rule_specs': [{
-                        'inputs': {'x': 'InputString'},
-                        'rule_type': 'Equals',
-                    }],
-                    'tagged_misconception_id': None,
-                    'training_data': ['answer1', 'answer2', 'answer3'],
-                }],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'placeholder': {'value': ''},
-                    'rows': {'value': 1},
-                },
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {'content_id': 'default_outcome', 'html': ''},
-                    'labelled_as_correct': False,
-                    'missing_prerequisite_skill_id': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                },
-                'hints': [],
-                'id': 'TextInput',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
     }
 
     VERSION_1_STORY_CONTENTS_DICT = {
@@ -1487,6 +1672,31 @@ class AppEngineTestBase(TestBase):
         'next_node_id': 'node_2',
     }
 
+    VERSION_5_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p>'
+                '<oppia-noninteractive-math math_content-with-value="{'
+                '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                '}">'
+                '</oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+        }],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2',
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
@@ -1515,6 +1725,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1535,6 +1746,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1547,6 +1759,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1567,6 +1780,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1587,76 +1801,13 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = (
-        """author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-    def __init__(self, *args, **kwargs):
-        super(AppEngineTestBase, self).__init__(*args, **kwargs)
-        # Defined outside of setUp() because we want to swap it in during tests,
-        # while minimizing the swap's scope. We accomplish this by using a
-        # context manager over run().
-        self._taskqueue_services_stub = TaskqueueServicesStub(self)
-        self._es_stub = ElasticSearchStub()
-
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
 
         Reference URL:
         https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
 
-        AppEngineTestBase's override of run() wraps super().run() in swap
+        GenericTestBase's override of run() wraps super().run() in swap
         contexts to mock out the cache and taskqueue services.
 
         Args:
@@ -1665,38 +1816,33 @@ tags: []
                 defaultTestResult() method) and used instead.
         """
         memory_cache_services_stub = MemoryCacheServicesStub()
-        memory_cache_services_stub.flush_cache()
+        memory_cache_services_stub.flush_caches()
+        es_stub = ElasticSearchStub()
+        es_stub.reset()
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
+            stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
-                self._es_stub.mock_create_index))
+                es_stub.mock_create_index))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'index',
-                self._es_stub.mock_index))
+                es_stub.mock_index))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'exists',
-                self._es_stub.mock_exists))
+                es_stub.mock_exists))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'delete',
-                self._es_stub.mock_delete))
+                es_stub.mock_delete))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'delete_by_query',
-                self._es_stub.mock_delete_by_query))
+                es_stub.mock_delete_by_query))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'search',
-                self._es_stub.mock_search))
-
-            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
-                stack.callback(AuthServicesStub.install_stub(self))
-
+                es_stub.mock_search))
             stack.enter_context(self.swap(
-                platform_taskqueue_services, 'create_http_task',
-                self._taskqueue_services_stub.create_http_task))
-
-            stack.enter_context(self.swap(
-                memory_cache_services, 'flush_cache',
-                memory_cache_services_stub.flush_cache))
+                memory_cache_services, 'flush_caches',
+                memory_cache_services_stub.flush_caches))
             stack.enter_context(self.swap(
                 memory_cache_services, 'get_multi',
                 memory_cache_services_stub.get_multi))
@@ -1710,87 +1856,74 @@ tags: []
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
 
-            super(AppEngineTestBase, self).run(result=result)
+            super(GenericTestBase, self).run(result=result)
 
-    def setUp(self):
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
+    def setUp(self) -> None:
+        super(GenericTestBase, self).setUp()
+        if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
+            self.signup_superadmin_user()
 
-        self.testbed.setup_env(
-            overwrite=True,
-            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
-            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
-            default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
-
-        # Declare any relevant App Engine service stubs here.
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_search_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_user_stub()
-
-        policy = (
-            datastore_services.make_instantaneous_global_consistency_policy())
-        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self._taskqueue_stub = (
-            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
-
-        # Set up the app to be tested.
-        self.testapp = webtest.TestApp(main.app)
-        self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
-        self.mail_testapp = webtest.TestApp(main_mail.app)
-
-        self.signup_superadmin_user()
-        self._es_stub.reset()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        self.testbed.deactivate()
-
-    def login(self, email, is_super_admin=False):
+    def login(self, email: str, is_super_admin: Optional[bool] = False) -> None:
         """Sets the environment variables to simulate a login.
 
         Args:
             email: str. The email of the user who is to be logged in.
             is_super_admin: bool. Whether the user is a super admin.
         """
-        self.testbed.setup_env(
-            overwrite=True,
-            user_email=email, user_id=self.get_auth_id_from_email(email),
-            user_is_admin=('1' if is_super_admin else '0'))
+        os.environ['USER_ID'] = self.get_auth_id_from_email(email)
+        os.environ['USER_EMAIL'] = email
+        os.environ['USER_IS_ADMIN'] = ('1' if is_super_admin else '0')
 
-    def logout(self):
+    def logout(self) -> None:
         """Simulates a logout by resetting the environment variables."""
-        self.testbed.setup_env(
-            overwrite=True, user_email='', user_id='', user_is_admin='0')
+        os.environ['USER_ID'] = ''
+        os.environ['USER_EMAIL'] = ''
+        os.environ['USER_IS_ADMIN'] = '0'
 
     @contextlib.contextmanager
-    def mock_datetime_utcnow(self, mocked_datetime):
-        """Mocks response from datetime.datetime.utcnow method.
+    def mock_datetime_utcnow(self, mocked_now):
+        """Mocks parts of the datastore to accept a fake datetime type that
+        always returns the same value for utcnow.
 
-        Example usage:
+        Example:
             import datetime
-            mocked_datetime_utcnow = (
-                datetime.datetime.utcnow() - datetime.timedelta(days=1))
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow() # prints current time.
+            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            with mock_datetime_utcnow(mocked_now):
+                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+            actual_now = datetime.datetime.utcnow() # Returns actual time.
 
         Args:
-            mocked_datetime: datetime.datetime. The datetime which will be used
+            mocked_now: datetime.datetime. The datetime which will be used
                 instead of the current UTC datetime.
 
         Yields:
             None. Empty yield statement.
         """
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+        if not isinstance(mocked_now, datetime.datetime):
+            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+        old_datetime = datetime.datetime
+
+        class MockDatetimeType(type):
+            """Overrides isinstance() behavior."""
+
+            @classmethod
+            def __instancecheck__(cls, instance):
+                return isinstance(instance, old_datetime)
+
+        class MockDatetime(old_datetime, metaclass=MockDatetimeType):
+            """Always returns mocked_now as the current UTC time."""
+
+            @classmethod
+            def utcnow(cls) -> datetime.datetime:
+                """Returns the mocked datetime."""
+                return mocked_now
+
+        setattr(datetime, 'datetime', MockDatetime)
+        try:
             yield
+        finally:
+            setattr(datetime, 'datetime', old_datetime)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
@@ -1822,16 +1955,24 @@ tags: []
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username):
+    def signup(
+            self,
+            email: str,
+            username: str,
+            is_super_admin: Optional[bool] = False
+    ) -> None:
         """Complete the signup process for the user with the given username.
 
         Args:
             email: str. Email of the given user.
             username: str. Username of the given user.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        login_context = self.login_context(email, is_super_admin=is_super_admin)
+
+        with login_context, requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
@@ -1862,36 +2003,42 @@ tags: []
                 },
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_user_role(self, username, user_role):
-        """Sets the given role for this user.
+    def add_user_role(self, username: str, user_role: str) -> None:
+        """Adds the given role to the user account with the given username.
 
         Args:
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
         with self.super_admin_context():
-            self.post_json('/adminrolehandler', {
+            self.put_json('/adminrolehandler', {
                 'username': username,
-                'role': user_role,
+                'role': user_role
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_admins(self, admin_usernames):
-        """Sets role of given users as ADMIN.
+    def set_curriculum_admins(self, curriculum_admin_usernames):
+        """Sets role of given users as CURRICULUM_ADMIN.
 
         Args:
-            admin_usernames: list(str). List of usernames.
+            curriculum_admin_usernames: list(str). List of usernames.
         """
-        for name in admin_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_ADMIN)
+        for name in curriculum_admin_usernames:
+            self.add_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-    def set_topic_managers(self, topic_manager_usernames):
+    def set_topic_managers(self, topic_manager_usernames, topic_id):
         """Sets role of given users as TOPIC_MANAGER.
 
         Args:
             topic_manager_usernames: list(str). List of usernames.
+            topic_id: str. The topic Id.
         """
-        for name in topic_manager_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
+        with self.super_admin_context():
+            for username in topic_manager_usernames:
+                self.put_json('/topicmanagerrolehandler', {
+                    'username': username,
+                    'action': 'assign',
+                    'topic_id': topic_id
+                }, csrf_token=self.get_new_csrf_token())
 
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
@@ -1900,16 +2047,27 @@ tags: []
             moderator_usernames: list(str). List of usernames.
         """
         for name in moderator_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
+            self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def set_banned_users(self, banned_usernames):
-        """Sets role of given users as BANNED_USER.
+    def set_voiceover_admin(self, voiceover_admin_username):
+        """Sets role of given users as VOICEOVER ADMIN.
 
         Args:
-            banned_usernames: list(str). List of usernames.
+            voiceover_admin_username: list(str). List of usernames.
         """
-        for name in banned_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_BANNED_USER)
+        for name in voiceover_admin_username:
+            self.add_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
+    def mark_user_banned(self, username):
+        """Marks a user banned.
+
+        Args:
+            username: str. The username of the user to ban.
+        """
+        with self.super_admin_context():
+            self.put_json('/bannedusershandler', {
+                'username': username
+            }, csrf_token=self.get_new_csrf_token())
 
     def set_collection_editors(self, collection_editor_usernames):
         """Sets role of given users as COLLECTION_EDITOR.
@@ -1918,7 +2076,7 @@ tags: []
             collection_editor_usernames: list(str). List of usernames.
         """
         for name in collection_editor_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
+            self.add_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
         """Gets the user ID corresponding to the given email.
@@ -1953,7 +2111,30 @@ tags: []
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
-        return python_utils.convert_to_bytes(abs(hash(email)))
+        return python_utils.UNICODE(abs(hash(email)))
+
+    def get_all_python_files(self):
+        """Recursively collects all Python files in the core/ and extensions/
+        directory.
+
+        Returns:
+            list(str). A list of Python files.
+        """
+        current_dir = os.getcwd()
+        files_in_directory = []
+        for _dir, _, files in os.walk(current_dir):
+            for file_name in files:
+                filepath = os.path.relpath(
+                    os.path.join(_dir, file_name), start=current_dir)
+                if (
+                        filepath.endswith('.py') and (
+                            filepath.startswith('core/') or
+                            filepath.startswith('extensions/')
+                        )
+                ):
+                    module = filepath[:-3].replace('/', '.')
+                    files_in_directory.append(module)
+        return files_in_directory
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -1981,8 +2162,11 @@ tags: []
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
-                url, params=params, expect_errors=expect_errors,
-                status=expected_status_int)
+                url,
+                params=params,
+                expect_errors=expect_errors,
+                status=expected_status_int
+            )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
@@ -2082,7 +2266,13 @@ tags: []
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expected_status_int=200):
+    def get_json(
+            self,
+            url: str,
+            params: Optional[Dict[str, str]] = None,
+            expected_status_int: int = 200,
+            headers: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
             self.assertIsInstance(params, dict)
@@ -2091,7 +2281,8 @@ tags: []
 
         json_response = self.testapp.get(
             url, params=params, expect_errors=expect_errors,
-            status=expected_status_int)
+            status=expected_status_int, headers=headers
+        )
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -2105,18 +2296,47 @@ tags: []
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, payload, csrf_token=None, expected_status_int=200,
-            upload_files=None):
-        """Post an object to the server by JSON; return the received object."""
-        data = {'payload': json.dumps(payload)}
+            self, url, data, headers=None, csrf_token=None,
+            expected_status_int=200, upload_files=None, use_payload=True,
+            source=None):
+
+        """Post an object to the server by JSON; return the received object.
+
+        Args:
+            url: str. The URL to send the POST request to.
+            data: dict. The dictionary that acts as the body of the request.
+            headers: dict. The headers set in the request.
+            csrf_token: str. The csrf token to identify the user.
+            expected_status_int: int. Expected return status of the POST
+                request.
+            upload_files: list(tuple). List of
+                (fieldname, filename, file_content) tuples. Can also provide
+                just (fieldname, filename) to have the file contents be
+                read from disk.
+            use_payload: bool. If true, a new dict is created (which is sent as
+                the body of the POST request) with one key - 'payload' - and the
+                dict passed in 'data' is used as the value for that key. If
+                false, the dict in 'data' is directly passed as the body of the
+                request. For all requests called from the frontend, this should
+                be set to 'true'.
+            source: unicode. The url from which the post call is requested.
+
+        Returns:
+            dict. The JSON response for the request in dict form.
+        """
+        if use_payload:
+            data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
+        if source:
+            data['source'] = source
 
         expect_errors = expected_status_int >= 400
 
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors,
-            expected_status_int=expected_status_int, upload_files=upload_files)
+            expected_status_int=expected_status_int, upload_files=upload_files,
+            headers=headers)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -2180,46 +2400,15 @@ tags: []
         # Convert the files to bytes.
         if upload_files is not None:
             upload_files = tuple(
-                tuple(python_utils.convert_to_bytes(f) for f in upload_file)
-                for upload_file in upload_files)
+                tuple(
+                    f.encode('utf-8') if isinstance(f, str) else f
+                    for f in upload_file
+                ) for upload_file in upload_files
+            )
 
         return app.post(
             url, params=data, headers=headers, status=expected_status_int,
             upload_files=upload_files, expect_errors=expect_errors)
-
-    def post_email(
-            self, recipient_email, sender_email, subject, body, html_body=None,
-            expect_errors=False, expected_status_int=200):
-        """Post an email from the sender to the recipient.
-
-        Args:
-            recipient_email: str. The email of the recipient.
-            sender_email: str. The email of the sender.
-            subject: str. The subject of the email.
-            body: str. The body of the email.
-            html_body: str. The HTML body of the email.
-            expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code of the JSON
-                response.
-
-        Returns:
-            json. A JSON response generated by _send_post_request function.
-        """
-        email = mail.EmailMessage(
-            sender=sender_email, to=recipient_email, subject=subject, body=body)
-        if html_body is not None:
-            email.html = html_body
-
-        mime_email = email.to_mime_message()
-        headers = {
-            'Content-Type': mime_email.get_content_type(),
-        }
-        data = mime_email.as_string()
-        incoming_email_url = '/_ah/mail/%s' % recipient_email
-
-        return self._send_post_request(
-            self.mail_testapp, incoming_email_url, data, expect_errors,
-            headers=headers, expected_status_int=expected_status_int)
 
     def post_task(
             self, url, payload, headers, csrf_token=None, expect_errors=False,
@@ -2229,7 +2418,7 @@ tags: []
         """
         if csrf_token:
             payload['csrf_token'] = csrf_token
-        return self.taskqueue_testapp.post(
+        return self.testapp.post(
             url, params=json.dumps(payload), headers=headers,
             status=expected_status_int, expect_errors=expect_errors,
             content_type='application/json')
@@ -2322,7 +2511,7 @@ tags: []
             elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_and_assign_content_ids(
-                        x[schema_property.name],
+                        schema['properties'][schema_property.name],
                         schema_property['schema'],
                         '%s_%s' % (contentId, schema_property.name))
 
@@ -2393,7 +2582,8 @@ tags: []
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2410,6 +2600,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2424,6 +2616,7 @@ tags: []
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2431,60 +2624,15 @@ tags: []
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
-
-    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 0 states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
-        # Create an ExplorationIssues model to match the behavior of creating
-        # new explorations.
-        stats_services.create_exp_issues_for_new_exploration(exp_id, 1)
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
@@ -2532,52 +2680,6 @@ tags: []
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 21 states
-        dictionary. Version 21 is where training data of exploration is stored
-        with the states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=21,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_21_STATE_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
 
@@ -2585,7 +2687,7 @@ tags: []
             owner_id: str. The user_id of the owner of the exploration.
             exploration_id: str. The ID of the new exploration.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
@@ -2657,7 +2759,7 @@ tags: []
             owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
@@ -2701,7 +2803,8 @@ tags: []
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, thumbnail_filename, thumbnail_bg_color,
-            owner_id, title, description, notes, corresponding_topic_id,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
             meta_tag_content='story meta tag content'):
@@ -2721,6 +2824,8 @@ tags: []
             thumbnail_filename: str|None. Thumbnail filename for the story.
             thumbnail_bg_color: str|None. Thumbnail background color for the
                 story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -2735,8 +2840,10 @@ tags: []
         """
         story_model = story_models.StoryModel(
             id=story_id, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color, description=description,
-            title=title, language_code=language_code,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
             story_contents_schema_version=1, notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
@@ -2745,6 +2852,83 @@ tags: []
         story_model.commit(
             owner_id, commit_message,
             [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+
+    def save_new_story_with_story_contents_schema_v5(
+            self, story_id, thumbnail_filename, thumbnail_bg_color,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
+        """Saves a new story with a default version 1 story contents data dict.
+
+        This function should only be used for creating stories in tests
+        involving migration of datastore stories that use an old story contents
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating stories. This is because
+        the latter approach would result in a story with the *current* story
+        contents schema version.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            thumbnail_filename: str|None. Thumbnail filename for the story.
+            thumbnail_bg_color: str|None. Thumbnail background color for the
+                story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level description of the story.
+            notes: str. A set of notes, that describe the characters, main
+                storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
+            url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
+        """
+        story_content_v5 = {
+            'nodes': [{
+                'outline': (
+                    '<p>Value</p>'
+                    '<oppia-noninteractive-math math_content-with-value="{'
+                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' # pylint: disable=line-too-long
+                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                    '}">'
+                    '</oppia-noninteractive-math>'),
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': None,
+                'thumbnail_size_in_bytes': 21131,
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
+        }
+        story_model = story_models.StoryModel(
+            id=story_id, thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
+            story_contents_schema_version=5, notes=notes,
+            corresponding_topic_id=corresponding_topic_id,
+            story_contents=story_content_v5,
+            url_fragment=url_fragment, meta_tag_content=meta_tag_content)
+        commit_message = 'New story created with title \'%s\'.' % title
+        story_model.commit(
+            owner_id, commit_message,
+            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+        story_services.create_story_summary(story_id)
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
         """Creates an Oppia subtopic and saves it.
@@ -2777,6 +2961,7 @@ tags: []
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+            thumbnail_size_in_bytes=21131,
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
@@ -2795,6 +2980,8 @@ tags: []
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the topic.
             description: str. The description of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -2828,8 +3015,9 @@ tags: []
         subtopics = subtopics or []
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids, subtopics,
+            thumbnail_bg_color, thumbnail_size_in_bytes, description,
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
@@ -3125,122 +3313,6 @@ tags: []
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def _get_all_queue_names(self):
-        """Returns a list of all queue names."""
-        return [q['name'] for q in self._taskqueue_stub.GetQueues()]
-
-    def count_jobs_in_taskqueue(self, queue_name):
-        """Returns the total number of tasks in a single queue if a queue name
-        is specified or the entire taskqueue if no queue name is specified.
-
-        Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
-
-        Returns:
-            int. The total number of tasks in a single queue or in the entire
-            taskqueue.
-        """
-        return self._taskqueue_services_stub.count_jobs_in_taskqueue(
-            queue_name=queue_name)
-
-    def process_and_flush_pending_tasks(self, queue_name=None):
-        """Executes all of the tasks in a single queue if a queue name is
-        specified or all of the tasks in the taskqueue if no queue name is
-        specified.
-
-        Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
-        """
-        self._taskqueue_services_stub.process_and_flush_tasks(
-            queue_name=queue_name)
-
-    def get_pending_tasks(self, queue_name=None):
-        """Returns a list of the tasks in a single queue if a queue name is
-        specified or a list of all of the tasks in the taskqueue if no queue
-        name is specified.
-
-        Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
-
-        Returns:
-            list(Task). List of tasks in a single queue or in the entire
-            taskqueue.
-        """
-        return self._taskqueue_services_stub.get_pending_tasks(
-            queue_name=queue_name)
-
-    def count_jobs_in_mapreduce_taskqueue(self, queue_name):
-        """Counts the jobs in the given mapreduce taskqueue."""
-        return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
-
-    def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given mapreduce taskqueue. If queue_name is
-        None, defaults to returning the jobs in all available queues.
-        """
-        queue_names = None if queue_name is None else [queue_name]
-        return self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-
-    def _execute_mapreduce_tasks(self, tasks):
-        """Execute mapreduce queued tasks.
-
-        Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
-                queued tasks.
-        """
-        for task in tasks:
-            if task.url == '/_ah/queue/deferred':
-                deferred.run(task.payload)
-            else:
-                # All other tasks are expected to be for mapreduce or taskqueue.
-                params = task.payload or ''
-                headers = {
-                    'Content-Length': python_utils.convert_to_bytes(len(params))
-                }
-                headers.update(
-                    (key, python_utils.convert_to_bytes(val))
-                    for key, val in task.headers.items())
-
-                app = (
-                    self.taskqueue_testapp if task.url.startswith('/task') else
-                    self.testapp)
-                response = app.post(
-                    task.url, params=params, headers=headers,
-                    expect_errors=True)
-                if response.status_code != 200:
-                    raise RuntimeError('MapReduce task failed: %r' % task)
-
-    def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
-        """Runs and flushes pending mapreduce tasks. If queue_name is None, does
-        so for all queues; otherwise, this only runs and flushes tasks for the
-        specified queue.
-
-        For more information on taskqueue_stub, see:
-        https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
-        """
-        queue_names = (
-            self._get_all_queue_names() if queue_name is None else [queue_name])
-
-        get_enqueued_tasks = lambda: list(
-            self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names))
-
-        # Loop until get_enqueued_tasks() returns an empty list.
-        for tasks in iter(get_enqueued_tasks, []):
-            for queue in queue_names:
-                self._taskqueue_stub.FlushQueue(queue)
-            self._execute_mapreduce_tasks(tasks)
-
-    def run_but_do_not_flush_pending_mapreduce_tasks(self):
-        """"Runs but not flushes mapreduce pending tasks."""
-        queue_names = self._get_all_queue_names()
-
-        tasks = self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for queue in queue_names:
-            self._taskqueue_stub.FlushQueue(queue)
-        self._execute_mapreduce_tasks(tasks)
-
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.
 
@@ -3282,9 +3354,6 @@ tags: []
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
-
-
-GenericTestBase = AppEngineTestBase
 
 
 class LinterTestBase(GenericTestBase):
@@ -3333,59 +3402,6 @@ class LinterTestBase(GenericTestBase):
         """
         failed_count = sum(msg.startswith('FAILED') for msg in stdout)
         self.assertEqual(failed_count, expected_failed_count)
-
-
-class AuditJobsTestBase(GenericTestBase):
-    """Base class for audit jobs tests."""
-
-    def run_job_and_check_output(
-            self, expected_output, sort=False, literal_eval=False):
-        """Helper function to run job and compare output.
-
-        Args:
-            expected_output: list(*). The expected result of the job.
-            sort: bool. Whether to sort the outputs before comparison.
-            literal_eval: bool. Whether to use ast.literal_eval before
-                comparison.
-        """
-        self.process_and_flush_pending_tasks()
-        job_id = self.job_class.create_new()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        self.job_class.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.process_and_flush_pending_tasks()
-        actual_output = self.job_class.get_output(job_id)
-
-        if literal_eval:
-            actual_output_dict = {}
-            expected_output_dict = {}
-
-            for item in (ast.literal_eval(value) for value in actual_output):
-                value = item[1]
-                if isinstance(value, list):
-                    value = sorted(value)
-                actual_output_dict[item[0]] = value
-
-            for item in (ast.literal_eval(value) for value in expected_output):
-                value = item[1]
-                if isinstance(value, list):
-                    value = sorted(value)
-                expected_output_dict[item[0]] = value
-
-            self.assertItemsEqual(actual_output_dict, expected_output_dict)
-
-            for key in actual_output_dict:
-                self.assertEqual(
-                    actual_output_dict[key], expected_output_dict[key])
-        elif sort:
-            self.assertEqual(sorted(actual_output), sorted(expected_output))
-        else:
-            self.assertEqual(actual_output, expected_output)
 
 
 class EmailMessageMock(python_utils.OBJECT):
@@ -3571,7 +3587,7 @@ class ClassifierTestBase(GenericEmailTestBase):
         response = self._send_post_request(
             self.testapp, url, data,
             expect_errors, expected_status_int=expected_status_int,
-            headers={b'content-type': b'application/octet-stream'})
+            headers={'content-type': 'application/octet-stream'})
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
@@ -3728,7 +3744,7 @@ class FailingFunction(FunctionWrapper):
             self._num_tries_before_success == FailingFunction.INFINITY)
         self._times_called = 0
 
-        if not (self._num_tries_before_success >= 0 or self._always_fail):
+        if not self._always_fail and self._num_tries_before_success < 0:
             raise ValueError(
                 'num_tries_before_success should either be an '
                 'integer greater than or equal to 0, '
@@ -3744,6 +3760,7 @@ class FailingFunction(FunctionWrapper):
         """
         self._times_called += 1
         call_should_fail = (
+            self._always_fail or
             self._num_tries_before_success >= self._times_called)
-        if call_should_fail or self._always_fail:
+        if call_should_fail:
             raise self._exception

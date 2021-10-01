@@ -14,12 +14,12 @@
 
 """Domain objects for Wipeout."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.platform import models
-import python_utils
-import utils
 
 USER_DELETION_SUCCESS = 'SUCCESS'
 USER_DELETION_ALREADY_DONE = 'ALREADY DONE'
@@ -36,7 +36,6 @@ class PendingDeletionRequest(python_utils.OBJECT):
             self,
             user_id,
             email,
-            role,
             normalized_long_term_username,
             deletion_complete,
             pseudonymizable_entity_mappings):
@@ -49,7 +48,6 @@ class PendingDeletionRequest(python_utils.OBJECT):
                 the user who is being deleted. Can be None when the user was on
                 the Oppia site only for a short time and thus the username
                 hasn't been well-established yet.
-            role: str. The role of the user who is being related.
             deletion_complete: bool. Whether the deletion is completed.
             pseudonymizable_entity_mappings: dict(str, str). Mapping between
                 the entity IDs and pseudonymized user IDs.
@@ -57,13 +55,12 @@ class PendingDeletionRequest(python_utils.OBJECT):
         self.user_id = user_id
         self.email = email
         self.normalized_long_term_username = normalized_long_term_username
-        self.role = role
         self.deletion_complete = deletion_complete
         self.pseudonymizable_entity_mappings = pseudonymizable_entity_mappings
 
     @classmethod
     def create_default(
-            cls, user_id, email, role, normalized_long_term_username=None):
+            cls, user_id, email, normalized_long_term_username=None):
         """Creates a PendingDeletionRequest object with default values.
 
         Args:
@@ -73,14 +70,13 @@ class PendingDeletionRequest(python_utils.OBJECT):
                 the user who is being deleted. Can be None when the user was on
                 the Oppia site only for a short time and thus the username
                 hasn't been well-established yet.
-            role: str. The role of the user who is being deleted.
 
         Returns:
             PendingDeletionRequest. The default pending deletion request
             domain object.
         """
         return cls(
-            user_id, email, role, normalized_long_term_username, False, {})
+            user_id, email, normalized_long_term_username, False, {})
 
     def validate(self):
         """Checks that the domain object is valid.
@@ -90,6 +86,6 @@ class PendingDeletionRequest(python_utils.OBJECT):
                 contains wrong key.
         """
         for key in self.pseudonymizable_entity_mappings.keys():
-            if key not in [name for name in models.NAMES.__dict__]:
+            if key not in [name.value for name in models.NAMES]:
                 raise utils.ValidationError(
                     'pseudonymizable_entity_mappings contain wrong key')

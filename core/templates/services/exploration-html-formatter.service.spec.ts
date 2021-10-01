@@ -24,45 +24,102 @@ import { CamelCaseToHyphensPipe } from
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Exploration Html Formatter Service', () => {
-  let ehfs: ExplorationHtmlFormatterService = null;
+  let ehfs: ExplorationHtmlFormatterService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    ehfs = TestBed.get(ExplorationHtmlFormatterService);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
   });
 
-  it('should correctly set interaction HTML for TextInput when it is in' +
-     ' editor mode', () => {
-    var interactionId = 'TextInput';
+  it('should correctly set interaction HTML for a non migrated interaction ' +
+     'when it is in editor mode', () => {
+    var interactionId = 'nonMigratedInteraction';
     let custArgs = {
       placeholder: {value: new SubtitledUnicode('enter here', '')},
       rows: {value: 1}
     };
-    var expectedHtmlTag = '<oppia-interactive-text-input ' +
+    var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
-      '</oppia-interactive-text-input>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null))
+      '</oppia-interactive-non-migrated-interaction>';
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
+      .toBe(expectedHtmlTag);
+  });
+
+  it('should correctly set [last-answer] for MigratedInteractions when it' +
+  ' is in editor mode', () => {
+    var interactionId = 'GraphInput';
+    let custArgs = {
+      placeholder: {value: new SubtitledUnicode('enter here', '')},
+      rows: {value: 1}
+    };
+    var expectedHtmlTag = '<oppia-interactive-graph-input ' +
+      'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
+      'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
+      'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
+      '</oppia-interactive-graph-input>';
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
+      .toBe(expectedHtmlTag);
+  });
+
+  it('should correctly set [last-answer] for MigratedInteractions when it' +
+  ' is in editor mode', () => {
+    var interactionId = 'GraphInput';
+    let custArgs = {
+      placeholder: {value: new SubtitledUnicode('enter here', '')},
+      rows: {value: 1}
+    };
+    var expectedHtmlTag = '<oppia-interactive-graph-input ' +
+      'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
+      'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
+      'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
+      '</oppia-interactive-graph-input>';
+    expect(ehfs.getInteractionHtml(
+      interactionId, custArgs, true, '', null))
       .toBe(expectedHtmlTag);
   });
 
   it('should correctly set interaction HTML when it is in player mode',
     () => {
-      var interactionId = 'TextInput';
+      var interactionId = 'nonMigratedInteraction';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'last-answer="null" label-for-focus-target="' + focusLabel + '">' +
-        '</oppia-interactive-text-input>';
+      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
+        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
+        '</oppia-interactive-non-migrated-interaction>';
       expect(
-        ehfs.getInteractionHtml(interactionId, {}, false, focusLabel)
+        ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
+      ).toBe(expectedHtmlTag);
+    });
+
+  it('should correctly set interaction HTML when solution has been provided',
+    () => {
+      var interactionId = 'nonMigratedInteraction';
+      var focusLabel = 'sampleLabel';
+      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
+        'saved-solution="solution" ' +
+        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
+        '</oppia-interactive-non-migrated-interaction>';
+      expect(
+        ehfs.getInteractionHtml(
+          interactionId, {}, false, focusLabel, 'solution')
+      ).toBe(expectedHtmlTag);
+      interactionId = 'GraphInput';
+      focusLabel = 'sampleLabel';
+      expectedHtmlTag = '<oppia-interactive-graph-input ' +
+        '[saved-solution]="solution" ' +
+        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
+        '</oppia-interactive-graph-input>';
+      expect(
+        ehfs.getInteractionHtml(
+          interactionId, {}, false, focusLabel, 'solution')
       ).toBe(expectedHtmlTag);
     });
 

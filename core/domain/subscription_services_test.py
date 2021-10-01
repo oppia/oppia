@@ -16,9 +16,10 @@
 
 """Tests for subscription management."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -30,7 +31,6 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -62,7 +62,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def _get_thread_ids_subscribed_to(self, user_id):
         """Returns the feedback thread ids to which the user corresponding to

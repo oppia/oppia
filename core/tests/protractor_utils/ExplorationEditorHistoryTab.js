@@ -27,11 +27,19 @@ var ExplorationEditorHistoryTab = function() {
    */
   var historyGraph = element(by.css('.protractor-test-history-graph'));
   var stateNodes = historyGraph.all(by.css('.protractor-test-node'));
+  var codeMirrorElement = element.all(by.css('.CodeMirror-code'));
+  var nodeBackgroundLocator = by.css('.protractor-test-node-background');
+  var nodeLabelLocator = by.css('.protractor-test-node-label');
+  var toastSuccessElement = element(by.css('.toast-success'));
+  var firstVersionDropdown = element(
+    by.css('.protractor-test-history-version-dropdown-first'));
+  var secondVersionDropdown = element(
+    by.css('.protractor-test-history-version-dropdown-second'));
   var stateNodeBackground = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-background'));
+    return nodeElement.element(nodeBackgroundLocator);
   };
   var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
+    return nodeElement.element(nodeLabelLocator);
   };
 
   /*
@@ -68,6 +76,9 @@ var ExplorationEditorHistoryTab = function() {
   this.expectCommitDatesToBeDisplayed = async function() {
     var numCommitDates = await datesCommitsWereSaved.count();
     for (var i = 0; i < numCommitDates; i++) {
+      await waitFor.visibilityOf(
+        datesCommitsWereSaved.get(
+          i), 'Dates Commits Were Saved taking too long to appear');
       var date = await datesCommitsWereSaved.get(i).getText();
       // The dates can be of varying format
       // (see getLocaleAbbreviatedDatetimeString). To play it
@@ -81,12 +92,15 @@ var ExplorationEditorHistoryTab = function() {
     return {
       openStateHistory: async function(stateName) {
         var listOfNames = await stateNodes.map(async function(stateElement) {
+          await waitFor.visibilityOf(stateNodeLabel(
+            stateElement), 'State Node Label taking too long to appear');
           return await stateNodeLabel(stateElement).getText();
         });
         var matched = false;
         for (var i = 0; i < listOfNames.length; i++) {
           if (listOfNames[i] === stateName) {
-            await stateNodes.get(i).click();
+            var stateNodeButton = stateNodes.get(i);
+            await action.click('State Node Button', stateNodeButton);
             matched = true;
           }
         }
@@ -100,12 +114,16 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button is not clickable');
         expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
-        await closeStateHistoryButton.click();
+        await action.click(
+          'Close State History Button', closeStateHistoryButton);
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
       },
       deselectVersion: async function() {
+        await waitFor.invisibilityOf(
+          toastSuccessElement,
+          'Toast message is taking too long to disappear after saving changes');
         await action.click('Reset graph button', resetGraphButton);
       },
       /*
@@ -116,21 +134,13 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        var firstVersionDropdown = element(
-          by.css('.protractor-test-history-version-dropdown-first'));
-        await waitFor.visibilityOf(
-          firstVersionDropdown, 'First version dropdown');
-        await (
-          firstVersionDropdown.element(
-            by.cssContainingText('option', versionNumber1))).click();
+        var versionNumber1Button = firstVersionDropdown.element(
+          by.cssContainingText('option', versionNumber1));
+        await action.click('Version Number1 Button', versionNumber1Button);
 
-        var secondVersionDropdown = element(
-          by.css('.protractor-test-history-version-dropdown-second'));
-        await waitFor.visibilityOf(
-          secondVersionDropdown, 'Second version dropdown');
-        await (
-          secondVersionDropdown.element(
-            by.cssContainingText('option', versionNumber2))).click();
+        var versionNumber2Button = secondVersionDropdown.element(
+          by.cssContainingText('option', versionNumber2));
+        await action.click('Version Number2 Button', versionNumber2Button);
       },
       /*
        * This method compares the states in the history graph using each
@@ -148,6 +158,8 @@ var ExplorationEditorHistoryTab = function() {
         await waitFor.visibilityOf(
           historyGraph, 'History graph takes too long to be visible.');
         var states = await stateNodes.map(async function(stateElement) {
+          await waitFor.visibilityOf(stateNodeLabel(
+            stateElement), 'State Node Label taking too long to appear');
           var label = await stateNodeLabel(stateElement).getText();
           var color = await stateNodeBackground(stateElement).getCssValue(
             'fill');
@@ -159,9 +171,10 @@ var ExplorationEditorHistoryTab = function() {
         expect(states.length).toEqual(expectedStates.length);
         // Note: we need to compare this way because the state graph is
         // sometimes generated with states in different configurations.
-        states.forEach(function(element) {
-          expect(expectedStates).toContain(element);
-        });
+        for (var index = 0; index < states.length; index++) {
+          var state = states[index];
+          expect(expectedStates).toContain(state);
+        }
       },
       /*
        * This method checks for the number of deleted links(red), added links
@@ -195,7 +208,7 @@ var ExplorationEditorHistoryTab = function() {
       /**
        * This method compares text contents of 2 version's state contents to
        * provided text contents
-       * v1 is most recent state and v2 is older state
+       * v1 is older state and v2 is most recent state
        *    Args:
        *        v1StateContents(dict of dict) : dicts containing state details
        *                                        of v1
@@ -211,18 +224,18 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextToMatch: async function(v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).first(),
+          codeMirrorElement.first(),
           'first'
         ).expectTextToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).last(),
+          codeMirrorElement.last(),
           'last'
         ).expectTextToBe(v2StateContents);
       },
       /*
        *  This function compares regular/highlighted text contents of 2
        *  versions' state contents to provided text contents
-       *  v1 is most recent state and v2 is older state
+       *  v1 is older state and v2 is most recent state
        *    Args:
        *        v1StateContents(dict) : dicts containing state details of v1
        *        v2StateContents(dict) : dicts containing state details of v2
@@ -233,11 +246,11 @@ var ExplorationEditorHistoryTab = function() {
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          await element.all(by.css('.CodeMirror-code')).first(),
+          codeMirrorElement.first(),
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          await element.all(by.css('.CodeMirror-code')).last(),
+          codeMirrorElement.last(),
           'last'
         ).expectTextWithHighlightingToBe(v2StateContents);
       }

@@ -23,7 +23,7 @@ import { SchemaFormSubmittedService } from
   'services/schema-form-submitted.service';
 
 describe('Schema Submitted Service', () => {
-  let schemaFormSubmittedService = null;
+  let schemaFormSubmittedService: SchemaFormSubmittedService;
 
   beforeEach(() => {
     schemaFormSubmittedService = TestBed.get(SchemaFormSubmittedService);

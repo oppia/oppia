@@ -29,7 +29,7 @@ import { StoryDataDict, StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 
 describe('Story viewer backend API service', () => {
-  let storyViewerBackendApiService: StoryViewerBackendApiService = null;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryData(
+      storyViewerBackendApiService.fetchStoryDataAsync(
         'abbrev', 'staging', '0').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -81,7 +81,7 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryData(
+      storyViewerBackendApiService.fetchStoryDataAsync(
         'abbrev', 'staging', '0').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -133,7 +133,7 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.recordChapterCompletion(
+      storyViewerBackendApiService.recordChapterCompletionAsync(
         'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -158,7 +158,7 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.recordChapterCompletion(
+      storyViewerBackendApiService.recordChapterCompletionAsync(
         'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

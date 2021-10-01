@@ -22,10 +22,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;
@@ -43,9 +45,13 @@ describe('Image preloader service', () => {
   let imagePreloaderService: ImagePreloaderService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
+  let ctms: ContentTranslationManagerService;
+  let svgSanitizerService: SvgSanitizerService;
+
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    correctness_feedback_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
@@ -91,12 +97,14 @@ describe('Image preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -125,11 +133,13 @@ describe('Image preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -227,6 +237,7 @@ describe('Image preloader service', () => {
           solution: null
         },
         solicit_answer_details: false,
+        card_is_checkpoint: true,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -235,6 +246,7 @@ describe('Image preloader service', () => {
             feedback_2: {}
           }
         },
+        linked_skill_id: null,
         next_content_id_index: null,
       },
       'State 6': {
@@ -331,6 +343,7 @@ describe('Image preloader service', () => {
           solution: null,
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -340,6 +353,7 @@ describe('Image preloader service', () => {
             hint_1: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       }
@@ -347,6 +361,19 @@ describe('Image preloader service', () => {
     param_specs: {},
     param_changes: [],
   };
+  class mockReaderObject {
+    result = null;
+    onloadend = null;
+    constructor() {
+      this.onloadend = () => {
+        return 'Fake onload executed';
+      };
+    }
+    readAsDataURL(file) {
+      this.onloadend();
+      return 'The file is loaded';
+    }
+  }
   const filename1 = 'sIMChoice1_height_32_width_42.png';
   const filename2 = 'sIMChoice2_height_30_width_40.png';
   const filename3 = 'sIOFeedback_height_50_width_50.png';
@@ -370,10 +397,16 @@ describe('Image preloader service', () => {
     explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
     contextService = TestBed.get(ContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+    ctms = TestBed.get(ContentTranslationManagerService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
+    spyOn(ctms, 'getTranslatedHtml').and.callFake(
+      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+        return content.html;
+      });
 
     exploration = (
       explorationObjectFactory.createFromBackendDict(explorationDict));
@@ -604,7 +637,7 @@ describe('Image preloader service', () => {
     }).toThrowError(/it does not contain dimensions/);
   });
 
-  it('should get image url', fakeAsync(() => {
+  it('should fetch a non-SVG image', fakeAsync(() => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
@@ -624,10 +657,55 @@ describe('Image preloader service', () => {
 
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
     flushMicrotasks();
 
+    expect(onSuccess).toHaveBeenCalled();
+    expect(onFailure).not.toHaveBeenCalled();
+  }));
+
+  it('should fetch an SVG image', fakeAsync(() => {
+    imagePreloaderService.init(exploration);
+    imagePreloaderService.kickOffImagePreloader(initStateName);
+
+    httpTestingController.expectOne(requestUrl1).flush(
+      new Blob(['svg image'], { type: 'image/svg+xml' }));
+    httpTestingController.expectOne(requestUrl2);
+    httpTestingController.expectOne(requestUrl3);
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([filename1, filename2, filename3]);
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
+
+    flushMicrotasks();
+
+    httpTestingController.expectOne(requestUrl4);
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([filename2, filename3, filename4]);
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
+
+    var onSuccess = jasmine.createSpy('success');
+    var onFailure = jasmine.createSpy('fail');
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
+
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
+    flushMicrotasks();
+
+    expect(svgSanitizerService.getTrustedSvgResourceUrl).toHaveBeenCalled();
     expect(onSuccess).toHaveBeenCalled();
     expect(onFailure).not.toHaveBeenCalled();
   }));
@@ -654,8 +732,15 @@ describe('Image preloader service', () => {
 
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     flushMicrotasks();
@@ -688,7 +773,8 @@ describe('Image preloader service', () => {
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
 
-      imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+      imagePreloaderService.getImageUrlAsync(filename1)
+        .then(onSuccess, onFailure);
 
       httpTestingController.expectOne(requestUrl1)
         .flush(imageBlob, {status: 404, statusText: 'Status Text'});
@@ -706,8 +792,15 @@ describe('Image preloader service', () => {
 
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
@@ -734,7 +827,8 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1)
       .flush(imageBlob, {status: 404, statusText: 'Status Text'});

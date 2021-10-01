@@ -25,22 +25,24 @@ import { forkJoin } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { ThreadMessage, ThreadMessageBackendDict, ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
-import { SuggestionBackendDict } from 'domain/suggestion/SuggestionObjectFactory';
+import { ThreadMessage, ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.model';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { SuggestionThread, SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
 
-type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
+export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
+
+type SuggestionBackendDictsByThreadId = Map<string, SuggestionBackendDict>;
 
 interface NumberOfOpenThreads {
   'num_open_threads': number;
 }
 
-interface SuggestionAndFeedbackThreads {
+export interface SuggestionAndFeedbackThreads {
   feedbackThreads: FeedbackThread[];
   suggestionThreads: SuggestionThread[];
 }
@@ -76,7 +78,6 @@ export class ThreadDataBackendApiService {
     private http: HttpClient,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
-    private threadMessageObjectFactory: ThreadMessageObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -133,7 +134,8 @@ export class ThreadDataBackendApiService {
 
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
+      suggestionBackendDict: SuggestionBackendDict
+  ): SuggestionThread {
     if (!threadBackendDict || !suggestionBackendDict) {
       throw new Error('Missing input backend dicts');
     }
@@ -143,21 +145,24 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  getThread(threadId: string): SuggestionAndFeedbackThread {
+  // A 'null' value will be returned if threadId is invalid.
+  getThread(threadId: string): SuggestionAndFeedbackThread | null {
     return this.threadsById.get(threadId) || null;
   }
 
-  getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
-    let suggestions$ = this.http.get(this.getSuggestionListHandlerUrl(), {
-      params: {
-        target_type: 'exploration',
-        target_id: this.contextService.getExplorationId()
+  async getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
+    let suggestions = this.http.get<SuggestionData>(
+      this.getSuggestionListHandlerUrl(), {
+        params: {
+          target_type: 'exploration',
+          target_id: this.contextService.getExplorationId()
+        }
       }
-    });
+    );
 
-    let threads$ = this.http.get(this.getThreadListHandlerUrl());
+    let threads = this.http.get<ThreadData>(this.getThreadListHandlerUrl());
 
-    return forkJoin([suggestions$, threads$])
+    return forkJoin([suggestions, threads])
       .toPromise()
       .then((response: [SuggestionData, ThreadData]) => {
         let [suggestionData, threadData] = response;
@@ -166,58 +171,79 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-        let suggestionBackendDictsByThreadId = new Map(
-          suggestionBackendDicts.map(dict => [
-            this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
-            dict
-          ]));
+        let suggestionBackendDictsByThreadId:
+          SuggestionBackendDictsByThreadId = (
+            new Map(
+              suggestionBackendDicts.map(dict => [
+                this.suggestionsService
+                  .getThreadIdFromSuggestionBackendDict(dict),
+                dict
+              ])
+            )
+          );
 
         return {
           feedbackThreads: feedbackThreadBackendDicts.map(
             dict => this.setFeedbackThreadFromBackendDict(dict)),
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
-              dict, suggestionBackendDictsByThreadId.get(
-                (dict === null ? null : dict.thread_id))))
+              dict, <SuggestionBackendDict>suggestionBackendDictsByThreadId.get(
+                dict?.thread_id)))
         };
       },
-      () => Promise.reject('Error on retrieving feedback threads.'));
+      async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  getMessagesAsync(thread: SuggestionAndFeedbackThread):
-   Promise<ThreadMessage[]> {
+  async getMessagesAsync(
+      thread: SuggestionAndFeedbackThread
+  ): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
 
-    return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
-      .then((response: ThreadMessages) => {
-        let threadMessageBackendDicts = response.messages;
-        thread.setMessages(threadMessageBackendDicts.map(
-          m => this.threadMessageObjectFactory.createFromBackendDict(m)));
-        return thread.getMessages();
-      });
+    return this.http.get<ThreadMessages>(
+      this.getThreadHandlerUrl(threadId)
+    ).toPromise().then((response: ThreadMessages) => {
+      let threadMessageBackendDicts = response.messages;
+      thread.setMessages(threadMessageBackendDicts.map(
+        m => ThreadMessage.createFromBackendDict(m)));
+      return thread.getMessages();
+    });
   }
 
-  getOpenThreadsCountAsync(): Promise<number> {
-    return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
-      .then((response: NumberOfOpenThreads) => {
-        return this.openThreadsCount = response.num_open_threads;
-      });
+  async fetchMessagesAsync(
+      threadId: string
+  ): Promise<ThreadMessages> {
+    return this.http.get<ThreadMessages>(
+      this.getThreadHandlerUrl(threadId)
+    ).toPromise();
+  }
+
+  async getOpenThreadsCountAsync(): Promise<number> {
+    let threadsCount = this.http.get<NumberOfOpenThreads>(
+      this.getFeedbackStatsHandlerUrl()
+    ).toPromise().then(
+      (response: NumberOfOpenThreads) => {
+        this.openThreadsCount = response.num_open_threads;
+        return this.openThreadsCount;
+      }
+    );
+    return threadsCount;
   }
 
   getOpenThreadsCount(): number {
     return this.openThreadsCount;
   }
 
-  createNewThreadAsync(newSubject: string, newText: string):
+  async createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
-    return this.http.post(this.getThreadListHandlerUrl(), {
-      state_name: null,
-      subject: newSubject,
-      text: newText
-    }).toPromise().then(() => {
+    return this.http.post<void | SuggestionAndFeedbackThreads>(
+      this.getThreadListHandlerUrl(), {
+        subject: newSubject,
+        text: newText
+      }
+    ).toPromise().then(async() => {
       this.openThreadsCount += 1;
       return this.getThreadsAsync();
     },
@@ -227,18 +253,18 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  markThreadAsSeenAsync(thread: SuggestionAndFeedbackThread): Promise<void> {
+  async markThreadAsSeenAsync(
+      thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
 
-    return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
-      thread_id: threadId
-    }).toPromise().then();
+    return this.http.post(
+      this.getFeedbackThreadViewEventUrl(threadId), {}).toPromise().then();
   }
 
-  addNewMessageAsync(
+  async addNewMessageAsync(
       thread: SuggestionAndFeedbackThread, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
@@ -248,7 +274,7 @@ export class ThreadDataBackendApiService {
     let oldStatus = thread.status;
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
-    return this.http.post(this.getThreadHandlerUrl(threadId), {
+    return this.http.post<ThreadMessages>(this.getThreadHandlerUrl(threadId), {
       updated_status: updatedStatus,
       updated_subject: null,
       text: newMessage
@@ -264,14 +290,17 @@ export class ThreadDataBackendApiService {
       thread.status = newStatus;
       let threadMessageBackendDicts = response.messages;
       thread.setMessages(threadMessageBackendDicts.map(
-        m => this.threadMessageObjectFactory.createFromBackendDict(m)));
+        m => ThreadMessage.createFromBackendDict(m)));
       return thread.messages;
     });
   }
 
-  resolveSuggestionAsync(
-      thread: SuggestionAndFeedbackThread, action: string, commitMsg: string,
-      reviewMsg: string): Promise<ThreadMessage[]> {
+  async resolveSuggestionAsync(
+      thread: SuggestionAndFeedbackThread,
+      action: string,
+      commitMsg: string,
+      reviewMsg: string
+  ): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -283,11 +312,12 @@ export class ThreadDataBackendApiService {
       commit_message: (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
           commitMsg : null)
-    }).toPromise().then(() => {
+    }).toPromise().then(async() => {
       thread.status = (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-         ExplorationEditorPageConstants.STATUS_FIXED :
-          ExplorationEditorPageConstants.STATUS_IGNORED);
+        ExplorationEditorPageConstants.STATUS_FIXED :
+        ExplorationEditorPageConstants.STATUS_IGNORED
+      );
       this.openThreadsCount -= 1;
 
       return this.getMessagesAsync(thread);

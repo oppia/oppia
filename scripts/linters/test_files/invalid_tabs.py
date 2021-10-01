@@ -18,10 +18,10 @@
 python_linter_test. This file is using tabs instead of spaces.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import python_utils
+from core import python_utils
 
 
 class FakeClass(python_utils.OBJECT):

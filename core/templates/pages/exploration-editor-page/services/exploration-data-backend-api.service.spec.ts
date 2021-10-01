@@ -37,7 +37,7 @@ describe('Exploration data backend api service', () => {
   it('should send a post request to discardDraft', fakeAsync(() => {
     edbas.discardDraft(
       '/createhandler/autosave_draft/0').subscribe(
-      (res) => expect(res).toBe(1)
+      async(res) => expect(res).toBe(1)
     );
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0');
@@ -48,8 +48,8 @@ describe('Exploration data backend api service', () => {
 
   it('should send a put update exploration', fakeAsync(() => {
     edbas.saveChangeList(
-      '/createhandler/autosave_draft/0', [], '1').subscribe(
-      (res) => expect(res).toBe(1)
+      '/createhandler/autosave_draft/0', [], 1).subscribe(
+      async(res) => expect(res).toBe(1)
     );
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0');

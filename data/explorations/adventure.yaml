@@ -1,6 +1,8 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Interactive Fiction
+correctness_feedback_enabled: false
 init_state_name: Welcome
 language_code: en
 objective: N/A
@@ -23,76 +25,142 @@ param_specs:
     obj_type: UnicodeString
   sneezeitem:
     obj_type: UnicodeString
-schema_version: 17
+schema_version: 47
 states:
   Clearing:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There
-        is a path leading back to the <b>southeast</b>.</div>
+      content_id: content
+      html: <p>You are at a clearing. There are lots of pretty <strong>flowers</strong>
+        here.</p><p>There is a path leading back to the <strong>southeast</strong>.</p>
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: picking
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: pick
+            x:
+              contentId: rule_input_6
+              normalizedStrSet:
+              - pick
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: picking
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: flower
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - flower
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Fork
           feedback:
-          - You go southeast
+            content_id: feedback_3
+            html: <p>You go southeast</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: southeast
+            x:
+              contentId: rule_input_8
+              normalizedStrSet:
+              - southeast
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Fork
           feedback:
-          - You go southeast
+            content_id: feedback_4
+            html: <p>You go southeast</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: se
+            x:
+              contentId: rule_input_9
+              normalizedStrSet:
+              - se
           rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_5
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: Clearing
         feedback:
-        - Pardon?
-        - Huh?
-        - Did you mean "pick some flowers"?
+          content_id: default_outcome
+          html: <p>Pardon?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 10
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        rule_input_6: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        rule_input_6: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
   END:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -103,184 +171,330 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
   Fork:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: You are standing at a fork in the road. The main road goes to the <b>northeast</b>,
-        while a smaller path winds to the <b>northwest</b>.
+      content_id: content
+      html: <p>You are standing at a fork in the road. The main road goes to the <strong>northeast</strong>,
+        while a smaller path winds to the <strong>northwest</strong>.</p>
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Troll
           feedback:
-          - You go northeast
+            content_id: feedback_1
+            html: <p>You go northeast</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: northeast
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - northeast
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Clearing
           feedback:
-          - You go northwest
+            content_id: feedback_2
+            html: <p>You go northwest</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: northwest
+            x:
+              contentId: rule_input_8
+              normalizedStrSet:
+              - northwest
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - You go northeast
+            content_id: feedback_3
+            html: <p>You go northeast</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: ne
+            x:
+              contentId: rule_input_9
+              normalizedStrSet:
+              - ne
           rule_type: StartsWith
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Clearing
           feedback:
-          - You go northwest
+            content_id: feedback_4
+            html: <p>You go northwest</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: nw
+            x:
+              contentId: rule_input_10
+              normalizedStrSet:
+              - nw
           rule_type: StartsWith
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Fork
           feedback:
-          - You cannot go back
-          - The gate is closed
-          - There is no way back. You must carry on!
+            content_id: feedback_5
+            html: <p>You cannot go back</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: back
+            x:
+              contentId: rule_input_11
+              normalizedStrSet:
+              - back
           rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_6
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: Fork
         feedback:
-        - Pardon?
-        - Nothing happens
-        - Maybe you should pick a direction to go in. Northwest or Northeast?
-        - I'm not sure how to {{answer}}
+          content_id: default_outcome
+          html: <p>Pardon?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 12
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
   Rainbow:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: <span>"Guess how many coins I'm holding!"</span><br>
+      content_id: content
+      html: <p>"Guess how many coins I'm holding!"<br></p>
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: get coins
           feedback:
-          - Correct!
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{numcoins}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Rainbow
           feedback:
-          - Actually, I can't hold any more than 10 coins. My hands are too small.
+            content_id: feedback_2
+            html: <p>Actually, I can't hold any more than 10 coins. My hands are too
+              small.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 10.0
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Rainbow
           feedback:
-          - I do have some coins!
+            content_id: feedback_3
+            html: <p>I do have some coins!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1.0
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Rainbow
           feedback:
-          - No, fewer than that!
+            content_id: feedback_4
+            html: <p>No, fewer than that!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{numcoins}}'
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Rainbow
           feedback:
-          - More than that!
+            content_id: feedback_5
+            html: <p>More than that!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{numcoins}}'
           rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Rainbow
         feedback:
-        - This should never happen
+          content_id: default_outcome
+          html: <p>This should never happen</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
+    next_content_id_index: 6
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
   Road:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
-        also get a pretty red <b>towel</b>.</div></div><div><br></div>You are standing
-        in a small courtyard. To the north is a gate, with a sign:<div>"This way to
-        adventure!"</div>'
+      content_id: content
+      html: "<p>You get: a name tag. It says \"Hello, I'm {{answer}}!\"</p><p>You\
+        \ also get a pretty red <strong>towel</strong>.</p><p>\xC2\_</p><p>You are\
+        \ standing in a small courtyard. To the north is a gate, with a sign:</p><p>\"\
+        This way to adventure!\"</p>"
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Fork
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - Go north
+          - content_id: ca_choices_2
+            html: <p>Go north</p>
+        showChoicesInShuffledOrder:
+          value: false
       default_outcome:
         dest: Fork
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 3
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -299,234 +513,448 @@ states:
         value: nothing
       generator_id: Copier
       name: payitem
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Troll:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
-        {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
-        is a path leading back to the <b>southwest</b>.</div>
+      content_id: content
+      html: "<p>You come to a bridge that is being guarded by a troll. The troll says:</p><p>\_\
+        </p><p>\"Hello, {{Name}}. You have to pay a toll if you want to cross this\
+        \ bridge.\"</p><p>\_</p><p>There is a path leading back to the <strong>southwest</strong>.</p>"
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Fork
           feedback:
-          - You go southwest
+            content_id: feedback_1
+            html: <p>You go southwest</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: southwest
+            x:
+              contentId: rule_input_12
+              normalizedStrSet:
+              - southwest
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Fork
           feedback:
-          - You go southwest
+            content_id: feedback_2
+            html: <p>You go southwest</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: sw
+            x:
+              contentId: rule_input_13
+              normalizedStrSet:
+              - sw
           rule_type: StartsWith
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - You use nothing. Nothing happens.
+            content_id: feedback_3
+            html: <p>You use nothing. Nothing happens.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: use nothing
+            x:
+              contentId: rule_input_14
+              normalizedStrSet:
+              - use nothing
           rule_type: StartsWith
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - You do nothing. nothing happens.
+            content_id: feedback_4
+            html: <p>You do nothing. nothing happens.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: nothing
+            x:
+              contentId: rule_input_15
+              normalizedStrSet:
+              - nothing
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - You flail at the troll with your {{Weapon}}. He is not amused.
+            content_id: feedback_5
+            html: <p>You flail at the troll with your {{Weapon}}. He is not amused.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{Weapon}}'
+            x:
+              contentId: rule_input_16
+              normalizedStrSet:
+              - '{{Weapon}}'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: pre-rainbow
           feedback:
-          - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
-            he sneezes really loudly and you are carried away by the gust...
+            content_id: feedback_6
+            html: <p>You flail your {{sneezeitem}} at the troll. Oh no, the troll
+              is allergic! he sneezes really loudly and you are carried away by the
+              gust...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{sneezeitem}}'
+            x:
+              contentId: rule_input_17
+              normalizedStrSet:
+              - '{{sneezeitem}}'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: END
           feedback:
-          - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
-            \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
-            \ and toward victory!"
+            content_id: feedback_7
+            html: "<p>You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
+              \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
+              \ and toward victory!</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{payitem}}'
+            x:
+              contentId: rule_input_18
+              normalizedStrSet:
+              - '{{payitem}}'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - You don't have that!
+            content_id: feedback_8
+            html: <p>You don't have that!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: use
+            x:
+              contentId: rule_input_19
+              normalizedStrSet:
+              - use
           rule_type: StartsWith
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - You flail at the troll with your bare hands. He is not amused.
+            content_id: feedback_9
+            html: <p>You flail at the troll with your bare hands. He is not amused.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: troll
+            x:
+              contentId: rule_input_20
+              normalizedStrSet:
+              - troll
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Troll
           feedback:
-          - Pay toll with what?
+            content_id: feedback_10
+            html: <p>Pay toll with what?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: toll
+            x:
+              contentId: rule_input_21
+              normalizedStrSet:
+              - toll
           rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_11
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: Troll
         feedback:
-        - Pardon?
-        - I don't know how to {{answer}}
-        - I don't understand
-        - Have you tried using things? (type "use [item]")
+          content_id: default_outcome
+          html: <p>Pardon?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 22
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_11: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+        rule_input_12: {}
+        rule_input_13: {}
+        rule_input_14: {}
+        rule_input_15: {}
+        rule_input_16: {}
+        rule_input_17: {}
+        rule_input_18: {}
+        rule_input_19: {}
+        rule_input_20: {}
+        rule_input_21: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_11: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+        rule_input_12: {}
+        rule_input_13: {}
+        rule_input_14: {}
+        rule_input_15: {}
+        rule_input_16: {}
+        rule_input_17: {}
+        rule_input_18: {}
+        rule_input_19: {}
+        rule_input_20: {}
+        rule_input_21: {}
   Welcome:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "<div>Hello, brave adventurer, and welcome!</div><div><br></div><div>On\
-        \ this adventure, keep two things in mind:</div><div><br></div><div>1) Figuring\
-        \ out what to do is half the game! That said, the possible options are usually\
-        \ displayed in <b>bold</b> within the text of the state. Go back and look\
-        \ for the latest bolded words if you get stuck.</div><div><b><br></b></div><div>2)\
-        \ There is no global text-parsing engine, so each and every input field is\
-        \ very specific to its context - <u>there are no</u> \"inventory\" or \"look\"\
-        \ or \"drink\" or any other universal commands that would be available to\
-        \ you any time an input field is provided in a \"classic\" adventure game.</div><div><br></div><div>Now\
-        \ - what is your name?\_<br></div>"
+      content_id: content
+      html: "<p>Hello, brave adventurer, and welcome!</p><p>\_</p><p>On this adventure,\
+        \ keep two things in mind:</p><p>\_</p><p>1) Figuring out what to do is half\
+        \ the game! That said, the possible options are usually displayed in <strong>bold</strong>\
+        \ within the text of the state. Go back and look for the latest bolded words\
+        \ if you get stuck.</p><p><strong><br></strong></p><p>2) There is no global\
+        \ text-parsing engine, so each and every input field is very specific to its\
+        \ context - there are no \"inventory\" or \"look\" or \"drink\" or any other\
+        \ universal commands that would be available to you any time an input field\
+        \ is provided in a \"classic\" adventure game.</p><p>\_</p><p>Now - what is\
+        \ your name?\xC2\_<br></p>"
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: Road
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
   get coins:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: He gives you the <b>coins</b> and uses his magic to return you back to
-        the troll.
+      content_id: content
+      html: <p>He gives you the <strong>coins</strong> and uses his magic to return
+        you back to the troll.</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
       default_outcome:
         dest: Troll
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 1
     param_changes:
     - customization_args:
         value: coins
       generator_id: Copier
       name: payitem
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
   picking:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: You pick a pretty bouquet of <b>flowers</b>.
+      content_id: content
+      html: <p>You pick a pretty bouquet of <strong>flowers</strong>.</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
       default_outcome:
         dest: Clearing
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 1
     param_changes:
     - customization_args:
         value: flowers
       generator_id: Copier
       name: sneezeitem
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
   pre-rainbow:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
-        says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
+      content_id: content
+      html: <p>You find yourself at the end of a rainbow. There's a leprechaun here.</p><p>He
+        says:<br></p><p>"Hello, {{Name}}! How are you?"</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: Rainbow
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes:
     - customization_args:
         list_of_values:
@@ -542,6 +970,17 @@ states:
         - '10'
       generator_id: RandomSelector
       name: numcoins
-states_schema_version: 13
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
 tags: []
 title: Parameterized Adventure

@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the learner flow.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -48,17 +49,20 @@ describe('Learner dashboard functionality', function() {
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
   var clickContinueButton = async function() {
-    await waitFor.elementToBeClickable(
-      continueButton, 'Could not click continue button');
-    await continueButton.click();
+    await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
+  var testExplorationId = null;
+  var collectionExplorationId = null;
+  var dummyExplorationId = null;
 
-  var createDummyExplorationOnDesktop = async function() {
+  var createDummyExplorationOnDesktop = async function(welcomeModalIsShown) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await waitFor.pageToFullyLoad();
-    await explorationEditorMainTab.exitTutorial();
+    if (welcomeModalIsShown) {
+      await explorationEditorMainTab.exitTutorial();
+    }
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
@@ -92,6 +96,7 @@ describe('Learner dashboard functionality', function() {
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
+    dummyExplorationId = await general.getExplorationIdFromEditor();
   };
 
   beforeAll(function() {
@@ -109,11 +114,10 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and plays the correct exploration',
+  it('should visit the exploration player and play the correct exploration',
     async function() {
-      await users.createUser(
+      await users.createAndLoginSuperAdminUser(
         'expCreator@learnerDashboard.com', 'expCreator');
-      await users.login('expCreator@learnerDashboard.com', true);
       // Create or load an exploration named 'Exploration Player Test'.
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
@@ -122,11 +126,12 @@ describe('Learner dashboard functionality', function() {
           'Exploration Player Test',
           'Astronomy',
           'To test the exploration player',
-          'English'
+          'English',
+          true
         );
       }
       await users.logout();
-      var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'expPlayerDM';
       await users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
@@ -134,12 +139,11 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('should visit the collection player and plays the correct collection',
+  it('should visit the collection player and play the correct collection',
     async function() {
-      await users.createUser(
+      await users.createAndLoginSuperAdminUser(
         'expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
-      await users.login('expOfCollectionCreator@learnerDashboard.com', true);
       // Create or load a collection named
       // 'Introduction to Collections in Oppia'.
       if (browser.isMobile) {
@@ -149,15 +153,16 @@ describe('Learner dashboard functionality', function() {
           'Demo Exploration',
           'Algebra',
           'To test collection player',
-          'English'
+          'English',
+          true
         );
+        testExplorationId = await general.getExplorationIdFromEditor();
         // Update the role of the user to admin since only admin users
         // can create a collection.
         await adminPage.get();
-        await adminPage.updateRole('expOfCollectionCreator', 'admin');
+        await adminPage.addRole('expOfCollectionCreator', 'collection editor');
         await workflow.createCollectionAsAdmin();
-        await collectionEditorPage.searchForAndAddExistingExploration(
-          'Demo Exploration');
+        await collectionEditorPage.addExistingExploration(testExplorationId);
         await collectionEditorPage.saveDraft();
         await collectionEditorPage.closeSaveModal();
         await collectionEditorPage.publishCollection();
@@ -169,7 +174,7 @@ describe('Learner dashboard functionality', function() {
         await collectionEditorPage.saveChanges();
       }
       await users.logout();
-      var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'collectionPlayerDM';
       await users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
@@ -178,9 +183,8 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('should display incomplete and completed explorations', async function() {
-    await users.createUser(
+    await users.createAndLoginSuperAdminUser(
       'originalCreator@learnerDashboard.com', 'originalCreator');
-    await users.login('originalCreator@learnerDashboard.com', true);
     // Create or load explorations.
     if (browser.isMobile) {
       await adminPage.reloadExploration('learner_flow_test.yaml');
@@ -188,13 +192,14 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      await createDummyExplorationOnDesktop();
+      await createDummyExplorationOnDesktop(true);
       // Create a second exploration named 'Test Exploration'.
       await workflow.createAndPublishExploration(
         'Test Exploration',
         'Astronomy',
         'To expand the horizon of the minds!',
-        'English'
+        'English',
+        false
       );
     }
     await users.logout();
@@ -216,7 +221,7 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave exploration.
-    await oppiaLogo.click();
+    await action.click('Oppia logo', oppiaLogo);
     await general.acceptAlert();
 
     // Go to 'Test Exploration'.
@@ -224,16 +229,18 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.findExploration('Test Exploration');
     await libraryPage.playExploration('Test Exploration');
     await waitFor.pageToFullyLoad();
-    await oppiaLogo.click();
+    await action.click('Oppia logo', oppiaLogo);
     await waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
-    await learnerDashboardPage.checkIncompleteExplorationSection(
-      'Dummy Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckIncompleteExplorations(
+        'Dummy Exploration');
     // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
-    await learnerDashboardPage.checkCompleteExplorationSection(
-      'Test Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Test Exploration');
 
     await libraryPage.get();
     await libraryPage.findExploration('Dummy Exploration');
@@ -253,25 +260,28 @@ describe('Learner dashboard functionality', function() {
     }
     // Both should be added to the completed section.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteExplorationSection(
-      'Dummy Exploration');
-    await learnerDashboardPage.checkCompleteExplorationSection(
-      'Test Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Dummy Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Test Exploration');
     await users.logout();
 
     // For desktop, go to the exploration editor page and
     // delete 'Dummy Exploration'.
     if (!browser.isMobile) {
-      // Login as Admin and delete exploration 'Dummy Exploration'.
-      await users.createAndLoginAdminUser(
+      // Login as Moderator and delete exploration 'Dummy Exploration'.
+      await users.createModerator(
         'inspector@learnerDashboard.com', 'inspector');
+      await users.login('inspector@learnerDashboard.com');
       await libraryPage.get();
       await libraryPage.findExploration('Dummy Exploration');
       await libraryPage.playExploration('Dummy Exploration');
       // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
-      await general.openEditor(explorationId);
+      await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();
       await users.logout();
@@ -280,7 +290,7 @@ describe('Learner dashboard functionality', function() {
       // from learner dashboard.
       await users.login('learner@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.navigateToCompletedSection();
+      await learnerDashboardPage.navigateToCommunityLessonsSection();
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
         'Test Exploration');
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
@@ -289,31 +299,31 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display incomplete and completed collections', async function() {
-    await users.createUser(
+    await users.createAndLoginSuperAdminUser(
       'explorationCreator@learnerDashboard.com', 'explorationCreator');
-    await users.login('explorationCreator@learnerDashboard.com', true);
     // Create or load a collection.
     if (browser.isMobile) {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      await createDummyExplorationOnDesktop();
+      await createDummyExplorationOnDesktop(true);
       // Create a second exploration named 'Collection Exploration'.
       await workflow.createAndPublishExploration(
         'Collection Exploration',
         'Architect',
         'To be a part of a collection!',
-        'English'
+        'English',
+        false
       );
-      // Update the role of the user to admin since only admin users
-      // can create a collection.
+      collectionExplorationId = await general.getExplorationIdFromEditor();
+      // Update the role of the user to collection editor since only collection
+      // editors can create a collection.
       await adminPage.get();
-      await adminPage.updateRole('explorationCreator', 'admin');
+      await adminPage.addRole('explorationCreator', 'collection editor');
       // Create new 'Test Collection' containing
       // exploration 'Dummy Exploration'.
       await workflow.createCollectionAsAdmin();
-      await collectionEditorPage.searchForAndAddExistingExploration(
-        'Dummy Exploration');
+      await collectionEditorPage.addExistingExploration(dummyExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.closeSaveModal();
       await collectionEditorPage.publishCollection();
@@ -333,14 +343,11 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? await element.all(
-      by.css('.protractor-mobile-test-collection-exploration')).first() :
-      await element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+    var firstExploration = browser.isMobile ? element.all(
+      by.css('.protractor-test-mobile-collection-exploration')).first() :
+      element.all(by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    await waitFor.elementToBeClickable(
-      firstExploration, 'Could not click first exploration in collection');
-    await firstExploration.click();
+    await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
     // Leave this collection incomplete.
     if (browser.isMobile) {
@@ -348,9 +355,7 @@ describe('Learner dashboard functionality', function() {
       // to begin an exploration which is a part of a collection.
       var playExploration = element(
         by.css('.protractor-test-play-exploration-button'));
-      await waitFor.elementToBeClickable(
-        playExploration, 'Could not click play exploration button');
-      await playExploration.click();
+      await action.click('Play exploration', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
     } else {
@@ -358,13 +363,14 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection.
-    await oppiaLogo.click();
+    await action.click('Oppia logo', oppiaLogo);
     await general.acceptAlert();
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
-    await learnerDashboardPage.checkIncompleteCollectionSection(
-      'Test Collection');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckIncompleteCollections(
+        'Test Collection');
     // Now find and play 'Test Collection' completely.
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
@@ -372,21 +378,16 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? await element.all(
-      by.css('.protractor-mobile-test-collection-exploration')).first() :
-      await element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+    var firstExploration = browser.isMobile ? element.all(
+      by.css('.protractor-test-mobile-collection-exploration')).first() :
+      element.all(by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    await waitFor.elementToBeClickable(
-      firstExploration, 'Could not click first exploration in collection');
-    await firstExploration.click();
+    await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
     if (browser.isMobile) {
       var playExploration = element(
         by.css('.protractor-test-play-exploration-button'));
-      await waitFor.elementToBeClickable(
-        playExploration, 'Could not click play exploration button');
-      await playExploration.click();
+      await action.click('Play exploration', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
       await waitFor.pageToFullyLoad();
@@ -402,8 +403,9 @@ describe('Learner dashboard functionality', function() {
     // Learner Dashboard should display
     // 'Test Collection' as complete.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteCollectionSection(
-      'Test Collection');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteCollections(
+        'Test Collection');
     await users.logout();
 
     // This part of the test is desktop-only for the following reasons:
@@ -427,10 +429,10 @@ describe('Learner dashboard functionality', function() {
       await waitFor.pageToFullyLoad();
       // Click on 'Collections' tab.
       var collectionsTab = element(by.css('.protractor-test-collections-tab'));
-      await collectionsTab.click();
+      await action.click('Collections tab', collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
-      await collectionEditorPage.searchForAndAddExistingExploration(
-        'Collection Exploration');
+      await collectionEditorPage.addExistingExploration(
+        collectionExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
@@ -439,8 +441,9 @@ describe('Learner dashboard functionality', function() {
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.checkIncompleteCollectionSection(
-        'Test Collection');
+      await learnerDashboardPage
+        .navigateToCommunityLessonsAndCheckIncompleteCollections(
+          'Test Collection');
     }
   });
 

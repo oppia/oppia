@@ -16,8 +16,8 @@
 
 """Unit tests for scripts/pre_commit_linter.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import subprocess
@@ -91,7 +91,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             mock_install_third_party_libs_main)
 
     def test_main_with_no_files(self):
-        def mock_get_all_filepaths(unused_path, unused_files):
+        def mock_get_all_filepaths(
+                unused_path, unused_files, unused_shard, namespace):  # pylint: disable=unused-argument
             return []
 
         all_filepath_swap = self.swap(
@@ -118,6 +119,76 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     pre_commit_linter.main()
         self.assert_same_list_elements(
             ['No files to check'], self.linter_stdout)
+
+    def test_main_with_non_other_shard(self):
+        def mock_get_filepaths_from_path(path, namespace):  # pylint: disable=unused-argument
+            if path == pre_commit_linter.SHARDS['1'][0]:
+                return [VALID_PY_FILEPATH]
+            return []
+
+        get_filenames_from_path_swap = self.swap_with_checks(
+            pre_commit_linter, '_get_filepaths_from_path',
+            mock_get_filepaths_from_path, expected_args=[
+                (prefix,)
+                for prefix in pre_commit_linter.SHARDS['1']
+            ])
+
+        with self.print_swap, self.sys_swap:
+            with self.install_swap:
+                with get_filenames_from_path_swap:
+                    pre_commit_linter.main(args=['--shard', '1'])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+
+    def test_main_with_invalid_shards(self):
+        def mock_get_filepaths_from_path(unused_path, namespace):  # pylint: disable=unused-argument
+            return ['mock_file', 'mock_file']
+
+        def mock_install_third_party_main():
+            raise AssertionError(
+                'Third party libs should not be installed.')
+
+        get_filenames_from_path_swap = self.swap_with_checks(
+            pre_commit_linter, '_get_filepaths_from_path',
+            mock_get_filepaths_from_path, expected_args=[
+                (prefix,)
+                for prefix in pre_commit_linter.SHARDS['1']
+            ])
+        install_swap = self.swap(
+            install_third_party_libs, 'main',
+            mock_install_third_party_main)
+
+        with self.print_swap, self.sys_swap, install_swap:
+            with get_filenames_from_path_swap:
+                with self.assertRaisesRegexp(
+                    RuntimeError, 'mock_file in multiple shards'
+                ):
+                    pre_commit_linter.main(args=['--shard', '1'])
+
+    def test_main_with_other_shard(self):
+        def mock_get_filepaths_from_path(path, namespace):  # pylint: disable=unused-argument
+            if os.path.abspath(path) == os.getcwd():
+                return [VALID_PY_FILEPATH, 'nonexistent_file']
+            elif path == 'core/templates/':
+                return ['nonexistent_file']
+            else:
+                return []
+
+        filenames_from_path_expected_args = [(os.getcwd(),)] + [
+            (prefix,)
+            for prefix in pre_commit_linter.SHARDS['1']
+        ]
+
+        get_filenames_from_path_swap = self.swap_with_checks(
+            pre_commit_linter, '_get_filepaths_from_path',
+            mock_get_filepaths_from_path,
+            expected_args=filenames_from_path_expected_args)
+
+        with self.print_swap, self.sys_swap:
+            with self.install_swap:
+                with get_filenames_from_path_swap:
+                    pre_commit_linter.main(
+                        args=['--shard', pre_commit_linter.OTHER_SHARD_NAME])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self):
         with self.print_swap, self.sys_swap:

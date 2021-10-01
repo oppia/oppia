@@ -24,6 +24,9 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { StateCardIsCheckpointService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -46,7 +49,7 @@ import { ReadOnlyExplorationBackendApiService } from
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 import * as d3 from 'd3';
@@ -67,6 +70,7 @@ describe('State Graph Visualization directive', function() {
   var $rootScope = null;
   var $scope = null;
   var explorationWarningsService = null;
+  var explorationStatesService = null;
   var routerService = null;
   var stateGraphLayoutService = null;
   var translationStatusService = null;
@@ -119,6 +123,9 @@ describe('State Graph Visualization directive', function() {
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
+      'StateCardIsCheckpointService',
+      TestBed.get(StateCardIsCheckpointService));
+    $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
     $provide.value(
@@ -151,6 +158,7 @@ describe('State Graph Visualization directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     explorationWarningsService = $injector.get('ExplorationWarningsService');
+    explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
     translationStatusService = $injector.get('TranslationStatusService');
 
@@ -380,5 +388,91 @@ describe('State Graph Visualization directive', function() {
     expect(d3.event.transform.x).toBe(10);
     expect(d3.event.transform.y).toBe(10);
     expect($scope.overallTransformStr).toBe('translate(-20,-20)');
+  });
+
+  it('should check if state is a checkpoint', function() {
+    explorationStatesService.init({
+      'First State': {
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: 'First State Content'
+        },
+        interaction: {
+          id: 'TextInput',
+          customization_args: {
+            placeholder: {value: {
+              content_id: 'ca_placeholder',
+              unicode_str: ''
+            }},
+            rows: {value: 1}
+          },
+          answer_groups: [{
+            rule_specs: [],
+            outcome: {
+              dest: 'unused',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
+          }],
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
+          },
+          solution: {
+            correct_answer: 'This is the correct answer',
+            answer_is_exclusive: false,
+            explanation: {
+              html: 'Solution explanation',
+              content_id: 'content_4'
+            }
+          },
+          hints: []
+        },
+        linked_skill_id: null,
+        next_content_id_index: 0,
+        param_changes: [],
+        solicit_answer_details: false,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {
+              en: {
+                filename: 'myfile2.mp3',
+                file_size_bytes: 120000,
+                needs_update: false,
+                duration_secs: 1.2
+              }
+            }
+          }
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {
+              en: {
+                html: 'This is a html',
+                needs_update: false
+              }
+            }
+          }
+        }
+      }
+    });
+
+    expect($scope.isCheckpoint('First State')).toBe(true);
   });
 });

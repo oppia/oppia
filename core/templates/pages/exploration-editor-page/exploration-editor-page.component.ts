@@ -17,12 +17,10 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -54,9 +52,6 @@ require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.component.ts');
 require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
 require('pages/exploration-editor-page/history-tab/history-tab.component.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
@@ -77,7 +72,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('interactions/interactionsRequires.ts');
@@ -148,19 +143,24 @@ require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/internet-connectivity.service.ts');
+require('services/alerts.service.ts');
+require('services/user.service.ts');
 
+require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$templateCache', '$timeout', '$uibModal',
+    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -172,16 +172,19 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationParamSpecsService', 'ExplorationPropertyService',
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+    'ExplorationTitleService', 'ExplorationWarningsService',
+    'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
+    'RouterService', 'SiteAnalyticsService',
+    'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'WindowDimensionsService',
+    'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $templateCache, $timeout, $uibModal,
+        $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -193,38 +196,30 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationParamSpecsService, ExplorationPropertyService,
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+        ExplorationTitleService, ExplorationWarningsService,
+        FocusManagerService, GraphDataService, InternetConnectivityService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        ParamSpecsObjectFactory, PreventPageUnloadEventService,
+        RouterService, SiteAnalyticsService,
+        StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        WindowDimensionsService) {
+        UserService, WindowDimensionsService) {
       var ctrl = this;
+      var reconnectedMessageTimeoutMilliseconds = 4000;
+      var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
-      var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
-      var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
-      var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
-      var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
+      ctrl.connectedToInternet = true;
 
-      var saveButtonTutorialElement = {
-        type: 'element',
-        selector: _ID_TUTORIAL_SAVE_BUTTON,
-        heading: 'Save',
-        text: (
-          'When you\'re done making changes, ' +
-          'be sure to save your work.<br><br>'),
-        placement: 'bottom'
-      };
-
-      var setPageTitle = function() {
+      var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             ExplorationTitleService.savedMemento + ' - Oppia Editor');
         } else {
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             'Untitled Exploration - Oppia Editor');
         }
       };
@@ -245,22 +240,28 @@ angular.module('oppia').component('explorationEditorPage', {
       // Called on page load.
       ctrl.initExplorationPage = () => {
         return $q.all([
-          ExplorationDataService.getData((explorationId, lostChanges) => {
+          ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
+              $rootScope.$applyAsync();
             }
           }),
-          ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync()
-        ]).then(async([explorationData, featuresData, openThreadsCount]) => {
+          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          UserService.getUserInfoAsync()
+        ]).then(async(
+            [explorationData, featuresData, openThreadsCount, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
+            ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
 
           ExplorationFeaturesService.init(explorationData, featuresData);
 
+          StateClassifierMappingService.init(
+            ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(explorationData.states);
 
           ExplorationTitleService.init(explorationData.title);
@@ -282,6 +283,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
 
+
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
           ctrl.explorationObjectiveService = ExplorationObjectiveService;
@@ -289,8 +291,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
-          ctrl.currentUserIsModerator = explorationData.is_moderator;
+          ctrl.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
+          ctrl.currentUserIsModerator = userInfo.isModerator();
 
           ctrl.currentUser = explorationData.user;
           ctrl.currentVersion = explorationData.version;
@@ -345,6 +347,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (explorationData.draft_changes !== null) {
             ChangeListService.loadAutosavedChangeList(
               explorationData.draft_changes);
+            $rootScope.$applyAsync();
           }
 
           if (explorationData.is_version_of_draft_valid === false &&
@@ -354,6 +357,7 @@ angular.module('oppia').component('explorationEditorPage', {
             // changes is invalid, and draft_changes is not `null`.
             AutosaveInfoModalsService.showVersionMismatchModal(
               ChangeListService.getChangeList());
+            $rootScope.$applyAsync();
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
@@ -376,30 +380,8 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
-          // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and is being played by
-          // learners.
-          if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
-
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
-          }
+          // TODO(#13352): Initialize StateTopAnswersStatsService and register
+          // relevant callbacks.
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
@@ -414,39 +396,42 @@ angular.module('oppia').component('explorationEditorPage', {
         return RouterService.getActiveTabName();
       };
 
-      var leaveTutorial = function() {
-        EditabilityService.onEndTutorial();
-        $scope.$apply();
-        StateTutorialFirstTimeService.markEditorTutorialFinished();
-        ctrl.tutorialInProgress = false;
+      ctrl.setFocusOnActiveTab = function(activeTab) {
+        if (activeTab === 'history') {
+          FocusManagerService.setFocus('usernameInputField');
+        }
+        if (activeTab === 'feedback') {
+          if (!ctrl.activeThread) {
+            FocusManagerService.setFocus('newThreadButton');
+          }
+          if (ctrl.activeThread) {
+            FocusManagerService.setFocus('tmpMessageText');
+          }
+        }
       };
 
-      ctrl.onSkipTutorial = function() {
-        SiteAnalyticsService.registerSkipTutorialEvent(ctrl.explorationId);
-        leaveTutorial();
+      ctrl.startEditorTutorial = function() {
+        EditabilityService.onStartTutorial();
+        if (RouterService.getActiveTabName() !== 'main') {
+          ctrl.selectMainTab();
+        } else {
+          StateEditorRefreshService.onRefreshStateEditor.emit();
+        }
       };
 
-      ctrl.onFinishTutorial = function() {
-        SiteAnalyticsService.registerFinishTutorialEvent(
-          ctrl.explorationId);
-        leaveTutorial();
-      };
-
-      ctrl.startTutorial = function() {
-        RouterService.navigateToMainTab();
-        // The $timeout wrapper is needed for all components on the page
-        // to load, otherwise elements within ng-if's are not guaranteed to
-        // be present on the page.
-        $timeout(function() {
-          EditabilityService.onStartTutorial();
-          ctrl.tutorialInProgress = true;
-        });
+      ctrl.startTranslationTutorial = function() {
+        EditabilityService.onStartTutorial();
+        if (RouterService.getActiveTabName() !== 'translation') {
+          ctrl.selectTranslationTab();
+        } else {
+          RouterService.onRefreshTranslationTab.emit();
+        }
       };
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeModalController',
@@ -454,7 +439,7 @@ angular.module('oppia').component('explorationEditorPage', {
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
-          ctrl.startTutorial();
+          ctrl.startEditorTutorial();
         }, function(explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
             explorationId);
@@ -470,7 +455,10 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
       ctrl.hasCriticalWarnings = () => (
         ExplorationWarningsService.hasCriticalWarnings);
-      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectMainTab = () => {
+        RouterService.navigateToMainTab();
+        $rootScope.$applyAsync();
+      };
       ctrl.selectTranslationTab = (
         () => RouterService.navigateToTranslationTab());
       ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();
@@ -478,8 +466,14 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.selectStatsTab = () => RouterService.navigateToStatsTab();
       ctrl.selectImprovementsTab = (
         () => RouterService.navigateToImprovementsTab());
-      ctrl.selectHistoryTab = () => RouterService.navigateToHistoryTab();
-      ctrl.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
+      ctrl.selectHistoryTab = () => {
+        RouterService.navigateToHistoryTab();
+        ctrl.setFocusOnActiveTab('history');
+      };
+      ctrl.selectFeedbackTab = () => {
+        RouterService.navigateToFeedbackTab();
+        ctrl.setFocusOnActiveTab('feedback');
+      };
       ctrl.getOpenThreadsCount = (
         () => ThreadDataBackendApiService.getOpenThreadsCount());
       ctrl.showUserHelpModal = () => {
@@ -488,8 +482,8 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',
@@ -508,12 +502,36 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
+        InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
-              setPageTitle();
+              setDocumentTitle();
+              $rootScope.$applyAsync();
             }
           )
+        );
+        ctrl.directiveSubscriptions.add(
+          InternetConnectivityService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              ctrl.connectedToInternet = internetAccessible;
+              if (internetAccessible) {
+                AlertsService.addSuccessMessage(
+                  'Reconnected. Checking whether your changes are mergeable.',
+                  reconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.removeListener();
+              } else {
+                AlertsService.addInfoMessage(
+                  'Looks like you are offline. ' +
+                  'You can continue working, and can save ' +
+                  'your changes once reconnected.',
+                  disconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.addListener();
+                if (RouterService.getActiveTabName() !== 'main') {
+                  ctrl.selectMainTab();
+                }
+              }
+            })
         );
         ctrl.directiveSubscriptions.add(
           ChangeListService.autosaveIsInProgress$.subscribe(
@@ -547,7 +565,13 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
-              ctrl.startTutorial();
+              ctrl.startEditorTutorial();
+            })
+        );
+        ctrl.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
+            () => {
+              ctrl.startTranslationTutorial();
             })
         );
         ctrl.EditabilityService = EditabilityService;
@@ -569,132 +593,6 @@ angular.module('oppia').component('explorationEditorPage', {
         // is also called in $scope.$on when some external events are
         // triggered.
         ctrl.initExplorationPage();
-        ctrl.EDITOR_TUTORIAL_OPTIONS = [{
-          type: 'title',
-          heading: 'Creating in Oppia',
-          text: (
-            'Explorations are learning experiences that you create using ' +
-            'Oppia. Think of explorations as a conversation between a ' +
-            'student and a tutor.')
-        }, {
-          type: 'function',
-          fn: function(isGoingForward) {
-            $('html, body').animate({
-              scrollTop: (isGoingForward ? 0 : 20)
-            }, 1000);
-          }
-        }, {
-          type: 'element',
-          selector: _ID_TUTORIAL_STATE_CONTENT,
-          heading: 'Content',
-          text: (
-            '<p>An Oppia exploration is divided into several \'cards\'. ' +
-            'The first part of a card is the <b>content</b>.</p>' +
-            '<p>Use the content section to set the scene. ' +
-            'Tell the learner a story, give them some information, ' +
-            'and then ask a relevant question.</p>'),
-          placement: 'bottom'
-        }, {
-          type: 'function',
-          fn: function(isGoingForward) {
-            var idToScrollTo = (
-              isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
-              _ID_TUTORIAL_STATE_CONTENT);
-            $('html, body').animate({
-              scrollTop: angular.element(idToScrollTo).offset().top - 200
-            }, 1000);
-          }
-        }, {
-          type: 'title',
-          selector: _ID_TUTORIAL_STATE_INTERACTION,
-          heading: 'Interaction',
-          text: (
-            '<p>After you\'ve written the content of your conversation, ' +
-            'choose an <b>interaction type</b>. ' +
-            'An interaction is how you want your learner to respond ' +
-            'to your question.</p> ' +
-            '<p>Oppia has several built-in interactions, including:</p>' +
-            '<ul>' +
-            '  <li>' +
-            '    Multiple Choice' +
-            '  </li>' +
-            '  <li>' +
-            '    Text/Number input' +
-            '  </li>' +
-            '  <li>' +
-            '    Code snippets' +
-            '  </li>' +
-            '</ul>' +
-            'and more.')
-        }, {
-          type: 'function',
-          fn: function(isGoingForward) {
-            var idToScrollTo = (
-              isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-              _ID_TUTORIAL_STATE_INTERACTION);
-            $('html, body').animate({
-              scrollTop: angular.element(idToScrollTo).offset().top - 200
-            }, 1000);
-          }
-        }, {
-          type: 'title',
-          heading: 'Responses',
-          text: (
-            'After the learner uses the interaction you created, it\'s ' +
-            'your turn again to choose how your exploration will respond ' +
-            'to their input. You can send a learner to a new card or ' +
-            'have them repeat the same card, depending on how they answer.')
-        }, {
-          type: 'function',
-          fn: function(isGoingForward) {
-            var idToScrollTo = (
-              isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-              _ID_TUTORIAL_STATE_INTERACTION);
-            $('html, body').animate({
-              scrollTop: angular.element(idToScrollTo).offset().top - 200
-            }, 1000);
-          }
-        }, {
-          type: 'element',
-          selector: _ID_TUTORIAL_PREVIEW_TAB,
-          heading: 'Preview',
-          text: (
-            'At any time, you can click the <b>preview</b> button to ' +
-            'play through your exploration.'),
-          placement: 'bottom'
-        }, saveButtonTutorialElement, {
-          type: 'title',
-          heading: 'Tutorial Complete',
-          text: (
-            '<h2>Now for the fun part...</h2>' +
-            'That\'s the end of the tour! ' +
-            'To finish up, here are some things we suggest: ' +
-            '<ul>' +
-            '  <li>' +
-            '    Create your first card!' +
-            '  </li>' +
-            '  <li>' +
-            '    Preview your exploration.' +
-            '  </li>' +
-            '  <li>' +
-            '    Check out more resources in the ' +
-            '    <a href="https://oppia.github.io/#/" target="_blank">' +
-            '      Help Center.' +
-            '    </a>' +
-            '  </li>' +
-            '</ul>')
-        }];
-        // Remove save from tutorial if user does not has edit rights for
-        // exploration since in that case Save Draft button will not be
-        // visible on the create page.
-        UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
-            if (!permissions.canEdit) {
-              var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
-                saveButtonTutorialElement);
-              ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-            }
-          });
 
         let improvementsTabIsEnabled = false;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
@@ -702,16 +600,6 @@ angular.module('oppia').component('explorationEditorPage', {
             improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
           });
         ctrl.isImprovementsTabEnabled = () => improvementsTabIsEnabled;
-
-        // Replace the ng-joyride template with one that uses <[...]>
-        // interpolators instead of/ {{...}} interpolators.
-        var ngJoyrideTemplate = $templateCache.get(
-          'ng-joyride-title-tplv1.html');
-        ngJoyrideTemplate = ngJoyrideTemplate.replace(
-          /\{\{/g, '<[').replace(/\}\}/g, ']>');
-        $templateCache.put(
-          'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
-        ctrl.tutorialInProgress = false;
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

@@ -17,7 +17,7 @@
  */
 
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
-require('domain/suggestion/SuggestionObjectFactory.ts');
+require('domain/suggestion/suggestion.model.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
@@ -37,6 +37,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
     var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
+    var _UPDATE_TRANSLATION_HANDLER_URL = (
+      '/updatetranslationsuggestionhandler/<suggestion_id>'
+    );
+    var _UPDATE_QUESTION_HANDLER_URL = (
+      '/updatequestionsuggestionhandler/<suggestion_id>'
+    );
 
     var _fetchSuggestionsAsync = async function(url) {
       return $http.get(url).then(function(res) {
@@ -87,7 +93,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       },
       resolveSuggestionToExploration: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
-          onSuccess) {
+          onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
             exp_id: targetId,
@@ -102,11 +108,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           )
         }).then(function() {
           onSuccess(suggestionId);
-        });
+        }, (error) => onFailure && onFailure(error));
       },
       resolveSuggestiontoSkill: function(
           targetId, suggestionId, action, reviewMessage, skillDifficulty,
-          onSuccess) {
+          onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
             skill_id: targetId,
@@ -118,7 +124,49 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           skill_difficulty: skillDifficulty
         }).then(function() {
           onSuccess(suggestionId);
+        }, () => onFailure && onFailure(suggestionId));
+      },
+      updateTranslationSuggestionAsync: async function(
+          suggestionId, translationHtml,
+          onSuccess, onFailure) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _UPDATE_TRANSLATION_HANDLER_URL, {
+            suggestion_id: suggestionId
+          });
+        return $http.put(url, {
+          translation_html: translationHtml
+        }).then(function() {
+          onSuccess(suggestionId);
+        }, () => onFailure && onFailure(suggestionId));
+      },
+      updateQuestionSuggestionAsync: async function(
+          suggestionId, skillDifficulty, questionStateData, imagesData,
+          onSuccess, onFailure) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _UPDATE_QUESTION_HANDLER_URL, {
+            suggestion_id: suggestionId
+          });
+        const payload = {
+          skill_difficulty: skillDifficulty,
+          question_state_data: questionStateData
+        };
+        const body = new FormData();
+        body.append('payload', JSON.stringify(payload));
+        imagesData.forEach(obj => {
+          if (obj.imageBlob !== null) {
+            body.append(obj.filename, obj.imageBlob);
+          }
         });
+        return $http({
+          method: 'POST',
+          url,
+          data: body,
+          headers: {
+            'Content-Type': undefined
+          },
+        }).then(function() {
+          onSuccess(suggestionId);
+        }, () => onFailure && onFailure(suggestionId));
       }
     };
   }

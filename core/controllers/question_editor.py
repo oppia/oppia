@@ -16,12 +16,14 @@
 and are created.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
@@ -31,8 +33,6 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
-import feconf
-import utils
 
 
 class QuestionCreationHandler(base.BaseHandler):
@@ -120,7 +120,7 @@ class QuestionCreationHandler(base.BaseHandler):
         for filename in filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging.exception(
                     'Image not provided for file with name %s when the question'
                     ' with id %s was created.' % (filename, question.id))
                 raise self.InvalidInputException(
@@ -153,42 +153,28 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         """Updates the QuestionSkillLink models with respect to the given
         question.
         """
-        if self.payload.get('action') == 'update_difficulty':
-            new_difficulty = self.payload.get('new_difficulty')
-            skill_id = self.payload.get('skill_id')
-            if skill_id is None:
-                raise self.InvalidInputException(
-                    'The \'skill_id\' field is missing in payload')
-            if new_difficulty is None:
-                raise self.InvalidInputException(
-                    'The \'new_difficulty\' field is missing in payload')
-            question_services.update_question_skill_link_difficulty(
-                question_id, skill_id, float(new_difficulty))
-        elif self.payload.get('action') == 'edit_links':
-            difficulty = self.payload.get('difficulty')
-            skill_ids_task_list = self.payload.get('skill_ids_task_list')
-            if skill_ids_task_list is None:
-                raise self.InvalidInputException(
-                    'Missing fields \'skill_ids_task_list\'in payload')
+        skill_ids_task_list = self.payload.get('skill_ids_task_list')
+        if skill_ids_task_list is None:
+            raise self.InvalidInputException(
+                'Missing fields \'skill_ids_task_list\'in payload')
 
-            for task_dict in skill_ids_task_list:
-                if not 'id' in task_dict:
-                    raise self.InvalidInputException(
-                        'Missing skill ID for edit_links.')
-                if task_dict['task'] == 'remove':
-                    question_services.delete_question_skill_link(
-                        self.user_id, question_id, task_dict['id'])
-                elif task_dict['task'] == 'add':
-                    if difficulty is None:
-                        raise self.InvalidInputException(
-                            'Missing field \'difficulty\' in payload')
-                    question_services.create_new_question_skill_link(
-                        self.user_id, question_id, task_dict['id'], difficulty)
-                else:
-                    raise self.InvalidInputException(
-                        'Invalid task for edit_links.')
-        else:
-            raise self.InvalidInputException('Invalid action in payload.')
+        for task_dict in skill_ids_task_list:
+            if not 'id' in task_dict:
+                raise self.InvalidInputException(
+                    'Missing skill ID.')
+            if task_dict['task'] == 'remove':
+                question_services.delete_question_skill_link(
+                    self.user_id, question_id, task_dict['id'])
+            elif task_dict['task'] == 'add':
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, task_dict['id'],
+                    task_dict['difficulty'])
+            elif task_dict['task'] == 'update_difficulty':
+                question_services.update_question_skill_link_difficulty(
+                    question_id, task_dict['id'],
+                    float(task_dict['difficulty']))
+            else:
+                raise self.InvalidInputException('Invalid task.')
 
         self.render_json(self.values)
 

@@ -31,11 +31,11 @@ import { Change, TopicChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
-import { ShortSkillSummary } from 'core/templates/domain/skill/ShortSkillSummaryObjectFactory';
-import { SubtitledHtml } from 'core/templates/domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtopicPage } from 'core/templates/domain/topic/SubtopicPageObjectFactory';
-import { RecordedVoiceovers } from 'core/templates/domain/exploration/RecordedVoiceoversObjectFactory';
-import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
+import { SubtitledHtml } from 'core/templates/domain/exploration/subtitled-html.model';
+import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';
+import { RecordedVoiceovers } from 'core/templates/domain/exploration/recorded-voiceovers.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
@@ -48,7 +48,7 @@ type SubtopicUpdateReverse = (
   providedIn: 'root'
 })
 export class TopicUpdateService {
-  constructor(private undoRedoService:UndoRedoService) {}
+  constructor(private undoRedoService: UndoRedoService) {}
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
@@ -71,7 +71,7 @@ export class TopicUpdateService {
   // Applies a topic property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
   private _applyTopicPropertyChange(
-      topic :Topic, propertyName: string, newValue: string|boolean,
+      topic: Topic, propertyName: string, newValue: string|boolean,
       oldValue: string|boolean,
       apply: TopicUpdateApply, reverse: TopicUpdateReverse) {
     this._applyChange(topic, TopicDomainConstants.CMD_UPDATE_TOPIC_PROPERTY, {
@@ -568,8 +568,7 @@ export class TopicUpdateService {
    * the undo/redo service.
    */
   setSubtopicUrlFragment(
-      topic: Topic, subtopicId: number, urlFragment: string)
-  : void {
+      topic: Topic, subtopicId: number, urlFragment: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);

@@ -16,13 +16,13 @@
 
 """Domain objects for authentication."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -34,6 +34,18 @@ import utils
 # corresponding Oppia-generated IDs in our APIs.
 AuthIdUserIdPair = (
     collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))
+
+
+class InvalidAuthSessionError(Exception):
+    """Error raised when an invalid auth session is detected."""
+
+    pass
+
+
+class StaleAuthSessionError(Exception):
+    """Error raised when an auth session needs to be refreshed."""
+
+    pass
 
 
 class AuthClaims(python_utils.OBJECT):

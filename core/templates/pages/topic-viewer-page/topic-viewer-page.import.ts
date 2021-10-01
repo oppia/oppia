@@ -23,16 +23,18 @@ import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+  'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
+
+require('Polyfills.ts');
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('App.ts');
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require('base-components/oppia-root.directive.ts');
 
 require(

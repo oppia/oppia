@@ -14,10 +14,12 @@
 
 """Controllers for the story editor."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -27,8 +29,6 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
-import feconf
-import utils
 
 
 class StoryEditorPage(base.BaseHandler):
@@ -118,8 +118,10 @@ class EditableStoryDataHandler(base.BaseHandler):
             for change_dict in change_dicts
         ]
         try:
-            story_services.update_story(
-                self.user_id, story_id, change_list, commit_message)
+            # Update the Story and its corresponding TopicSummary.
+            topic_services.update_story_and_topic_summary(
+                self.user_id, story_id, change_list, commit_message,
+                story.corresponding_topic_id)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

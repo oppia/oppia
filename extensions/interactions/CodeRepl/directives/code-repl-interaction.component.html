@@ -1,0 +1,35 @@
+<div class="code-repl-container">
+  <div>
+    <!-- This ng-form is needed for submitting answer on hitting enter. -->
+    <form (ngSubmit)="runAndSubmitCode(code)">
+      <div class="code-repl-input-box">
+        <ngx-codemirror [options]="editorOptions"
+                        [ngModel]="code"
+                        [disabled]="!interactionIsActive"
+                        [autoFocus]="true"
+                        (ngModelChange)="onEditorChange($event)"
+                        [ngModelOptions]="{standalone: true}"
+        ></ngx-codemirror>
+      </div>
+      <button mat-raised-button
+              type="button"
+              [disabled]="!interactionIsActive || !hasLoaded"
+              (click)="runCode(code)">
+        Test Run
+      </button>
+      <span class="code-repl-language">
+        <em>Language: {{ language }}</em>
+      </span>
+    </form>
+  </div>
+
+  <hr>
+
+  <div *ngIf="fullError">
+    <pre class="code-repl-terminal-error">{{ fullError }}</pre>
+  </div>
+  <div *ngIf="!fullError">
+    <pre *ngIf="output" class="code-repl-terminal">{{ output }}</pre>
+    <pre *ngIf="!output" class="code-repl-terminal">[No terminal output]</pre>
+  </div>
+</div>

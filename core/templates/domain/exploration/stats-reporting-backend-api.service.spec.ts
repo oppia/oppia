@@ -76,7 +76,7 @@ describe('Stats reporting backend API Service', () => {
   });
 
   it('should post stats correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.postsStats(
+    statsReportingBackendApiService.postsStatsAsync(
       aggregatedStats, expVersion, expId, currentState, nextExpId,
       previousState, nextState);
 
@@ -89,7 +89,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record exp start correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordExpStarted(
+    statsReportingBackendApiService.recordExpStartedAsync(
       params, sessionId, currentState, expVersion, expId, currentState,
       nextExpId, previousState, nextState);
 
@@ -102,7 +102,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record state hit correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordStateHit(
+    statsReportingBackendApiService.recordStateHitAsync(
       timeSpent, expVersion, nextState, params, sessionId, expId, currentState,
       nextExpId, previousState, nextState);
 
@@ -115,7 +115,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record exploration actually started correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordExplorationActuallyStarted(
+    statsReportingBackendApiService.recordExplorationActuallyStartedAsync(
       expVersion, currentState, sessionId, expId, currentState,
       nextExpId, previousState, nextState);
 
@@ -128,7 +128,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record solution hit correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordSolutionHit(
+    statsReportingBackendApiService.recordSolutionHitAsync(
       timeSpent, expVersion, currentState, sessionId, expId, currentState,
       nextExpId, previousState, nextState);
 
@@ -141,7 +141,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record leave for refresher exp correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordLeaveForRefresherExp(
+    statsReportingBackendApiService.recordLeaveForRefresherExpAsync(
       expVersion, expId, currentState, sessionId, timeSpent, expId,
       currentState, nextExpId, previousState, nextState);
 
@@ -154,7 +154,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record state completion correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordStateCompleted(
+    statsReportingBackendApiService.recordStateCompletedAsync(
       expVersion, sessionId, currentState, timeSpent, expId,
       currentState, nextExpId, previousState, nextState);
 
@@ -167,7 +167,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record exploration completion correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordExplorationCompleted(
+    statsReportingBackendApiService.recordExplorationCompletedAsync(
       timeSpent, collectionId, params, sessionId, currentState, expVersion,
       expId, currentState, nextExpId, previousState, nextState);
 
@@ -180,7 +180,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record answer submission correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordAnswerSubmitted(
+    statsReportingBackendApiService.recordAnswerSubmittedAsync(
       'answer', params, expVersion, sessionId, timeSpent, previousState,
       1, 2, 'category', expId, currentState, nextExpId, previousState,
       nextState);
@@ -194,7 +194,7 @@ describe('Stats reporting backend API Service', () => {
   }));
 
   it('should record exp leave correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordMaybeLeaveEvent(
+    statsReportingBackendApiService.recordMaybeLeaveEventAsync(
       timeSpent, collectionId, params, sessionId, currentState, expVersion,
       expId, currentState, nextExpId, previousState, nextState);
 
@@ -206,7 +206,7 @@ describe('Stats reporting backend API Service', () => {
     flushMicrotasks();
   }));
 
-  it('should handle errors correctly.', fakeAsync(() => {
+  it('should handle errors correctly.', fakeAsync(async() => {
     let mockGetExpId = () => {
       return 'expId';
     };
@@ -222,10 +222,9 @@ describe('Stats reporting backend API Service', () => {
 
     spyOn(contextService, 'getExplorationId').and.callFake(mockGetExpId);
 
-    expect(() => {
-      statsReportingBackendApiService.postsStats(
-        aggregatedStats, expVersion, expId, currentState, nextExpId,
-        previousState, nextState);
-    }).toThrowError();
+    flushMicrotasks();
+    await expectAsync(statsReportingBackendApiService.postsStatsAsync(
+      aggregatedStats, expVersion, expId, currentState, nextExpId,
+      previousState, nextState)).toBeRejectedWithError();
   }));
 });

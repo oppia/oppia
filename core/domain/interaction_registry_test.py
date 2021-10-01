@@ -16,19 +16,19 @@
 
 """Tests for methods in the interaction registry."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 import os
 
+from core import feconf
+from core import python_utils
+from core import schema_utils
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
-import feconf
-import python_utils
-import schema_utils
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
@@ -56,8 +56,8 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
-                ['CodeRepl', 'LogicProof']),
-            ['skulpt', 'codemirror'])
+                ['CodeRepl', 'AlgebraicExpressionInput']),
+            ['skulpt', 'codemirror', 'guppy', 'nerdamer'])
 
     def test_dependency_loads_in_exploration_player_page(self):
         exp_id = '0'
@@ -90,7 +90,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """Do some sanity checks on the interaction registry."""
         self.assertEqual(
             len(interaction_registry.Registry.get_all_interactions()),
-            len(interaction_registry.Registry.get_all_interaction_ids()))
+            len(set(interaction_registry.Registry.get_all_interaction_ids())))
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
@@ -98,7 +98,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
             len(list(specs_dict.keys())),
-            len(interaction_registry.Registry.get_all_interaction_ids()))
+            len(set(interaction_registry.Registry.get_all_interaction_ids())))
 
         terminal_interactions_count = 0
         for item in specs_dict.values():

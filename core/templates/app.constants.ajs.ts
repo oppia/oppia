@@ -56,6 +56,9 @@ angular.module('oppia').constant(
   'STATE_ERROR_MESSAGES', AppConstants.STATE_ERROR_MESSAGES);
 
 angular.module('oppia').constant(
+  'CHECKPOINT_ERROR_MESSAGES', AppConstants.CHECKPOINT_ERROR_MESSAGES);
+
+angular.module('oppia').constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
   AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE);
 
@@ -138,8 +141,6 @@ angular.module('oppia').constant('SITE_NAME', AppConstants.SITE_NAME);
 
 angular.module('oppia').constant(
   'DEFAULT_PROFILE_IMAGE_PATH', AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
-
-angular.module('oppia').constant('LOGOUT_URL', AppConstants.LOGOUT_URL);
 
 // TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).

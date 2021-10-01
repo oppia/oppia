@@ -24,13 +24,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Save Version Mismatch Modal Controller', () => {
   let $scope = null;
-  let $log = null;
-  let logSpy = null;
   let $timeout = null;
   let $q = null;
   const windowRef = new WindowRef();
   const mockExplorationData = {
-    discardDraft: (callback) => callback()
+    discardDraftAsync: (callback) => callback()
   };
   const lostChanges = [{
     cmd: 'add_state',
@@ -52,10 +50,8 @@ describe('Save Version Mismatch Modal Controller', () => {
     $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(($injector, $controller) => {
-    $log = $injector.get('$log');
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    logSpy = spyOn($log, 'error').and.callThrough();
 
     const $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -66,13 +62,6 @@ describe('Save Version Mismatch Modal Controller', () => {
       });
   }));
 
-  it('should evaluates lostChanges when controller is initialized', () => {
-    expect($scope.lostChanges[0].cmd).toBe('add_state');
-    expect($scope.lostChanges[0].stateName).toBe('State name');
-    expect(logSpy).toHaveBeenCalledWith(
-      'Lost changes: ' + JSON.stringify(lostChanges));
-  });
-
   it('should remove exploration draft from local storage when modal is closed',
     () => {
       const reloadSpy = jasmine.createSpy('reload');
@@ -82,7 +71,7 @@ describe('Save Version Mismatch Modal Controller', () => {
         }
       });
       const discardDraftSpy = (
-        spyOn(mockExplorationData, 'discardDraft').and.callFake(
+        spyOn(mockExplorationData, 'discardDraftAsync').and.callFake(
           () => {
             var deferred = $q.defer();
             deferred.resolve('sample-csrf-token');

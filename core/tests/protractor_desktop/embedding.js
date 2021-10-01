@@ -104,6 +104,17 @@ describe('Embedding', function() {
     await workflow.publishExploration();
   };
 
+  // These errors are to be ignored as 'idToBeReplaced' is not a valid
+  // exploration id. It appears just after the page loads.
+  var EMBEDDING_ERRORS_TO_IGNORE = [
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
+    '\'X-Frame-Options\' to \'deny\'.',
+    'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
+    'responded with a status of 400 ()',
+  ];
+
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
@@ -122,6 +133,7 @@ describe('Embedding', function() {
       // iframes. see: https://github.com/angular/protractor/issues/4678
       // Current, work-around is to use browser.sleep() before executing
       // functions that require angular to be present inside the iframe.
+      // eslint-disable-next-line oppia/protractor-practices
       await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
@@ -146,20 +158,19 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    await users.createUser('user1@embedding.com', 'user1Embedding');
-    await users.login('user1@embedding.com', true);
+    await users.createAndLoginSuperAdminUser(
+      'user1@embedding.com', 'user1Embedding');
 
     // Create exploration.
     // Version 1 is creation of the exploration.
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     // Create Version 2 of the exploration.
     await createCountingExploration();
-
-    await general.openEditor(explorationId);
+    await general.openEditor(explorationId, false);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
-    await explorationEditorPage.saveChanges('demonstration edit');
+    await explorationEditorPage.publishChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
       // This is necessary as the pages are non-angular.
@@ -239,7 +250,7 @@ describe('Embedding', function() {
     expect(embeddingLogs).toEqual(expectedLogs);
 
     await users.logout();
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
   });
 
   it('should use the exploration language as site language.',
@@ -267,6 +278,7 @@ describe('Embedding', function() {
         // iframes. see: https://github.com/angular/protractor/issues/4678
         // Current, work-around is to use browser.sleep() before executing
         // functions that require angular to be present inside the iframe.
+        // eslint-disable-next-line oppia/protractor-practices
         await browser.sleep(5000);
         await waitFor.pageToFullyLoad();
 
@@ -276,11 +288,11 @@ describe('Embedding', function() {
         await browser.switchTo().defaultContent();
       };
 
-      await users.createUser('embedder2@example.com', 'Embedder2');
-      await users.login('embedder2@example.com', true);
+      await users.createAndLoginSuperAdminUser(
+        'embedder2@example.com', 'Embedder2');
 
       // Create an exploration.
-      await workflow.createExploration();
+      await workflow.createExploration(true);
       explorationId = await general.getExplorationIdFromEditor();
 
       await explorationEditorMainTab.setContent(
@@ -314,30 +326,23 @@ describe('Embedding', function() {
       await workflow.publishExploration();
 
       // Change language to Thai, which is not a supported site language.
-      await general.openEditor(explorationId);
+      await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
-      await explorationEditorPage.saveChanges(
+      await explorationEditorPage.publishChanges(
         'Changing the language to a not supported one.');
       // We expect the default language, English.
       await checkPlaceholder('Type a number');
 
       // Change language to Spanish, which is a supported site language.
-      await general.openEditor(explorationId);
+      await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('español');
-      await explorationEditorPage.saveChanges(
+      await explorationEditorPage.publishChanges(
         'Changing the language to a supported one.');
       await checkPlaceholder('Ingresa un número');
 
       await users.logout();
-
-      // This error is to be ignored as 'idToBeReplaced' is not a valid
-      // exploration id. It appears just after the page loads.
-      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
-        'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-        'locale=en#version=0.0.1&secret=';
-      await general.checkForConsoleErrors([errorToIgnore]);
+      await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
     });
 });

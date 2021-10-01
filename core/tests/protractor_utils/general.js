@@ -17,6 +17,8 @@
  * with protractor.
  */
 
+var _ = require('lodash');
+
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
@@ -24,6 +26,12 @@ var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
+  await waitFor.visibilityOf(
+    fromElement,
+    'fromElement taking too long to load');
+  await waitFor.visibilityOf(
+    toElement,
+    'toElement taking too long to load');
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
 };
 
@@ -31,37 +39,41 @@ var scrollToTop = async function() {
   await browser.executeScript('window.scrollTo(0,0);');
 };
 
-// We will report all console logs of level greater than this.
+// The minimum log level we will report as an error.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [];
+var CONSOLE_ERRORS_TO_IGNORE = [
+  // These "localhost:9099" are errors related to communicating with the
+  // Firebase emulator, which would never occur in production, so we just ignore
+  // them.
+  _.escapeRegExp(
+    'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
+    'relyingparty/getAccountInfo?key=fake-api-key'),
+  _.escapeRegExp(
+    'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
+    'relyingparty/verifyPassword?key=fake-api-key'),
+  // This error covers the case when the PencilCode site uses an
+  // invalid SSL certificate (which can happen when it expires).
+  // In such cases, we ignore the error since it is out of our control.
+  _.escapeRegExp(
+    'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
+    'load resource: net::ERR_CERT_DATE_INVALID'),
+];
 
-var checkForConsoleErrors = async function(errorsToIgnore) {
-  var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-  var browserLogs = await browser.manage().logs().get('browser');
-  var fatalErrors = [];
+var checkForConsoleErrors = async function(
+    errorsToIgnore, skipDebugging = true) {
+  errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
   if (browser.isMobile) {
-    browserLogs = browserLogs.filter(function(browserLog) {
-      return !(browserLog.message.includes(' Slow network is detected.'));
-    });
+    errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  for (var i = 0; i < browserLogs.length; i++) {
-    if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-      var errorFatal = true;
-      for (var j = 0; j < irrelevantErrors.length; j++) {
-        if (browserLogs[i].message.match(irrelevantErrors[j])) {
-          errorFatal = false;
-        }
-      }
-      if (errorFatal) {
-        fatalErrors.push(browserLogs[i]);
-      }
-    }
-  }
-  expect(fatalErrors).toEqual([]);
+  var browserLogs = await browser.manage().logs().get('browser');
+  var browserErrors = browserLogs.filter(logEntry => (
+    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+    errorsToIgnore.every(e => logEntry.message.match(e) === null)));
+  expect(browserErrors).toEqual([]);
 };
 
 var isInDevMode = function() {
@@ -72,7 +84,8 @@ var SERVER_URL_PREFIX = 'http://localhost:9001';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var USER_PREFERENCES_URL = '/preferences';
-var LOGIN_URL_SUFFIX = '/_ah/login';
+var LOGIN_URL_SUFFIX = '/login';
+var LOGOUT_URL_SUFFIX = '/logout';
 var MODERATOR_URL_SUFFIX = '/moderator';
 // Note that this only works in dev, due to the use of cache slugs in prod.
 var SCRIPTS_URL_SLICE = '/assets/scripts/';
@@ -101,12 +114,14 @@ var getExplorationIdFromPlayer = async function() {
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = async function(explorationId) {
+var openEditor = async function(explorationId, welcomeModalIsShown) {
   await browser.get(EDITOR_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  await explorationEditorMainTab.exitTutorial();
+  if (welcomeModalIsShown) {
+    await explorationEditorMainTab.exitTutorial();
+  }
 };
 
 var openPlayer = async function(explorationId) {
@@ -122,32 +137,58 @@ var moveToPlayer = async function() {
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = async function() {
+var moveToEditor = async function(welcomeModalIsShown) {
   var explorationId = await getExplorationIdFromPlayer();
-  await openEditor(explorationId);
+  await openEditor(explorationId, welcomeModalIsShown);
 };
 
-var expect404Error = async function() {
-  expect(await element(by.css('.protractor-test-error-container')).getText()).
-    toMatch('Error 404');
+var expectErrorPage = async function(errorNum) {
+  var errorContainer = element(
+    by.css('.protractor-test-error-container'));
+  await waitFor.visibilityOf(
+    errorContainer,
+    'Protractor test error container taking too long to appear');
+  expect(await errorContainer.getText()).
+    toMatch(`Error ${errorNum}`);
 };
 
 // Checks no untranslated values are shown in the page.
 var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  var promiseValue = await element(by.css(
-    '.oppia-base-container')).getAttribute('innerHTML');
+  var oppiaBaseContainer = element(by.css(
+    '.protractor-test-base-container'));
+  await waitFor.visibilityOf(
+    oppiaBaseContainer,
+    'Oppia base container taking too long to appear.');
+
+  // We try to avoid browser.executeScript whereas possible as it
+  // can introduce flakiness.
+  // The usage here is only allowed because this the recommended approach
+  // by protractor to read innerHTML.
+  let promiseValue = await browser.executeScript(
+    'return arguments[0].innerHTML;', oppiaBaseContainer);
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+  var REGEX_NGB_TOOLTIP_ATTR = new RegExp(
+    'tooltip="I18N_|tooltip="\'I18N_', 'g');
   var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
   var REGEX_NG_TOP_NAV_VISIBILITY = (
     new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));
   expect(
     promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+      .replace(REGEX_NGB_TOOLTIP_ATTR, '')
       .replace(REGEX_NG_VARIABLE, '')
       .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
+};
+
+var acceptPrompt = async function(promptResponse) {
+  await waitFor.alertToBePresent();
+  var alert = await browser.switchTo().alert();
+  await alert.sendKeys(promptResponse);
+  await alert.accept();
+  await waitFor.pageToFullyLoad();
 };
 
 var acceptAlert = async function() {
@@ -193,7 +234,7 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
 
 var goToHomePage = async function() {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  await oppiaMainLogo.click();
+  await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 
@@ -209,13 +250,51 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await openProfileDropdown();
   var topicsAndSkillsDashboardLink = element(by.css(
     '.protractor-test-topics-and-skills-dashboard-link'));
-  await action.click(
-    'Topics and skills dashboard link from dropdown',
-    topicsAndSkillsDashboardLink);
-  await waitFor.pageToFullyLoad();
+  await waitFor.clientSideRedirection(async() => {
+    await action.click(
+      'Topics and skills dashboard link from dropdown',
+      topicsAndSkillsDashboardLink);
+  }, (url) => {
+    return /topics-and-skills-dashboard/.test(url);
+  },
+  async() => {
+    await waitFor.pageToFullyLoad();
+  });
+};
+
+var goOnline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  // For Oppia, any speed above 150KB/s is considered good. These values
+  // are set to be large enough to download and upload a few files and are
+  // found empirically.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: false,
+      latency: 150,
+      download_throughput: 450 * 1024,
+      upload_throughput: 150 * 1024
+    });
+};
+
+var goOffline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: true,
+      latency: 0,
+      download_throughput: 0,
+      upload_throughput: 0
+    });
 };
 
 exports.acceptAlert = acceptAlert;
+exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 exports.isInDevMode = isInDevMode;
@@ -224,6 +303,7 @@ exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
+exports.LOGOUT_URL_SUFFIX = LOGOUT_URL_SUFFIX;
 exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
@@ -234,7 +314,7 @@ exports.openEditor = openEditor;
 exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
-exports.expect404Error = expect404Error;
+exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
 
@@ -246,3 +326,6 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
+
+exports.goOffline = goOffline;
+exports.goOnline = goOnline;

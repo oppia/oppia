@@ -16,17 +16,20 @@
 
 """Tests for topic domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
+import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
+from core.domain import fs_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import utils
 
 
 class TopicDomainUnitTests(test_utils.GenericTestBase):
@@ -43,15 +46,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
@@ -64,6 +67,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'description': 'description',
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -101,6 +105,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 21131,
                 'title': 'Title',
                 'url_fragment': 'dummy-subtopic-url'}])
 
@@ -254,7 +259,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
 
         skill_ids = self.topic.subtopics[0].skill_ids
@@ -325,9 +330,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title1', [], None, None, 'title-one'),
-            topic_domain.Subtopic(2, 'Title2', [], None, None, 'title-two'),
-            topic_domain.Subtopic(3, 'Title3', [], None, None, 'title-three')]
+            topic_domain.Subtopic(
+                1, 'Title1', [], None, None, None, 'title-one'),
+            topic_domain.Subtopic(
+                2, 'Title2', [], None, None, None, 'title-two'),
+            topic_domain.Subtopic(
+                3, 'Title3', [], None, None, None, 'title-three')]
 
         subtopics = self.topic.subtopics
 
@@ -576,6 +584,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Subtopic thumbnail background color is not specified.')
 
+    def test_subtopic_thumbnail_size_in_bytes_validation(self):
+        self.topic.subtopics[0].thumbnail_size_in_bytes = 0
+        self._assert_validation_error(
+            'Subtopic thumbnail size in bytes cannot be zero.')
+
     def test_topic_practice_tab_is_displayed_validation(self):
         self.topic.practice_tab_is_displayed = 0
         self._assert_validation_error(
@@ -734,7 +747,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-title-two'))
         with self.assertRaisesRegexp(
             Exception,
@@ -821,8 +834,29 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The thumbnail img.svg for topic with id %s does not exist'
+            ' in the filesystem.' % (self.topic_id)):
+            self.topic.update_thumbnail_filename('img.svg')
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.topic.id))
+        fs.commit(
+            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Test successful update of thumbnail present in the filesystem.
         self.topic.update_thumbnail_filename('img.svg')
         self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
+        self.assertEqual(self.topic.thumbnail_size_in_bytes, len(raw_image))
 
     def test_update_thumbnail_bg_color(self):
         self.assertEqual(self.topic.thumbnail_bg_color, None)
@@ -859,9 +893,32 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(self.topic.subtopics), 1)
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
+
+        # Test Exception when the thumbnail is not found in filesystem.
+        with self.assertRaisesRegexp(
+            Exception, 'The thumbnail %s for subtopic with topic_id %s does'
+            ' not exist in the filesystem.' % (
+                'new_image.svg', self.topic_id)):
+            self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
+
+        # Test successful update of thumbnail_filename when the thumbnail
+        # is found in the filesystem.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.topic_id))
+        fs.commit(
+            'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
         with self.assertRaisesRegexp(
             Exception, 'The subtopic with id invalid_id does not exist.'):
@@ -910,11 +967,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-one'),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
         with self.assertRaisesRegexp(
             Exception,
@@ -1265,6 +1322,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'uncategorized_skill_count': 1,
             'subtopic_count': 1,
             'total_skill_count': 1,
+            'total_published_node_count': 1,
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
@@ -1273,8 +1331,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
-            current_time)
+            1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
+            current_time, current_time)
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic summary passes validation.
@@ -1420,6 +1478,18 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected total_skill_count to be greater than or equal to '
             'uncategorized_skill_count 10, received \'5\'')
+
+    def test_validation_fails_with_invalid_total_published_node_count(self):
+        self.topic_summary.total_published_node_count = '10'
+        self._assert_validation_error(
+            'Expected total published node count to be an integer, '
+            'received \'10\'')
+
+    def test_validation_fails_with_negative_total_published_node_count(self):
+        self.topic_summary.total_published_node_count = -1
+        self._assert_validation_error(
+            'Expected total_published_node_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'

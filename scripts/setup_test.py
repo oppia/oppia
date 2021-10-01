@@ -16,8 +16,8 @@
 
 """Unit tests for scripts/setup.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import os
@@ -25,9 +25,8 @@ import subprocess
 import sys
 import tarfile
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import clean
 from . import common
@@ -140,7 +139,7 @@ class SetupTests(test_utils.GenericTestBase):
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor'])
         with self.swap(
-            sys, 'version_info', version_info(major=2, minor=7)):
+            sys, 'version_info', version_info(major=3, minor=7)):
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(self):

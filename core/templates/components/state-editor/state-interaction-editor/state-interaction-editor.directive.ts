@@ -25,7 +25,6 @@ require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'customize-interaction-modal.controller.ts');
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
@@ -60,11 +59,12 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/context.service');
 
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateInteractionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       link: function(scope, element) {
@@ -83,19 +83,21 @@ angular.module('oppia').directive('stateInteractionEditor', [
         recomputeGraph: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-interaction-editor/' +
+      template: require(
+        'components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
-        'ExplorationHtmlFormatterService', 'InteractionDetailsCacheService',
+        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        'EditabilityService', 'ExplorationHtmlFormatterService',
+        'InteractionDetailsCacheService',
         'ResponsesService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $scope, $uibModal, AlertsService, EditabilityService,
-            ExplorationHtmlFormatterService, InteractionDetailsCacheService,
+            $scope, $uibModal, AlertsService, ContextService,
+            EditabilityService, ExplorationHtmlFormatterService,
+            InteractionDetailsCacheService,
             ResponsesService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -110,6 +112,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           // interaction preview.
           $scope.submitAnswer = function() {};
           $scope.adjustPageHeight = function() {};
+          $scope.interactionIsDisabled = false;
 
           $scope.getCurrentInteractionName = function() {
             return (
@@ -132,7 +135,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
             return ExplorationHtmlFormatterService.getInteractionHtml(
               StateInteractionIdService.savedMemento,
-              interactionCustomizationArgs, false);
+              interactionCustomizationArgs, false, null);
           };
 
           var _updateInteractionPreview = function() {
@@ -142,6 +145,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateCustomizationArgsService.savedMemento;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
+            $scope.interactionIsDisabled = (
+              $scope.interactionId === 'EndExploration' &&
+              ContextService.isExplorationLinkedToStory());
           };
 
           var _updateAnswerChoices = function() {
@@ -216,12 +222,15 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.openInteractionCustomizerModal = function() {
+            if ($scope.interactionIsDisabled) {
+              return;
+            }
             if (EditabilityService.isEditable()) {
               AlertsService.clearWarnings();
 
               $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/editor-tab/templates/' +
+                template: require(
+                  'pages/exploration-editor-page/editor-tab/templates/' +
                   'modal-templates/customize-interaction-modal.template.html'),
                 resolve: {
                   showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
@@ -243,8 +252,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
           $scope.deleteInteraction = function() {
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'

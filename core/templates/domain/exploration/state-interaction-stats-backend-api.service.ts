@@ -42,7 +42,10 @@ export class StateInteractionStatsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  getStats(explorationId: string, name: string): Promise<VisualizationInfo[]> {
+  async getStatsAsync(
+      explorationId: string,
+      name: string
+  ): Promise<VisualizationInfo[]> {
     return new Promise((resolve, reject) => {
       this.http.get<StateInteractionStatsBackendDict>(
         this.urlInterpolationService.interpolateUrl(

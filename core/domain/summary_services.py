@@ -16,10 +16,12 @@
 
 """Commands that can be used to operate on activity summaries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -30,8 +32,6 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
-import python_utils
-import utils
 
 _LIBRARY_INDEX_GROUPS = [{
     'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
@@ -719,9 +719,8 @@ def get_recently_published_exp_summary_dicts(limit):
             'title': u'Exploration 2 Albert title',
         }, ]
     """
-    recently_published_exploration_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_recently_published_exp_summaries(limit).values()]
+    recently_published_exploration_summaries = list(
+        exp_services.get_recently_published_exp_summaries(limit).values())
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

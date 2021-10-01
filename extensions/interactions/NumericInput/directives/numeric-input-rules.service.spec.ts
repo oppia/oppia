@@ -20,7 +20,7 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 
 describe('Numeric Input service', () => {
-  let nirs: NumericInputRulesService = null;
+  let nirs: NumericInputRulesService;
   beforeEach(() => {
     nirs = new NumericInputRulesService();
   });

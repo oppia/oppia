@@ -16,15 +16,19 @@
 
 """Domain objects relating to questions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import copy
 import datetime
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -35,10 +39,6 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 from pylatexenc import latex2text
 
@@ -1030,6 +1030,151 @@ class Question(python_utils.OBJECT):
                                     rule_inputs[rule_input_name],
                                     choices))
 
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v42_dict_to_v43_dict(cls, question_state_dict):
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] in [
+                'NumericExpressionInput', 'AlgebraicExpressionInput',
+                'MathEquationInput']:
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
+        """Converts from version 43 to version 44. Version 44 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners.
+
+        Args:
+            question_state_dict: dict. A dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict['card_is_checkpoint'] = False
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v44_dict_to_v45_dict(cls, question_state_dict):
+        """Converts from version 44 to 45. Version 45 contains
+        linked skil id.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        question_state_dict['linked_skill_id'] = None
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
+        """Converts from version 45 to 46. Version 46 ensures that the written
+        translations in a state containing unicode content do not contain HTML
+        tags and the data_format is unicode. This does not affect questions, so
+        no conversion is required.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v46_dict_to_v47_dict(cls, question_state_dict):
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v47_dict_to_v48_dict(cls, question_state_dict):
+        """Converts draft change list from state version 47 to 48. Version 48
+        fixes encoding issues in HTML fields.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.fix_incorrectly_encoded_chars)
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v48_dict_to_v49_dict(cls, question_state_dict):
+        """Converts from version 48 to 49. Version 49 adds
+        requireNonnegativeInput customization arg to NumericInput
+        interaction which allows creators to set input range greater than
+        or equal to zero.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'NumericInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'requireNonnegativeInput': {
+                    'value': False
+                }
+            })
         return question_state_dict
 
     @classmethod

@@ -24,7 +24,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('components/summary-tile/exploration-summary-tile.component.ts');
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -197,7 +197,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
               iconParametersArray.push({
                 thumbnailIconUrl:
                   collectionNodes[i].getExplorationSummaryObject(
-                  ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+                  ).thumbnail_icon_url.replace(
+                    'subjects', 'inverted_subjects'),
                 left: x + 'px',
                 top: y + 'px',
                 thumbnailBgColor:
@@ -238,7 +239,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.collection', function(newValue) {
-              if (newValue !== null) {
+              if (
+                newValue !== null &&
+                ctrl.collection.getCollectionNodeCount()) {
                 ctrl.generatePathParameters();
               }
             }, true);
@@ -306,7 +309,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
               function(collection) {
                 ctrl.collection = collection;
 
-                PageTitleService.setPageTitle(
+                PageTitleService.setDocumentTitle(
                   ctrl.collection.getTitle() + ' - Oppia');
 
                 // Load the user's current progress in the collection. If the

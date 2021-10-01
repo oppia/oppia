@@ -14,10 +14,12 @@
 
 """Controllers for the skill editor."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import role_services
@@ -25,10 +27,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_services
-import feconf
-import utils
 
 
 def _require_valid_version(version_from_payload, skill_version):
@@ -99,7 +98,7 @@ class SkillRightsHandler(base.BaseHandler):
         """Returns whether the user can edit the description of a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
 
@@ -258,16 +257,31 @@ class FetchSkillsHandler(base.BaseHandler):
     def get(self):
         """Returns all skill IDs linked to some topic."""
 
-        skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
+        skill_ids = topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
 
-        try:
-            skills = skill_fetchers.get_multi_skills(skill_ids)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
             'skills': skill_dicts
         })
 
+        self.render_json(self.values)
+
+
+class SkillDescriptionHandler(base.BaseHandler):
+    """A data handler for checking if a skill with given description exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_create_skill
+    def get(self, skill_description):
+        """Handler that receives a skill description and checks whether
+        a skill with the same description exists.
+        """
+        self.values.update({
+            'skill_description_exists': (
+                skill_services.does_skill_with_description_exist(
+                    skill_description))
+        })
         self.render_json(self.values)

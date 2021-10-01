@@ -14,9 +14,10 @@
 
 """Functions to perform actions related to voiceover application."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
@@ -25,7 +26,6 @@ from core.domain import rights_manager
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
-import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -193,7 +193,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    reviewer = user_services.get_user_actions_info(reviewer_id)
 
     voiceover_application.accept(reviewer_id)
 
@@ -252,7 +252,7 @@ def reject_voiceover_application(
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    reviewer = user_services.get_user_actions_info(reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
     _save_voiceover_applications([voiceover_application])

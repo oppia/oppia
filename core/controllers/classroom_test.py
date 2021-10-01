@@ -14,15 +14,16 @@
 
 """Tests for the classroom page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
@@ -45,27 +46,20 @@ class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
-        config_property = config_domain.Registry.get_config_property(
-            'classroom_page_is_accessible')
-        config_property.set_value('committer_id', True)
         response = self.get_html_response('/learn/math')
-        self.assertIn('<classroom-page></classroom-page>', response)
-        config_property.set_value('committer_id', False)
-
-    def test_get_fails_when_classroom_page_is_accessible_not_enabled(self):
-        self.get_html_response('/learn/math', expected_status_int=404)
+        self.assertIn('<oppia-root></oppia-root>', response)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
             topic_id_1, 'private_topic_name',
             'private-topic-name', 'description')
@@ -80,7 +74,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         public_topic.next_subtopic_id = 2
         topic_services.save_new_topic(admin_id, public_topic)
@@ -108,10 +102,10 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         json_response = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
         public_topic_summary_dict = (
-            topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+            topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict())
         public_topic_summary_dict['is_published'] = True
         private_topic_summary_dict = (
-            topic_services.get_topic_summary_by_id(topic_id_1).to_dict())
+            topic_fetchers.get_topic_summary_by_id(topic_id_1).to_dict())
         private_topic_summary_dict['is_published'] = False
 
         expected_dict = {

@@ -24,7 +24,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Voiceover opportunities component', function() {
   var ctrl = null;
@@ -60,7 +60,8 @@ describe('Voiceover opportunities component', function() {
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
-    spyOn(contributionOpportunitiesService, 'getVoiceoverOpportunities').and
+    spyOn(
+      contributionOpportunitiesService, 'getVoiceoverOpportunitiesAsync').and
       .callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '1',
@@ -70,6 +71,9 @@ describe('Voiceover opportunities component', function() {
           content_count: 2,
           translation_counts: {
             en: 1
+          },
+          translation_in_review_counts: {
+            hi: 20
           }
         }),
         ExplorationOpportunitySummary.createFromBackendDict({
@@ -80,11 +84,15 @@ describe('Voiceover opportunities component', function() {
           content_count: 4,
           translation_counts: {
             en: 2
+          },
+          translation_in_review_counts: {
+            hi: 20
           }
         }),
       ], true));
-    spyOn(contributionOpportunitiesService, 'getMoreVoiceoverOpportunities').and
-      .callFake((languageCode, callback) => callback([
+    spyOn(
+      contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync')
+      .and.callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '3',
           topic_name: 'topic_3',
@@ -93,6 +101,9 @@ describe('Voiceover opportunities component', function() {
           content_count: 3,
           translation_counts: {
             en: 3
+          },
+          translation_in_review_counts: {
+            hi: 20
           }
         }),
       ], true));

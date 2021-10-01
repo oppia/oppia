@@ -20,7 +20,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
   '$log', '$q', '$window', function($log, $q, $window) {
     var audioContextAvailable = null,
       defer = null,
-      definedAudioContext = null, // Will be defined audio context
+      definedAudioContext = null, // Will be defined audio context.
       isAvailable = null,
       isRecording = false,
       microphone = null,
@@ -100,7 +100,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       _postMessage(array);
     };
 
-    var _startMicrophone = function() {
+    var _startMicrophoneAsync = async function() {
       return navigator.mediaDevices.getUserMedia({audio: true, video: false});
     };
 
@@ -134,12 +134,12 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
           isRecording: isRecording
         };
       },
-      startRecording: function() {
+      startRecordingAsync: async function() {
         // If worker is not available then do not start recording.
         if (mp3Worker === null) {
           return null;
         }
-        var navigator = _startMicrophone();
+        var navigator = _startMicrophoneAsync();
         navigator.then(function(stream) {
           isRecording = true;
           // Set microphone stream will be used for stopping track

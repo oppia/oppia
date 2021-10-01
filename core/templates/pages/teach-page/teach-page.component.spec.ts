@@ -15,34 +15,23 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-import { Pipe, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
-    return value;
-  }
-}
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
+import { of } from 'rxjs';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -55,10 +44,11 @@ class MockI18nLanguageCodeService {
 }
 
 describe('Teach Page', () => {
-  const siteAnalyticsServiceStub = new SiteAnalyticsService(
-    new WindowRef());
+  let siteAnalyticsService: SiteAnalyticsService;
   let loaderService: LoaderService = null;
   let userService: UserService;
+  let windowDimensionsService: WindowDimensionsService;
+  var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -70,11 +60,11 @@ describe('Teach Page', () => {
         {
           provide: WindowDimensionsService,
           useValue: {
-            isWindowNarrow: () => true
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
           }
         },
-        { provide: TranslateService, useClass: MockTranslateService },
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
@@ -82,7 +72,8 @@ describe('Teach Page', () => {
             nativeWindow: {
               location: {
                 href: ''
-              }
+              },
+              gtag: () => {}
             }
           }
         }
@@ -97,12 +88,14 @@ describe('Teach Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   let component;
-
+  let teachPageComponent;
   beforeEach(() => {
-    const teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
   });
 
@@ -110,8 +103,7 @@ describe('Teach Page', () => {
     () => {
       expect(component).toBeDefined();
     });
-
-  it('should get static image url', function() {
+  it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
@@ -121,6 +113,8 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(0);
     expect(component.testimonialCount).toBe(3);
     expect(component.classroomUrl).toBe('/learn/math');
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
   });
 
@@ -134,8 +128,9 @@ describe('Teach Page', () => {
 
   it('should check if user is logged in or not', fakeAsync(() => {
     const UserInfoObject = {
+      roles: ['EXPLORATION_EDITOR'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -152,62 +147,88 @@ describe('Teach Page', () => {
     expect(component.userIsLoggedIn).toBe(true);
   }));
 
-  it('should record analytics when Start Learning is clicked', function() {
+  it('should record analytics when Start Learning is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
+      siteAnalyticsService, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
     component.onClickStartLearningButton();
-    expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
+    expect(siteAnalyticsService.registerClickStartLearningButtonEvent)
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Visit Classroom is clicked', function() {
+  it('should record analytics when Visit Classroom is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
+      siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
-    expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+    expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalled();
   });
 
+  it('should redirect to library page when Browse Library is clicked',
+    () => {
+      component.onClickBrowseLibraryButton();
+      expect(
+        component.windowRef.nativeWindow.location.href
+      ).toBe('/community-library');
+    }
+  );
 
-  it('should record analytics when Browse Library is clicked', function() {
+  it('should record analytics when Browse Library is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
+      siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
     component.onClickBrowseLibraryButton();
-    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
+    expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Guide For Parents is clicked', function() {
+  it('should redirect to teach page when Guide For Parents is clicked',
+    () => {
+      component.onClickGuideParentsButton();
+      expect(
+        component.windowRef.nativeWindow.location.href
+      ).toBe('/teach');
+    }
+  );
+
+  it('should record analytics when Guide For Parents is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
+      siteAnalyticsService, 'registerClickGuideParentsButtonEvent')
       .and.callThrough();
     component.onClickGuideParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickGuideParentsButtonEvent)
+    expect(siteAnalyticsService.registerClickGuideParentsButtonEvent)
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Tips For Parents is clicked', function() {
+  it('should redirect to teach page when Tips For Parents is clicked',
+    () => {
+      component.onClickTipforParentsButton();
+      expect(
+        component.windowRef.nativeWindow.location.href
+      ).toBe('/teach');
+    }
+  );
+
+  it('should record analytics when Tips For Parents is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
+      siteAnalyticsService, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
     component.onClickTipforParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
+    expect(siteAnalyticsService.registerClickTipforParentsButtonEvent)
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Explore Lessons is clicked', function() {
+  it('should record analytics when Explore Lessons is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickExploreLessonsButtonEvent')
+      siteAnalyticsService, 'registerClickExploreLessonsButtonEvent')
       .and.callThrough();
     component.onClickExploreLessonsButton();
-    expect(siteAnalyticsServiceStub.registerClickExploreLessonsButtonEvent)
+    expect(siteAnalyticsService.registerClickExploreLessonsButtonEvent)
       .toHaveBeenCalled();
   });
 
-  it('should increment and decrement testimonial IDs correctly', function() {
+  it('should increment and decrement testimonial IDs correctly', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
     component.incrementDisplayedTestimonialId();
@@ -224,7 +245,7 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(1);
   });
 
-  it('should get testimonials correctly', function() {
+  it('should get testimonials correctly', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });

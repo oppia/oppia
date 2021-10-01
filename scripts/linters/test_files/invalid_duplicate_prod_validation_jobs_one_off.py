@@ -23,9 +23,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
-from core import jobs
+from core import python_utils
 from core.platform import models
-import python_utils
 
 (user_models,) = (models.Registry.import_models([models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
@@ -56,25 +55,3 @@ MODEL_TO_VALIDATOR_MAPPING = {
 
 class ProdValidationAuditOneOffJobMetaClass(type):
     _MODEL_AUDIT_ONE_OFF_JOB_NAMES = set()
-
-
-class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
-        python_utils.with_metaclass(
-            ProdValidationAuditOneOffJobMetaClass,
-            jobs.BaseMapReduceOneOffJobManager)):
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        raise NotImplementedError
-
-
-class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.PendingDeletionRequestModel]
-
-
-class PendingDeletionRequestModelAuditOneOffJobs(ProdValidationAuditOneOffJob):
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.PendingDeletionRequestModel]

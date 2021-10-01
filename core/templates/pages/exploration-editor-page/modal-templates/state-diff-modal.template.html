@@ -24,10 +24,10 @@
 </table>
 
 <div class="modal-body" ng-cloak>
-  <codemirror-mergeview options="CODEMIRROR_MERGEVIEW_OPTIONS"
-                        left-value="yamlStrs.leftPane"
-                        right-value="yamlStrs.rightPane">
-  </codemirror-mergeview>
+  <oppia-codemirror-mergeview [options]="CODEMIRROR_MERGEVIEW_OPTIONS"
+                              [left-value]="yamlStrs.leftPane"
+                              [right-value]="yamlStrs.rightPane">
+  </oppia-codemirror-mergeview>
   <div align="center" class="oppia-click-arrows-text">
     <strong>Click arrows to desynchronize scrolling</strong>
   </div>
@@ -43,6 +43,14 @@
 <style>
   .CodeMirror-merge-copy {
     display: none;
+  }
+  .CodeMirror-merge-r-deleted {
+    text-decoration: underline #90EE90 2px;
+    text-decoration-skip-ink: none;
+  }
+  .CodeMirror-merge-r-inserted {
+    text-decoration: underline red 2px;
+    text-decoration-skip-ink: none;
   }
   .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
     height: 55vh;

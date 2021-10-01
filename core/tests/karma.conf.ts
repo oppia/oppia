@@ -1,4 +1,8 @@
-var argv = require('yargs').argv;
+var argv = require('yargs').positional('terminalEnabled', {
+  type: 'boolean',
+  'default': false
+}).argv;
+
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
@@ -17,6 +21,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.8.2/angular-mocks.js',
+      '/third_party/static/lamejs-1.2.0/worker-example/worker-realtime.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -31,6 +36,12 @@ module.exports = function(config) {
       // unknown reason.
       'core/templates/combined-tests.spec.ts',
       {
+        pattern: 'assets/**',
+        watched: false,
+        served: true,
+        included: false
+      },
+      {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
@@ -39,18 +50,13 @@ module.exports = function(config) {
       'extensions/interactions/**/*.directive.html',
       'extensions/interactions/**/*.component.html',
       'extensions/interactions/*.json',
-      'core/tests/data/*.json',
-      {
-        pattern: 'assets/i18n/**/*.json',
-        watched: true,
-        served: true,
-        included: false
-      }
+      'core/tests/data/*.json'
     ],
     exclude: [
       'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
+      'extensions/classifiers/proto/*'
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -77,7 +83,7 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
-      reports: ['html', 'lcovonly'],
+      reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
       fixWebpackSourcePaths: true,
       'report-config': {
@@ -94,7 +100,7 @@ module.exports = function(config) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
-      terminal: true
+      terminal: argv.terminalEnabled
     },
     // Continue running in the background after running tests.
     singleRun: true,

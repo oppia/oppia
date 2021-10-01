@@ -14,13 +14,15 @@
 
 """Tests for Oppia storage models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import re
+
+from core import python_utils
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (
     base_models, collection_models, email_models,
@@ -61,8 +63,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_base_or_versioned_model_child_classes():
             try:
                 self.assertIn(
-                    clazz.get_deletion_policy(),
-                    base_models.DELETION_POLICY.__dict__)
+                    clazz.get_deletion_policy(), base_models.DELETION_POLICY)
             except NotImplementedError:
                 self.fail(msg='get_deletion_policy is not defined for %s' % (
                     clazz.__name__))
@@ -74,9 +75,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
                 with self.assertRaisesRegexp(
                     NotImplementedError,
-                    r'The has_reference_to_user_id\(\) method is missing from '
-                    r'the derived class. It should be implemented in the '
-                    r'derived class.'
+                    re.escape(
+                        'The has_reference_to_user_id() method is missing from '
+                        'the derived class. It should be implemented in the '
+                        'derived class.'
+                    )
                 ):
                     clazz.has_reference_to_user_id('any_id')
             else:

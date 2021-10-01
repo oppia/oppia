@@ -50,7 +50,7 @@ describe('Topic editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
@@ -59,6 +59,7 @@ describe('Topic editor functionality', function() {
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -254,7 +255,13 @@ describe('Chapter editor functionality', function() {
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
-      await workflow.createAndPublishExploration.apply(workflow, info);
+      if (i === 0) {
+        info.push(true);
+        await workflow.createAndPublishExploration.apply(workflow, info);
+      } else {
+        info.push(false);
+        await workflow.createAndPublishExploration.apply(workflow, info);
+      }
       var url = await browser.getCurrentUrl();
       var id = url.split('/')[4].replace('#', '');
       ids.push(id);
@@ -282,7 +289,7 @@ describe('Chapter editor functionality', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       userEmail, 'creatorChapterTest');
     var handle = await browser.getWindowHandle();
     dummyExplorationIds = await createDummyExplorations(3);
@@ -294,6 +301,7 @@ describe('Chapter editor functionality', function() {
       Constants.TEST_SVG_PATH);
     await general.closeCurrentTabAndSwitchTo(handle);
     dummySkills = await createDummySkills(2);
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -431,12 +439,9 @@ describe('Chapter editor functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors(allowedErrors);
+    await users.logout();
     while (allowedErrors.length !== 0) {
       allowedErrors.pop();
     }
-  });
-
-  afterAll(async function() {
-    await users.logout();
   });
 });

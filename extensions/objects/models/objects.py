@@ -16,14 +16,15 @@
 
 """Classes for interpreting typed objects in Oppia."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
+import json
 
-from constants import constants
-import python_utils
-import schema_utils
+from core import python_utils
+from core import schema_utils
+from core.constants import constants
 
 
 class BaseObject(python_utils.OBJECT):
@@ -60,84 +61,6 @@ class BaseObject(python_utils.OBJECT):
             TypeError. The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.get_schema())
-
-
-class BaseTranslatableObject(BaseObject):
-    """Base translatable object class.
-
-    This is a superclass for objects that are translatable and thus require a
-    content id. This class enforces that the object is a dictionary with a
-    content id field. The schema of the actual value is determined by the
-    _get_value_schema() method.
-    """
-
-    @staticmethod
-    def _get_value_schema():
-        """Returns a list of properties that store the object value.
-
-        Returns:
-            list(dict). A list of properties that store the object value.
-        """
-        raise NotImplementedError(
-            'Subclasses of BaseTranslatableObject should implement '
-            '_get_value_schema().')
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Returns a method that normalizes the values of the object.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                ormalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-        """
-        raise NotImplementedError(
-            'Subclasses of BaseTranslatableObject should implement '
-            '_normalize_value().')
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the full object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'dict',
-            'properties': [{
-                'name': 'contentId',
-                # The default content id is none. However, it should be
-                # populated before being saved. The normalize() method has
-                # validation checks for this.
-                'schema': {'type': 'unicode_or_none'}
-            }] + cls._get_value_schema()
-        }
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object.
-
-        Args:
-            raw: dict. A Python object to be validated against the schema,
-                normalizing if necessary.
-
-        Returns:
-            dict. The normalized object.
-
-        Raises:
-            TypeError. Error while normalizing.
-        """
-        if not isinstance(raw['contentId'], python_utils.BASESTRING):
-            raise TypeError(
-                'Expected content id to be a string, received %s' %
-                raw['contentId'])
-
-        return schema_utils.normalize_against_schema(
-            cls._normalize_value(raw),
-            cls.get_schema())
 
 
 class Boolean(BaseObject):
@@ -245,7 +168,7 @@ class Html(BaseObject):
         }
 
 
-# TODO(#11433): Migrate SubtitledUnicode to TranslatableUnicode.
+# TODO(#11433): Migrate SubtitledUnicode to TranslatableUnicodeString.
 class SubtitledUnicode(BaseObject):
     """SubtitledUnicode class."""
 
@@ -332,7 +255,7 @@ class NonnegativeInt(BaseObject):
 
 
 class PositiveInt(BaseObject):
-    """Nonnegative integer class."""
+    """Positive integer class."""
 
     description = 'A positive integer.'
     default_value = 1
@@ -828,121 +751,6 @@ class CheckedProof(BaseObject):
             return copy.deepcopy(raw)
         except Exception:
             raise TypeError('Cannot convert to checked proof %s' % raw)
-
-
-class LogicQuestion(BaseObject):
-    """A question giving a formula to prove."""
-
-    description = 'A question giving a formula to prove.'
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object.
-
-        Args:
-            raw: *. A Python object to be validated against the schema,
-                normalizing if necessary.
-
-        Returns:
-            dict. The normalized object containing the following key-value
-            pairs:
-                assumptions: list(dict(str, *)). The list containing all the
-                    assumptions in the dict format containing following
-                    key-value pairs:
-                        top_kind_name: str. The top kind name in the
-                            expression.
-                        top_operator_name: str. The top operator name
-                            in the expression.
-                        arguments: list(str). A list of arguments.
-                        dummies: list. A list of dummy values.
-                results: list(dict(str, *)). The list containing the final
-                    results of the required proof in the dict format
-                    containing following key-value pairs:
-                        top_kind_name: str. The top kind name in the
-                            expression.
-                        top_operator_name: str. The top operator name
-                            in the expression.
-                        arguments: list(str). A list of arguments.
-                        dummies: list. A list of dummy values.
-                default_proof_string: str. The default proof string.
-
-        Raises:
-            TypeError. Cannot convert to LogicQuestion schema.
-        """
-
-        def _validate_expression(expression):
-            """Validates the given expression.
-
-            Args:
-                expression: dict(str, *). The expression to be verified in the
-                    dict format.
-
-            Raises:
-                AssertionError. The specified expression is not in the correct
-                    format.
-            """
-            assert isinstance(expression, dict)
-            assert isinstance(
-                expression['top_kind_name'], python_utils.BASESTRING)
-            top_operator_name_type = (
-                int
-                if (
-                    expression['top_kind_name'] == 'constant' and
-                    'type' in expression and
-                    expression['type'] == 'integer'
-                ) else python_utils.BASESTRING
-            )
-            assert isinstance(
-                expression['top_operator_name'], top_operator_name_type)
-            _validate_expression_array(expression['arguments'])
-            _validate_expression_array(expression['dummies'])
-
-        def _validate_expression_array(array):
-            """Validates the given expression array.
-
-            Args:
-                array: list(dict(str, *)). The expression array to be verified.
-
-            Raises:
-                AssertionError. The specified expression array is not in the
-                    list format.
-            """
-            assert isinstance(array, list)
-            for item in array:
-                _validate_expression(item)
-
-        try:
-            assert isinstance(raw, dict)
-            _validate_expression_array(raw['assumptions'])
-            _validate_expression_array(raw['results'])
-            assert isinstance(
-                raw['default_proof_string'], python_utils.BASESTRING)
-
-            return copy.deepcopy(raw)
-        except Exception:
-            raise TypeError('Cannot convert to a logic question %s' % raw)
-
-
-class LogicErrorCategory(BaseObject):
-    """A string from a list of possible categories."""
-
-    description = 'One of the possible error categories of a logic proof.'
-    default_value = 'mistake'
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'unicode',
-            'choices': [
-                'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
-                'target', 'mistake'
-            ]
-        }
 
 
 class Graph(BaseObject):
@@ -1629,110 +1437,6 @@ class CustomOskLetters(BaseObject):
         }
 
 
-class TranslatableSetOfNormalizedString(BaseTranslatableObject):
-    """Class for translatable sets of NormalizedStrings."""
-
-    default_value = {
-        'contentId': None,
-        'normalizedStrSet': []
-    }
-
-    @staticmethod
-    def _get_value_schema():
-        """Returns a list of properties that store the object value.
-
-        Returns:
-            list. A list of properties that store the object value.
-        """
-        return [{
-            'name': 'normalizedStrSet',
-            'schema': SetOfNormalizedString.get_schema()
-        }]
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatable object.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                normalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-
-        Raises:
-            TypeError. The Python object cannot be normalized.
-        """
-        if not isinstance(raw['normalizedStrSet'], list):
-            raise TypeError(
-                'Invalid unicode string set: %s' % raw['normalizedStrSet'])
-
-        for normalized_str in raw['normalizedStrSet']:
-            if not isinstance(normalized_str, python_utils.BASESTRING):
-                raise TypeError(
-                    'Invalid content unicode: %s' % normalized_str)
-
-        normalized_str_set = set(raw['normalizedStrSet'])
-        if len(normalized_str_set) != len(raw['normalizedStrSet']):
-            raise TypeError(
-                'Duplicate unicode found '
-                'in set: %s' % raw['normalizedStrSet'])
-
-        return raw
-
-
-class TranslatableSetOfUnicodeString(BaseTranslatableObject):
-    """Class for translatable sets of UnicodeStrings."""
-
-    default_value = {
-        'contentId': None,
-        'unicodeStrSet': []
-    }
-
-    @staticmethod
-    def _get_value_schema():
-        """Returns a list of properties that store the object value.
-
-        Returns:
-            list. A list of properties that store the object value.
-        """
-        return [{
-            'name': 'unicodeStrSet',
-            'schema': SetOfUnicodeString.get_schema()
-        }]
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatable object.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                normalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-
-        Raises:
-            TypeError. The Python object cannot be normalized.
-        """
-        if not isinstance(raw['unicodeStrSet'], list):
-            raise TypeError(
-                'Invalid unicode string set: %s' % raw['unicodeStrSet'])
-
-        for unicode_str in raw['unicodeStrSet']:
-            if not isinstance(unicode_str, python_utils.BASESTRING):
-                raise TypeError(
-                    'Invalid content unicode: %s' % unicode_str)
-
-        if len(set(raw['unicodeStrSet'])) != len(raw['unicodeStrSet']):
-            raise TypeError(
-                'Duplicate unicode found in set: %s' % raw['unicodeStrSet'])
-
-        return raw
-
-
 class TranslatableHtmlContentId(BaseObject):
     """A TranslatableHtml content id."""
 
@@ -1785,3 +1489,131 @@ class ListOfSetsOfTranslatableHtmlContentIds(BaseObject):
             'type': 'list',
             'items': SetOfTranslatableHtmlContentIds.get_schema()
         }
+
+
+class BaseTranslatableObject(BaseObject):
+    """Base translatable object class.
+
+    This is a superclass for objects that are translatable and thus require a
+    content id. This class enforces that the object is a dictionary with a
+    content id field. The schema of the actual value is determined by the
+    _value_schema property.
+    """
+
+    # The key name in the translatable object corresponding to the translatable
+    # value. This field must be populated by subclasses.
+    _value_key_name = None
+    # The schema of the translatable value. This field must be populated by
+    # subclasses.
+    _value_schema = None
+    # The default value of the object. This field must be populated by
+    # subclasses.
+    default_value = None
+
+    @classmethod
+    def normalize_value(cls, value):
+        """Normalizes the translatable value of the object.
+
+        Args:
+            value: *. The translatable part of the Python object (corresponding
+                to the non-content-id field) which is to be normalized.
+
+        Returns:
+            *. The normalized value.
+        """
+        if cls._value_key_name is None or cls._value_schema is None:
+            raise NotImplementedError(
+                'The _value_key_name and _value_schema for this class must '
+                'both be set.')
+        return schema_utils.normalize_against_schema(value, cls._value_schema)
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the full object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        if cls._value_key_name is None or cls._value_schema is None:
+            raise NotImplementedError(
+                'The _value_key_name and _value_schema for this class must '
+                'both be set.')
+        return {
+            'type': 'dict',
+            'properties': [{
+                'name': 'contentId',
+                # The default content id is none. However, it should be
+                # populated before being saved. The normalize() method has
+                # validation checks for this.
+                'schema': {'type': 'unicode'}
+            }, {
+                'name': cls._value_key_name,
+                'schema': copy.deepcopy(cls._value_schema),
+            }]
+        }
+
+
+class TranslatableUnicodeString(BaseTranslatableObject):
+    """Class for translatable unicode strings."""
+
+    _value_key_name = 'unicodeStr'
+    _value_schema = UnicodeString.get_schema()
+    default_value = {
+        'contentId': None,
+        'unicodeStr': '',
+    }
+
+
+class TranslatableHtml(BaseTranslatableObject):
+    """Class for translatable HTML strings."""
+
+    _value_key_name = 'html'
+    _value_schema = Html.get_schema()
+    default_value = {
+        'contentId': None,
+        'html': '',
+    }
+
+
+class TranslatableSetOfNormalizedString(BaseTranslatableObject):
+    """Class for translatable sets of NormalizedStrings."""
+
+    _value_key_name = 'normalizedStrSet'
+    _value_schema = SetOfNormalizedString.get_schema()
+    default_value = {
+        'contentId': None,
+        'normalizedStrSet': [],
+    }
+
+
+class TranslatableSetOfUnicodeString(BaseTranslatableObject):
+    """Class for translatable sets of UnicodeStrings."""
+
+    _value_key_name = 'unicodeStrSet'
+    _value_schema = SetOfUnicodeString.get_schema()
+    default_value = {
+        'contentId': None,
+        'unicodeStrSet': [],
+    }
+
+
+class JsonEncodedInString(BaseObject):
+    """Converts stringified value to its actual data type."""
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: str. Strings to be validated and normalized.
+
+        Returns:
+            *. The normalized value of any type, it depends on the raw value
+            which we want to load from json.
+        """
+        if not isinstance(raw, python_utils.BASESTRING):
+            raise Exception('Expected string received %s of type %s' % (
+                raw, type(raw))
+            )
+
+        return json.loads(raw)

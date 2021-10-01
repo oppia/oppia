@@ -24,10 +24,10 @@ require(
   'fraction-input-validation.service.ts');
 require(
   'interactions/FractionInput/directives/' +
-  'oppia-interactive-fraction-input.directive.ts');
+  'oppia-interactive-fraction-input.component.ts');
 require(
   'interactions/FractionInput/directives/' +
-  'oppia-response-fraction-input.directive.ts');
+  'oppia-response-fraction-input.component.ts');
 require(
   'interactions/FractionInput/directives/' +
-  'oppia-short-response-fraction-input.directive.ts');
+  'oppia-short-response-fraction-input.component.ts');

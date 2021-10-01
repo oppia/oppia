@@ -14,13 +14,14 @@
 
 """Tests the methods defined in skill services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
-import random
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_services
 from core.domain import question_domain
 from core.domain import skill_domain
@@ -29,12 +30,10 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (skill_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.suggestion])
@@ -76,16 +75,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.SKILL_ID3 = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('admin2@example.com', 'adm2')
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
-        self.set_admins([self.ADMIN_USERNAME, 'adm2'])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
-        self.user_admin_2 = user_services.UserActionsInfo(self.user_id_admin_2)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME, 'adm2'])
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+        self.user_admin_2 = user_services.get_user_actions_info(
+            self.user_id_admin_2)
 
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='Description',
@@ -146,7 +148,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertEqual(filenames, ['img.svg', 'img2.svg'])
+        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -414,7 +416,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -458,7 +460,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
             abbreviated_name='topic-two', url_fragment='topic-two',
@@ -561,8 +563,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_get_all_topic_assignments_for_skill(self):
-        topic_id = topic_services.get_new_topic_id()
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-three', url_fragment='topic-three',
@@ -578,6 +580,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -604,8 +607,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_assignments[1].subtopic_id, 1)
 
     def test_remove_skill_from_all_topics(self):
-        topic_id = topic_services.get_new_topic_id()
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-five', url_fragment='topic-five',
@@ -621,6 +624,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -635,6 +639,62 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_assignments_dict = (
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         self.assertEqual(len(topic_assignments_dict), 0)
+
+    def test_successfully_replace_skill_id_in_all_topics(self):
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+            subtopics=[], next_subtopic_id=1)
+
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-one'
+        })
+        self.save_new_topic(
+            topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-six', url_fragment='topic-six',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
+        self.assertEqual(len(topic_assignments_dict), 0)
+        skill_services.replace_skill_id_in_all_topics(
+            self.USER_ID, self.SKILL_ID, 'new_skill_id')
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
+        self.assertEqual(len(topic_assignments_dict), 2)
+
+    def test_failure_replace_skill_id_in_all_topics(self):
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID, 'new_skill_id'],
+            subtopics=[], next_subtopic_id=1)
+        error_message = (
+            'Found topic \'Topic1\' contains the two skills to be merged. '
+            'Please unassign one of these skills from topic '
+            'and retry this operation.')
+        with self.assertRaisesRegexp(Exception, error_message):
+            skill_services.replace_skill_id_in_all_topics(
+                self.USER_ID, self.SKILL_ID, 'new_skill_id')
 
     def test_update_skill(self):
         changelist = [
@@ -1046,6 +1106,31 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.misconceptions[0].feedback, '<p>new feedback</p>')
 
+    def test_update_skill_schema(self):
+        orig_skill_dict = (
+            skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict())
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': (
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
+                'from_version': 1,
+                'to_version': 2,
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist, 'Update schema.')
+
+        new_skill_dict = skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict()
+
+        # Check version is updated.
+        self.assertEqual(new_skill_dict['version'], 2)
+
+        # Delete version and check that the two dicts are the same.
+        del orig_skill_dict['version']
+        del new_skill_dict['version']
+        self.assertEqual(orig_skill_dict, new_skill_dict)
+
     def test_cannot_update_skill_with_invalid_change_list(self):
         observed_log_messages = []
 
@@ -1055,7 +1140,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, '\'unicode\' object has no attribute \'cmd\'')
+            Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(
@@ -1232,49 +1317,36 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
-    def test_filter_skills_by_mastery(self):
-        # Create feconf.MAX_NUMBER_OF_SKILL_IDS + 3 skill_ids
-        # to test two things:
-        #   1. The skill_ids should be sorted.
-        #   2. The filtered skill_ids should be feconf.MAX_NUMBER_OF_SKILL_IDS
-        # in number.
-
-        # List of mastery values (float values between 0.0 and 1.0)
-        masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2, None]
-
-        # Creating feconf.MAX_NUMBER_OF_SKILL_IDS additional user skill
-        # masteries.
-        for _ in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
-            skill_id = skill_services.get_new_skill_id()
-            mastery = random.random()
-            masteries.append(mastery)
-            skill_services.create_user_skill_mastery(
-                self.USER_ID, skill_id, mastery)
-            self.SKILL_IDS.append(skill_id)
-
-        # Sorting the masteries, which should represent the masteries of the
-        # skill_ids that are finally returned.
-        masteries.sort()
+    def test_get_sorted_skill_ids(self):
         degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
-        arranged_filtered_skill_ids = skill_services.filter_skills_by_mastery(
-            self.USER_ID, self.SKILL_IDS)
+        with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 2):
+            sorted_skill_ids = skill_services.get_sorted_skill_ids(
+                degrees_of_masteries)
+        expected_sorted_skill_ids = [self.SKILL_ID_3, self.SKILL_ID_1]
+        self.assertEqual(len(sorted_skill_ids), 2)
+        self.assertEqual(sorted_skill_ids, expected_sorted_skill_ids)
 
-        self.assertEqual(
-            len(arranged_filtered_skill_ids), feconf.MAX_NUMBER_OF_SKILL_IDS)
+        with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 3):
+            sorted_skill_ids = skill_services.get_sorted_skill_ids(
+                degrees_of_masteries)
+        expected_sorted_skill_ids = [
+            self.SKILL_ID_3, self.SKILL_ID_1, self.SKILL_ID_2]
+        self.assertEqual(sorted_skill_ids, expected_sorted_skill_ids)
 
-        # Assert that all the returned skill_ids are a part of the first
-        # feconf.MAX_NUMBER_OF_SKILL_IDS sorted skill_ids.
-        for i in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
-            self.assertIn(
-                degrees_of_masteries[arranged_filtered_skill_ids[i]],
-                masteries[:feconf.MAX_NUMBER_OF_SKILL_IDS])
+    def test_filter_skills_by_mastery(self):
+        with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 2):
+            arranged_filtered_skill_ids = (
+                skill_services.filter_skills_by_mastery(
+                    self.USER_ID, self.SKILL_IDS))
+        self.assertEqual(len(arranged_filtered_skill_ids), 2)
+        expected_skill_ids = [self.SKILL_ID_1, self.SKILL_ID_3]
+        self.assertEqual(arranged_filtered_skill_ids, expected_skill_ids)
 
-        # Testing the arrangement.
-        excluded_skill_ids = list(set(self.SKILL_IDS) - set(
-            arranged_filtered_skill_ids))
-        for skill_id in excluded_skill_ids:
-            self.SKILL_IDS.remove(skill_id)
+        with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', len(self.SKILL_IDS)):
+            arranged_filtered_skill_ids = (
+                skill_services.filter_skills_by_mastery(
+                    self.USER_ID, self.SKILL_IDS))
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
 
 
@@ -1386,12 +1458,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.skill_contents_schema_version, 2)
+        self.assertEqual(skill.skill_contents_schema_version, 4)
 
         self.assertEqual(
             skill.skill_contents.explanation.html,
@@ -1454,12 +1526,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 3)
+        self.assertEqual(skill.misconceptions_schema_version, 5)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
         self.assertEqual(
@@ -1519,12 +1591,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.rubric_schema_version, 3)
+        self.assertEqual(skill.rubric_schema_version, 5)
         self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
         self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
         self.assertEqual(skill.rubrics[1].difficulty, 'Medium')

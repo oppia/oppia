@@ -1,0 +1,126 @@
+<div class="oppia-skills-list-container">
+  <md-card class="oppia-page-card oppia-long-text">
+    <div class="oppia-skills-mastery">
+      <h3 class="form-heading"> Skills included in this topic </h3>
+      <h4 class="not-logged-in-warning" ng-if="!$ctrl.userIsLoggedIn"> Please login to view your skill mastery. </h4>
+      <table class="skill-mastery-table" ng-if="$ctrl.skillIdsAndMastery.length > 0">
+        <colgroup>
+          <col class="oppia-colgroup-col-1">
+          <col class="oppia-colgroup-col-2">
+        </colgroup>
+        <tr>
+          <th class="skill-mastery-table-headings">
+            Skill Descriptions
+          </th>
+          <th class="skill-mastery-table-headings">
+            Skill Mastery
+          </th>
+        </tr>
+        <tr ng-repeat="item in $ctrl.skillIdsAndMastery | orderBy: '-mastery'"
+            class="list-item oppia-list-item"
+            ng-click="$ctrl.openConceptCardModal(item.skillId)">
+          <td> <[$ctrl.getSkillDescriptions()[item.skillId]]> </td>
+          <td>
+            <div class="oppia-skill-mastery-container">
+              <div class="mastery-bar" ng-style="$ctrl.getMasteryBarStyle(item.skillId)"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <h4 class="no-skill-warning" ng-if="$ctrl.skillIdsAndMastery.length === 0">
+        No skill is assigned to this topic.
+      </h4>
+    </div>
+  </md-card>
+</div>
+
+<style>
+  skills-mastery-list .oppia-page-card {
+    margin-left: 10%;
+    margin-top: 2%;
+    width: 80%;
+  }
+
+  skills-mastery-list .oppia-skills-mastery {
+    padding-bottom: 10px;
+  }
+
+  skills-mastery-list .oppia-skills-mastery .not-logged-in-warning {
+    color: gray;
+  }
+
+  skills-mastery-list .oppia-skills-mastery .skill-mastery-table {
+    font-size: 15px;
+    margin-bottom: 16px;
+    margin-top: 30px;
+    text-align: center;
+    width: 100%;
+  }
+
+  skills-mastery-list .skill-mastery-table .skill-mastery-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  skills-mastery-list .skill-mastery-table .skill-mastery-table-headings p {
+    display: inline;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-summary,
+  skills-mastery-list .skill-mastery-table .list-summary:active,
+  skills-mastery-list .skill-mastery-table .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  skills-mastery-list .skill-mastery-table .oppia-skill-mastery-container {
+    background: #FFF;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    height: 12px;
+    margin: 10px 25px 0;
+  }
+
+  .oppia-skill-mastery-container .mastery-bar {
+    height: 10px;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-item:hover {
+    background-color: #ededed;
+  }
+
+  skills-mastery-list .oppia-colgroup-col-1 {
+    width: 40%;
+  }
+
+  skills-mastery-list .oppia-colgroup-col-2 {
+    width: 60%;
+  }
+
+  skills-mastery-list .oppia-list-item {
+    height: 4em;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+
+  @media(max-width: 815px) {
+    skills-mastery-list .skill-mastery-table .list-summary .additional-text {
+      display: none;
+    }
+  }
+
+  skills-mastery-list .oppia-skills-mastery .no-skill-warning {
+    color: gray;
+  }
+</style>

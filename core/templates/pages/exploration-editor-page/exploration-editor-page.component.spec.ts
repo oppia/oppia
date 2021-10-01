@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -28,10 +30,14 @@ import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { AlertsService } from 'services/alerts.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -43,8 +49,13 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
-
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
+import { ChangeListService } from './services/change-list.service';
+import { ExplorationDataService } from './services/exploration-data.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -59,10 +70,10 @@ describe('Exploration editor page component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $timeout = null;
   var $uibModal = null;
-  var aims = null;
-  var cls = null;
+  let aims: AutosaveInfoModalsService = null;
+  let cls: ChangeListService = null;
+  let as: AlertsService = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -77,23 +88,25 @@ describe('Exploration editor page component', function() {
   var pts = null;
   var rs = null;
   var sas = null;
+  var sers = null;
   var ses = null;
   var sts = null;
-  var stass = null;
   var stfts = null;
   var tds = null;
+  var userService = null;
   var ueps = null;
+  var ics = null;
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
-  var registerSkipTutorialEventSpy;
-  var registerFinishTutorialEventSpy;
   var registerDeclineTutorialModalEventSpy;
+  var focusManagerService = null;
 
   var refreshGraphEmitter = new EventEmitter();
 
   var autosaveIsInProgress = new EventEmitter();
-
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
   var mockOpenEditorTutorialEmitter = new EventEmitter();
+  var mockOpenTranslationTutorialEmitter = new EventEmitter();
 
   var mockInitExplorationPageEmitter = new EventEmitter();
 
@@ -170,8 +183,6 @@ describe('Exploration editor page component', function() {
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
     state_classifier_mapping: [],
-    is_admin: true,
-    is_moderator: true,
     user: {},
     version: '1',
     rights: {},
@@ -181,47 +192,68 @@ describe('Exploration editor page component', function() {
     show_state_editor_tutorial_on_load: true,
     show_state_translation_tutorial_on_load: true
   };
-  var mockExplorationDataService = {
-    getData: function(callback) {
-      callback();
-      return $q.resolve(explorationData);
-    }
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        NgbModule
+      ],
+      declarations: [
+        LostChangesModalComponent
+      ],
       providers: [
+        AlertsService,
+        AutosaveInfoModalsService,
+        ChangeListService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
+        InternetConnectivityService,
         PageTitleService,
         LoaderService,
         ParamChangesObjectFactory,
         ParamSpecsObjectFactory,
         SiteAnalyticsService,
         StateClassifierMappingService,
+        StateEditorRefreshService,
         StateEditorService,
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
-        UrlInterpolationService
-      ]
+        UrlInterpolationService,
+        FocusManagerService,
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            getDataAsync: function(callback) {
+              callback();
+              return $q.resolve(explorationData);
+            },
+            autosaveChangeListAsync: function() {
+              return;
+            }
+          }
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [LostChangesModalComponent]
+      }
     });
-  });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDataService', mockExplorationDataService);
-  }));
+    aims = TestBed.inject(AutosaveInfoModalsService);
+    cls = TestBed.inject(ChangeListService);
+    as = TestBed.inject(AlertsService);
+  });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $uibModal = $injector.get('$uibModal');
-    aims = $injector.get('AutosaveInfoModalsService');
-    cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
+    ics = $injector.get('InternetConnectivityService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
@@ -234,12 +266,14 @@ describe('Exploration editor page component', function() {
     pts = $injector.get('PageTitleService');
     rs = $injector.get('RouterService');
     sas = $injector.get('SiteAnalyticsService');
+    sers = $injector.get('StateEditorRefreshService');
     ses = $injector.get('StateEditorService');
     sts = $injector.get('StateTutorialFirstTimeService');
-    stass = $injector.get('StateTopAnswersStatsService');
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
+    userService = $injector.get('UserService');
     ueps = $injector.get('UserExplorationPermissionsService');
+    focusManagerService = $injector.get('FocusManagerService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage');
@@ -253,25 +287,28 @@ describe('Exploration editor page component', function() {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve(new UserInfo(
+          ['USER_ROLE'], true, true, false, false, false, null, null, null,
+          false)));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
         mockOpenEditorTutorialEmitter);
+      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
+        mockOpenTranslationTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
 
@@ -282,10 +319,45 @@ describe('Exploration editor page component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should start tutorial on event of opening tutorial', () => {
-      spyOn(ctrl, 'startTutorial');
+    it('should start editor tutorial when on main page', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
+      spyOn(sers.onRefreshStateEditor, 'emit');
+      rs.navigateToMainTab();
+      $scope.$apply();
       mockOpenEditorTutorialEmitter.emit();
-      expect(ctrl.startTutorial).toHaveBeenCalled();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
+      expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
+    });
+
+    it('should start editor tutorial when not on main page', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
+      spyOn(rs, 'navigateToMainTab');
+      rs.navigateToSettingsTab();
+      $scope.$apply();
+      expect(rs.getActiveTabName()).toBe('settings');
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
+
+    it('should start translation tutorial when on translation page', () => {
+      spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+      spyOn(rs.onRefreshTranslationTab, 'emit');
+      rs.navigateToTranslationTab();
+      $scope.$apply();
+      mockOpenTranslationTutorialEmitter.emit();
+      expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
+      expect(rs.onRefreshTranslationTab.emit).toHaveBeenCalled();
+    });
+
+    it('should start translation tutorial when not on translation page', () => {
+      spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+      spyOn(rs, 'navigateToTranslationTab');
+      rs.navigateToSettingsTab();
+      $scope.$apply();
+      mockOpenTranslationTutorialEmitter.emit();
+      expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
+      expect(rs.navigateToTranslationTab).toHaveBeenCalled();
     });
 
     it('should mark exploration as editable and translatable', () => {
@@ -337,15 +409,15 @@ describe('Exploration editor page component', function() {
     });
 
     it('should load change list by draft changes successfully', () => {
-      spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
+      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
       $scope.$apply();
 
-      expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
+      expect(loadSpy).toHaveBeenCalledWith(
         explorationData.draft_changes);
     });
 
     it('should show mismatch version modal when draft change exists', () => {
-      spyOn(aims, 'showVersionMismatchModal').and.callThrough();
+      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
       $scope.$apply();
 
       expect(aims.showVersionMismatchModal)
@@ -362,6 +434,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should navigate between tabs', () => {
+      var focusSpy = spyOn(ctrl, 'setFocusOnActiveTab');
       spyOn(rs, 'navigateToMainTab').and.stub();
       ctrl.selectMainTab();
       expect(rs.navigateToMainTab).toHaveBeenCalled();
@@ -389,10 +462,24 @@ describe('Exploration editor page component', function() {
       spyOn(rs, 'navigateToHistoryTab').and.stub();
       ctrl.selectHistoryTab();
       expect(rs.navigateToHistoryTab).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalledWith('history');
 
       spyOn(rs, 'navigateToFeedbackTab').and.stub();
       ctrl.selectFeedbackTab();
       expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalledWith('feedback');
+    });
+
+    it('should set focus on active tab', () => {
+      var focusSpy = spyOn(focusManagerService, 'setFocus');
+      ctrl.setFocusOnActiveTab('history');
+      expect(focusSpy).toHaveBeenCalledWith('usernameInputField');
+      ctrl.activeThread = true;
+      ctrl.setFocusOnActiveTab('feedback');
+      expect(focusSpy).toHaveBeenCalledWith('tmpMessageText');
+      ctrl.activeThread = false;
+      ctrl.setFocusOnActiveTab('feedback');
+      expect(focusSpy).toHaveBeenCalledWith('newThreadButton');
     });
 
     it('should show the user help modal for editor tutorial', () => {
@@ -414,19 +501,75 @@ describe('Exploration editor page component', function() {
     });
   });
 
+  describe('Checking internet Connection', () => {
+    beforeEach(() => {
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
+      spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
+        mockConnectionServiceEmitter);
+      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
+        mockOpenTranslationTutorialEmitter);
+      spyOn(as, 'addInfoMessage');
+      spyOn(as, 'addSuccessMessage');
+      explorationData.is_version_of_draft_valid = false;
+
+      ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should change status to ONLINE when internet is connected', () => {
+      mockConnectionServiceEmitter.emit(true);
+      $scope.$apply();
+      expect(as.addSuccessMessage).toHaveBeenCalled();
+    });
+
+    it('should change status to OFFLINE when internet disconnects', () => {
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect(as.addInfoMessage).toHaveBeenCalled();
+    });
+
+    it('should navigate to editor tab when internet disconnects', () => {
+      var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
+      activeTabNameSpy.and.returnValue('settings');
+      spyOn(rs, 'navigateToMainTab');
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect(as.addInfoMessage).toHaveBeenCalled();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
+  });
+
   describe('when user permission is false and draft changes are true', () => {
     var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -434,11 +577,14 @@ describe('Exploration editor page component', function() {
         mockExplorationPropertyChangedEventEmitter);
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve(new UserInfo(
+          ['USER_ROLE'], true, true, false, false, false, null, null, null,
+          false)));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
       spyOnProperty(cls, 'autosaveIsInProgress$').and.returnValue(
         autosaveIsInProgress);
@@ -476,12 +622,10 @@ describe('Exploration editor page component', function() {
         '/createhandler/revert/' + explorationId);
       expect(ctrl.areExplorationWarningsVisible).toBeFalse();
 
-      expect(ctrl.currentUserIsAdmin).toBeTrue();
+      expect(ctrl.currentUserIsCurriculumAdmin).toBeTrue();
       expect(ctrl.currentUserIsModerator).toBeTrue();
       expect(ctrl.currentUser).toEqual(explorationData.user);
       expect(ctrl.currentVersion).toBe(explorationData.version);
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
     });
 
     it('should navigate to feedback tab', () => {
@@ -497,7 +641,7 @@ describe('Exploration editor page component', function() {
       ets.init('Exploration Title');
       mockExplorationPropertyChangedEventEmitter.emit();
 
-      expect(pts.setPageTitle).toHaveBeenCalledWith(
+      expect(pts.setDocumentTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
     });
 
@@ -505,7 +649,7 @@ describe('Exploration editor page component', function() {
       ets.init('');
       mockExplorationPropertyChangedEventEmitter.emit();
 
-      expect(pts.setPageTitle).toHaveBeenCalledWith(
+      expect(pts.setDocumentTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
     });
 
@@ -518,7 +662,7 @@ describe('Exploration editor page component', function() {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
-
+      spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -531,69 +675,34 @@ describe('Exploration editor page component', function() {
       expect(successCallback).toHaveBeenCalled();
     }));
 
-    it('should accept tutorial when closing welcome exploration modal and' +
-      ' then skip it', () => {
-      spyOn(rs, 'navigateToMainTab').and.callThrough();
+    it('should start editor tutorial when closing welcome exploration' +
+      ' modal', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve(explorationId)
       });
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
       expect(registerAcceptTutorialModalEventSpy)
         .toHaveBeenCalledWith(explorationId);
-      expect(rs.navigateToMainTab).toHaveBeenCalled();
-      $timeout.flush();
-
-      expect(ctrl.tutorialInProgress).toBeTrue();
-
-      ctrl.onSkipTutorial();
-      expect(registerSkipTutorialEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(ctrl.tutorialInProgress).toBeFalse();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
     });
 
-    it('should accept tutorial when closing welcome exploration modal and' +
-      ' then finish it', () => {
-      spyOn(rs, 'navigateToMainTab').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve(explorationId)
-      });
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
-
-      ctrl.showWelcomeExplorationModal();
-      $scope.$apply();
-
-      expect(registerAcceptTutorialModalEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(rs.navigateToMainTab).toHaveBeenCalled();
-      $timeout.flush();
-
-      expect(ctrl.tutorialInProgress).toBeTrue();
-
-      ctrl.onFinishTutorial();
-      expect(registerFinishTutorialEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(ctrl.tutorialInProgress).toBeFalse();
-    });
-
-    it('should dismiss tutorial if welcome exploration modal dismissed', () => {
+    it('should dismiss tutorial when dismissing welcome exploration' +
+      ' modal', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject(explorationId)
       });
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
       expect(registerDeclineTutorialModalEventSpy)
         .toHaveBeenCalled();
-      expect(ctrl.tutorialInProgress).toBeFalse();
+      expect(ctrl.startEditorTutorial).not.toHaveBeenCalled();
     });
 
     it('should toggle exploration warning visibility', () => {
@@ -620,211 +729,17 @@ describe('Exploration editor page component', function() {
       activeTabNameSpy.and.returnValue('history');
       expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
     });
-
-    // The describe block below tests all the possible functions
-    // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
-    // with JQuery the 'save from tutorial' button.
-    describe('when testing functions for JQuery manipulation from' +
-      ' ctrl.EDITOR_TUTORIAL_OPTIONS array', () => {
-      it('should change element scroll top when calling fn property' +
-        ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: 20
-        }, 1000);
-      });
-
-      it('should not change element scroll top when calling fn property' +
-        ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: 0
-        }, 1000);
-      });
-
-      it('should change state interaction element scroll top when calling' +
-        ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateContent').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 5
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
-
-      it('should change state content element scroll top when calling fn' +
-        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateInteraction').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 20
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
-
-      it('should change preview tab element scroll top when calling fn' +
-        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialPreviewTab').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 5
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
-
-      it('should change state interaction element scroll top when calling' +
-        ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateInteraction').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 20
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
-
-      it('should change preview tabn element scroll top when calling fn' +
-        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialPreviewTab').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 5
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
-
-      it('should change state interaction element scroll top when calling' +
-        ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateInteraction').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 20
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
-    });
   });
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       mockEnterEditorForTheFirstTime = new EventEmitter();
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeatures')
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue(Promise.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
@@ -832,8 +747,7 @@ describe('Exploration editor page component', function() {
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync')
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
@@ -849,6 +763,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
+      spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(true));
 
@@ -860,6 +775,7 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
+      spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(false));
 
@@ -876,96 +792,5 @@ describe('Exploration editor page component', function() {
       mockEnterEditorForTheFirstTime.emit();
       expect(ctrl.showWelcomeExplorationModal).toHaveBeenCalled();
     });
-  });
-
-  describe('State-change registration', () => {
-    beforeEach(() => {
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
-      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
-      spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: false}));
-      $scope.$apply();
-
-      explorationData.is_version_of_draft_valid = true;
-
-      ctrl.$onInit();
-    });
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    it('should callback state-added method for stats', fakeAsync(() => {
-      let onStateAddedSpy = spyOn(stass, 'onStateAdded');
-      spyOn(cls, 'addState');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.addState('Prologue');
-
-      flushMicrotasks();
-      expect(onStateAddedSpy).toHaveBeenCalledWith('Prologue');
-    }));
-
-    it('should callback state-deleted method for stats', fakeAsync(() => {
-      let onStateDeletedSpy = spyOn(stass, 'onStateDeleted');
-      spyOn(cls, 'deleteState');
-      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.deleteState('Final');
-
-      flushMicrotasks();
-      expect(onStateDeletedSpy).toHaveBeenCalledWith('Final');
-    }));
-
-    it('should callback state-renamed method for stats', fakeAsync(() => {
-      let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
-      spyOn(cls, 'renameState');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.renameState('Introduction', 'Start');
-
-      flushMicrotasks();
-      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
-    }));
-
-    it('should callback interaction-changed method for stats', fakeAsync(() => {
-      let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');
-      spyOn(cls, 'editStateProperty');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.saveInteractionAnswerGroups('Introduction', []);
-
-      flushMicrotasks();
-      expect(onStateInteractionSavedSpy)
-        .toHaveBeenCalledWith(ess.getState('Introduction'));
-    }));
   });
 });

@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service.ts';
+import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
 describe('State Param Changes service', () => {
-  let spcs: StateParamChangesService = null;
+  let spcs: StateParamChangesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

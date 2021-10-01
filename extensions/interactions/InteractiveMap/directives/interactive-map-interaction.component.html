@@ -1,0 +1,35 @@
+<style>
+  .oppia-interactive-map {
+    height: 400px;
+    margin: auto;
+    max-height: 400px;
+    max-width: 560px;
+  }
+
+  .interactive-map-container {
+    background: #fff;
+    padding: 8px;
+  }
+
+  @media screen and (max-width: 559px) {
+    .oppia-interactive-map {
+      max-width: 83vw;
+    }
+
+    .interactive-map-container {
+      padding: 8px 0;
+    }
+  }
+</style>
+
+<div class="interactive-map-container">
+  <div leaflet
+       id="interactiveMap"
+       class="oppia-interactive-map"
+       [leafletOptions]="mapOptions"
+       (leafletClick)="leafletClick($event)"
+       (leafletMouseOut)="leafletMouseOut()"
+       (leafletMouseOver)="leafletMouseOver()">
+    <div *ngIf="mapMarkers" [leafletLayer]="mapMarkers"></div>
+  </div>
+</div>

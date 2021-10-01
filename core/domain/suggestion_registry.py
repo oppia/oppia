@@ -16,12 +16,15 @@
 subclasses for each type of suggestion.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -35,9 +38,6 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -64,6 +64,8 @@ class BaseSuggestion(python_utils.OBJECT):
         language_code: str|None. The ISO 639-1 code used to query suggestions
             by language, or None if the suggestion type is not queryable by
             language.
+        edited_by_reviewer: bool. Whether the suggestion is edited by the
+            reviewer.
     """
 
     def __init__(self, status, final_reviewer_id):
@@ -89,7 +91,8 @@ class BaseSuggestion(python_utils.OBJECT):
             'change': self.change.to_dict(),
             'score_category': self.score_category,
             'language_code': self.language_code,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated)
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'edited_by_reviewer': self.edited_by_reviewer
         }
 
     def get_score_type(self):
@@ -185,7 +188,8 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not user_services.is_user_or_pseudonymous_id(self.author_id):
+        if not utils.is_user_id_valid(
+                self.author_id, allow_pseudonymous_id=True):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
                 'received %s' % self.author_id)
@@ -195,10 +199,10 @@ class BaseSuggestion(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
-            if (
-                    not user_services.is_user_or_pseudonymous_id(
-                        self.final_reviewer_id) and
-                    self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
+            if not utils.is_user_id_valid(
+                    self.final_reviewer_id,
+                    allow_system_user_id=True,
+                    allow_pseudonymous_id=True
             ):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be in a valid user ID '
@@ -338,7 +342,8 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, language_code, last_updated=None):
+            change, score_category, language_code, edited_by_reviewer,
+            last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -355,6 +360,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.score_category = score_category
         self.language_code = language_code
         self.last_updated = last_updated
+        self.edited_by_reviewer = edited_by_reviewer
         # Currently, we don't allow adding images in the "edit state content"
         # suggestion, so the image_context is None.
         self.image_context = None
@@ -524,7 +530,8 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, language_code, last_updated=None):
+            change, score_category, language_code, edited_by_reviewer,
+            last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -541,6 +548,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.score_category = score_category
         self.language_code = language_code
         self.last_updated = last_updated
+        self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
     def validate(self):
@@ -567,10 +575,19 @@ class SuggestionTranslateContent(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_TRANSLATION,
                     self.get_score_type()))
 
-        if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
+        # TODO(#12981): Write a one-off job to modify all existing translation
+        # suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
+        # CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will
+        # only use CMD_ADD_WRITTEN_TRANSLATION. DEPRECATED_CMD_ADD_TRANSLATION
+        # is added in the following check to support older suggestions.
+        accepted_cmds = [
+            exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
+            exp_domain.CMD_ADD_WRITTEN_TRANSLATION
+        ]
+        if self.change.cmd not in accepted_cmds:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_ADD_TRANSLATION, self.change.cmd))
+                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change.cmd))
 
         if not utils.is_supported_audio_language_code(
                 self.change.language_code):
@@ -585,6 +602,33 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change.language_code, self.language_code))
 
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+
+        Args:
+            change: ExplorationChange. The new change.
+
+        Raises:
+            ValidationError. Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        elif self.change.state_name != change.state_name:
+            raise utils.ValidationError(
+                'The new change state_name must be equal to %s' %
+                self.change.state_name)
+        elif self.change.content_html != change.content_html:
+            raise utils.ValidationError(
+                'The new change content_html must be equal to %s' %
+                self.change.content_html)
+        elif self.change.language_code != change.language_code:
+            raise utils.ValidationError(
+                'The language code must be equal to %s' %
+                self.change.language_code)
+
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
@@ -594,12 +638,6 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
-        content_html = exploration.get_content_html(
-            self.change.state_name, self.change.content_id)
-        if content_html != self.change.content_html:
-            raise Exception(
-                'The given content_html does not match the content of the '
-                'exploration.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -607,6 +645,19 @@ class SuggestionTranslateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
+        # If the translation is for a set of strings, we don't want to process
+        # the HTML strings for images.
+        if (
+                hasattr(self.change, 'data_format') and (
+                    self.change.data_format == 'set_of_normalized_string' or
+                    self.change.data_format == 'set_of_unicode_string'
+                )
+        ):
+            exp_services.update_exploration(
+                self.final_reviewer_id, self.target_id, [self.change],
+                commit_message, is_suggestion=True)
+            return
+
         self._copy_new_images_to_target_entity_storage()
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
@@ -618,7 +669,16 @@ class SuggestionTranslateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        return [self.change.translation_html, self.change.content_html]
+        content_strings = []
+        if isinstance(self.change.translation_html, list):
+            content_strings.extend(self.change.translation_html)
+        else:
+            content_strings.append(self.change.translation_html)
+        if isinstance(self.change.content_html, list):
+            content_strings.extend(self.change.content_html)
+        else:
+            content_strings.append(self.change.content_html)
+        return content_strings
 
     def get_target_entity_html_strings(self):
         """Gets all html content strings from target entity used in the
@@ -665,12 +725,15 @@ class SuggestionAddQuestion(BaseSuggestion):
             was last updated.
         language_code: str. The ISO 639-1 code used to query suggestions
             by language. In this case it is the language code of the question.
+        edited_by_reviewer: bool. Whether the suggestion is edited by the
+            reviewer.
     """
 
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, language_code, last_updated=None):
+            change, score_category, language_code, edited_by_reviewer,
+            last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -687,6 +750,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.last_updated = last_updated
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
+        self.edited_by_reviewer = edited_by_reviewer
 
     def _update_change_to_latest_state_schema_version(self):
         """Holds the responsibility of performing a step-by-step, sequential
@@ -707,7 +771,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
         if not (25 <= state_schema_version
                 <= feconf.CURRENT_STATE_SCHEMA_VERSION):
-            raise Exception(
+            raise utils.ValidationError(
                 'Expected state schema version to be in between 25 and %d, '
                 'received %s.' % (
                     feconf.CURRENT_STATE_SCHEMA_VERSION, state_schema_version))
@@ -831,7 +895,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
 
-        self._copy_new_images_to_target_entity_storage()
+        # Images need to be stored in the storage path corresponding to the
+        # question.
+        new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+        fs_services.copy_images(
+            self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
+            question_dict['id'], new_image_filenames)
 
         question_services.add_question(self.author_id, question)
 
@@ -866,10 +935,12 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
                 self.change.skill_id)
-        if self.change.question_dict == change.question_dict:
+
+        if (self.change.skill_difficulty == change.skill_difficulty) and (
+                self.change.question_dict == change.question_dict):
             raise utils.ValidationError(
-                'The new change question_dict must not be equal to the old '
-                'question_dict')
+                'At least one of the new skill_difficulty or question_dict '
+                'should be changed.')
 
     def _get_skill_difficulty(self):
         """Returns the suggestion's skill difficulty."""
@@ -894,7 +965,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         return []
 
     def convert_html_in_suggestion_change(self, conversion_fn):
-        """Checks for HTML fields in the suggestion change  and converts it
+        """Checks for HTML fields in the suggestion change and converts it
         according to the conversion function.
 
         Args:
@@ -910,7 +981,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 42)
+                        'question_state_data_schema_version'] < 45)
             )
         )
 
@@ -1327,6 +1398,80 @@ class CommunityContributionStats(python_utils.OBJECT):
             self.question_suggestion_count > (
                 config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
                     self.question_reviewer_count)))
+
+
+class TranslationContributionStats(python_utils.OBJECT):
+    """Domain object for the TranslationContributionStatsModel."""
+
+    def __init__(
+            self, language_code, contributor_user_id, topic_id,
+            submitted_translations_count, submitted_translation_word_count,
+            accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count,
+            accepted_translation_word_count, rejected_translations_count,
+            rejected_translation_word_count, contribution_dates):
+        self.language_code = language_code
+        self.contributor_user_id = contributor_user_id
+        self.topic_id = topic_id
+        self.submitted_translations_count = submitted_translations_count
+        self.submitted_translation_word_count = submitted_translation_word_count
+        self.accepted_translations_count = accepted_translations_count
+        self.accepted_translations_without_reviewer_edits_count = (
+            accepted_translations_without_reviewer_edits_count
+        )
+        self.accepted_translation_word_count = accepted_translation_word_count
+        self.rejected_translations_count = rejected_translations_count
+        self.rejected_translation_word_count = rejected_translation_word_count
+        self.contribution_dates = contribution_dates
+
+    @classmethod
+    def create_default(
+        cls, language_code=None, contributor_user_id=None, topic_id=None
+    ) -> 'TranslationContributionStats':
+        """Create default translation contribution stats.
+
+        Args:
+            language_code: str. The language code for which are these stats
+                generated.
+            contributor_user_id: str. User ID of the contributor to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the translations created.
+
+        Returns:
+            TranslationContributionStats. Default translation contribution
+            stats.
+        """
+        return cls(
+            language_code, contributor_user_id, topic_id,
+            0, 0, 0, 0, 0, 0, 0, set()
+        )
+
+    def to_dict(self):
+        """Returns a dict representation of a TranslationContributionStats
+        domain object.
+
+        Returns:
+            dict. A dict representation of a TranslationContributionStats
+            domain object.
+        """
+        return {
+            'language_code': self.language_code,
+            'contributor_user_id': self.contributor_user_id,
+            'topic_id': self.topic_id,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'contribution_dates': self.contribution_dates
+        }
 
 
 class ReviewableSuggestionEmailInfo(python_utils.OBJECT):

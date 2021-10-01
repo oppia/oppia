@@ -16,14 +16,17 @@
 
 """Unit tests for core.domain.collection_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_domain
@@ -31,12 +34,10 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -66,16 +67,22 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+
+class MockCollectionModel(collection_models.CollectionModel):
+
+    nodes = datastore_services.JsonProperty(repeated=True)
 
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
@@ -156,6 +163,43 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
         self.assertEqual(collection.version, 1)
+        self.assertEqual(
+            collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+    def test_get_collection_from_model_with_schema_version_2_copies_nodes(self):
+        collection_model = MockCollectionModel(
+            id='collection_id',
+            category='category',
+            title='title',
+            schema_version=2,
+            objective='objective',
+            version=1,
+            nodes=[
+                {
+                    'exploration_id': 'exp_id1',
+                    'acquired_skills': ['11'],
+                    'prerequisite_skills': ['22'],
+                }, {
+                    'exploration_id': 'exp_id2',
+                    'acquired_skills': ['33'],
+                    'prerequisite_skills': ['44'],
+                }
+            ]
+        )
+
+        collection = (
+            collection_services.get_collection_from_model(collection_model))
+        self.assertEqual(collection.id, 'collection_id')
+        self.assertEqual(collection.title, 'title')
+        self.assertEqual(collection.category, 'category')
+        self.assertEqual(collection.objective, 'objective')
+        self.assertEqual(
+            collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
+        self.assertEqual(collection.version, 1)
+        self.assertEqual(
+            collection.nodes[0].to_dict(), {'exploration_id': 'exp_id1'})
+        self.assertEqual(
+            collection.nodes[1].to_dict(), {'exploration_id': 'exp_id2'})
         self.assertEqual(
             collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
@@ -420,7 +464,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             observed_log_messages[0],
             'ValidationError Command invalid command is not allowed '
-            'collection_id [{u\'cmd\': u\'invalid command\'}]')
+            'collection_id [{\'cmd\': \'invalid command\'}]')
 
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
@@ -1187,6 +1231,26 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID)
         self.assertEqual(collection.version, 2)
 
+    def test_update_collection_schema(self):
+        exp_id = 'exp_id'
+        self.save_new_valid_collection(
+            self.COLLECTION_0_ID, self.owner_id, exploration_id=exp_id)
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
+
+        # This should not give an error.
+        collection_services.update_collection(
+            feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+                'from_version': 2,
+                'to_version': 3,
+            }], 'Did migration.')
+
+        # Check that the version of the collection is incremented.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_0_ID)
+        self.assertEqual(collection.version, 2)
+
 
 class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
 
@@ -1211,7 +1275,7 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %
-                (collection.title.encode('utf-8'), processing_time))
+                (collection.title, processing_time))
 
         self.assertEqual(
             collection_models.CollectionModel.get_collection_count(),
@@ -1227,10 +1291,9 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection_services.load_demo('invalid_collection_id')
 
     def test_demo_file_path_ends_with_yaml(self):
-        for collection_id in feconf.DEMO_COLLECTIONS:
+        for collection_path in feconf.DEMO_COLLECTIONS.values():
             demo_filepath = os.path.join(
-                feconf.SAMPLE_COLLECTIONS_DIR,
-                feconf.DEMO_COLLECTIONS[collection_id])
+                feconf.SAMPLE_COLLECTIONS_DIR, collection_path)
 
             self.assertTrue(demo_filepath.endswith('yaml'))
 
@@ -1856,7 +1919,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             user_id=self.viewer_id))
 
     def test_contributor_ids(self):
-        albert = user_services.UserActionsInfo(self.albert_id)
+        albert = user_services.get_user_actions_info(self.albert_id)
 
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)

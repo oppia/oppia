@@ -54,13 +54,14 @@ describe('Exploration permissions backend api service', () => {
       can_voiceover: true,
       can_delete: false,
       can_modify_roles: true,
-      can_edit: true
+      can_edit: true,
+      can_manage_voice_artist: false
     };
 
     let expectedResponse =
       ExplorationPermissions.createFromBackendDict(backendResponse);
 
-    epbas.getPermissions().then((expPermissions) => {
+    epbas.getPermissionsAsync().then((expPermissions) => {
       expect(expPermissions).toEqual(expectedResponse);
     });
 
@@ -77,7 +78,7 @@ describe('Exploration permissions backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      epbas.getPermissions().then(successHandler, failHandler);
+      epbas.getPermissionsAsync().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
         '/createhandler/permissions/exp1');

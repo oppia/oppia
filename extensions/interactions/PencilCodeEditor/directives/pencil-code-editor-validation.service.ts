@@ -28,18 +28,30 @@ import { PencilCodeEditorCustomizationArgs } from
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
+import { AppConstants } from 'app.constants';
+
 @Injectable({
   providedIn: 'root'
 })
 export class PencilCodeEditorValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance:
+      baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
       customizationArgs: PencilCodeEditorCustomizationArgs): Warning[] {
-    // TODO(juansaba): Implement customization args validations.
-    return [];
+    var warningsList = [];
+    this.baseInteractionValidationServiceInstance
+      .requireCustomizationArguments(customizationArgs, ['initialCode']);
+
+    var initialCode = customizationArgs.initialCode.value;
+    if (!(typeof initialCode === 'string')) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The initialCode must be a string.'
+      });
+    }
+    return warningsList;
   }
 
   getAllWarnings(

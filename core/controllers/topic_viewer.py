@@ -14,19 +14,19 @@
 
 """Controllers for the topic viewer page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
+from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
-import feconf
-import utils
 
 
 class TopicViewerPage(base.BaseHandler):
@@ -67,30 +67,34 @@ class TopicPageDataHandler(base.BaseHandler):
 
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
-            pending_nodes = story_fetchers.get_pending_nodes_in_story(
-                self.user_id, story_summary.id)
+            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['all_nodes']
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
             story_summary_dict['completed_node_titles'] = completed_node_titles
-            story_summary_dict['pending_node_dicts'] = [
-                node.to_dict() for node in pending_nodes]
+            story_summary_dict['all_node_dicts'] = [
+                node.to_dict() for node in all_nodes]
             canonical_story_dicts.append(story_summary_dict)
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
-            pending_nodes = story_fetchers.get_pending_nodes_in_story(
-                self.user_id, story_summary.id)
+            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['all_nodes']
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
             story_summary_dict['completed_node_titles'] = completed_node_titles
-            story_summary_dict['pending_node_dicts'] = [
-                node.to_dict() for node in pending_nodes]
+            story_summary_dict['all_node_dicts'] = [
+                node.to_dict() for node in all_nodes]
             additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
@@ -103,7 +107,7 @@ class TopicPageDataHandler(base.BaseHandler):
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.error(
+            logging.exception(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic.id)
             )

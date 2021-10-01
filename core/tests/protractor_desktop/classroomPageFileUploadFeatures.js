@@ -42,17 +42,12 @@ describe('Classroom page functionality', function() {
     topicEditorPage = (
       new TopicEditorPage.TopicEditorPage());
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
   });
 
-  beforeEach(async function() {
-    await users.login('creator@classroomPage.com');
+  afterAll(async function() {
+    await users.logout();
   });
 
   it('should add a new published topic to the Math classroom',
@@ -107,7 +102,6 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);
-      await users.logout();
     });
 
   afterEach(async function() {

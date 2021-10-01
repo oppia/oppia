@@ -43,13 +43,11 @@ describe('Topic editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    await users.logout();
   });
 
   beforeEach(async function() {
-    await users.login('creator@topicEditor.com');
     await topicsAndSkillsDashboardPage.get();
   });
 
@@ -164,6 +162,9 @@ describe('Topic editor functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
     await users.logout();
   });
 });
@@ -184,6 +185,7 @@ describe('Chapter editor functionality', function() {
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
+      info.push(i === 0);
       await workflow.createAndPublishExploration.apply(workflow, info);
       var url = await browser.getCurrentUrl();
       var id = url.split('/')[4].replace('#', '');
@@ -200,14 +202,9 @@ describe('Chapter editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       USER_EMAIL, 'creatorChapterTest');
     dummyExplorationIds = await createDummyExplorations(1);
-    await users.logout();
-  });
-
-  beforeEach(async function() {
-    await users.login(USER_EMAIL);
   });
 
   it('should create a basic chapter with a thumbnail.', async function() {
@@ -244,7 +241,6 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.saveStory('First save');
     // Check if the thumbnail images persist on reload.
     await browser.refresh();
-    await general.scrollToTop();
     await storyEditorPage.navigateToStoryEditorTab();
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);

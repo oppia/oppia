@@ -16,27 +16,23 @@
 
 """Domain object for statistics models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import json
 import numbers
 import sys
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import playthrough_issue_registry
-from core.platform import models
-import feconf
-import python_utils
-import utils
-
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -232,6 +228,18 @@ class ExplorationStats(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected state_stats_mapping to be a dict, received %s' % (
                     self.state_stats_mapping))
+
+    def clone(self):
+        """Returns a clone of this instance."""
+        return ExplorationStats(
+            self.exp_id, self.exp_version, self.num_starts_v1,
+            self.num_starts_v2, self.num_actual_starts_v1,
+            self.num_actual_starts_v2, self.num_completions_v1,
+            self.num_completions_v2,
+            {
+                state_name: state_stats.clone()
+                for state_name, state_stats in self.state_stats_mapping.items()
+            })
 
 
 class StateStats(python_utils.OBJECT):
@@ -527,6 +535,16 @@ class StateStats(python_utils.OBJECT):
             if state_stats_dict[stat_property] < 0:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
+
+    def clone(self):
+        """Returns a clone of this instance."""
+        return StateStats(
+            self.total_answers_count_v1, self.total_answers_count_v2,
+            self.useful_feedback_count_v1, self.useful_feedback_count_v2,
+            self.total_hit_count_v1, self.total_hit_count_v2,
+            self.first_hit_count_v1, self.first_hit_count_v2,
+            self.num_times_solution_viewed_v2, self.num_completions_v1,
+            self.num_completions_v2)
 
 
 class SessionStateStats(python_utils.OBJECT):
@@ -1488,15 +1506,6 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
         self.calculation_id = calculation_id
         self.interaction_id = interaction_id
         self.calculation_output = calculation_output
-
-    def save(self):
-        """Validate the domain object and commit it to storage."""
-        self.validate()
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            self.exploration_id, self.exploration_version, self.state_name,
-            self.interaction_id, self.calculation_id,
-            self.calculation_output.calculation_output_type,
-            self.calculation_output.to_raw_type())
 
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before

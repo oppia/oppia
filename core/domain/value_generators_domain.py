@@ -16,17 +16,17 @@
 
 """Classes relating to value generators."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import inspect
 import os
 import pkgutil
 
-import feconf
-import python_utils
-import utils
+from core import feconf
+from core import python_utils
+from core import utils
 
 
 class BaseValueGenerator(python_utils.OBJECT):

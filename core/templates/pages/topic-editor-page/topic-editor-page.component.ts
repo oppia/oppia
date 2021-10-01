@@ -19,7 +19,7 @@
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
@@ -30,7 +30,7 @@ require(
 require(
   'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
-  'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
+  'pages/topic-editor-page/questions-tab/topic-questions-tab.component.ts');
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -41,8 +41,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
-require('services/contextual/window-ref.service');
 require('services/loader.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -57,15 +57,15 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        'BottomNavbarStatusService', 'ContextService', 'LoaderService',
-        'PageTitleService',
+        '$rootScope', 'BottomNavbarStatusService', 'ContextService',
+        'LoaderService', 'PageTitleService', 'PreventPageUnloadEventService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'WindowRef',
+        'UndoRedoService', 'UrlService',
         function(
-            BottomNavbarStatusService, ContextService, LoaderService,
-            PageTitleService,
+            $rootScope, BottomNavbarStatusService, ContextService,
+            LoaderService, PageTitleService, PreventPageUnloadEventService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, WindowRef) {
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -75,11 +75,11 @@ angular.module('oppia').directive('topicEditorPage', [
             return ContextService.getEntityType();
           };
 
-          var setPageTitle = function() {
+          var setDocumentTitle = function() {
             let topicName = TopicEditorStateService.getTopic().getName();
-            PageTitleService.setPageTitle(
+            PageTitleService.setDocumentTitle(
               topicName + ' - Oppia');
-            PageTitleService.setPageSubtitleForMobileView(topicName);
+            PageTitleService.setNavbarSubtitleForMobileView(topicName);
             ctrl.topic = TopicEditorStateService.getTopic();
             ctrl._validateTopic();
           };
@@ -178,43 +178,42 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
-          ctrl.setUpBeforeUnload = function() {
-            WindowRef.nativeWindow.addEventListener(
-              'beforeunload', ctrl.confirmBeforeLeaving);
-          };
-
-          ctrl.confirmBeforeLeaving = function(e) {
-            if (UndoRedoService.getChangeCount()) {
-              // This message is irrelevant, but is needed to trigger the
-              // confirmation before leaving.
-              e.returnValue = 'Sure?';
-              return false;
-            }
-          };
-
           ctrl.$onInit = function() {
             LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
                 () => {
                   LoaderService.hideLoadingScreen();
-                  setPageTitle();
+                  setDocumentTitle();
+                  $rootScope.$applyAsync();
                 }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(
-                () => setPageTitle()
+                () => {
+                  setDocumentTitle();
+                  $rootScope.$applyAsync();
+                }
               ));
+            // This subscription can be removed once this component is migrated.
+            ctrl.directiveSubscriptions.add(
+              TopicEditorRoutingService.updateViewEventEmitter.subscribe(
+                () => {
+                  $rootScope.$applyAsync();
+                }
+              )
+            );
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
-            PageTitleService.setPageTitleForMobileView('Topic Editor');
-            ctrl.setUpBeforeUnload();
+            PageTitleService.setNavbarTitleForMobileView('Topic Editor');
+            PreventPageUnloadEventService.addListener(
+              UndoRedoService.getChangeCount.bind(UndoRedoService));
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
-                () => setPageTitle()
+              UndoRedoService.getUndoRedoChangeEventEmitter().subscribe(
+                () => setDocumentTitle()
               )
             );
           };

@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,38 +13,47 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying the list of threads in the feedback
+ * @fileoverview Component for displaying the list of threads in the feedback
  * tab of the exploration editor.
  */
 
-require('filters/string-utility-filters/truncate.filter.ts');
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { SuggestionThread } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
-require('services/date-time-format.service.ts');
+@Component({
+  selector: 'oppia-thread-table',
+  templateUrl: './thread-table.component.html'
+})
+export class ThreadTableComponent {
+  @Output() rowClick: EventEmitter<string> = (
+    new EventEmitter());
+  @Input() threads: SuggestionThread[] = [];
+  constructor(
+    private dateTimeFormatService: DateTimeFormatService,
+    private threadStatusDisplayService: ThreadStatusDisplayService
+  ) { }
 
-angular.module('oppia').component('threadTable', {
-  bindings: {
-    onClickRow: '=',
-    getThreads: '&threads'
-  },
-  template: require('./thread-table.component.html'),
-  controller: [
-    '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
-    function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
-      $scope.getLabelClass = function(status) {
-        return ThreadStatusDisplayService.getLabelClass(status);
-      };
-      $scope.getHumanReadableStatus = function(status) {
-        return ThreadStatusDisplayService.getHumanReadableStatus(status);
-      };
-      $scope.getLocaleAbbreviatedDatetimeString = function(
-          millisSinceEpoch) {
-        return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-          millisSinceEpoch);
-      };
-    }
-  ]
-});
+  onRowClick(threadId: string): void {
+    this.rowClick.emit(threadId);
+  }
+
+  getLabelClass(status: string): string {
+    return this.threadStatusDisplayService.getLabelClass(status);
+  }
+
+  getHumanReadableStatus(status: string): string {
+    return this.threadStatusDisplayService.getHumanReadableStatus(status);
+  }
+
+  getLocaleAbbreviatedDateTimeString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService
+      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaThreadTable', downgradeComponent(
+    {component: ThreadTableComponent}));

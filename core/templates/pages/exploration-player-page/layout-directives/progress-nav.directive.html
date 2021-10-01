@@ -21,8 +21,10 @@
   <div ng-if="!hasNext" class="oppia-nav-button">
     <div ng-if="isSubmitButtonShown() && !shouldContinueButtonBeShown() && !helpCardHasContinueButton">
       <!-- Special case for the 'Continue' interaction. -->
-      <md-button ng-if="interactionId === 'Continue'" ng-click="onSubmit()"
-                 class="oppia-learner-confirm-button protractor-test-continue-button">
+      <md-button ng-if="interactionId === 'Continue'"
+                 ng-click="onSubmit()"
+                 class="oppia-learner-confirm-button protractor-test-continue-button oppia-autofocus"
+                 focus-on="continue-btn">
         <[interactionCustomizationArgs.buttonText.value.unicode]>
         <i class="fas fa-arrow-right oppia-arrow-right"></i>
       </md-button>
@@ -32,12 +34,12 @@
                  translate="I18N_INTERACTIONS_SUBMIT">
       </md-button>
     </div>
-    <continue-button ng-if="shouldContinueButtonBeShown()"
-                     focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                     is-learn-again-button="isLearnAgainButton()"
-                     ng-click="onClickContinueButton()"
-                     class="d-block">
-    </continue-button>
+    <oppia-continue-button ng-if="shouldContinueButtonBeShown()"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [is-learn-again-button]="isLearnAgainButton()"
+                           (click-continue-button)="onClickContinueButton()"
+                           class="d-block">
+    </oppia-continue-button>
   </div>
 </div>
 
@@ -48,6 +50,17 @@
   .md-button.md-default-theme.md-raised,
   .md-button.md-default-theme.md-fab {
     background-color: rgba(158,158,158,0.185);
+  }
+
+  .oppia-nav-button .md-button.oppia-autofocus:focus {
+    background-color: #0D48A1;
+  }
+
+  progress-nav continue-button {
+    margin-bottom: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 12px;
   }
 
   progress-nav .progress-nav-bar {

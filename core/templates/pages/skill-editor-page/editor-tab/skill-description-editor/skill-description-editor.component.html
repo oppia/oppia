@@ -1,0 +1,38 @@
+<div class="oppia-editor-card-body">
+  <div class="oppia-editor-card-section skill-description-container">
+    <strong class="heading-text">Skill Description</strong>
+    <div class="oppia-input-box-subtitle">
+      <i>This is the name of the skill as visible to learners and other creators.</i>
+    </div>
+    <br>
+    <p [ngClass]="{'has-error': !tmpSkillDescription.length > 0}">
+      <input type="text" aria-label="Skill Description" class="form-control protractor-test-skill-description-field" *ngIf="canEditSkillDescription()"
+             [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()" (blur)="saveSkillDescription(tmpSkillDescription)"
+             maxlength="MAX_CHARS_IN_SKILL_DESCRIPTION" ng-trim="false">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Skill description should be at most {{ MAX_CHARS_IN_SKILL_DESCRIPTION }} characters.
+        </i>
+      </span>
+      <span *ngIf="errorMsg" class="skill-description-error-message">
+        <i>
+          {{ errorMsg }}
+        </i>
+      </span>
+      <span *ngIf="!canEditSkillDescription()">{{ tmpSkillDescription }}</span>
+    </p>
+  </div>
+</div>
+<style>
+  span.skill-description-error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-description-editor .skill-description-container {
+      padding: 0;
+    }
+  }
+</style>

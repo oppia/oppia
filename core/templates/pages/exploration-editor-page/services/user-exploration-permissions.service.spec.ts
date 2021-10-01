@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
+import { EventEmitter } from '@angular/core';
 
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
@@ -28,9 +29,9 @@ import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions.model';
 
 describe('User Exploration Permissions Service', () => {
-  let ueps: UserExplorationPermissionsService = null;
-  let contextService: ContextService = null;
-  let httpTestingController: HttpTestingController = null;
+  let ueps: UserExplorationPermissionsService;
+  let contextService: ContextService;
+  let httpTestingController: HttpTestingController;
 
   let sampleExplorationId = 'sample-exploration';
   let samplePermissionsData = {
@@ -41,31 +42,32 @@ describe('User Exploration Permissions Service', () => {
     can_publish: false,
     can_delete: false,
     can_modify_roles: false,
+    can_manage_voice_artist: false
   };
   let permissionsResponse: ExplorationPermissions;
 
 
-  beforeEach(angular.mock.inject(() => {
+  beforeEach(()=> {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    ueps = TestBed.get(UserExplorationPermissionsService);
-    contextService = TestBed.get(ContextService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    ueps = TestBed.inject(UserExplorationPermissionsService);
+    contextService = TestBed.inject(ContextService);
     permissionsResponse =
       ExplorationPermissions.createFromBackendDict(samplePermissionsData);
     spyOn(contextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
     UserExplorationPermissionsService.permissionsPromise = null;
-  }));
+  });
 
   afterEach(()=> {
     httpTestingController.verify();
   });
 
   it('should fetch the correct data', fakeAsync(() => {
-    ueps.getPermissionsAsync().then(function(response) {
+    ueps.getPermissionsAsync().then((response) => {
       expect(response).toEqual(permissionsResponse);
     });
 
@@ -87,5 +89,37 @@ describe('User Exploration Permissions Service', () => {
     ueps.getPermissionsAsync();
     httpTestingController.expectNone(
       '/createhandler/permissions/' + sampleExplorationId);
+  }));
+
+  it('should fetch rights data irrespective' +
+  'whether it is cached or not', fakeAsync(() => {
+    ueps.getPermissionsAsync();
+    let req = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePermissionsData);
+    flushMicrotasks();
+
+    ueps.fetchPermissionsAsync();
+    let req2 = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+
+    expect(req2.request.method).toEqual('GET');
+    req2.flush(samplePermissionsData);
+    flushMicrotasks();
+  }));
+
+  it('should emit when the user exploration' +
+  'permissions are fetched', fakeAsync(() => {
+    let mockuserExplorationPermissionsFetched = new EventEmitter();
+    ueps.fetchPermissionsAsync();
+    let req = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePermissionsData);
+    flushMicrotasks();
+    expect(ueps.onUserExplorationPermissionsFetched).toEqual(
+      mockuserExplorationPermissionsFetched);
   }));
 });

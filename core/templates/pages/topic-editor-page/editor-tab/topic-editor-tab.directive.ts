@@ -20,10 +20,10 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/custom-forms-directives/' +
-    'edit-thumbnail-modal.controller.ts');
+    'edit-thumbnail-modal.component.ts');
 require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
@@ -37,7 +37,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require(
-  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
+  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
@@ -45,6 +45,7 @@ require('services/context.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
+require('services/stateful/focus-manager.service.ts');
 require('domain/question/question-backend-api.service.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -66,7 +67,8 @@ angular.module('oppia').directive('topicEditorTab', [
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
-        'EntityCreationService', 'ImageUploadHelperService',
+        'EntityCreationService', 'FocusManagerService',
+        'ImageUploadHelperService',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -77,7 +79,8 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, ContextService,
-            EntityCreationService, ImageUploadHelperService,
+            EntityCreationService, FocusManagerService,
+            ImageUploadHelperService,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
@@ -107,6 +110,7 @@ angular.module('oppia').directive('topicEditorTab', [
             if (TopicEditorStateService.hasLoadedTopic()) {
               $scope.topicDataHasLoaded = true;
               $scope.$applyAsync();
+              FocusManagerService.setFocus('addStoryBtn');
             }
             $scope.editableName = $scope.topic.getName();
             $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
@@ -292,6 +296,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicThumbnailBgColor(
               $scope.topic, newThumbnailBgColor);
+            $scope.$applyAsync();
           };
 
           $scope.updateTopicDescription = function(newDescription) {
@@ -359,8 +364,8 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
-            PageTitleService.setPageTitleForMobileView('Subtopic Editor');
-            PageTitleService.setPageSubtitleForMobileView(subtopicName);
+            PageTitleService.setNavbarTitleForMobileView('Subtopic Editor');
+            PageTitleService.setNavbarSubtitleForMobileView(subtopicName);
             TopicEditorRoutingService.navigateToSubtopicEditorWithId(
               subtopicId);
           };
@@ -462,6 +467,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           ctrl.$onInit = function() {
+            FocusManagerService.setFocus('addStoryBtn');
             $scope.topicPreviewCardIsShown = false;
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';

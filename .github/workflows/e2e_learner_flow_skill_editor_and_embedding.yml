@@ -19,29 +19,51 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '2.x'
+          python-version: '3.7'
           architecture: 'x64'
-      - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: pip install wheel==0.35.0
-      - name: Install third party
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.install_third_party_libs
-      - name: Install chrome version 77.0.3865.75-1
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          sudo apt-get update
-          sudo apt-get install libappindicator3-1
-          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
-          sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-          sudo dpkg -i google-chrome.deb
-          google-chrome --version
+      - uses: ./.github/actions/merge
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
+      - name: Install chrome
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.install_chrome_for_ci
+      - name: Install ffmpeg
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: sudo apt install ffmpeg
       - name: Run Learner Flow E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="learner" --prod_env
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="learner" --prod_env
+        env: 
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Skill Editor E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="skillEditor" --prod_env
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="skillEditor" --prod_env
+        env: 
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Embedding E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env
+        env: 
+          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Uploading protractor-video as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: protractor-video
+          path: /home/runner/work/oppia/protractor-video
+      - name: Checking Memory Usage
+        if: ${{ always() }}
+        run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes

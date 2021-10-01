@@ -26,7 +26,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 // This makes the UrlParamsType like a dict whose keys and values both are
 // string.
-interface UrlParamsType {
+export interface UrlParamsType {
   [param: string]: string
 }
 
@@ -61,7 +61,7 @@ export class UrlService {
   So exact type of this function can not be determined
   https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
   getUrlParams(): UrlParamsType {
-    let params = {};
+    let params: UrlParamsType = {};
     this.getCurrentQueryString().replace(
       /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         return params[decodeURIComponent(key)] = decodeURIComponent(value);
@@ -111,11 +111,20 @@ export class UrlService {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[3]);
+    } else if (pathname.startsWith('/explore')) {
+      // The following section is for getting the URL fragment from the
+      // exploration player.
+      if (
+        this.getUrlParams().hasOwnProperty('topic_url_fragment') &&
+        this.getUrlParams().topic_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().topic_url_fragment;
+      }
     }
     throw new Error('Invalid URL for topic');
   }
 
-  getStoryUrlFragmentFromLearnerUrl(): string {
+  getStoryUrlFragmentFromLearnerUrl(): string | null {
     let pathname = this.getPathname();
     // The following segment is for getting the fragment from the new learner
     // pages.
@@ -151,6 +160,15 @@ export class UrlService {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[2]);
+    } else if (pathname.startsWith('/explore')) {
+      // The following section is for getting the URL fragment from the
+      // exploration player.
+      if (
+        this.getUrlParams().hasOwnProperty('classroom_url_fragment') &&
+        this.getUrlParams().classroom_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().classroom_url_fragment;
+      }
     }
     throw new Error('Invalid URL for classroom');
   }
@@ -239,6 +257,20 @@ export class UrlService {
       throw new Error('Invalid Skill Id');
     }
     return skillId;
+  }
+
+  /**
+   * This function is used to find the blog id from the url.
+   * @return {string} the blog post id.
+   * @throws Will throw an error if the blog post Id is invalid.
+   */
+  getBlogPostIdFromUrl(): string {
+    let pathname = this.getHash();
+    let blogPostId = pathname.split('/')[2];
+    if (blogPostId.length !== 12) {
+      throw new Error('Invalid Blog Post Id.');
+    }
+    return blogPostId;
   }
 
   /**

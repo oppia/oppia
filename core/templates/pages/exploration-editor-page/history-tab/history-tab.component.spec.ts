@@ -17,11 +17,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -29,16 +27,10 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -51,6 +43,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('History tab component', function() {
   var ctrl = null;
@@ -84,11 +77,7 @@ describe('History tab component', function() {
     commit_cmds: []
   }];
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  importAllAngularServices();
 
   beforeEach(function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
@@ -103,8 +92,6 @@ describe('History tab component', function() {
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
-    $provide.value(
-      'FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
       'HintObjectFactory', TestBed.get(HintObjectFactory));
@@ -114,16 +101,9 @@ describe('History tab component', function() {
       'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
     $provide.value(
       'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      TestBed.get(RecordedVoiceoversObjectFactory));
     $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
-    $provide.value(
-      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
       TestBed.get(WrittenTranslationObjectFactory));
@@ -135,12 +115,15 @@ describe('History tab component', function() {
       data: {
         version: 2
       },
-      getData: () => $q.resolve({
+      getDataAsync: () => $q.resolve({
         version: 2,
       })
     });
     $provide.value('RouterService', {
-      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter
+      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
+      getActiveTabName() {
+        return ('main');
+      },
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',

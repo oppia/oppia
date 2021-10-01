@@ -20,19 +20,16 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
-import { SubtitledHtmlObjectFactory, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
 
 
 interface BoolSchema {
   type: 'bool';
 }
 
-interface UnicodeSchema {
+export interface UnicodeSchema {
   type: 'unicode';
   // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
@@ -56,9 +53,9 @@ interface FloatSchema {
   choices?: number[];
 }
 
-interface ListSchema {
+export interface ListSchema {
   type: 'list';
-  items: Schema | Schema[];
+  items: Schema | Schema[] | string;
 }
 
 export interface DictSchema {
@@ -104,7 +101,6 @@ type SchemaDefaultValue = (
 export class SchemaDefaultValueService {
   constructor(
       private logger: LoggerService,
-      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
       private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
   ) {}
 
@@ -119,10 +115,10 @@ export class SchemaDefaultValueService {
       schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
     );
 
-    if ('choices' in schema) {
+    if ('choices' in schema && schema.choices !== undefined) {
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict({
+      return SubtitledHtml.createFromBackendDict({
         html: '', content_id: null
       });
     } else if (schemaIsSubtitledUnicode) {
@@ -139,11 +135,11 @@ export class SchemaDefaultValueService {
       if (!Array.isArray(schema.items)) {
         return [];
       }
-      return schema.items.map(function(item) {
+      return schema.items.map((item) => {
         return that.getDefaultValue(item);
       });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-      var result = {};
+      var result: SchemaDefaultValue = {};
       for (var i = 0; i < schema.properties.length; i++) {
         result[schema.properties[i].name] = this.getDefaultValue(
           schema.properties[i].schema);
@@ -154,6 +150,7 @@ export class SchemaDefaultValueService {
       return 0;
     } else {
       this.logger.error('Invalid schema: ' + JSON.stringify(schema));
+      throw new Error('Invalid Schema');
     }
   }
 }

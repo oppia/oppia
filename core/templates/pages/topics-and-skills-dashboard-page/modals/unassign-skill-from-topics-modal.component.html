@@ -1,0 +1,40 @@
+<div class="modal-header">
+  <h3>
+    Unassign Skill from Topics
+  </h3>
+</div>
+<div class="modal-body">
+  <span>This skill is assigned to these following topics, Tick the topics that you want this skill to be unassigned from.</span>
+  <div *ngFor="let topicsAssignment of topicsAssignments | keyvalue" class="protractor-test-unassign-topic-label">
+    <input type="checkbox" class="topic-name protractor-test-unassign-topic" (click)="selectedTopicToUnassign(topicsAssignment.key)"> {{topicsAssignment.key}}
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger protractor-test-confirm-unassign-skill-button" (click)="close()"  [disabled]="!topicsAssignmentsAreFetched">
+    <span>Unassign Skill</span>
+  </button>
+</div>
+
+<style>
+  .unassign-skill-from-topics-modal .topic-name {
+    font-weight: bold;
+  }
+  @media screen and (max-width: 768px) {
+    .unassign-skill-from-topics-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .unassign-skill-from-topics-modal .modal-header {
+      padding: 10px 15px;
+    }
+    .unassign-skill-from-topics-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }
+</style>

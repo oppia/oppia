@@ -23,12 +23,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+import { TopicRightsBackendDict } from './topic-rights.model';
 
 interface TopicRightsBackendResponse {
   'topic_id': string,
   'topic_is_published': boolean,
   'manager_ids': string[]
 }
+
+type TopicRightsCache = (
+  Record<string, (TopicRightsBackendDict | TopicRightsBackendResponse)>);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,19 +43,19 @@ export class TopicRightsBackendApiService {
     private httpClient: HttpClient
   ) {}
 
-  topicRightsCache = {};
+  topicRightsCache: TopicRightsCache = {};
 
   private _fetchTopicRights(
       topicId: string,
-      successCallback: (value?: TopicRightsBackendResponse) => void,
+      successCallback: (value: TopicRightsBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
     let topicRightsUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
         topic_id: topicId
       });
 
-    this.httpClient.get(topicRightsUrl).toPromise().then(
-      (response: TopicRightsBackendResponse) => {
+    this.httpClient.get<TopicRightsBackendDict>(topicRightsUrl)
+      .toPromise().then((response) => {
         successCallback(response);
       }, (errorResponse) => {
         errorCallback(errorResponse.error.error);
@@ -60,7 +65,7 @@ export class TopicRightsBackendApiService {
   private _setTopicStatus(
       topicId: string,
       publishStatus: boolean,
-      successCallback: (value?: TopicRightsBackendResponse) => void,
+      successCallback: (value: TopicRightsBackendResponse) => void,
       errorCallback: (reason?: string) => void): void {
     let changeTopicStatusUrl = this.urlInterpolationService.interpolateUrl(
       '/rightshandler/change_topic_status/<topic_id>', {
@@ -71,14 +76,14 @@ export class TopicRightsBackendApiService {
       publish_status: publishStatus
     };
 
-    this.httpClient.put(
-      changeTopicStatusUrl, putParams).toPromise().then(
-      (response: TopicRightsBackendResponse) => {
-        this.topicRightsCache[topicId] = response;
-        successCallback(response);
-      }, (errorResponse) => {
-        errorCallback(errorResponse.error.error);
-      });
+    this.httpClient.put<TopicRightsBackendResponse>(
+      changeTopicStatusUrl, putParams
+    ).toPromise().then((response) => {
+      this.topicRightsCache[topicId] = response;
+      successCallback(response);
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
   }
 
   private _sendMail(
@@ -106,7 +111,8 @@ export class TopicRightsBackendApiService {
     return this.topicRightsCache.hasOwnProperty(topicId);
   }
 
-  fetchTopicRights(topicId: string): Promise<TopicRightsBackendResponse> {
+  async fetchTopicRightsAsync(
+      topicId: string): Promise<TopicRightsBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchTopicRights(topicId, resolve, reject);
     });
@@ -121,15 +127,16 @@ export class TopicRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  loadTopicRights(topicId: string): Promise<TopicRightsBackendResponse> {
+  async loadTopicRightsAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(topicId)) {
-        resolve(this.topicRightsCache[topicId]);
+        resolve(<TopicRightsBackendResponse> this.topicRightsCache[topicId]);
       } else {
         this._fetchTopicRights(topicId, (topicRights) => {
           // Save the fetched topic rights to avoid future fetches.
           this.topicRightsCache[topicId] = topicRights;
-          resolve(this.topicRightsCache[topicId]);
+          resolve(<TopicRightsBackendResponse> this.topicRightsCache[topicId]);
         }, reject);
       }
     });
@@ -157,13 +164,15 @@ export class TopicRightsBackendApiService {
   /**
    * Publishes a topic.
    */
-  publishTopic(topicId: string): Promise<TopicRightsBackendResponse> {
+  async publishTopicAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, true, resolve, reject);
     });
   }
 
-  sendMail(topicId: string, topicName: string): Promise<void> {
+  async sendMailAsync(
+      topicId: string, topicName: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._sendMail(topicId, topicName, resolve, reject);
     });
@@ -172,7 +181,8 @@ export class TopicRightsBackendApiService {
   /**
    * Unpublishes a topic.
    */
-  unpublishTopic(topicId: string): Promise<TopicRightsBackendResponse> {
+  async unpublishTopicAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, false, resolve, reject);
     });

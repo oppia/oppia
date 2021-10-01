@@ -26,32 +26,31 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Exploration Summary Backend Api Service', () => {
-  let explorationSummaryBackendApiService:
-    ExplorationSummaryBackendApiService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
-  let alertsService: AlertsService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
+  let alertsService: AlertsService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    explorationSummaryBackendApiService = TestBed.get(
+    explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
-    alertsService = TestBed.get(AlertsService);
-    httpTestingController = TestBed.get(
+    csrfService = TestBed.inject(CsrfTokenService);
+    alertsService = TestBed.inject(AlertsService);
+    httpTestingController = TestBed.inject(
       HttpTestingController
     );
 
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('simple-csrf-token');
     });
   });
@@ -62,10 +61,10 @@ describe('Exploration Summary Backend Api Service', () => {
 
   it('should not load public exploration summaries from backend when' +
   ' exploration id is not valid', fakeAsync(() => {
-    const explorationIds = ['#', null, '1'];
+    const explorationIds = ['#', '', '1'];
     const alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-    explorationSummaryBackendApiService.loadPublicExplorationSummaries(
+    explorationSummaryBackendApiService.loadPublicExplorationSummariesAsync(
       explorationIds).then(successHandler, failHandler);
 
     flushMicrotasks();
@@ -83,7 +82,7 @@ describe('Exploration Summary Backend Api Service', () => {
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 
-      explorationSummaryBackendApiService.loadPublicExplorationSummaries(
+      explorationSummaryBackendApiService.loadPublicExplorationSummariesAsync(
         explorationIds).then(successHandler, failHandler);
       const req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
@@ -112,7 +111,7 @@ describe('Exploration Summary Backend Api Service', () => {
       '&' + 'include_private_explorations=false';
 
     explorationSummaryBackendApiService
-      .loadPublicExplorationSummaries(explorationIds)
+      .loadPublicExplorationSummariesAsync(explorationIds)
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(requestUrl);
@@ -146,7 +145,7 @@ describe('Exploration Summary Backend Api Service', () => {
 
 
       explorationSummaryBackendApiService
-        .loadPublicAndPrivateExplorationSummaries(explorationIds).then(
+        .loadPublicAndPrivateExplorationSummariesAsync(explorationIds).then(
           successHandler, failHandler);
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -168,7 +167,7 @@ describe('Exploration Summary Backend Api Service', () => {
       '&' + 'include_private_explorations=false';
 
     explorationSummaryBackendApiService
-      .loadPublicExplorationSummaries(explorationIds)
+      .loadPublicExplorationSummariesAsync(explorationIds)
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(requestUrl);
@@ -192,7 +191,7 @@ describe('Exploration Summary Backend Api Service', () => {
       '&' + 'include_private_explorations=false';
 
     explorationSummaryBackendApiService
-      .loadPublicExplorationSummaries(explorationIds)
+      .loadPublicExplorationSummariesAsync(explorationIds)
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(requestUrl);

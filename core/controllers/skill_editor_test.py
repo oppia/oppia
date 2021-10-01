@@ -14,21 +14,21 @@
 
 """Tests for the skill editor page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -38,22 +38,22 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
     def setUp(self):
         """Completes the sign-up process for the various users."""
         super(BaseSkillEditorControllerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Description')
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic1')
         subtopic.skill_ids = [self.skill_id]
@@ -97,12 +97,12 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
         self.logout()
 
         # Check that admins can access and edit in the editor page.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(self.url)
         self.logout()
 
     def test_skill_editor_page_fails(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
@@ -118,7 +118,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
         self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
 
     def test_skill_rights_handler_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can access and edit in the editor page.
         self.get_json(self.url)
         # Check GET returns JSON object with can_edit_skill_description set
@@ -183,7 +183,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='TopicName1',
             abbreviated_name='topicname', url_fragment='topic-one',
@@ -225,7 +225,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Addition')
         subtopic.skill_ids = [skill_id]
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Maths',
             abbreviated_name='maths', url_fragment='maths',
@@ -236,7 +236,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Chemistry')
         subtopic.skill_ids = [skill_id]
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Science',
             abbreviated_name='science', url_fragment='science',
@@ -269,7 +269,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_put_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         # Check that admins can edit a skill.
         json_response = self.put_json(
@@ -280,7 +280,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_fails_long_commit_message(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         put_payload_copy = self.put_payload.copy()
         put_payload_copy['commit_message'] = (
@@ -295,7 +295,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_put_fails(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         # Check PUT returns 400 when an exception is raised updating the
         # skill.
@@ -321,10 +321,10 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_delete_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can delete a skill.
         skill_has_topics_swap = self.swap(
-            topic_services,
+            topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [])
         with skill_has_topics_swap:
@@ -333,13 +333,13 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_delete_when_associated_questions_exist(
             self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check DELETE returns 400 when the skill still has associated
         # questions.
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
         skill_has_topics_swap = self.swap(
-            topic_services,
+            topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [])
         with skill_has_questions_swap, skill_has_topics_swap:
@@ -347,10 +347,10 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_delete_when_associated_topics_exist(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check DELETE removes skill from the topic and returns 200 when the
         # skill still has associated topics.
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Topic1',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -388,7 +388,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         }
 
     def test_skill_data_handler_get_multiple_skills(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can access two skills data at the same time.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
@@ -396,7 +396,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_skill_data_handler_get_fails(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
@@ -414,16 +414,66 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
         self.url = feconf.FETCH_SKILLS_URL_PREFIX
 
     def test_skill_data_handler_get_multiple_skills(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can access two skills data at the same time.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
         self.assertEqual(len(json_response['skills']), 1)
         self.logout()
 
-    def test_skill_data_handler_get_fails(self):
-        self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when cannot get skill by id.
-        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        self.get_json(self.url, expected_status_int=404)
-        self.logout()
+
+class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for SkillDescriptionHandler."""
+
+    def setUp(self):
+        super(SkillDescriptionHandlerTest, self).setUp()
+        self.skill_description = 'Adding Fractions'
+        self.url = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
+
+    def test_skill_description_handler_when_unique(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+        # Publish a skill.
+        new_skill_id = skill_services.get_new_skill_id()
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, self.skill_description, rubrics)
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        # Unique skill description does not exist.
+        skill_description_2 = 'Subtracting Fractions'
+        url_2 = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, skill_description_2)
+        json_response = self.get_json(url_2)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+    def test_skill_description_handler_when_duplicate(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+        # Publish a skill.
+        new_skill_id = skill_services.get_new_skill_id()
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, self.skill_description, rubrics)
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        # Skill description exists since we've already published it.
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], True)

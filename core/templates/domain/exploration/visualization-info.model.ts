@@ -17,7 +17,7 @@
  */
 
 import { AnswerStats } from
-  'domain/exploration/AnswerStatsObjectFactory';
+  'domain/exploration/answer-stats.model';
 import { InteractionAnswer } from
   'interactions/answer-defs';
 
@@ -30,7 +30,7 @@ export interface AnswerStatsBackendDict {
   // For example, for SetInput interactions the individual answer elements are
   // not generally intended to be used as a single response to SetInput
   // interactions, so we omit addressed information entirely.
-  'is_addressed'?: boolean;
+  'is_addressed': boolean;
 }
 
 export type Option = string | string[];

@@ -14,17 +14,16 @@
 
 """Tests for the image validation service."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import image_validation_services
 from core.tests import test_utils
-
-import feconf
-import python_utils
-import utils
 
 
 class ImageValidationServiceTests(test_utils.GenericTestBase):
@@ -65,7 +64,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'The svg tag does not contains the \'xmlns\' attribute.')
 
         self._assert_validation_error(
-            'not an image', 'image.png', 'Image not recognized')
+            b'not an image', 'image.png', 'Image not recognized')
 
         self._assert_validation_error(
             self.raw_image, '.png', 'Invalid filename')

@@ -38,8 +38,6 @@ import {
   InteractiveMapCustomizationArgsBackendDict,
   ItemSelectionInputCustomizationArgs,
   ItemSelectionInputCustomizationArgsBackendDict,
-  LogicProofCustomizationArgs,
-  LogicProofCustomizationArgsBackendDict,
   MathEquationInputCustomizationArgs,
   MathEquationInputCustomizationArgsBackendDict,
   MultipleChoiceInputCustomizationArgs,
@@ -63,7 +61,7 @@ import {
 } from 'interactions/customization-args-defs';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 /**
  * These dtslint type tests check that for each interaction, its frontend
@@ -168,14 +166,6 @@ type TestItemSelectionInputCustomizationArgsInterfacesMatch = AssertTrue<
   >
 >;
 
-type TestLogicProofCustomizationArgsInterfacesMatch = AssertTrue<
-  IsExactAfterReplacement<
-    LogicProofCustomizationArgsBackendDict,
-    {},
-    LogicProofCustomizationArgs
-  >
->;
-
 type TestMathEquationInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     MathEquationInputCustomizationArgsBackendDict,
@@ -219,7 +209,7 @@ type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
 type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     NumericInputCustomizationArgsBackendDict,
-    {},
+    { requireNonnegativeInput: { value: boolean } },
     NumericInputCustomizationArgs
   >
 >;

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for PreviewSummaryTileModalController.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Preview Summary Tile Modal Controller', function() {
   var $scope = null;

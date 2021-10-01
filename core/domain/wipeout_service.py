@@ -14,13 +14,17 @@
 
 """Service for handling the user deletion process."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
+import itertools
 import logging
 import re
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -28,22 +32,20 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (
-    base_models, collection_models, config_models,
-    exp_models, feedback_models, question_models,
-    skill_models, story_models, subtopic_models,
+    app_feedback_report_models, base_models, blog_models,
+    collection_models, config_models, exp_models, feedback_models,
+    question_models, skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.app_feedback_report, models.NAMES.base_model,
+    models.NAMES.blog, models.NAMES.collection, models.NAMES.config,
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
@@ -51,6 +53,8 @@ import python_utils
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+bulk_email_services = models.Registry.import_bulk_email_services()
+
 
 WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
 PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED = datetime.timedelta(weeks=1)
@@ -70,7 +74,6 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
-        pending_deletion_request_model.role,
         pending_deletion_request_model.normalized_long_term_username,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.pseudonymizable_entity_mappings
@@ -107,7 +110,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
             'email': deletion_request.email,
             'normalized_long_term_username': (
                 deletion_request.normalized_long_term_username),
-            'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
             'pseudonymizable_entity_mappings': (
                 deletion_request.pseudonymizable_entity_mappings)
@@ -156,11 +158,10 @@ def pre_delete_user(user_id):
         pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
-                profile_user_settings.email,
-                profile_user_settings.role
+                profile_user_settings.email
             )
         )
-    if user_settings.role != feconf.ROLE_ID_LEARNER:
+    if feconf.ROLE_ID_MOBILE_LEARNER not in user_settings.roles:
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
@@ -170,6 +171,8 @@ def pre_delete_user(user_id):
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
             user_id, False, False, False, False)
+        bulk_email_services.permanently_delete_user_from_list(
+            user_settings.email)
 
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (
@@ -185,12 +188,77 @@ def pre_delete_user(user_id):
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
-            user_settings.role,
             normalized_long_term_username=normalized_long_term_username
         )
     )
 
     save_pending_deletion_requests(pending_deletion_requests)
+
+
+def delete_users_pending_to_be_deleted():
+    """Taskqueue service method for deleting users that are pending
+    to be deleted. Once these users are deleted, the job results
+    will be mailed to the admin.
+    """
+    pending_deletion_request_models = (
+        user_models.PendingDeletionRequestModel.query().fetch())
+    if len(pending_deletion_request_models) == 0:
+        return
+
+    email_message = 'Results of the User Deletion Cron Job'
+    for request_model in pending_deletion_request_models:
+        pending_deletion_request = get_pending_deletion_request(
+            request_model.id)
+        # The final status of the deletion. Either 'SUCCESS' or 'ALREADY DONE'.
+        deletion_status = run_user_deletion(pending_deletion_request)
+        email_message += '\n-----------------------------------\n'
+        email_message += (
+            'PendingDeletionRequestModel ID: %s\n'
+            'User ID: %s\n'
+            'Deletion status: %s\n'
+        ) % (
+            request_model.id, pending_deletion_request.user_id,
+            deletion_status
+        )
+
+    email_subject = 'User Deletion job result'
+    if feconf.CAN_SEND_EMAILS:
+        email_manager.send_mail_to_admin(email_subject, email_message)
+
+
+def check_completion_of_user_deletion():
+    """Taskqueue service method for checking the completion of user deletion.
+    It checks if all models do not contain the user ID of the deleted user in
+    their fields. If any field contains the user ID of the deleted user, the
+    deletion_complete is set to False, so that later the
+    delete_users_pending_to_be_deleted will be run on that user again.
+    If all the fields do not contain the user ID of the deleted
+    user, the final email announcing that the deletion was completed is sent,
+    and the deletion request is deleted.
+    """
+    pending_deletion_request_models = (
+        user_models.PendingDeletionRequestModel.query().fetch())
+
+    email_message = 'Results of the Completion of User Deletion Cron Job'
+    for request_model in pending_deletion_request_models:
+        pending_deletion_request = get_pending_deletion_request(
+            request_model.id)
+        # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',
+        # or 'FAILURE'.
+        completion_status = run_user_deletion_completion(
+            pending_deletion_request)
+        if feconf.CAN_SEND_EMAILS:
+            email_message += '\n-----------------------------------\n'
+            email_message += (
+                'PendingDeletionRequestModel ID: %s\n'
+                'User ID: %s\n'
+                'Completion status: %s\n'
+            ) % (
+                request_model.id, pending_deletion_request.user_id,
+                completion_status
+            )
+            email_subject = 'Completion of User Deletion job result'
+            email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def run_user_deletion(pending_deletion_request):
@@ -223,9 +291,9 @@ def run_user_deletion_completion(pending_deletion_request):
     Returns:
         str. The outcome of the verification.
     """
-    # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
-    # for the user. The verification will be done in the next run of
-    # FullyCompleteUserDeletionOneOffJob.
+    # If deletion_complete is False the delete_users_pending_to_be_deleted
+    # wasn't yet run for the user. The verification will be done in the next
+    # run of check_completion_of_user_deletion.
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
@@ -237,12 +305,18 @@ def run_user_deletion_completion(pending_deletion_request):
         if pending_deletion_request.normalized_long_term_username is not None:
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username)
-        email_manager.send_account_deleted_email(
-            pending_deletion_request.user_id, pending_deletion_request.email)
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_account_deleted_email(
+                pending_deletion_request.user_id,
+                pending_deletion_request.email
+            )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
-        email_manager.send_account_deletion_failed_email(
-            pending_deletion_request.user_id, pending_deletion_request.email)
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_account_deletion_failed_email(
+                pending_deletion_request.user_id,
+                pending_deletion_request.email
+            )
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE
@@ -263,25 +337,26 @@ def _delete_models_with_delete_at_end_policy(user_id):
 
 def delete_user(pending_deletion_request):
     """Delete all the models for user specified in pending_deletion_request
-    on the basis of the user role specified in the request.
+    on the basis of the user role.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_role = pending_deletion_request.role
+    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
 
     auth_services.delete_external_auth_associations(user_id)
 
-    _delete_models(user_id, user_role, models.NAMES.auth)
-    _delete_models(user_id, user_role, models.NAMES.user)
+    _delete_models(user_id, models.NAMES.auth)
+    _delete_models(user_id, models.NAMES.user)
     _pseudonymize_config_models(pending_deletion_request)
-    _delete_models(user_id, user_role, models.NAMES.feedback)
-    _delete_models(user_id, user_role, models.NAMES.improvements)
-    if user_role != feconf.ROLE_ID_LEARNER:
+    _delete_models(user_id, models.NAMES.feedback)
+    _delete_models(user_id, models.NAMES.improvements)
+    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
+        _pseudonymize_app_feedback_report_models(pending_deletion_request)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
@@ -342,7 +417,8 @@ def delete_user(pending_deletion_request):
             'topic_id',
             feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
             ('manager_ids',))
-    _delete_models(user_id, user_role, models.NAMES.email)
+        _pseudonymize_blog_post_models(pending_deletion_request)
+    _delete_models(user_id, models.NAMES.email)
 
 
 def verify_user_deleted(user_id, include_delete_at_end_models=False):
@@ -504,7 +580,36 @@ def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
     }
 
 
-def _save_pseudonymizable_entity_mappings(
+def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
+        pending_deletion_request, entity_category, entity_ids):
+    """Generate mapping from entity IDs to a single pseudonymized user ID.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to which to save the entity mappings.
+        entity_category: models.NAMES. The category of the models that
+            contain the entity IDs.
+        entity_ids: list(str). List of entity IDs for which to generate new
+            pseudonymous user IDs. The IDs are of entities (e.g. models in
+            config, collection, skill, or suggestion) that were modified
+            in some way by the user who is currently being deleted.
+
+    Returns:
+        dict(str, str). Mapping between the entity IDs and pseudonymous user
+        ID.
+    """
+    if (
+            entity_category.value not in
+            pending_deletion_request.pseudonymizable_entity_mappings):
+        pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            entity_category.value] = {
+                entity_id: pseudonymized_id for entity_id in entity_ids
+            }
+        save_pending_deletion_requests([pending_deletion_request])
+
+
+def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, entity_category, entity_ids):
     """Save the entity mappings for some entity category into the pending
     deletion request.
@@ -519,33 +624,24 @@ def _save_pseudonymizable_entity_mappings(
     # The pseudonymizable_entity_mappings field might have only been partially
     # generated, so we fill in the missing part for this entity category.
     if (
-            entity_category not in
+            entity_category.value not in
             pending_deletion_request.pseudonymizable_entity_mappings):
         pending_deletion_request.pseudonymizable_entity_mappings[
-            entity_category] = (
+            entity_category.value] = (
                 _generate_entity_to_pseudonymized_ids_mapping(entity_ids))
         save_pending_deletion_requests([pending_deletion_request])
 
 
-def _delete_models(user_id, user_role, module_name):
+def _delete_models(user_id, module_name):
     """Delete all the models from the given module, for a given user.
 
     Args:
         user_id: str. The id of the user to be deleted.
-        user_role: str. The role of the user to be deleted.
         module_name: models.NAMES. The name of the module containing the models
             that are being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes([module_name]):
         deletion_policy = model_class.get_deletion_policy()
-        lowest_role_for_class = model_class.get_lowest_supported_role()
-        if (
-                user_role != lowest_role_for_class and
-                role_services.check_if_path_exists_in_roles_graph(
-                    lowest_role_for_class, user_role) is False
-        ):
-            continue
-
         if deletion_policy == base_models.DELETION_POLICY.DELETE:
             model_class.apply_deletion_policy(user_id)
 
@@ -615,7 +711,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
             )
     model_ids = snapshot_metadata_ids | commit_log_ids
 
-    _save_pseudonymizable_entity_mappings(
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, activity_category, list(model_ids))
 
     return (snapshot_metadata_models, commit_log_models)
@@ -642,7 +738,9 @@ def _pseudonymize_config_models(pending_deletion_request):
         )
     )
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -665,7 +763,7 @@ def _pseudonymize_config_models(pending_deletion_request):
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.config])
+            models.NAMES.config.value])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -674,8 +772,7 @@ def _pseudonymize_config_models(pending_deletion_request):
                 0,
                 len(config_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 config_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -724,7 +821,9 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         )
     )
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -753,7 +852,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            activity_category])
+            activity_category.value])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in snapshot_metadata_models
@@ -766,8 +865,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
                 0,
                 len(activity_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 activity_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
@@ -823,7 +921,9 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         )
     )
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -924,7 +1024,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            activity_category])
+            activity_category.value])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_snapshot_metadata_models = [
             model for model in snapshot_metadata_models
@@ -953,8 +1053,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                 0,
                 len(activity_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 activity_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -975,7 +1074,8 @@ def _remove_user_id_from_contributors_in_summary_models(
         summary_model_class.contributor_ids == user_id
     ).fetch()
 
-    def _remove_user_id_from_models(summary_models):
+    @transaction_services.run_in_transaction_wrapper
+    def _remove_user_id_from_models_transactional(summary_models):
         """Remove the user ID from contributor_ids and contributor_summary
         fields.
 
@@ -1001,9 +1101,61 @@ def _remove_user_id_from_contributors_in_summary_models(
             0,
             len(related_summary_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _remove_user_id_from_models,
+        _remove_user_id_from_models_transactional(
             related_summary_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
+
+
+def _pseudonymize_app_feedback_report_models(pending_deletion_request):
+    """Pseudonymize the app feedback report models for the user with user_id,
+    if they scrubbed a feedback report. If the user scrubs multiple reports,
+    they will be given the same pseudonym for each model entity.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    model_class = app_feedback_report_models.AppFeedbackReportModel
+    user_id = pending_deletion_request.user_id
+
+    feedback_report_models = model_class.query(
+        model_class.scrubbed_by == user_id).fetch()
+    report_ids = set(model.id for model in feedback_report_models)
+
+    # Fill in any missing keys in the category's
+    # pseudonymizable_entity_mappings, using the same pseudonym for each entity
+    # so that a user will have the same pseudonymized ID for each entity
+    # referencing them.
+    entity_category = models.NAMES.app_feedback_report
+    _save_pseudonymizable_entity_mappings_to_same_pseudonym(
+        pending_deletion_request, entity_category, report_ids)
+
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(feedback_report_models):
+        """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        feedback_report_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
+        Args:
+            feedback_report_models: list(FeedbackReportModel). The models with a
+                user ID in the 'scrubbed_by' field that we want to pseudonymize.
+        """
+        for report_model in feedback_report_models:
+            report_model.scrubbed_by = (
+                report_ids_to_pids[report_model.id])
+        model_class.update_timestamps_multi(feedback_report_models)
+        model_class.put_multi(feedback_report_models)
+
+    report_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.app_feedback_report.value])
+
+    for i in python_utils.RANGE(
+            0, len(feedback_report_models),
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        _pseudonymize_models_transactional(
+            feedback_report_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
 
 
@@ -1029,13 +1181,13 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             feedback_thread_model_class.last_nonempty_message_author_id == (
                 user_id)
         )).fetch()
-    feedback_ids = set([model.id for model in feedback_thread_models])
+    feedback_ids = set(model.id for model in feedback_thread_models)
 
     feedback_message_model_class = feedback_models.GeneralFeedbackMessageModel
     feedback_message_models = feedback_message_model_class.query(
         feedback_message_model_class.author_id == user_id
     ).fetch()
-    feedback_ids |= set([model.thread_id for model in feedback_message_models])
+    feedback_ids |= set(model.thread_id for model in feedback_message_models)
 
     suggestion_model_class = suggestion_models.GeneralSuggestionModel
     general_suggestion_models = suggestion_model_class.query(
@@ -1043,12 +1195,14 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             suggestion_model_class.author_id == user_id,
             suggestion_model_class.final_reviewer_id == user_id
         )).fetch()
-    feedback_ids |= set([model.id for model in general_suggestion_models])
+    feedback_ids |= set(model.id for model in general_suggestion_models)
 
-    _save_pseudonymizable_entity_mappings(
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.feedback, feedback_ids)
 
-    def _pseudonymize_models(feedback_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            feedback_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1095,7 +1249,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
 
     feedback_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.feedback])
+            models.NAMES.feedback.value])
     for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
         feedback_related_models = [
             model for model in feedback_thread_models
@@ -1111,8 +1265,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
                 0,
                 len(feedback_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 feedback_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
@@ -1134,12 +1287,13 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             voiceover_application_class.author_id == user_id,
             voiceover_application_class.final_reviewer_id == user_id
         )).fetch()
-    suggestion_ids = set([model.id for model in voiceover_application_models])
+    suggestion_ids = set(model.id for model in voiceover_application_models)
 
-    _save_pseudonymizable_entity_mappings(
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.suggestion, suggestion_ids)
 
-    def _pseudonymize_models(voiceover_application_models):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(voiceover_application_models):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1165,13 +1319,98 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
 
     suggestion_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.suggestion])
+            models.NAMES.suggestion.value])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _pseudonymize_models,
+        _pseudonymize_models_transactional(
             voiceover_application_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
+
+
+def _pseudonymize_blog_post_models(pending_deletion_request):
+    """Pseudonymizes the blog post models for the user with user_id.
+       Also removes the user-id from the list of editor ids from the
+       blog post rights model.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending
+            deletion request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+
+    # We want to preserve the same pseudonymous user ID on all the models
+    # related to one blog post. So we collect all the users' blog
+    # post models and blog post summary models then
+    # we generate a pseudonymous user ID and replace the user ID
+    # with that pseudonymous user ID in all the models.
+    blog_post_model_class = blog_models.BlogPostModel
+    blog_post_models_list = blog_post_model_class.query(
+        blog_post_model_class.author_id == user_id
+    ).fetch()
+    blog_post_ids = {model.id for model in blog_post_models_list}
+
+    blog_post_summary_model_class = blog_models.BlogPostSummaryModel
+    blog_post_summary_models = blog_post_summary_model_class.query(
+        blog_post_summary_model_class.author_id == user_id
+    ).fetch()
+    blog_post_ids |= {model.id for model in blog_post_summary_models}
+
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
+        pending_deletion_request, models.NAMES.blog, blog_post_ids)
+
+    # We want to remove the user ID from the list of editor ids on all the
+    # blog post rights models related to the user.
+    blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(user_id)
+
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            blog_posts_related_models, pseudonymized_id):
+        """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        blog_posts_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
+        Args:
+            blog_posts_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        blog_post_models_list = [
+            model for model in blog_posts_related_models
+            if isinstance(model, blog_post_model_class)]
+        for blog_post_model in blog_post_models_list:
+            if blog_post_model.author_id == user_id:
+                blog_post_model.author_id = pseudonymized_id
+            blog_post_model.update_timestamps()
+
+        blog_post_summary_models_list = [
+            model for model in blog_posts_related_models
+            if isinstance(model, blog_post_summary_model_class)]
+        for blog_post_summary in blog_post_summary_models_list:
+            if blog_post_summary.author_id == user_id:
+                blog_post_summary.author_id = pseudonymized_id
+            blog_post_summary.update_timestamps()
+
+        datastore_services.put_multi(
+            blog_post_models_list + blog_post_summary_models_list)
+
+    blog_post_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.blog.value])
+    for blog_post_id, pseudonymized_id in blog_post_ids_to_pids.items():
+        blog_posts_related_models = [
+            model for model in itertools.chain(
+                blog_post_models_list, blog_post_summary_models)
+            if model.id == blog_post_id
+        ]
+        transaction_slices = utils.grouper(
+            blog_posts_related_models,
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION)
+        for transaction_slice in transaction_slices:
+            _pseudonymize_models_transactional(
+                [m for m in transaction_slice if m is not None],
+                pseudonymized_id)

@@ -16,15 +16,15 @@
 
 """Registry for issues."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import pkgutil
 
+from core import feconf
+from core import python_utils
 from core.platform import models
-import feconf
-import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

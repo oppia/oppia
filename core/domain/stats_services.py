@@ -16,27 +16,30 @@
 
 """Services for exploration-related statistics."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import datetime
 import itertools
 
+from core import feconf
+from core import utils
 from core.domain import exp_fetchers
-from core.domain import interaction_registry
 from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
-import feconf
-import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
 
-
-# Counts contributions from all versions.
-VERSION_ALL = 'all'
+# NOTE TO DEVELOPERS: The functions:
+#   - get_visualizations_info()
+#   - get_top_state_answer_stats()
+#   - get_top_state_unresolved_answers()
+#   - get_top_state_answer_stats_multi()
+# were removed in #13021 as part of the migration to Apache Beam. Please refer
+# to that PR if you need to reinstate them.
 
 
 def _migrate_to_latest_issue_schema(exp_issue_dict):
@@ -117,7 +120,9 @@ def get_exploration_stats(exp_id, exp_version):
     return exploration_stats
 
 
-def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
+@transaction_services.run_in_transaction_wrapper
+def _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats. The model GET and PUT must be done in a transaction to avoid loss of
     updates that come in rapid succession.
@@ -140,6 +145,11 @@ def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
 
     for state_name, stats in aggregated_stats['state_stats_mapping'].items():
         if state_name not in exp_stats.state_stats_mapping:
+            # Some events in the past seems to have 'undefined' state names
+            # passed from the frontend code. These are invalid and should be
+            # discarded.
+            if state_name == 'undefined':
+                return
             raise Exception(
                 'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
                 'does not exist' % (exp_id, exp_version, state_name))
@@ -159,8 +169,8 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    transaction_services.run_in_transaction(
-        _update_stats_transactional, exp_id, exp_version, aggregated_stats)
+    _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):
@@ -205,6 +215,7 @@ def get_stats_for_new_exp_version(
     Returns:
         ExplorationStats. The newly created exploration stats object.
     """
+    old_exp_stats = None
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
     exploration_stats = get_exploration_stats_by_id(
@@ -216,39 +227,78 @@ def get_stats_for_new_exp_version(
     # Handling reverts.
     if revert_to_version:
         old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
+
+    return advance_version_of_exp_stats(
+        new_exp_version, exp_versions_diff, exploration_stats, old_exp_stats,
+        revert_to_version)
+
+
+def advance_version_of_exp_stats(
+        exp_version, exp_versions_diff, exp_stats,
+        reverted_exp_stats, revert_to_version):
+    """Makes required changes to the structure of ExplorationStatsModel of an
+    old exp_version and a new ExplorationStatsModel is created for the new
+    exp_version. Note: This function does not save the newly created model, it
+    returns it. Callers should explicitly save the model if required.
+
+    Args:
+        exp_version: int. Version of the exploration.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
+        exp_stats: ExplorationStats. The ExplorationStats model.
+        reverted_exp_stats: ExplorationStats|None. The reverted
+            ExplorationStats model.
+        revert_to_version: int|None. If the change is a revert, the version.
+            Otherwise, None.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
+    """
+
+    # Handling reverts.
+    if revert_to_version:
         # If the old exploration issues model doesn't exist, the current model
         # is carried over (this is a fallback case for some tests, and can never
         # happen in production.)
-        if old_exp_stats:
-            exploration_stats.num_starts_v2 = old_exp_stats.num_starts_v2
-            exploration_stats.num_actual_starts_v2 = (
-                old_exp_stats.num_actual_starts_v2)
-            exploration_stats.num_completions_v2 = (
-                old_exp_stats.num_completions_v2)
-            exploration_stats.state_stats_mapping = (
-                old_exp_stats.state_stats_mapping)
-        exploration_stats.exp_version = new_exp_version
+        if reverted_exp_stats:
+            exp_stats.num_starts_v2 = reverted_exp_stats.num_starts_v2
+            exp_stats.num_actual_starts_v2 = (
+                reverted_exp_stats.num_actual_starts_v2)
+            exp_stats.num_completions_v2 = (
+                reverted_exp_stats.num_completions_v2)
+            exp_stats.state_stats_mapping = (
+                reverted_exp_stats.state_stats_mapping)
+        exp_stats.exp_version = exp_version
 
-        return exploration_stats
+        return exp_stats
 
-    # Handling state deletions.
-    for state_name in exp_versions_diff.deleted_state_names:
-        exploration_stats.state_stats_mapping.pop(state_name)
+    new_state_name_stats_mapping = {}
 
-    # Handling state additions.
+    # Handle unchanged states.
+    unchanged_state_names = set(utils.compute_list_difference(
+        exp_stats.state_stats_mapping,
+        exp_versions_diff.deleted_state_names +
+        list(exp_versions_diff.new_to_old_state_names.values())))
+    for state_name in unchanged_state_names:
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[state_name].clone())
+
+    # Handle renamed states.
+    for state_name in exp_versions_diff.new_to_old_state_names:
+        old_state_name = exp_versions_diff.new_to_old_state_names[
+            state_name]
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[old_state_name].clone())
+
+    # Handle newly-added states.
     for state_name in exp_versions_diff.added_state_names:
-        exploration_stats.state_stats_mapping[state_name] = (
+        new_state_name_stats_mapping[state_name] = (
             stats_domain.StateStats.create_default())
 
-    # Handling state renames.
-    for new_state_name in exp_versions_diff.new_to_old_state_names:
-        exploration_stats.state_stats_mapping[new_state_name] = (
-            exploration_stats.state_stats_mapping.pop(
-                exp_versions_diff.new_to_old_state_names[new_state_name]))
+    exp_stats.state_stats_mapping = new_state_name_stats_mapping
+    exp_stats.exp_version = exp_version
 
-    exploration_stats.exp_version = new_exp_version
-
-    return exploration_stats
+    return exp_stats
 
 
 def assign_playthrough_to_corresponding_issue(
@@ -499,11 +549,9 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
         stats_models.ExplorationStatsModel.get_multi_versions(
             exp_id, version_numbers))
     for exploration_stats_model in exploration_stats_models:
-        if exploration_stats_model is None:
-            exploration_stats.append(None)
-        else:
-            exploration_stats.append(get_exploration_stats_from_model(
-                exploration_stats_model))
+        exploration_stats.append(
+            None if exploration_stats_model is None else
+            get_exploration_stats_from_model(exploration_stats_model))
     return exploration_stats
 
 
@@ -658,6 +706,7 @@ def save_exp_issues_model(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain object.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _save_exp_issues_model_transactional():
         """Implementation to be run in a transaction."""
 
@@ -671,8 +720,7 @@ def save_exp_issues_model(exp_issues):
 
     # Run in transaction to help prevent data-races between concurrent learners
     # who may have a playthrough recorded at the same time.
-    transaction_services.run_in_transaction(
-        _save_exp_issues_model_transactional)
+    _save_exp_issues_model_transactional()
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -711,6 +759,7 @@ def delete_playthroughs_multi(playthrough_ids):
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(
@@ -718,74 +767,7 @@ def delete_playthroughs_multi(playthrough_ids):
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(
-        _delete_playthroughs_multi_transactional)
-
-
-def get_visualizations_info(exp_id, state_name, interaction_id):
-    """Returns a list of visualization info. Each item in the list is a dict
-    with keys 'data' and 'options'.
-
-    Args:
-        exp_id: str. The ID of the exploration.
-        state_name: str. Name of the state.
-        interaction_id: str. The interaction type.
-
-    Returns:
-        list(dict). Each item in the list is a dict with keys representing
-        - 'id': str. The visualization ID.
-        - 'data': list(dict). A list of answer/frequency dicts.
-        - 'options': dict. The visualization options.
-
-        An example of the returned value may be:
-        [{
-            'options': {'header': 'Pretty Tiles!', 'use_percentages': True},
-            'id': 'SortedTiles',
-            'data': [{'frequency': 1, 'answer': 0}]
-        }]
-    """
-    if interaction_id is None:
-        return []
-
-    visualizations = interaction_registry.Registry.get_interaction_by_id(
-        interaction_id).answer_visualizations
-
-    calculation_ids = set([
-        visualization.calculation_id for visualization in visualizations])
-
-    calculation_ids_to_outputs = {}
-    for calculation_id in calculation_ids:
-        # Don't show top unresolved answers calculation ouutput in stats of
-        # exploration.
-        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
-            continue
-
-        # This is None if the calculation job has not yet been run for this
-        # state.
-        calc_output_domain_object = _get_calc_output(
-            exp_id, state_name, calculation_id)
-
-        # If the calculation job has not yet been run for this state, we simply
-        # exclude the corresponding visualization results.
-        if calc_output_domain_object is None:
-            continue
-
-        # If the output was associated with a different interaction ID, skip the
-        # results. This filtering step is needed since the same calculation_id
-        # can be shared across multiple interaction types.
-        if calc_output_domain_object.interaction_id != interaction_id:
-            continue
-
-        calculation_ids_to_outputs[calculation_id] = (
-            calc_output_domain_object.calculation_output.to_raw_type())
-    return [{
-        'id': visualization.id,
-        'data': calculation_ids_to_outputs[visualization.calculation_id],
-        'options': visualization.options,
-        'addressed_info_is_supported': (
-            visualization.addressed_info_is_supported),
-    } for visualization in visualizations
-            if visualization.calculation_id in calculation_ids_to_outputs]
+    _delete_playthroughs_multi_transactional()
 
 
 def record_answer(
@@ -891,108 +873,6 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
         for submitted_answer_dict in sample_answers]
 
 
-def get_top_state_answer_stats(exploration_id, state_name):
-    """Fetches the top (at most) 10 answers from the given state_name in the
-    corresponding exploration. Only answers that occur with frequency >=
-    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
-
-    Args:
-        exploration_id: str. The exploration ID.
-        state_name: str. The name of the state to fetch answers for.
-
-    Returns:
-        list(*). A list of the top 10 answers, sorted by decreasing frequency.
-    """
-    calc_output = (
-        _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies'))
-    raw_calc_output = (
-        [] if calc_output is None else
-        calc_output.calculation_output.to_raw_type())
-    return [
-        {'answer': output['answer'], 'frequency': output['frequency']}
-        for output in raw_calc_output
-        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
-    ]
-
-
-def get_top_state_unresolved_answers(exploration_id, state_name):
-    """Fetches the top unresolved answers for the given state_name in the
-    corresponding exploration. Only answers that occur with frequency >=
-    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
-
-    Args:
-        exploration_id: str. The exploration ID.
-        state_name: str. The name of the state to fetch answers for.
-
-    Returns:
-        list(*). A list of the top 10 answers, sorted by decreasing frequency.
-    """
-    calc_output_model = _get_calc_output(
-        exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
-
-    if not calc_output_model:
-        return []
-
-    calculation_output = calc_output_model.calculation_output.to_raw_type()
-    return [
-        {'answer': output['answer'], 'frequency': output['frequency']}
-        for output in calculation_output
-        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
-    ]
-
-
-def get_top_state_answer_stats_multi(exploration_id, state_names):
-    """Fetches the top (at most) 10 answers from each given state_name in the
-    corresponding exploration. Only answers that occur with frequency >=
-    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
-
-    Args:
-        exploration_id: str. The exploration ID.
-        state_names: list(str). The name of the state to fetch answers for.
-
-    Returns:
-        dict(str: list(*)). Dict mapping each state name to the list of its top
-        (at most) 10 answers, sorted by decreasing frequency.
-    """
-    return {
-        state_name: get_top_state_answer_stats(exploration_id, state_name)
-        for state_name in state_names
-    }
-
-
-def _get_calc_output(exploration_id, state_name, calculation_id):
-    """Get state answers calculation output domain object obtained from
-    StateAnswersCalcOutputModel instance stored in the data store. The
-    calculation ID comes from the name of the calculation class used to compute
-    aggregate data from submitted user answers. This returns aggregated output
-    for all versions of the specified state and exploration.
-
-    Args:
-        exploration_id: str. ID of the exploration.
-        state_name: str. Name of the state.
-        calculation_id: str. Name of the calculation class.
-
-    Returns:
-        StateAnswersCalcOutput|None. The state answers calculation output
-        domain object or None.
-    """
-    calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-        exploration_id, VERSION_ALL, state_name, calculation_id)
-    if calc_output_model:
-        calculation_output = None
-        if (calc_output_model.calculation_output_type ==
-                stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
-            calculation_output = (
-                stats_domain.AnswerFrequencyList.from_raw_type(
-                    calc_output_model.calculation_output))
-        return stats_domain.StateAnswersCalcOutput(
-            exploration_id, VERSION_ALL, state_name,
-            calc_output_model.interaction_id, calculation_id,
-            calculation_output)
-    else:
-        return None
-
-
 def get_state_reference_for_exploration(exp_id, state_name):
     """Returns the generated state reference for the given exploration id and
     state name.
@@ -1095,8 +975,7 @@ def create_learner_answer_details_model_instance(learner_answer_details):
         learner_answer_details.entity_type,
         learner_answer_details.state_reference,
         learner_answer_details.interaction_id,
-        [learner_answer_info.to_dict() for learner_answer_info
-         in learner_answer_details.learner_answer_info_list],
+        learner_answer_details.learner_answer_info_list,
         learner_answer_details.learner_answer_info_schema_version,
         learner_answer_details.accumulated_answer_info_json_size_bytes)
 

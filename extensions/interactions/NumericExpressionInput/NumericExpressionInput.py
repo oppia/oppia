@@ -16,8 +16,8 @@
 
 """Python configuration for NumericExpressionInput interaction."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from extensions.interactions import base
 
@@ -45,4 +45,12 @@ class NumericExpressionInput(base.BaseInteraction):
             'content_id': None,
             'unicode_str': 'Type an expression here, using only numbers.'
         }
+    }, {
+        'name': 'useFractionForDivision',
+        'description': (
+            'Represent division using fractions (rather than ÷).'),
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False
     }]

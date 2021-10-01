@@ -26,8 +26,8 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
-  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
-require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
+  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.ts');
+require('pages/story-editor-page/navbar/story-editor-navbar.component.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 require(
   'pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts');
@@ -43,7 +43,7 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/loader.service.ts');
-require('services/contextual/window-ref.service');
+require('services/prevent-page-unload-event.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -52,16 +52,18 @@ angular.module('oppia').component('storyEditorPage', {
   controller: [
     '$uibModal', '$window', 'BottomNavbarStatusService',
     'EditableStoryBackendApiService', 'LoaderService',
-    'PageTitleService', 'StoryEditorNavigationService',
-    'StoryEditorStateService', 'StoryValidationService', 'UndoRedoService',
-    'UrlInterpolationService', 'UrlService', 'WindowRef',
+    'PageTitleService', 'PreventPageUnloadEventService',
+    'StoryEditorNavigationService', 'StoryEditorStateService',
+    'StoryValidationService', 'UndoRedoService',
+    'UrlInterpolationService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
         $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService, LoaderService,
-        PageTitleService, StoryEditorNavigationService,
-        StoryEditorStateService, StoryValidationService, UndoRedoService,
-        UrlInterpolationService, UrlService, WindowRef,
+        PageTitleService, PreventPageUnloadEventService,
+        StoryEditorNavigationService, StoryEditorStateService,
+        StoryValidationService, UndoRedoService,
+        UrlInterpolationService, UrlService,
         MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -91,10 +93,10 @@ angular.module('oppia').component('storyEditorPage', {
             ), '_self');
         }
       };
-      var setPageTitle = function() {
-        PageTitleService.setPageTitle(
+      var setDocumentTitle = function() {
+        PageTitleService.setDocumentTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
-        PageTitleService.setPageSubtitleForMobileView(
+        PageTitleService.setNavbarSubtitleForMobileView(
           StoryEditorStateService.getStory().getTitle());
       };
 
@@ -167,7 +169,7 @@ angular.module('oppia').component('storyEditorPage', {
           }
           ctrl.forceValidateExplorations = false;
           if (explorationIds.length > 0) {
-            EditableStoryBackendApiService.validateExplorations(
+            EditableStoryBackendApiService.validateExplorationsAsync(
               ctrl.story.getId(), explorationIds
             ).then(function(validationIssues) {
               ctrl.explorationValidationIssues =
@@ -187,7 +189,7 @@ angular.module('oppia').component('storyEditorPage', {
 
       var _initPage = function() {
         ctrl.story = StoryEditorStateService.getStory();
-        setPageTitle();
+        setDocumentTitle();
         _validateStory();
       };
 
@@ -197,20 +199,6 @@ angular.module('oppia').component('storyEditorPage', {
 
       ctrl.navigateToStoryEditor = function() {
         StoryEditorNavigationService.navigateToStoryEditor();
-      };
-
-      ctrl.setUpBeforeUnload = function() {
-        WindowRef.nativeWindow.addEventListener(
-          'beforeunload', ctrl.confirmBeforeLeaving);
-      };
-
-      ctrl.confirmBeforeLeaving = function(e) {
-        if (UndoRedoService.getChangeCount()) {
-          // This message is irrelevant, but is needed to trigger the
-          // confirmation before leaving.
-          e.returnValue = 'Sure?';
-          return false;
-        }
       };
 
       ctrl.$onInit = function() {
@@ -232,11 +220,12 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.forceValidateExplorations = true;
         ctrl.warningsAreShown = false;
         BottomNavbarStatusService.markBottomNavbarStatus(true);
-        ctrl.setUpBeforeUnload();
+        PreventPageUnloadEventService.addListener(
+          UndoRedoService.getChangeCount.bind(UndoRedoService));
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         ctrl.story = StoryEditorStateService.getStory();
 
-        PageTitleService.setPageTitleForMobileView('Story Editor');
+        PageTitleService.setNavbarTitleForMobileView('Story Editor');
 
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();
@@ -245,7 +234,7 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
         ctrl.directiveSubscriptions.add(
-          UndoRedoService.onUndoRedoChangeApplied$().subscribe(
+          UndoRedoService.getUndoRedoChangeEventEmitter().subscribe(
             () => _initPage()
           )
         );

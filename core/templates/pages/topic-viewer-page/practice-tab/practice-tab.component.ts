@@ -19,13 +19,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/subtopic.model';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants.ts';
+  'pages/practice-session-page/practice-session-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -38,10 +38,17 @@ export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
   @Input() startButtonIsDisabled: boolean = false;
   @Input() subtopicsList: Subtopic[];
+  @Input() displayArea: string = 'topicViewer';
+  @Input() topicUrlFragment: string = '';
+  @Input() classroomUrlFragment: string = '';
+  @Input() subtopicMastery: Record<string, number> = {};
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
   questionsAreAvailable: boolean = false;
+  subtopicIds: number[] = [];
+  clientWidth: number;
+  subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(
@@ -58,8 +65,26 @@ export class PracticeTabComponent implements OnInit {
         return subtopic.getSkillSummaries().length > 0;
       }
     );
+    for (var subtopic of this.subtopicsList) {
+      this.subtopicIds.push(subtopic.getId());
+    }
+    for (let item of this.subtopicIds) {
+      if (this.subtopicMastery[item] !== undefined) {
+        this.subtopicMasteryArray.push(Math.floor(
+          this.subtopicMastery[item] * 100));
+      } else {
+        this.subtopicMasteryArray.push(0);
+      }
+    }
     this.selectedSubtopicIndices = Array(
       this.availableSubtopics.length).fill(false);
+    this.clientWidth = window.innerWidth;
+    if (this.displayArea === 'topicViewer') {
+      this.topicUrlFragment = (
+        this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      this.classroomUrlFragment = (
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    }
   }
 
   isStartButtonDisabled(): boolean {
@@ -83,7 +108,7 @@ export class PracticeTabComponent implements OnInit {
       }
     }
     if (skillIds.length > 0) {
-      this.questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+      this.questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         skillIds).then(questionCount => {
         this.questionsAreAvailable = questionCount > 0;
         this.questionsStatusCallIsComplete = true;
@@ -102,19 +127,44 @@ export class PracticeTabComponent implements OnInit {
           this.availableSubtopics[idx].getId());
       }
     }
-    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+    let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
-        topic_url_fragment: (
-          this.urlService.getTopicUrlFragmentFromLearnerUrl()),
-        classroom_url_fragment: (
-          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
-        comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment: this.classroomUrlFragment,
+        stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds)
       });
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
   }
 
   isAtLeastOneSubtopicSelected(): boolean {
     return this.selectedSubtopicIndices.some(item => item);
+  }
+
+  getBackgroundForProgress(i: number): number {
+    return this.subtopicMasteryArray[i];
+  }
+
+  // This function is used to calculate the position of subtopic mastery
+  // percent in the capsule shaped progress bar.
+  subtopicMasteryPosition(i: number): number {
+    if (this.clientWidth > 510) {
+      if (this.subtopicMasteryArray[i] <= 89) {
+        return 225 - this.subtopicMasteryArray[i] * 2.5;
+      }
+      return 225 - (this.subtopicMasteryArray[i] * 2) - 15;
+    } else {
+      if (this.subtopicMasteryArray[i] <= 89) {
+        return 215 - (this.subtopicMasteryArray[i] * 2) - 25;
+      }
+      return 215 - (this.subtopicMasteryArray[i] * 2) - 10;
+    }
+  }
+
+  masteryTextColor(i: number): string {
+    if (this.subtopicMasteryArray[i] <= 89) {
+      return 'black';
+    }
+    return 'white';
   }
 }
 

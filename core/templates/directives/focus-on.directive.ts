@@ -16,12 +16,28 @@
  * @fileoverview FocusOn Directive (not associated with reusable
  * components.)
  * NB: Reusable component directives should go in the components/ folder.
+ *
+ * NOTE TO DEVELOPERS: Please make sure that any code changes are done for BOTH
+ * the directives in this file.
+ * There are two attribute directives in this file. One for AngularJS code and
+ * the other for Angular code.
+ * Attribute directives can't be shared at between AngularJS and Angular
+ * (similar to how pipes/filters can't be). The best that can be done in this
+ * situation is shifting common code in a function and reusing those functions
+ * or just keeping the repeated code in the file.
+ * The old code can be safely removed when the directive is no longer used in
+ * AngularJS codebase.
  */
+
+import { Directive, ElementRef, Input, OnDestroy } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-require('services/stateful/focus-manager.service.ts');
+import { AppConstants } from 'app.constants';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
+
+require('services/stateful/focus-manager.service.ts');
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
 angular.module('oppia').directive('focusOn', [
@@ -31,7 +47,7 @@ angular.module('oppia').directive('focusOn', [
       const directiveSubscriptions = new Subscription();
       directiveSubscriptions.add(
         FocusManagerService.onFocus.subscribe(
-          (name) => {
+          (name: string) => {
             if (name === attrs.focusOn) {
               elt[0].focus();
             }
@@ -50,3 +66,36 @@ angular.module('oppia').directive('focusOn', [
     };
   }
 ]);
+
+@Directive({
+  selector: '[oppiaFocusOn]'
+})
+export class FocusOnDirective implements OnDestroy {
+  // This property is initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input('oppiaFocusOn') focusOn!: string;
+  directiveSubscriptions = new Subscription();
+  constructor(
+    private el: ElementRef, private focusManagerService: FocusManagerService) {
+    this.directiveSubscriptions.add(
+      this.focusManagerService.onFocus.subscribe(
+        (name: string) => {
+          if (name === this.focusOn) {
+            this.el.nativeElement.focus();
+          }
+
+          // If the purpose of the focus switch was to clear focus, blur the
+          // element.
+          if (name === AppConstants.LABEL_FOR_CLEARING_FOCUS) {
+            this.el.nativeElement.blur();
+          }
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}

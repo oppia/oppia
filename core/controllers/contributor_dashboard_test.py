@@ -14,23 +14,26 @@
 
 """Tests for the contributor dashboard controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -57,13 +60,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionOpportunitiesHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -77,27 +80,22 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
+        self.topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
-        topic.thumbnail_filename = 'thumbnail.svg'
-        topic.thumbnail_bg_color = '#C6DCDA'
-        topic.subtopics = [
-            topic_domain.Subtopic(
-                1, 'Title', ['skill_id_3'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                'dummy-subtopic-three')]
-        topic.next_subtopic_id = 2
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic('0', self.admin_id)
-
+            self.topic_id, 'topic', 'abbrev', 'description')
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
-        self.skill_ids = [self.skill_id_0, self.skill_id_1]
-        for skill_id in self.skill_ids:
-            self.save_new_skill(
-                skill_id, self.admin_id, description='skill_description')
-            topic_services.add_uncategorized_skill(
-                self.admin_id, '0', skill_id)
+        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
+
+        # Add skill opportunity topic to a classroom.
+        config_services.set_property(
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math-one',
+                'topic_ids': [self.topic_id],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
 
         self.expected_skill_opportunity_dict_0 = {
             'id': self.skill_id_0,
@@ -151,7 +149,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 0',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
 
         self.expected_opportunity_dict_2 = {
@@ -160,7 +159,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 1',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
@@ -189,7 +189,34 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
+    def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
+            self):
+        config_services.revert_property(
+            self.admin_id, 'classroom_pages_data')
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={})
+
+        self.assertEqual(
+            response['opportunities'], [])
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
+
+    def test_get_skill_opportunity_data_does_not_throw_for_deleted_topics(self):
+        topic_services.delete_topic(self.admin_id, self.topic_id)
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={})
+
+        self.assertEqual(
+            response['opportunities'], [])
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -203,7 +230,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -218,7 +244,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -241,7 +266,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'cursor': next_cursor})
 
-            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_skill_opportunity_dict_1])
@@ -249,6 +274,74 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(
                 isinstance(
                     next_response['next_cursor'], python_utils.BASESTRING))
+
+    def test_get_skill_opportunity_data_pagination_multiple_fetches(self):
+        # Unassign topic 0 from the classroom.
+        config_services.revert_property(
+            self.admin_id, 'classroom_pages_data')
+
+        # Create a new topic.
+        topic_id = '1'
+        topic_name = 'topic1'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, 'url-fragment', 'description')
+        skill_id_2 = 'skill_id_2'
+        skill_id_3 = 'skill_id_3'
+        skill_id_4 = 'skill_id_4'
+        skill_id_5 = 'skill_id_5'
+        self._publish_valid_topic(
+            topic, [skill_id_2, skill_id_3, skill_id_4, skill_id_5])
+
+        # Add new topic to a classroom.
+        config_services.set_property(
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math-one',
+                'topic_ids': [topic_id],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
+
+        # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
+        # fetched first. Since skill_id_0, skill_id_1 are not linked to a
+        # classroom, another fetch will be made to retrieve skill_id_3,
+        # skill_id_4, skill_id_5 to fulfill the page size.
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
+            response = self.get_json(
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={})
+            self.assertEqual(len(response['opportunities']), 4)
+            self.assertEqual(
+                response['opportunities'],
+                [
+                    {
+                        'id': skill_id_2,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    },
+                    {
+                        'id': skill_id_3,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    },
+                    {
+                        'id': skill_id_4,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    },
+                    {
+                        'id': skill_id_5,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    }
+                ])
+            self.assertFalse(response['more'])
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -262,12 +355,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
-            next_cursor = response['next_cursor']
             next_response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi', 'cursor': next_cursor})
-
-            self.assertEqual(len(response['opportunities']), 1)
+                params={
+                    'language_code': 'hi',
+                    'cursor': response['next_cursor']
+                }
+            )
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
@@ -293,7 +388,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en', 'cursor': next_cursor})
 
-            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
@@ -334,19 +429,57 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
                 expected_status_int=404)
 
+    def _publish_valid_topic(self, topic, uncategorized_skill_ids):
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        subtopic_id = 1
+        subtopic_skill_id = 'subtopic_skill_id' + topic.id
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic.id))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+        for skill_id in uncategorized_skill_ids:
+            self.save_new_skill(
+                skill_id, self.admin_id, description='skill_description')
+            topic_services.add_uncategorized_skill(
+                self.admin_id, topic.id, skill_id)
+
 
 class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
 
     def setUp(self):
         super(TranslatableTextHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -367,7 +500,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -447,10 +580,23 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 2,
             'state_names_to_content_id_mapping': {
                 'Introduction': {
-                    'content': '<p>A content to translate.</p>'
+                    'content': {
+                        'content': (
+                            '<p>A content to translate.</p>'),
+                        'data_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None
+                    }
                 },
                 'End State': {
-                    'content': ''
+                    'content': {
+                        'content': '',
+                        'data_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None
+                    }
                 }
             }
         }
@@ -459,12 +605,13 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
     def test_handler_does_not_return_in_review_content(self):
         change_dict = {
-            'cmd': 'add_translation',
+            'cmd': 'add_written_translation',
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -480,9 +627,207 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 1,
             'state_names_to_content_id_mapping': {
                 'End State': {
-                    'content': ''
+                    'content': {
+                        'content': '',
+                        'data_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None
+                    }
                 }
             }
+        }
+        self.assertEqual(output, expected_output)
+
+
+class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
+    """Tests for MachineTranslationStateTextsHandler"""
+
+    def setUp(self):
+        super(MachineTranslationStateTextsHandlerTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.exp_id = exp_fetchers.get_new_exploration_id()
+        exp = self.save_new_valid_exploration(
+            self.exp_id,
+            self.owner_id,
+            title='title',
+            category='category',
+            end_state_name='End State'
+        )
+
+        self.publish_exploration(self.owner_id, exp.id)
+
+    def test_handler_with_invalid_language_code_raises_exception(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': '["content"]',
+                'target_language_code': 'invalid_language_code'
+            }, expected_status_int=400)
+
+        error_msg = (
+            'Schema validation for \'target_language_code\' failed: '
+            'Validation failed: is_supported_audio_language_code ({}) for '
+            'object invalid_language_code')
+        self.assertEqual(
+            output['error'], error_msg)
+
+    def test_handler_with_no_target_language_code_raises_exception(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': '["content"]',
+            }, expected_status_int=400)
+
+        error_msg = 'Missing key in handler args: target_language_code.'
+        self.assertEqual(
+            output['error'], error_msg)
+
+    def test_handler_with_invalid_exploration_id_returns_not_found(self):
+        self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': 'invalid_exploration_id',
+                'state_name': 'End State',
+                'content_ids': '["content"]',
+                'target_language_code': 'es'
+            }, expected_status_int=404)
+
+    def test_handler_with_no_exploration_id_raises_exception(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'state_name': 'End State',
+                'content_ids': '["content"]',
+                'target_language_code': 'es'
+            }, expected_status_int=400)
+
+        error_msg = 'Missing key in handler args: exp_id.'
+        self.assertEqual(
+            output['error'], error_msg)
+
+    def test_handler_with_invalid_state_name_returns_not_found(self):
+        self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'invalid_state_name',
+                'content_ids': '["content"]',
+                'target_language_code': 'es'
+            }, expected_status_int=404)
+
+    def test_handler_with_no_state_name_raises_exception(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'content_ids': '["content"]',
+                'target_language_code': 'es'
+            }, expected_status_int=400)
+
+        error_msg = 'Missing key in handler args: state_name.'
+        self.assertEqual(
+            output['error'], error_msg)
+
+    def test_handler_with_invalid_content_ids_returns_none(self):
+        exp_services.update_exploration(
+            self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'End State',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'Please continue.'
+                }
+            })], 'Changes content.')
+
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': '["invalid_content_id", "content"]',
+                'target_language_code': 'es'
+            }, expected_status_int=200
+        )
+
+        expected_output = {
+            'translated_texts': {
+                'content': 'Por favor continua.',
+                'invalid_content_id': None
+            }
+        }
+        self.assertEqual(output, expected_output)
+
+    def test_handler_with_invalid_content_ids_format_raises_exception(
+            self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': 'invalid_format',
+                'target_language_code': 'es'
+            }, expected_status_int=400)
+        self.assertEqual(
+            output['error'],
+            'Improperly formatted content_ids: invalid_format')
+
+    def test_handler_with_empty_content_ids_returns_empty_response_dict(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': '[]',
+                'target_language_code': 'es'
+            }, expected_status_int=200
+        )
+        expected_output = {
+            'translated_texts': {}
+        }
+        self.assertEqual(output, expected_output)
+
+    def test_handler_with_missing_content_ids_parameter_raises_exception(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'target_language_code': 'en'
+            }, expected_status_int=400
+        )
+
+        error_msg = 'Missing key in handler args: content_ids.'
+        self.assertEqual(
+            output['error'], error_msg)
+
+    def test_handler_with_valid_input_returns_translation(self):
+        exp_services.update_exploration(
+            self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'Please continue.'
+                }
+            })], 'Changes content.')
+
+        output = self.get_json(
+            '/machine_translated_state_texts_handler',
+            params={
+                'exp_id': self.exp_id,
+                'state_name': 'Introduction',
+                'content_ids': '["content"]',
+                'target_language_code': 'es'
+            },
+            expected_status_int=200
+        )
+
+        expected_output = {
+            'translated_texts': {'content': 'Por favor continua.'}
         }
         self.assertEqual(output, expected_output)
 
@@ -535,9 +880,21 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     def test_can_suggest_questions_flag_in_response(self):
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
+        user_id = self.get_user_id_from_email(user_email)
         self.login(user_email)
         config_services.set_property(
             'admin', 'contributor_can_suggest_questions', False)
+
+        response = self.get_json('/usercontributionrightsdatahandler')
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False,
+                'can_suggest_questions': False
+            })
+
+        user_services.allow_user_to_submit_question(user_id)
 
         response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(

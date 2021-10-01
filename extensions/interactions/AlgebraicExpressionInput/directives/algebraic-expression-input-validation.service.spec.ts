@@ -69,6 +69,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     });
 
     customizationArgs = {
+      useFractionForDivision: false,
       customOskLetters: {
         value: ['x', 'y', 'a', 'b']
       }
@@ -88,7 +89,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }
     }, 'AlgebraicExpressionInput');
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -197,6 +198,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }, 'AlgebraicExpressionInput')
     ];
     customizationArgs = {
+      useFractionForDivision: false,
       customOskLetters: {
         value: ['y', 'a', 'b']
       }
@@ -222,6 +224,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }, 'AlgebraicExpressionInput')
     ];
     customizationArgs = {
+      useFractionForDivision: false,
       customOskLetters: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
       }

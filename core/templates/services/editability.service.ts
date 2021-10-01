@@ -48,6 +48,13 @@ export class EditabilityService {
   }
 
   /**
+   * @return {boolean} Whether the service is in tutorial mode.
+   */
+  inTutorialMode(): boolean {
+    return EditabilityService.inTutorialMode;
+  }
+
+  /**
    * @return {boolean} Whether the service is editable outside tutorial mode.
    */
   isEditableOutsideTutorialMode(): boolean {

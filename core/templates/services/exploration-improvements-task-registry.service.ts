@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { group } from 'd3-array';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config.model';
@@ -245,8 +245,6 @@ export class ExplorationImprovementsTaskRegistryService {
       oldTask.markAsObsolete();
     }
 
-    // Map uses the reserved keyword delete as a method name.
-    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
   }
 
@@ -283,8 +281,6 @@ export class ExplorationImprovementsTaskRegistryService {
     }
 
     this.tasksByState.set(newStateName, newStateTasks);
-    // Map uses the reserved keyword delete as a method name.
-    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
   }
 

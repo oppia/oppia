@@ -17,6 +17,7 @@
  */
 var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
@@ -49,11 +50,6 @@ describe('Oppia landing pages tour', function() {
 
   it('should visit the Teachers landing page', async function() {
     await browser.get('/teachers');
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('should visit the Volunteers landing page', async function() {
-    await browser.get('/volunteers');
     await waitFor.pageToFullyLoad();
   });
 
@@ -130,6 +126,50 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Login page', async function() {
+    await browser.get('/login');
+    await waitFor.pageToFullyLoad();
+    var loginPage = element(by.css('.protractor-test-login-page'));
+    await waitFor.presenceOf(loginPage, 'Login page did not load');
+  });
+
+  it('should redirect away from the Login page when visited by logged-in user',
+    async function() {
+      var loginPage = element(by.css('.protractor-test-login-page'));
+      var learnerDashboardPage = (
+        element(by.css('.protractor-test-learner-dashboard-page')));
+
+      await users.createAndLoginUser('user@navigation.com', 'navigationUser');
+
+      await waitFor.clientSideRedirection(async() => {
+        // Login page will redirect user away if logged in.
+        await browser.get('/login');
+
+        // Wait for first redirection (login page to splash page).
+        await browser.driver.wait(async() => {
+          var url = await browser.driver.getCurrentUrl();
+          // Wait until the URL has changed to something that is not /login.
+          return !(/login/.test(url));
+        }, 10000);
+      },
+      (url) => {
+        // Wait for second redirection (splash page to preferred dashboard
+        // page).
+        return url !== 'http://localhost:9001/';
+      },
+      async() => {
+        await waitFor.presenceOf(
+          learnerDashboardPage, 'Learner dashboard page did not load');
+      });
+
+      expect(await loginPage.isPresent()).toBe(false);
+
+      await users.logout();
+      await browser.get('/login');
+      await waitFor.pageToFullyLoad();
+      await waitFor.presenceOf(loginPage, 'Login page did not load');
+    });
+
   it('should visit the Teach page', async function() {
     await browser.get('/teach');
     await waitFor.pageToFullyLoad();
@@ -165,6 +205,20 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Partnerships page', async function() {
+    await browser.get('/partnerships');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-partnerships-page')).isPresent()).toBe(true);
+  });
+
+  it('should visit the About foundation page', async function() {
+    await browser.get('/about-foundation');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-about-foundation-page')).isPresent()).toBe(true);
+  });
+
   it('should visit the Privacy page', async function() {
     await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
@@ -186,11 +240,18 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Volunteer page', async function() {
+    await browser.get('/volunteer');
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-volunteer-page')),
+      'Volunteer page taking too long to appear');
+  });
+
   it('should show the error page when an incorrect url is given',
     async function() {
       await browser.get('/splashes');
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+      await general.expectErrorPage(404);
     });
 });

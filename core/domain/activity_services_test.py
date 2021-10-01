@@ -16,10 +16,10 @@
 
 """Unit tests for core.domain.activity_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core.constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services
@@ -65,8 +65,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.moderator = user_services.UserActionsInfo(self.moderator_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.moderator = user_services.get_user_actions_info(self.moderator_id)
 
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)

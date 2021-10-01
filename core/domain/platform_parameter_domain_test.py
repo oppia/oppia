@@ -16,13 +16,17 @@
 
 """Tests for the domain objects relating to platform parameters."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import collections
+
+from core import feconf
+from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
-import feconf
-import utils
+
+SERVER_MODES = parameter_domain.SERVER_MODES
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
@@ -111,7 +115,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         self.assertFalse(context.is_valid)
@@ -124,7 +128,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         self.assertTrue(context.is_valid)
@@ -136,7 +140,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'browser_type': 'Chrome',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         self.assertTrue(context.is_valid)
@@ -148,7 +152,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '3.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         self.assertTrue(context.is_valid)
@@ -161,7 +165,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         context.validate()
@@ -174,7 +178,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         # No exception should be raised since invalid platform types are
@@ -189,7 +193,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         with self.assertRaisesRegexp(
@@ -204,7 +208,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': 'a.a.a',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         with self.assertRaisesRegexp(
@@ -220,7 +224,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0.0',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         with self.assertRaisesRegexp(
@@ -235,7 +239,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0-abcedef-invalid',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         with self.assertRaisesRegexp(
@@ -243,6 +247,8 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             context.validate()
 
     def test_validate_with_invalid_server_mode_raises_exception(self):
+        MockEnum = collections.namedtuple('Enum', ['value'])
+        mock_enum = MockEnum('invalid')
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
@@ -250,11 +256,12 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'invalid',
+                'server_mode': mock_enum,
             },
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid server mode \'invalid\''):
+            utils.ValidationError, 'Invalid server mode \'invalid\''
+        ):
             context.validate()
 
 
@@ -274,7 +281,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 'app_version': app_version,
             },
             {
-                'server_mode': mode,
+                'server_mode': getattr(SERVER_MODES, mode),
             },
         )
 
@@ -1596,7 +1603,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
@@ -1631,7 +1638,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': 'prod',
+                'server_mode': SERVER_MODES.prod,
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
@@ -1666,7 +1673,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': SERVER_MODES.dev,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')

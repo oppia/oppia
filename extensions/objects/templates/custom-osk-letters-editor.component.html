@@ -1,91 +1,91 @@
 <div class="protractor-test-custom-letters-div custom-letters-div">
   <div class="oppia-custom-selected-letters">
-    <div ng-repeat="letter in $ctrl.value">
-      <[letter]>
+    <div *ngFor="let letter of value">
+      {{ letter }}
     </div>
   </div>
-  <p class="letter-counter">You can still add <[$ctrl.getRemainingLettersCount()]> more letter(s).</p>
+  <p class="letter-counter">You can still add {{ getRemainingLettersCount() }} more letter(s).</p>
   <div class="oppia-custom-letters-navbar">
-    <button ng-class="($ctrl.currentTab === $ctrl.latinTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" ng-click="$ctrl.currentTab = $ctrl.latinTab">
+    <button [attr.class]="(currentTab === latinTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" (click)="currentTab = latinTab">
       abc
     </button>
-    <button ng-class="($ctrl.currentTab === $ctrl.greekTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" ng-click="$ctrl.currentTab = $ctrl.greekTab">
+    <button [attr.class]="(currentTab === greekTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" (click)="currentTab = greekTab">
       αβγ
     </button>
   </div>
   <div class="oppia-custom-letters">
-    <div ng-if="$ctrl.currentTab === $ctrl.latinTab && $ctrl.lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+    <div *ngIf="currentTab === latinTab && lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button id="custom-letter-<[letter]>" ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.latinLowerCase[0]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button id="custom-letter-<[letter]>" ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.latinLowerCase[1]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-3">
-        <button ng-class="($ctrl.lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-click="$ctrl.lettersAreLowercase = !$ctrl.lettersAreLowercase">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button id="custom-letter-<[letter]>" ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.latinLowerCase[2]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[2]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
     </div>
-    <div ng-if="$ctrl.currentTab === $ctrl.latinTab && !$ctrl.lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+    <div *ngIf="currentTab === latinTab && !lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button id="custom-letter-<[letter]>" ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.latinUpperCase[0]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button id="custom-letter-<[letter]>" ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.latinUpperCase[1]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-3">
-        <button ng-class="($ctrl.lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-click="$ctrl.lettersAreLowercase = !$ctrl.lettersAreLowercase">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button id="custom-letter-<[letter]>" ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.latinUpperCase[2]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[2]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
     </div>
-    <div ng-if="$ctrl.currentTab === $ctrl.greekTab && $ctrl.lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+    <div *ngIf="currentTab === greekTab && lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.greekLowerCase[0]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.greekLowerCase[1]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-3">
-        <button ng-class="($ctrl.lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-click="$ctrl.lettersAreLowercase = !$ctrl.lettersAreLowercase">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.greekLowerCase[2]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[2]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
     </div>
-    <div ng-if="$ctrl.currentTab === $ctrl.greekTab && !$ctrl.lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+    <div *ngIf="currentTab === greekTab && !lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.greekUpperCase[0]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button ng-class="($ctrl.lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-click="$ctrl.lettersAreLowercase = !$ctrl.lettersAreLowercase">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button ng-class="($ctrl.value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" ng-repeat="letter in $ctrl.greekUpperCase[1]" ng-click="$ctrl.updateLettersList(letter)">
-          <[letter]>
+        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
         </button>
       </div>
     </div>
@@ -98,7 +98,7 @@
     border-radius: 5px;
     margin-top: 13px;
     min-height: 55px;
-    padding: 10px 0px;
+    padding: 10px 0;
     text-align: center;
   }
 
@@ -109,12 +109,12 @@
     display: initial;
     font-family: 'Noto Serif', serif;
     font-size: 20px;
-    margin: 0px 10px;
+    margin: 0 10px;
   }
 
   .letter-counter {
     font-size: 15px;
-    margin: 15px 0px;
+    margin: 15px 0;
     text-align: end;
   }
 
@@ -128,7 +128,7 @@
     border: none;
     font-family: 'Noto Serif', serif;
     font-size: 20px;
-    margin: 0px 10px;
+    margin: 0 10px;
     outline: none;
     padding-bottom: 5px;
   }
@@ -142,7 +142,7 @@
   }
 
   .oppia-custom-letters {
-    padding: 10px 0px;
+    padding: 10px 0;
     text-align: center;
   }
 
@@ -150,11 +150,11 @@
     border-radius: 5px;
     font-family: 'Noto Serif', serif;
     font-size: 20px;
-    margin: 3px 0px;
+    margin: 3px 0;
     outline: none;
-    padding: 11.2px 0px;
+    padding: 11.2px 0;
     position: relative;
-    top: 0px;
+    top: 0;
     transition: all ease 0.3s;
     width: 10%;
   }
@@ -167,14 +167,14 @@
   .oppia-custom-letters-active {
     background-color: #399e80;
     border: 1px solid #10423d;
-    box-shadow: 0px 5px 0px #10423d;
+    box-shadow: 0 5px 0 #10423d;
     color: #fff;
   }
 
   .oppia-custom-letters-inactive {
     background-color: inherit;
     border: 1px solid #b8b8b8;
-    box-shadow: 0px 5px 0px #696969;
+    box-shadow: 0 5px 0 #696969;
     color: #696969;
   }
 </style>

@@ -17,21 +17,23 @@
  */
 
 import { Injectable } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
-import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ContextService } from 'services/context.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface ImageCallback {
   resolveMethod: (_: string) => void;
   rejectMethod: () => void;
 }
 
-interface ImageDimensions {
+export interface ImageDimensions {
   width: number;
   height: number;
   verticalPadding?: number;
@@ -45,8 +47,9 @@ export class ImagePreloaderService {
       private assetsBackendApiService: AssetsBackendApiService,
       private computeGraphService: ComputeGraphService,
       private contextService: ContextService,
-      private extractImageFilenamesFromStateService:
-        ExtractImageFilenamesFromStateService) {}
+      private ExtractImageFilenamesFromModelService:
+        ExtractImageFilenamesFromModelService,
+      private svgSanitizerService: SvgSanitizerService) {}
 
   private filenamesOfImageCurrentlyDownloading: string[] = [];
   private filenamesOfImageToBeDownloaded: string[] = [];
@@ -84,7 +87,7 @@ export class ImagePreloaderService {
     this.filenamesOfImageToBeDownloaded = (
       this.getImageFilenamesInBfsOrder(sourceStateName));
     const imageFilesInGivenState = (
-      this.extractImageFilenamesFromStateService.getImageFilenamesInState(
+      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(
         this.exploration.states.getState(sourceStateName)));
     this.filenamesOfImageFailedToDownload = (
       this.filenamesOfImageFailedToDownload.filter(
@@ -120,7 +123,7 @@ export class ImagePreloaderService {
       let numImageFilesCurrentlyDownloading = 0;
       let numImagesNeitherInCacheNorDownloading = 0;
 
-      this.extractImageFilenamesFromStateService.getImageFilenamesInState(
+      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(
         state
       ).forEach(filename => {
         var isFileCurrentlyDownloading = (
@@ -198,6 +201,22 @@ export class ImagePreloaderService {
     return this.filenamesOfImageCurrentlyDownloading;
   }
 
+  private convertImageFileToSafeBase64Url(
+      imageFile: Blob,
+      callback: (src: string | ArrayBuffer | SafeResourceUrl) => void): void {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (imageFile.type === 'image/svg+xml') {
+        callback(
+          this.svgSanitizerService.getTrustedSvgResourceUrl(
+            <string> reader.result));
+      } else {
+        callback(reader.result);
+      }
+    };
+    reader.readAsDataURL(imageFile);
+  }
+
   /**
    * Gets the Url for the image file.
    * @param {string} filename - Filename of the image whose Url is to be
@@ -205,7 +224,7 @@ export class ImagePreloaderService {
    * @param {function} onLoadCallback - Function that is called when the
    *                                    Url of the loaded image is obtained.
    */
-  getImageUrl(filename: string): Promise<string> {
+  async getImageUrlAsync(filename: string): Promise<string|ArrayBuffer> {
     return new Promise((resolve, reject) => {
       if (this.assetsBackendApiService.isCached(filename) ||
           this.isInFailedDownload(filename)) {
@@ -217,7 +236,7 @@ export class ImagePreloaderService {
             if (this.isInFailedDownload(loadedImageFile.filename)) {
               this.removeFromFailedDownload(loadedImageFile.filename);
             }
-            resolve(URL.createObjectURL(loadedImageFile.data));
+            this.convertImageFileToSafeBase64Url(loadedImageFile.data, resolve);
           },
           reject);
       } else {
@@ -259,7 +278,7 @@ export class ImagePreloaderService {
 
     stateNamesInBfsOrder.forEach(stateName => {
       var state = this.exploration.states.getState(stateName);
-      this.extractImageFilenamesFromStateService.getImageFilenamesInState(state)
+      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(state)
         .forEach(filename => imageFilenames.push(filename));
     });
     return imageFilenames;
@@ -297,7 +316,8 @@ export class ImagePreloaderService {
         if (this.imageLoadedCallback[loadedImage.filename]) {
           var onLoadImageResolve = (
             this.imageLoadedCallback[loadedImage.filename].resolveMethod);
-          onLoadImageResolve(URL.createObjectURL(loadedImage.data));
+          this.convertImageFileToSafeBase64Url(
+            loadedImage.data, onLoadImageResolve);
           this.imageLoadedCallback[loadedImage.filename] = null;
         }
       },

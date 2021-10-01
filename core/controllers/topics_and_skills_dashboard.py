@@ -16,11 +16,14 @@
 are created.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -35,9 +38,6 @@ from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-import feconf
-import python_utils
-import utils
 
 
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
@@ -58,7 +58,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
@@ -67,10 +67,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             summary.to_dict() for summary in skill_summaries]
 
         skill_ids_assigned_to_some_topic = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic())
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
         merged_skill_ids = (
             skill_services.get_merged_skill_ids())
-        topic_rights_dict = topic_services.get_all_topic_rights()
+        topic_rights_dict = topic_fetchers.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
             if topic_rights_dict[topic_summary['id']]:
                 topic_rights = topic_rights_dict[topic_summary['id']]
@@ -215,8 +215,8 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 
         if (keywords is not None and (not isinstance(keywords, list) or (
                 not all(
-                    [isinstance(keyword, python_utils.BASESTRING)
-                     for keyword in keywords])))):
+                    isinstance(keyword, python_utils.BASESTRING)
+                    for keyword in keywords)))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 
@@ -262,7 +262,7 @@ class NewTopicHandler(base.BaseHandler):
         except:
             raise self.InvalidInputException(
                 'Invalid topic name, received %s.' % name)
-        new_topic_id = topic_services.get_new_topic_id()
+        new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
         topic_services.save_new_topic(self.user_id, topic)
@@ -337,6 +337,10 @@ class NewSkillHandler(base.BaseHandler):
 
         skill_domain.Skill.require_valid_description(description)
 
+        if skill_services.does_skill_with_description_exist(description):
+            raise self.InvalidInputException(
+                'Skill description should not be a duplicate.')
+
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
@@ -353,7 +357,7 @@ class NewSkillHandler(base.BaseHandler):
         for filename in image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging.exception(
                     'Image not provided for file with name %s when the skill '
                     'with id %s was created.' % (filename, skill.id))
                 raise self.InvalidInputException(
@@ -395,6 +399,9 @@ class MergeSkillHandler(base.BaseHandler):
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))
+
+        skill_services.replace_skill_id_in_all_topics(
+            self.user_id, old_skill_id, new_skill_id)
         question_services.replace_skill_id_for_all_questions(
             old_skill_id, old_skill.description, new_skill_id)
         changelist = [

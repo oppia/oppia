@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,202 +13,226 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for moderatorPage.
+ * @fileoverview Unit tests for Moderator Page Component.
  */
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 
-require('pages/moderator-page/moderator-page.component.ts');
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync }
+  from '@angular/core/testing';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { SchemaBasedEditorDirective }
+  from 'components/forms/schema-based-editors/schema-based-editor.directive';
+import { ThreadMessage, ThreadMessageBackendDict }
+  from 'domain/feedback_message/ThreadMessage.model';
+import { AlertsService } from 'services/alerts.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { LoaderService } from 'services/loader.service';
+import { ModeratorPageComponent } from './moderator-page.component';
+import { ActivityIdTypeDict, FeaturedActivityResponse,
+  ModeratorPageBackendApiService, RecentCommitResponse, RecentFeedbackMessages }
+  from './services/moderator-page-backend-api.service';
 
-describe('Moderator Page', function() {
-  var ctrl = null;
-
-  var $httpBackend = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var loadingMessage = null;
-  var AlertsService = null;
-  var CsrfService = null;
-  var LoaderService = null;
-  var subscriptions = [];
-
-  var activityReferences = [
-    { type: 'exploration', id: 1 },
-    { type: 'exploration', id: 2 }
-  ];
-  var commitsResults = ['commit1', 'commit2'];
-  var explorationIdsToExplorationData = {
-    0: 'exploration1',
-    1: 'exploration2',
-    2: 'exploration3'
+describe('Moderator Page Component', () => {
+  let fixture: ComponentFixture<ModeratorPageComponent>;
+  let componentInstance: ModeratorPageComponent;
+  let loaderService: LoaderService;
+  let datetimeFormatService: DateTimeFormatService;
+  let alertsService: AlertsService;
+  let threadMessageBackendDict: ThreadMessageBackendDict = {
+    author_username: 'author',
+    created_on_msecs: 123,
+    entity_type: 'exploration',
+    entity_id: 'id',
+    message_id: 12312,
+    text: 'test_txt',
+    updated_status: 'stastu',
+    updated_subject: 'asdf'
   };
-  var feedbackMessages = [
-    { message_id: 1, text: 'Feedback 1' },
-    { message_id: 2, text: 'Feedback 2' }
-  ];
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+  let message: ThreadMessage = ThreadMessage
+    .createFromBackendDict(threadMessageBackendDict);
+
+  let recentCommits: RecentCommitResponse = {
+    results: [],
+    cursor: 'str1',
+    more: true,
+    exp_ids_to_exp_data: [{
+      category: 'test_category',
+      title: 'test_title'
+    }]
+  };
+
+  let recentFeedbackMessages: RecentFeedbackMessages = {
+    results: [threadMessageBackendDict],
+    cursor: 'test',
+    more: true
+  };
+
+  let activityResponse: FeaturedActivityResponse = {
+    featured_activity_references: []
+  };
+
+  class MockModeratorPageBackendApiService {
+    getRecentCommitsAsync() {
+      return {
+        then: (
+            successCallback: (response: RecentCommitResponse) => void
+        ) => {
+          successCallback(recentCommits);
+        }
+      };
     }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('DateTimeFormatService', {
-      getLocaleAbbreviatedDatetimeString: () => '11/21/14'
-    });
-  }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    AlertsService = $injector.get('AlertsService');
-    CsrfService = $injector.get('CsrfTokenService');
-    loadingMessage = '';
-    LoaderService = $injector.get('LoaderService');
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
-    spyOn(CsrfService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('moderatorPage', {
-      $scope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
+    getRecentFeedbackMessagesAsync() {
+      return {
+        then: (
+            successCallback: (response: RecentFeedbackMessages) => void
+        ) => {
+          successCallback(recentFeedbackMessages);
+        }
+      };
     }
+
+    getFeaturedActivityReferencesAsync() {
+      return {
+        then: (
+            successCallback: (response: FeaturedActivityResponse) => void
+        ) => {
+          successCallback(activityResponse);
+        }
+      };
+    }
+
+    saveFeaturedActivityReferencesAsync(references: ActivityIdTypeDict[]) {
+      return {
+        then: (
+            successCallback: () => void
+        ) => {
+          successCallback();
+        }
+      };
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        NgbNavModule
+      ],
+      declarations: [
+        ModeratorPageComponent,
+        SchemaBasedEditorDirective
+      ],
+      providers: [
+        {
+          provide: ModeratorPageBackendApiService,
+          useClass: MockModeratorPageBackendApiService
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ModeratorPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = (TestBed.inject(LoaderService) as unknown) as
+      jasmine.SpyObj<LoaderService>;
+    datetimeFormatService = (
+      TestBed.inject(DateTimeFormatService) as unknown) as
+      jasmine.SpyObj<DateTimeFormatService>;
+    alertsService = (
+      TestBed.inject(AlertsService) as unknown) as
+      jasmine.SpyObj<AlertsService>;
   });
 
-  it('should get date time as string', function() {
-    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-    var NOW_MILLIS = 1416563100000;
-    expect(ctrl.getDatetimeAsString(NOW_MILLIS)).toEqual('11/21/14');
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
   });
 
-  it('should return correct bool for isMessageFromExploration', function() {
-    expect(
-      ctrl.isMessageFromExploration({entityType: 'exploration'})
-    ).toBeTrue();
-    expect(
-      ctrl.isMessageFromExploration({entityType: 'collection'})
-    ).toBeFalse();
-    expect(
-      ctrl.isMessageFromExploration({entityType: 'topic'})
-    ).toBeFalse();
+  it('should initiailze', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    componentInstance.explorationData = [];
+    componentInstance.ngOnInit();
+    expect(componentInstance.explorationData)
+      .toEqual(recentCommits.exp_ids_to_exp_data);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.allCommits).toEqual(recentCommits.results);
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+
+    expect(componentInstance.allFeedbackMessages)
+      .toEqual(recentFeedbackMessages.results.map(
+        d => ThreadMessage.createFromBackendDict(d))
+      );
+
+    expect(componentInstance.displayedFeaturedActivityReferences)
+      .toEqual(activityResponse.featured_activity_references);
+    expect(componentInstance.lastSavedFeaturedActivityReferences).toEqual(
+      componentInstance.displayedFeaturedActivityReferences);
+  }));
+
+  it('should get date time as string', () => {
+    let testDatetime: string = 'test_datetime';
+    spyOn(datetimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+      .and.returnValue(testDatetime);
+    expect(componentInstance.getDatetimeAsString(100)).toEqual(testDatetime);
   });
 
-  it('should get exploration create url', function() {
-    expect(ctrl.getExplorationCreateUrl('1')).toEqual('/create/1');
+  it('should tell if message is from exploration', () => {
+    expect(componentInstance.isMessageFromExploration(message)).toBeTrue();
+    message.entityType = 'other_than_exploration';
+    expect(componentInstance.isMessageFromExploration(message)).toBeFalse();
   });
 
-  it('should get activity create url for exploration', function() {
-    var reference = { type: 'exploration', id: 1 };
-    expect(ctrl.getActivityCreateUrl(reference)).toEqual('/create/1');
+  it('should get exploration create url', () => {
+    expect(componentInstance.getExplorationCreateUrl('test'))
+      .toEqual('/create/test');
   });
 
-  it('should get activity create url for collection', function() {
-    var reference = { type: 'collection', id: 1 };
-    expect(ctrl.getActivityCreateUrl(reference))
-      .toEqual('/create_collection/1');
+  it('should get activity create url', () => {
+    let reference: ActivityIdTypeDict = {
+      id: 'test_id',
+      type: 'exploration'
+    };
+    expect(componentInstance.getActivityCreateUrl(reference))
+      .toEqual('/create/' + reference.id);
+    reference.type = 'not_exploration';
+    expect(componentInstance.getActivityCreateUrl(reference))
+      .toEqual('/create_collection/' + reference.id);
   });
 
-  it('should call http request when calling onInit', function() {
-    $httpBackend.expectGET(
-      '/recentcommitshandler/recent_commits?query_type=all_non_private_commits')
-      .respond({
-        exp_ids_to_exp_data: explorationIdsToExplorationData,
-        results: commitsResults
-      });
-    $httpBackend.expectGET('/recent_feedback_messages').respond({
-      results: feedbackMessages
-    });
-    $httpBackend.expectGET('/moderatorhandler/featured').respond({
-      featured_activity_references: activityReferences
-    });
-
-    ctrl.$onInit();
-    expect(loadingMessage).toEqual('Loading');
-    $httpBackend.flush(3);
-
-    expect(loadingMessage).toEqual('');
-    expect(ctrl.explorationData).toEqual(explorationIdsToExplorationData);
-    expect(ctrl.allCommits).toEqual(commitsResults);
-    expect(ctrl.allFeedbackMessages.length).toEqual(2);
-    expect(ctrl.allFeedbackMessages[0].text).toEqual('Feedback 1');
-    expect(ctrl.allFeedbackMessages[1].text).toEqual('Feedback 2');
-    expect(ctrl.allFeedbackMessages[0].messageId).toEqual(1);
-    expect(ctrl.allFeedbackMessages[1].messageId).toEqual(2);
-    expect(ctrl.displayedFeaturedActivityReferences)
-      .toEqual(activityReferences);
-    expect(ctrl.lastSavedFeaturedActivityReferences)
-      .toEqual(activityReferences);
+  it('should tell if save featured activies button is disabled', () => {
+    componentInstance.displayedFeaturedActivityReferences = componentInstance
+      .lastSavedFeaturedActivityReferences;
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled())
+      .toBeTrue();
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.lastSavedFeaturedActivityReferences = [
+      { id: 'not', type: 'equal' }];
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled())
+      .toBeFalse();
   });
 
-  it('should handler when http request fails when calling onInit', function() {
-    $httpBackend.expectGET(
-      '/recentcommitshandler/recent_commits?query_type=all_non_private_commits')
-      .respond(500);
-    $httpBackend.expectGET('/recent_feedback_messages').respond(500);
-    $httpBackend.expectGET('/moderatorhandler/featured').respond(500);
-
-    ctrl.$onInit();
-    expect(loadingMessage).toEqual('Loading');
-    $httpBackend.flush(3);
-
-    expect(loadingMessage).toEqual('Loading');
-    expect(ctrl.explorationData).toEqual({});
-    expect(ctrl.allCommits).toEqual([]);
-    expect(ctrl.allFeedbackMessages).toEqual([]);
-    expect(ctrl.displayedFeaturedActivityReferences).toEqual([]);
-    expect(ctrl.lastSavedFeaturedActivityReferences).toEqual([]);
+  it('should save featured activity references', () => {
+    spyOn(alertsService, 'clearWarnings');
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.saveFeaturedActivityReferences();
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalled();
   });
 
-  it('should save new featured activity references', function() {
-    $httpBackend.expectGET(
-      '/recentcommitshandler/recent_commits?query_type=all_non_private_commits')
-      .respond({
-        exp_ids_to_exp_data: explorationIdsToExplorationData,
-        results: commitsResults
-      });
-    $httpBackend.expectGET('/recent_feedback_messages').respond({
-      results: feedbackMessages
-    });
-    $httpBackend.expectGET('/moderatorhandler/featured').respond({
-      featured_activity_references: activityReferences
-    });
+  it('should get schema', () => {
+    expect(componentInstance.getSchema())
+      .toEqual(componentInstance.FEATURED_ACTIVITY_REFERENCES_SCHEMA);
+  });
 
-    var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
-      .and.callThrough();
-    ctrl.$onInit();
-    $httpBackend.flush(3);
-
-    expect(ctrl.displayedFeaturedActivityReferences)
-      .toEqual(activityReferences);
-    expect(ctrl.lastSavedFeaturedActivityReferences)
-      .toEqual(activityReferences);
-
-    var newReference = { type: 'exploration', id: 3 };
-    ctrl.displayedFeaturedActivityReferences.push(newReference);
-    expect(ctrl.isSaveFeaturedActivitiesButtonDisabled()).toBe(false);
-
-    $httpBackend.expectPOST('/moderatorhandler/featured').respond(200);
-    ctrl.saveFeaturedActivityReferences();
-    $httpBackend.flush();
-
-    expect(ctrl.displayedFeaturedActivityReferences)
-      .toEqual(activityReferences.concat([newReference]));
-    expect(ctrl.lastSavedFeaturedActivityReferences)
-      .toEqual(activityReferences.concat([newReference]));
-    expect(ctrl.isSaveFeaturedActivitiesButtonDisabled()).toBe(true);
-    expect(addSuccessMessageSpy)
-      .toHaveBeenCalledWith('Featured activities saved.');
+  it('should update displayed featured activity references', () => {
+    let newValue: ActivityIdTypeDict[] = [{
+      id: 'test_id',
+      type: 'exploration'
+    }];
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+    expect(componentInstance.displayedFeaturedActivityReferences)
+      .toEqual(newValue);
   });
 });

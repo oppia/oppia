@@ -16,15 +16,17 @@
 
 """Tests for typed object classes (mostly normalization)."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import inspect
+import json
+import re
 
+from core import python_utils
+from core import schema_utils_test
 from core.tests import test_utils
 from extensions.objects.models import objects
-import python_utils
-import schema_utils_test
 
 
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
@@ -59,10 +61,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests objects of type Boolean."""
         mappings = [('', False), (False, False), (True, True), (None, False)]
         invalid_values_with_error_messages = [
-            ({}, r'Expected bool, received \{\}'),
-            ([], r'Expected bool, received \[\]'),
-            (['a'], r'Expected bool, received \[u\'a\'\]'),
-            ('aabcc', r'Expected bool, received aabcc')]
+            ({}, re.escape('Expected bool, received {}')),
+            ([], re.escape('Expected bool, received []')),
+            (['a'], re.escape('Expected bool, received [\'a\']')),
+            ('aabcc', 'Expected bool, received aabcc')]
 
         self.check_normalization(
             objects.Boolean, mappings, invalid_values_with_error_messages)
@@ -72,11 +74,15 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
                     ('-1', -1), (3.00, 3), (3.05, 3.05), ('3.05', 3.05), ]
         invalid_values_with_error_messages = [
-            ('a', 'Could not convert unicode to float: a'),
-            ('', 'Could not convert unicode to float: '),
-            ({'a': 3}, r'Could not convert dict to float: \{u\'a\': 3\}'),
-            ([3], r'Could not convert list to float: \[3\]'),
-            (None, 'Could not convert NoneType to float: None')]
+            ('a', 'Could not convert str to float: a'),
+            ('', 'Could not convert str to float: '),
+            (
+                {'a': 3},
+                re.escape('Could not convert dict to float: {\'a\': 3}')
+            ),
+            ([3], re.escape('Could not convert list to float: [3]')),
+            (None, 'Could not convert NoneType to float: None')
+        ]
 
         self.check_normalization(
             objects.Real, mappings, invalid_values_with_error_messages)
@@ -86,17 +92,15 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0),
                     ('-1', -1), (-1, -1), (3.00, 3), (3.05, 3), ]
         invalid_values_with_error_messages = [
-            ('a', 'Could not convert unicode to int: a'),
-            ('', 'Could not convert unicode to int: '),
+            ('a', 'Could not convert str to int: a'),
+            ('', 'Could not convert str to int: '),
             (
                 {'a': 3},
-                r'Could not convert dict to int: \{u\'a\': 3\}'),
-            (
-                [3],
-                r'Could not convert list to int: \[3\]'),
-            (
-                None,
-                'Could not convert NoneType to int: None')]
+                re.escape('Could not convert dict to int: {\'a\': 3}')
+            ),
+            ([3], re.escape('Could not convert list to int: [3]')),
+            (None, 'Could not convert NoneType to int: None')
+        ]
 
         self.check_normalization(
             objects.Int, mappings, invalid_values_with_error_messages)
@@ -106,25 +110,35 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (3.00, 3),
                     (3.05, 3), ]
         invalid_values_with_error_messages = [
-            ('a', 'Could not convert unicode to int: a'),
-            ('', 'Could not convert unicode to int: '),
+            ('a', 'Could not convert str to int: a'),
+            ('', 'Could not convert str to int: '),
             (
                 {'a': 3},
-                r'Could not convert dict to int: \{u\'a\': 3\}'),
+                re.escape('Could not convert dict to int: {\'a\': 3}')
+            ),
             (
                 [3],
-                r'Could not convert list to int: \[3\]'),
+                re.escape('Could not convert list to int: [3]')
+            ),
             (
                 None,
-                'Could not convert NoneType to int: None'),
+                'Could not convert NoneType to int: None'
+            ),
             (
                 -1,
-                r'Validation failed: is_at_least \(\{u\'min_value\': 0\}\) '
-                r'for object -1'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 0}) '
+                    'for object -1'
+                )
+            ),
             (
                 '-1',
-                r'Validation failed: is_at_least \(\{u\'min_value\': '
-                r'0\}\) for object -1')]
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 0}) '
+                    'for object -1'
+                )
+            )
+        ]
 
         self.check_normalization(
             objects.NonnegativeInt, mappings,
@@ -135,33 +149,48 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), (3.00, 3),
                     (3.05, 3), ]
         invalid_values_with_error_messages = [
-            ('a', 'Could not convert unicode to int: a'),
-            ('', 'Could not convert unicode to int: '),
+            ('a', 'Could not convert str to int: a'),
+            ('', 'Could not convert str to int: '),
             (
                 {'a': 3},
-                r'Could not convert dict to int: \{u\'a\': 3\}'),
+                re.escape('Could not convert dict to int: {\'a\': 3}')
+            ),
             (
                 [3],
-                r'Could not convert list to int: \[3\]'),
+                re.escape('Could not convert list to int: [3]')
+            ),
             (
                 None,
                 'Could not convert NoneType to int: None'),
             (
                 -1,
-                r'Validation failed: is_at_least \(\{u\'min_value\': 1\}\) '
-                r'for object -1'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) '
+                    'for object -1'
+                )
+            ),
             (
                 '-1',
-                r'Validation failed: is_at_least \(\{u\'min_value\': '
-                r'1\}\) for object -1'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) '
+                    'for object -1'
+                )
+            ),
             (
                 0,
-                r'Validation failed: is_at_least \(\{u\'min_value\': 1\}\) '
-                r'for object 0'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) '
+                    'for object 0'
+                )
+            ),
             (
                 '0',
-                r'Validation failed: is_at_least \(\{u\'min_value\': '
-                r'1\}\) for object 0')]
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) '
+                    'for object 0'
+                )
+            )
+        ]
 
         self.check_normalization(
             objects.PositiveInt, mappings, invalid_values_with_error_messages)
@@ -178,9 +207,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_values_with_error_messages = [
             (
                 {'code': '', 'output': '', 'evaluation': ''},
-                r'Missing keys: \[u\'error\'\], Extra keys: \[\]'),
+                re.escape('Missing keys: [\'error\'], Extra keys: []')
+            ),
             ('a', 'Expected dict, received a'),
-            ([], r'Expected dict, received \[\]'),
+            ([], re.escape('Expected dict, received []')),
             (None, 'Expected dict, received None')
         ]
 
@@ -206,11 +236,12 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(['b', 'a'], ['b', 'a']), ([], [])]
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
-            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
+            ({'a': 1}, re.escape('Expected list, received {\'a\': 1}')),
             (3.0, 'Expected list, received 3.0'),
             (None, 'Expected list, received None'),
             ([3, 'a'], 'Expected unicode string, received 3'),
-            ([1, 2, 1], 'Expected unicode string, received 1')]
+            ([1, 2, 1], 'Expected unicode string, received 1')
+        ]
         self.check_normalization(
             objects.ListOfUnicodeString, mappings,
             invalid_values_with_error_messages)
@@ -235,12 +266,16 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         )]
         invalid_values_with_error_messages = [
             ('G4', 'Expected list, received G4'),
-            ({'n': 1}, r'Expected list, received \{u\'n\': 1\}'),
+            ({'n': 1}, re.escape('Expected list, received {\'n\': 1}')),
             (2.0, 'Expected list, received 2.0'),
             (None, 'Expected list, received None'),
             (
                 {'readableNoteName': 'C5'},
-                r'Expected list, received \{u\'readableNoteName\': u\'C5\'\}')]
+                re.escape(
+                    'Expected list, received {\'readableNoteName\': \'C5\'}'
+                )
+            )
+        ]
 
         self.check_normalization(
             objects.MusicPhrase, mappings, invalid_values_with_error_messages)
@@ -261,10 +296,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             ([3, 'a'], 'Expected dict, received 3'),
             (
                 [{'content': '<p>abc</p>', 'url': 'xyx'}],
-                r'Missing keys: \[u\'title\'\], Extra keys: \[u\'url\'\]'),
+                re.escape('Missing keys: [\'title\'], Extra keys: [\'url\']')
+            ),
             (
                 [{'content': '<p>abc</p>', 'title': 'xyz'}, [1, 2, 3]],
-                r'Expected dict, received \[1, 2, 3\]')]
+                re.escape('Expected dict, received [1, 2, 3]')
+            )
+        ]
         self.check_normalization(
             objects.ListOfTabs, mappings, invalid_values_with_error_messages)
 
@@ -277,18 +315,25 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
-            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
+            ({'a': 1}, re.escape('Expected list, received {\'a\': 1}')),
             (3.0, 'Expected list, received 3.0'),
             (None, 'Expected list, received None'),
             ([3, 'a'], 'Expected unicode string, received 3'),
             (
                 ['a', 'a', 'b'],
-                r'Validation failed: is_uniquified \(\{\}\) '
-                r'for object \[\'a\', \'a\', \'b\'\]'),
+                re.escape(
+                    'Validation failed: is_uniquified ({}) '
+                    'for object [\'a\', \'a\', \'b\']'
+                )
+            ),
             (
                 ['ab', 'abc', 'ab'],
-                r'Validation failed: is_uniquified '
-                r'\(\{\}\) for object \[\'ab\', \'abc\', \'ab\'\]')]
+                re.escape(
+                    'Validation failed: is_uniquified ({}) '
+                    'for object [\'ab\', \'abc\', \'ab\']'
+                )
+            )
+        ]
 
         self.check_normalization(
             objects.SetOfUnicodeString, mappings,
@@ -301,8 +346,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
         invalid_values_with_error_messages = [
             (3.0, 'Expected unicode string, received 3.0'),
-            ({'a': 1}, r'Expected unicode string, received \{u\'a\': 1\}'),
-            ([1, 2, 1], r'Expected unicode string, received \[1, 2, 1\]'),
+            (
+                {'a': 1},
+                re.escape('Expected unicode string, received {\'a\': 1}')
+            ),
+            (
+                [1, 2, 1],
+                re.escape('Expected unicode string, received [1, 2, 1]')
+            ),
             (None, 'Expected unicode string, received None')]
 
         self.check_normalization(
@@ -322,8 +373,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 '<a>spam spam SPAM!</a>'),
         ]
         invalid_values_with_error_messages = [
-            ({'a': 1}, r'Expected unicode HTML string, received \{u\'a\': 1\}'),
-            ([1, 2, 1], r'Expected unicode HTML string, received \[1, 2, 1\]'),
+            (
+                {'a': 1},
+                re.escape('Expected unicode HTML string, received {\'a\': 1}')
+            ),
+            (
+                [1, 2, 1],
+                re.escape('Expected unicode HTML string, received [1, 2, 1]')
+            ),
             (None, 'Expected unicode HTML string, received None')]
 
         self.check_normalization(
@@ -336,8 +393,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
         invalid_values_with_error_messages = [
             (3.0, 'Expected unicode string, received 3.0'),
-            ({'a': 1}, r'Expected unicode string, received \{u\'a\': 1\}'),
-            ([1, 2, 1], r'Expected unicode string, received \[1, 2, 1\]'),
+            (
+                {'a': 1},
+                re.escape('Expected unicode string, received {\'a\': 1}')
+            ),
+            (
+                [1, 2, 1],
+                re.escape('Expected unicode string, received [1, 2, 1]')
+            ),
             (None, 'Expected unicode string, received None')]
 
         self.check_normalization(
@@ -357,24 +420,31 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (3.0, 'Expected dict, received 3.0'),
             (
                 {'a': 1},
-                r'Missing keys: \[u\'raw_latex\', u\'svg_filename\'\], '
-                r'Extra keys: \[u\'a\'\]'),
-            ([1, 2, 1], r'Expected dict, received \[1, 2, 1\]'),
+                re.escape(
+                    'Missing keys: [\'raw_latex\', \'svg_filename\'], '
+                    'Extra keys: [\'a\']'
+                )
+            ),
+            ([1, 2, 1], re.escape('Expected dict, received [1, 2, 1]')),
             (None, 'Expected dict, received None'),
             (
                 {'raw_latex': 1, 'svg_filename': 2},
-                'Expected unicode string, received 1'),
+                'Expected unicode string, received 1'
+            ),
             (
                 {'raw_latex': ['x^2'], 'svg_filename':{}},
-                r'Expected unicode string, received \[u\'x\^2\'\]'),
+                re.escape('Expected unicode string, received [\'x^2\']')
+            ),
             (
                 {'raw_latex': ('x', 'y'), 'svg_filename': ''},
-                'not all arguments converted during string formatting')
+                'not all arguments converted during string formatting'
+            )
         ]
 
         self.check_normalization(
             objects.MathExpressionContent, mappings,
-            invalid_values_with_error_messages)
+            invalid_values_with_error_messages
+        )
 
     def test_skill_id_string_validation(self):
         """Tests objects of type SkillSelector."""
@@ -383,8 +453,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
         invalid_values_with_error_messages = [
             (3.0, 'Expected unicode string, received 3.0'),
-            ({'a': 1}, r'Expected unicode string, received \{u\'a\': 1\}'),
-            ([1, 2, 1], r'Expected unicode string, received \[1, 2, 1\]'),
+            (
+                {'a': 1},
+                re.escape('Expected unicode string, received {\'a\': 1}')
+            ),
+            (
+                [1, 2, 1],
+                re.escape('Expected unicode string, received [1, 2, 1]')
+            ),
             (None, 'Expected unicode string, received None')]
 
         self.check_normalization(
@@ -398,23 +474,35 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
 
         invalid_values_with_error_messages = [
-            (u'http://¡Hola!.com', r'u\'\\xa1\''),
             (
                 'javascript:alert(5);',
-                r'Invalid URL: Sanitized URL should start with \'http://\' or '
-                r'\'https://\'; received javascript:alert%285%29%3B'),
+                re.escape(
+                    'Invalid URL: Sanitized URL should start with \'http://\' '
+                    'or \'https://\'; received javascript:alert%285%29%3B'
+                )
+            ),
             (
                 'ftp://gopher.com',
-                r'Invalid URL: Sanitized URL should start with \'http://\' or '
-                r'\'https://\'; received ftp://gopher.com'),
+                re.escape(
+                    'Invalid URL: Sanitized URL should start with \'http://\' '
+                    'or \'https://\'; received ftp://gopher.com'
+                )
+            ),
             (
                 'test',
-                r'Invalid URL: Sanitized URL should start with \'http://\' or '
-                r'\'https://\'; received test'),
+                re.escape(
+                    'Invalid URL: Sanitized URL should start with \'http://\' '
+                    'or \'https://\'; received test'
+                )
+            ),
             (
                 'google.com',
-                r'Invalid URL: Sanitized URL should start with \'http://\' or '
-                r'\'https://\'; received google.com')]
+                re.escape(
+                    'Invalid URL: Sanitized URL should start with \'http://\' '
+                    'or \'https://\'; received google.com'
+                )
+            )
+        ]
 
         self.check_normalization(
             objects.SanitizedUrl, mappings, invalid_values_with_error_messages)
@@ -446,108 +534,28 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (None, 'Cannot convert to checked proof None'),
             (
                 {'assumptions_string': 'p'},
-                r'Cannot convert to checked proof '
-                r'{u\'assumptions_string\': u\'p\'}'),
-            ({
-                'assumptions_string': 'p',
-                'target_string': 'q',
-                'proof_string': 'from p we have q',
-                'correct': False
-            },
-             r'Cannot convert to checked proof {u\'assumptions_string\': '
-             r'u\'p\', u\'target_string\': u\'q\', u\'correct\': False, '
-             r'u\'proof_string\': u\'from p we have q\'}')]
+                re.escape(
+                    'Cannot convert to checked proof '
+                    '{\'assumptions_string\': \'p\'}'
+                )
+            ),
+            (
+                {
+                    'assumptions_string': 'p',
+                    'target_string': 'q',
+                    'proof_string': 'from p we have q',
+                    'correct': False
+                },
+                re.escape(
+                    'Cannot convert to checked proof {\'assumptions_string\': '
+                    '\'p\', \'target_string\': \'q\', \'proof_string\': '
+                    '\'from p we have q\', \'correct\': False}'
+                )
+            )
+        ]
 
         self.check_normalization(
             objects.CheckedProof, mappings, invalid_values_with_error_messages)
-
-    def test_logic_question_validation_for_variables(self):
-        """Tests objects of type LogicQuestion."""
-        p_expression = {
-            'top_kind_name': 'variable',
-            'top_operator_name': 'p',
-            'arguments': [],
-            'dummies': []
-        }
-
-        valid_example = {
-            'assumptions': [p_expression],
-            'results': [p_expression],
-            'default_proof_string': 'a proof'
-        }
-        mappings = [(valid_example, valid_example)]
-
-        invalid_values_with_error_messages = [
-            ({}, 'Cannot convert to a logic question {}'),
-            (None, 'Cannot convert to a logic question None'),
-            (
-                {'assumptions': p_expression},
-                'Cannot convert to a logic question'),
-            ({
-                'assumptions': p_expression,
-                'results': {
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p'
-                }
-            }, 'Cannot convert to a logic question')]
-
-        self.check_normalization(
-            objects.LogicQuestion, mappings, invalid_values_with_error_messages)
-
-    def test_logic_question_validation_for_constants(self):
-        """Tests objects of type LogicQuestion."""
-        numeric_expression = {
-            'top_kind_name': 'constant',
-            'top_operator_name': 1,
-            'arguments': [],
-            'dummies': [],
-            'type': 'integer'
-        }
-
-        valid_example = {
-            'assumptions': [numeric_expression],
-            'results': [numeric_expression],
-            'default_proof_string': 'a proof'
-        }
-        mappings = [(valid_example, valid_example)]
-
-        invalid_values_with_error_messages = [
-            ({}, 'Cannot convert to a logic question {}'),
-            (None, 'Cannot convert to a logic question None'),
-            (
-                {'assumptions': numeric_expression},
-                'Cannot convert to a logic question'),
-            ({
-                'assumptions': numeric_expression,
-                'results': {
-                    'top_kind_name': 'constant',
-                    'top_operator_name': 1
-                }
-            }, 'Cannot convert to a logic question')]
-
-        self.check_normalization(
-            objects.LogicQuestion, mappings, invalid_values_with_error_messages)
-
-    def test_logic_error_category_validation(self):
-        """Tests objects of type LogicErrorCategory."""
-
-        mappings = [
-            ('parsing', 'parsing'), ('typing', 'typing'),
-            ('mistake', 'mistake')]
-
-        invalid_values_with_error_messages = [
-            (None, 'Expected unicode string, received None'),
-            (2, 'Expected unicode string, received 2'),
-            (
-                'string',
-                'Received string which is not in the allowed range of choices'),
-            (
-                'item',
-                'Received item which is not in the allowed range of choices')]
-
-        self.check_normalization(
-            objects.LogicErrorCategory, mappings,
-            invalid_values_with_error_messages)
 
     def test_graph(self):
         """Tests objects of type Graph."""
@@ -577,10 +585,24 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': False
         }
+        directed_graph = {
+            'vertices': [
+                {'x': 0.0, 'y': 10.0, 'label': ''},
+                {'x': 50.0, 'y': 10.0, 'label': ''},
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1},
+            ],
+            'isLabeled': False,
+            'isDirected': True,
+            'isWeighted': False
+        }
 
         mappings = [
             (empty_graph, empty_graph),
             (cycle_5_graph, cycle_5_graph),
+            (directed_graph, directed_graph),
         ]
 
         invalid_values_with_error_messages = [
@@ -588,12 +610,15 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (1, 'Cannot convert to graph 1'),
             ({}, 'Cannot convert to graph {}'),
             ('string', 'Cannot convert to graph string'),
-            ({
-                'vertices': [],
-                'edges': []
-            },
-             r'Cannot convert to graph {u\'edges\': \[\], u\'vertices\':'
-             r' \[\]}'),
+            (
+                {
+                    'vertices': [],
+                    'edges': []
+                },
+                re.escape(
+                    'Cannot convert to graph {\'vertices\': [], \'edges\': []}'
+                )
+            ),
             ({
                 'vertices': [
                     {'x': 0.0, 'y': 0.0, 'label': ''},
@@ -687,34 +712,52 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 'Expected bool, received non-boolean'),
             (
                 self._create_fraction_dict(True, 'non-int', 2, 3),
-                'Could not convert unicode to int: non-int'),
+                'Could not convert str to int: non-int'),
             (
                 self._create_fraction_dict(None, None, None, None),
                 'Expected bool, received None'),
             (
                 self._create_fraction_dict(False, 10, 1, -3),
-                r'Validation failed: is_at_least \({u\'min_value\': 1}\) '
-                r'for object -3'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) '
+                    'for object -3'
+                )
+            ),
             (
                 self._create_fraction_dict(False, -10, 11, 3),
-                r'Validation failed: is_at_least \({u\'min_value\': 0}\) '
-                r'for object -10'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 0}) '
+                    'for object -10'
+                )
+            ),
             (
                 self._create_fraction_dict(False, 10, -11, 3),
-                r'Validation failed: is_at_least \({u\'min_value\': 0}\) '
-                r'for object -11'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 0}) '
+                    'for object -11'
+                )
+            ),
             (
                 self._create_fraction_dict(False, -10, -11, -3),
-                r'Validation failed: is_at_least \({u\'min_value\': 0}\) '
-                r'for object -10'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 0}) '
+                    'for object -10'
+                )
+            ),
             (
                 self._create_fraction_dict(False, 1, 1, 0),
-                r'Validation failed: is_at_least \({u\'min_value\': 1}\) '
-                r'for object 0'),
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) '
+                    'for object 0'
+                )
+            ),
             (
                 {},
-                r'Missing keys: \[u\'denominator\', u\'numerator\', '
-                r'u\'wholeNumber\', u\'isNegative\'\], Extra keys: \[\]'),
+                re.escape(
+                    'Missing keys: [\'denominator\', \'isNegative\', '
+                    '\'numerator\', \'wholeNumber\'], Extra keys: []'
+                )
+            ),
             ('1/3', 'Expected dict, received 1/3'),
             (1, 'Expected dict, received 1')]
 
@@ -789,8 +832,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_values_with_error_messages = [
             (None, 'Expected list, received None'),
             (2, 'Expected list, received 2'),
-            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
-            ('1: 2: 1', r'Expected list, received 1: 2: 1')]
+            ({'a': 1}, re.escape('Expected list, received {\'a\': 1}')),
+            ('1: 2: 1', re.escape('Expected list, received 1: 2: 1'))]
 
         self.check_normalization(
             objects.RatioExpression, mappings,
@@ -806,18 +849,23 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
-            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
+            ({'a': 1}, re.escape('Expected list, received {\'a\': 1}')),
             (3.0, 'Expected list, received 3.0'),
             (None, 'Expected list, received None'),
             ([3, 'a'], 'Expected unicode string, received 3'),
             (
                 ['a', 'a', 'b'],
-                r'Validation failed: is_uniquified \(\{\}\) '
-                r'for object \[\'a\', \'a\', \'b\'\]'),
+                re.escape(
+                    'Validation failed: is_uniquified ({}) '
+                    'for object [\'a\', \'a\', \'b\']'
+                )
+            ),
             (
                 ['a', 'invalid_identifier', 'b'],
                 'Received invalid_identifier which is not in the allowed '
-                'range of choices')]
+                'range of choices'
+            )
+        ]
 
         self.check_normalization(
             objects.SetOfAlgebraicIdentifier, mappings,
@@ -839,7 +887,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 52)
+        self.assertEqual(count, 53)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -847,34 +895,54 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
     def test_default_values_for_objects_are_valid(self):
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member) and member.default_value is not None:
+                if member.__name__ == 'BaseTranslatableObject':
+                    continue
+
                 if isinstance(member(), objects.BaseTranslatableObject):
-                    # If object is a BaseTranslatableObject, the default
-                    # content_id could be None but the normalization will
-                    # enforce a non-None string. This is because the content id
-                    # is populated before being saved. To get around this, we
-                    # populate the content id.
-                    member.default_value['contentId'] = 'rule_input'
+                    self.assertIsInstance(member.default_value, dict)
+                    self.assertEqual(len(member.default_value.keys()), 2)
+                    # We need to check the protected property in order to avoid
+                    # skew between it and the key that is used in the default
+                    # value.
+                    self.assertEqual(
+                        sorted(['contentId', member._value_key_name]),  # pylint: disable=protected-access
+                        sorted(member.default_value.keys()))
+                    self.assertIsNone(member.default_value['contentId'])
 
-                self.assertEqual(
-                    member.normalize(member.default_value),
-                    member.default_value)
-
-                # Comparing types here is necessary because 0 == False in
-                # Python. We handle the string case separately since Python
-                # treats str and unicode as different types.
-                type_error_message = (
-                    'Mismatched default value types for object class %s' %
-                    member.__name__)
-                if isinstance(member.default_value, python_utils.BASESTRING):
-                    self.assertIsInstance(
-                        member.normalize(member.default_value),
-                        python_utils.BASESTRING,
-                        msg=type_error_message)
+                    # If the object is a subclass of BaseTranslatableObject,
+                    # the default content_id would be None but the
+                    # normalization will enforce a non-None string. This is
+                    # because the content id is populated before being saved.
+                    # So we do the same here.
+                    actual_default_value = member.default_value
+                    actual_default_value['contentId'] = 'content_id'
+                    normalized_default_value = member.normalize(
+                        actual_default_value)
+                    self.assertIsInstance(normalized_default_value, dict)
+                    self.assertEqual(
+                        normalized_default_value, actual_default_value)
                 else:
-                    self.assertIsInstance(
+                    self.assertEqual(
                         member.normalize(member.default_value),
-                        type(member.default_value),
-                        msg=type_error_message)
+                        member.default_value)
+
+                    type_error_message = (
+                        'Mismatched default value types for object class %s' %
+                        member.__name__)
+
+                    # Comparing types here is necessary because 0 == False in
+                    # Python. We handle the string case separately since Python
+                    # treats str and unicode as different types.
+                    if isinstance(
+                            member.default_value, python_utils.BASESTRING):
+                        self.assertIsInstance(
+                            member.normalize(member.default_value),
+                            python_utils.BASESTRING, msg=type_error_message)
+                    else:
+                        self.assertIsInstance(
+                            member.normalize(member.default_value),
+                            type(member.default_value),
+                            msg=type_error_message)
 
 
 class NormalizedRectangleTests(test_utils.GenericTestBase):
@@ -920,68 +988,262 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
 
     def test_abstract_base_class_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
-            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
+            NotImplementedError,
+            'The _value_key_name and _value_schema for this class must both '
+            'be set'):
             objects.BaseTranslatableObject.get_schema()
 
-        with self.assertRaisesRegexp(
-            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
-            objects.BaseTranslatableObject.normalize({
-                'contentId': 'rule_input'
-            })
+        with self.swap(objects.BaseTranslatableObject, '_value_key_name', 'a'):
+            with self.assertRaisesRegexp(
+                NotImplementedError,
+                'The _value_key_name and _value_schema for this class must '
+                'both be set'):
+                objects.BaseTranslatableObject.normalize({
+                    'contentId': 'rule_input',
+                    'a': 'thing to translate'
+                })
 
     def test_base_translatable_object_normalization(self):
         with self.assertRaisesRegexp(
-            TypeError, 'Expected content id to be a string'):
+            NotImplementedError,
+            'The _value_key_name and _value_schema for this class must both '
+            'be set'):
             objects.BaseTranslatableObject.normalize({
                 'contentId': 5
             })
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'The _value_key_name and _value_schema for this class must both '
+            'be set'):
+            objects.BaseTranslatableObject.normalize_value(5)
+
+
+class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(
+            AssertionError, 'Expected unicode string, received 5'):
+            objects.TranslatableUnicodeString.normalize({
+                'contentId': 'rule_input',
+                'unicodeStr': 5
+            })
+
+        with self.assertRaisesRegexp(
+            AssertionError,
+            re.escape('Expected unicode string, received [\'abc\']')
+        ):
+            objects.TranslatableUnicodeString.normalize({
+                'contentId': 'rule_input',
+                'unicodeStr': ['abc']
+            })
+
+        self.assertEqual(objects.TranslatableUnicodeString.normalize({
+            'contentId': 'rule_input',
+            'unicodeStr': 'abc'
+        }), {
+            'contentId': 'rule_input',
+            'unicodeStr': 'abc'
+        })
+
+    def test_normalize_value(self):
+        with self.assertRaisesRegexp(
+                AssertionError, 'Expected unicode string, received 5'):
+            objects.TranslatableUnicodeString.normalize_value(5)
+
+        with self.assertRaisesRegexp(
+            AssertionError,
+            re.escape('Expected unicode string, received [\'abc\']')
+        ):
+            objects.TranslatableUnicodeString.normalize_value(['abc'])
+
+        self.assertEqual(
+            objects.TranslatableUnicodeString.normalize_value('abc'), 'abc')
+
+
+class TranslatableHtmlTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+            objects.TranslatableHtml.normalize({
+                'contentId': 'rule_input',
+                'html': 5
+            })
+
+        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+            objects.TranslatableHtml.normalize({
+                'contentId': 'rule_input',
+                'html': ['abc']
+            })
+
+        self.assertEqual(objects.TranslatableHtml.normalize({
+            'contentId': 'rule_input',
+            'html': '<b>This is bold text.</b>'
+        }), {
+            'contentId': 'rule_input',
+            'html': '<b>This is bold text.</b>'
+        })
+
+        self.assertEqual(objects.TranslatableHtml.normalize({
+            'contentId': 'rule_input',
+            'html': '<script>a'
+        }), {
+            'contentId': 'rule_input',
+            'html': 'a'
+        })
+
+        self.assertEqual(objects.TranslatableHtml.normalize({
+            'contentId': 'rule_input',
+            'html': 'good<script src="http://evil.com">text</script>'
+        }), {
+            'contentId': 'rule_input',
+            'html': 'goodtext'
+        })
+
+    def test_normalize_value(self):
+        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+            objects.TranslatableHtml.normalize_value(5)
+
+        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+            objects.TranslatableHtml.normalize_value(['abc'])
+
+        with self.assertRaisesRegexp(
+            AssertionError,
+            re.escape('Expected unicode string, received [\'abc\']')
+        ):
+            objects.TranslatableUnicodeString.normalize_value(['abc'])
+
+        self.assertEqual(
+            objects.TranslatableHtml.normalize_value(
+                '<b>This is bold text.</b>'),
+            '<b>This is bold text.</b>')
+
+        self.assertEqual(
+            objects.TranslatableHtml.normalize_value('<script>a'), 'a')
+
+        self.assertEqual(
+            objects.TranslatableHtml.normalize_value(
+                'good<script src="http://evil.com">text</script>'
+            ),
+            'goodtext'
+        )
 
 
 class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
         with self.assertRaisesRegexp(
-            TypeError, 'Invalid unicode string set'):
+            AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfNormalizedString.normalize({
                 'contentId': 'rule_input',
                 'normalizedStrSet': 5
             })
 
         with self.assertRaisesRegexp(
-            TypeError, 'Invalid content unicode'):
+            AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfNormalizedString.normalize({
                 'contentId': 'rule_input',
                 'normalizedStrSet': ['1', 2, '3']
             })
 
         with self.assertRaisesRegexp(
-            TypeError, 'Duplicate unicode found'):
+            AssertionError, 'Validation failed: is_uniquified'):
             objects.TranslatableSetOfNormalizedString.normalize({
                 'contentId': 'rule_input',
                 'normalizedStrSet': ['1', '1']
             })
+
+        self.assertEqual(objects.TranslatableSetOfNormalizedString.normalize({
+            'contentId': 'rule_input',
+            'normalizedStrSet': ['1', '2']
+        }), {
+            'contentId': 'rule_input',
+            'normalizedStrSet': ['1', '2']
+        })
+
+    def test_normalize_value(self):
+        with self.assertRaisesRegexp(
+            AssertionError, 'Expected list, received 5'):
+            objects.TranslatableSetOfNormalizedString.normalize_value(5)
+
+        with self.assertRaisesRegexp(
+            AssertionError, 'Expected unicode string, received 2'):
+            objects.TranslatableSetOfNormalizedString.normalize_value(
+                ['1', 2, '3'])
+
+        with self.assertRaisesRegexp(
+            AssertionError, 'Validation failed: is_uniquified'):
+            objects.TranslatableSetOfNormalizedString.normalize_value(
+                ['1', '1'])
+
+        self.assertEqual(
+            objects.TranslatableSetOfNormalizedString.normalize_value(
+                ['1', '2']),
+            ['1', '2'])
 
 
 class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
         with self.assertRaisesRegexp(
-            TypeError, 'Invalid unicode string set'):
+            AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStrSet': 5
             })
 
         with self.assertRaisesRegexp(
-            TypeError, 'Invalid content unicode'):
+            AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStrSet': ['1', 2, '3']
             })
 
         with self.assertRaisesRegexp(
-            TypeError, 'Duplicate unicode found'):
+            AssertionError, 'Validation failed: is_uniquified'):
             objects.TranslatableSetOfUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStrSet': ['1', '1']
             })
+
+        self.assertEqual(objects.TranslatableSetOfUnicodeString.normalize({
+            'contentId': 'rule_input',
+            'unicodeStrSet': ['1', '2']
+        }), {
+            'contentId': 'rule_input',
+            'unicodeStrSet': ['1', '2']
+        })
+
+    def test_normalize_value(self):
+        with self.assertRaisesRegexp(
+            AssertionError, 'Expected list, received 5'):
+            objects.TranslatableSetOfUnicodeString.normalize_value(5)
+
+        with self.assertRaisesRegexp(
+            AssertionError, 'Expected unicode string, received 2'):
+            objects.TranslatableSetOfUnicodeString.normalize_value(
+                ['1', 2, '3'])
+
+        with self.assertRaisesRegexp(
+            AssertionError, 'Validation failed: is_uniquified'):
+            objects.TranslatableSetOfUnicodeString.normalize_value(['1', '1'])
+
+        self.assertEqual(
+            objects.TranslatableSetOfUnicodeString.normalize_value(['1', '2']),
+            ['1', '2'])
+
+
+class JsonEncodedInStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        list_of_ids = ['0', '1']
+        with self.assertRaisesRegexp(
+            Exception, 'Expected string received 2 of type %s' % type(2)
+        ):
+            objects.JsonEncodedInString.normalize(2)
+
+        self.assertEqual(
+            objects.JsonEncodedInString.normalize(
+                json.dumps(list_of_ids)),
+            list_of_ids
+        )

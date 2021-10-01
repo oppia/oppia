@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { EmailDashboardBackendApiService } from
+import { EmailDashboardBackendApiService, QueryData } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from
   'domain/email-dashboard/email-dashboard-query.model';
@@ -30,6 +30,14 @@ import { EmailDashboardQueryResults } from
 describe('Email dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
   let edbas: EmailDashboardBackendApiService;
+  let defaultData: QueryData = {
+    inactive_in_last_n_days: 0,
+    has_not_logged_in_for_n_days: 0,
+    created_at_least_n_exps: 0,
+    created_fewer_than_n_exps: 0,
+    edited_at_least_n_exps: 0,
+    edited_fewer_than_n_exps: 0
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -147,14 +155,8 @@ describe('Email dashboard backend api service', () => {
   );
 
   it('should correctly submit query.', fakeAsync(() => {
-    let postData = {
-      hasNotLoggedInForNDays: '1',
-      inactiveInLastNDays: '2',
-      createdAtLeastNExps: '1',
-      createdFewerThanNExps: '1',
-      editedAtLeastNExps: '0',
-      editedFewerThanNExps: '3'
-    };
+    var postData = defaultData;
+    postData.inactive_in_last_n_days = 10;
 
     let backendResponse = {
       query: {
@@ -183,14 +185,8 @@ describe('Email dashboard backend api service', () => {
 
   it('should use the rejection handler if the query submission failed.',
     fakeAsync(() => {
-      let postData = {
-        hasNotLoggedInForNDays: '1',
-        inactiveInLastNDays: '2',
-        createdAtLeastNExps: '1',
-        createdFewerThanNExps: '1',
-        editedAtLeastNExps: '0',
-        editedFewerThanNExps: '3'
-      };
+      var postData = defaultData;
+      postData.inactive_in_last_n_days = 10;
 
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');

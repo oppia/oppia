@@ -1,0 +1,77 @@
+<style>
+  .oppia-interactive-image-click-input .image-click-container {
+    background: #fff;
+    padding: 8px;
+    position: relative;
+  }
+  .oppia-interactive-image-click-input .oppia-image-click-img {
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .oppia-interactive-image-click-input .oppia-click-region {
+    background: rgba(0,0,255,0.5);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .oppia-interactive-image-click-input .oppia-highlighted-region {
+    background: red;
+    border: 1px solid #000;
+    border-radius: 50%;
+    height: 10px;
+    position: absolute;
+    width: 10px;
+    z-index: 10;
+  }
+  @media screen and (max-width: 959px) {
+    .oppia-interactive-image-click-input .code-repl-container {
+      width: 100vw;
+    }
+    .oppia-interactive-image-click-input .oppia-image-click-img {
+      max-width: 100vw;
+    }
+    .oppia-interactive-image-click-input .image-click-container {
+      padding: 8px 0;
+    }
+  }
+</style>
+<div class="oppia-interactive-image-click-input">
+  <div *ngIf="isLoadingIndicatorShown" class="oppia-image-container" [ngStyle]="imageContainerStyle">
+    <img [src]="loadingIndicatorUrl"
+         class="center-element-horizontally"
+         [ngStyle]="loadingIndicatorStyle" alt="Loading...">
+  </div>
+  <div *ngIf="isTryAgainShown" class="oppia-image-container" [ngStyle]="imageContainerStyle">
+    <button mat-button
+            (click)="loadImage()"
+            class="oppia-learner-reload-image-button center-element-horizontally">
+      <span>Reload image<i class="material-icons oppia-reload-image-symbol">&#10227;</i></span>
+    </button>
+  </div>
+
+  <div class="image-click-container" *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
+    <img [src]="imageUrl"
+         class="oppia-image-click-img"
+         (click)="onClickImage($event)"
+         (mousemove)="onMousemoveImage($event)"
+         (style)="imageContainerStyle">
+    <div *ngIf="highlightRegionsOnHover">
+      <div *ngFor="let region of allRegions; let idx = index"
+           class="oppia-click-region position-absolute"
+           [style.height]="getRegionDimensions(idx).height + 'px'"
+           [style.width]="getRegionDimensions(idx).width + 'px'"
+           [style.left]="getRegionDimensions(idx).left + 'px'"
+           [style.top]="getRegionDimensions(idx).top + 'px'"
+           [style.display]="getRegionDisplay(region.label)">
+      </div>
+    </div>
+    <div *ngIf="!highlightRegionsOnHover && !interactionIsActive"
+         class="oppia-highlighted-region"
+         [ngStyle]="{
+          'display': getDotDisplay(),
+          'left': getDotLocation().left + 'px',
+          'top': getDotLocation().top + 'px'}">
+    </div>
+  </div>
+</div>

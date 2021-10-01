@@ -35,9 +35,9 @@ describe('Skill backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    skillBackendApiService = TestBed.get(SkillBackendApiService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
       id: '2',
@@ -97,6 +97,23 @@ describe('Skill backend API service', () => {
     httpTestingController.verify();
   });
 
+  it('should fetch all skills', fakeAsync(() => {
+    const skills: SkillBackendDict[] = [];
+    skills.push(
+      skillObjectFactory.createFromBackendDict(skillBackendDict).toBackendDict()
+    );
+    skillBackendApiService.fetchAllSkills().toPromise().then(
+      res => {
+        expect(res).toEqual(skills);
+      }
+    );
+    let req = httpTestingController.expectOne('/fetch_skills');
+    expect(req.request.method).toEqual('GET');
+    req.flush(skills);
+
+    flushMicrotasks();
+  }));
+
   it(
     'should succesfully fetch an existing skill from the backend.',
     fakeAsync(() => {
@@ -130,7 +147,7 @@ describe('Skill backend API service', () => {
         groupedSkillSummaries: groupedSkillSummaries
       };
 
-      skillBackendApiService.fetchSkill('1').then(response => {
+      skillBackendApiService.fetchSkillAsync('1').then(response => {
         expect(response).toEqual(expectedResponse);
       });
 
@@ -147,7 +164,8 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.fetchSkill('1').then(successHandler, failHandler);
+      skillBackendApiService.fetchSkillAsync('1').then(
+        successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
@@ -175,7 +193,7 @@ describe('Skill backend API service', () => {
         skill_id: '2'
       } as const;
 
-      skillBackendApiService.updateSkill(
+      skillBackendApiService.updateSkillAsync(
         '1', 1, 'commit message', [changeList]).then(response => {
         expect(response).toEqual(skill);
       });
@@ -185,6 +203,55 @@ describe('Skill backend API service', () => {
       req.flush(backendResponse);
 
       flushMicrotasks();
+    }));
+
+  it(
+    'should make a request to check if skill description exists in backend.',
+    fakeAsync(() => {
+      const backendResponse = {
+        skill_description_exists: false,
+      };
+      const description = 'Adding Fractions';
+
+      skillBackendApiService.doesSkillWithDescriptionExistAsync(
+        description).then(response => {
+        expect(response).toEqual(false);
+      });
+
+      let req = httpTestingController.expectOne(
+        '/skill_description_handler/Adding%20Fractions'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(backendResponse);
+
+      flushMicrotasks();
+    }));
+
+  it(
+    'should use the rejection handler if skill description exists backend ' +
+    'request failed.', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const description = 'Adding Fractions';
+
+      skillBackendApiService.doesSkillWithDescriptionExistAsync(
+        description).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/skill_description_handler/Adding%20Fractions'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     }));
 
   it(
@@ -198,7 +265,7 @@ describe('Skill backend API service', () => {
         skill_id: '2'
       } as const;
 
-      skillBackendApiService.updateSkill(
+      skillBackendApiService.updateSkillAsync(
         '1', 1, 'commit message', [changeList]).then(
         successHandler, failHandler);
 
@@ -224,9 +291,10 @@ describe('Skill backend API service', () => {
         skills: [skillBackendDict, skillBackendDict]
       };
 
-      skillBackendApiService.fetchMultiSkills(['1', '2']).then(response => {
-        expect(response).toEqual([skill, skill]);
-      });
+      skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(
+        response => {
+          expect(response).toEqual([skill, skill]);
+        });
 
       let req = httpTestingController.expectOne(
         '/skill_data_handler/' + encodeURIComponent('1,2'));
@@ -242,7 +310,7 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.fetchMultiSkills(['1', '2']).then(
+      skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -264,7 +332,7 @@ describe('Skill backend API service', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    skillBackendApiService.deleteSkill('1').then(
+    skillBackendApiService.deleteSkillAsync('1').then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
@@ -283,7 +351,7 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.deleteSkill('1').then(
+      skillBackendApiService.deleteSkillAsync('1').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/skill_editor_handler/data/1');

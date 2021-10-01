@@ -1,0 +1,371 @@
+<mat-card class="list-view-item">
+  <table class="dashboard-table protractor-test-skills-table">
+    <colgroup>
+      <col class="dashboard-table-index-column">
+      <col class="dashboard-table-description-column">
+      <col class="dashboard-table-examples-column">
+      <col class="dashboard-table-misconception-column">
+      <col class="dashboard-table-status-column">
+      <col class="dashboard-table-options-column">
+    </colgroup>
+    <tr>
+      <th *ngFor="let key of SKILL_HEADINGS"
+          class="dashboard-table-headings">
+        <p *ngIf="key === 'index'" class="text-center"></p>
+        <p *ngIf="key === 'description'" class="text-left">Skill Description</p>
+        <p *ngIf="key === 'worked_examples_count'" class="text-center">Worked Examples</p>
+        <p *ngIf="key === 'misconception_count'" class="text-center">Misconceptions</p>
+        <p *ngIf="key === 'status'" class="text-right skill-status-heading">Status</p>
+      </th>
+    </tr>
+    <tr *ngFor="let skill of skillSummaries; index as idx"
+        class="list-item">
+      <td>
+        {{ getSerialNumberForSkill(idx) }}.
+      </td>
+      <td class="protractor-test-skills-list-item">
+        <a [href]="getSkillEditorUrl(skill.id)" class="list-summary">
+          <div class="skill-description protractor-test-skill-description">{{ skill.description }}</div>
+          <div class="skill-topic">
+            <span *ngIf="!skill.topicNames.length">
+              Unassigned
+              <i class="fa fa-exclamation-triangle"></i>
+            </span>
+            <span *ngIf="skill.topicNames.length">
+              {{ skill.topicNames.join(', ') }}
+            </span>
+          </div>
+        </a>
+      </td>
+      <td>
+        <span class="list-summary text-center">
+          <span> {{skill.workedExamplesCount}} </span>
+        </span>
+      </td>
+      <td>
+        <span class="list-summary text-center">
+          <span> {{skill.misconceptionCount}} </span>
+        </span>
+      </td>
+      <td class="text-right">
+        <span>
+          <span *ngIf="skill.topicNames.length">
+            Assigned
+          </span>
+          <span *ngIf="!skill.topicNames.length" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" (click)="assignSkillToTopic(skill)">
+            UNASSIGNED
+          </span>
+        </span>
+        <div class="skill-list-options-container">
+          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" attr.aria-label="Edit option for skill, {{ skill.description }}" (click)="changeEditOptions(skill.id)"></p>
+          <div *ngIf="showEditOptions(skill.id)" class="skill-edit-options" (mouseleave)="changeEditOptions(null)">
+            <div class="assign-skill-box" *ngIf="editableTopicSummaries.length > 0 && !isUnpublishedSkill" (click)="assignSkillToTopic(skill)">
+              <span class="skills-list-action-button">
+                <i class="fa fa-wrench"></i>
+                <span> Assign to Topic </span>
+              </span>
+            </div>
+            <div class="merge-skill-box" *ngIf="mergeableSkillSummaries.length > 0" (click)="mergeSkill(skill)">
+              <div class="protractor-test-merge-skills-button">
+                <i class="fa fa-plus"></i>
+                <span>Merge Skill</span>
+              </div>
+            </div>
+            <div class="unassign-skill-box protractor-test-unassign-skill-button" *ngIf="skill.topicNames.length" (click)="unassignSkill(skill.id)">
+              <div>
+                <i class="fa fa-minus"></i>
+                <span>Unassign Skill</span>
+              </div>
+            </div>
+            <div class="delete-icon-box protractor-test-delete-skill-button" (click)="deleteSkill(skill.id)">
+              <a *ngIf="userCanDeleteSkill">
+                <span class="fa fa-trash-alt"></span>
+                <span>Delete</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div class="skills-list-mobile">
+    <div *ngFor="let skill of skillSummaries; index as idx" class="skill-item">
+      <div class="skill-item-header">
+        <div class="skill-item-description-box">
+          <div class="skill-item-description-name">
+            <div class="skill-item-description-mobile">
+              <a [href]="getSkillEditorUrl(skill.id)">
+                <span>{{ getSerialNumberForSkill(idx) }}.</span>
+                <span>{{ skill.description }}</span>
+              </a>
+            </div>
+            <div class="skill-list-options-container">
+              <p class="fas fa-ellipsis-v skill-edit-box-icon" (click)="changeEditOptions(skill.id)"></p>
+              <div *ngIf="showEditOptions(skill.id)" class="skill-edit-options" attr.aria-label="Edit Option For Skill {{ skill.description }} " (mouseleave)="changeEditOptions(null)">
+                <div class="assign-skill-box" *ngIf="editableTopicSummaries.length > 0 && !isUnpublishedSkill">
+                  <span class="skills-list-action-button" (click)="assignSkillToTopic(skill)">
+                    <i class="fa fa-wrench"></i>
+                    <span> Assign to Topic </span>
+                  </span>
+                </div>
+                <div class="merge-skill-box" *ngIf="mergeableSkillSummaries.length > 0" (click)="mergeSkill(skill)">
+                  <div class="protractor-test-merge-skills-button">
+                    <i class="fa fa-plus"></i>
+                    <span>Merge Skill</span>
+                  </div>
+                </div>
+                <div class="delete-icon-box" (click)="deleteSkill(skill.id)">
+                  <span *ngIf="userCanDeleteSkill">
+                    <i class="fa fa-trash-alt"></i>
+                    <span>Delete</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="skill-topic">
+              <span *ngIf="!skill.topicNames.length">
+                Unassigned
+                <i class="fa fa-exclamation-triangle"></i>
+              </span>
+              <span *ngIf="skill.topicNames.length">
+                {{ skill.topicNames.join(', ') }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="skill-item-entities">
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Worked Examples</span></div>
+          <div class="skill-item-value"><span> {{ skill.workedExamplesCount }}</span></div>
+        </div>
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Misconceptions</span></div>
+          <div class="skill-item-value"><span> {{ skill.misconceptionCount }}</span></div>
+        </div>
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Status</span></div>
+          <div *ngIf="skill.topicNames.length" class="skill-item-value"><span> {{ skill.topicNames.join(', ') }}</span></div>
+          <div *ngIf="!skill.topicNames.length" class="skill-item-value"><span>Not Assigned</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-card>
+<span *ngIf="!canCreateSkill">
+  <em>To create new skills, please talk to one of the lesson creation admins.</em>
+</span>
+
+<style>
+  .list-view-item {
+    background: #fff;
+    box-shadow: none;
+    margin-top: 50px;
+  }
+
+  .list-item {
+    height: 140px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  .skills-list-mobile {
+    display: none;
+  }
+
+  .dashboard-table-index-column {
+    width: 5%;
+  }
+
+  .dashboard-table-description-column {
+    width: 25%;
+  }
+
+  .dashboard-table-examples-column {
+    width: 12%;
+  }
+
+  .dashboard-table-misconception-column {
+    width: 12%;
+  }
+
+  .dashboard-table-status-column {
+    width: 12%;
+  }
+
+  .skill-status-heading {
+    margin-right: 5%;
+  }
+
+  .skill-topic-unassigned {
+    color: #00645C;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .skill-edit-box-icon {
+    cursor: pointer;
+  }
+
+  .list-item td {
+    padding-top: 15px;
+  }
+
+  .skill-description {
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  .skill-topic {
+    font-size: 15px;
+    margin: 4px 0;
+    text-transform: uppercase;
+  }
+
+  .skill-topic i {
+    color: #D57B00;
+  }
+
+  .dashboard-table {
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  .list-summary,
+  .list-summary:active,
+  .list-summary:visited {
+    color: inherit;
+    display: block;
+    text-decoration: none;
+  }
+
+  .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  .hoverable-cell {
+    background-color: #ededed;
+  }
+
+  .delete-icon {
+    padding-left: 0.8vw;
+  }
+
+  .merge-skill {
+    padding-left: 0.8vw;
+  }
+
+  .merge-skill .merge-skill-icon {
+    cursor: pointer;
+    width: 20px;
+  }
+
+  .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+
+  .skill-list-options-container {
+    display: inline;
+    position: relative;
+  }
+
+  .skill-edit-options {
+    background-color: #fff;
+    border: 1px solid #000;
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    right: 0;
+    text-align: left;
+    top: 0;
+    width: 140px;
+  }
+
+  .assign-skill-box,
+  .merge-skill-box,
+  .unassign-skill-box,
+  .delete-icon-box {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 4px 0 4px 4px;
+    width: 100%;
+  }
+
+  .delete-icon-box {
+    border-bottom: none;
+  }
+
+  .skill-edit-options div:hover,
+  .skill-edit-options div:active,
+  .skill-edit-options div:visited {
+    background-color: #e6e6e6;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-table {
+      display: none;
+    }
+    .skills-list-mobile {
+      display: block;
+      width: 100%;
+    }
+    .skill-item-description-name a {
+      color: inherit;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .skill-item {
+      border-bottom: 1px solid #c0bebe;
+    }
+    .skill-item:not(:first-child) {
+      padding-top: 18px;
+    }
+    .skill-item-entities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 10px auto;
+      width: 80%;
+    }
+    .skill-item-entity {
+      display: flex;
+      font-size: 15px;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .skill-item-actions {
+      align-items: center;
+      display: flex;
+      justify-content: space-evenly;
+      margin: 7px 0;
+    }
+    .assign-btn {
+      border: 2px solid #00645C;
+    }
+
+    .skill-item-description-mobile {
+      display: inline-block;
+      width: 90%;
+    }
+
+    .skill-edit-options {
+      right: 15px;
+      text-align: left;
+      top: -5px;
+      width: 140px;
+    }
+
+    .skill-edit-box-icon {
+      margin: 0;
+    }
+  }
+</style>

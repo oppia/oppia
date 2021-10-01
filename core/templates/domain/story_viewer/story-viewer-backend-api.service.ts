@@ -39,7 +39,7 @@ interface StoryChapterCompletionBackendResponse {
   'summaries': LearnerExplorationSummaryBackendDict[];
 }
 
-interface StoryChapterCompletionResponse {
+export interface StoryChapterCompletionResponse {
   nextNodeId: string;
   readyForReviewTest: boolean;
   summaries: LearnerExplorationSummary[];
@@ -113,8 +113,8 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  fetchStoryData(
-      topicUrlFragment:string,
+  async fetchStoryDataAsync(
+      topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
@@ -124,7 +124,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  recordChapterCompletion(
+  async recordChapterCompletionAsync(
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string,

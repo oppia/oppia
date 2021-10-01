@@ -14,11 +14,18 @@
 
 """Models for storing the story data models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
+
+from typing import Any, Dict, List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -36,9 +43,54 @@ class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to stories.
+
+    A new instance of this model is created and saved every time a commit to
+    StoryModel occurs.
+
+    The id for this model is of the form 'story-[story_id]-[version]'.
+    """
+
+    # The id of the story being edited.
+    story_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_instance_id(cls, story_id: str, version: int) -> str:
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            story_id: str. The id of the story being edited.
+            version: int. The version number of the story after the commit.
+
+        Returns:
+            str. The commit id with the story id and version number.
+        """
+        return 'story-%s-%s' % (story_id, version)
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StoryModel(base_models.VersionedModel):
@@ -50,6 +102,7 @@ class StoryModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = StorySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = StorySnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = StoryCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The title of the story.
@@ -58,8 +111,10 @@ class StoryModel(base_models.VersionedModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
+    # The thumbnail size of the story.
+    thumbnail_size_in_bytes = datastore_services.IntegerProperty(indexed=True)
     # A high-level description of the story.
-    description = datastore_services.StringProperty(indexed=True)
+    description = datastore_services.TextProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = datastore_services.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
@@ -83,12 +138,19 @@ class StoryModel(base_models.VersionedModel):
         indexed=True, default='')
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
+            self,
+            committer_id: str,
+            commit_type: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -117,17 +179,19 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.put()
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -140,7 +204,7 @@ class StoryModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_by_url_fragment(cls, url_fragment):
+    def get_by_url_fragment(cls, url_fragment: str) -> Optional['StoryModel']:
         """Gets StoryModel by url_fragment. Returns None if the story with
         name url_fragment doesn't exist.
 
@@ -151,53 +215,7 @@ class StoryModel(base_models.VersionedModel):
             StoryModel|None. The story model of the story or None if not
             found.
         """
-        return StoryModel.query().filter(
-            cls.url_fragment == url_fragment).filter(
-                cls.deleted == False).get() # pylint: disable=singleton-comparison
-
-
-class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to stories.
-
-    A new instance of this model is created and saved every time a commit to
-    StoryModel occurs.
-
-    The id for this model is of the form 'story-[story_id]-[version]'.
-    """
-
-    # The id of the story being edited.
-    story_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @classmethod
-    def _get_instance_id(cls, story_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            story_id: str. The id of the story being edited.
-            version: int. The version number of the story after the commit.
-
-        Returns:
-            str. The commit id with the story id and version number.
-        """
-        return 'story-%s-%s' % (story_id, version)
-
-    @staticmethod
-    def get_model_association_to_user():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return cls.get_all().filter(cls.url_fragment == url_fragment).get()
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -219,7 +237,7 @@ class StorySummaryModel(base_models.BaseModel):
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
     # A high-level description of the story.
-    description = datastore_services.StringProperty(required=True, indexed=True)
+    description = datastore_services.TextProperty(required=True, indexed=False)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
@@ -243,17 +261,18 @@ class StorySummaryModel(base_models.BaseModel):
         datastore_services.StringProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,

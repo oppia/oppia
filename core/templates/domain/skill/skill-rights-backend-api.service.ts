@@ -25,7 +25,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { SkillRightsBackendDict, SkillRights } from
   'domain/skill/skill-rights.model';
 import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants.ts';
+  'pages/skill-editor-page/skill-editor-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 

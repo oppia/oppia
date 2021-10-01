@@ -108,10 +108,6 @@ export interface ItemSelectionRuleInputs {
   x: string[];
 }
 
-export interface LogicProofRuleInputs {
-  c: string;
-}
-
 // MathEquation interaction has multiple types of inputs based on
 // rule type. Parameter y is supposed to represent the side of the equation that
 // needs to be checked.
@@ -218,9 +214,15 @@ export interface RatioInputHasNumberOfTermsEqualToRuleInputs {
   y: number;
 }
 
+export interface RatioInputHasSpecificTermEqualToRuleInputs {
+  x: number;
+  y: number;
+}
+
 export type RatioInputRuleInputs = (
   RatioInputEqualRuleInputs |
-  RatioInputHasNumberOfTermsEqualToRuleInputs);
+  RatioInputHasNumberOfTermsEqualToRuleInputs |
+  RatioInputHasSpecificTermEqualToRuleInputs);
 
 export interface BaseTranslatableObject {
   contentId: string | null;
@@ -254,7 +256,6 @@ export type InteractionRuleInputs = (
   ImageClickRuleInputs |
   InteractiveMapRuleInputs |
   ItemSelectionRuleInputs |
-  LogicProofRuleInputs |
   MathEquationRuleInputs |
   MultipleChoiceRuleInputs |
   MusicNotesRuleInputs |

@@ -42,7 +42,7 @@ export class UtilsService {
    * @param {Object} obj - the object to be checked.
    * @return {boolean} - true if object is empty, false otherwise.
    */
-  isEmpty(obj: Object): boolean {
+  isEmpty(obj: Object | undefined | null): boolean {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         return false;
@@ -58,7 +58,7 @@ export class UtilsService {
    * @param {Object} input - the object to be checked.
    * @return {boolean} - true if input is string, false otherwise.
    */
-  isString(input: Object): boolean {
+  isString(input: Object | undefined | null): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
 
@@ -70,7 +70,7 @@ export class UtilsService {
    * @param {Object} b - the second object to be compared.
    * @return {boolean} - true if a is equivalent to b, false otherwise.
    */
-  isEquivalent(a: Object, b: Object): boolean {
+  isEquivalent(a: Object | null, b: Object | null): boolean {
     if (a === null || b === null) {
       return a === b;
     }
@@ -86,9 +86,19 @@ export class UtilsService {
     if (aProps.length !== bProps.length) {
       return false;
     }
+    // The indexing of an Object with a string implicitly returns
+    // 'any' type. This issue is solved according to
+    // https://github.com/microsoft/TypeScript/issues/35859.
+    // Additionally a cast was added to the Record type in order not
+    // to modify the structure of the Object interface.
     for (var i = 0; i < aProps.length; i++) {
       var propName = aProps[i];
-      if (!this.isEquivalent(a[propName], b[propName])) {
+      const getKeyValue = (key: string) =>
+        (obj: Record<string, Object>) => obj[key];
+      if (!this.isEquivalent(
+        getKeyValue(propName)(<Record<string, object>>a),
+        getKeyValue(propName)(<Record<string, object>>b))
+      ) {
         return false;
       }
     }
@@ -101,22 +111,61 @@ export class UtilsService {
    * @param {Object} value - the object to be checked.
    * @return {boolean} - true if value is an Error object, false otherwise.
    */
-  isError(value: Object): boolean {
+  isError(value: Object | undefined | null): boolean {
     switch (Object.prototype.toString.call(value)) {
       case '[object Error]': return true;
-      case '[object Exception]': return true;
       case '[object DOMException]': return true;
       default: return value instanceof Error;
     }
   }
 
-  isOverflowing(element: HTMLElement): boolean {
+  isOverflowing(element: HTMLElement | null): boolean {
     if (!element) {
       return false;
     } else {
       return (
         element.offsetWidth < element.scrollWidth ||
         element.offsetHeight < element.scrollHeight);
+    }
+  }
+
+  // Determines whether the URL is pointing to a page on the Oppia site.
+  getSafeReturnUrl(urlString: string): string {
+    try {
+      // Make sure the URL can be decoded properly.
+      urlString = decodeURIComponent(urlString);
+    } catch (_) {
+      // The URL could not be decoded, so reject it and return '/' instead.
+      return '/';
+    }
+
+    try {
+      // Throws an exception when the URL does not have a scheme.
+      const url = new URL(urlString);
+
+      // Does this URL originate from this website?
+      if (url.origin !== new URL(document.URL, document.baseURI).origin) {
+        // This is an external URL, so reject it and return '/' instead.
+        return '/';
+      }
+    } catch (_) {
+      // Continue to the next validation strategy.
+    }
+
+    try {
+      // Throws an exception if the URL is truly malformed in some way.
+      new URL(urlString, document.baseURI);
+    } catch (_) {
+      // This is a truly malformed URL, so reject it and return '/' instead.
+      return '/';
+    }
+
+    if (urlString.charAt(0) !== '/' || urlString.charAt(1) === '/') {
+      // The URL is not a relative path, so reject it and return '/' instead.
+      return '/';
+    } else {
+      // The URL is a safe, relative path.
+      return urlString;
     }
   }
 }

@@ -8,7 +8,7 @@ language_code: en
 objective: discover the Root Linear Coefficient Theorem
 param_changes: []
 param_specs: {}
-schema_version: 43
+schema_version: 47
 states:
   Coefficient Signs:
     classifier_model_id: null
@@ -19,10 +19,11 @@ states:
         \ - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
         ></oppia-noninteractive-math><br><br>If\_<oppia-noninteractive-math math_content-with-value=\"\
         {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>\_is even, what's the\
-        \ sign of the constant term? \_How about the linear term?</p><p><br>Likewise,\
-        \ if\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
-        \ &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is even, what's the sign of the constant term?\
+        \ \_How about the linear term?</p><p><br>Likewise, if\_<oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;,\
+        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>\_is odd, what's the sign of the constant term?\
         \ \_What's the sign of the linear term?</p>"
     interaction:
@@ -160,9 +161,10 @@ states:
         \ = 3&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_145112_zdet2aoua9_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
         {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_2=4&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_145208_5bmpx75x83_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"></oppia-noninteractive-math>, and\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;a_3\
-        \ = 1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_145257_o9m38za85u_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
+        \ &amp;quot;mathImg_20200904_145208_5bmpx75x83_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, and\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_3 = 1&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_145257_o9m38za85u_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>, then you're suggesting that the constant term\
         \ should be positive, right?</p><p>\_</p><p>What is the constant term?</p>"
     interaction:
@@ -217,14 +219,16 @@ states:
       html: "<p>You said \"-,+,-,+\" meaning if you expand:</p><p><oppia-noninteractive-math\
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
         \ a_1) (x - a_2) (x - a_3) ... (x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math>,<br>and\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>\_\
-        is even, you should get that the constant term is negative. \_Let's try it\
-        \ on this sample case:</p><p>\_</p><p><oppia-noninteractive-math math_content-with-value=\"\
-        {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x - 3) (x - 4)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_145457_e8wewljydb_height_2d731_width_14d388_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math><br><br>What is the\
-        \ coefficient of the constant term?</p>"
+        \ &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,<br>and\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is even, you should get that the constant term\
+        \ is negative. \_Let's try it on this sample case:</p><p>\_</p><p><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
+        \ 3) (x - 4)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_145457_e8wewljydb_height_2d731_width_14d388_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>What is the coefficient of the constant\
+        \ term?</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -300,7 +304,8 @@ states:
       content_id: content
       html: "<p>What about\_<oppia-noninteractive-math math_content-with-value=\"\
         {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x-a)(x-b)(x-c)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_150030_q2zopa1qyw_height_2d731_width_21d329_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math>?</p>"
+        \ &amp;quot;mathImg_20200904_150030_q2zopa1qyw_height_2d731_width_21d329_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>?</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -381,8 +386,9 @@ states:
         \ if we consider an even more general expression:<br><oppia-noninteractive-math\
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
         \ a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math><br><br>What is the\
-        \ absolute value of the constant term (the term with no x's)?</p>"
+        \ &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
+        \ term (the term with no x's)?</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -509,7 +515,8 @@ states:
           html: "<p>This one's a little tricky.  Maybe trying this case will help\
             \ you out?\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
             \ &amp;quot;(x - a_1) (x - a_2) (x - a_3)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-            \ &amp;quot;mathImg_20200904_144525_sn4diooumw_height_2d731_width_24d969_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math></p>"
+            \ &amp;quot;mathImg_20200904_144525_sn4diooumw_height_2d731_width_24d969_vertical_0d833.svg&amp;quot;}\"\
+            ></oppia-noninteractive-math></p>"
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -545,12 +552,14 @@ states:
       html: "<p>Here's the general expression again:</p><p><oppia-noninteractive-math\
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
         \ a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_130924_ji4wc82lll_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math><br><br>When\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>\_\
-        is even, the constant and linear terms have opposite signs...</p><p><br>when\_\
-        <oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
-        \ &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        \ &amp;quot;mathImg_20200904_130924_ji4wc82lll_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>When\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is even, the constant and linear terms have\
+        \ opposite signs...</p><p><br>when\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>\_is odd, the constant and linear terms also\
         \ have opposite signs...<br><br>What, then, is the sign of the quotient:<br>[linear\
         \ coefficient] / [constant term]<br>?</p>"
@@ -703,18 +712,21 @@ states:
       html: "<p>What about something a little harder? \_Can you tell me what the terms\
         \ are in the expansion of this:</p><p><oppia-noninteractive-math math_content-with-value=\"\
         {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x-3)(x+2)(x-5)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_135225_0gz4xvjk92_height_2d731_width_21d582_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math><br><br>If a, b, c,\
-        \ and d are the coefficients of\_<oppia-noninteractive-math math_content-with-value=\"\
-        {&amp;quot;raw_latex&amp;quot;: &amp;quot;x^3&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_135312_mxctsqirp2_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>,\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_135422_87qht0r32f_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>,\_\
-        <oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
-        \ &amp;quot;x&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_144017_spjf7y0aym_height_1d429_width_1d34_vertical_0d241.svg&amp;quot;}\"\
+        \ &amp;quot;mathImg_20200904_135225_0gz4xvjk92_height_2d731_width_21d582_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>If a, b, c, and d are the coefficients\
+        \ of\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;x^3&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_135312_mxctsqirp2_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_135422_87qht0r32f_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;x&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_144017_spjf7y0aym_height_1d429_width_1d34_vertical_0d241.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>\_and\_<oppia-noninteractive-math math_content-with-value=\"\
         {&amp;quot;raw_latex&amp;quot;: &amp;quot;1&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_132540_jbva8gbc53_height_2d021_width_1d173_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>, respectively, format\
-        \ your answer as the string: a,b,c,d (without spaces).</p>"
+        \ &amp;quot;mathImg_20200904_132540_jbva8gbc53_height_2d021_width_1d173_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, respectively, format your answer as the string:\
+        \ a,b,c,d (without spaces).</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -728,7 +740,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 1,-6,-1,30
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - 1,-6,-1,30
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -752,7 +767,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -760,6 +775,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -767,6 +783,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   Start:
     classifier_model_id: null
     content:
@@ -774,7 +791,8 @@ states:
       html: "<p>Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(a +\
         \ b)(c + d) = ac + ad + bc + bd&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_145553_bpk4bpmcis_height_2d731_width_34d499_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math>.<br></p>"
+        \ &amp;quot;mathImg_20200904_145553_bpk4bpmcis_height_2d731_width_34d499_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>.<br></p>"
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -815,23 +833,28 @@ states:
       html: "<p>The Root Linear Coefficient Theorem is...<br><br>Given the polynomial\_\
         <oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
         \ &amp;quot;x^n + c_{n-1} x^{n-1} + ... + c_2 x^2 + c_1 x^1 + c_0&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133543_2upm7inrzr_height_2d85_width_37d969_vertical_0d715.svg&amp;quot;}\"></oppia-noninteractive-math><br>with\
-        \ roots\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
-        \ &amp;quot;a_1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133655_ou7e9pxilh_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}\"\
+        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133543_2upm7inrzr_height_2d85_width_37d969_vertical_0d715.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br>with roots\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_1&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133655_ou7e9pxilh_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
         {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_2&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_133755_mnzsrlo05g_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}\"></oppia-noninteractive-math>, ...,\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;a_n&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133855_jhklfg01go_height_1d784_width_2d466_vertical_0d596.svg&amp;quot;}\"></oppia-noninteractive-math>:<br><br>The\
-        \ sum of the reciprocals of the roots:\_<oppia-noninteractive-math math_content-with-value=\"\
-        {&amp;quot;raw_latex&amp;quot;: &amp;quot;(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133958_w8wzb081od_height_2d731_width_25d559_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math><br>is\
-        \ equal to the negative coefficient of the linear term:\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;-c_1&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134100_2931f8hu3e_height_2d139_width_3d898_vertical_0d596.svg&amp;quot;}\"></oppia-noninteractive-math><br><br>or...</p><p><br><oppia-noninteractive-math\
+        \ &amp;quot;mathImg_20200904_133755_mnzsrlo05g_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, ...,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133855_jhklfg01go_height_1d784_width_2d466_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>:<br><br>The sum of the reciprocals of the roots:\_\
+        <oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133958_w8wzb081od_height_2d731_width_25d559_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br>is equal to the negative coefficient of the\
+        \ linear term:\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;-c_1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134100_2931f8hu3e_height_2d139_width_3d898_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>or...</p><p><br><oppia-noninteractive-math\
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;c_1\
         \ = -(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
-        \ &amp;quot;mathImg_20200904_134203_ob2se8mse4_height_2d731_width_32d565_vertical_0d833.svg&amp;quot;}\"></oppia-noninteractive-math></p>"
+        \ &amp;quot;mathImg_20200904_134203_ob2se8mse4_height_2d731_width_32d565_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math></p>"
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -866,6 +889,6 @@ states:
         ca_buttonText_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 38
+states_schema_version: 42
 tags: []
 title: Root Linear Coefficient Theorem

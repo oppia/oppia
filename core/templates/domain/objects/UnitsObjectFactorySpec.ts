@@ -21,7 +21,7 @@ import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 
 describe('UnitsObjectFactory', () => {
-  let units: UnitsObjectFactory = null;
+  let units: UnitsObjectFactory;
 
   beforeEach(() => {
     units = TestBed.get(UnitsObjectFactory);
@@ -173,6 +173,9 @@ describe('UnitsObjectFactory', () => {
     expect(units.unitWithMultiplier(
       ['cent', '*', '(', 'kg', '/', 'N', ')']))
       .toEqual([['cent', 1], ['kg', 1], ['N', -1]]);
+    expect(() => units.unitWithMultiplier(
+      ['cm', '/', 'kg', '/', 'N', ')']))
+      .toThrowError('Close parenthesis with no open parenthesis');
   });
 
   it('should convert a unit dict to a list', () => {
@@ -210,14 +213,12 @@ describe('UnitsObjectFactory', () => {
   it('should throw errors for invalid units', () => {
     expect(() => {
       units.fromRawInputString('NK*kg');
-    }).toThrowError('SyntaxError: Unit "NK" not found.');
+    }).toThrowError('Unit "NK" not found.');
     expect(() => {
       units.fromRawInputString('per &kg$');
-    }).toThrowError(
-      'SyntaxError: Unexpected "&" in "dollar/ &kg" at index 8');
+    }).toThrowError('Unexpected "&" in "dollar/ &kg" at index 8');
     expect(() => {
       units.fromRawInputString('cent %mol$');
-    }).toThrowError(
-      'SyntaxError: Unit "dollarcent" not found.');
+    }).toThrowError('Unit "dollarcent" not found.');
   });
 });

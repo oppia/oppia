@@ -21,8 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subscription } from 'rxjs';
 
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service.ts';
-import { UrlService } from 'services/contextual/url.service.ts';
+import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'collection-navbar',

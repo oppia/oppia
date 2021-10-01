@@ -16,10 +16,10 @@
 
 """Domain objects used within multiple extensions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import python_utils
+from core import python_utils
 
 
 class CustomizationArgSpec(python_utils.OBJECT):

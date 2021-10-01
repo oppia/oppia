@@ -21,9 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-class GuppyObject {
-  divId = null;
-  guppyInstance = null;
+export class GuppyObject {
+  // These properties are initialized using constructor function
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  divId!: string;
+  guppyInstance!: Guppy;
   constructor(divId: string, guppyInstance: Guppy) {
     this.divId = divId;
     this.guppyInstance = guppyInstance;
@@ -57,8 +60,7 @@ export class GuppyInitializationService {
         '\\color{grey}{\\text{\\small{' + placeholderText + '}}}');
 
       // Initialize it with a value for the creator's view.
-      if (guppyDivClassName === 'guppy-div-creator' &&
-        initialValue.length !== 0) {
+      if (initialValue.length !== 0) {
         if (initialValue.indexOf('=') !== -1) {
           let splitByEquals = initialValue.split('=');
           splitByEquals[0] = mathInteractionsService.insertMultiplicationSigns(

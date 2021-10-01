@@ -19,19 +19,19 @@
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 
-interface LabeledRegion {
+export interface LabeledRegion {
   region: {
     area: number[][];
   };
   label: string;
 }
 
-interface ImageWithRegions {
+export interface ImageWithRegions {
   labeledRegions: LabeledRegion[];
   imagePath: string;
 }
@@ -41,11 +41,13 @@ interface ReadableMusicNote {
 }
 
 export interface AlgebraicExpressionInputCustomizationArgs {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
 }
 export interface AlgebraicExpressionInputCustomizationArgsBackendDict {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
@@ -126,13 +128,13 @@ export interface EndExplorationCustomizationArgs {
 
 export interface FractionInputCustomizationArgsBackendDict {
   requireSimplestForm: {
-    value: string;
+    value: boolean;
   };
   allowImproperFraction: {
-    value: string;
+    value: boolean;
   };
   allowNonzeroIntegerPart: {
-    value: string;
+    value: boolean;
   };
   customPlaceholder: {
     value: SubtitledUnicodeBackendDict;
@@ -140,13 +142,13 @@ export interface FractionInputCustomizationArgsBackendDict {
 }
 export interface FractionInputCustomizationArgs {
   requireSimplestForm: {
-    value: string;
+    value: boolean;
   };
   allowImproperFraction: {
-    value: string;
+    value: boolean;
   };
   allowNonzeroIntegerPart: {
-    value: string;
+    value: boolean;
   };
   customPlaceholder: {
     value: SubtitledUnicode;
@@ -274,24 +276,15 @@ export interface ItemSelectionInputCustomizationArgs {
 }
 
 
-export interface LogicProofCustomizationArgsBackendDict {
-  question: {
-    value: Object;
-  };
-}
-export interface LogicProofCustomizationArgs {
-  question: {
-    value: Object;
-  };
-}
-
 
 export interface MathEquationInputCustomizationArgsBackendDict {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
 }
 export interface MathEquationInputCustomizationArgs {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
@@ -394,19 +387,29 @@ export interface TextInputCustomizationArgs {
 
 
 export interface NumericExpressionInputCustomizationArgsBackendDict {
+  useFractionForDivision: boolean;
   placeholder: {
     value: SubtitledUnicodeBackendDict;
   };
 }
 export interface NumericExpressionInputCustomizationArgs {
+  useFractionForDivision: boolean;
   placeholder: {
     value: SubtitledUnicode;
   };
 }
 
 
-export interface NumericInputCustomizationArgsBackendDict { }
-export interface NumericInputCustomizationArgs { }
+export interface NumericInputCustomizationArgsBackendDict {
+  requireNonnegativeInput: {
+    value: boolean;
+  };
+}
+export interface NumericInputCustomizationArgs {
+  requireNonnegativeInput: {
+    value: boolean;
+  };
+}
 
 
 export interface NumberWithUnitsCustomizationArgsBackendDict { }
@@ -424,7 +427,6 @@ export type InteractionCustomizationArgsBackendDict = (
   ImageClickInputCustomizationArgsBackendDict |
   InteractiveMapCustomizationArgsBackendDict |
   ItemSelectionInputCustomizationArgsBackendDict |
-  LogicProofCustomizationArgsBackendDict |
   MathEquationInputCustomizationArgsBackendDict |
   MultipleChoiceInputCustomizationArgsBackendDict |
   MusicNotesInputCustomizationArgsBackendDict |
@@ -447,7 +449,6 @@ export type InteractionCustomizationArgs = (
   ImageClickInputCustomizationArgs |
   InteractiveMapCustomizationArgs |
   ItemSelectionInputCustomizationArgs |
-  LogicProofCustomizationArgs |
   MathEquationInputCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |

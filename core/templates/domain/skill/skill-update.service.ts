@@ -30,7 +30,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 @Injectable({
   providedIn: 'root',

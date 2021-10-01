@@ -20,37 +20,41 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+export interface FetchIssuesResponseBackendDict {
+  'unresolved_issues': PlaythroughIssueBackendDict[],
+}
+
 import {
   PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
-} from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {
-  private cachedIssues = null;
+  private cachedIssues: PlaythroughIssue[] = [];
 
   constructor(
       private httpClient: HttpClient,
       private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchIssues(
+  async fetchIssuesAsync(
       explorationId: string,
       explorationVersion: number): Promise<PlaythroughIssue[]> {
-    if (this.cachedIssues !== null) {
+    if (this.cachedIssues.length !== 0) {
       return Promise.resolve(this.cachedIssues);
     }
 
     return new Promise((resolve, reject) => {
-      this.httpClient.get<PlaythroughIssueBackendDict[]>(
+      this.httpClient.get<FetchIssuesResponseBackendDict>(
         this.getFetchIssuesUrl(explorationId), {
           params: { exp_version: explorationVersion.toString() }}).toPromise()
         .then(response => {
-          resolve(this.cachedIssues = response.map(
+          resolve(this.cachedIssues = response.unresolved_issues.map(
             this.playthroughIssueObjectFactory.createFromBackendDict));
         }, errorResponse => {
           reject(errorResponse.error.error);
@@ -58,7 +62,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  fetchPlaythrough(
+  async fetchPlaythroughAsync(
       explorationId: string,
       playthroughId: string): Promise<PlaythroughIssue> {
     return new Promise((resolve, reject) => {
@@ -73,7 +77,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  resolveIssue(
+  async resolveIssueAsync(
       issueToResolve: PlaythroughIssue,
       explorationId: string, explorationVersion: number): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -82,7 +86,7 @@ export class PlaythroughIssuesBackendApiService {
         exp_version: explorationVersion
       }).toPromise()
         .then(() => {
-          if (this.cachedIssues !== null) {
+          if (this.cachedIssues.length !== 0) {
             const issueIndex = this.cachedIssues.findIndex(
               issue => angular.equals(issue, issueToResolve));
             if (issueIndex !== -1) {

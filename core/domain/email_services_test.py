@@ -14,16 +14,14 @@
 
 """ Tests for services relating to emails."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import email_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
-import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
@@ -31,37 +29,6 @@ platform_email_services = models.Registry.import_email_services()
 
 class EmailServicesTest(test_utils.EmailTestBase):
     """Tests for email_services functions."""
-
-    def test_reply_info_email_objects_are_created_and_queried_correctly(self):
-        model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user1', 'exploration.exp1.1')
-        reply_to_id = model.reply_to_id
-        queried_object = (
-            email_services.get_feedback_thread_reply_info_by_reply_to_id(
-                reply_to_id))
-
-        self.assertEqual(queried_object.reply_to_id, reply_to_id)
-        self.assertEqual(queried_object.id, 'user1.exploration.exp1.1')
-
-        queried_object = (
-            email_services.get_feedback_thread_reply_info_by_reply_to_id(
-                'unknown.reply.to.id'))
-        self.assertEqual(queried_object, None)
-
-        queried_object = (
-            email_services
-            .get_feedback_thread_reply_info_by_user_and_thread(
-                'user1', 'exploration.exp1.1'))
-
-        self.assertEqual(queried_object.reply_to_id, reply_to_id)
-        self.assertEqual(queried_object.id, 'user1.exploration.exp1.1')
-
-        queried_object = (
-            email_services
-            .get_feedback_thread_reply_info_by_user_and_thread(
-                'user_unknown', 'invalid_thread_id'))
-
-        self.assertEqual(queried_object, None)
 
     def test_send_mail_raises_exception_for_invalid_permissions(self):
         """Tests the send_mail exception raised for invalid user permissions."""
@@ -81,8 +48,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, 'subject')
             self.assertEqual(messages[0].body, 'body')
@@ -98,28 +64,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
-
-    def test_reply_to_id_flag(self):
-        """Verifies that the reply_to_id flag is working properly."""
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        reply_id = 123
-
-        with allow_emailing:
-            email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
-                'subject', 'body', 'html',
-                bcc_admin=False, reply_to_id=reply_id)
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].reply_to,
-                'reply+' + python_utils.UNICODE(reply_id) + '@' +
-                feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
     def test_send_bulk_mail_exception_for_invalid_permissions(self):
         """Tests the send_bulk_mail exception raised for invalid user
@@ -129,7 +76,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertRaisesRegexp(
                 Exception, 'This app cannot send emails to users.'))
         with send_email_exception, (
-            self.swap(constants, 'DEV_MODE', False)):
+            self.swap(constants, 'DEV_MODE', False)
+        ):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
@@ -145,8 +93,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, recipients)
 

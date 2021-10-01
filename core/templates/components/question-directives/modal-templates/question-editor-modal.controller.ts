@@ -12,36 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+
 /**
  * @fileoverview Controller for question editor modal.
  */
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('components/skill-selector/select-skill-modal.controller.ts');
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'ShortSkillSummaryObjectFactory',
+  'ImageLocalStorageService', 'NgbModal', 'QuestionUndoRedoService',
+  'QuestionValidationService',
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubric', 'skillName', 'untriagedSkillSummaries', 'MAX_COMMIT_MESSAGE_LENGTH',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, QuestionUndoRedoService,
-      QuestionValidationService, ShortSkillSummaryObjectFactory,
+      ImageLocalStorageService, NgbModal, QuestionUndoRedoService,
+      QuestionValidationService,
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
@@ -96,23 +99,20 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         groupedSkillSummaries.current.concat(
           groupedSkillSummaries.others);
       var allowSkillsFromOtherTopics = true;
-      $uibModal.open({
-        templateUrl:
-          UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/skill-selector/' +
-            'select-skill-modal.template.html'),
+      let modalRef: NgbModalRef = NgbModal.open(SelectSkillModalComponent, {
         backdrop: 'static',
-        resolve: {
-          skillsInSameTopicCount: () => skillsInSameTopicCount,
-          sortedSkillSummaries: () => sortedSkillSummaries,
-          categorizedSkills: () => categorizedSkills,
-          allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
-          untriagedSkillSummaries: () => untriagedSkillSummaries
-        },
-        controller: 'SelectSkillModalController',
         windowClass: 'skill-select-modal',
         size: 'xl'
-      }).result.then(function(summary) {
+      });
+      modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+      modalRef.componentInstance.skillsInSameTopicCount = (
+        skillsInSameTopicCount);
+      modalRef.componentInstance.categorizedSkills = categorizedSkills;
+      modalRef.componentInstance.allowSkillsFromOtherTopics = (
+        allowSkillsFromOtherTopics);
+      modalRef.componentInstance.untriagedSkillSummaries = (
+        untriagedSkillSummaries);
+      modalRef.result.then(function(summary) {
         for (var idx in $scope.associatedSkillSummaries) {
           if (
             $scope.associatedSkillSummaries[idx].getId() ===
@@ -123,13 +123,13 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           }
         }
         $scope.associatedSkillSummaries.push(
-          ShortSkillSummaryObjectFactory.create(
+          ShortSkillSummary.create(
             summary.id, summary.description));
         returnModalObject.skillLinkageModificationsArray.push({
           id: summary.id,
           task: 'add'
         });
-      }, function() {
+      }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is
         // clicked. No further action is needed.

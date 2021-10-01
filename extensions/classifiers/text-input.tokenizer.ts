@@ -34,7 +34,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TextInputTokenizer {
-  generateTokens(textInput: string): RegExpMatchArray {
+  // It returns 'null' if input contains less than 2 alphanumeric characters.
+  generateTokens(textInput: string): RegExpMatchArray | null {
     var tokenizedTextInput;
     // The default regexp select tokens of 2 or more alphanumeric
     // characters (punctuation is completely ignored and always treated

@@ -17,136 +17,233 @@
  * fields.
  */
 
-angular.module('oppia').factory('TranslateTextService', [
-  '$http', function($http) {
-    var stateWiseContents = null;
-    var stateWiseContentIds = {};
-    var activeStateName = null;
-    var activeContentId = null;
-    var stateNamesList = [];
-    var activeExpId = null;
-    var activeExpVersion = null;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { ImagesData } from 'services/image-local-storage.service';
 
-    const getNextContentId = function() {
-      return stateWiseContentIds[activeStateName].pop();
-    };
+import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
+import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import {
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 
-    const getNextState = function() {
-      const currentIndex = stateNamesList.indexOf(activeStateName);
-      return stateNamesList[currentIndex + 1];
-    };
+export interface TranslatableItem {
+  translation: string | string[],
+  status: Status,
+  text: string | string[],
+  more: boolean
+  dataFormat: string,
+  contentType: string,
+  interactionId?: string,
+  ruleType?: string
+}
 
-    const getNextText = function() {
-      if (stateNamesList.length === 0) {
-        return null;
-      }
-      activeContentId = getNextContentId();
-      if (!activeContentId) {
-        activeStateName = getNextState();
-        if (!activeStateName) {
-          return null;
-        }
-        activeContentId = getNextContentId();
-      }
-      return stateWiseContents[activeStateName][activeContentId];
-    };
+export type Status = 'pending' | 'submitted';
 
-    const isMoreTextAvailableForTranslation = function() {
-      if (stateNamesList.length === 0) {
-        return false;
-      }
-      return !(
-        stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
-          stateWiseContentIds[activeStateName].length === 0);
-    };
+export class StateAndContent {
+  constructor(
+    public stateName: string,
+    public contentID: string,
+    public contentText: string | string[],
+    public status: Status,
+    public translation: string | string[],
+    public dataFormat: string,
+    public contentType: string,
+    public interactionId?: string,
+    public ruleType?: string
+  ) {}
+}
 
+@Injectable({
+  providedIn: 'root'
+})
+export class TranslateTextService {
+  STARTING_INDEX = -1;
+  PENDING = 'pending';
+  SUBMITTED = 'submitted';
+  stateWiseContents = {};
+  stateWiseContentIds = {};
+  stateNamesList = [];
+  stateAndContent = [];
+  activeIndex = this.STARTING_INDEX;
+  activeExpId;
+  activeExpVersion;
+  activeContentId;
+  activeStateName: string;
+  activeContentText: string;
+  activeContentStatus: Status;
+
+  constructor(
+    private translateTextBackedApiService:
+      TranslateTextBackendApiService
+  ) { }
+
+  private _getNextText(): string | string[] {
+    if (this.stateAndContent.length === 0) {
+      return null;
+    }
+    this.activeIndex += 1;
+    this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
+    this.activeContentId = this.stateAndContent[this.activeIndex].contentID;
+    this.activeContentText = (
+      this.stateAndContent[this.activeIndex].contentText);
+    return this.activeContentText;
+  }
+
+  private _getPreviousText(): string | string[] {
+    if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
+      return null;
+    }
+    this.activeIndex -= 1;
+    this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
+    this.activeContentId = this.stateAndContent[this.activeIndex].contentID;
+    this.activeContentText = this.stateAndContent[this.activeIndex].contentText;
+    return this.activeContentText;
+  }
+
+  private _isPreviousTextAvailableForTranslation(): boolean {
+    return this.activeIndex > 0;
+  }
+
+  private _isMoreTextAvailableForTranslation(): boolean {
+    if (this.stateAndContent.length === 0) {
+      return false;
+    }
+    return (this.activeIndex + 1 < this.stateAndContent.length);
+  }
+
+  private _isSetDataFormat(dataFormat: string): boolean {
+    return (
+      dataFormat === TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
+      dataFormat === TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+    );
+  }
+
+  private _getUpdatedTextToTranslate(
+      text: string | string[],
+      more: boolean,
+      status: Status,
+      translation: string
+  ): TranslatableItem {
+    const {
+      dataFormat,
+      contentType,
+      interactionId,
+      ruleType
+    }: {
+      dataFormat?: string,
+      contentType?: string,
+      interactionId?: string,
+      ruleType?: string
+    } = this.stateAndContent[this.activeIndex] || {};
     return {
-      init: function(expId, languageCode, successCallback) {
-        stateWiseContents = null;
-        stateWiseContentIds = {};
-        activeStateName = null;
-        activeContentId = null;
-        stateNamesList = [];
-        activeExpId = expId;
-        activeExpVersion = null;
-
-        $http.get('/gettranslatabletexthandler', {
-          params: {
-            exp_id: expId,
-            language_code: languageCode
-          }
-        }).then(function(response) {
-          stateWiseContents = response.data.state_names_to_content_id_mapping;
-          activeExpVersion = response.data.version;
-          for (const stateName in stateWiseContents) {
-            let stateHasText = false;
-            const contentIds = [];
-            for (const [contentId, text] of Object.entries(
-              stateWiseContents[stateName])) {
-              if (text !== '') {
-                contentIds.push(contentId);
-                stateHasText = true;
-              }
-            }
-            // If none of the state's texts are non-empty, then don't consider
-            // the state for processing.
-            if (stateHasText) {
-              stateNamesList.push(stateName);
-              stateWiseContentIds[stateName] = contentIds;
-            }
-          }
-          if (stateNamesList.length > 0) {
-            activeStateName = stateNamesList[0];
-          }
-          successCallback();
-        });
-      },
-      getTextToTranslate: function() {
-        return {
-          text: getNextText(),
-          more: isMoreTextAvailableForTranslation()
-        };
-      },
-      suggestTranslatedText: function(
-          translationHtml, languageCode, imagesData, successCallback) {
-        const url = '/suggestionhandler/';
-        const postData = {
-          suggestion_type: 'translate_content',
-          target_type: 'exploration',
-          description: 'Adds translation',
-          target_id: activeExpId,
-          target_version_at_submission: activeExpVersion,
-          change: {
-            cmd: 'add_translation',
-            content_id: activeContentId,
-            state_name: activeStateName,
-            language_code: languageCode,
-            content_html: stateWiseContents[activeStateName][activeContentId],
-            translation_html: translationHtml
-          }
-        };
-
-        let body = new FormData();
-        body.append('payload', JSON.stringify(postData));
-        let filenames = imagesData.map(obj => obj.filename);
-        let imageBlobs = imagesData.map(obj => obj.imageBlob);
-        for (let idx in imageBlobs) {
-          body.append(filenames[idx], imageBlobs[idx]);
-        }
-        $http.post(url, body, {
-          // The actual header to be added is 'multipart/form-data', But
-          // adding it manually won't work because we will miss the boundary
-          // parameter. When we keep 'Content-Type' as undefined the browser
-          // automatically fills the boundary parameter according to the form
-          // data. Refer https://stackoverflow.com/questions/37039852/. and
-          // https://stackoverflow.com/questions/34983071/.
-          // Note: This should be removed and a convetion similar to
-          // SkillCreationBackendApiService should be followed once this service
-          // is migrated to Angular 8.
-          headers: {
-            'Content-Type': undefined
-          }
-        }).then(successCallback);
-      }
+      text: text,
+      more: more,
+      status: status,
+      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
+      dataFormat: dataFormat,
+      contentType: contentType,
+      interactionId: interactionId,
+      ruleType: ruleType
     };
-  }]);
+  }
+
+  init(expId: string, languageCode: string, successCallback: () => void): void {
+    this.stateWiseContentIds = {};
+    this.stateNamesList = [];
+    this.stateAndContent = [];
+    this.activeIndex = this.STARTING_INDEX;
+    this.activeContentId = null;
+    this.activeStateName = null;
+    this.activeContentText = null;
+    this.activeContentStatus = this.PENDING as Status;
+    this.activeExpId = expId;
+    this.translateTextBackedApiService.getTranslatableTextsAsync(
+      expId, languageCode).then((translatableTexts: TranslatableTexts) => {
+      this.stateWiseContents = translatableTexts.stateWiseContents;
+      this.activeExpVersion = translatableTexts.explorationVersion;
+      for (const stateName in this.stateWiseContents) {
+        let stateHasText: boolean = false;
+        const contentIds = [];
+        const contentIdToContentMapping = this.stateWiseContents[stateName];
+        for (const contentId in contentIdToContentMapping) {
+          const translatableItem = contentIdToContentMapping[contentId];
+          if (translatableItem.content === '') {
+            continue;
+          }
+          contentIds.push(contentId);
+          this.stateAndContent.push(
+            new StateAndContent(
+              stateName, contentId,
+              translatableItem.content,
+              this.PENDING as Status,
+              this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
+              translatableItem.dataFormat,
+              translatableItem.contentType,
+              translatableItem.interactionId,
+              translatableItem.ruleType
+            )
+          );
+          stateHasText = true;
+        }
+
+        if (stateHasText) {
+          this.stateNamesList.push(stateName);
+          this.stateWiseContentIds[stateName] = contentIds;
+        }
+      }
+      successCallback();
+    });
+  }
+
+  getActiveIndex(): number {
+    return this.activeIndex;
+  }
+
+  getTextToTranslate(): TranslatableItem {
+    const text = this._getNextText();
+    const {
+      status = this.PENDING,
+      translation = ''
+    } = { ...this.stateAndContent[this.activeIndex] };
+    return this._getUpdatedTextToTranslate(
+      text, this._isMoreTextAvailableForTranslation(), status, translation);
+  }
+
+  getPreviousTextToTranslate(): TranslatableItem {
+    const text = this._getPreviousText();
+    const {
+      status = this.PENDING,
+      translation = ''
+    } = { ...this.stateAndContent[this.activeIndex] };
+    return this._getUpdatedTextToTranslate(
+      text, this._isPreviousTextAvailableForTranslation(), status, translation);
+  }
+
+  suggestTranslatedText(
+      translation: string | string[], languageCode: string, imagesData:
+      ImagesData[], dataFormat: string, successCallback: () => void,
+      errorCallback: () => void): void {
+    this.translateTextBackedApiService.suggestTranslatedTextAsync(
+      this.activeExpId,
+      this.activeExpVersion,
+      this.activeContentId,
+      this.activeStateName,
+      languageCode,
+      this.stateWiseContents[
+        this.activeStateName][this.activeContentId].content,
+      translation,
+      imagesData,
+      dataFormat
+    ).then(() => {
+      this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
+      this.stateAndContent[this.activeIndex].translation = (
+        translation);
+      successCallback();
+    }, errorCallback);
+  }
+}
+
+angular.module('oppia').factory(
+  'TranslateTextService', downgradeInjectable(TranslateTextService));

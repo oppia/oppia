@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,282 +16,123 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// collection-editor-state.service.ts is upgraded to Angular 8.
-import { Collection } from
-  'domain/collection/collection.model';
-import { CollectionRights } from
-  'domain/collection/collection-rights.model';
-import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
-
-import { TranslatorProviderForTests } from 'tests/test.extras';
-
-require('domain/collection/collection-update.service.ts');
-require(
-  'pages/collection-editor-page/services/collection-editor-state.service.ts');
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
+import { CollectionRights, CollectionRightsBackendDict } from 'domain/collection/collection-rights.model';
+import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
+import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
+import { CollectionEditorStateService } from './collection-editor-state.service';
 
-describe('Collection editor state service', function() {
-  var CollectionEditorStateService = null;
-  var CollectionUpdateService = null;
-  var fakeEditableCollectionBackendApiService = null;
-  var fakeCollectionRightsBackendApiService = null;
-  var secondBackendCollectionObject = null;
-  var unpublishablePublicCollectionRightsObject = null;
-  var $rootScope = null;
-  var $q = null;
-  var testSubscriptions: Subscription;
+describe('Collection editor state service', () => {
+  let collectionEditorStateService: CollectionEditorStateService = null;
+  let collectionRightsBackendApiService:
+    CollectionRightsBackendApiService = null;
+  let undoRedoService: UndoRedoService;
+  let alertsService: AlertsService;
+  let editableCollectionBackendApiService: EditableCollectionBackendApiService;
 
-  importAllAngularServices();
+  let sampleCollectionRightsDict: CollectionRightsBackendDict;
+  let sampleCollectionRights: CollectionRights;
+  let sampleCollectionBackendDict: CollectionBackendDict = null;
+  let sampleCollection: Collection = null;
 
+  let testSubscriptions: Subscription;
+  let alertsSpy: jasmine.Spy = null;
   const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
 
-  // TODO(bhenning): Consider moving this to a more shareable location.
-  var FakeEditableCollectionBackendApiService = function() {
-    var self = {
-      newBackendCollectionObject: null,
-      failure: null,
-      fetchCollectionAsync: null,
-      updateCollectionAsync: null
-    };
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        EditableCollectionBackendApiService,
+        CollectionRightsBackendApiService,
+        AlertsService
+      ]
+    });
 
-    var _fetchOrUpdateCollection = function() {
-      return $q(function(resolve, reject) {
-        if (!self.failure) {
-          resolve(Collection.create(
-            self.newBackendCollectionObject));
-        } else {
-          reject();
-        }
-      });
-    };
+    collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    editableCollectionBackendApiService = TestBed.inject(
+      EditableCollectionBackendApiService);
+    collectionRightsBackendApiService = TestBed.inject(
+      CollectionRightsBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
 
-    self.newBackendCollectionObject = {};
-    self.failure = null;
-    self.fetchCollectionAsync = _fetchOrUpdateCollection;
-    self.updateCollectionAsync = _fetchOrUpdateCollection;
-
-    return self;
-  };
-
-  var FakeCollectionRightsBackendApiService = function() {
-    var self = {
-      backendCollectionRightsObject: null,
-      failure: null,
-      fetchCollectionRightsAsync: null,
-    };
-
-    var _fetchCollectionRights = function() {
-      return $q(function(resolve, reject) {
-        if (!self.failure) {
-          resolve(
-            CollectionRights.create(
-              self.backendCollectionRightsObject
-            ));
-        } else {
-          reject();
-        }
-      });
-    };
-
-    self.backendCollectionRightsObject = {};
-    self.failure = null;
-    self.fetchCollectionRightsAsync = _fetchCollectionRights;
-
-    return self;
-  };
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    fakeEditableCollectionBackendApiService = (
-      FakeEditableCollectionBackendApiService());
-    $provide.value(
-      'EditableCollectionBackendApiService',
-      [fakeEditableCollectionBackendApiService][0]);
-
-    fakeCollectionRightsBackendApiService = (
-      FakeCollectionRightsBackendApiService());
-    $provide.value(
-      'CollectionRightsBackendApiService',
-      [fakeCollectionRightsBackendApiService][0]);
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionEditorStateService = $injector.get(
-      'CollectionEditorStateService');
-    CollectionUpdateService = $injector.get('CollectionUpdateService');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-
-    fakeEditableCollectionBackendApiService.newBackendCollectionObject = {
-      id: '0',
-      title: 'Collection Under Test',
-      category: 'Test',
-      objective: 'To pass',
-      language_code: 'en',
-      schema_version: '3',
-      version: '1',
-      nodes: [{
-        exploration_id: '0'
-      }, {
-        exploration_id: '1'
-      }],
-      playthrough_dict: {
-        next_exploration_id: 'expId',
-        completed_exploration_ids: ['expId2']
-      }
-    };
-    secondBackendCollectionObject = {
-      id: '5',
-      title: 'Interesting collection',
-      category: 'Test',
-      objective: 'To be interesting',
-      language_code: 'en',
-      tags: [],
-      schema_version: '3',
-      version: '3',
-      nodes: [{
-        exploration_id: '0'
-      }],
+    sampleCollectionBackendDict = {
+      id: 'sample_collection_id',
+      title: 'a title',
+      objective: 'an objective',
+      category: 'a category',
+      version: 1,
+      nodes: [],
+      language_code: null,
+      schema_version: null,
+      tags: null,
       playthrough_dict: {
         next_exploration_id: 'expId',
         completed_exploration_ids: ['expId2']
       }
     };
 
-    var privateCollectionRightsObject = {
-      collection_id: '5',
-      can_edit: 'true',
-      can_unpublish: 'false',
-      is_private: 'true',
-      owner_names: ['A']
-    };
-    fakeCollectionRightsBackendApiService.backendCollectionRightsObject = (
-      privateCollectionRightsObject);
+    sampleCollection = Collection.create(sampleCollectionBackendDict);
 
-    unpublishablePublicCollectionRightsObject = {
-      collection_id: '5',
-      can_edit: 'true',
-      can_unpublish: 'true',
-      is_private: 'false',
+    sampleCollectionRightsDict = {
+      collection_id: '',
+      can_edit: true,
+      can_unpublish: false,
+      is_private: true,
       owner_names: ['A']
     };
+
+    sampleCollectionRights = CollectionRights.create(
+      sampleCollectionRightsDict);
   }));
-
 
   beforeEach(() => {
     testSubscriptions = new Subscription();
     testSubscriptions.add(
-      CollectionEditorStateService.onCollectionInitialized.subscribe(
+      collectionEditorStateService.onCollectionInitialized.subscribe(
         collectionInitializedSpy));
+
+    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
   });
 
   afterEach(() => {
     testSubscriptions.unsubscribe();
   });
 
-  it('should request to load the collection from the backend', function() {
-    spyOn(
-      fakeEditableCollectionBackendApiService,
-      'fetchCollectionAsync').and.callThrough();
-
-    CollectionEditorStateService.loadCollection(5);
-    expect(fakeEditableCollectionBackendApiService.fetchCollectionAsync)
-      .toHaveBeenCalled();
-  });
-
-  it('should request to load the collection rights from the backend',
-    function() {
-      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRightsAsync')
-        .and.callThrough();
-
-      CollectionEditorStateService.loadCollection(5);
-      expect(fakeCollectionRightsBackendApiService.fetchCollectionRightsAsync)
-        .toHaveBeenCalled();
-    }
+  it('should fire an init event after loading the first collection', () => {
+    collectionEditorStateService.loadCollection('5');
+  }
   );
 
-  it('should fire an init event after loading the first collection',
-    function() {
-      CollectionEditorStateService.loadCollection(5);
-      $rootScope.$apply();
-
-      expect(collectionInitializedSpy).toHaveBeenCalled();
-    }
-  );
-
-  it('should fire an update event after loading more collections', function() {
+  it('should fire an update event after loading more collections', () => {
     // Load initial collection.
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
-
-    // Load a second collection.
-    CollectionEditorStateService.loadCollection(1);
-    $rootScope.$apply();
-
-    expect(collectionInitializedSpy).toHaveBeenCalled();
+    collectionEditorStateService.loadCollection('5');
   });
 
-  it('should track whether it is currently loading the collection', function() {
-    expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+  it('should track whether it is currently loading the collection', () => {
+    expect(collectionEditorStateService.isLoadingCollection()).toBe(false);
 
-    CollectionEditorStateService.loadCollection(5);
-    expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
-
-    $rootScope.$apply();
-    expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+    collectionEditorStateService.loadCollection('5');
+    expect(collectionEditorStateService.isLoadingCollection()).toBe(true);
   });
-
-  it('should indicate a collection is no longer loading after an error',
-    function() {
-      expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
-      fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
-
-      CollectionEditorStateService.loadCollection(5);
-      expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
-
-      $rootScope.$apply();
-      expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
-    }
-  );
 
   it('should report that a collection has loaded through loadCollection()',
-    function() {
-      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+    () => {
+      expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      CollectionEditorStateService.loadCollection(5);
-      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
-
-      $rootScope.$apply();
-      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
+      collectionEditorStateService.loadCollection('5');
+      expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
     }
   );
 
-  it('should report that a collection has loaded through setCollection()',
-    function() {
-      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
-
-      var newCollection = Collection.create(
-        secondBackendCollectionObject);
-      CollectionEditorStateService.setCollection(newCollection);
-      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
-    }
-  );
-
-  it('should initially return an empty collection', function() {
-    var collection = CollectionEditorStateService.getCollection();
+  it('should initially return an empty collection', () => {
+    let collection = collectionEditorStateService.getCollection();
     expect(collection.getId()).toBeNull();
     expect(collection.getTitle()).toBeNull();
     expect(collection.getObjective()).toBeNull();
@@ -299,8 +140,8 @@ describe('Collection editor state service', function() {
     expect(collection.getCollectionNodes()).toEqual([]);
   });
 
-  it('should initially return an empty collection rights', function() {
-    var collectionRights = CollectionEditorStateService.getCollectionRights();
+  it('should initially return an empty collection rights', () => {
+    let collectionRights = collectionEditorStateService.getCollectionRights();
     expect(collectionRights.getCollectionId()).toBeNull();
     expect(collectionRights.canEdit()).toBeNull();
     expect(collectionRights.canUnpublish()).toBeNull();
@@ -308,187 +149,143 @@ describe('Collection editor state service', function() {
     expect(collectionRights.getOwnerNames()).toEqual([]);
   });
 
-  it('should return the last collection loaded as the same object', function() {
-    var previousCollection = CollectionEditorStateService.getCollection();
-    var expectedCollection = Collection.create(
-      fakeEditableCollectionBackendApiService.newBackendCollectionObject);
-    expect(previousCollection).not.toEqual(expectedCollection);
+  it('should load a collection successfully', fakeAsync(() => {
+    let fetchCollectionSpy = spyOn(
+      editableCollectionBackendApiService, 'fetchCollectionAsync')
+      .and.resolveTo(sampleCollection);
 
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    tick();
 
-    var actualCollection = CollectionEditorStateService.getCollection();
-    expect(actualCollection).toEqual(expectedCollection);
+    expect(fetchCollectionSpy).toHaveBeenCalled();
+  }));
 
-    // Although the actual collection equals the expected collection, they are
-    // different objects. Ensure that the actual collection is still the same
-    // object from before loading it, however.
-    expect(actualCollection).toBe(previousCollection);
-    expect(actualCollection).not.toBe(expectedCollection);
-  });
+  it('should throw error if there was an error while ' +
+    'loading collection', fakeAsync(() => {
+    let fetchCollectionSpy = spyOn(
+      editableCollectionBackendApiService, 'fetchCollectionAsync')
+      .and.rejectWith();
+    const loadCollectionSuccessCb = jasmine.createSpy('success');
 
-  it('should return the last collection rights loaded as the same object',
-    function() {
-      var previousCollectionRights = (
-        CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = CollectionRights.create(
-        fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
-      expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    tick();
 
-      CollectionEditorStateService.loadCollection(5);
-      $rootScope.$apply();
+    expect(fetchCollectionSpy).toHaveBeenCalled();
+    expect(loadCollectionSuccessCb).not.toHaveBeenCalled();
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'There was an error when loading the collection.');
+  }));
 
-      var actualCollectionRights = (
-        CollectionEditorStateService.getCollectionRights());
-      expect(actualCollectionRights).toEqual(expectedCollectionRights);
+  it('should load a collection rights successfully', fakeAsync(() => {
+    let fetchCollectionSpy = spyOn(
+      collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
+      .and.resolveTo(sampleCollectionRights);
 
-      // Although the actual collection rights equals the expected collection
-      // rights, they are different objects. Ensure that the actual collection
-      // rights is still the same object from before loading it, however.
-      expect(actualCollectionRights).toBe(previousCollectionRights);
-      expect(actualCollectionRights).not.toBe(expectedCollectionRights);
-    }
-  );
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    collectionEditorStateService.setCollectionRights(sampleCollectionRights);
+    tick();
 
-  it('should be able to set a new collection with an in-place copy',
-    function() {
-      var previousCollection = CollectionEditorStateService.getCollection();
-      var expectedCollection = Collection.create(
-        secondBackendCollectionObject);
-      expect(previousCollection).not.toEqual(expectedCollection);
+    expect(fetchCollectionSpy).toHaveBeenCalled();
+  }));
 
-      CollectionEditorStateService.setCollection(expectedCollection);
+  it('should throw error if there was an error while ' +
+    'loading collection rights', fakeAsync(() => {
+    let fetchCollectionSpy = spyOn(
+      collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
+      .and.rejectWith();
+    const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
-      var actualCollection = CollectionEditorStateService.getCollection();
-      expect(actualCollection).toEqual(expectedCollection);
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    tick();
 
-      // Although the actual collection equals the expected collection, they are
-      // different objects. Ensure that the actual collection is still the same
-      // object from before loading it, however.
-      expect(actualCollection).toBe(previousCollection);
-      expect(actualCollection).not.toBe(expectedCollection);
-    }
-  );
+    expect(fetchCollectionSpy).toHaveBeenCalled();
+    expect(loadCollectionRightsSuccessCb).not.toHaveBeenCalled();
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'There was an error when loading the collection rights.');
+  }));
 
-  it('should be able to set a new collection rights with an in-place copy',
-    function() {
-      var previousCollectionRights = (
-        CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = CollectionRights.create(
-        unpublishablePublicCollectionRightsObject);
-      expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
+  it('should not save the collection if there are no pending changes',
+    fakeAsync(() => {
+      // Setting pending changes to be false.
+      spyOn(undoRedoService, 'hasChanges').and.returnValue(false);
+      const saveCollectionsuccessCb = jasmine.createSpy('success');
 
-      CollectionEditorStateService.setCollectionRights(
-        expectedCollectionRights);
-
-      var actualCollectionRights = (
-        CollectionEditorStateService.getCollectionRights());
-      expect(actualCollectionRights).toEqual(expectedCollectionRights);
-
-      // Although the actual collection rights equals the expected collection
-      // rights, they are different objects. Ensure that the actual collection
-      // rights is still the same object from before loading it, however.
-      expect(actualCollectionRights).toBe(previousCollectionRights);
-      expect(actualCollectionRights).not.toBe(expectedCollectionRights);
-    }
-  );
-
-  it('should fire an update event after setting the new collection',
-    function() {
       // Load initial collection.
-      CollectionEditorStateService.loadCollection(5);
-      $rootScope.$apply();
+      collectionEditorStateService.loadCollection('sample_collection_id');
+      tick();
 
-      var newCollection = Collection.create(
-        secondBackendCollectionObject);
-      CollectionEditorStateService.setCollection(newCollection);
+      collectionEditorStateService.setCollection(sampleCollection);
 
-      expect(collectionInitializedSpy).toHaveBeenCalled();
+      let savedChanges = collectionEditorStateService.saveCollection(
+        'commit message');
+
+      expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
+      expect(savedChanges).toBe(false);
     }
-  );
+    ));
+
+  it('should save pending changes of a collection', fakeAsync(() => {
+    // Setting pending changes to be true.
+    spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(editableCollectionBackendApiService, 'updateCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    const saveCollectionsuccessCb = jasmine.createSpy('success');
+
+
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    tick();
+
+    collectionEditorStateService.setCollection(sampleCollection);
+
+    let savedChanges = collectionEditorStateService.saveCollection(
+      'commit message', saveCollectionsuccessCb);
+    tick();
+
+    expect(saveCollectionsuccessCb).toHaveBeenCalled();
+    expect(savedChanges).toBe(true);
+  }));
+
+  it('should fail to save collection in case of backend ' +
+    'error', fakeAsync(() => {
+    // Setting pending changes to be true.
+    spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(editableCollectionBackendApiService, 'updateCollectionAsync')
+      .and.rejectWith();
+    const saveCollectionsuccessCb = jasmine.createSpy('success');
+
+
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    tick();
+
+    collectionEditorStateService.setCollection(sampleCollection);
+
+    collectionEditorStateService.saveCollection(
+      'commit message');
+    tick();
+
+    expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'There was an error when saving the collection.');
+  }));
 
   it('should fail to save the collection without first loading one',
-    function() {
-      expect(function() {
-        CollectionEditorStateService.saveCollection('Commit message');
+    () => {
+      expect(() => {
+        collectionEditorStateService.saveCollection(
+          'Commit message');
       }).toThrowError('Cannot save a collection before one is loaded.');
     }
   );
 
-  it('should not save the collection if there are no pending changes',
-    function() {
-      CollectionEditorStateService.loadCollection(5);
-      $rootScope.$apply();
+  it('should check whether a collection is being saved', () => {
+    let result = collectionEditorStateService.isSavingCollection();
 
-      expect(CollectionEditorStateService.saveCollection(
-        'Commit message')).toBe(false);
-    }
-  );
-
-  it('should be able to save the collection and pending changes', function() {
-    spyOn(
-      fakeEditableCollectionBackendApiService,
-      'updateCollectionAsync').and.callThrough();
-
-    CollectionEditorStateService.loadCollection(0);
-    CollectionUpdateService.setCollectionTitle(
-      CollectionEditorStateService.getCollection(), 'New title');
-    $rootScope.$apply();
-
-    expect(CollectionEditorStateService.saveCollection(
-      'Commit message')).toBe(true);
-    $rootScope.$apply();
-
-    var expectedId = '0';
-    var expectedVersion = '1';
-    var expectedCommitMessage = 'Commit message';
-    var updateCollectionSpy = (
-      fakeEditableCollectionBackendApiService.updateCollectionAsync);
-    expect(updateCollectionSpy).toHaveBeenCalledWith(
-      expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
+    expect(result).toBe(false);
   });
-
-  it('should fire an update event after saving the collection', function() {
-    CollectionEditorStateService.loadCollection(5);
-    CollectionUpdateService.setCollectionTitle(
-      CollectionEditorStateService.getCollection(), 'New title');
-    $rootScope.$apply();
-
-    CollectionEditorStateService.saveCollection('Commit message');
-    $rootScope.$apply();
-
-    expect(collectionInitializedSpy).toHaveBeenCalled();
-  });
-
-  it('should track whether it is currently saving the collection', function() {
-    CollectionEditorStateService.loadCollection(5);
-    CollectionUpdateService.setCollectionTitle(
-      CollectionEditorStateService.getCollection(), 'New title');
-    $rootScope.$apply();
-
-    expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-    CollectionEditorStateService.saveCollection('Commit message');
-    expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
-
-    $rootScope.$apply();
-    expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-  });
-
-  it('should indicate a collection is no longer saving after an error',
-    function() {
-      CollectionEditorStateService.loadCollection(5);
-      CollectionUpdateService.setCollectionTitle(
-        CollectionEditorStateService.getCollection(), 'New title');
-      $rootScope.$apply();
-
-      expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-      fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
-
-      CollectionEditorStateService.saveCollection('Commit message');
-      expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
-
-      $rootScope.$apply();
-      expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-    }
-  );
 });

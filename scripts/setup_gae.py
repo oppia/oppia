@@ -14,8 +14,8 @@
 
 """Python execution environment setup for scripts that require GAE."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import os
@@ -23,7 +23,7 @@ import subprocess
 import sys
 import tarfile
 
-import python_utils
+from core import python_utils
 
 from . import common
 
@@ -38,13 +38,10 @@ GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 def main(args=None):
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    coverage_home = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'coverage-%s' % common.COVERAGE_VERSION)
 
     sys.path.append('.')
-    sys.path.append(coverage_home)
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
+    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.35'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -61,9 +58,12 @@ def main(args=None):
             'Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
+            # If the google cloud version is updated here, the corresponding
+            # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
+            # should also be updated.
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-304.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
@@ -72,21 +72,21 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0/'))
         tar.close()
 
-        # This command installs specific google cloud components for the google
-        # cloud sdk to prevent the need for developers to install it themselves
-        # when the app engine development server starts up. The --quiet
-        # parameter specifically tells the gcloud program to autofill all
-        # prompts with default values. In this case, that means accepting all
-        # installations of gcloud packages.
-        subprocess.call([
-            common.GCLOUD_PATH,
-            'components', 'install', 'cloud-datastore-emulator',
-            'app-engine-python', 'app-engine-python-extras', '--quiet'])
-
         os.remove('gcloud-sdk.tar.gz')
+
+    # This command installs specific google cloud components for the google
+    # cloud sdk to prevent the need for developers to install it themselves when
+    # the app engine development server starts up. The --quiet parameter
+    # specifically tells the gcloud program to autofill all prompts with default
+    # values. In this case, that means accepting all installations of gcloud
+    # packages.
+    subprocess.call([
+        common.GCLOUD_PATH,
+        'components', 'install', 'beta', 'cloud-datastore-emulator',
+        'app-engine-python', 'app-engine-python-extras', '--quiet'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

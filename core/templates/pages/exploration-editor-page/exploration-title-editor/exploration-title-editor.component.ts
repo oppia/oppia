@@ -15,6 +15,10 @@
 /**
  * @fileoverview Component for the exploration title field in forms.
  */
+require('pages/exploration-editor-page/services/router.service.ts');
+require('services/stateful/focus-manager.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationTitleEditor', {
   bindings: {
@@ -29,9 +33,23 @@ angular.module('oppia').component('explorationTitleEditor', {
   },
   template: require('./exploration-title-editor.component.html'),
   controller: [
-    '$scope', 'ExplorationTitleService',
-    function($scope, ExplorationTitleService) {
+    '$scope', 'ExplorationTitleService', 'FocusManagerService',
+    'RouterService', 'MAX_CHARS_IN_EXPLORATION_TITLE',
+    function(
+        $scope, ExplorationTitleService, FocusManagerService,
+        RouterService, MAX_CHARS_IN_EXPLORATION_TITLE) {
       $scope.explorationTitleService = ExplorationTitleService;
-    }
-  ]
+      var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
+      ctrl.$onInit = function() {
+        ctrl.MAX_CHARS_IN_EXPLORATION_TITLE = MAX_CHARS_IN_EXPLORATION_TITLE;
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshSettingsTab.subscribe(
+            () => {
+              FocusManagerService.setFocus(ctrl.focusLabel);
+            }
+          )
+        );
+      };
+    }]
 });

@@ -14,13 +14,15 @@
 
 """Commands that can be used to operate on skills."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
@@ -36,8 +38,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
@@ -441,6 +441,56 @@ def get_all_topic_assignments_for_skill(skill_id):
     return topic_assignments
 
 
+def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
+    """Replaces the old skill id with the new one in all the associated topics.
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        old_skill_id: str. The old skill id.
+        new_skill_id: str. The new skill id.
+    """
+    all_topics = topic_fetchers.get_all_topics()
+    for topic in all_topics:
+        change_list = []
+        if old_skill_id in topic.get_all_skill_ids():
+            if new_skill_id in topic.get_all_skill_ids():
+                raise Exception(
+                    'Found topic \'%s\' contains the two skills to be merged. '
+                    'Please unassign one of these skills from topic '
+                    'and retry this operation.' % topic.name)
+            if old_skill_id in topic.uncategorized_skill_ids:
+                change_list.extend([topic_domain.TopicChange({
+                    'cmd': 'remove_uncategorized_skill_id',
+                    'uncategorized_skill_id': old_skill_id
+                }), topic_domain.TopicChange({
+                    'cmd': 'add_uncategorized_skill_id',
+                    'new_uncategorized_skill_id': new_skill_id
+                })])
+            for subtopic in topic.subtopics:
+                if old_skill_id in subtopic.skill_ids:
+                    change_list.extend([topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                        'subtopic_id': subtopic.id,
+                        'skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': 'remove_uncategorized_skill_id',
+                        'uncategorized_skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': 'add_uncategorized_skill_id',
+                        'new_uncategorized_skill_id': new_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                        'old_subtopic_id': None,
+                        'new_subtopic_id': subtopic.id,
+                        'skill_id': new_skill_id
+                    })])
+                    break
+            topic_services.update_topic_and_subtopic_pages(
+                user_id, topic.id, change_list,
+                'Replace skill id %s with skill id %s in the topic' % (
+                    old_skill_id, new_skill_id))
+
+
 def remove_skill_from_all_topics(user_id, skill_id):
     """Deletes the skill with the given id from all the associated topics.
 
@@ -544,6 +594,20 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         skill.description)
 
 
+def does_skill_with_description_exist(description):
+    """Checks if skill with provided description exists.
+
+    Args:
+        description: str. The description for the skill.
+
+    Returns:
+        bool. Whether the the description for the skill exists.
+    """
+    existing_skill = (
+        skill_fetchers.get_skill_by_description(description))
+    return existing_skill is not None
+
+
 def save_new_skill(committer_id, skill):
     """Saves a new skill.
 
@@ -571,7 +635,7 @@ def apply_change_list(skill_id, change_list, committer_id):
         Skill. The resulting skill domain object.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
@@ -751,10 +815,10 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
-    misconception_is_deleted = any([
+    misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
         for change in change_list
-    ])
+    )
     if misconception_is_deleted:
         deleted_skill_misconception_ids = [
             skill.generate_skill_misconception_id(change.misconception_id)
@@ -1001,6 +1065,32 @@ def skill_has_associated_questions(skill_id):
     return len(question_ids) > 0
 
 
+def get_sorted_skill_ids(degrees_of_mastery):
+    """Sort the dict based on the mastery value.
+
+    Args:
+        degrees_of_mastery: dict(str, float|None). Dict mapping
+            skill ids to mastery level. The mastery level can be
+            float or None.
+
+    Returns:
+        list. List of the initial skill id's based on the mastery level.
+    """
+    skill_dict_with_float_value = {
+        skill_id: degree for skill_id, degree in degrees_of_mastery.items()
+        if degree is not None}
+
+    sorted_skill_ids_with_float_value = sorted(
+        skill_dict_with_float_value, key=skill_dict_with_float_value.get)
+    skill_ids_with_none_value = [
+        skill_id for skill_id, degree in degrees_of_mastery.items()
+        if degree is None]
+
+    sorted_skill_ids = (
+        skill_ids_with_none_value + sorted_skill_ids_with_float_value)
+    return sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
+
+
 def filter_skills_by_mastery(user_id, skill_ids):
     """Given a list of skill_ids, it returns a list of
     feconf.MAX_NUMBER_OF_SKILL_IDS skill_ids in which the user has
@@ -1015,15 +1105,11 @@ def filter_skills_by_mastery(user_id, skill_ids):
         list(str). A list of the filtered skill_ids.
     """
     degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
-
-    sorted_skill_ids = sorted(
-        degrees_of_mastery, key=degrees_of_mastery.get)
-
-    filtered_skill_ids = sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
+    filtered_skill_ids = get_sorted_skill_ids(degrees_of_mastery)
 
     # Arranges the skill_ids in the order as it was received.
     arranged_filtered_skill_ids = []
-    for i in python_utils.RANGE(len(skill_ids)):
-        if skill_ids[i] in filtered_skill_ids:
-            arranged_filtered_skill_ids.append(skill_ids[i])
+    for skill_id in skill_ids:
+        if skill_id in filtered_skill_ids:
+            arranged_filtered_skill_ids.append(skill_id)
     return arranged_filtered_skill_ids

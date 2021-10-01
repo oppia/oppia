@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -27,6 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { CollectionFooterComponent } from
   'pages/collection-player-page/collection-footer/collection-footer.component';
+import { CollectionLocalNavComponent } from 'pages/collection-player-page/collection-local-nav/collection-local-nav.component';
 import { CollectionNavbarComponent } from
   'pages/collection-player-page/collection-navbar/collection-navbar.component';
 import { CollectionNodeListComponent } from
@@ -34,22 +35,27 @@ import { CollectionNodeListComponent } from
   'pages/collection-player-page/collection-node-list/collection-node-list.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CollectionFooterComponent,
+    CollectionLocalNavComponent,
     CollectionNavbarComponent,
     CollectionNodeListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CollectionFooterComponent,
+    CollectionLocalNavComponent,
     CollectionNodeListComponent,
     CollectionNavbarComponent
   ],
@@ -64,6 +70,10 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -74,12 +84,13 @@ class CollectionPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(CollectionPlayerPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

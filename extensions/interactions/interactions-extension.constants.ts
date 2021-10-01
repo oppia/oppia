@@ -17,11 +17,6 @@
  */
 
 export const InteractionsExtensionsConstants = {
-  // Minimum confidence required for a predicted answer group to be shown to
-  // user. Generally a threshold of 0.7-0.8 is assumed to be a good one in
-  // practice, however value need not be in those bounds.
-  CODE_REPL_PREDICTION_SERVICE_THRESHOLD: 0.7,
-
   GRAPH_INPUT_LEFT_MARGIN: 120,
 
   // Gives the staff-lines human readable values.

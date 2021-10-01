@@ -18,19 +18,30 @@
 
 export const AdminPageConstants = {
   ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
+  TOPIC_MANAGER_ROLE_HANDLER_URL: '/topicmanagerrolehandler',
 
   ADMIN_HANDLER_URL: '/adminhandler',
   ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL: '/admintopicscsvdownloadhandler',
 
   ADMIN_JOB_OUTPUT_URL_TEMPLATE: '/adminjoboutput?job_id=<jobId>',
+  ADMIN_MEMORY_CACHE_HANDLER_URL: '/memorycacheadminhandler',
+  ADMIN_UPDATE_USERNAME_HANDLER_URL: '/updateusernamehandler',
+  ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL:
+    '/numberofdeletionrequestshandler',
+  ADMIN_SEND_DUMMY_MAIL_HANDLER_URL: '/senddummymailtoadminhandler',
+  ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL:
+    '/verifyusermodelsdeletedhandler',
+  ADMIN_DELETE_USER_HANDLER_URL: '/deleteuserhandler',
+  ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL: '/adminsuperadminhandler',
+  ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
+  ADMIN_UPDATE_BLOG_POST_DATA_HANDLER: '/updateblogpostdatahandler',
 
   ADMIN_TAB_URLS: {
-    ACTIVITIES: '#activities',
-    JOBS: '#jobs',
-    CONFIG: '#config',
-    FEATURES: '#features',
-    ROLES: '#roles',
-    MISC: '#misc'
+    ACTIVITIES: '#/activities',
+    CONFIG: '#/config',
+    FEATURES: '#/features',
+    ROLES: '#/roles',
+    MISC: '#/misc'
   },
 
   PROFILE_URL_TEMPLATE: '/profile/<username>'

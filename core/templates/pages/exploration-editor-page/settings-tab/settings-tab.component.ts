@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -30,6 +32,12 @@ require(
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.component.ts');
+require(
+  'pages/exploration-editor-page/settings-tab/templates/' +
+  'remove-role-confirmation-modal.controller.ts');
+require(
+  'pages/exploration-editor-page/settings-tab/templates/' +
+  'reassign-role-confirmation-modal.controller.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
   'moderator-unpublish-exploration-modal.controller.ts');
@@ -78,22 +86,22 @@ require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/context.service');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-import { Subscription } from 'rxjs';
-
 angular.module('oppia').component('settingsTab', {
   bindings: {
-    currentUserIsAdmin: '=',
+    currentUserIsCurriculumAdmin: '=',
     currentUserIsModerator: '='
   },
   template: require('./settings-tab.component.html'),
   controller: [
     '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
-    'EditabilityService', 'EditableExplorationBackendApiService',
+    'ContextService', 'EditabilityService',
+    'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesService',
@@ -102,13 +110,14 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService', 'WindowDimensionsService',
-    'WindowRef', 'ALL_CATEGORIES',
-    'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
+    'RouterService', 'UserEmailPreferencesService',
+    'UserExplorationPermissionsService', 'UserService',
+    'WindowDimensionsService', 'WindowRef',
+    'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
         $http, $rootScope, $uibModal, AlertsService, ChangeListService,
-        EditabilityService, EditableExplorationBackendApiService,
+        ContextService, EditabilityService,
+        EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesService,
@@ -117,21 +126,47 @@ angular.module('oppia').component('settingsTab', {
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        RouterService, UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService, WindowDimensionsService,
-        WindowRef, ALL_CATEGORIES,
-        EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
+        RouterService, UserEmailPreferencesService,
+        UserExplorationPermissionsService, UserService,
+        WindowDimensionsService, WindowRef,
+        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
       var EXPLORE_PAGE_PREFIX = '/explore/';
 
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.explorationIsLinkedToStory = false;
 
       ctrl.getExplorePageUrl = function() {
         return (
           WindowRef.nativeWindow.location.protocol + '//' +
           WindowRef.nativeWindow.location.host +
           EXPLORE_PAGE_PREFIX + ctrl.explorationId);
+      };
+
+      var reassignRole = function(username, newRole, oldRole) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          template: require(
+            'pages/exploration-editor-page/settings-tab/templates/' +
+            'reassign-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => username,
+            newRole: () => newRole,
+            oldRole: () => oldRole
+          },
+          controller: 'ReassignRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.saveRoleChanges(
+            username, newRole);
+          ctrl.closeRolesForm();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        });
       };
 
       ctrl.refreshSettingsTab = function() {
@@ -141,7 +176,7 @@ angular.module('oppia').component('settingsTab', {
         // /settings) results in a console error.
 
         ctrl.hasPageLoaded = false;
-        ExplorationDataService.getData().then(function() {
+        ExplorationDataService.getDataAsync().then(function() {
           if (ExplorationStatesService.isInitialized()) {
             var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
               function(categoryItem) {
@@ -161,15 +196,31 @@ angular.module('oppia').component('settingsTab', {
             }
 
             ctrl.stateNames = ExplorationStatesService.getStateNames();
+            ctrl.explorationIsLinkedToStory = (
+              ContextService.isExplorationLinkedToStory());
           }
           ctrl.hasPageLoaded = true;
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
         $rootScope.$applyAsync();
       };
 
       ctrl.saveExplorationTitle = function() {
         ExplorationTitleService.saveDisplayedValue();
+        if (!ctrl.isTitlePresent()) {
+          ctrl.rolesSaveButtonEnabled = false;
+          ctrl.errorMessage = (
+            'Please provide a title before inviting.');
+          return;
+        } else {
+          ctrl.rolesSaveButtonEnabled = true;
+          ctrl.errorMessage = ('');
+          return;
+        }
       };
 
       ctrl.saveExplorationCategory = function() {
@@ -211,6 +262,13 @@ angular.module('oppia').component('settingsTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.areParametersUsed = function() {
+        if (ctrl.hasPageLoaded) {
+          return (ExplorationDataService.data.param_changes.length > 0);
+        }
+      };
+
       ctrl.enableParameters = function() {
         ExplorationFeaturesService.enableParameters();
       };
@@ -238,16 +296,88 @@ angular.module('oppia').component('settingsTab', {
         ctrl.newMemberRole = ctrl.ROLES[0];
       };
 
+      ctrl.openVoiceoverRolesForm = () => {
+        ctrl.isVoiceoverFormOpen = true;
+        ctrl.newVoiceArtistUsername = '';
+      };
+
       ctrl.closeEditRolesForm = function() {
         ctrl.newMemberUsername = '';
         ctrl.newMemberRole = ctrl.ROLES[0];
         ctrl.closeRolesForm();
       };
 
+      ctrl.closeVoiceoverForm = () => {
+        ctrl.newVoiceArtistUsername = '';
+        ctrl.isVoiceoverFormOpen = false;
+      };
+
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
-        ctrl.closeRolesForm();
-        ExplorationRightsService.saveRoleChanges(
-          newMemberUsername, newMemberRole);
+        if (!ExplorationRightsService.checkUserAlreadyHasRoles(
+          newMemberUsername)) {
+          ExplorationRightsService.saveRoleChanges(
+            newMemberUsername, newMemberRole);
+          ctrl.closeRolesForm();
+          return;
+        }
+        let oldRole = ExplorationRightsService.getOldRole(
+          newMemberUsername);
+        reassignRole(newMemberUsername, newMemberRole, oldRole);
+      };
+
+      ctrl.removeRole = function(memberUsername, memberRole) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          template: require(
+            'pages/exploration-editor-page/settings-tab/templates/' +
+            'remove-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => memberUsername,
+            role: () => memberRole
+          },
+          controller: 'RemoveRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.removeRoleAsync(
+            memberUsername);
+          ctrl.closeRolesForm();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        });
+      };
+
+      ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
+        ExplorationRightsService.assignVoiceArtistRoleAsync(
+          newVoiceArtistUsername);
+        ctrl.closeVoiceoverForm();
+        return;
+      };
+
+      ctrl.removeVoiceArtist = function(voiceArtistUsername) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          template: require(
+            'pages/exploration-editor-page/settings-tab/templates/' +
+            'remove-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => voiceArtistUsername,
+            role: () => 'voice artist'
+          },
+          controller: 'RemoveRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.removeVoiceArtistRoleAsync(
+            voiceArtistUsername);
+          ctrl.closeVoiceoverForm();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        });
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
@@ -255,33 +385,41 @@ angular.module('oppia').component('settingsTab', {
           !ExplorationRightsService.viewableIfPrivate());
       };
 
+      ctrl._successCallback = () => {
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
+        $rootScope.$applyAsync();
+      };
+
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true);
+          true, ctrl._successCallback);
       };
       ctrl.muteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          true
+          true,
+          ctrl._successCallback
         );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          false
+          false,
+          ctrl._successCallback
         );
       };
       ctrl.unmuteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false);
+          false, ctrl._successCallback);
       };
 
       // Methods relating to control buttons.
       ctrl.previewSummaryTile = function() {
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'preview-summary-tile-modal.template.html'),
           backdrop: true,
           controller: 'PreviewSummaryTileModalController'
@@ -293,8 +431,8 @@ angular.module('oppia').component('settingsTab', {
       ctrl.showTransferExplorationOwnershipModal = function() {
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'transfer-exploration-ownership-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
@@ -309,13 +447,13 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'delete-exploration-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          EditableExplorationBackendApiService.deleteExploration(
+          EditableExplorationBackendApiService.deleteExplorationAsync(
             ctrl.explorationId).then(function() {
             WindowRef.nativeWindow.location = CREATOR_DASHBOARD_PAGE_URL;
           });
@@ -335,8 +473,8 @@ angular.module('oppia').component('settingsTab', {
           var draftEmailBody = response.data.draft_email_body;
 
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/settings-tab/templates/' +
+            template: require(
+              'pages/exploration-editor-page/settings-tab/templates/' +
               'moderator-unpublish-exploration-modal.template.html'),
             backdrop: true,
             resolve: {
@@ -344,8 +482,17 @@ angular.module('oppia').component('settingsTab', {
             },
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
-            ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+            ExplorationRightsService.saveModeratorChangeToBackendAsync(
+              emailBody).then(function() {
+              UserExplorationPermissionsService.fetchPermissionsAsync()
+                .then(function(permissions) {
+                  ctrl.canUnpublish = permissions.canUnpublish;
+                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
+                });
+            });
           }, function() {
             AlertsService.clearWarnings();
           });
@@ -357,11 +504,35 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl.closeRolesForm = function() {
+        ctrl.errorMessage = '';
+        ctrl.rolesSaveButtonEnabled = true;
         ctrl.isRolesFormOpen = false;
       };
 
       ctrl.isTitlePresent = function() {
         return ExplorationTitleService.savedMemento.length > 0;
+      };
+
+      ctrl.onRolesFormUsernameBlur = function() {
+        ctrl.rolesSaveButtonEnabled = true;
+        ctrl.errorMessage = '';
+
+        if (ctrl.newMemberUsername === ctrl.loggedInUser) {
+          ctrl.rolesSaveButtonEnabled = false;
+          ctrl.errorMessage = (
+            'Users are not allowed to assign other roles to themselves.');
+          return;
+        }
+        if (ExplorationRightsService.checkUserAlreadyHasRoles(
+          ctrl.newMemberUsername)) {
+          var oldRole = ExplorationRightsService.getOldRole(
+            ctrl.newMemberUsername);
+          if (oldRole === ctrl.newMemberRole.value) {
+            ctrl.rolesSaveButtonEnabled = false;
+            ctrl.errorMessage = `User is already ${oldRole}.`;
+            return;
+          }
+        }
       };
 
       ctrl.toggleCards = function(card) {
@@ -391,6 +562,21 @@ angular.module('oppia').component('settingsTab', {
             }
           )
         );
+        ctrl.directiveSubscriptions.add(
+          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
+            .subscribe(
+              () => {
+                UserExplorationPermissionsService.getPermissionsAsync()
+                  .then(function(permissions) {
+                    ctrl.canUnpublish = permissions.canUnpublish;
+                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$applyAsync();
+                  });
+              }
+            )
+        );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
           EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
         ctrl.EditabilityService = EditabilityService;
@@ -402,6 +588,9 @@ angular.module('oppia').component('settingsTab', {
           });
         }
         ctrl.isRolesFormOpen = false;
+        ctrl.isVoiceoverFormOpen = false;
+        ctrl.rolesSaveButtonEnabled = false;
+        ctrl.errorMessage = '';
         ctrl.basicSettingIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.advancedFeaturesIsShown = (
           !WindowDimensionsService.isWindowNarrow());
@@ -415,7 +604,12 @@ angular.module('oppia').component('settingsTab', {
         ctrl.canModifyRoles = false;
         ctrl.canReleaseOwnership = false;
         ctrl.canUnpublish = false;
+        ctrl.canManageVoiceArtist = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
+        ctrl.loggedInUser = null;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.loggedInUser = userInfo.getUsername();
+        });
 
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
@@ -423,6 +617,7 @@ angular.module('oppia').component('settingsTab', {
             ctrl.canModifyRoles = permissions.canModifyRoles;
             ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
             ctrl.canUnpublish = permissions.canUnpublish;
+            ctrl.canManageVoiceArtist = permissions.canManageVoiceArtist;
           });
 
         ctrl.explorationTitleService = ExplorationTitleService;
@@ -447,9 +642,6 @@ angular.module('oppia').component('settingsTab', {
         }, {
           name: 'Collaborator (can make changes)',
           value: 'editor'
-        }, {
-          name: 'Voice Artist (can do voiceover)',
-          value: 'voice artist'
         }, {
           name: 'Playtester (can give feedback)',
           value: 'viewer'

@@ -14,10 +14,12 @@
 
 """Tests for the topic viewer page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -26,8 +28,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
@@ -37,27 +37,25 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         super(BaseTopicViewerControllerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.topic_id = 'topic'
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
-        self.topic_id_1 = 'topic1'
-        self.topic_id_2 = 'topic2'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', 'description', self.topic_id_1,
+            self.story_id_1, 'story_title', 'description', self.topic_id,
             'story-frag-one')
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', 'description', self.topic_id_2,
+            self.story_id_2, 'story_title', 'description', self.topic_id,
             'story-frag-two')
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
@@ -67,7 +65,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'subtopic-name'))
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.svg'
@@ -85,15 +83,6 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
         story_services.save_new_story(self.admin_id, self.story_2)
-
-        self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name',
-            'private_topic_name', 'description')
-        self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
-        self.topic.url_fragment = 'private'
-        topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
@@ -117,10 +106,19 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
         self.get_html_response('/learn/staging/%s' % 'public')
 
     def test_accessibility_of_unpublished_topic_viewer_page(self):
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'private_topic_name',
+            'private_topic_name', 'description')
+        topic.thumbnail_filename = 'Image.svg'
+        topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic.url_fragment = 'private'
+        topic_services.save_new_topic(self.admin_id, topic)
+
         self.get_html_response(
             '/learn/staging/%s' % 'private',
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response('/learn/staging/%s' % 'private')
         self.logout()
 
@@ -144,7 +142,7 @@ class TopicPageDataHandlerTests(
                 'story_is_published': True,
                 'completed_node_titles': [],
                 'url_fragment': 'story-frag-one',
-                'pending_node_dicts': []
+                'all_node_dicts': []
             }],
             'additional_story_dicts': [{
                 'id': self.story_2.id,
@@ -156,12 +154,13 @@ class TopicPageDataHandlerTests(
                 'story_is_published': True,
                 'completed_node_titles': [],
                 'url_fragment': 'story-frag-two',
-                'pending_node_dicts': []
+                'all_node_dicts': []
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
                 u'thumbnail_filename': u'image.svg',
                 u'thumbnail_bg_color': u'#FFFFFF',
+                u'thumbnail_size_in_bytes': 21131,
                 u'skill_ids': [self.skill_id_2],
                 u'id': 1,
                 u'title': u'subtopic_name',
@@ -194,9 +193,7 @@ class TopicPageDataHandlerTests(
                 ' present in topic with id %s' % (
                     self.skill_id_1, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'topic_id': self.topic_id,
@@ -210,7 +207,7 @@ class TopicPageDataHandlerTests(
                     'story_is_published': True,
                     'completed_node_titles': [],
                     'url_fragment': 'story-frag-one',
-                    'pending_node_dicts': []
+                    'all_node_dicts': []
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -222,12 +219,13 @@ class TopicPageDataHandlerTests(
                     'story_is_published': True,
                     'completed_node_titles': [],
                     'url_fragment': 'story-frag-two',
-                    'pending_node_dicts': []
+                    'all_node_dicts': []
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
                     u'thumbnail_filename': u'image.svg',
                     u'thumbnail_bg_color': u'#FFFFFF',
+                    u'thumbnail_size_in_bytes': 21131,
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name',

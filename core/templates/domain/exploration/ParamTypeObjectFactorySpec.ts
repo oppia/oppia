@@ -20,7 +20,7 @@ import { ParamTypeObjectFactory, ParamType } from
   'domain/exploration/ParamTypeObjectFactory';
 
 describe('ParamType objects', () => {
-  let paramType: ParamTypeObjectFactory = null;
+  let paramType: ParamTypeObjectFactory;
 
   beforeEach(() => {
     paramType = new ParamTypeObjectFactory();
@@ -60,7 +60,7 @@ describe('ParamType objects', () => {
   });
 
   describe('UnicodeString', () => {
-    let UnicodeString: ParamType = null;
+    let UnicodeString: ParamType;
 
     beforeEach(() => {
       UnicodeString = paramType.registry.UnicodeString;

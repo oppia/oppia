@@ -42,6 +42,8 @@ export type FeatureStatusChecker = {
   }
 };
 
+export type FeatureNamesKeys = (keyof typeof FeatureNames)[];
+
 /**
  * Item of the status checker of feature flags, which represents the status of
  * one feature flag, providing the '.isEnabled' interface to check the status
@@ -91,7 +93,8 @@ export class FeatureStatusSummary {
    */
   static createDefault(): FeatureStatusSummary {
     const defaultDict: FeatureStatusSummaryBackendDict = {};
-    Object.keys(FeatureNames).forEach(
+    const featureNamesKeys = <FeatureNamesKeys> Object.keys(FeatureNames);
+    featureNamesKeys.forEach(
       name => defaultDict[FeatureNames[name]] = false);
     return this.createFromBackendDict(defaultDict);
   }
@@ -103,7 +106,7 @@ export class FeatureStatusSummary {
    * of the instance.
    */
   toBackendDict(): FeatureStatusSummaryBackendDict {
-    const backendDict = {};
+    const backendDict: Record<string, boolean> = {};
     for (const [key, value] of this.featureNameToFlag.entries()) {
       backendDict[key] = value;
     }
@@ -117,10 +120,13 @@ export class FeatureStatusSummary {
    */
   toStatusChecker(): FeatureStatusChecker {
     const checker = <FeatureStatusChecker>{};
-    Object.keys(FeatureNames).forEach(name => {
-      checker[name] = new FeatureStatusCheckerItem(
-        () => this.isFeatureEnabled(FeatureNames[name])
-      );
+    const featureNamesKeys = <FeatureNamesKeys> Object.keys(FeatureNames);
+    featureNamesKeys.forEach(name => {
+      Object.defineProperty(checker, name, {
+        value: new FeatureStatusCheckerItem(
+          () => this.isFeatureEnabled(FeatureNames[name])
+        )
+      });
     });
     return checker;
   }
@@ -134,9 +140,10 @@ export class FeatureStatusSummary {
    * @throws {Error} - If the feature with the specified name doesn't exist.
    */
   private isFeatureEnabled(featureName: string): boolean {
-    if (!this.featureNameToFlag.has(featureName)) {
+    const isEnabled = this.featureNameToFlag.get(featureName);
+    if (isEnabled === undefined) {
       throw new Error(`Feature '${featureName}' does not exist.`);
     }
-    return this.featureNameToFlag.get(featureName);
+    return isEnabled;
   }
 }

@@ -97,8 +97,7 @@ export class Misconception {
 })
 export class MisconceptionObjectFactory {
   createFromBackendDict(
-      misconceptionBackendDict: MisconceptionBackendDict)
-      : Misconception {
+      misconceptionBackendDict: MisconceptionBackendDict): Misconception {
     return new Misconception(
       misconceptionBackendDict.id,
       misconceptionBackendDict.name,

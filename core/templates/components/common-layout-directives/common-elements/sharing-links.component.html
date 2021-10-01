@@ -1,24 +1,24 @@
-<div class="oppia-sharing-links" [ngClass] = "getFontAndFlexClass()">
+<div class="oppia-sharing-links" [ngClass]="getFontAndFlexClass()">
   <div class="fx-main-center fx-cross-center padding-0-2">
     <a title="Facebook" class="fx-main-center fx-cross-start" [href]="getUrl('facebook')" (click)="registerShareEvent('facebook')" target="_window">
-      <i class="oppia-share-icons fab fa-facebook-square" [ngClass] = "smallFont ? 'font-small' : 'font-big'" ></i>
+      <i class="oppia-share-icons fab fa-facebook-square" [ngClass]="smallFont ? 'font-small' : 'font-big'" ></i>
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </div>
   <div class="fx-main-center fx-cross-center padding-0-2 twitter-icon">
     <a title="Twitter" class="fx-main-center fx-cross-start" [href]="getUrl('twitter')"  (click)="registerShareEvent('twitter')" target="_window">
-      <i class="oppia-share-icons fab fa-twitter-square" [ngClass] = "smallFont ? 'font-small' : 'font-big'" ></i>
+      <i class="oppia-share-icons fab fa-twitter-square" [ngClass]="smallFont ? 'font-small' : 'font-big'" ></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </div>
   <div class="fx-main-center fx-cross-center padding-0-2">
     <a class="fx-main-center fx-cross-center" title="Google Classroom" [href]="getUrl('classroom')"  (click)="registerShareEvent('classroom')" target="_window">
-      <img class="share-option-img share-icons" [ngClass] = "smallFont ? 'font-small' : 'font-big'"  [src]="classroomUrl" alt="Classroom">
+      <img class="share-option-img share-icons" [ngClass]="smallFont ? 'font-small' : 'font-big'"  [src]="classroomUrl" alt="Classroom">
     </a>
   </div>
   <div *ngIf="shareType === 'exploration'" title="Embed this Exploration" class="fx-main-center fx-cross-center padding-0-2">
     <a class="fx-main-center fx-cross-center" (click)="showEmbedExplorationModal()" tabindex="0">
-      <i class="material-icons embed-link share-icons embed-icon" [ngClass] = "smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
+      <i class="material-icons embed-link share-icons embed-icon" [ngClass]="smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </div>
@@ -69,7 +69,7 @@
 
   .oppia-sharing-links .share-option-img {
     border-radius: 0.2rem;
-    margin: 0;
+    margin: 0 0 2px 0;
     max-width: 2rem;
   }
 
@@ -89,10 +89,14 @@
 
   i.oppia-share-icons.fab.fa-facebook-square {
     color: #3b5998;
+    font-size: 19.5px;
+    margin-top: 3px;
   }
 
   i.oppia-share-icons.fab.fa-twitter-square {
     color: #1da1f2;
+    font-size: 19.5px;
+    margin-top: 3px;
   }
 
   i.oppia-share-icons.fab.fa-chalkboard-teacher {
@@ -110,12 +114,13 @@
   i.material-icons.embed-link.share-icons.embed-icon {
     font-size: 1.8rem;
     height: 1.75rem;
-    margin-top: 0.1rem;
+    margin-bottom: 0.15rem;
+    padding: 0 1px;
     width: 1.8rem;
   }
   .oppia-sharing-links .share-option-img.font-big {
     height: 1.79rem;
-    margin-top: 0.1rem;
+    margin-top: 0.02rem;
     width: 1.8rem;
   }
   .fx-main-center.fx-cross-center.padding-0-2.twitter-icon {

@@ -49,14 +49,18 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var changeListService = null;
+  let changeListService: ChangeListService = null;
+  var $uibModal = null;
   var contextService = null;
+  var ics = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
   var explorationWarningsService = null;
@@ -64,6 +68,7 @@ describe('Exploration save and publish buttons component', function() {
   var userExplorationPermissionsService = null;
 
   var mockExternalSaveEventEmitter = null;
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -71,9 +76,13 @@ describe('Exploration save and publish buttons component', function() {
 
   beforeEach(function() {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        ChangeListService
+      ]
     });
 
+    changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.get(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     editabilityService = TestBed.get(EditabilityService);
@@ -117,7 +126,9 @@ describe('Exploration save and publish buttons component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
+    $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
+    ics = $injector.get('InternetConnectivityService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
@@ -126,6 +137,8 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue($q.resolve({
         canPublish: true
       }));
+    spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
+      mockConnectionServiceEmitter);
     spyOn(explorationSaveService, 'saveChanges').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
@@ -142,6 +155,8 @@ describe('Exploration save and publish buttons component', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationSaveAndPublishButtons', {
       $scope: $scope,
+      $uibModal: $uibModal,
+      InternetConnectivityService: ics,
       EditabilityService: editabilityService,
       UserExplorationPermissionsService: userExplorationPermissionsService
     });
@@ -149,18 +164,16 @@ describe('Exploration save and publish buttons component', function() {
     $scope.$apply();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize $scope properties after controller initialization',
     function() {
       expect($scope.saveIsInProcess).toBe(false);
       expect($scope.publishIsInProcess).toBe(false);
       expect($scope.loadingDotsAreShown).toBe(false);
     });
-
-  it('should show publish button when user can publish and exploration' +
-    ' is private', function() {
-    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-    expect($scope.showPublishButton()).toBe(true);
-  });
 
   it('should save exploration when saving changes', function() {
     $scope.saveChanges();
@@ -242,7 +255,8 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should count changes made in an exploration', function() {
-    spyOn(changeListService, 'getChangeList').and.returnValue([{}, {}]);
+    spyOn(changeListService, 'getChangeList').and.returnValue(
+      [{}, {}] as ExplorationChange[]);
     expect($scope.getChangeListLength()).toBe(2);
   });
 
@@ -269,4 +283,129 @@ describe('Exploration save and publish buttons component', function() {
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
     expect($scope.isEditableOutsideTutorialMode()).toBe(false);
   });
+
+  it('should display publish button when the exploration is unpublished',
+    function() {
+      $scope.explorationCanBePublished = false;
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect($scope.explorationCanBePublished).toBe(true);
+    });
+
+  it('should fetch userExplorationPermissions when ' +
+    'showPublishExplorationModal is called', function() {
+    var userPermissions = {
+      canPublish: true
+    };
+    $scope.explorationCanBePublished = false;
+    spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+      .returnValue($q.resolve(userPermissions));
+
+    $scope.showPublishExplorationModal();
+    $scope.$apply();
+
+    expect($scope.publishIsInProcess).toBe(false);
+    expect($scope.loadingDotsAreShown).toBe(false);
+    expect(userExplorationPermissionsService.fetchPermissionsAsync)
+      .toHaveBeenCalled();
+    expect($scope.explorationCanBePublished).toBe(true);
+  });
+
+  it('should unsubscribe when onDestroy runs', function() {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should open a exploration save prompt modal', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+    spyOn($scope, 'saveChanges');
+    $scope.saveIsInProcess = false;
+
+    $scope.getChangeListLength();
+    $scope.$apply();
+
+    expect($uibModal.open).toHaveBeenCalled();
+    expect($scope.saveChanges).toHaveBeenCalled();
+  });
+
+  it('should open a exploration save prompt modal only once',
+    function() {
+      spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      spyOn($scope, 'saveChanges');
+      $scope.saveIsInProcess = false;
+
+      $scope.getChangeListLength();
+      $scope.$apply();
+      expect($uibModal.open).toHaveBeenCalledTimes(1);
+      expect($scope.saveChanges).not.toHaveBeenCalled();
+      $scope.getChangeListLength();
+      $scope.$apply();
+
+      expect($uibModal.open).toHaveBeenCalledTimes(1);
+      expect($scope.saveChanges).not.toHaveBeenCalled();
+    });
+
+  it('should open a confirmation modal with rejection', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+    spyOn($scope, 'saveChanges');
+    $scope.saveIsInProcess = false;
+
+    $scope.getChangeListLength();
+    $scope.$apply();
+
+    expect($uibModal.open).toHaveBeenCalled();
+    expect($scope.saveChanges).not.toHaveBeenCalled();
+  });
+
+  it('should open a confirmation modal when save is in progress', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+    spyOn($scope, 'saveChanges');
+    $scope.saveIsInProcess = true;
+
+    $scope.getChangeListLength();
+    $scope.$apply();
+
+    expect($uibModal.open).not.toHaveBeenCalled();
+    expect($scope.saveChanges).not.toHaveBeenCalled();
+  });
+
+  it('should change connnection status to ONLINE when internet is connected',
+    () => {
+      $scope.connectedToInternet = false;
+      mockConnectionServiceEmitter.emit(true);
+      $scope.$apply();
+      expect($scope.connectedToInternet).toBe(true);
+    });
+
+  it('should change connnection status to OFFLINE when internet disconnects',
+    () => {
+      $scope.connectedToInternet = true;
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect($scope.connectedToInternet).toBe(false);
+      expect($scope.getSaveButtonTooltip()).toBe(
+        'You can not save the exploration when offline.');
+      expect($scope.getPublishExplorationButtonTooltip()).toBe(
+        'You can not publish the exploration when offline.');
+    });
 });

@@ -22,13 +22,17 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import os
 import sys
 import unittest
+
+sys.path.insert(1, os.getcwd())
+
+from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -36,18 +40,8 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk', 'platform',
     'google_appengine')
-
-DIRS_TO_ADD_TO_SYS_PATH = [
-    GOOGLE_APP_ENGINE_SDK_HOME,
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.35'),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.2.2'),
-    os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.3'),
-    os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
-    CURR_DIR,
-    os.path.join(THIRD_PARTY_DIR, 'python_libs')
-]
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -62,21 +56,35 @@ def create_test_suites(test_target=None):
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     loader = unittest.TestLoader()
-    return (
-        [loader.loadTestsFromName(test_target)]
-        if test_target else [loader.discover(
-            CURR_DIR, pattern='[^core/tests/data]*_test.py',
-            top_level_dir=CURR_DIR)])
+    master_test_suite = (
+        loader.loadTestsFromName(test_target)
+        if test_target else
+        loader.discover(
+            CURR_DIR,
+            pattern='[^core/tests/data]*_test.py',
+            top_level_dir=CURR_DIR
+        )
+    )
+
+    return [master_test_suite]
 
 
 def main(args=None):
     """Runs the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    for directory in DIRS_TO_ADD_TO_SYS_PATH:
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
+
+    # Remove coverage from path since it causes conflicts with the Python html
+    # library. The problem is that coverage library has a file named html.py,
+    # then when bs4 library attempts to do 'from html.entities import ...',
+    # it will fail with error "No module named 'html.entities';
+    # 'html' is not a package". This happens because Python resolves to
+    # the html.py file in coverage instead of the native html library.
+    sys.path = [path for path in sys.path if 'coverage' not in path]
 
     # The devappserver function fixes the system path by adding certain google
     # appengine libraries that we need in oppia to the system path. The Google
@@ -97,10 +105,12 @@ def main(args=None):
     if 'google' in sys.modules:
         google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
-        google_module.__path__ = [google_path]
+        google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
 
-    suites = create_test_suites(test_target=parsed_args.test_target)
+    suites = create_test_suites(
+        test_target=parsed_args.test_target,
+    )
 
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]

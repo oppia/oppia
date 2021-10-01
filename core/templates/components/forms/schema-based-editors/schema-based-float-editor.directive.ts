@@ -30,31 +30,42 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        labelForFocusTarget: '&'
+      },
       bindToController: {
         localValue: '=',
         isDisabled: '&',
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        uiConfig: '&'
       },
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$timeout', 'FocusManagerService', 'NumericInputValidationService',
+        '$scope', '$timeout', 'FocusManagerService',
+        'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $timeout, FocusManagerService, NumericInputValidationService,
+            $scope, $timeout, FocusManagerService,
+            NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
-          ctrl.validate = function(localValue) {
+          var labelForFocus = $scope.labelForFocusTarget();
+          ctrl.validate = function(localValue, customizationArg) {
+            let { checkRequireNonnegativeInput } = customizationArg || {};
+            let checkRequireNonnegativeInputValue = (
+            checkRequireNonnegativeInput === undefined ? false :
+            checkRequireNonnegativeInput);
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
-                NumericInputValidationService.getErrorString(localValue)));
+                NumericInputValidationService.getErrorString(
+                  localValue, checkRequireNonnegativeInputValue)));
           };
 
           ctrl.onFocus = function() {
@@ -90,7 +101,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
 
           ctrl.generateErrors = function() {
             ctrl.errorString = (
-              NumericInputValidationService.getErrorString(ctrl.localValue));
+              NumericInputValidationService.getErrorString(
+                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
           };
 
           ctrl.onKeypress = function(evt) {
@@ -106,6 +118,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.isUserCurrentlyTyping = true;
             }
           };
+
           ctrl.$onInit = function() {
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
@@ -116,6 +129,20 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
+            // To check checkRequireNonnegativeInput customization argument
+            // Value of numeric input interaction.
+            let { checkRequireNonnegativeInput } = ctrl.uiConfig() || {};
+            ctrl.checkRequireNonnegativeInputValue = (
+            checkRequireNonnegativeInput === undefined ? false :
+            checkRequireNonnegativeInput);
+            // If customization argument of numeric input interaction is true
+            // Set Min value as 0 to not let down key go below 0.
+            ctrl.minValue = checkRequireNonnegativeInput && 0;
+            // So that focus is applied after all the functions in
+            // main thread have executed.
+            $timeout(function() {
+              FocusManagerService.setFocusWithoutScroll(labelForFocus);
+            }, 50);
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.
             $timeout(function() {

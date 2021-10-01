@@ -49,6 +49,11 @@ angular.module('oppia').controller(
         SuggestionModalService.cancelSuggestion($uibModalInstance);
       };
 
+      $scope.updateValue = function(value: string) {
+        $scope.suggestionData.suggestionHtml = value;
+        $scope.$applyAsync();
+      };
+
       $scope.submitSuggestion = function() {
         var data = {
           target_id: ExplorationEngineService.getExplorationId(),

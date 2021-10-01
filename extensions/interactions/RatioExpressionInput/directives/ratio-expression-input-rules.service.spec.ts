@@ -22,8 +22,8 @@ import { RatioExpressionInputRulesService } from
 import { TestBed } from '@angular/core/testing';
 
 describe('Ratio expression input rules service', () => {
-  let reirs: RatioExpressionInputRulesService = null;
-  let inputList;
+  let reirs: RatioExpressionInputRulesService;
+  let inputList: number[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -52,6 +52,23 @@ describe('Ratio expression input rules service', () => {
     expect(reirs.HasNumberOfTermsEqualTo([1, 2], {y: inputNumber})).toBeFalse();
     expect(reirs.HasNumberOfTermsEqualTo(
       [1, 2, 3, 4], {y: inputNumber})).toBeFalse();
+  });
+
+  it('should have a correct HasSpecificTermEqualTo rule', () => {
+    let answer = [2, 4, 6];
+
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 1, y: 2})).toBeTrue();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 1, y: 4})).toBeFalse();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 1, y: 6})).toBeFalse();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 2, y: 4})).toBeTrue();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 3, y: 6})).toBeTrue();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 4, y: 6})).toBeFalse();
   });
 
   it('should have a correct IsEquivalent rule', () => {

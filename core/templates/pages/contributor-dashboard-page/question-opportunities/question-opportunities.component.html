@@ -1,8 +1,8 @@
 <div>
-  <opportunities-list load-opportunities="$ctrl.loadOpportunities"
-                      on-click-action-button="$ctrl.onClickSuggestQuestionButton"
-                      load-more-opportunities="$ctrl.loadMoreOpportunities"
-                      progress-bar-required="true"
-                      opportunity-heading-truncation-length="50">
-  </opportunities-list>
+  <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
+                            (click-action-button)="$ctrl.onClickSuggestQuestionButton($event)"
+                            [load-more-opportunities]="$ctrl.loadMoreOpportunities"
+                            [progress-bar-required]="true"
+                            [opportunity-heading-truncation-length]="50">
+  </oppia-opportunities-list>
 </div>

@@ -20,10 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { createUnit, unit } from 'mathjs';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { Unit } from
-  'interactions/answer-defs';
+import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
+import { Unit } from 'interactions/answer-defs';
 
 interface UnitsBackendDict {
   units: Unit[];
@@ -32,6 +30,9 @@ interface UnitsBackendDict {
 interface UnitsDict {
   [unit: string]: number;
 }
+
+type CurrencyUnitsKeys = (
+  keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
 
 export class Units {
   units: Unit[];
@@ -67,6 +68,13 @@ export class UnitsObjectFactory {
     return !('/*() '.includes(unit));
   }
 
+  isLastElementUnit(unitList: string[]): boolean {
+    return (
+      unitList.length > 0 &&
+      this.isunit(<string> unitList.slice(-1).pop())
+    );
+  }
+
   stringToLexical(units: string): string[] {
     units += '#';
     var unitList = [];
@@ -74,7 +82,7 @@ export class UnitsObjectFactory {
     for (var i = 0; i < units.length; i++) {
       if ('*/()# '.includes(units[i]) && unit !== 'per') {
         if (unit.length > 0) {
-          if ((unitList.length > 0) && this.isunit(unitList.slice(-1).pop())) {
+          if (this.isLastElementUnit(unitList)) {
             unitList.push('*');
           }
           unitList.push(unit);
@@ -95,7 +103,7 @@ export class UnitsObjectFactory {
 
   unitWithMultiplier(unitList: string[]): [string, number][] {
     var multiplier = 1;
-    var unitsWithMultiplier = [];
+    var unitsWithMultiplier: [string, number][] = [];
     var parenthesisStack = [];
 
     for (var ind = 0; ind < unitList.length; ind++) {
@@ -114,7 +122,11 @@ export class UnitsObjectFactory {
         }
       } else if (unitList[ind] === ')') {
         var elem = parenthesisStack.pop();
-        multiplier = parseInt(elem[1]) * multiplier;
+        if (elem) {
+          multiplier = parseInt(<string> elem[1]) * multiplier;
+        } else {
+          throw new Error('Close parenthesis with no open parenthesis');
+        }
       } else if (this.isunit(unitList[ind])) {
         unitsWithMultiplier.push([unitList[ind], multiplier]);
         // If previous element was division then we need to invert
@@ -130,13 +142,13 @@ export class UnitsObjectFactory {
   convertUnitDictToList(unitDict: UnitsDict): Unit[] {
     var unitList: Unit[] = [];
     for (var key in unitDict) {
-      unitList.push({unit: key, exponent: unitDict[key]});
+      unitList.push({ unit: key, exponent: unitDict[key] });
     }
     return unitList;
   }
 
   unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
-    var unitDict = {};
+    var unitDict: UnitsDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
       var multiplier = unitsWithMultiplier[i][1];
@@ -168,17 +180,27 @@ export class UnitsObjectFactory {
   }
 
   createCurrencyUnits(): void {
-    var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+    var keys = (
+      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+    );
     for (var i = 0; i < keys.length; i++) {
-      if (ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit === null) {
-        // Base unit (like: rupees, dollar etc.).
-        createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
-          aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases});
-      } else {
+      let baseUnitValue = (
+        ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit);
+      if (baseUnitValue !== null) {
         // Sub unit (like: paise, cents etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
-          definition: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit,
-          aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases});
+          definition: baseUnitValue,
+          aliases: Object.values(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases
+          ),
+        });
+      } else {
+        // Base unit (like: rupees, dollar etc.).
+        createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
+          aliases: Object.values(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases
+          ),
+        });
       }
     }
   }
@@ -190,7 +212,9 @@ export class UnitsObjectFactory {
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
-    var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+    var keys = (
+      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+    );
     for (var i = 0; i < keys.length; i++) {
       for (
         var j = 0;
@@ -228,11 +252,7 @@ export class UnitsObjectFactory {
 
     var compatibleUnits = this.toMathjsCompatibleString(units);
     if (compatibleUnits !== '') {
-      try {
-        unit(compatibleUnits);
-      } catch (err) {
-        throw new Error(err);
-      }
+      unit(compatibleUnits);
     }
     return new Units(this.fromStringToList(units));
   }

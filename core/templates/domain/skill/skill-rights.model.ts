@@ -25,8 +25,7 @@ export class SkillRights {
   _skillId: string;
   _canEditSkillDescription: boolean;
 
-  constructor(
-      skillId: string, canEditSkillDescription: boolean) {
+  constructor(skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }
@@ -38,10 +37,6 @@ export class SkillRights {
       skillRightsBackendDict.can_edit_skill_description);
   }
 
-  static createInterstitialSkillRights(): SkillRights {
-    return new SkillRights(null, false);
-  }
-
   getSkillId(): string {
     return this._skillId;
   }
@@ -50,7 +45,7 @@ export class SkillRights {
     return this._canEditSkillDescription;
   }
 
-  copyFromSkillRights(otherSkillRights: SkillRights):void {
+  copyFromSkillRights(otherSkillRights: SkillRights): void {
     this._skillId = otherSkillRights.getSkillId();
     this._canEditSkillDescription =
       otherSkillRights.canEditSkillDescription();

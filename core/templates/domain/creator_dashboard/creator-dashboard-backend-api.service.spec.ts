@@ -25,7 +25,7 @@ import { CreatorDashboardBackendApiService } from
 
 describe('Creator Dashboard backend API service', () => {
   let creatorDashboardBackendApiService:
-    CreatorDashboardBackendApiService = null;
+    CreatorDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {
@@ -204,7 +204,7 @@ describe('Creator Dashboard backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      creatorDashboardBackendApiService.fetchDashboardData()
+      creatorDashboardBackendApiService.fetchDashboardDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
@@ -223,7 +223,7 @@ describe('Creator Dashboard backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      creatorDashboardBackendApiService.fetchDashboardData()
+      creatorDashboardBackendApiService.fetchDashboardDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
@@ -236,6 +236,27 @@ describe('Creator Dashboard backend API service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it('should successfully post exploration view to given view',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var newView = 'list';
+      creatorDashboardBackendApiService.postExplorationViewAsync(newView)
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/creatordashboardhandler/data');
+      expect(req.request.method).toEqual('POST');
+      req.flush('Success');
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
     })
   );
 });

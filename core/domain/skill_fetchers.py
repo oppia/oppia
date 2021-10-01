@@ -16,16 +16,16 @@
 
 """Getter commands for for skill models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
+from core import python_utils
 from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -66,7 +66,7 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         Skill or None. The domain object representing a skill with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = python_utils.UNICODE(version) if version else None
     cached_skill = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_SKILL,
         sub_namespace,
@@ -146,6 +146,21 @@ def get_skill_from_model(skill_model):
         skill_model.superseding_skill_id, skill_model.all_questions_merged,
         skill_model.prerequisite_skill_ids, skill_model.created_on,
         skill_model.last_updated)
+
+
+def get_skill_by_description(description):
+    """Returns a domain object representing a skill.
+
+    Args:
+        description: str. The description of the skill.
+
+    Returns:
+        Skill or None. The domain object representing a skill with the
+        given description, or None if it does not exist.
+    """
+    skill_model = (
+        skill_models.SkillModel.get_by_description(description))
+    return get_skill_from_model(skill_model) if skill_model else None
 
 
 def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):

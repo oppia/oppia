@@ -17,10 +17,11 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -33,22 +34,57 @@ import { ContentLanguageSelectorComponent } from
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { MatButtonModule } from '@angular/material/button';
+import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
+import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
+import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
+import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
+import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
+import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
+import { InformationCardModalComponent } from './templates/information-card-modal.component';
+import { MaterialModule } from 'modules/material.module';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    InteractionExtensionsModule,
+    MatButtonModule,
+    NgbModalModule,
+    MaterialModule,
+    NgbPopoverModule,
+    SharedComponentsModule,
+    NgbPopoverModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    LearnerAnswerInfoCard,
+    ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent,
+    LearnerViewInfoComponent,
+    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard,
+    LearnerViewInfoComponent,
+    RefresherExplorationConfirmationModal,
   ],
   providers: [
     {
@@ -61,6 +97,10 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -71,12 +111,13 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ExplorationPlayerPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

@@ -16,20 +16,21 @@
 
 """Functions that manage rights for various user actions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
@@ -477,7 +478,7 @@ def check_can_access_activity(user, activity_rights):
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
-        activity_rights: AcitivityRights or None. Rights object for the given
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
@@ -565,6 +566,27 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
+def check_can_manage_voice_artist_in_activity(user, activity_rights):
+    """Check whether the user can manage voice artist for an activity.
+
+    Args:
+        user: UserActionInfo. Object having user_id, role, and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the user can assign voice artist.
+    """
+    if activity_rights is None:
+        return False
+    elif (role_services.ACTION_CAN_MANAGE_VOICE_ARTIST in user.actions and (
+            activity_rights.community_owned or activity_rights.is_published())):
+        return True
+    else:
+        return False
+
+
 def check_can_save_activity(user, activity_rights):
     """Checks whether the user can save given activity.
 
@@ -610,8 +632,9 @@ def check_can_delete_activity(user, activity_rights):
     return False
 
 
-def check_can_modify_activity_roles(user, activity_rights):
-    """Checks whether the user can modify roles for given activity.
+def check_can_modify_core_activity_roles(user, activity_rights):
+    """Checks whether the user can modify core roles for the given activity. The
+    core roles for an activity includes owner, editor etc.
 
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -629,10 +652,10 @@ def check_can_modify_activity_roles(user, activity_rights):
             activity_rights.cloned_from):
         return False
 
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in
             user.actions):
         return True
-    if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
         if activity_rights.is_owner(user.user_id):
             return True
@@ -657,7 +680,7 @@ def check_can_release_ownership(user, activity_rights):
     if activity_rights.is_private():
         return False
 
-    return check_can_modify_activity_roles(
+    return check_can_modify_core_activity_roles(
         user, activity_rights)
 
 
@@ -717,7 +740,8 @@ def check_can_unpublish_activity(user, activity_rights):
 
 
 def _assign_role(
-        committer, assignee_id, new_role, activity_id, activity_type):
+        committer, assignee_id, new_role, activity_id, activity_type,
+        allow_assigning_any_role=False):
     """Assigns a new role to the user.
 
     Args:
@@ -733,6 +757,9 @@ def _assign_role(
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
+        allow_assigning_any_role: bool. Whether to assign a role to the user
+            irrespective of whether they have any existing role in the activity.
+            The default value is false.
 
     Raises:
         Exception. The committer does not have rights to modify a role.
@@ -748,7 +775,16 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    user_can_assign_role = False
+    if new_role == rights_domain.ROLE_VOICE_ARTIST and (
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
+        user_can_assign_role = check_can_manage_voice_artist_in_activity(
+            committer, activity_rights)
+    else:
+        user_can_assign_role = check_can_modify_core_activity_roles(
+            committer, activity_rights)
+
+    if not user_can_assign_role:
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
@@ -759,7 +795,20 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
-    if new_role == rights_domain.ROLE_OWNER:
+    if new_role not in [
+            rights_domain.ROLE_OWNER,
+            rights_domain.ROLE_EDITOR,
+            rights_domain.ROLE_VOICE_ARTIST,
+            rights_domain.ROLE_VIEWER
+    ]:
+        raise Exception('Invalid role: %s' % new_role)
+    # TODO(#12369): Currently, only exploration allows reassigning users to
+    # any role. We are expecting to remove the below check and allow this
+    # function to assign any role in general once the collection is removed.
+    if allow_assigning_any_role:
+        old_role = activity_rights.assign_new_role(assignee_id, new_role)
+
+    elif new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):
             raise Exception('This user already owns this %s.' % activity_type)
 
@@ -776,6 +825,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VOICE_ARTIST
 
     elif new_role == rights_domain.ROLE_EDITOR:
+
         if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
@@ -792,6 +842,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VOICE_ARTIST:
+
         if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_voice_artist(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
@@ -805,6 +856,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VIEWER:
+
         if (activity_rights.is_owner(assignee_id) or
                 activity_rights.is_editor(assignee_id) or
                 activity_rights.is_viewer(assignee_id)):
@@ -816,9 +868,6 @@ def _assign_role(
                 'Public %ss can be viewed by anyone.' % activity_type)
 
         activity_rights.viewer_ids.append(assignee_id)
-
-    else:
-        raise Exception('Invalid role: %s' % new_role)
 
     commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
@@ -855,14 +904,22 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    user_can_deassign_role = False
+    if activity_rights.is_voice_artist(removed_user_id) and (
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
+        user_can_deassign_role = check_can_manage_voice_artist_in_activity(
+            committer, activity_rights)
+    else:
+        user_can_deassign_role = check_can_modify_core_activity_roles(
+            committer, activity_rights)
+
+    if not user_can_deassign_role:
         logging.error(
             'User %s tried to remove user %s from an activity %s '
             'but was refused permission.' % (
                 committer_id, removed_user_id, activity_id))
         raise Exception(
             'UnauthorizedUserException: Could not deassign role.')
-
     if activity_rights.is_owner(removed_user_id):
         old_role = rights_domain.ROLE_OWNER
         activity_rights.owner_ids.remove(removed_user_id)
@@ -929,6 +986,7 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
     activity_rights.owner_ids = []
     activity_rights.editor_ids = []
     activity_rights.viewer_ids = []
+    activity_rights.voice_artist_ids = []
     commit_cmds = [{
         'cmd': rights_domain.CMD_RELEASE_OWNERSHIP,
     }]
@@ -1068,7 +1126,7 @@ def assign_role_for_exploration(
     """
     _assign_role(
         committer, assignee_id, new_role, exploration_id,
-        constants.ACTIVITY_TYPE_EXPLORATION)
+        constants.ACTIVITY_TYPE_EXPLORATION, allow_assigning_any_role=True)
     if new_role in [
             rights_domain.ROLE_OWNER,
             rights_domain.ROLE_EDITOR,
@@ -1202,6 +1260,9 @@ def unpublish_exploration(committer, exploration_id):
     """
     _unpublish_activity(
         committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, [exploration_id])
 
 
 # Rights functions for collections.

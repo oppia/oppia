@@ -14,15 +14,15 @@
 
 """Tests for the learner playlist."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):

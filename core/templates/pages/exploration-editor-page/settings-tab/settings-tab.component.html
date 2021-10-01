@@ -184,7 +184,7 @@
     </div>
 
     <div ng-if="$ctrl.advancedFeaturesIsShown" class="oppia-mobile-collapsible-card-content">
-      <div role="form" class="form-horizontal">
+      <div role="form" class="form-horizontal" ng-if="$ctrl.areParametersUsed()">
         <div class="oppia-features-header">
           <label for="$ctrl.enableParameters">
             Parameters
@@ -192,7 +192,7 @@
           <div>
             <div class="oppia-on-off-switch">
               <input span ng-if="$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" checked disabled>
-              <input span ng-if="!$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" ng-click="$ctrl.enableParameters()">
+              <input span ng-if="!$ctrl.areParametersEnabled()" ng-disabled="$ctrl.explorationIsLinkedToStory" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" ng-click="$ctrl.enableParameters()">
               <label class="oppia-on-off-switch-label protractor-test-enable-parameters" for="parameter-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -202,6 +202,9 @@
         </div>
         <span class="form-text secondary-info-text">
           Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
+        </span>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.explorationIsLinkedToStory">
+          Explorations in a story cannot have parameters enabled.
         </span>
       </div>
       <hr class="oppia-feature-separator">
@@ -238,7 +241,7 @@
           <div>
             <div class="oppia-on-off-switch">
               <input type="checkbox" ng-if="!$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()">
-              <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
+              <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" ng-disabled="$ctrl.explorationIsLinkedToStory" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
               <label class="oppia-on-off-switch-label protractor-test-enable-mark-correctness-feedback" for="correctness-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -249,94 +252,161 @@
         <span class="form-text secondary-info-text">
           Correctness feedback allows the user to categorise answer groups as correct or incorrect.
         </span>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.explorationIsLinkedToStory && $ctrl.isCorrectnessFeedbackEnabled()">
+          Correctness feedback cannot be disabled for an exploration linked to a story.
+        </span>
       </div>
       <hr class="oppia-feature-separator">
     </div>
 
   </md-card>
 
-  <md-card class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
-    <div ng-if="$ctrl.ExplorationRightsService.ownerNames.length > 0 && !$ctrl.ExplorationRightsService.isCloned()">
-      <div class="oppia-roles-container">
-        <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('roles')">
-          <h3>Roles</h3>
-          <i class="fa fa-caret-down"
-             ng-if="!$ctrl.rolesCardIsShown"
-             aria-hidden="true">
-          </i>
-          <i class="fa fa-caret-up"
-             ng-if="$ctrl.rolesCardIsShown"
-             aria-hidden="true">
-          </i>
+  <md-card ng-if="$ctrl.ExplorationRightsService.ownerNames.length > 0 && !$ctrl.ExplorationRightsService.isCloned()"
+           class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
+    <div class="oppia-roles-container">
+      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('roles')">
+        <h3>Roles</h3>
+        <i class="fa fa-caret-down"
+           ng-if="!$ctrl.rolesCardIsShown"
+           aria-hidden="true">
+        </i>
+        <i class="fa fa-caret-up"
+           ng-if="$ctrl.rolesCardIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
+        <div ng-if="$ctrl.canModifyRoles" ng-hide="$ctrl.isRolesFormOpen" class="oppia-edit-roles-btn-container">
+          <span ng-click="$ctrl.openEditRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
+            EDIT
+          </span>
         </div>
-        <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
-          <div ng-if="$ctrl.canModifyRoles" ng-hide="$ctrl.isRolesFormOpen" class="oppia-edit-roles-btn-container">
-            <span ng-click="$ctrl.openEditRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
+
+        <div ng-show="$ctrl.ExplorationRightsService.ownerNames.length > 0">
+          <strong>Managers</strong>
+          <ul>
+            <li ng-repeat="ownerName in $ctrl.ExplorationRightsService.ownerNames track by $index">
+              <div class="oppia-user-list-item">
+                <span><[ownerName]></span>
+                <span ng-hide="!$ctrl.isRolesFormOpen || ownerName === $ctrl.loggedInUser" uib-tooltip="Remove user" type="button" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(ownerName, 'Managers')">highlight_off
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-show="$ctrl.ExplorationRightsService.editorNames.length > 0">
+          <strong>Collaborators</strong>
+          <ul>
+            <li ng-repeat="editorName in $ctrl.ExplorationRightsService.editorNames track by $index">
+              <div  class="oppia-user-list-item">
+                <span><[editorName]></span>
+                <span ng-hide="!$ctrl.isRolesFormOpen" type="button" uib-tooltip="Remove user" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(editorName, 'Collaborators')">highlight_off
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-show="$ctrl.ExplorationRightsService.viewerNames.length > 0">
+          <strong>Playtesters</strong>
+          <ul>
+            <li ng-repeat="viewerName in $ctrl.ExplorationRightsService.viewerNames track by $index">
+              <div class="oppia-user-list-item">
+                <span><[viewerName]></span>
+                <span ng-hide="!$ctrl.isRolesFormOpen" type="button" uib-tooltip="Remove user" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(viewerName, 'Playtesters')">highlight_off
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-if="$ctrl.canModifyRoles" ng-show="$ctrl.isRolesFormOpen">
+          <strong>Add or Change Role</strong>
+          <div class="form-group">
+            <form ng-submit="$ctrl.editRole($ctrl.newMemberUsername, $ctrl.newMemberRole.value)">
+              <label for="$ctrl.newMemberUsername">Username of invited user</label>
+              <div>
+                <input type="text" id="$ctrl.newMemberUsername" class="form-control protractor-test-role-username" ng-model="$ctrl.newMemberUsername" placeholder="username" ng-blur="$ctrl.onRolesFormUsernameBlur()">
+              </div>
+              <br>
+              <label for="$ctrl.newMemberRole">Role of invited user</label>
+              <div>
+                <select ng-model="$ctrl.newMemberRole" class="form-control oppia-role-select protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES" ng-blur="$ctrl.onRolesFormUsernameBlur()">
+                </select>
+                <span class="form-text">
+                  <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of voice artists, and voice artists also have the permissions of viewers.</p>
+                </span>
+              </div>
+
+              <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled">
+              <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeEditRolesForm()" ng-show="$ctrl.isRolesFormOpen">
+                Cancel
+              </button>
+              <p ng-show="!$ctrl.rolesSaveButtonEnabled" class="text-danger protractor-test-title-warning"><[$ctrl.errorMessage]></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+
+  <md-card ng-if="$ctrl.ExplorationRightsService.ownerNames.length > 0 && !$ctrl.ExplorationRightsService.isCloned()"
+           class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
+    <div class="oppia-roles-container">
+      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('roles')">
+        <h3>Voice Artists</h3>
+        <i class="fa fa-caret-down"
+           ng-if="!$ctrl.rolesCardIsShown"
+           aria-hidden="true">
+        </i>
+        <i class="fa fa-caret-up"
+           ng-if="$ctrl.rolesCardIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
+        <div>
+          <div ng-show="!$ctrl.isVoiceoverFormOpen" class="oppia-no-voice-artist-message" ng-if="!$ctrl.ExplorationRightsService.voiceArtistNames.length">
+            No voice artists are assigned to this exploration.
+          </div>
+          <div ng-if="$ctrl.canManageVoiceArtist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
+            <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-voice-artist-roles">
               EDIT
             </span>
           </div>
+        </div>
 
-          <div ng-show="$ctrl.ExplorationRightsService.ownerNames.length > 0">
-            <strong>Managers</strong>
-            <ul>
-              <li ng-repeat="ownerName in $ctrl.ExplorationRightsService.ownerNames track by $index">
-                <[ownerName]>
-              </li>
-            </ul>
-          </div>
+        <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
+          <ul>
+            <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
+              <div class="oppia-user-list-item protractor-test-voice-artist-{{voiceArtistName}}">
+                <span><[voiceArtistName]></span>
+                <span ng-show="$ctrl.isVoiceoverFormOpen" type="button" uib-tooltip="Remove user" class="material-icons" ng-click="$ctrl.removeVoiceArtist(voiceArtistName)">highlight_off
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
 
-          <div ng-show="$ctrl.ExplorationRightsService.editorNames.length > 0">
-            <strong>Collaborators</strong>
-            <ul>
-              <li ng-repeat="editorName in $ctrl.ExplorationRightsService.editorNames track by $index">
-                <[editorName]>
-              </li>
-            </ul>
-          </div>
-
-          <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
-            <strong>Voice Artists</strong>
-            <ul>
-              <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
-                <[voiceArtistName]>
-              </li>
-            </ul>
-          </div>
-
-          <div ng-show="$ctrl.ExplorationRightsService.viewerNames.length > 0">
-            <strong>Playtesters</strong>
-            <ul>
-              <li ng-repeat="viewerName in $ctrl.ExplorationRightsService.viewerNames track by $index">
-                <[viewerName]>
-              </li>
-            </ul>
-          </div>
-
-          <div ng-if="$ctrl.canModifyRoles" ng-show="$ctrl.isRolesFormOpen">
-            <strong>Add or Change Role</strong>
-            <div class="form-group">
-              <form ng-submit="$ctrl.editRole($ctrl.newMemberUsername, $ctrl.newMemberRole.value)">
-                <label for="$ctrl.newMemberUsername">Username of invited user</label>
-                <div>
-                  <input type="text" id="$ctrl.newMemberUsername" class="form-control protractor-test-role-username" ng-model="$ctrl.newMemberUsername" placeholder="username">
-                </div>
-                <br>
-                <label for="$ctrl.newMemberRole">Role of invited user</label>
-                <div>
-                  <select ng-model="$ctrl.newMemberRole" class="form-control oppia-role-select protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES">
-                  </select>
-                  <span class="form-text">
-                    <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of voice artists, and voice artists also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</p>
-                  </span>
-                </div>
-
-                <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.isTitlePresent()">
-                <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeEditRolesForm()" ng-show="$ctrl.isRolesFormOpen">
-                  Cancel
-                </button>
-                <p ng-show="!$ctrl.isTitlePresent()" class="text-danger protractor-test-title-warning">Please provide a title before inviting.</p>
-              </form>
-            </div>
+        <div ng-if="$ctrl.canManageVoiceArtist" ng-show="$ctrl.isVoiceoverFormOpen">
+          <div class="form-group">
+            <form ng-submit="$ctrl.editVoiseArtist($ctrl.newVoicAartistUsername)">
+              <div>
+                <label>Add new voice artsit: </label>
+                <input id="$ctrl.newVoicAartistUsername"
+                       class="form-control protractor-test-new-voice-artist-username"
+                       ng-model="$ctrl.newVoicAartistUsername"
+                       placeholder="Voice artist username"
+                       type="text">
+              </div>
+              <input type="submit" class="btn btn-secondary protractor-test-add-voice-artist-role-button" value="Save">
+              <button type="button"
+                      class="btn btn-secondary"
+                      ng-click="$ctrl.closeVoiceoverForm()">
+                Cancel
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -466,7 +536,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" ng-if="$ctrl.EditabilityService.isEditable()">
+  <md-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" ng-if="$ctrl.canDelete || $ctrl.canReleaseOwnership">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('controls')">
       <h3>Controls</h3>
       <i class="fa fa-caret-down"
@@ -497,29 +567,29 @@
       </p>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6" ng-if="$ctrl.currentUserIsAdmin || $ctrl.currentUserIsModerator">
+    <div class="col-lg-6 col-md-6 col-sm-6" ng-if="$ctrl.currentUserIsCurriculumAdmin || $ctrl.currentUserIsModerator">
       <h3>Admin Controls</h3>
 
       <p ng-if="$ctrl.canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="$ctrl.ExplorationRightsService.isPublic()">
         <button type="button" class="btn btn-secondary" ng-click="$ctrl.unpublishExplorationAsModerator()" ng-disabled="$ctrl.isExplorationLockedForEditing()">
           Unpublish
-          <span ng-if="$ctrl.currentUserIsAdmin">(as admin)</span>
-          <span ng-if="!$ctrl.currentUserIsAdmin && $ctrl.currentUserIsModerator">(as moderator)</span>
+          <span ng-if="$ctrl.currentUserIsCurriculumAdmin">(as admin)</span>
+          <span ng-if="!$ctrl.currentUserIsCurriculumAdmin && $ctrl.currentUserIsModerator">(as moderator)</span>
         </button>
       </p>
 
-      <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="$ctrl.ExplorationRightsService.isPublic() && ($ctrl.currentUserIsAdmin || $ctrl.currentUserIsModerator)">
+      <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="$ctrl.ExplorationRightsService.isPublic() && ($ctrl.currentUserIsCurriculumAdmin || $ctrl.currentUserIsModerator)">
         <button type="button" class="btn oppia-delete-button protractor-test-delete-exploration-button"
                 ng-click="$ctrl.deleteExploration()">
           DELETE EXPLORATION
-          <span ng-if="$ctrl.currentUserIsAdmin">(as admin)</span>
-          <span ng-if="!$ctrl.currentUserIsAdmin && $ctrl.currentUserIsModerator">(as moderator)</span>
+          <span ng-if="$ctrl.currentUserIsCurriculumAdmin">(as admin)</span>
+          <span ng-if="!$ctrl.currentUserIsCurriculumAdmin && $ctrl.currentUserIsModerator">(as moderator)</span>
         </button>
       </p>
     </div>
   </md-card>
 
-  <md-card class="oppia-settings-card-container oppia-editor-card oppia-parameters-card" ng-if="$ctrl.areParametersEnabled()">
+  <md-card class="oppia-settings-card-container oppia-editor-card oppia-parameters-card" ng-if="$ctrl.areParametersUsed()">
     <h3>Parameters used in this exploration</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
@@ -650,5 +720,19 @@
     settings-tab .oppia-settings-card-container h3 {
       margin-bottom: 0;
     }
+  }
+  .oppia-user-list-item {
+    align-items: center;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px;
+    width: 50%;
+  }
+  .oppia-user-list-item:hover {
+    background-color: rgba(189, 189, 189, 0.678);
+  }
+  .oppia-no-voice-artist-message {
+    float: left;
   }
 </style>

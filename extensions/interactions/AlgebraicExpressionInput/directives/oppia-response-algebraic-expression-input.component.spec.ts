@@ -16,25 +16,29 @@
  * @fileoverview Unit tests for the AlgebraicExpressionInput response component.
  */
 
-require(
-  'interactions/AlgebraicExpressionInput/directives/' +
-  'oppia-response-algebraic-expression-input.component.ts');
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ResponseAlgebraicExpressionInputComponent } from './oppia-response-algebraic-expression-input.component';
 
 describe('AlgebraicExpressionInputResponse', function() {
-  let ctrl = null;
+  let component: ResponseAlgebraicExpressionInputComponent;
+  let fixture: ComponentFixture<ResponseAlgebraicExpressionInputComponent>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$attrs', {
-      answer: '&quot;answer&quot;',
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaResponseAlgebraicExpressionInput');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ResponseAlgebraicExpressionInputComponent]
+      }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ResponseAlgebraicExpressionInputComponent);
+    component = fixture.componentInstance;
+    component.answer = '&quot;answer&quot;';
+    fixture.detectChanges();
+  });
   it('should correctly escape characters in the answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toBe('answer');
+    component.ngOnInit();
+    expect(component.escapedAnswer).toBe('answer');
   });
 });

@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 import { TestBed } from '@angular/core/testing';
@@ -68,11 +68,11 @@ describe('Exploration player page', function() {
     ' and set angular element content property based on the exploration',
   function() {
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(ReadOnlyExplorationBackendApiService, 'fetchExploration').and
+    spyOn(ReadOnlyExplorationBackendApiService, 'fetchExplorationAsync').and
       .returnValue($q.resolve({
         exploration: exploration
       }));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
 
     var angularElementSpy = spyOn(angular, 'element');
 
@@ -97,7 +97,7 @@ describe('Exploration player page', function() {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');
     expect(elementNameItemProp.attr('content')).toBe(exploration.title);
     expect(elementDescriptionItemProp.attr('content')).toBe(

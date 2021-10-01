@@ -57,7 +57,7 @@ angular.module('oppia').controller(
         ExplorationHtmlFormatterService.getInteractionHtml(
           StateInteractionIdService.savedMemento,
           StateCustomizationArgsService.savedMemento,
-          false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
+          false, FOCUS_LABEL_TEST_INTERACTION_INPUT, null));
 
       var _rebuildTrainingData = function() {
         $scope.trainingData = [];

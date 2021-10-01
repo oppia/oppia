@@ -30,7 +30,7 @@ describe('Collection rights backend API service', function() {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: CollectionRightsBackendDict;
-  let csrfService: CsrfTokenService = null;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +42,7 @@ describe('Collection rights backend API service', function() {
       TestBed.get(CollectionRightsBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
@@ -51,7 +51,7 @@ describe('Collection rights backend API service', function() {
 
   beforeEach(() => {
     sampleDataResults = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: false,
       is_private: true,

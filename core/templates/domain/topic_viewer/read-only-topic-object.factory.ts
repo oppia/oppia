@@ -20,16 +20,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
-import { StorySummaryBackendDict, StorySummary } from
-  'domain/story/story-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { StorySummaryBackendDict, StorySummary } from 'domain/story/story-summary.model';
 import {
   SkillIdToDescriptionMap,
   SubtopicBackendDict,
-  Subtopic,
-  SubtopicObjectFactory
-} from 'domain/topic/SubtopicObjectFactory';
+  Subtopic
+} from 'domain/topic/subtopic.model';
 import { StoryNode } from 'domain/story/story-node.model';
 
 export interface DegreesOfMastery {
@@ -142,19 +139,17 @@ export class ReadOnlyTopic {
   providedIn: 'root'
 })
 export class ReadOnlyTopicObjectFactory {
-  constructor(
-    private subtopicObjectFactory: SubtopicObjectFactory,
-    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
+  constructor() {}
 
   createFromBackendDict(
       topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map(subtopic => {
-      return this.subtopicObjectFactory.create(
+      return Subtopic.create(
         subtopic, topicDataDict.skill_descriptions);
     });
     let uncategorizedSkills =
         topicDataDict.uncategorized_skill_ids.map(skillId => {
-          return this.skillSummaryObjectFactory.create(
+          return ShortSkillSummary.create(
             skillId, topicDataDict.skill_descriptions[skillId]);
         });
     let degreesOfMastery: DegreesOfMastery = topicDataDict.degrees_of_mastery;
@@ -162,8 +157,8 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.skill_descriptions;
     let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {
-          let pendingNodes = (
-            storyDict.pending_node_dicts.map(storyNodeDict => {
+          let allNodes = (
+            storyDict.all_node_dicts.map(storyNodeDict => {
               return StoryNode.createFromBackendDict(
                 storyNodeDict);
             }));
@@ -171,12 +166,12 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, pendingNodes);
+            storyDict.url_fragment, allNodes, null, null, null);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
-          let pendingNodes = (
-            storyDict.pending_node_dicts.map(storyNodeDict => {
+          let allNodes = (
+            storyDict.all_node_dicts.map(storyNodeDict => {
               return StoryNode.createFromBackendDict(
                 storyNodeDict);
             }));
@@ -184,7 +179,7 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, pendingNodes);
+            storyDict.url_fragment, allNodes, null, null, null);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,

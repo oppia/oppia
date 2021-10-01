@@ -33,8 +33,6 @@ import { baseInteractionValidationService } from
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -57,17 +55,14 @@ describe('Interaction validator', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new OutcomeObjectFactory(),
         new RuleObjectFactory()));
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
     $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
+      'OutcomeObjectFactory', new OutcomeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
@@ -141,6 +136,20 @@ describe('Interaction validator', function() {
       }
     );
 
+    it('should have a warning for an answer group with a self-loop labelled' +
+    ' as correct', function() {
+      goodOutcomeFeedback.labelledAsCorrect = true;
+      var answerGroups = [
+        agof.createNew([], goodOutcomeFeedback, false, null)
+      ];
+      var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message:
+            'In answer group 1, self-loops should not be labelled as correct.'
+      }]);
+    });
+
     it('should not have any warnings for a non-confusing default outcome',
       function() {
         var warnings = bivs.getDefaultOutcomeWarnings(
@@ -159,6 +168,19 @@ describe('Interaction validator', function() {
         type: WARNING_TYPES.ERROR,
         message: 'Please add feedback for the user in the [All other ' +
           'answers] rule.'
+      }]);
+    });
+
+    it('should have a warning for a default outcome with a self-loop' +
+    ' labelled as correct', function() {
+      goodOutcomeFeedback.labelledAsCorrect = true;
+      var warnings = bivs.getDefaultOutcomeWarnings(
+        goodOutcomeFeedback, currentState);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In the [All other answers] group, self-loops should not be ' +
+          'labelled as correct.')
       }]);
     });
 

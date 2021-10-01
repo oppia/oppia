@@ -14,13 +14,13 @@
 
 """Tests for the moderator page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class ModeratorPageTests(test_utils.GenericTestBase):
@@ -30,7 +30,7 @@ class ModeratorPageTests(test_utils.GenericTestBase):
         # Try accessing the moderator page without logging in.
         self.get_html_response('/moderator', expected_status_int=302)
 
-        # Try accessing the moderator page without being a moderator or admin.
+        # Try accessing the moderator page without being a moderator.
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response('/moderator', expected_status_int=401)
@@ -40,13 +40,6 @@ class ModeratorPageTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
-        self.get_html_response('/moderator')
-        self.logout()
-
-        # Try accessing the moderator page after logging in as an admin.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL)
         self.get_html_response('/moderator')
         self.logout()
 
@@ -64,7 +57,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.user_id = self.get_user_id_from_email(self.user_email)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id)
         rights_manager.publish_exploration(self.user, self.EXP_ID_1)
 

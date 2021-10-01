@@ -17,7 +17,6 @@
  */
 
 var action = require('../protractor_utils/action.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -25,6 +24,7 @@ var CreatorDashboardPage =
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ModeratorPage = require('../protractor_utils/ModeratorPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
@@ -33,10 +33,11 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  await action.select(
-    'Language Selector',
-    element(by.css('.protractor-test-i18n-language-selector')),
-    language);
+  var languageDropdown = element(by.css('.protractor-test-language-dropdown'));
+  var languageOption = element(
+    by.css('.protractor-test-i18n-language-' + language));
+  await action.click('Language Dropdown', languageDropdown);
+  await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
 };
@@ -45,9 +46,11 @@ var _selectLanguage = async function(language) {
 describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
+    var moderatorPage = null;
 
     beforeAll(function() {
       libraryPage = new LibraryPage.LibraryPage();
+      moderatorPage = new ModeratorPage.ModeratorPage();
     });
 
     it('should create users', async function() {
@@ -58,7 +61,8 @@ describe('Basic user journeys', function() {
       await libraryPage.get();
       await general.checkForConsoleErrors([]);
 
-      await browser.get(general.MODERATOR_URL_SUFFIX);
+      await moderatorPage.get();
+      await general.expectErrorPage(401);
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await users.logout();
@@ -67,9 +71,11 @@ describe('Basic user journeys', function() {
     it('should create moderators', async function() {
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
-
       await users.login('mod@userManagement.com');
-      await browser.get(general.MODERATOR_URL_SUFFIX);
+      await general.checkForConsoleErrors([
+        'Failed to load resource: the server responded with a status of 401']);
+      await moderatorPage.get();
+      await moderatorPage.expectModeratorPageToBeVisible();
       await general.openProfileDropdown();
       await users.logout();
       await general.checkForConsoleErrors([]);
@@ -85,7 +91,6 @@ describe('Basic user journeys', function() {
 });
 
 describe('Site language', function() {
-  var adminPage = null;
   var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
@@ -97,7 +102,6 @@ describe('Site language', function() {
   var preferencesPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -109,16 +113,11 @@ describe('Site language', function() {
     var CREATOR_USERNAME = 'langCreatorExplorations';
     var EDITOR_USERNAME = 'langCollections';
 
-    await users.createUser('lang@collections.com', EDITOR_USERNAME);
     await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
-    await users.createAndLoginAdminUser(
-      'testlangadm@collections.com', 'testlangadm');
-    await adminPage.get();
-    await adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
-    await users.logout();
+    await users.createCollectionEditor('lang@collections.com', EDITOR_USERNAME);
 
     await users.login('langCreator@explorations.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Language Test'));
@@ -154,8 +153,7 @@ describe('Site language', function() {
     await waitFor.pageToFullyLoad();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // In the url a # is added at the end that is not part of collection ID.
-    collectionId = pathname[5].slice(0, -1);
+    collectionId = pathname[5];
     // Add existing explorations.
     await collectionEditorPage.addExistingExploration(firstExplorationId);
     await collectionEditorPage.saveDraft();
@@ -172,7 +170,7 @@ describe('Site language', function() {
     // Starting language is English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('English');
+    await _selectLanguage('en');
     await libraryPage.get();
     await libraryPage.expectMainHeaderTextToBe(
       'Imagine what you could learn today...');
@@ -181,7 +179,7 @@ describe('Site language', function() {
   it('should change after selecting a different language', async function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('Español');
+    await _selectLanguage('es');
 
     await libraryPage.get();
     await libraryPage.expectMainHeaderTextToBe(
@@ -220,7 +218,7 @@ describe('Site language', function() {
       await users.login('feanor@example.com');
       await browser.get('/about');
       await waitFor.pageToFullyLoad();
-      await _selectLanguage('Español');
+      await _selectLanguage('es');
       await libraryPage.get();
       await libraryPage.expectMainHeaderTextToBe(
         'Imagina lo que podrías aprender hoy...');
@@ -234,17 +232,20 @@ describe('Site language', function() {
   );
 
   it('should not change in an exploration', async function() {
-    await users.login('langCreator@explorations.com', true);
+    await users.login('langCreator@explorations.com');
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('Español');
-
-    await general.openEditor(firstExplorationId);
+    await _selectLanguage('es');
+    await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholder = await element(by.css('.protractor-test-float-form-input'))
-      .getAttribute('placeholder');
-    expect(placeholder).toEqual('Ingresa un número');
+    var placeholderElement = await element(
+      by.css('.protractor-test-float-form-input'));
+    await waitFor.visibilityOf(
+      placeholderElement, 'Placeholder Element taking too long to appear');
+    await waitFor.elementAttributeToBe(
+      placeholderElement, 'placeholder', 'Ingresa un número',
+      'Placeholder text taking too long to change from English to Spanish');
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });
@@ -253,19 +254,21 @@ describe('Site language', function() {
     async function() {
       await browser.get('/about');
       await waitFor.pageToFullyLoad();
-      await _selectLanguage('Español');
+      await _selectLanguage('es');
 
       // Checking collection player page.
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.oppia-share-collection-footer')).getText())
+      expect(await element(
+        by.css('.protractor-test-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.author-profile-text')).getText())
+      expect(await element(
+        by.css('.protractor-test-author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }
@@ -275,7 +278,7 @@ describe('Site language', function() {
     // Reset language back to English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('English');
+    await _selectLanguage('en');
     await general.checkForConsoleErrors([]);
   });
 });

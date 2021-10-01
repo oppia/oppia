@@ -16,14 +16,16 @@
 classifiers.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import json
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
@@ -33,10 +35,8 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-from proto import text_classifier_pb2
-from proto import training_job_response_payload_pb2
-import python_utils
+from proto_files import text_classifier_pb2
+from proto_files import training_job_response_payload_pb2
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -54,7 +54,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with python_utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')
 
         assets_list = []
@@ -121,7 +121,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
-            self.payload_proto.job_result.SerializeToString(),
+            python_utils.convert_to_bytes(
+                self.payload_proto.job_result.SerializeToString()),
             self.payload_proto.vm_id)
 
         self.payload_for_fetching_next_job_request = {
@@ -132,7 +133,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_for_fetching_next_job_request['signature'] = (
             classifier_services.generate_signature(
                 python_utils.convert_to_bytes(self.secret),
-                self.payload_for_fetching_next_job_request['message'],
+                python_utils.convert_to_bytes(
+                    self.payload_for_fetching_next_job_request['message']),
                 self.payload_for_fetching_next_job_request['vm_id']))
 
     def test_trained_classifier_handler(self):
@@ -176,17 +178,19 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         config_property = config_domain.Registry.get_config_property(
             'notification_user_ids_for_failed_tasks')
         config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(self.ADMIN_EMAIL)])
+            'committer_id',
+            [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
 
         with can_send_emails_ctx, can_send_feedback_email_ctx:
             with fail_training_job:
                 # Adding moderator email to admin config page
                 # for sending emails for failed training jobs.
-                self.login(self.ADMIN_EMAIL, is_super_admin=True)
+                self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
                 response_dict = self.get_json('/adminhandler')
                 response_config_properties = response_dict['config_properties']
                 expected_email_list = {
-                    'value': [self.get_user_id_from_email(self.ADMIN_EMAIL)]}
+                    'value': [self.get_user_id_from_email(
+                        self.CURRICULUM_ADMIN_EMAIL)]}
                 sys_config_list = response_config_properties[
                     email_manager.NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.name]
                 self.assertDictContainsSubset(
@@ -211,10 +215,11 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                     feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
-                self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
+                self.assertEqual(messages[0].subject, expected_subject)
+                messages = (
+                    self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
                 self.assertEqual(len(messages), 1)
-                self.assertEqual(messages[0].subject.decode(), expected_subject)
+                self.assertEqual(messages[0].subject, expected_subject)
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
@@ -235,7 +240,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto.job_result.ClearField('classifier_frozen_model')
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
-            self.payload_proto.job_result.SerializeToString(),
+            python_utils.convert_to_bytes(
+                self.payload_proto.job_result.SerializeToString()),
             self.payload_proto.vm_id)
         self.post_blob(
             '/ml/trainedclassifierhandler',
@@ -386,12 +392,24 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': new_exp.init_state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'NumericInput'
-        })]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': new_exp.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'NumericInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': new_exp.init_state_name,
+                'new_value': {
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                }
+            })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
@@ -545,7 +563,8 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.payload['message'] = json.dumps({})
         self.payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            self.payload['message'], self.payload['vm_id'])
+            python_utils.convert_to_bytes(self.payload['message']),
+            self.payload['vm_id'])
 
     def test_next_job_handler(self):
         json_response = self.post_json(

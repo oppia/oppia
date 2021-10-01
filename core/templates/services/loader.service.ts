@@ -23,20 +23,16 @@ import { EventEmitter, Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoaderService {
-  // TODO(#9154): Remove static when migration is complete.
-  /**
-   * The static keyword is used here because this service is used in both
-   * angular and angularjs. Since we are using upgradedServices.ts, where a new
-   * instance is created for angularjs and angular will creates a new instance
-   * for the angular part, we end up having two instances of the service.
-   * In order to keep the variables same, static is used until migration is
-   * complete.
-   */
+  // TODO(#8472): Remove static when migration is complete.
+  // Until then, we need to use static so that the two instances of the service
+  // created by our hybrid app (one for Angular, the other for AngularJS) can
+  // refer to the same objects.
   static loadingMessageChangedEventEmitter = new EventEmitter<string>();
   get onLoadingMessageChange(): EventEmitter<string> {
     // TODO(#9154): Change LoaderService to "this".
     return LoaderService.loadingMessageChangedEventEmitter;
   }
+
   constructor() {}
 
   showLoadingScreen(message: string): void {

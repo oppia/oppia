@@ -19,7 +19,7 @@
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
@@ -28,8 +28,6 @@ require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
 require(
-  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
-require(
   'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -37,7 +35,7 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
-require('services/contextual/window-ref.service');
+require('services/prevent-page-unload-event.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -45,13 +43,15 @@ angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'BottomNavbarStatusService',
+    'PreventPageUnloadEventService',
     'SkillEditorRoutingService', 'SkillEditorStateService',
-    'UndoRedoService', 'UrlInterpolationService', 'UrlService', 'WindowRef',
+    'UndoRedoService', 'UrlInterpolationService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
         $rootScope, $uibModal, BottomNavbarStatusService,
+        PreventPageUnloadEventService,
         SkillEditorRoutingService, SkillEditorStateService,
-        UndoRedoService, UrlInterpolationService, UrlService, WindowRef,
+        UndoRedoService, UrlInterpolationService, UrlService,
         MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
@@ -88,26 +88,13 @@ angular.module('oppia').component('skillEditorPage', {
         }
       };
       ctrl.getWarningsCount = function() {
-        return ctrl.skill.getValidationIssues().length;
-      };
-
-      ctrl.setUpBeforeUnload = function() {
-        WindowRef.nativeWindow.addEventListener(
-          'beforeunload', ctrl.confirmBeforeLeaving);
-      };
-
-      ctrl.confirmBeforeLeaving = function(e) {
-        if (UndoRedoService.getChangeCount()) {
-          // This message is irrelevant, but is needed to trigger the
-          // confirmation before leaving.
-          e.returnValue = 'Sure?';
-          return false;
-        }
+        return ctrl.skill ? ctrl.skill.getValidationIssues().length : 0;
       };
 
       ctrl.$onInit = function() {
         BottomNavbarStatusService.markBottomNavbarStatus(true);
-        ctrl.setUpBeforeUnload();
+        PreventPageUnloadEventService.addListener(
+          UndoRedoService.getChangeCount.bind(UndoRedoService));
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
         ctrl.directiveSubscriptions.add(

@@ -16,10 +16,10 @@
  * @fileoverview Loads scripts needed for ui-codemirror.
  */
 
-window.CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
-require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
-require('static/code-mirror-5.17.0/mode/python/python.js');
-require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
-require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
+window.CodeMirror = require('codemirror');
+
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/python/python';
+import 'codemirror/mode/yaml/yaml';
 require('static/diff-match-patch-1.0.0/diff_match_patch.js');
-require('static/code-mirror-5.17.0/addon/merge/merge.js');
+import 'codemirror/addon/merge/merge';

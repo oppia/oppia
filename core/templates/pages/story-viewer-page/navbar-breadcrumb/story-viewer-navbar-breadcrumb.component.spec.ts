@@ -16,43 +16,83 @@
  * @fileoverview Unit tests for storyViewerNavbarBreadcrumb.
  */
 
-import { EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StoryViewerNavbarBreadcrumbComponent } from './story-viewer-navbar-breadcrumb.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 
-describe('Story viewer navbar breadcrumb component', function() {
-  var ctrl = null;
-  var urlService = null;
-  var storyViewerBackendApiService = null;
-  var mockSendStoryDataEventEmitter = null;
+class MockUrlService {
+  getTopicUrlFragmentFromLearnerUrl() {
+    return 'topic_1';
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    urlService = $injector.get('UrlService');
-    storyViewerBackendApiService = $injector.get(
-      'StoryViewerBackendApiService');
+  getClassroomUrlFragmentFromLearnerUrl() {
+    return 'classroom_1';
+  }
 
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'topic1');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'classroom1');
-    mockSendStoryDataEventEmitter = new EventEmitter();
-    spyOnProperty(
-      storyViewerBackendApiService,
-      'onSendStoryData').and.returnValue(mockSendStoryDataEventEmitter);
+  getStoryUrlFragmentFromLearnerUrl() {
+    return 'story';
+  }
+}
 
-    ctrl = $componentController('storyViewerNavbarBreadcrumb', { });
-    ctrl.$onInit();
+let component: StoryViewerNavbarBreadcrumbComponent;
+let fixture: ComponentFixture<StoryViewerNavbarBreadcrumbComponent>;
+
+describe('Subtopic viewer navbar breadcrumb component', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [StoryViewerNavbarBreadcrumbComponent],
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: StoryViewerBackendApiService,
+          useValue: {
+            fetchStoryDataAsync: async() => (
+              new Promise((resolve) => {
+                resolve(
+                  StoryPlaythrough.createFromBackendDict({
+                    story_id: 'id',
+                    story_nodes: [],
+                    story_title: 'title',
+                    story_description: 'description',
+                    topic_name: 'topic_1',
+                    meta_tag_content: 'this is a meta tag content'
+                  }));
+              })
+            )
+          }
+        },
+        { provide: UrlService, useClass: MockUrlService },
+        UrlInterpolationService,
+      ],
+    }).compileComponents();
   }));
 
-  afterEach(() => {
-    ctrl.$onDestroy();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StoryViewerNavbarBreadcrumbComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should get topic url when story data is already loaded', function() {
-    mockSendStoryDataEventEmitter.emit({
-      topicName: 'topic_1',
-      storyTitle: 'Story title'
-    });
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
 
-    expect(ctrl.getTopicUrl()).toBe('/learn/classroom1/topic1/story');
+  it('should set story title when component is initialized', async(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicName).toBe('topic_1');
+      expect(component.storyTitle).toBe('title');
+    });
+  }));
+
+  it('should get topic url after component is initialized', () => {
+    component.ngOnInit();
+    expect(component.getTopicUrl()).toBe(
+      '/learn/classroom_1/topic_1/story');
   });
 });

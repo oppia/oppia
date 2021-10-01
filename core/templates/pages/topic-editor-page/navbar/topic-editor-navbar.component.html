@@ -1,0 +1,275 @@
+<ul class="navbar-desktop nav navbar-nav oppina-navbar-nav float-right ng-cloak"
+    ng-if="topicRights.canEditTopic()">
+  <li class="oppia-navbar-dropdown-menu">
+    <div uib-dropdown>
+      <button class="btn btn-light oppia-save-changes-button protractor-test-save-topic-button float-left"
+              ng-class="{'btn-success': isTopicSaveable()}"
+              ng-click="saveChanges()"
+              ng-disabled="!isTopicSaveable()">
+        <span ng-if="!isSaveInProgress()">
+          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+             alt="Save Topic">
+            &#xE161;
+          </i>
+          <span class="oppia-save-publish-button-label float-left">Save Changes</span>
+          <span class="d-none d-md-block float-left oppia-change-count"
+                ng-if="getChangeListLength() > 0">
+            (<[getChangeListLength()]>)
+          </span>
+        </span>
+
+        <span ng-if="isSaveInProgress()">
+          <span class="oppia-save-publish-button-label">Saving</span>
+          <loading-dots></loading-dots>
+        </span>
+      </button>
+      <button type="button" class="btn btn-light uib-dropdown-toggle dropdown-toggle oppia-dropdown-toggle-button"
+              ng-disabled="!getChangeListLength()" aria-label="Dropdown toggle" uib-dropdown-toggle>
+      </button>
+      <ul uib-dropdown-menu role="menu" class="oppia-dropdown-menu" ng-style="{ width: getChangeListLength() && topicRights.isPublished() ? '150px' : '120px' }">
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
+      </ul>
+    </div>
+  </li>
+  <li class="oppia-editor-publish-button-container">
+    <button type="button" ng-if="!topicRights.isPublished()"
+            class="btn btn-light oppia-editor-publish-button protractor-test-publish-topic-button"
+            ng-click="publishTopic()"
+            ng-class="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
+            ng-disabled="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
+      <span class="oppia-save-publish-button-label">Publish Topic</span>
+    </button>
+    <button type="button" ng-click="unpublishTopic()"
+            ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
+            class="btn btn-light"
+            ng-disabled="isTopicSaveable()">
+      Unpublish Topic
+    </button>
+  </li>
+</ul>
+<div class="topic-nav-mobile">
+  <div class="topic-navbar-mobile-tabs">
+    <div class="topic-nav-dropdown-container">
+      <div class="topic-nav-topic-nav-dropdown-options" ng-if="showNavigationOptions">
+        <div class="topic-nav-dropdown-option" ng-click="selectMainTab()">
+          <i class="material-icons">&#xE254;</i><span>Editor</span>
+        </div>
+        <div class="topic-nav-dropdown-option" ng-click="selectQuestionsTab()">
+          <i class="material-icons">&#xE254;</i><span>Questions</span>
+        </div>
+        <div class="topic-nav-dropdown-option" ng-click="openTopicViewer()">
+          <i class="material-icons">&#xE037;</i><span>Preview</span>
+        </div>
+      </div>
+      <div>
+        <div ng-if="warningsAreShown" class="warning-box">
+          <span>Warnings</span>
+          <div ng-repeat="issue in validationIssues track by $index">
+            <hr class="oppia-editor-warnings-separator">
+            <[issue]>
+          </div>
+          <div ng-repeat="issue in prepublishValidationIssues track by $index">
+            <hr class="oppia-editor-warnings-separator">
+            <[issue]>
+          </div>
+        </div>
+      </div>
+      <div class="topic-nav-dropdown-content">
+        <div class="topic-nav-dropdown-text" ng-click="toggleWarningText()">
+          <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
+          <span><[activeTab]></span>
+          <span ng-if="getTotalWarningsCount()">(<[getTotalWarningsCount()]> <i class="fa fa-exclamation-triangle error-icon"></i>)</span>
+        </div>
+        <div class="topic-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
+          <i class="fa fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+    <div class="topic-nav-dropdown-container save-options-dropdown">
+      <div class="topic-nav-topic-nav-dropdown-options" ng-if="showTopicEditOptions">
+        <div class="topic-nav-dropdown-option" ng-click="discardChanges()">
+          <i class="material-icons">&#xE254;</i>
+          <span>Discard Changes</span>
+        </div>
+        <div class="topic-nav-dropdown-option">
+          <div ng-if="!topicRights.isPublished()"
+               ng-click="publishTopic()"
+               ng-disabled="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+            <i class="material-icons">&#xE254;</i>
+            <span>Publish Topic</span>
+          </div>
+          <div ng-click="unpublishTopic()"
+               ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
+               ng-disabled="isTopicSaveable()">
+            <i class="material-icons">&#xE254;</i>
+            <span>Unpublish Topic</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-nav-dropdown-content right-container">
+        <div class="topic-nav-dropdown-text" ng-click="saveChanges()">
+          <span ng-if="isSaveInProgress()">
+            <span>Saving</span>
+          </span>
+          <span ng-if="!isSaveInProgress()">
+            Save Changes
+          </span>
+          <span ng-if="getChangeListLength() > 0">
+            (<[getChangeListLength()]>)
+          </span>
+        </div>
+        <div class="topic-nav-dropdown-icon" ng-click="toggleTopicEditOptions()">
+          <i class="fa fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  topic-editor-navbar .icon {
+    width: 3.5em;
+  }
+  topic-editor-navbar .icon .material-icons {
+    font-size: 1.4em;
+    margin-left: 0.3vw;
+  }
+  topic-editor-navbar .topic-nav-mobile {
+    display: none;
+  }
+  topic-editor-navbar .oppia-navbar-dropdown-menu {
+    margin-right: 5px;
+    margin-top: 8px;
+  }
+  topic-editor-navbar .oppia-change-count {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  topic-editor-navbar .oppia-dropdown-toggle-button {
+    height: 34px;
+  }
+  topic-editor-navbar .oppia-dropdown-menu {
+    min-width: 125px;
+    right: inherit;
+  }
+  topic-editor-navbar .oppia-editor-publish-button-container {
+    margin-right: 20px;
+    margin-top: 8px;
+  }
+  @media screen and (max-width: 768px) {
+    topic-editor-navbar .navbar-desktop {
+      display: none;
+    }
+    topic-editor-navbar .topic-nav-mobile {
+      display: block;
+    }
+    topic-editor-navbar .topic-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    topic-editor-navbar .save-change-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    topic-editor-navbar .save-changes-btn {
+      background-color: #008098;
+      color: #FFF;
+      font-weight: bold;
+      width: 80%;
+    }
+    topic-editor-navbar .discard-changes-btn {
+      background-color: #008098;
+      bottom: 47px;
+      color: #FFF;
+      font-weight: bold;
+      left: 12px;
+      position: absolute;
+      width: 144px;
+    }
+    topic-editor-navbar .btn-publish-topic {
+      background-color: white;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+    .arrow-up-container {
+      align-items: center;
+      background-color: #FFF;
+      border: 1px solid #808080;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      width: 20%;
+    }
+    .arrow-up-container i {
+      color: #008098;
+    }
+    .publish-button-container {
+      width: 40%;
+    }
+    .publish-button-container button {
+      width: 100%;
+    }
+    topic-editor-navbar .topic-nav-dropdown-container {
+      position: relative;
+      text-align: left;
+      width: 45%;
+    }
+    topic-editor-navbar .topic-nav-topic-nav-dropdown-options {
+      background-color: #FFF;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+      width: 100%;
+    }
+    topic-editor-navbar .topic-nav-dropdown-content {
+      background-color: #FFF;
+      border: 1.5px solid #6d6969;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    topic-editor-navbar .right-container {
+      background-color: #419889;
+      color: #FFF;
+    }
+
+    topic-editor-navbar .topic-nav-dropdown-option {
+      padding: 5px 0;
+    }
+
+    topic-editor-navbar .topic-nav-dropdown-icon {
+      align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 20%;
+    }
+    topic-editor-navbar .topic-nav-dropdown-text {
+      padding: 5px 10px;
+    }
+    topic-editor-navbar .save-options-dropdown {
+      width: 52%;
+    }
+    topic-editor-navbar .warning-box {
+      background-color: #f5f55a;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+    }
+    topic-editor-navbar .error-icon {
+      background-color: #f5f55a;
+    }
+  }
+</style>

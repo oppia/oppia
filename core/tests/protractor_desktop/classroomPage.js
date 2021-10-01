@@ -20,27 +20,20 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Classroom page functionality', function() {
-  var adminPage = null;
   var classroomPage = null;
   var libraryPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -52,7 +45,8 @@ describe('Classroom page functionality', function() {
       'Exploration Title',
       'Algorithms',
       'This is the objective.',
-      'English');
+      'English',
+      true);
     await classroomPage.get('math');
     await libraryPage.findExploration('Title');
     await libraryPage.expectExplorationToBeVisible('Exploration Title');
@@ -62,10 +56,10 @@ describe('Classroom page functionality', function() {
 
     await libraryPage.selectCategories(['Algorithms']);
     await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
-    await users.logout();
   });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

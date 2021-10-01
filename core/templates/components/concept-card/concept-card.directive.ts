@@ -20,64 +20,89 @@ require('domain/skill/concept-card-backend-api.service.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/format-rte-preview.filter.ts');
 
-angular.module('oppia').directive('conceptCard', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getSkillIds: '&skillIds',
-        index: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/concept-card/concept-card.template.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$rootScope', '$scope', 'ConceptCardBackendApiService',
-        function(
-            $rootScope, $scope, ConceptCardBackendApiService) {
-          var ctrl = this;
-          ctrl.isLastWorkedExample = function() {
-            return ctrl.numberOfWorkedExamplesShown ===
+angular.module('oppia').directive('conceptCard', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      skillIds: '<',
+      index: '<'
+    },
+    template: require('./concept-card.template.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$rootScope', '$scope', 'ConceptCardBackendApiService',
+      function(
+          $rootScope, $scope, ConceptCardBackendApiService) {
+        var ctrl = this;
+        ctrl.isLastWorkedExample = function() {
+          return ctrl.numberOfWorkedExamplesShown ===
               ctrl.currentConceptCard.getWorkedExamples().length;
-          };
+        };
 
-          ctrl.showMoreWorkedExamples = function() {
-            ctrl.explanationIsShown = false;
-            ctrl.numberOfWorkedExamplesShown++;
-          };
+        ctrl.showMoreWorkedExamples = function() {
+          ctrl.explanationIsShown = false;
+          ctrl.numberOfWorkedExamplesShown++;
+        };
 
-          ctrl.$onInit = function() {
-            ctrl.conceptCards = [];
-            ctrl.currentConceptCard = null;
-            ctrl.numberOfWorkedExamplesShown = 0;
-            ctrl.loadingMessage = 'Loading';
-            $scope.$watch('$ctrl.index', function(newIndex) {
-              ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-              if (ctrl.currentConceptCard) {
-                ctrl.numberOfWorkedExamplesShown = 0;
-                if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
-                  ctrl.numberOfWorkedExamplesShown = 1;
-                }
-              }
-            });
-            ConceptCardBackendApiService.loadConceptCardsAsync(
-              ctrl.getSkillIds()
-            ).then(function(conceptCardObjects) {
-              conceptCardObjects.forEach(function(conceptCardObject) {
-                ctrl.conceptCards.push(conceptCardObject);
-              });
-              ctrl.loadingMessage = '';
-              ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+        ctrl.$onInit = function() {
+          ctrl.conceptCards = [];
+          ctrl.currentConceptCard = null;
+          ctrl.numberOfWorkedExamplesShown = 0;
+          ctrl.loadingMessage = 'Loading';
+          $scope.$watch('$ctrl.index', function(newIndex) {
+            ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
+            if (ctrl.currentConceptCard) {
               ctrl.numberOfWorkedExamplesShown = 0;
               if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
                 ctrl.numberOfWorkedExamplesShown = 1;
               }
-              // TODO(#8521): Remove when this directive is migrated to Angular.
-              $rootScope.$apply();
+            }
+          });
+          ConceptCardBackendApiService.loadConceptCardsAsync(
+            ctrl.skillIds
+          ).then(function(conceptCardObjects) {
+            conceptCardObjects.forEach(function(conceptCardObject) {
+              ctrl.conceptCards.push(conceptCardObject);
             });
-          };
-        }
-      ]
-    };
-  }]);
+            ctrl.loadingMessage = '';
+            ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+            ctrl.numberOfWorkedExamplesShown = 0;
+            if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
+              ctrl.numberOfWorkedExamplesShown = 1;
+            }
+            // TODO(#8521): Remove when this directive is migrated to Angular.
+            $rootScope.$apply();
+          }, function(errorResponse) {
+            ctrl.loadingMessage = '';
+            ctrl.skillDeletedMessage = 'Oops, it looks like this skill has' +
+              ' been deleted.';
+          });
+        };
+      }
+    ]
+  };
+}]);
+
+// Allow $scope to be provided to parent Component.
+export const ScopeProvider = {
+  deps: ['$injector'],
+  provide: '$scope',
+  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
+};
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'concept-card',
+  providers: [ScopeProvider]
+})
+export class ConceptCardComponent extends UpgradeComponent {
+  @Input() skillIds;
+  @Input() index;
+
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('conceptCard', elementRef, injector);
+  }
+}

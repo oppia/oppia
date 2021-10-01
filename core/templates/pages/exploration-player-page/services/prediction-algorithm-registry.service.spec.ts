@@ -18,38 +18,18 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
-import { PredictionAlgorithmRegistryService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { TextInputPredictionService } from
-  'interactions/TextInput/text-input-prediction.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 describe('Prediction Algorithm Registry Service', () => {
-  let codeReplPredictionService: CodeReplPredictionService;
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let textInputPredictionService: TextInputPredictionService;
 
   beforeEach(() => {
-    codeReplPredictionService = TestBed.get(CodeReplPredictionService);
     predictionAlgorithmRegistryService = TestBed.get(
       PredictionAlgorithmRegistryService);
     textInputPredictionService = TestBed.get(TextInputPredictionService);
-  });
-
-  it('should return service for CodeClassifier at schema version 1.', () => {
-    expect(
-      predictionAlgorithmRegistryService
-        .getPredictionService('CodeClassifier', 1)
-    ).toBe(codeReplPredictionService);
-  });
-
-  it('should return null for CodeClassifier at schema version 999.', () => {
-    expect(
-      predictionAlgorithmRegistryService
-        .getPredictionService('CodeClassifier', 999)
-    ).toBeNull();
   });
 
   it('should return service for TextClassifier at schema version 1.', () => {
@@ -75,7 +55,7 @@ describe('Prediction Algorithm Registry Service', () => {
 
   describe('when trying to mock prediction services in tests', () => {
     class MockPredictionService {
-      predict(classifierData, answer): number {
+      predict(classifierData: ArrayBuffer, answer: InteractionAnswer): number {
         return 1;
       }
     }

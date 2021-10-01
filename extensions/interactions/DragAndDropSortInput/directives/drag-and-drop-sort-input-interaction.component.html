@@ -1,0 +1,95 @@
+<style>
+  @media screen and (max-width: 959px) {
+    .drag-and-drop-item .drag-and-drop-subitem {
+      width: inherit;
+    }
+
+    .angular-ui-tree-placeholder {
+      width: inherit;
+    }
+  }
+
+  .angular-ui-tree-placeholder {
+    border: 2px dashed #add8e6;
+    border-radius: 10px;
+    height: 70px;
+    margin-left: 50px;
+    max-width: 300px;
+  }
+
+  .drag-and-drop-sort-container {
+    border: 1px solid #000000;
+    margin: auto;
+  }
+
+  .drag-and-drop-item {
+    background-color: #add8e6;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    margin: 10px 0 0 70px;
+    max-height: 200px;
+    max-width: 300px;
+    min-height: 50px;
+    overflow: hidden;
+    padding-left: 10px;
+  }
+
+  .drag-and-drop-subitem {
+    background-color: #add8e6;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    margin: -5px 0 0 50px;
+    max-height: 200px;
+    max-width: 300px;
+    min-height: 50px;
+    overflow: hidden;
+    padding-left: 10px;
+    position: relative;
+  }
+
+  .drag-and-drop-sort-container img {
+    max-height: 200px;
+    object-fit: contain;
+  }
+
+  .conversation-skin-interaction-container {
+    /* This CSS class is essential for auto-scrolling in the Drag and Drop Sort
+       interaction to work correctly. The class is intentionally defined here so
+       that it does not affect any other interaction.
+
+       If this class is removed, the auto-scrolling in Drag and drop interaction
+       will break, as this container will not be scrollable when there are a lot
+       of draggable items (see issue #5280). So, it has to be set as
+       overflow: scroll with a definite max-height.
+
+       'touch-action: manipulation' is used for fixing the error thrown by drag
+       and drop interactions on mobile (see issue #5607), while also maintaining
+       vertical touch movements and zoom touch actions.
+    */
+    margin: auto;
+    max-height: 400px;
+    overflow-y: scroll;
+    padding: 10px 10px 25px 10px;
+    touch-action: manipulation;
+  }
+</style>
+
+
+<form ng-submit="$ctrl.submitAnswer()">
+  <div ui-tree="$ctrl.treeOptions" class="drag-and-drop-sort-container" data-max-depth="$ctrl.dataMaxDepth">
+    <ol ui-tree-nodes="" ng-model="$ctrl.list">
+      <li ng-repeat="item in $ctrl.list" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
+        <div ui-tree-handle class="drag-and-drop-item">
+          <angular-html-bind html-data="item.title"></angular-html-bind>
+        </div>
+        <ol ui-tree-nodes="" ng-model="item.items">
+          <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
+            <div ui-tree-handle class="drag-and-drop-subitem">
+              <angular-html-bind html-data="subItem.title"></angular-html-bind>
+            </div>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </div>
+</form>

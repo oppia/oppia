@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
+  'domain/question/question-backend-api.service';
 
 describe('Question backend Api service', () => {
   let questionBackendApiService = null;
@@ -92,7 +92,7 @@ describe('Question backend Api service', () => {
           question_content: ''
         }
       }],
-      next_start_cursor: null
+      more: false
     };
   });
 
@@ -108,7 +108,7 @@ describe('Question backend Api service', () => {
       '/question_player_handler?skill_ids=1&question_count=1' +
       '&fetch_by_difficulty=true';
 
-    questionBackendApiService.fetchQuestions(
+    questionBackendApiService.fetchQuestionsAsync(
       ['1'], 1, true).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
@@ -131,7 +131,7 @@ describe('Question backend Api service', () => {
       '/question_player_handler?skill_ids=1&question_count=1' +
       '&fetch_by_difficulty=false';
 
-    questionBackendApiService.fetchQuestions(
+    questionBackendApiService.fetchQuestionsAsync(
       ['1'], 1, false).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
@@ -153,7 +153,7 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/question_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
@@ -176,7 +176,7 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/question_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
@@ -203,7 +203,7 @@ describe('Question backend Api service', () => {
         '/question_player_handler?skill_ids=1&question_count=1' +
         '&fetch_by_difficulty=true';
 
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         ['1'], 1, true).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
@@ -226,7 +226,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         ['1'], 'abc', true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -239,7 +239,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         ['1'], -1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -252,7 +252,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         ['1'], 1.5, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -265,7 +265,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         'x', 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -278,7 +278,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         [1, 2], 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -291,7 +291,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         null, 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -304,7 +304,7 @@ describe('Question backend Api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestions(
+      questionBackendApiService.fetchQuestionsAsync(
         ['1'], null, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -318,10 +318,10 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      questionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -329,7 +329,7 @@ describe('Question backend Api service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
-        nextCursor: null
+        more: false
       });
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -340,10 +340,10 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      questionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading questions.'
@@ -363,10 +363,10 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      questionBackendApiService.fetchQuestionSummaries(
-        '1', '1').then(successHandler, failHandler);
+      questionBackendApiService.fetchQuestionSummariesAsync(
+        '1', 1).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=1');
+        '/questions_list_handler/1?offset=1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -374,7 +374,7 @@ describe('Question backend Api service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
-        nextCursor: null
+        more: false
       });
       expect(failHandler).not.toHaveBeenCalled();
     })

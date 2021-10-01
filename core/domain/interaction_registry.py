@@ -16,17 +16,17 @@
 
 """Registry for interactions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import itertools
 import json
 import os
 import pkgutil
 
-from constants import constants
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
+from core.constants import constants
 
 
 class Registry(python_utils.OBJECT):

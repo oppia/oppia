@@ -26,11 +26,11 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" ng-if="$ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
-      <opportunities-list load-opportunities="$ctrl.loadContributions"
-                          on-click-action-button="$ctrl.onClickViewSuggestion"
-                          label-required="!$ctrl.activeReviewTab"
-                          opportunity-heading-truncation-length="30">
-      </opportunities-list>
+      <oppia-opportunities-list [load-opportunities]="$ctrl.loadContributions"
+                                (click-action-button)="$ctrl.onClickViewSuggestion($event)"
+                                [label-required]="!$ctrl.activeReviewTab"
+                                [opportunity-heading-truncation-length]="30">
+      </oppia-opportunities-list>
     </div>
   </div>
 </div>
@@ -95,7 +95,6 @@
     color: white;
     font-size: 16px;
     font-weight: bold;
-    height: 28px;
     margin-right: 20%;
     padding-left: 20%;
     text-align: left;

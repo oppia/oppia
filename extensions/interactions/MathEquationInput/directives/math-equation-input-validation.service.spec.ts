@@ -69,6 +69,7 @@ describe('MathEquationInputValidationService', () => {
     });
 
     customizationArgs = {
+      useFractionForDivision: false,
       customOskLetters: {
         value: ['x', 'y', 'm', 'x', 'c', 'a', 'b']
       }
@@ -89,7 +90,7 @@ describe('MathEquationInputValidationService', () => {
       }
     }, 'MathEquationInput');
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -200,6 +201,7 @@ describe('MathEquationInputValidationService', () => {
       }, 'MathEquationInput')
     ];
     customizationArgs = {
+      useFractionForDivision: false,
       customOskLetters: {
         value: ['y', 'a', 'b']
       }
@@ -225,6 +227,7 @@ describe('MathEquationInputValidationService', () => {
       }, 'MathEquationInput')
     ];
     customizationArgs = {
+      useFractionForDivision: false,
       customOskLetters: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
       }

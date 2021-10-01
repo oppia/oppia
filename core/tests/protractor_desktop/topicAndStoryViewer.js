@@ -16,9 +16,11 @@
  * @fileoverview End-to-end tests for the story viewer.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -27,30 +29,26 @@ var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicAndStoryViewerPage = require(
   '../protractor_utils/TopicAndStoryViewerPage.js');
+var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
+var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
-describe('Story viewer functionality', function() {
+describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
+  var topicViewerPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
+  var subTopicViewerPage = null;
   var explorationPlayerPage = null;
   var dummyExplorationIds = [];
-
-  beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    topicAndStoryViewerPage = (
-      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
-    topicsAndSkillsDashboardPage = (
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-    topicEditorPage = new TopicEditorPage.TopicEditorPage();
-    storyEditorPage = new StoryEditorPage.StoryEditorPage();
-  });
+  var skillId = null;
+  var skillEditorPage = null;
 
   var createDummyExplorations = async function() {
     var EXPLORATION = {
@@ -58,26 +56,34 @@ describe('Story viewer functionality', function() {
       objective: 'The goal is to check story viewer functionality.',
       language: 'English'
     };
+
     for (var i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
         `Exploration TASV1 - ${i}`,
         EXPLORATION.category,
         EXPLORATION.objective,
         EXPLORATION.language,
+        i === 1,
         true
       );
       dummyExplorationIds.push(await general.getExplorationIdFromEditor());
     }
   };
 
-  it('should save story progress on login.', async function() {
-    await users.createAndLoginAdminUser(
+  beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    topicAndStoryViewerPage = (
+      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
+    topicViewerPage = new TopicViewerPage.TopicViewerPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
+    await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
@@ -86,6 +92,7 @@ describe('Story viewer functionality', function() {
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
@@ -101,10 +108,13 @@ describe('Story viewer functionality', function() {
       });
 
     await topicsAndSkillsDashboardPage.get();
-    (
-      await
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill TASV1', 'Concept card explanation', false));
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill TASV1', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
@@ -114,11 +124,11 @@ describe('Story viewer functionality', function() {
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
+    await topicEditorPage.addConceptCardToSubtopicExplanation('Skill TASV1');
+    await topicEditorPage.saveSubtopicExplanation();
     await topicEditorPage.saveTopic('Added subtopic.');
-
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
-
     await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
@@ -140,20 +150,71 @@ describe('Story viewer functionality', function() {
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
     await users.logout();
+  });
+
+  it('should play through story and save progress on login.', async function() {
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.login(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer');
+
+    // Signing up with the login button should redirect the user back to the
+    // exploration.
+    var loginButton = element(by.css('.protractor-test-login-button'));
+    await action.click('Login button', loginButton);
+    await users.createAndLoginUser(
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
+
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
+    await users.logout();
   });
+
+  it(
+    'should check for topic description, stories and revision cards',
+    async function() {
+      await users.createAndLoginCurriculumAdminUser(
+        'creator1@storyViewer.com', 'creatorStoryViewer1');
+      await topicViewerPage.get('math', 'Topic TASV1');
+      await topicViewerPage.expectTopicInformationToBe('Description');
+      await topicViewerPage.expectStoryCountToBe(1);
+      await topicViewerPage.moveToRevisionTab();
+      await subTopicViewerPage.expectRevisionCardCountToBe(1);
+      await subTopicViewerPage.get('Subtopic TASV1');
+      await subTopicViewerPage.expectConceptCardCountToBe(1);
+      await subTopicViewerPage.getConceptCard();
+      await subTopicViewerPage.expectConceptCardInformationToBe(
+        'Concept card explanation');
+      await skillEditorPage.get(skillId);
+      await workflow.createQuestion();
+      await skillEditorPage.get(skillId);
+      await skillEditorPage.moveToQuestionsTab();
+      await topicViewerPage.get('math', 'Topic TASV1');
+      await topicViewerPage.moveToPracticeTab();
+      await topicViewerPage.selectSkillForPractice('Subtopic TASV1');
+
+      await waitFor.clientSideRedirection(async() => {
+        // Start practice to trigger redirection to practice session page.
+        await topicViewerPage.startPractice();
+      }, (url) => {
+        // Wait until the URL has changed to /practice.
+        return (/practice/.test(url));
+      }, async() => {
+        await topicAndStoryViewerPage.waitForPracticeSessionContainer();
+      });
+
+      await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+      await explorationPlayerPage.clickThroughToNextCard();
+      await topicViewerPage.expectMessageAfterCompletion(
+        'Session complete. Well done!'
+      );
+      await users.logout();
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);

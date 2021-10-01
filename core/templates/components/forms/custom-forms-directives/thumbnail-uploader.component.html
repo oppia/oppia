@@ -1,0 +1,57 @@
+<div class="thumbnail-editor protractor-test-thumbnail-editor form-group">
+  <div>
+    <div class="oppia-editable-section float-left" title="Change Thumbnail"
+         [ngStyle]="{background: bgColor}">
+      <div class="oppia-click-to-start-editing protractor-test-photo-button"
+           (click)="showEditThumbnailModal()"
+           aria-label="upload or edit thumbnail">
+      </div>
+      <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">
+        &#xE254;
+      </i>
+      <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" class="oppia-thumbnail-placeholder" alt="">
+      <oppia-thumbnail-display *ngIf="editableThumbnailDataUrl"
+                               [hidden]="!thumbnailIsLoading"
+                               [imgSrc]="editableThumbnailDataUrl"
+                               [aspectRatio]="aspectRatio"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [background]="bgColor">
+      </oppia-thumbnail-display>
+      <oppia-thumbnail-display *ngIf="useLocalStorage && newThumbnailDataUrl"
+                               [imgSrc]="newThumbnailDataUrl"
+                               [aspectRatio]="aspectRatio"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [background]="localStorageBgcolor">
+      </oppia-thumbnail-display>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-thumbnail-placeholder {
+    height: 180px;
+    width: 180px;
+  }
+
+  .thumbnail-editor {
+    height: 200px;
+  }
+
+  .oppia-editable-section {
+    border-radius: 0.25rem;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .img-thumbnail {
+    border: none;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .oppia-pencil-icon {
+    right: 8px;
+    top: 8px;
+  }
+</style>

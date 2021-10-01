@@ -19,8 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerStatsObjectFactory, AnswerStats, AnswerStatsBackendDict } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats, AnswerStatsBackendDict } from
+  'domain/exploration/answer-stats.model';
 
 interface StateInteractionIds {
   [stateName: string]: string;
@@ -50,16 +50,13 @@ export class StateTopAnswersStats {
   providedIn: 'root'
 })
 export class StateTopAnswersStatsObjectFactory {
-  constructor(
-    private answerStatsObjectFactory: AnswerStatsObjectFactory) {}
-
   createFromBackendDict(
       backendDict: StateTopAnswersStatsBackendDict): StateTopAnswersStats {
     let stateTopAnswers: StateTopAnswers = {};
 
     for (let stateName in backendDict.answers) {
       stateTopAnswers[stateName] = backendDict.answers[stateName].map(
-        answerStatsDict => this.answerStatsObjectFactory
+        answerStatsDict => AnswerStats
           .createFromBackendDict(answerStatsDict));
     }
 

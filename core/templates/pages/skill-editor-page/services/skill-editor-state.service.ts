@@ -27,11 +27,12 @@ import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillRights } from 'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
+import { LoaderService } from 'services/loader.service';
 
-interface GroupedSkillSummaries {
+export interface GroupedSkillSummaries {
   current: {
     id: string,
     description: string,
@@ -46,14 +47,17 @@ export class SkillEditorStateService {
     private alertsService: AlertsService,
     private questionsListService: QuestionsListService,
     private skillBackendApiService: SkillBackendApiService,
-    private skillObjectFactory: SkillObjectFactory,
     private skillRightsBackendApiService: SkillRightsBackendApiService,
-    private undoRedoService: UndoRedoService
+    private loaderService: LoaderService,
+    private undoRedoService: UndoRedoService,
   ) {}
 
-  private _skill: Skill = this.skillObjectFactory.createInterstitialSkill();
-  private _skillRights: SkillRights = (
-    SkillRights.createInterstitialSkillRights());
+  // The following two properties are initialized when the skill
+  // is loaded from the backend and we need to do non-null assertion,
+  // for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _skill!: Skill;
+  private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
@@ -65,7 +69,15 @@ export class SkillEditorStateService {
   private _skillChangedEventEmitter = new EventEmitter();
 
   private _setSkill = (skill: Skill) => {
-    this._skill.copyFromSkill(skill);
+    if (!this._skill) {
+      // The skill is set directly for the first load.
+      this._skill = skill;
+    } else {
+      // After first initialization, the skill object will be retained for
+      // the lifetime of the editor and on every data reload or update, the new
+      // contents will be copied into the same retained object.
+      this._skill.copyFromSkill(skill);
+    }
     this._skillIsInitialized = true;
     this._skillChangedEventEmitter.emit();
   };
@@ -107,7 +119,15 @@ export class SkillEditorStateService {
   };
 
   private _setSkillRights = (skillRights: SkillRights) => {
-    this._skillRights.copyFromSkillRights(skillRights);
+    if (!this._skillRights) {
+      // The skillRights is set directly for the first load.
+      this._skillRights = skillRights;
+    } else {
+      // After first initialization, the skill Rights object will be retained
+      // for the lifetime of the editor and on every data reload or update,
+      // the new contents will be copied into the same retained object.
+      this._skillRights.copyFromSkillRights(skillRights);
+    }
   };
 
   private _updateSkillRights = (newSkillRightsObject: SkillRights) => {
@@ -121,7 +141,8 @@ export class SkillEditorStateService {
    */
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
-    let skillDataPromise = this.skillBackendApiService.fetchSkill(skillId);
+    this.loaderService.showLoadingScreen('Loading Skill Editor');
+    let skillDataPromise = this.skillBackendApiService.fetchSkillAsync(skillId);
     let skillRightsPromise = (
       this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
     Promise.all([skillDataPromise, skillRightsPromise]).then(
@@ -136,6 +157,7 @@ export class SkillEditorStateService {
           skillId, true, false
         );
         this._skillIsBeingLoaded = false;
+        this.loaderService.hideLoadingScreen();
       }, (error) => {
         this.alertsService.addWarning(error);
         this._skillIsBeingLoaded = false;
@@ -195,7 +217,7 @@ export class SkillEditorStateService {
     }
     this._skillIsBeingSaved = true;
 
-    this.skillBackendApiService.updateSkill(
+    this.skillBackendApiService.updateSkillAsync(
       this._skill.getId(), this._skill.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList()).then(
       (skill) => {
@@ -211,6 +233,24 @@ export class SkillEditorStateService {
         this._skillIsBeingSaved = false;
       });
     return true;
+  }
+  /**
+   * Checks if the skill description exists and updates class
+   * variable. `create-new-skill-modal.controller` will search
+   * for that variable.
+   */
+  updateExistenceOfSkillDescription(
+      description: string, successCallback: (value?: Object) => void): void {
+    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+      description).then(
+      (skillDescriptionExists) => {
+        successCallback(skillDescriptionExists);
+      }, (error) => {
+        this.alertsService.addWarning(
+          error ||
+          'There was an error when checking if the skill description ' +
+          'exists for another skill.');
+      });
   }
 
   get onSkillChange(): EventEmitter<unknown> {

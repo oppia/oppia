@@ -16,18 +16,24 @@
 
 """Models for the content of sent emails."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+from typing import Dict, List, Optional, Sequence
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -88,7 +94,7 @@ class SentEmailModel(base_models.BaseModel):
     email_hash = datastore_services.StringProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: recipient_id,
         recipient_email, sender_id, and sender_email, but this isn't deleted
         because this model is needed for auditing purposes.
@@ -96,14 +102,15 @@ class SentEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since emails were sent
         to them.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because users already have access to noteworthy details of this data
         (since emails were sent to them).
@@ -121,7 +128,7 @@ class SentEmailModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether SentEmailModel exists for user.
 
         Args:
@@ -136,7 +143,7 @@ class SentEmailModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def _generate_id(cls, intent):
+    def _generate_id(cls, intent: str) -> str:
         """Generates an ID for a new SentEmailModel instance.
 
         Args:
@@ -168,8 +175,16 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, recipient_id, recipient_email, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
+            cls,
+            recipient_id: str,
+            recipient_email: str,
+            sender_id: str,
+            sender_email: str,
+            intent: str,
+            subject: str,
+            html_body: str,
+            sent_datetime: datetime.datetime
+    ) -> None:
         """Creates a new SentEmailModel entry.
 
         Args:
@@ -193,14 +208,18 @@ class SentEmailModel(base_models.BaseModel):
         email_model_instance.update_timestamps()
         email_model_instance.put()
 
-    def _pre_put_hook(self):
+    def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
         super(SentEmailModel, self)._pre_put_hook()
         self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
 
     @classmethod
-    def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
+    def get_by_hash(
+            cls,
+            email_hash: str,
+            sent_datetime_lower_bound: Optional[datetime.datetime] = None
+    ) -> Sequence['SentEmailModel']:
         """Returns all messages with a given email_hash.
 
         This also takes an optional sent_datetime_lower_bound argument,
@@ -235,12 +254,15 @@ class SentEmailModel(base_models.BaseModel):
         if sent_datetime_lower_bound is not None:
             query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
 
-        messages = query.fetch()
-
-        return messages
+        return query.fetch()
 
     @classmethod
-    def _generate_hash(cls, recipient_id, email_subject, email_body):
+    def _generate_hash(
+            cls,
+            recipient_id: str,
+            email_subject: str,
+            email_body: str
+    ) -> str:
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
 
@@ -259,7 +281,12 @@ class SentEmailModel(base_models.BaseModel):
         return hash_value
 
     @classmethod
-    def check_duplicate_message(cls, recipient_id, email_subject, email_body):
+    def check_duplicate_message(
+            cls,
+            recipient_id: str,
+            email_subject: str,
+            email_body: str
+    ) -> bool:
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
@@ -329,7 +356,7 @@ class BulkEmailModel(base_models.BaseModel):
         datastore_services.DateTimeProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: recipient_ids,
         sender_id, and sender_email, but this isn't deleted because this model
         is needed for auditing purposes.
@@ -337,14 +364,15 @@ class BulkEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since the emails were sent
         to them.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because users already have access to noteworthy details of this data
         (since emails were sent to them).
@@ -360,7 +388,7 @@ class BulkEmailModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether BulkEmailModel exists for user. Since recipient_ids
         can't be indexed it also can't be checked by this method, we can allow
         this because the deletion policy for this model is keep , thus even the
@@ -377,8 +405,16 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, instance_id, recipient_ids, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
+            cls,
+            instance_id: str,
+            recipient_ids: List[str],
+            sender_id: str,
+            sender_email: str,
+            intent: str,
+            subject: str,
+            html_body: str,
+            sent_datetime: datetime.datetime
+    ) -> None:
         """Creates a new BulkEmailModel entry.
 
         Args:
@@ -398,210 +434,3 @@ class BulkEmailModel(base_models.BaseModel):
             html_body=html_body, sent_datetime=sent_datetime)
         email_model_instance.update_timestamps()
         email_model_instance.put()
-
-
-REPLY_TO_ID_LENGTH = 84
-
-
-class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
-    """This model stores unique_id for each <user, thread>
-    combination.
-
-    This unique_id is used in reply-to email address in outgoing feedback and
-    suggestion emails. The id/key of instances of this model has form of
-    [user_id].[thread_id]
-    """
-
-    user_id = datastore_services.StringProperty(required=True, indexed=True)
-    thread_id = datastore_services.StringProperty(required=False, indexed=True)
-    # The reply-to ID that is used in the reply-to email address.
-    reply_to_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """Model contains data to delete corresponding to a user:
-        user_id field.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @staticmethod
-    def get_model_association_to_user():
-        """Model is exported as multiple instances per user since there can be
-        multiple GeneralFeedbackEmailReplyToIdModels per user.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id':
-                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
-            'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
-        })
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether GeneralFeedbackEmailReplyToIdModel exists for user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id):
-        """Delete instance of GeneralFeedbackEmailReplyToIdModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
-
-    @classmethod
-    def _generate_id(cls, user_id, thread_id):
-        """Returns the unique id corresponding to the given user and thread ids.
-
-        Args:
-            user_id: str. The user id.
-            thread_id: str. The thread id.
-
-        Returns:
-            str. The unique id used in the reply-to email address in outgoing
-            feedback and suggestion emails.
-        """
-        return '.'.join([user_id, thread_id])
-
-    @classmethod
-    def _generate_unique_reply_to_id(cls):
-        """Generates the unique reply-to id.
-
-        Raises:
-            Exception. When unique id generator produces too many collisions.
-
-        Returns:
-            str. The unique reply-to id if there are no collisions.
-        """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-            new_id = utils.convert_to_hash(
-                '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
-                REPLY_TO_ID_LENGTH)
-            if not cls.get_by_reply_to_id(new_id):
-                return new_id
-
-        raise Exception('Unique id generator is producing too many collisions.')
-
-    @classmethod
-    def create(cls, user_id, thread_id):
-        """Creates a new FeedbackEmailReplyToIdModel instance.
-
-        Args:
-            user_id: str. ID of the corresponding user.
-            thread_id: str. ID of the corresponding thread.
-
-        Returns:
-            FeedbackEmailReplyToIdModel. The created instance
-            with the unique reply_to_id generated.
-
-        Raises:
-            Exception. Model instance for given user_id and
-                thread_id already exists.
-        """
-
-        instance_id = cls._generate_id(user_id, thread_id)
-        if cls.get_by_id(instance_id):
-            raise Exception(
-                'Unique reply-to ID for given user and thread already exists.')
-
-        reply_to_id = cls._generate_unique_reply_to_id()
-        feedback_email_reply_model_instance = cls(
-            id=instance_id,
-            user_id=user_id,
-            thread_id=thread_id,
-            reply_to_id=reply_to_id)
-
-        feedback_email_reply_model_instance.update_timestamps()
-        feedback_email_reply_model_instance.put()
-        return feedback_email_reply_model_instance
-
-    @classmethod
-    def get_by_reply_to_id(cls, reply_to_id):
-        """Fetches the FeedbackEmailReplyToIdModel instance corresponding to the
-        given 'reply-to' id.
-
-        Args:
-            reply_to_id: str. The unique 'reply-to' id.
-
-        Returns:
-            FeedbackEmailReplyToIdModel or None. The instance corresponding to
-            the given 'reply_to_id' if it is present in the datastore,
-            else None.
-        """
-        model = cls.query(cls.reply_to_id == reply_to_id).get()
-        return model
-
-    @classmethod
-    def get(cls, user_id, thread_id, strict=True):
-        """Gets the FeedbackEmailReplyToIdModel instance corresponding to the
-        unique instance id.
-
-        Args:
-            user_id: str. The user id.
-            thread_id: str. The thread id.
-            strict: bool. Whether to fail noisily if no entry with the given
-                instance id exists in the datastore. Default is True.
-
-        Returns:
-            FeedbackEmailReplyToIdModel|None. An instance that corresponds to
-            the given instance id if it is present in the datastore.
-        """
-        instance_id = cls._generate_id(user_id, thread_id)
-        return super(
-            GeneralFeedbackEmailReplyToIdModel, cls).get(
-                instance_id, strict=strict)
-
-    @classmethod
-    def get_multi_by_user_ids(cls, user_ids, thread_id):
-        """Returns the FeedbackEmailReplyToIdModel instances corresponding to
-        the given user ids in dict format.
-
-        Args:
-            user_ids: list(str). A list of user ids.
-            thread_id: str. The thread id.
-
-        Returns:
-            dict. The FeedbackEmailReplyToIdModel instances corresponding to the
-            given list of user ids in dict format. The key is the unique user id
-            and the corresponding value is the list of
-            FeedbackEmailReplyToIdModel instances.
-        """
-        instance_ids = [cls._generate_id(user_id, thread_id)
-                        for user_id in user_ids]
-        retrieved_models = cls.get_multi(instance_ids)
-        return {
-            user_id: model for user_id, model in python_utils.ZIP(
-                user_ids, retrieved_models)}
-
-    @classmethod
-    def export_data(cls, user_id):
-        """(Takeout) Export FeedbackEmailReplyToIdModel's user data.
-
-        Args:
-            user_id: str. The user_id denotes which user's data to extract.
-
-        Returns:
-            dict. A dict whose keys are IDs of threads the user is involved in.
-            The corresponding value is the reply_to_id of that thread.
-        """
-        user_data = {}
-        email_reply_models = cls.get_all().filter(cls.user_id == user_id)
-        for model in email_reply_models:
-            user_data[model.thread_id] = {
-                'reply_to_id': model.reply_to_id
-            }
-        return user_data

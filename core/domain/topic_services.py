@@ -16,12 +16,15 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import logging
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import caching_services
 from core.domain import feedback_services
 from core.domain import opportunity_services
@@ -37,120 +40,9 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
-
-
-def get_all_topic_summaries():
-    """Returns the summaries of all topics present in the datastore.
-
-    Returns:
-        list(TopicSummary). The list of summaries of all topics present in the
-        datastore.
-    """
-    topic_summaries_models = topic_models.TopicSummaryModel.get_all()
-    topic_summaries = [
-        get_topic_summary_from_model(summary)
-        for summary in topic_summaries_models]
-    return topic_summaries
-
-
-def get_multi_topic_summaries(topic_ids):
-    """Returns the summaries of all topics whose topic ids are passed in.
-
-    Args:
-        topic_ids: list(str). The IDs of topics for which summaries are to be
-            returned.
-
-    Returns:
-        list(TopicSummary). The list of summaries of all given topics present in
-        the datastore.
-    """
-    topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
-    topic_summaries = [
-        get_topic_summary_from_model(summary) if summary else None
-        for summary in topic_summaries_models]
-    return topic_summaries
-
-
-def get_all_skill_ids_assigned_to_some_topic():
-    """Returns the ids of all the skills that are linked to some topics.
-
-    Returns:
-        set([str]). The ids of all the skills linked to some topic.
-    """
-    skill_ids = set([])
-    all_topic_models = topic_models.TopicModel.get_all()
-    all_topics = [
-        topic_fetchers.get_topic_from_model(topic)
-        for topic in all_topic_models]
-    for topic in all_topics:
-        skill_ids.update(topic.get_all_skill_ids())
-    return skill_ids
-
-
-def get_topic_summary_from_model(topic_summary_model):
-    """Returns a domain object for an Oppia topic summary given a
-    topic summary model.
-
-    Args:
-        topic_summary_model: TopicSummaryModel. The topic summary model object
-            to get the corresponding domain object.
-
-    Returns:
-        TopicSummary. The domain object corresponding to the given model object.
-    """
-    return topic_domain.TopicSummary(
-        topic_summary_model.id, topic_summary_model.name,
-        topic_summary_model.canonical_name,
-        topic_summary_model.language_code,
-        topic_summary_model.description,
-        topic_summary_model.version,
-        topic_summary_model.canonical_story_count,
-        topic_summary_model.additional_story_count,
-        topic_summary_model.uncategorized_skill_count,
-        topic_summary_model.subtopic_count,
-        topic_summary_model.total_skill_count,
-        topic_summary_model.thumbnail_filename,
-        topic_summary_model.thumbnail_bg_color,
-        topic_summary_model.url_fragment,
-        topic_summary_model.topic_model_created_on,
-        topic_summary_model.topic_model_last_updated
-    )
-
-
-def get_topic_summary_by_id(topic_id, strict=True):
-    """Returns a domain object representing a topic summary.
-
-    Args:
-        topic_id: str. ID of the topic summary.
-        strict: bool. Whether to fail noisily if no topic summary with the given
-            id exists in the datastore.
-
-    Returns:
-        TopicSummary or None. The topic summary domain object corresponding to
-        a topic with the given topic_id, if it exists, or else None.
-    """
-    topic_summary_model = topic_models.TopicSummaryModel.get(
-        topic_id, strict=strict)
-    if topic_summary_model:
-        topic_summary = get_topic_summary_from_model(topic_summary_model)
-        return topic_summary
-    else:
-        return None
-
-
-def get_new_topic_id():
-    """Returns a new topic id.
-
-    Returns:
-        str. A new topic id.
-    """
-    return topic_models.TopicModel.get_new_id('')
 
 
 def _create_topic(committer_id, topic, commit_message, commit_cmds):
@@ -180,6 +72,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         url_fragment=topic.url_fragment,
         thumbnail_bg_color=topic.thumbnail_bg_color,
         thumbnail_filename=topic.thumbnail_filename,
+        thumbnail_size_in_bytes=topic.thumbnail_size_in_bytes,
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
@@ -502,6 +395,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.url_fragment = topic.url_fragment
     topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
+    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
     topic_model.canonical_story_references = [
         reference.to_dict() for reference in topic.canonical_story_references
     ]
@@ -574,8 +468,7 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
 
-    for subtopic_page_id in updated_subtopic_pages_dict:
-        subtopic_page = updated_subtopic_pages_dict[subtopic_page_id]
+    for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
             subtopic_page_id]
         subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
@@ -664,7 +557,7 @@ def publish_story(topic_id, story_id, committer_id):
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the story.')
@@ -685,8 +578,11 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
-    opportunity_services.create_exploration_opportunities_for_story(
-        story_id, topic_id)
+    # Create exploration opportunities corresponding to the story and linked
+    # explorations.
+    linked_exp_ids = story.story_contents.get_all_linked_exp_ids()
+    opportunity_services.add_new_exploration_opportunities(
+        story_id, linked_exp_ids)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -702,7 +598,7 @@ def unpublish_story(topic_id, story_id, committer_id):
         Exception. The story is already unpublished.
         Exception. The user does not have enough rights to unpublish the story.
     """
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
@@ -865,6 +761,29 @@ def delete_topic_summary(topic_id):
     topic_models.TopicSummaryModel.get(topic_id).delete()
 
 
+def update_story_and_topic_summary(
+        committer_id, story_id, change_list, commit_message, topic_id):
+    """Updates a story. Commits changes. Then generates a new
+    topic summary.
+
+    Args:
+        committer_id: str. The id of the user who is performing the update
+            action.
+        story_id: str. The story id.
+        change_list: list(StoryChange). These changes are applied in sequence to
+            produce the resulting story.
+        commit_message: str or None. A description of changes made to the
+            story.
+        topic_id: str. The id of the topic to which the story is belongs.
+    """
+    story_services.update_story(
+        committer_id, story_id, change_list, commit_message)
+    # Generate new TopicSummary after a Story has been updated to
+    # make sure the TopicSummaryTile displays the correct number
+    # of chapters on the classroom page.
+    generate_topic_summary(topic_id)
+
+
 def generate_topic_summary(topic_id):
     """Creates and stores a summary of the given topic.
 
@@ -888,14 +807,19 @@ def compute_summary_of_topic(topic):
     """
     canonical_story_count = 0
     additional_story_count = 0
+    published_node_count = 0
     for reference in topic.canonical_story_references:
         if reference.story_is_published:
             canonical_story_count += 1
+            story_summary = story_fetchers.get_story_summary_by_id(
+                reference.story_id)
+            published_node_count += len(story_summary.node_titles)
     for reference in topic.additional_story_references:
         if reference.story_is_published:
             additional_story_count += 1
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
+    total_model_published_node_count = published_node_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
@@ -908,8 +832,9 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.thumbnail_filename, topic.thumbnail_bg_color,
-        topic.url_fragment, topic.created_on, topic.last_updated
+        total_skill_count, total_model_published_node_count,
+        topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
+        topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -934,6 +859,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
+        'total_published_node_count':
+            topic_summary.total_published_node_count,
         'thumbnail_filename': topic_summary.thumbnail_filename,
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
@@ -971,7 +898,7 @@ def publish_topic(topic_id, committer_id):
         raise Exception('The given topic does not exist')
     topic = topic_fetchers.get_topic_by_id(topic_id)
     topic.validate(strict=True)
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the topic.')
@@ -984,7 +911,6 @@ def publish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds)
-    opportunity_services.create_exploration_opportunities_for_topic(topic.id)
 
 
 def unpublish_topic(topic_id, committer_id):
@@ -1002,7 +928,7 @@ def unpublish_topic(topic_id, committer_id):
     topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the topic.')
@@ -1015,15 +941,6 @@ def unpublish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
-
-    # Delete the exploration opportunities associated with the topic and reject
-    # the corresponding translation suggestions.
-    exp_ids = (
-        opportunity_services
-        .get_exploration_opportunity_ids_corresponding_to_topic(topic_id)
-    )
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
@@ -1061,56 +978,6 @@ def create_new_topic_rights(topic_id, committer_id):
         manager_ids=topic_rights.manager_ids,
         topic_is_published=topic_rights.topic_is_published
     ).commit(committer_id, 'Created new topic rights', commit_cmds)
-
-
-def get_multi_topic_rights(topic_ids):
-    """Returns the rights of all topics whose topic ids are passed in.
-
-    Args:
-        topic_ids: list(str). The IDs of topics for which rights are to be
-            returned.
-
-    Returns:
-        list(TopicRights). The list of rights of all given topics present in
-        the datastore.
-    """
-    topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
-    topic_rights = [
-        topic_fetchers.get_topic_rights_from_model(rights) if rights else None
-        for rights in topic_rights_models]
-    return topic_rights
-
-
-def get_topic_rights_with_user(user_id):
-    """Retrieves the rights object for all topics assigned to given user.
-
-    Args:
-        user_id: str. ID of the user.
-
-    Returns:
-        list(TopicRights). The rights objects associated with the topics
-        assigned to given user.
-    """
-    topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
-    return [
-        topic_fetchers.get_topic_rights_from_model(model)
-        for model in topic_rights_models
-        if model is not None]
-
-
-def get_all_topic_rights():
-    """Returns the rights object of all topics present in the datastore.
-
-    Returns:
-        dict. The dict of rights objects of all topics present in the datastore
-        keyed by topic id.
-    """
-    topic_rights_models = topic_models.TopicRightsModel.get_all()
-    topic_rights = {}
-    for model in topic_rights_models:
-        rights = topic_fetchers.get_topic_rights_from_model(model)
-        topic_rights[rights.id] = rights
-    return topic_rights
 
 
 def filter_published_topic_ids(topic_ids):
@@ -1169,7 +1036,7 @@ def deassign_user_from_all_topics(committer, user_id):
     Raises:
         Exception. The committer does not have rights to modify a role.
     """
-    topic_rights_list = get_topic_rights_with_user(user_id)
+    topic_rights_list = topic_fetchers.get_topic_rights_with_user(user_id)
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
@@ -1179,6 +1046,32 @@ def deassign_user_from_all_topics(committer, user_id):
         save_topic_rights(
             topic_rights, committer.user_id,
             'Removed all assigned topics from %s' % (user_id), commit_cmds)
+
+
+def deassign_manager_role_from_topic(committer, user_id, topic_id):
+    """Deassigns given user from all topics assigned to them.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        user_id: str. The ID of the user.
+        topic_id: str. The ID of the topic.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+    """
+    topic_rights = topic_fetchers.get_topic_rights(topic_id)
+    if user_id not in topic_rights.manager_ids:
+        raise Exception('User does not have manager rights in topic.')
+
+    topic_rights.manager_ids.remove(user_id)
+    commit_cmds = [topic_domain.TopicRightsChange({
+        'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+        'removed_user_id': user_id
+    })]
+    save_topic_rights(
+        topic_rights, committer.user_id,
+        'Removed all assigned topics from %s' % (user_id), commit_cmds)
 
 
 def assign_role(committer, assignee, new_role, topic_id):
@@ -1201,7 +1094,7 @@ def assign_role(committer, assignee, new_role, topic_id):
     """
     committer_id = committer.user_id
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(
             'User %s tried to allow user %s to be a %s of topic %s '
@@ -1241,3 +1134,19 @@ def assign_role(committer, assignee, new_role, topic_id):
     })]
 
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)
+
+
+def get_story_titles_in_topic(topic):
+    """Returns titles of the stories present in the topic.
+
+    Args:
+        topic: Topic. The topic domain objects.
+
+    Returns:
+        list(str). The list of story titles in the topic.
+    """
+    canonical_story_references = topic.canonical_story_references
+    story_ids = [story.story_id for story in canonical_story_references]
+    stories = story_fetchers.get_stories_by_ids(story_ids)
+    story_titles = [story.title for story in stories if story is not None]
+    return story_titles

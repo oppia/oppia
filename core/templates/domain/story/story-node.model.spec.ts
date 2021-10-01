@@ -16,13 +16,13 @@
  * @fileoverview Tests for StoryNode model.
  */
 
-import { StoryNode } from 'domain/story/story-node.model';
+import { StoryNode, StoryNodeBackendDict } from 'domain/story/story-node.model';
 
 describe('Story node model', () => {
-  var _sampleStoryNode = null;
+  var _sampleStoryNode: StoryNode;
 
   beforeEach(() => {
-    var sampleStoryNodeBackendDict = {
+    var sampleStoryNodeBackendDict: StoryNodeBackendDict = {
       id: 'node_1',
       thumbnail_filename: 'image.png',
       title: 'Title 1',

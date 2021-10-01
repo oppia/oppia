@@ -18,25 +18,22 @@
 
 require(
   'rich_text_components/Collapsible/directives/' +
-  'oppia-noninteractive-collapsible.directive.ts');
+  'oppia-noninteractive-collapsible.component.ts');
 require(
   'rich_text_components/Image/directives/' +
-  'oppia-noninteractive-image.directive.ts');
+  'oppia-noninteractive-image.component.ts');
 require(
   'rich_text_components/Link/directives/' +
-  'oppia-noninteractive-link.directive.ts');
+  'oppia-noninteractive-link.component.ts');
 require(
   'rich_text_components/Math/directives/' +
-  'oppia-noninteractive-math.directive.ts');
+  'oppia-noninteractive-math.component.ts');
 require(
   'rich_text_components/Skillreview/directives/' +
-  'oppia-noninteractive-skillreview.directive.ts');
-require(
-  'rich_text_components/Svgdiagram/directives/' +
-  'oppia-noninteractive-svgdiagram.component.ts');
+  'oppia-noninteractive-skillreview.component.ts');
 require(
   'rich_text_components/Tabs/directives/' +
-  'oppia-noninteractive-tabs.directive.ts');
+  'oppia-noninteractive-tabs.component.ts');
 require(
   'rich_text_components/Video/directives/' +
-  'oppia-noninteractive-video.directive.ts');
+  'oppia-noninteractive-video.component.ts');

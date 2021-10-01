@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
@@ -37,7 +37,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
@@ -53,18 +53,24 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'FocusManagerService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
         'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
+        'MAX_CHARS_IN_STORY_DESCRIPTION',
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
+            FocusManagerService,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,
             WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
+            MAX_CHARS_IN_STORY_DESCRIPTION,
             MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          $scope.MAX_CHARS_IN_STORY_DESCRIPTION = (
+            MAX_CHARS_IN_STORY_DESCRIPTION);
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
             MAX_CHARS_IN_STORY_URL_FRAGMENT);
@@ -107,6 +113,7 @@ angular.module('oppia').directive('storyEditor', [
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
             $scope.storyUrlFragmentExists = false;
+            $scope.$applyAsync();
           };
 
           $scope.setNodeToEdit = function(nodeId) {
@@ -132,6 +139,19 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.rearrangeNodeInStory = function(toIndex) {
+            if ($scope.dragStartIndex === toIndex) {
+              return;
+            }
+            if ($scope.dragStartIndex === 0) {
+              StoryUpdateService.setInitialNodeId(
+                $scope.story, $scope.story.getStoryContents().getNodes()[
+                  toIndex].getId());
+            }
+            if (toIndex === 0) {
+              StoryUpdateService.setInitialNodeId(
+                $scope.story, $scope.story.getStoryContents().getNodes()[
+                  $scope.dragStartIndex].getId());
+            }
             StoryUpdateService.rearrangeNodeInStory(
               $scope.story, $scope.dragStartIndex, toIndex);
             _initEditor();
@@ -289,6 +309,7 @@ angular.module('oppia').directive('storyEditor', [
               StoryUpdateService.setThumbnailFilename(
                 $scope.story, newThumbnailFilename);
             }
+            $scope.$applyAsync();
           };
 
           $scope.updateStoryThumbnailBgColor = function(
@@ -346,7 +367,10 @@ angular.module('oppia').directive('storyEditor', [
 
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
-                () => _init()
+                () =>{
+                  _init();
+                  FocusManagerService.setFocus('metaTagInputField');
+                }
               ));
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryReinitialized.subscribe(

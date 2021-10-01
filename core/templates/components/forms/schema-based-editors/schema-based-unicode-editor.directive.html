@@ -1,29 +1,38 @@
 <span>
   <textarea ng-if="!$ctrl.getCodingMode() && $ctrl.getRows()"
+            class="form-control"
             ng-model="$ctrl.localValue"
-            rows="<[$ctrl.getRows()]>"
-            placeholder="<[$ctrl.getPlaceholder()]>"
             ng-disabled="$ctrl.isDisabled()"
-            class="form-control" focus-on="<[$ctrl.labelForFocusTarget()]>"
             ng-blur="$ctrl.onInputBlur()"
-            ng-focus="$ctrl.onInputFocus()">
+            ng-focus="$ctrl.onInputFocus()"
+            focus-on="<[$ctrl.labelForFocusTarget()]>"
+            placeholder="<[$ctrl.getPlaceholder()]>"
+            apply-validation validators="$ctrl.validators()"
+            ng-keypress="$ctrl.onKeypress($event)"
+            rows="<[$ctrl.getRows()]>">
   </textarea>
 
   <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
-    <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control display-inline"
-           ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
-           ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
-           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
+    <input type="text"
+           class="form-control display-inline"
+           ng-model="$ctrl.localValue"
+           ng-disabled="$ctrl.isDisabled()"
+           ng-blur="$ctrl.onInputBlur()"
+           ng-focus="$ctrl.onInputFocus()"
+           focus-on="<[$ctrl.labelForFocusTarget()]>"
+           placeholder="<[$ctrl.getPlaceholder()]>"
+           apply-validation validators="$ctrl.validators()"
+           ng-keypress="$ctrl.onKeypress($event)"
            aria-label="text input">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
   <div ng-if="$ctrl.getCodingMode()" class="oppia-coding-editor">
-    <div ui-codemirror
-         ng-model="$ctrl.localValue"
-         ui-codemirror-opts="$ctrl.codemirrorOptions"
-         ui-refresh="$ctrl.codemirrorStatus">
-    </div>
+    <oppia-codemirror [value]="$ctrl.localValue"
+                      [options]="$ctrl.codemirrorOptions"
+                      [refresh]="$ctrl.codemirrorStatus"
+                      (value-change)="$ctrl.updateLocalValue($event)">
+    </oppia-codemirror>
   </div>
 </span>
 <style>

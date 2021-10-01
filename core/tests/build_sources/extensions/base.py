@@ -34,21 +34,21 @@ dicts, each representing a customization arg -- viz.:
     }]
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import json
 import os
 import sys
 
-from core.domain import obj_services
+from core import feconf
+from core import python_utils
+from core import utils
+from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
-import feconf
-import python_utils
-import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
@@ -166,7 +166,7 @@ class BaseInteraction(python_utils.OBJECT):
         if self.answer_type is None:
             return None
         else:
-            return obj_services.Registry.get_object_class_by_type(
+            return object_registry.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
 
     @property

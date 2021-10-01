@@ -33,14 +33,14 @@ angular.module('oppia').component('stateTranslationEditor', {
     'ExplorationStatesService', 'ExternalSaveService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
-    'TranslationTabActiveContentIdService', 'UrlInterpolationService',
+    'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
     function(
         $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
-        TranslationTabActiveContentIdService, UrlInterpolationService,
+        TranslationTabActiveContentIdService,
         WrittenTranslationObjectFactory) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -58,10 +58,10 @@ angular.module('oppia').component('stateTranslationEditor', {
             return;
           }
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/' +
+            template: require(
+              'components/forms/forms-templates/' +
               'mark-audio-as-needing-update-modal.directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
             recordedVoiceovers.toggleNeedsUpdateAttribute(
@@ -132,8 +132,9 @@ angular.module('oppia').component('stateTranslationEditor', {
           var stateName = StateEditorService.getActiveStateName();
           showMarkAudioAsNeedingUpdateModalIfRequired(
             contentId, languageCode);
-          ExplorationStatesService.saveWrittenTranslations(
-            stateName, StateWrittenTranslationsService.displayed);
+          ExplorationStatesService.saveWrittenTranslation(
+            contentId, newWrittenTranslation.dataFormat, languageCode,
+            stateName, newWrittenTranslation.translation);
           StateWrittenTranslationsService.saveDisplayedValue();
           TranslationStatusService.refresh();
         }
@@ -145,8 +146,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
-              WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+              WrittenTranslationObjectFactory.createNew($scope.dataFormat));
           }
         }
       };
@@ -173,12 +173,23 @@ angular.module('oppia').component('stateTranslationEditor', {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
       };
+
       ctrl.$onInit = function() {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
 
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
+        };
+
+        $scope.SET_OF_STRINGS_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          validators: [{
+            id: 'is_uniquified'
+          }]
         };
 
         ctrl.directiveSubscriptions.add(
@@ -203,6 +214,18 @@ angular.module('oppia').component('stateTranslationEditor', {
             }
           }));
       };
+
+      $scope.markAsNeedingUpdate = function() {
+        let contentId = (
+          TranslationTabActiveContentIdService.getActiveContentId());
+        let stateName = StateEditorService.getActiveStateName();
+        let languageCode = TranslationLanguageService.getActiveLanguageCode();
+        $scope.activeWrittenTranslation.needsUpdate = true;
+        ExplorationStatesService.markWrittenTranslationAsNeedingUpdate(
+          contentId, languageCode, stateName);
+        TranslationStatusService.refresh();
+      };
+
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
       };

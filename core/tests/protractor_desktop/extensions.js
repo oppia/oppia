@@ -46,13 +46,13 @@ describe('rich-text components', function() {
     await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
 
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText(' ');
       // TODO(Jacob): Add test for image RTE component.
-      await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
+      await richTextEditor.addRteComponent('Link', 'https://google.com/', true);
       await richTextEditor.addRteComponent(
         'Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
@@ -69,13 +69,12 @@ describe('rich-text components', function() {
     });
 
     await explorationEditorPage.navigateToPreviewTab();
-
     await explorationPlayerPage.expectContentToMatch(
       async function(richTextChecker) {
         await richTextChecker.readBoldText('bold');
         await richTextChecker.readPlainText(' ');
         await richTextChecker.readRteComponent(
-          'Link', 'http://google.com/', true);
+          'Link', 'https://google.com/', true);
         await richTextChecker.readRteComponent(
           'Video', 'M7lc1UVf-VE', 10, 100, false);
         await richTextChecker.readRteComponent(
@@ -102,6 +101,11 @@ describe('rich-text components', function() {
       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
+      // Triple backslashes are needed because backslashes are escape characters
+      // in both regexes and strings: https://stackoverflow.com/a/5514380
+      'The target origin provided \\\(\'https://www\.youtube\.com\'\\\) does ' +
+      'not match the recipient window\'s ' +
+      'origin \\\(\'http://localhost:9001\'\\\).',
     ]);
   });
 });
@@ -125,17 +129,17 @@ describe('Interactions', function() {
   it('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
+    await explorationEditorPage.saveChanges();
 
     var defaultOutcomeSet = false;
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
-
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
@@ -201,8 +205,11 @@ describe('Interactions', function() {
         await explorationEditorPage.navigateToMainTab();
         await explorationEditorMainTab.deleteInteraction();
       }
+      if (interaction.testSuite.length > 0) {
+        await explorationEditorPage.discardChanges();
+        defaultOutcomeSet = false;
+      }
     }
-    await explorationEditorPage.discardChanges();
     await users.logout();
   });
 
@@ -212,7 +219,7 @@ describe('Interactions', function() {
      */
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));
@@ -245,7 +252,7 @@ describe('Interactions', function() {
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
       'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
-      true, 'IsEquivalentTo', '(16(x^12))/4x^2');
+      true, 'IsEquivalentTo', '(16(x^12))/(4x^2)');
     // Expecting answer to be 4x^10.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');

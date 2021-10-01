@@ -16,12 +16,14 @@
 
 """Unit tests for core.domain.opportunity_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_domain
@@ -39,11 +41,13 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(
+    feedback_models, opportunity_models, story_models, suggestion_models
+) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.story,
+    models.NAMES.suggestion
+])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
@@ -52,24 +56,25 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     suggestion_target_id = '0'
     suggestion_target_version_at_submission = 1
     suggestion_change = {
-        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'End State',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '',
-        'translation_html': '<p>This is translated html.</p>'
+        'translation_html': '<p>This is translated html.</p>',
+        'data_format': 'html'
     }
 
     def setUp(self):
         super(OpportunityServicesIntegrationTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -100,7 +105,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         subtopic_page = (
@@ -179,6 +184,38 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = translation_opportunities[0]
         self.assertEqual(opportunity.topic_name, 'topic')
         self.assertEqual(opportunity.story_title, 'A story')
+
+    def test_get_translation_opportunities_with_translations_in_review(
+        self):
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        self.add_exploration_0_to_story()
+        self.create_translation_suggestion_for_exploration_0_and_verify()
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+        opportunity = translation_opportunities[0]
+        languages_of_translations_in_review = (
+            opportunity.translation_in_review_counts.keys())
+        self.assertEqual(len(languages_of_translations_in_review), 1)
+
+    def test_get_translation_opportunities_with_no_translations_in_review(self):
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        self.add_exploration_0_to_story()
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+        opportunity = translation_opportunities[0]
+        languages_of_translations_in_review = (
+            opportunity.translation_in_review_counts.keys())
+        self.assertEqual(len(languages_of_translations_in_review), 0)
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
             self):
@@ -405,7 +442,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 5)
+        self.assertEqual(translation_opportunities[0].content_count, 6)
 
     def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
             self):
@@ -436,12 +473,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }
             }),
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>'
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html'
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -453,12 +491,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }
             }),
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'End State',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>'
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html'
             }),
         ]
         exp_services.update_exploration(
@@ -469,6 +508,21 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
+
+        # The translation opportunity should be returned after marking a
+        # translation as stale.
+        translation_needs_update_change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, '0', translation_needs_update_change_list,
+            'commit message')
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
         skill_opportunities, _, _ = (
@@ -574,7 +628,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-    def test_publish_story_does_not_create_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
+    def test_publish_story_creates_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
             self):
         self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
@@ -590,38 +644,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-    def test_publish_topic_creates_exploration_opportunity(self):
-        self.add_exploration_0_to_story()
-        # Topic is already published, so unpublish first.
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-
-    def test_publish_topic_does_not_create_exploration_opportunity_if_story_is_not_published( # pylint: disable=line-too-long
-            self):
-        self.add_exploration_0_to_story()
-        # Story and topic are already published, so unpublish first.
-        topic_services.unpublish_story(
-            self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
 
     def test_unpublish_story_deletes_exploration_opportunity(self):
         self.add_exploration_0_to_story()
@@ -642,27 +665,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-
-        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
-        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
-
-    def test_unpublish_topic_deletes_exploration_opportunity(self):
-        self.add_exploration_0_to_story()
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 1)
-
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-    def test_unpublish_topic_rejects_translation_suggestions(self):
-        self.add_exploration_0_to_story()
-        self.create_translation_suggestion_for_exploration_0_and_verify()
-
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
@@ -750,12 +752,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     def setUp(self):
         super(OpportunityServicesUnitTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -778,7 +780,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -871,5 +873,51 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
                 observed_log_messages[0],
-                'Missing language codes [u\'new_lang\'] in exploration '
-                'opportunity model with id 0')
+                'Missing language codes [\'new_lang\'] in exploration '
+                'opportunity model with id 0'
+            )
+
+    def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
+            self):
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_1',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_2',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+
+        opportunity_services.delete_exp_opportunities_corresponding_to_story(
+            'story_id'
+        )
+
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'exp_1', strict=False
+            )
+        )
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'exp_2', strict=False
+            )
+        )
+
+    def test_regenerate_opportunities_related_to_topic_when_story_deleted(self):
+        story_models.StoryModel.delete_by_id(self.STORY_ID)
+
+        self.assertRaisesRegexp(
+            Exception, 'Failed to regenerate opportunities',
+            lambda: (
+                opportunity_services.regenerate_opportunities_related_to_topic(
+                    self.TOPIC_ID)))

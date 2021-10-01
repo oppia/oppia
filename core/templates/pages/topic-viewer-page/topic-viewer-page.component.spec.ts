@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { TopicViewerPageComponent } from
@@ -28,13 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { PageTitleService } from 'services/page-title.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Topic viewer page', () => {
   let httpTestingController = null;
@@ -58,7 +52,7 @@ describe('Topic viewer page', () => {
       thumbnail_bg_color: '',
       description: 'Story Description',
       story_is_published: true,
-      pending_node_dicts: []
+      all_node_dicts: []
     }],
     additional_story_dicts: [],
     uncategorized_skill_ids: [],
@@ -95,7 +89,7 @@ describe('Topic viewer page', () => {
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
 
-    spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
 
     topicViewerPageComponent.ngOnInit();
@@ -109,7 +103,7 @@ describe('Topic viewer page', () => {
 
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       `Learn ${topicName} | Topic page title | Oppia`);
     expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
       'Topic Meta Tag');

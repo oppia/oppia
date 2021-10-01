@@ -17,12 +17,12 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { PageTitleService } from 'services/page-title.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Review test page component', function() {
   var ctrl = null;
@@ -33,11 +33,9 @@ describe('Review test page component', function() {
   var reviewTestEngineService = null;
   var urlService = null;
 
-  beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+  importAllAngularServices();
 
+  beforeEach(function() {
     pageTitleService = TestBed.get(PageTitleService);
     reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
     reviewTestEngineService = TestBed.get(ReviewTestEngineService);

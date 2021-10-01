@@ -18,8 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('TrainingDataEditorPanelServiceModalController', function() {
   importAllAngularServices();
@@ -33,7 +36,22 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   var StateCustomizationArgsService = null;
   var TrainingModalService = null;
   var AlertsService = null;
-  var SubtitledHtmlObjectFactory = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -48,9 +66,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         return 'Hola';
       }
     });
-    $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
-    });
   }));
 
   describe('when answer group has rules', function() {
@@ -63,7 +78,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'StateCustomizationArgsService');
       TrainingModalService = $injector.get('TrainingModalService');
       AlertsService = $injector.get('AlertsService');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
       ExplorationStatesService.init({
         Hola: {
@@ -180,9 +194,9 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         expect($scope.stateContent).toBe('This is Hola State');
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
         expect($scope.inputTemplate).toBe(
-          '<oppia-interactive-text-input last-answer="null"' +
-          ' label-for-focus-target="testInteractionInput">' +
-          '</oppia-interactive-text-input>');
+          '<oppia-interactive-text-input ' +
+          'label-for-focus-target="testInteractionInput" [last-answer]="null"' +
+          '></oppia-interactive-text-input>');
       });
 
     it('should call init when controller is initialized', function() {
@@ -215,7 +229,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         '<oppia-response-text-input answer="&amp;quot;Answer2&' +
         'amp;quot;"></oppia-response-text-input>');
       expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtmlObjectFactory.createDefault('', 'feedback_1'));
+        SubtitledHtml.createDefault('', 'feedback_1'));
       expect($scope.newAnswerOutcomeDest).toBe('(try again)');
       expect($scope.newAnswerIsAlreadyResolved).toBe(true);
     });
@@ -229,7 +243,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         '<oppia-response-text-input answer="&amp;quot;Answer1&' +
         'amp;quot;"></oppia-response-text-input>');
       expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtmlObjectFactory.createDefault('', 'feedback_1'));
+        SubtitledHtml.createDefault('', 'feedback_1'));
       expect($scope.newAnswerOutcomeDest).toBe('(try again)');
       expect($scope.newAnswerIsAlreadyResolved).toBe(false);
       expect(addSuccessMessageSpy).toHaveBeenCalledWith(
@@ -267,7 +281,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'StateCustomizationArgsService');
       TrainingModalService = $injector.get('TrainingModalService');
       AlertsService = $injector.get('AlertsService');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
       ExplorationStatesService.init({
         Hola: {
@@ -397,7 +410,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'StateCustomizationArgsService');
       TrainingModalService = $injector.get('TrainingModalService');
       AlertsService = $injector.get('AlertsService');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
       ExplorationStatesService.init({
         Hola: {

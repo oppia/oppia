@@ -23,7 +23,7 @@ import { StateNameService } from
 
 
 describe('State name service', () => {
-  let sns: StateNameService = null;
+  let sns: StateNameService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
