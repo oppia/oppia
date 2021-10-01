@@ -35,8 +35,7 @@ describe('Missing Translations Custom Handler', () => {
     () => {
       let key = 'KEY_NOT_AVAILABLE_IN_APP_CONSTANTS';
       expect(mth.handle({
-        key,
-        translateService: {} as TranslateService
+        key, translateService: {} as TranslateService
       })).toEqual(key);
     });
 });

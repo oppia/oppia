@@ -166,8 +166,9 @@ export class CkEditorInitializerService {
               downcast: function(element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
-                (element.children[0] as CKEDITOR.htmlParser.element).
-                  setHtml('');
+                (
+                  element.children[0] as CKEDITOR.htmlParser.element
+                ).setHtml('');
                 // Return just the rich text component, without its wrapper.
                 return element.children[0];
               },

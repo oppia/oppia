@@ -119,7 +119,8 @@ export class ExpressionEvaluatorService {
       const funcName = parsed[0] as string;
       const funcArgs = parsed.slice(1).map(item => this.evaluate(item, envs));
       const funcEnvs = this.expressionSyntaxTreeService.lookupEnvs(
-        funcName, envs) as SystemEnv;
+        funcName, envs
+      ) as SystemEnv;
       return funcEnvs.eval(funcArgs as string[]);
     }
 

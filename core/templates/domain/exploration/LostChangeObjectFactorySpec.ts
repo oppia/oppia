@@ -72,7 +72,8 @@ describe('Lost Change Object Factory', () => {
 
     expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
     expect(lostChange.getStatePropertyValue(
-      lostChange.oldValue as string[] | Object)).toEqual({
+      lostChange.oldValue as string[] | Object)
+    ).toEqual({
       html: 'oldValue',
       content_id: ''
     });

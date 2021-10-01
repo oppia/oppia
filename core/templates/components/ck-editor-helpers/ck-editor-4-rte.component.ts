@@ -310,10 +310,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     // Initialize CKEditor.
     var ck = CKEDITOR.inline(
-            (
+              (
               this.elementRef.nativeElement.children[0].children[1]
               ) as HTMLElement,
-            ckConfig
+              ckConfig
     );
 
     // Hide the editor until it is fully loaded after `instanceReady`

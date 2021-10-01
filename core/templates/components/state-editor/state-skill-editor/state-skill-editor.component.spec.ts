@@ -175,7 +175,8 @@ describe('State Skill Editor Component', () => {
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
-        }) as NgbModalRef;
+        }
+      ) as NgbModalRef;
     });
     componentInstance.addSkill();
     fixture.detectChanges();
@@ -196,7 +197,8 @@ describe('State Skill Editor Component', () => {
       return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
-        }) as NgbModalRef;
+        }
+      ) as NgbModalRef;
     });
     componentInstance.deleteSkill();
     fixture.detectChanges();

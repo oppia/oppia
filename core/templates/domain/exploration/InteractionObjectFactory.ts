@@ -397,7 +397,7 @@ export class InteractionObjectFactory {
     switch (interactionId) {
       case 'AlgebraicExpressionInput':
         return (
-        cloneDeep(caBackendDict)) as AlgebraicExpressionInputCustomizationArgs;
+        cloneDeep(caBackendDict) as AlgebraicExpressionInputCustomizationArgs);
       case 'CodeRepl':
         return cloneDeep(caBackendDict) as CodeReplCustomizationArgs;
       case 'Continue':
@@ -407,7 +407,7 @@ export class InteractionObjectFactory {
         return this._createFromDragAndDropSortInputCustomizationArgsBackendDict(
           caBackendDict as DragAndDropSortInputCustomizationArgsBackendDict);
       case 'EndExploration':
-        return cloneDeep(caBackendDict) as EndExplorationCustomizationArgs;
+        return cloneDeep(caBackendDict as EndExplorationCustomizationArgs);
       case 'FractionInput':
         return this._createFromFractionInputCustomizationArgsBackendDict(
           caBackendDict as FractionInputCustomizationArgsBackendDict);
@@ -417,7 +417,7 @@ export class InteractionObjectFactory {
       case 'ImageClickInput':
         return cloneDeep(caBackendDict as ImageClickInputCustomizationArgs);
       case 'InteractiveMap':
-        return cloneDeep(caBackendDict) as InteractiveMapCustomizationArgs;
+        return cloneDeep(caBackendDict as InteractiveMapCustomizationArgs);
       case 'ItemSelectionInput':
         return this._createFromItemSelectionInputCustomizationArgsBackendDict(
           caBackendDict as ItemSelectionInputCustomizationArgsBackendDict);
@@ -429,7 +429,7 @@ export class InteractionObjectFactory {
       case 'MusicNotesInput':
         return cloneDeep(caBackendDict as MusicNotesInputCustomizationArgs);
       case 'NumberWithUnits':
-        return cloneDeep(caBackendDict) as NumberWithUnitsCustomizationArgs;
+        return cloneDeep(caBackendDict as NumberWithUnitsCustomizationArgs);
       case 'NumericExpressionInput':
         return (
           this._createFromNumericExpressionInputCustomizationArgsBackendDict(

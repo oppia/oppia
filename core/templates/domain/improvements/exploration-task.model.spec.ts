@@ -48,8 +48,10 @@ describe('Exploration task model', () => {
   it('should return a high bounce rate task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        newTaskEntryBackendDict('high_bounce_rate') as
-         ExplorationTaskBackendDict)
+        newTaskEntryBackendDict(
+          'high_bounce_rate'
+        ) as ExplorationTaskBackendDict
+      )
     ).toBeInstanceOf(HighBounceRateTask);
   });
 

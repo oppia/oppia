@@ -675,8 +675,8 @@ describe('Interaction object factory', () => {
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
     const args = (
-      otherInteraction.customizationArgs) as
-       MultipleChoiceInputCustomizationArgs;
+      otherInteraction.customizationArgs
+      ) as MultipleChoiceInputCustomizationArgs;
     args.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
@@ -797,7 +797,8 @@ describe('Interaction object factory', () => {
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
     const keys = Object.keys(
-      InteractionSpecsConstants.INTERACTION_SPECS) as InteractionSpecsKey[];
+      InteractionSpecsConstants.INTERACTION_SPECS
+    ) as InteractionSpecsKey[];
     keys.forEach(interactionId => {
       expect(() => {
         const defaultCa: Record<string, Object> = {};

@@ -256,7 +256,7 @@ export class FractionInputValidationService {
                   ' is invalid as integer part should be zero')
               });
             }
-            if ((rule.inputs.f as FractionAnswer).isNegative !== false) {
+            if ((rule.inputs.f as FractionAnswer).isNegative) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (

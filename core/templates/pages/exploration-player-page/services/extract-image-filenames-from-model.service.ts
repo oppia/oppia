@@ -267,9 +267,8 @@ export class ExtractImageFilenamesFromModelService {
       // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         let filename = ((
-          state.interaction
-            .customizationArgs as ImageClickInputCustomizationArgs).
-          imageAndRegions.value.imagePath);
+        state.interaction.customizationArgs as ImageClickInputCustomizationArgs
+        ).imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);

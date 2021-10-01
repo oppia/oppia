@@ -155,8 +155,9 @@ export class LostChange {
   }
 
   isDestEqual(): boolean {
-    return (this.oldValue as LostChangeValues).dest ===
-      (this.newValue as LostChangeValues).dest;
+    let newValueDest = (this.newValue as LostChangeValues).dest;
+    let oldValueDest = (this.oldValue as LostChangeValues).dest;
+    return newValueDest === oldValueDest;
   }
 
   isFeedbackEqual(): boolean {

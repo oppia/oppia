@@ -191,7 +191,10 @@ describe('Content translation manager service', () => {
         '<p>en content</p>',
         ehfs.getInteractionHtml(
           interaction.id as string,
-          interaction.customizationArgs, true, '', null
+          interaction.customizationArgs,
+          true,
+          '',
+          null
         ),
         interaction,
         RecordedVoiceovers.createEmpty(),
@@ -464,7 +467,9 @@ describe('Content translation manager service', () => {
         '<p>en content</p>',
         ehfs.getInteractionHtml(
           newInteraction.id as string
-          , newInteraction.customizationArgs, true, '',
+          , newInteraction.customizationArgs,
+          true,
+          '',
           null),
         newInteraction,
         RecordedVoiceovers.createEmpty(),
