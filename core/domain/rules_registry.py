@@ -24,7 +24,6 @@ import os
 
 from core import feconf
 from core import python_utils
-from core import utils
 
 
 class Registry(python_utils.OBJECT):
@@ -58,7 +57,8 @@ class Registry(python_utils.OBJECT):
         if not cached and state_schema_version is None:
             cls._state_schema_version_to_html_field_types_to_rule_specs[
                 state_schema_version] = json.loads(
-                    utils.get_file_contents(
+                    python_utils.get_package_file_contents(
+                        'extensions',
                         feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH)
                 )
         elif not cached:
@@ -69,8 +69,9 @@ class Registry(python_utils.OBJECT):
                 file_name)
 
             try:
-                with python_utils.open_file(spec_file, 'r') as f:
-                    specs_from_json = json.loads(f.read())
+                specs_from_json = json.loads(
+                    python_utils.get_package_file_contents(
+                        'extensions', spec_file))
             except:
                 raise Exception(
                     'No specs json file found for state schema v%i' %

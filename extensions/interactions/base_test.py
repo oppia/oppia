@@ -287,8 +287,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # The file having the information about the assembly of the html in the
         # rule specs.
         html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+            python_utils.get_package_file_contents(
+                'extensions', feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
 
         # The file having the templates for the structure of the rule specs.
         # Contents of the file html_field_types_to_rule_specs.json will be
