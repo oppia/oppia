@@ -25,9 +25,8 @@ import subprocess
 import sys
 import tarfile
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import clean
 from . import common

@@ -22,11 +22,10 @@ from __future__ import unicode_literals
 import datetime  # pylint: disable=unused-import
 import os
 
+from core import feconf
 from core.platform.taskqueue import cloud_tasks_emulator
-import feconf
 
 import requests
-
 from typing import Any, Dict, Optional
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'

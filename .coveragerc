@@ -8,6 +8,6 @@ omit =
     *core/tests/*
     *scripts/linters/test_files/*
     *__init__.py
-    # TODO(#7419): Remove python_utils from the list once the codebase is
+    # TODO(#13935): Remove python_utils from the list once the codebase is
     # run under Python 3.
-    python_utils.py
+    core/python_utils.py

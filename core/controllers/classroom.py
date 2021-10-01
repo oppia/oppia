@@ -17,13 +17,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import topic_fetchers
-import feconf
 
 
 class ClassroomDataHandler(base.BaseHandler):

@@ -24,9 +24,9 @@ import json
 import os
 import pkgutil
 
-from constants import constants
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
+from core.constants import constants
 
 
 class Registry(python_utils.OBJECT):

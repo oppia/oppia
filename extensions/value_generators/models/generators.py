@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import utils
 from core.domain import value_generators_domain
-import utils
 
 
 class Copier(value_generators_domain.BaseValueGenerator):

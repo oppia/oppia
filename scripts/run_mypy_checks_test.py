@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import os
 import subprocess
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import install_third_party_libs
 from scripts import run_mypy_checks
 

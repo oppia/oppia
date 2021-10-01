@@ -17,9 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.domain import user_services
-import python_utils
-import utils
 
 
 class FeedbackThread(python_utils.OBJECT):

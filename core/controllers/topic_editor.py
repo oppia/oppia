@@ -21,7 +21,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -40,8 +42,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-import feconf
-import utils
 
 
 class TopicEditorStoryHandler(base.BaseHandler):

@@ -29,7 +29,6 @@ from . import python_linter
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
-PYTHON_UTILS_FILEPATH = os.path.join(os.getcwd(), 'python_utils.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
 INVALID_PYCODESTYLE_FILEPATH = os.path.join(

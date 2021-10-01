@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import json
 import os
 
-import feconf
-import python_utils
-import utils
+from core import feconf
+from core import python_utils
+from core import utils
 
 
 class Registry(python_utils.OBJECT):

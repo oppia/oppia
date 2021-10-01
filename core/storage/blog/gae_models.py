@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.platform import models
-import python_utils
-import utils
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])

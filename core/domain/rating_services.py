@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
 from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
-import feconf
-import python_utils
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])

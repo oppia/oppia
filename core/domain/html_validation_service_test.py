@@ -22,11 +22,11 @@ from __future__ import unicode_literals
 import os
 import re
 
+from core import feconf
+from core import python_utils
 from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
-import feconf
-import python_utils
 
 import bs4
 

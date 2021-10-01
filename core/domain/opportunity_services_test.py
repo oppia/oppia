@@ -21,7 +21,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_domain
@@ -39,8 +41,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     feedback_models, opportunity_models, story_models, suggestion_models

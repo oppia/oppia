@@ -17,9 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.platform import models
-import python_utils
-import utils
 
 USER_DELETION_SUCCESS = 'SUCCESS'
 USER_DELETION_ALREADY_DONE = 'ALREADY DONE'

@@ -24,7 +24,11 @@ import copy
 import datetime
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -35,10 +39,6 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 from pylatexenc import latex2text
 

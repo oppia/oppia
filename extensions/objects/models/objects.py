@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import copy
 import json
 
-from constants import constants
-import python_utils
-import schema_utils
+from core import python_utils
+from core import schema_utils
+from core.constants import constants
 
 
 class BaseObject(python_utils.OBJECT):

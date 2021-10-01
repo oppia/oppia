@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.domain import user_services
 from core.platform import models
-import python_utils
-import utils
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))

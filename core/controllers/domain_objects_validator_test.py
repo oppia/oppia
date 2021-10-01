@@ -17,10 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 from core.controllers import domain_objects_validator
 from core.tests import test_utils
-
-import utils
 
 
 class ValidateExplorationChangeTests(test_utils.GenericTestBase):

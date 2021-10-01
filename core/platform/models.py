@@ -20,10 +20,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
-from types import ModuleType # pylint: disable=import-only-modules
-from constants import constants
-import feconf
-import python_utils
+from types import ModuleType  # pylint: disable=import-only-modules
+
+from core import feconf
+from core import python_utils
+from core.constants import constants
 
 from typing import List, Tuple, Type
 

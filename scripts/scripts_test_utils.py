@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import io
 import signal
 
-import python_utils
+from core import python_utils
 
 import psutil
 

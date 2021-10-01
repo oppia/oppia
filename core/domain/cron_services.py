@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
 from core.platform import models
-import feconf
 
 (base_models, job_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job, models.NAMES.user])

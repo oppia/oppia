@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 from core.domain import wipeout_domain
 from core.tests import test_utils
-import utils
 
 
 class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):

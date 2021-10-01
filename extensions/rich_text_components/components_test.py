@@ -23,9 +23,9 @@ import inspect
 import os
 import re
 
+from core import python_utils
 from core.tests import test_utils
 from extensions.rich_text_components import components
-import python_utils
 
 
 class ComponentValidationUnitTests(test_utils.GenericTestBase):

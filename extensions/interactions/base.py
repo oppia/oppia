@@ -40,13 +40,13 @@ from __future__ import unicode_literals
 import copy
 import json
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
-import feconf
-import python_utils
-import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.

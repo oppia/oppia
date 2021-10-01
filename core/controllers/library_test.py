@@ -21,7 +21,9 @@ import json
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services
@@ -34,8 +36,6 @@ from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import utils
 
 CAN_EDIT_STR = 'can_edit'
 

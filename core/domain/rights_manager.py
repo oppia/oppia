@@ -21,7 +21,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -29,8 +31,6 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([

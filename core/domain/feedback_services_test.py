@@ -17,6 +17,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import feedback_domain
@@ -27,8 +29,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     feedback_models, email_models, suggestion_models

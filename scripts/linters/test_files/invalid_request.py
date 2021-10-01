@@ -23,7 +23,7 @@ from __future__ import unicode_literals
 
 import urllib2
 
-import python_utils
+from core import python_utils
 
 
 class FakeClass(python_utils.OBJECT):

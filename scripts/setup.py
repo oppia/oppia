@@ -23,7 +23,7 @@ import subprocess
 import sys
 import tarfile
 
-import python_utils
+from core import python_utils
 
 from . import clean
 from . import common

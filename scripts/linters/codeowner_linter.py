@@ -23,7 +23,7 @@ import glob
 import os
 import subprocess
 
-import python_utils
+from core import python_utils
 from .. import concurrent_task_utils
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'

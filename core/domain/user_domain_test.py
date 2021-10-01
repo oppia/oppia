@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import auth_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 user_models, = models.Registry.import_models([models.NAMES.user])
 

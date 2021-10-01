@@ -23,8 +23,8 @@ import collections
 import os
 import tempfile
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import linter_utils
 

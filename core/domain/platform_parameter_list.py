@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-import python_utils
 
 Registry = registry.Registry
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name

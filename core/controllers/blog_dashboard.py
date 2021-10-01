@@ -17,6 +17,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -26,8 +28,6 @@ from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
-import feconf
-import utils
 
 from typing import Any, Dict, List
 

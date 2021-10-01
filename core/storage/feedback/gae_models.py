@@ -19,6 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
+from core import utils
 # TODO(#13594): After the domain layer is refactored to be independent of
 # the storage layer, the disable=invalid-import will
 # be removed.
@@ -30,9 +33,6 @@ from __future__ import unicode_literals
 # won't be accessible.
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 

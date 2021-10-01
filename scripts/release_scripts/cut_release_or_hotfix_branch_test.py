@@ -24,8 +24,8 @@ import json
 import subprocess
 import sys
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts.release_scripts import cut_release_or_hotfix_branch
 

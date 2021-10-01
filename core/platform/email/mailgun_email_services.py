@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import base64
 
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
 
 from typing import Dict, List, Optional, Union
 

@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import datetime
 import types
 
+from core import utils
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (base_models, blog_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.blog, models.NAMES.user])

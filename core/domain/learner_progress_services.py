@@ -21,7 +21,8 @@ from __future__ import unicode_literals
 
 import collections
 
-from constants import constants
+from core import utils
+from core.constants import constants
 from core.domain import classroom_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -37,7 +38,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
-import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()

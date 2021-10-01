@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import re
 
+from core import feconf
+from core import utils
 from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
 

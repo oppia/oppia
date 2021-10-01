@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
@@ -27,8 +28,7 @@ from core.domain import email_manager
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-import feconf
-from jobs.batch_jobs import cron_jobs
+from core.jobs.batch_jobs import cron_jobs
 
 
 class CronModelsCleanupHandler(base.BaseHandler):

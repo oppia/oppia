@@ -24,7 +24,7 @@ import shutil
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(

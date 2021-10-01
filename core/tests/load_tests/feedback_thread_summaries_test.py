@@ -23,10 +23,10 @@ from __future__ import unicode_literals
 
 import time
 
+from core import feconf
+from core import python_utils
 from core.domain import feedback_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):

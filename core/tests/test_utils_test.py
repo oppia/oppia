@@ -24,12 +24,12 @@ import os
 import re
 from unittest import mock
 
-from constants import constants
+from core import python_utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 import webapp2
 

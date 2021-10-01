@@ -24,7 +24,7 @@ import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

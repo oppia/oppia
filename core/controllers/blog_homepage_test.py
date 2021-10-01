@@ -17,12 +17,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

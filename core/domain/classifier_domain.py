@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])

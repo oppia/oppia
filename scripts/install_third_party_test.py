@@ -26,9 +26,8 @@ import tarfile
 import tempfile
 import zipfile
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import common
 from . import install_backend_python_libs

@@ -23,8 +23,8 @@ import ast
 import hashlib
 import logging
 
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
 
 import mailchimp3
 from mailchimp3 import mailchimpclient

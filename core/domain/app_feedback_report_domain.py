@@ -22,18 +22,20 @@ from __future__ import unicode_literals
 import datetime
 import re
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-import feconf
-from mypy_imports import app_feedback_report_models
-import python_utils
-import utils
-
 from typing import Dict, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])

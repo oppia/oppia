@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import time
 
+from core import python_utils
 from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
-import python_utils
 
 from typing import Any, Dict, List, Optional
 
