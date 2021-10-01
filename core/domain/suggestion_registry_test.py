@@ -20,6 +20,9 @@ from __future__ import unicode_literals
 import datetime
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -33,9 +36,6 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -1414,46 +1414,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
-        ):
-            suggestion.pre_accept_validate()
-
-    def test_pre_accept_validate_content_html(self):
-        self.save_new_default_exploration('exp1', self.author_id)
-        expected_suggestion_dict = self.suggestion_dict
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
-
-        exp_services.update_exploration(
-            self.author_id, 'exp1', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'new_value': {
-                        'content_id': 'content',
-                        'html': '<p>This is a content.</p>'
-                    },
-                    'state_name': 'State A',
-                })
-            ], 'Added state')
-        suggestion.change.state_name = 'State A'
-
-        suggestion.pre_accept_validate()
-
-        suggestion.change.content_html = 'invalid content_html'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The Exploration content has changed since this translation '
-            'was submitted.'
         ):
             suggestion.pre_accept_validate()
 

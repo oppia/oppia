@@ -20,16 +20,16 @@ from __future__ import unicode_literals
 import logging
 import string
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
-import feconf
-import python_utils
-import utils
 
 
 def get_matching_activity_dicts(

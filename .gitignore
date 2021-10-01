@@ -3,6 +3,7 @@
 *.swp
 *.swo
 *.bak
+*.egg-info
 __pycache__/
 gae_runtime/*
 # Ignore the auto-generated protobuf python code.

@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import question_services
@@ -31,7 +32,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
