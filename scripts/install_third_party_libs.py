@@ -32,7 +32,7 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 PREREQUISITES = [
     ('pyyaml', '5.4.1', os.path.join(TOOLS_DIR, 'pyyaml-5.4.1')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
-    ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
+    ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
     ('certifi', '2021.5.30', os.path.join(
         TOOLS_DIR, 'certifi-2021.5.30')),
 ]
