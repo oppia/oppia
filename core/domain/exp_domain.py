@@ -1888,33 +1888,37 @@ class Exploration(python_utils.OBJECT):
 
         for state_dict in states_dict.values():
             list_of_subtitled_unicode_content_ids = []
-            customisation_args = (
-                state_domain.InteractionInstance
-                .convert_customization_args_dict_to_customization_args(
-                    state_dict['interaction']['id'],
-                    state_dict['interaction']['customization_args']))
-            for ca_name in customisation_args:
-                list_of_subtitled_unicode_content_ids.extend(
-                    state_domain.InteractionCustomizationArg
-                    .traverse_by_schema_and_get(
-                        customisation_args[ca_name].schema,
-                        customisation_args[ca_name].value,
-                        [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
-                        lambda subtitled_unicode: subtitled_unicode.content_id
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                customisation_args = (
+                    state_domain.InteractionInstance
+                    .convert_customization_args_dict_to_customization_args(
+                        state_dict['interaction']['id'],
+                        state_dict['interaction']['customization_args']))
+                for ca_name in customisation_args:
+                    list_of_subtitled_unicode_content_ids.extend(
+                        state_domain.InteractionCustomizationArg
+                        .traverse_by_schema_and_get(
+                            customisation_args[ca_name].schema,
+                            customisation_args[ca_name].value,
+                            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                            lambda subtitled_unicode:
+                            subtitled_unicode.content_id
+                        )
                     )
-                )
-            translations_mapping = (
-                state_dict['written_translations']['translations_mapping'])
-            for content_id in translations_mapping:
-                if content_id in list_of_subtitled_unicode_content_ids:
-                    for language_code in translations_mapping[content_id]:
-                        written_translation = (
-                            translations_mapping[content_id][language_code])
-                        written_translation['data_format'] = (
-                            schema_utils.SCHEMA_TYPE_UNICODE)
-                        written_translation['translation'] = (
-                            html_cleaner.strip_html_tags(
-                                written_translation['translation']))
+                translations_mapping = (
+                    state_dict['written_translations']['translations_mapping'])
+                for content_id in translations_mapping:
+                    if content_id in list_of_subtitled_unicode_content_ids:
+                        for language_code in translations_mapping[content_id]:
+                            written_translation = (
+                                translations_mapping[content_id][language_code])
+                            written_translation['data_format'] = (
+                                schema_utils.SCHEMA_TYPE_UNICODE)
+                            written_translation['translation'] = (
+                                html_cleaner.strip_html_tags(
+                                    written_translation['translation']))
         return states_dict
 
     @classmethod
@@ -1933,9 +1937,13 @@ class Exploration(python_utils.OBJECT):
         """
 
         for state_dict in states_dict.values():
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service
+                    .convert_svg_diagram_tags_to_image_tags)
         return states_dict
 
     @classmethod
@@ -1953,9 +1961,40 @@ class Exploration(python_utils.OBJECT):
         """
 
         for state_dict in states_dict.values():
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.fix_incorrectly_encoded_chars)
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service.fix_incorrectly_encoded_chars)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
+        """Converts from version 48 to 49. Version 49 adds
+        requireNonnegativeInput customization arg to NumericInput
+        interaction which allows creators to set input should be greater
+        than or equal to zero.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'NumericInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                })
+
         return states_dict
 
     @classmethod

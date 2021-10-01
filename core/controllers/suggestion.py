@@ -24,6 +24,7 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import image_validation_services
@@ -223,7 +224,7 @@ class SuggestionsProviderHandler(base.BaseHandler):
             target_id_to_opportunity_dict = (
                 _get_target_id_to_exploration_opportunity_dict(suggestions))
             self.render_json({
-                'suggestions': [s.to_dict() for s in suggestions],
+                'suggestions': _construct_exploration_suggestions(suggestions),
                 'target_id_to_opportunity_dict':
                     target_id_to_opportunity_dict
             })
@@ -463,6 +464,29 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
                 rubric.to_dict() for rubric in skill.rubrics]
 
     return opportunity_id_to_opportunity_dict
+
+
+def _construct_exploration_suggestions(suggestions):
+    """Returns exploration suggestions with current exploration content.
+
+    Args:
+        suggestions: list(BaseSuggestion). A list of suggestions.
+
+    Returns:
+        list(dict). List of suggestion dicts with an additional
+        exploration_content_html field representing the target
+        exploration's current content.
+    """
+    suggestion_dicts = []
+    for suggestion in suggestions:
+        exploration = exp_fetchers.get_exploration_by_id(
+            suggestion.target_id)
+        content_html = exploration.get_content_html(
+            suggestion.change.state_name, suggestion.change.content_id)
+        suggestion_dict = suggestion.to_dict()
+        suggestion_dict['exploration_content_html'] = content_html
+        suggestion_dicts.append(suggestion_dict)
+    return suggestion_dicts
 
 
 def _upload_suggestion_images(request, suggestion, filenames):

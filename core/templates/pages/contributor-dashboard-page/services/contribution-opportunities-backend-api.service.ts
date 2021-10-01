@@ -92,7 +92,8 @@ export class ContributionOpportunitiesBackendApiService {
     return new ExplorationOpportunitySummary(
       opportunityDict.id, opportunityDict.topic_name,
       opportunityDict.story_title, opportunityDict.chapter_title,
-      opportunityDict.content_count, opportunityDict.translation_counts);
+      opportunityDict.content_count, opportunityDict.translation_counts,
+      opportunityDict.translation_in_review_counts);
   }
 
   private _getSkillOpportunityFromDict(

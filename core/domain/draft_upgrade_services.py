@@ -314,10 +314,31 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             return draft_change_list
 
     @classmethod
-    def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
-        """Converts draft change list from state version 47 to 48. State
-        version 48 includes the image_sizes_in_bytes dict as attribute in
+    def _convert_states_v49_dict_to_v50_dict(
+            cls, draft_change_list, entity_type, entity_id):
+        """Converts draft change list from state version 49 to 50. State
+        version 50 includes the image_sizes_in_bytes dict as attribute in
         SubtitledHtml and WrittenTranslation structures.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+            entity_type: str. The entity type of the draft change list.
+            entity_id: str. The entity ID of the draft change list.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return cls._update_image_sizes_in_bytes_in_draft_change_list(
+            draft_change_list,
+            entity_type,
+            entity_id)
+
+    @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
+        """Converts draft change list from state version 48 to 49. State
+        version 49 adds requireNonnegativeInput customization_arg to
+        NumericInput interaction.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

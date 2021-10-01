@@ -183,12 +183,11 @@ describe('NumberWithUnitsObjectFactory', () => {
       }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
         nwuof.fromRawInputString('2 m**2');
-      }).toThrowError('SyntaxError: Unexpected "*" in "m**2" at index 2');
+      }).toThrowError('Unexpected "*" in "m**2" at index 2');
       expect(() => {
         nwuof.fromRawInputString('2 kg / m^(2)');
       }).toThrowError(
-        'SyntaxError: In "kg / m^(2)", "^" must be ' +
-        'followed by a floating-point number');
+        'In "kg / m^(2)", "^" must be followed by a floating-point number');
     });
 
     it('should create currency units', () => {

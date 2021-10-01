@@ -929,50 +929,6 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_build_with_deparallelize_terser(self):
-        check_function_calls = {
-            'build_using_webpack_gets_called': False,
-            'ensure_files_exist_gets_called': False,
-            'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False
-        }
-        expected_check_function_calls = {
-            'build_using_webpack_gets_called': True,
-            'ensure_files_exist_gets_called': True,
-            'modify_constants_gets_called': True,
-            'compare_file_count_gets_called': True,
-        }
-
-        expected_config_path = build.WEBPACK_TERSER_CONFIG
-
-        def mock_build_using_webpack(config_path):
-            self.assertEqual(config_path, expected_config_path)
-            check_function_calls['build_using_webpack_gets_called'] = True
-
-        def mock_ensure_files_exist(unused_filepaths):
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
-            check_function_calls['modify_constants_gets_called'] = True
-
-        def mock_compare_file_count(unused_first_dir, unused_second_dir):
-            check_function_calls['compare_file_count_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
-            build, 'build_using_webpack', mock_build_using_webpack)
-        modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
-        compare_file_count_swap = self.swap(
-            build, '_compare_file_count', mock_compare_file_count)
-
-        with ensure_files_exist_swap, build_using_webpack_swap:
-            with modify_constants_swap, compare_file_count_swap:
-                build.main(args=['--prod_env', '--deparallelize_terser'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
     def test_build_with_prod_source_maps(self):
         check_function_calls = {
             'build_using_webpack_gets_called': False,
@@ -1014,40 +970,6 @@ class BuildTests(test_utils.GenericTestBase):
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
                 build.main(args=['--prod_env', '--source_maps'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_cannot_build_with_source_maps_with_terser_config(self):
-        check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'modify_constants_gets_called': False
-        }
-        expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
-            'modify_constants_gets_called': True
-        }
-
-        def mock_ensure_files_exist(unused_filepaths):
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
-            check_function_calls['modify_constants_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist)
-        modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception,
-            'source_maps flag shouldn\'t be used with '
-            'deparallelize_terser flag.')
-
-        with ensure_files_exist_swap, modify_constants_swap:
-            with assert_raises_regexp_context_manager:
-                build.main(
-                    args=[
-                        '--prod_env', '--source_maps',
-                        '--deparallelize_terser'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

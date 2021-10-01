@@ -56,7 +56,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'incomplete_translation_language_codes': ['hi-en'],
                     'translation_counts': {},
                     'language_codes_needing_voice_artists': ['en'],
-                    'language_codes_with_assigned_voice_artists': ['hi']
+                    'language_codes_with_assigned_voice_artists': ['hi'],
+                    'translation_in_review_counts': {}
                 }))
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
@@ -75,7 +76,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'incomplete_translation_language_codes': ['hi-en', 'hi'],
             'translation_counts': {},
             'language_codes_needing_voice_artists': ['en'],
-            'language_codes_with_assigned_voice_artists': []
+            'language_codes_with_assigned_voice_artists': [],
+            'translation_in_review_counts': {}
         }
 
         with self.mock_supported_audio_languages_context:
@@ -91,6 +93,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'chapter_title': 'A new chapter',
             'content_count': 5,
             'translation_counts': {},
+            'translation_in_review_counts': {}
         })
 
     def test_invalid_topic_id_fails_validation_check(self):

@@ -24,10 +24,10 @@ import feconf
 
 from apache_beam.options import pipeline_options
 
-from typing import List, Optional # isort: skip
+from typing import List, Optional
 
 
-class JobOptions(pipeline_options.PipelineOptions):
+class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
@@ -63,7 +63,6 @@ class JobOptions(pipeline_options.PipelineOptions):
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             temp_location=feconf.DATAFLOW_TEMP_LOCATION,
             staging_location=feconf.DATAFLOW_STAGING_LOCATION,
-            save_main_session=True,
             **job_options)
 
     @classmethod

@@ -53,6 +53,7 @@ import {
   MusicNotesInputCustomizationArgs,
   NumberWithUnitsCustomizationArgs,
   NumericExpressionInputCustomizationArgs,
+  NumericInputCustomizationArgsBackendDict,
   NumericInputCustomizationArgs,
   PencilCodeEditorCustomizationArgs,
   RatioExpressionInputCustomizationArgs,
@@ -379,6 +380,13 @@ export class InteractionObjectFactory {
     };
   }
 
+  _createFromNumericInputCustomizationArgsBackendDict(
+      caBackendDict: NumericInputCustomizationArgsBackendDict
+  ): NumericInputCustomizationArgs {
+    const { requireNonnegativeInput } = caBackendDict;
+    return { requireNonnegativeInput };
+  }
+
   convertFromCustomizationArgsBackendDict(
       interactionId: string | null,
       caBackendDict: InteractionCustomizationArgsBackendDict
@@ -428,7 +436,10 @@ export class InteractionObjectFactory {
             <NumericExpressionInputCustomizationArgsBackendDict> caBackendDict)
         );
       case 'NumericInput':
-        return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
+        return (
+          this._createFromNumericInputCustomizationArgsBackendDict(
+            <NumericInputCustomizationArgsBackendDict> caBackendDict)
+        );
       case 'PencilCodeEditor':
         return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
       case 'RatioExpressionInput':
