@@ -100,7 +100,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
             ])
 
     def test_indexes_non_deleted_models(self) -> None:
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             exp_summary = self.create_model(
                 exp_models.ExpSummaryModel,
                 id='abcd%s' % i,
@@ -131,7 +131,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
                         'rank': 20,
                     }],
                     search_services.SEARCH_INDEX_EXPLORATIONS
-                ) for i in python_utils.RANGE(5)
+                ) for i in range(5)
             ]
         )
 

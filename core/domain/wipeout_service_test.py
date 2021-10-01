@@ -2155,7 +2155,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_feedbacks_are_pseudonymized(self):
         feedback_thread_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_thread_models.append(
                 feedback_models.GeneralFeedbackThreadModel(
                     id='feedback-%s' % i,
@@ -2170,7 +2170,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
                 feedback_thread_models)
         feedback_message_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
                 feedback_models.GeneralFeedbackMessageModel(
                     id='message-%s' % i,
@@ -4890,7 +4890,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_blog_post_models_are_pseudonymized(self):
         blog_post_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_models_list.append(
                 blog_models.BlogPostModel(
                     id='blogmodel-%s' % i,
@@ -4906,7 +4906,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             blog_models.BlogPostModel.update_timestamps_multi(
                 blog_post_models_list)
         blog_post_summary_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_summary_models_list.append(
                 blog_models.BlogPostSummaryModel(
                     id='blogmodel-%s' % i,
@@ -4923,7 +4923,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_models_list)
 
         blog_post_rights_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_rights_models_list.append(
                 blog_models.BlogPostRightsModel(
                     id='blogmodel-%s' % i,

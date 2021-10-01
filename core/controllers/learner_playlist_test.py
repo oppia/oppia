@@ -148,7 +148,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # learner playlist.
         # Add feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT - 2 activities to reach
         # the maximum limit.
-        for exp_id in python_utils.RANGE(
+        for exp_id in range(
                 5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
             self.post_json(
                 '%s/%s/%s' % (
@@ -247,7 +247,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # learner playlist.
         # Add feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT - 2 activities to reach
         # the maximum limit.
-        for exp_id in python_utils.RANGE(
+        for exp_id in range(
                 5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
             response = self.post_json(
                 '%s/%s/%s' % (

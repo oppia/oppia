@@ -73,7 +73,7 @@ def try_upgrading_draft_to_exp_version(
         return None
 
     exp_versions = list(
-        python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
+        range(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
         exp_models.ExplorationCommitLogEntryModel.get_multi(
             exp_id, exp_versions))

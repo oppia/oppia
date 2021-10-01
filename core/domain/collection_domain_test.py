@@ -716,7 +716,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-        for version_num in python_utils.RANGE(
+        for version_num in range(
                 1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
@@ -734,7 +734,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        for version_num in python_utils.RANGE(
+        for version_num in range(
                 1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,

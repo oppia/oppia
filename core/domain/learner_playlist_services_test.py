@@ -193,7 +193,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_nunmber_of_explorations_cannot_exceed_max(self):
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT explorations.
-        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in python_utils.RANGE(
+        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
             0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for exp_id in exp_ids:
             learner_progress_services.add_exp_to_learner_playlist(
@@ -289,7 +289,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_number_of_collections_cannot_exceed_max(self):
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT collections.
-        col_ids = ['SAMPLE_COL_ID_%s' % index for index in python_utils.RANGE(
+        col_ids = ['SAMPLE_COL_ID_%s' % index for index in range(
             0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for col_id in col_ids:
             learner_progress_services.add_collection_to_learner_playlist(

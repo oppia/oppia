@@ -495,7 +495,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
             self._new_resolved_task(
                 state_name='State %d' % i,
                 resolved_on=self.MOCK_DATE + datetime.timedelta(minutes=i * 5))
-            for i in python_utils.RANGE(1, 26)]
+            for i in range(1, 26)]
         improvements_services.put_tasks(task_entries)
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url(cursor=None))
@@ -512,7 +512,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
             self._new_resolved_task(
                 state_name='State %d' % i,
                 resolved_on=self.MOCK_DATE + datetime.timedelta(minutes=i * 5))
-            for i in python_utils.RANGE(1, 26)]
+            for i in range(1, 26)]
         improvements_services.put_tasks(task_entries)
 
         with self.login_context(self.OWNER_EMAIL):

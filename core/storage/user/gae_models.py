@@ -310,10 +310,10 @@ class UserSettingsModel(base_models.BaseModel):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
+                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
             if (
                     not cls.get_by_id(new_id) and
                     not DeletedUserModel.get_by_id(new_id)
@@ -2933,10 +2933,10 @@ class PseudonymizedUserModel(base_models.BaseModel):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = 'pid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
+                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id
