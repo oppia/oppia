@@ -28,7 +28,7 @@ import shutil
 import subprocess
 import threading
 
-import python_utils
+from core import python_utils
 from scripts import common
 from scripts import servers
 
@@ -1317,6 +1317,14 @@ def generate_build_directory(hashes):
     python_utils.PRINT('Build completed.')
 
 
+def generate_python_package():
+    """Generates Python package using setup.py."""
+    python_utils.PRINT('Building Oppia package...')
+    subprocess.check_call(
+        ['python', 'setup.py', 'sdist', '-d', 'build'], shell=True)
+    python_utils.PRINT('Oppia package build completed.')
+
+
 def main(args=None):
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
@@ -1347,6 +1355,7 @@ def main(args=None):
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
+        generate_python_package()
         if options.source_maps:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:

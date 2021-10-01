@@ -23,8 +23,8 @@ import subprocess
 import sys
 import time
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker

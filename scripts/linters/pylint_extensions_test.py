@@ -25,7 +25,7 @@ from __future__ import unicode_literals
 import tempfile
 import unittest
 
-import python_utils
+from core import python_utils
 
 from . import pylint_extensions
 
