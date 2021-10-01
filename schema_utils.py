@@ -664,7 +664,7 @@ class _Validators(python_utils.OBJECT):
             return True
         except utils.ValidationError:
             return False
-    
+
     @staticmethod
     def is_at_most_char(obj: str, max_value: int) -> bool:
         """Returns True iff the given object (a string) has at most
@@ -672,9 +672,9 @@ class _Validators(python_utils.OBJECT):
         
         Args:
             obj: str. The string to verify.
-            max_value: int. The maximum number of characters that `obj` should contain.
+            max_value: int. The max number of characters that `obj` should contain.
 
         Returns:
             bool. Whether the given object has at most `max_value` characters.
-        """      
+        """
         return len(obj) <= max_value
