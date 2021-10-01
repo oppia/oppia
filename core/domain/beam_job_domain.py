@@ -23,7 +23,6 @@ import datetime
 
 from core.platform import models
 from jobs import base_jobs
-import python_utils
 import utils
 
 from typing import Dict, List, Type, Union # isort: skip

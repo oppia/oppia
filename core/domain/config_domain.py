@@ -24,7 +24,6 @@ from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 import feconf
-import python_utils
 import schema_utils
 
 (config_models, suggestion_models,) = models.Registry.import_models(

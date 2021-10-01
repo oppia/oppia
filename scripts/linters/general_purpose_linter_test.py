@@ -234,16 +234,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_use_of_object(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_OBJECT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 25: Please use python_utils.OBJECT.'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
 
 class GeneralLintTests(test_utils.LinterTestBase):
     """Test all other general lint functions."""

@@ -24,7 +24,6 @@ import pkgutil
 
 from core.platform import models
 import feconf
-import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

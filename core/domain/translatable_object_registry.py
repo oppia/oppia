@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import inspect
 
 from extensions.objects.models import objects
-import python_utils
 
 
 class Registry(object):

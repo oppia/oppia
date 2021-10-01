@@ -23,7 +23,6 @@ from core.domain import caching_services
 from core.domain import platform_parameter_domain
 from core.platform import models
 import feconf
-import python_utils
 
 
 (config_models,) = models.Registry.import_models(

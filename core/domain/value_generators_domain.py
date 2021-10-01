@@ -25,7 +25,6 @@ import os
 import pkgutil
 
 import feconf
-import python_utils
 import utils
 
 

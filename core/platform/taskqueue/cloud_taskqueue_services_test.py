@@ -25,7 +25,6 @@ import json
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
-import python_utils
 
 from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2

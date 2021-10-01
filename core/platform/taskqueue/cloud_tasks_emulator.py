@@ -28,8 +28,6 @@ import datetime  # pylint: disable=unused-import
 import threading
 import time
 
-import python_utils
-
 from typing import Any, Callable, Dict, List, Optional
 
 

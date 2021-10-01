@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from core.domain import user_services
 from core.platform import models
-import python_utils
 import utils
 
 (improvements_models,) = (

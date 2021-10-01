@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import copy
 
 from core.platform import models
-import python_utils
 import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])

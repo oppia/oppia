@@ -36,7 +36,6 @@ import collections
 import re
 
 from constants import constants
-import python_utils
 
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']

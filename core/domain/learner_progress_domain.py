@@ -19,8 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
-
 
 class LearnerProgress(object):
     """Domain object for the progress of the learner."""

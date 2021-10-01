@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import inspect
 
 from extensions.visualizations import models
-import python_utils
 
 
 class Registry(object):

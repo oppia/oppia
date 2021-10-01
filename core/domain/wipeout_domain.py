@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core.platform import models
-import python_utils
 import utils
 
 USER_DELETION_SUCCESS = 'SUCCESS'

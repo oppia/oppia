@@ -23,7 +23,6 @@ import json
 
 from extensions.objects.models import objects
 import feconf
-import python_utils
 import utils
 
 

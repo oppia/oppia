@@ -22,7 +22,6 @@ import logging
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 import feconf
-import python_utils
 
 from mailchimp3 import mailchimpclient
 
