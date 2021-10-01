@@ -67,7 +67,7 @@ class PlatformParameterChange(change_domain.BaseChange):
     }]
 
 
-class EvaluationContext(python_utils.OBJECT):
+class EvaluationContext(object):
     """Domain object representing the context for parameter evaluation."""
 
     def __init__(
@@ -186,7 +186,7 @@ class EvaluationContext(python_utils.OBJECT):
         )
 
 
-class PlatformParameterFilter(python_utils.OBJECT):
+class PlatformParameterFilter(object):
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPES = [
@@ -459,7 +459,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
         )
 
 
-class PlatformParameterRule(python_utils.OBJECT):
+class PlatformParameterRule(object):
     """Domain object for rules in platform parameters."""
 
     def __init__(self, filters, value_when_matched):
@@ -547,7 +547,7 @@ class PlatformParameterRule(python_utils.OBJECT):
         )
 
 
-class PlatformParameter(python_utils.OBJECT):
+class PlatformParameter(object):
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT = {

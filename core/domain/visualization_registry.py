@@ -25,7 +25,7 @@ from extensions.visualizations import models
 import python_utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry(object):
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.

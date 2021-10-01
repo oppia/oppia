@@ -23,7 +23,7 @@ from constants import constants
 import python_utils
 
 
-class ActivityReference(python_utils.OBJECT):
+class ActivityReference(object):
     """Domain object for an activity reference.
 
     An activity is a piece of learning material that can be created in Oppia.
@@ -90,7 +90,7 @@ class ActivityReference(python_utils.OBJECT):
             activity_reference_dict['type'], activity_reference_dict['id'])
 
 
-class ActivityReferences(python_utils.OBJECT):
+class ActivityReferences(object):
     """Domain object for a list of activity references.
 
     Attributes:

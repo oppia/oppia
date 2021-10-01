@@ -203,7 +203,7 @@ def get_variables(expression):
     return list(variables)
 
 
-class Token(python_utils.OBJECT):
+class Token(object):
     """Class for tokens of the math expression."""
 
     def __init__(self, text):
@@ -277,7 +277,7 @@ class Token(python_utils.OBJECT):
         return text in _VALID_OPERATORS
 
 
-class Node(python_utils.OBJECT):
+class Node(object):
     """Instances of the classes that inherit this class act as nodes of the
     parse tree. These could be internal as well as leaf nodes. For leaf nodes,
     the children parameter would be an empty list.
@@ -408,7 +408,7 @@ class UnaryFunctionNode(Node):
         super(UnaryFunctionNode, self).__init__([child])
 
 
-class Parser(python_utils.OBJECT):
+class Parser(object):
     """Class representing the math expression parser.
     Implements a greedy, recursive-descent parser that tries to consume
     as many tokens as possible while obeying the grammar.

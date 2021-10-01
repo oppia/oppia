@@ -31,7 +31,7 @@ from typing import Dict, List, Type, Union # isort: skip
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 
-class BeamJob(python_utils.OBJECT):
+class BeamJob(object):
     """Encapsulates the definition of an Apache Beam job.
 
     Attributes:
@@ -67,7 +67,7 @@ class BeamJob(python_utils.OBJECT):
         return {'name': self.name}
 
 
-class BeamJobRun(python_utils.OBJECT):
+class BeamJobRun(object):
     """Encapsulates an individual execution of an Apache Beam job.
 
     Attributes:
@@ -161,7 +161,7 @@ class BeamJobRun(python_utils.OBJECT):
         }
 
 
-class AggregateBeamJobRunResult(python_utils.OBJECT):
+class AggregateBeamJobRunResult(object):
     """Encapsulates the complete result of an Apache Beam job run.
 
     Attributes:

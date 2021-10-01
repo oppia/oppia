@@ -22,7 +22,7 @@ import python_utils
 import utils
 
 
-class FeedbackThread(python_utils.OBJECT):
+class FeedbackThread(object):
     """Domain object for a feedback thread.
 
     Attributes:
@@ -126,7 +126,7 @@ class FeedbackThread(python_utils.OBJECT):
         ]
 
 
-class FeedbackMessage(python_utils.OBJECT):
+class FeedbackMessage(object):
     """Domain object for a feedback message.
 
     Attributes:
@@ -199,7 +199,7 @@ class FeedbackMessage(python_utils.OBJECT):
         }
 
 
-class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
+class FullyQualifiedMessageIdentifier(object):
     """Domain object representing the full identifier of a message in a
     feedback thread.
 
@@ -213,7 +213,7 @@ class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
         self.message_id = message_id
 
 
-class FeedbackAnalytics(python_utils.OBJECT):
+class FeedbackAnalytics(object):
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -247,7 +247,7 @@ class FeedbackAnalytics(python_utils.OBJECT):
         }
 
 
-class FeedbackMessageReference(python_utils.OBJECT):
+class FeedbackMessageReference(object):
     """Domain object for feedback message references.
 
     Attributes:
@@ -278,7 +278,7 @@ class FeedbackMessageReference(python_utils.OBJECT):
         }
 
 
-class FeedbackThreadSummary(python_utils.OBJECT):
+class FeedbackThreadSummary(object):
     """Domain object for the summary of a particular thread.
 
     Attributes:

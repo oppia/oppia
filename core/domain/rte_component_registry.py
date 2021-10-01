@@ -28,7 +28,7 @@ import python_utils
 import utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry(object):
     """Registry of all custom rich-text components."""
 
     _rte_components = {}

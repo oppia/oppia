@@ -24,7 +24,7 @@ import python_utils
 import utils
 
 
-class ExplorationOpportunitySummary(python_utils.OBJECT):
+class ExplorationOpportunitySummary(object):
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
@@ -202,7 +202,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'received %s' % list(sorted(expected_set_of_all_languages)))
 
 
-class SkillOpportunity(python_utils.OBJECT):
+class SkillOpportunity(object):
     """The domain object for skill opportunities."""
 
     def __init__(

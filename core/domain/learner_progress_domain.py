@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import python_utils
 
 
-class LearnerProgress(python_utils.OBJECT):
+class LearnerProgress(object):
     """Domain object for the progress of the learner."""
 
     def __init__(
@@ -98,7 +98,7 @@ class LearnerProgress(python_utils.OBJECT):
             learnt_to_partially_learnt_topic_titles)
 
 
-class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
+class ActivityIdsInLearnerDashboard(object):
     """Domain object for ids of the activities completed, currently being
     completed, in the playlist or goals of the user.
     """

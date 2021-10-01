@@ -23,7 +23,7 @@ import python_utils
 import utils
 
 
-class MachineTranslation(python_utils.OBJECT):
+class MachineTranslation(object):
     """Domain object for machine translation of exploration content."""
 
     def __init__(

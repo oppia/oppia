@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import python_utils
 
 
-class Classroom(python_utils.OBJECT):
+class Classroom(object):
     """Domain object for a classroom."""
 
     def __init__(

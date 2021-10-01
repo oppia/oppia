@@ -29,7 +29,7 @@ USER_VERIFICATION_SUCCESS = 'SUCCESS'
 USER_VERIFICATION_FAILURE = 'FAILURE'
 
 
-class PendingDeletionRequest(python_utils.OBJECT):
+class PendingDeletionRequest(object):
     """Domain object for a PendingDeletionRequest."""
 
     def __init__(

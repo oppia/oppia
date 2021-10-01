@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 import python_utils
 
 
-class MemoryCacheStats(python_utils.OBJECT):
+class MemoryCacheStats(object):
     """Domain object for an Oppia memory profile object that contains
     information about the memory cache.
     """

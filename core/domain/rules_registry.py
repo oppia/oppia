@@ -27,7 +27,7 @@ import python_utils
 import utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry(object):
     """Registry of rules."""
 
     _state_schema_version_to_html_field_types_to_rule_specs = {}

@@ -96,7 +96,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
     def test_apply_change_list_with_invalid_property_name(self):
-        class MockSkillChange(python_utils.OBJECT):
+        class MockSkillChange(object):
             def __init__(self, cmd, property_name):
                 self.cmd = cmd
                 self.property_name = property_name

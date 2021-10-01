@@ -25,7 +25,7 @@ from extensions.answer_summarizers import models
 import python_utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry(object):
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.

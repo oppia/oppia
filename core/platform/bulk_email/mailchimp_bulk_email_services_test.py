@@ -38,15 +38,15 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         self.user_email_2 = 'test2@example.com'
         self.user_email_3 = 'test3@example.com'
 
-    class MockMailchimpClass(python_utils.OBJECT):
+    class MockMailchimpClass(object):
         """Class to mock Mailchimp class."""
 
         update_call_data: Dict[str, str] = {}
 
-        class MailchimpLists(python_utils.OBJECT):
+        class MailchimpLists(object):
             """Class to mock Mailchimp lists object."""
 
-            class MailchimpMembers(python_utils.OBJECT):
+            class MailchimpMembers(object):
                 """Class to mock Mailchimp members object."""
 
                 def __init__(self) -> None:

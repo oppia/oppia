@@ -29,7 +29,7 @@ import python_utils
 import utils
 
 
-class BaseValueGenerator(python_utils.OBJECT):
+class BaseValueGenerator(object):
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -72,7 +72,7 @@ class BaseValueGenerator(python_utils.OBJECT):
             'generate_value() method has not yet been implemented')
 
 
-class Registry(python_utils.OBJECT):
+class Registry(object):
     """Maintains a registry of all the value generators.
 
     Attributes:

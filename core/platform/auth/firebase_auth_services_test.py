@@ -65,7 +65,7 @@ RecordsPartitionTupleType = Tuple[
 ]
 
 
-class FirebaseAdminSdkStub(python_utils.OBJECT):
+class FirebaseAdminSdkStub(object):
     """Helper class for swapping the Firebase Admin SDK with a stateful stub.
 
     NOT INTENDED TO BE USED DIRECTLY. Just install it and then interact with the

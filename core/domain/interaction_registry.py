@@ -29,7 +29,7 @@ import feconf
 import python_utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry(object):
     """Registry of all interactions."""
 
     # Dict mapping interaction ids to instances of the interactions.
