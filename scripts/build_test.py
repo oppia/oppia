@@ -29,8 +29,8 @@ import subprocess
 import tempfile
 import threading
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import build
 from . import common
@@ -890,13 +890,15 @@ class BuildTests(test_utils.GenericTestBase):
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False
+            'compare_file_count_gets_called': False,
+            'generate_python_package_called': False,
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
             'modify_constants_gets_called': True,
-            'compare_file_count_gets_called': True
+            'compare_file_count_gets_called': True,
+            'generate_python_package_called': True,
         }
 
         expected_config_path = build.WEBPACK_PROD_CONFIG
@@ -914,6 +916,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
+        def mock_generate_python_package():
+            check_function_calls['generate_python_package_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
@@ -922,10 +927,13 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
+        generate_python_package_swap = self.swap(
+            build, 'generate_python_package', mock_generate_python_package)
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
-                build.main(args=['--prod_env'])
+                with generate_python_package_swap:
+                    build.main(args=['--prod_env'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

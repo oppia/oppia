@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import beam_job_services
 from core.domain import config_services
 from core.domain import email_manager
@@ -29,10 +30,9 @@ from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.jobs.batch_jobs import cron_jobs
 from core.platform import models
 from core.tests import test_utils
-import feconf
-from jobs.batch_jobs import cron_jobs
 import main
 
 import webtest

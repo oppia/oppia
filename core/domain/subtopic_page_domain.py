@@ -19,14 +19,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import html_validation_service
 from core.domain import state_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
