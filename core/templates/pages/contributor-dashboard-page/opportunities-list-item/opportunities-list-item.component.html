@@ -50,8 +50,10 @@
     </div>
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
-    <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
+    <button class="protractor-test-opportunity-list-item-button"
+            [ngClass]="{'oppia-opportunities-button': !isOpportunityButtonDisabled, 'oppia-opportunities-disabled-button': isOpportunityButtonDisabled}"
             [hidden]="opportunityDataIsLoading || isCorrespondingOpportunityDeleted"
+            [disabled]="isOpportunityButtonDisabled"
             (click)="clickActionButton.emit(opportunity.id)">
       {{ opportunity?.actionButtonTitle }}
     </button>
@@ -66,6 +68,16 @@
     border: 2px solid #009688;
     border-radius: 5px;
     color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 64%;
+    text-align: center;
+  }
+  .oppia-opportunities-disabled-button {
+    background-color: #fff;
+    border: 2px solid #71918d;
+    border-radius: 5px;
+    color: #71918d;
     font-size: 18px;
     font-weight: bold;
     min-width: 64%;

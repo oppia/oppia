@@ -57,6 +57,7 @@ export class OpportunitiesListItemComponent {
   untranslatedProgressStyle: { width: string; };
   isCorrespondingOpportunityDeleted: boolean = false;
   isTranslationProgressBar: boolean = false;
+  isOpportunityButtonDisabled: boolean = false;
 
   ngOnInit(): void {
     if (this.opportunity && this.labelRequired) {
@@ -91,6 +92,9 @@ export class OpportunitiesListItemComponent {
           this.inReviewProgressStyle = {
             width: inReviewTranslationsPercentage + '%'
           };
+          this.isOpportunityButtonDisabled = (
+            this.opportunity.translationsCount + this.opportunity.inReviewCount
+            >= this.opportunity.totalCount);
         } else {
           this.progressBarStyle = { width: this.progressPercentage };
         }
