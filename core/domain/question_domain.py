@@ -24,7 +24,11 @@ import copy
 import datetime
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -35,10 +39,6 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 from pylatexenc import latex2text
 
@@ -1150,6 +1150,31 @@ class Question(object):
         state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.fix_incorrectly_encoded_chars)
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v48_dict_to_v49_dict(cls, question_state_dict):
+        """Converts from version 48 to 49. Version 49 adds
+        requireNonnegativeInput customization arg to NumericInput
+        interaction which allows creators to set input range greater than
+        or equal to zero.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'NumericInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'requireNonnegativeInput': {
+                    'value': False
+                }
+            })
         return question_state_dict
 
     @classmethod

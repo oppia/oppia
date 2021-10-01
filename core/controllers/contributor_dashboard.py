@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 
 import json
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -29,7 +30,6 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
-import feconf
 
 
 class ContributorDashboardPage(base.BaseHandler):

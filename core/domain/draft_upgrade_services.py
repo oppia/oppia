@@ -21,13 +21,13 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import python_utils
+from core import utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
-import python_utils
-import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -209,6 +209,21 @@ class DraftUpgradeUtil(object):
                     'state_name': change.state_name,
                     'new_value': new_value
                 })
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
+        """Converts draft change list from state version 48 to 49. State
+        version 49 adds requireNonnegativeInput customization_arg to
+        NumericInput interaction.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
         return draft_change_list
 
     @classmethod

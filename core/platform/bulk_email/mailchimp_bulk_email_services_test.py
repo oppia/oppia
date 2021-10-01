@@ -19,13 +19,10 @@ from __future__ import unicode_literals
 
 import logging
 
-from core.platform.bulk_email import mailchimp_bulk_email_services
+from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils
-import feconf
 
-from mailchimp3 import mailchimpclient
-
-from typing import Any, Dict
+from typing import Any
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):

@@ -21,6 +21,8 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import feconf
+from core import python_utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -28,8 +30,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.platform import models
-import feconf
-import python_utils
 
 (feedback_models, stats_models, user_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.statistics, models.NAMES.user])

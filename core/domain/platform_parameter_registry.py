@@ -24,7 +24,6 @@ from core.domain import platform_parameter_domain
 from core.platform import models
 import feconf
 
-
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 

@@ -21,7 +21,8 @@ from __future__ import unicode_literals
 
 import collections
 
-from constants import constants
+from core import utils
+from core.constants import constants
 from core.domain import classroom_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -37,7 +38,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
-import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
@@ -1815,8 +1815,7 @@ def get_activity_progress(user_id):
                 ('TopicSummaryModel', topic_ids_to_learn),
                 ('ExpSummaryModel', exploration_playlist_ids),
                 ('CollectionSummaryModel', collection_playlist_ids),
-                ('TopicSummaryModel', all_topic_ids),
-                ('TopicSummaryModel', untracked_topic_ids)
+                ('TopicSummaryModel', all_topic_ids)
             ]))
 
     incomplete_exploration_models = activity_models[0]
@@ -1830,7 +1829,10 @@ def get_activity_progress(user_id):
     exploration_playlist_models = activity_models[8]
     collection_playlist_models = activity_models[9]
     all_topic_models = activity_models[10]
-    untracked_topic_models = activity_models[11]
+    untracked_topic_models = [
+        topic_model for topic_model in activity_models[10]
+        if topic_model.id in untracked_topic_ids
+    ]
 
     incomplete_exp_summaries = (
         [exp_fetchers.get_exploration_summary_from_model(model)

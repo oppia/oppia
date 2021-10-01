@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-
 class Classroom(object):
     """Domain object for a classroom."""
 

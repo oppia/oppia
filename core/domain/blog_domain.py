@@ -21,11 +21,10 @@ from __future__ import unicode_literals
 
 import re
 
-from constants import constants
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import html_cleaner
-
-import python_utils
-import utils
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
