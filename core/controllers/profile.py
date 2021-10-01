@@ -174,7 +174,11 @@ class PreferencesHandler(base.BaseHandler):
             },
             'data': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_at_most_char',
+                        'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
+                    }]
                 }
             }
         }
@@ -235,13 +239,8 @@ class PreferencesHandler(base.BaseHandler):
         update_type = self.normalized_payload.get('update_type')
         data = self.normalized_payload.get('data')
         bulk_email_signup_message_should_be_shown = False
-        if update_type == 'user_bio':
-            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
-                raise self.InvalidInputException(
-                    'User bio exceeds maximum character limit: %s'
-                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
-            else:
-                user_services.update_user_bio(self.user_id, data)
+        if update_type == 'user_bio':            
+            user_services.update_user_bio(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
@@ -263,9 +262,6 @@ class PreferencesHandler(base.BaseHandler):
                     data['can_receive_editor_role_email'],
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email']))
-        else:
-            raise self.InvalidInputException(
-                'Invalid update type: %s' % update_type)
 
         self.render_json({
             'bulk_email_signup_message_should_be_shown': (
@@ -417,20 +413,19 @@ class SignupHandler(base.BaseHandler):
             'can_receive_email_updates')
         bulk_email_signup_message_should_be_shown = False
 
-        if can_receive_email_updates is not None:
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, can_receive_email_updates,
-                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-            )
-            if bulk_email_signup_message_should_be_shown:
-                self.render_json({
-                    'bulk_email_signup_message_should_be_shown': (
-                        bulk_email_signup_message_should_be_shown)
-                })
-                return
+        bulk_email_signup_message_should_be_shown = (
+            user_services.update_email_preferences(
+                self.user_id, can_receive_email_updates,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        )
+        if bulk_email_signup_message_should_be_shown:
+            self.render_json({
+                'bulk_email_signup_message_should_be_shown': (
+                    bulk_email_signup_message_should_be_shown)
+            })
+            return
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered_account = (
