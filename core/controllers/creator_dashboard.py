@@ -115,7 +115,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             Returns:
                 float. The rounded average value of rating.
             """
-            return python_utils.ROUND(
+            return round(
                 rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         subscribed_exploration_summaries = (
