@@ -612,7 +612,7 @@ var toRichText = async function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
- var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
+var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   var lineContentElements = elem.all(by.css('.CodeMirror-line'));
   var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
   var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
