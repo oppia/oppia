@@ -29,6 +29,7 @@ import copy
 import json
 import re
 import string
+import yaml
 
 from core import feconf
 from core import python_utils
@@ -2328,7 +2329,7 @@ class Exploration(python_utils.OBJECT):
         # YAML representation.
         del exp_dict['id']
 
-        return python_utils.yaml_from_dict(exp_dict)
+        return yaml.dump(exp_dict, allow_unicode=True, default_flow_style=False)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all

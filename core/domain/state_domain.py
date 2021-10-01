@@ -24,6 +24,7 @@ import copy
 import itertools
 import logging
 import re
+import yaml
 
 from core import android_validation_constants
 from core import feconf
@@ -2695,7 +2696,7 @@ class State(python_utils.OBJECT):
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             python_utils.reraise_exception()
 
-        return python_utils.yaml_from_dict(state.to_dict(), width=width)
+        return yaml.dump(state.to_dict(), allow_unicode=True, default_flow_style=False, width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a

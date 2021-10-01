@@ -27,6 +27,7 @@ from __future__ import unicode_literals
 import json
 import re
 import string
+import yaml
 
 from core import feconf
 from core import python_utils
@@ -427,7 +428,7 @@ class Collection(python_utils.OBJECT):
         # YAML representation.
         del collection_dict['id']
 
-        return python_utils.yaml_from_dict(collection_dict)
+        return yaml.dump(collection_dict, allow_unicode=True, default_flow_style=False)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
