@@ -18,7 +18,7 @@
 python_linter_test.py. This file doesnot import from __future__.
 """
 
-import python_utils
+from core import python_utils
 
 
 class FakeClass(python_utils.OBJECT):

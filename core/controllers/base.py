@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 import base64
 import datetime
+import functools
 import hmac
 import json
 import logging
@@ -26,17 +27,16 @@ import os
 import re
 import time
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
-import feconf
-import python_utils
-import utils
 
-import backports.functools_lru_cache
 import webapp2
 
 from typing import Any, Dict, Optional # isort: skip
@@ -58,7 +58,7 @@ AUTH_HANDLER_PATHS = (
 )
 
 
-@backports.functools_lru_cache.lru_cache(maxsize=128)
+@functools.lru_cache(maxsize=128)
 def load_template(filename):
     """Return the HTML file contents at filepath.
 
@@ -282,7 +282,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if self.partially_logged_in and request_split.path != '/logout':
-            self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:

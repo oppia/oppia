@@ -70,7 +70,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
 
       ctrl.directiveSubscriptions = new Subscription();
       var initBindableFieldsDict = function() {
-        PageTitleService.setPageSubtitleForMobileView(
+        PageTitleService.setNavbarSubtitleForMobileView(
           SkillEditorStateService.getSkill().getDescription());
         $scope.bindableFieldsDict = {
           displayedConceptCardExplanation:
