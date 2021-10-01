@@ -877,7 +877,12 @@ LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner-dashboard'
-LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
+    '/learnerdashboardtopicsandstoriesprogresshandler/data')
+LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
+    '/learnerdashboardcollectionsprogresshandler/data')
+LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
+    '/learnerdashboardexplorationsprogresshandler/data')
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
