@@ -1001,8 +1001,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         completed_exp_summaries = (
@@ -1033,8 +1033,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         completed_exp_summaries = (
@@ -1051,8 +1051,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         completed_exp_summaries = (
@@ -1139,8 +1139,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         completed_collection_summaries = (
@@ -1171,8 +1171,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         completed_collection_summaries = (
@@ -1189,8 +1189,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         completed_collection_summaries = (
@@ -1218,9 +1218,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_services.unpublish_story(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         completed_story_summaries = (
             all_filtered_summaries.completed_story_summaries)
@@ -1256,9 +1257,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_rights.topic_is_published, False)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         learnt_topic_summaries = (
             all_filtered_summaries.learnt_topic_summaries)
@@ -1287,9 +1289,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Delete STORY_ID_1.
         story_services.delete_story(self.admin_id, self.STORY_ID_1)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         completed_story_summaries = (
             all_filtered_summaries.completed_story_summaries)
@@ -1322,9 +1325,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Delete TOPIC_ID_1.
         topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         learnt_topic_summaries = (
             all_filtered_summaries.learnt_topic_summaries)
@@ -1381,8 +1385,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         incomplete_exp_summaries = (
@@ -1416,8 +1420,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         incomplete_exp_summaries = (
@@ -1434,8 +1438,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         incomplete_exp_summaries = (
@@ -1600,8 +1604,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         incomplete_collection_summaries = (
@@ -1632,8 +1636,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         incomplete_collection_summaries = (
@@ -1650,8 +1654,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         incomplete_collection_summaries = (
@@ -1677,9 +1681,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_rights.topic_is_published, False)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         partially_learnt_topic_summaries = (
             all_filtered_summaries.partially_learnt_topic_summaries)
@@ -1705,9 +1710,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_rights.topic_is_published, False)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         partially_learnt_topic_summaries = (
             all_filtered_summaries.partially_learnt_topic_summaries)
@@ -1723,9 +1729,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_rights.topic_is_published, True)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         partially_learnt_topic_summaries = (
             all_filtered_summaries.partially_learnt_topic_summaries)
@@ -1752,9 +1759,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         topics_to_learn = (
             all_filtered_summaries.topics_to_learn_summaries)
@@ -1775,9 +1783,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Unpublish TOPIC_ID_0.
         topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
+        # Call get_topics_and_stories_progress to get filtered progress.
+        user_activity = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
         all_filtered_summaries = user_activity[0]
         topics_to_learn = (
             all_filtered_summaries.topics_to_learn_summaries)
@@ -1805,8 +1814,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         exploration_playlist = (
@@ -1833,8 +1842,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         exploration_playlist = (
@@ -1851,8 +1860,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_exploration_progress to get filtered progress.
+        user_activity = learner_progress_services.get_exploration_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         exploration_playlist = (
@@ -1880,8 +1889,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         collection_playlist = (
@@ -1908,8 +1917,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         collection_playlist = (
@@ -1926,8 +1935,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
+        # Call get_collection_progress to get filtered progress.
+        user_activity = learner_progress_services.get_collection_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
         collection_playlist = (
@@ -1996,7 +2005,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             activity_ids.collection_playlist_ids, [self.COL_ID_3])
 
-    def test_get_activity_progress(self):
+    def test_get_all_activity_progress(self):
         # Add topics to config_domain.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
@@ -2054,33 +2063,40 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID_2)
 
         # Get the progress of the user.
-        activity_progress = learner_progress_services.get_activity_progress(
-            self.user_id)
+        exploration_progress = (
+            learner_progress_services.get_exploration_progress(
+                self.user_id))
+        collection_progress = (
+            learner_progress_services.get_collection_progress(
+                self.user_id))
+        topics_and_stories_progress = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
 
         incomplete_exp_summaries = (
-            activity_progress[0].incomplete_exp_summaries)
+            exploration_progress[0].incomplete_exp_summaries)
         incomplete_collection_summaries = (
-            activity_progress[0].incomplete_collection_summaries)
+            collection_progress[0].incomplete_collection_summaries)
         partially_learnt_topic_summaries = (
-            activity_progress[0].partially_learnt_topic_summaries)
+            topics_and_stories_progress[0].partially_learnt_topic_summaries)
         completed_exp_summaries = (
-            activity_progress[0].completed_exp_summaries)
+            exploration_progress[0].completed_exp_summaries)
         completed_collection_summaries = (
-            activity_progress[0].completed_collection_summaries)
+            collection_progress[0].completed_collection_summaries)
         completed_story_summaries = (
-            activity_progress[0].completed_story_summaries)
+            topics_and_stories_progress[0].completed_story_summaries)
         learnt_topic_summaries = (
-            activity_progress[0].learnt_topic_summaries)
+            topics_and_stories_progress[0].learnt_topic_summaries)
         topics_to_learn_summaries = (
-            activity_progress[0].topics_to_learn_summaries)
+            topics_and_stories_progress[0].topics_to_learn_summaries)
         all_topic_summaries = (
-            activity_progress[0].all_topic_summaries)
+            topics_and_stories_progress[0].all_topic_summaries)
         untracked_topic_summaries = (
-            activity_progress[0].untracked_topic_summaries)
+            topics_and_stories_progress[0].untracked_topic_summaries)
         exploration_playlist_summaries = (
-            activity_progress[0].exploration_playlist_summaries)
+            exploration_progress[0].exploration_playlist_summaries)
         collection_playlist_summaries = (
-            activity_progress[0].collection_playlist_summaries)
+            collection_progress[0].collection_playlist_summaries)
 
         self.assertEqual(len(incomplete_exp_summaries), 1)
         self.assertEqual(len(incomplete_collection_summaries), 1)
@@ -2157,33 +2173,40 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         # Get the progress of the user.
-        activity_progress = learner_progress_services.get_activity_progress(
-            self.user_id)
+        exploration_progress = (
+            learner_progress_services.get_exploration_progress(
+                self.user_id))
+        collection_progress = (
+            learner_progress_services.get_collection_progress(
+                self.user_id))
+        topics_and_stories_progress = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
 
         # Check that the exploration is no longer present in the incomplete
         # section.
         self.assertEqual(
-            len(activity_progress[0].incomplete_exp_summaries), 0)
+            len(exploration_progress[0].incomplete_exp_summaries), 0)
         # Check that the dashboard records the exploration deleted in the
         # completed section.
-        self.assertEqual(activity_progress[1]['completed_explorations'], 1)
+        self.assertEqual(exploration_progress[1]['completed_explorations'], 1)
         # Check that the dashboard records the exploration deleted in the
         # incomplete section.
-        self.assertEqual(activity_progress[1]['incomplete_explorations'], 1)
+        self.assertEqual(exploration_progress[1]['incomplete_explorations'], 1)
         # Check that the dashboard records the exploration deleted in the
         # playlist section.
-        self.assertEqual(activity_progress[1]['exploration_playlist'], 1)
+        self.assertEqual(exploration_progress[1]['exploration_playlist'], 1)
 
         # Check that the dashboard records the topic deleted in the learn
         # section of the learner goals.
-        self.assertEqual(activity_progress[1]['topics_to_learn'], 1)
+        self.assertEqual(topics_and_stories_progress[1]['topics_to_learn'], 1)
 
         incomplete_collection_summaries = (
-            activity_progress[0].incomplete_collection_summaries)
+            collection_progress[0].incomplete_collection_summaries)
         completed_story_summaries = (
-            activity_progress[0].completed_story_summaries)
+            topics_and_stories_progress[0].completed_story_summaries)
         partially_learnt_topic_summaries = (
-            activity_progress[0].partially_learnt_topic_summaries)
+            topics_and_stories_progress[0].partially_learnt_topic_summaries)
 
         # Check that the collection to which a new exploration has been added
         # has been moved to the incomplete section.
@@ -2215,19 +2238,24 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)
 
         # Get the progress of the user.
-        activity_progress = learner_progress_services.get_activity_progress(
-            self.user_id)
+        collection_progress = (
+            learner_progress_services.get_collection_progress(
+                self.user_id))
+        topics_and_stories_progress = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id))
 
         # Check that the dashboard records the collection deleted in the
         # completed section.
-        self.assertEqual(activity_progress[1]['completed_collections'], 1)
+        self.assertEqual(collection_progress[1]['completed_collections'], 1)
         # Check that the dashboard records the collection deleted in the
         # incomplete section.
-        self.assertEqual(activity_progress[1]['incomplete_collections'], 1)
+        self.assertEqual(collection_progress[1]['incomplete_collections'], 1)
         # Check that the dashboard records the collection deleted in the
         # playlist section.
-        self.assertEqual(activity_progress[1]['collection_playlist'], 1)
+        self.assertEqual(collection_progress[1]['collection_playlist'], 1)
 
         # Check that the dashboard records the topic deleted in the incomplete
         # section.
-        self.assertEqual(activity_progress[1]['partially_learnt_topics'], 1)
+        self.assertEqual(
+            topics_and_stories_progress[1]['partially_learnt_topics'], 1)

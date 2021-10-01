@@ -1747,48 +1747,33 @@ def get_learner_dashboard_activities(user_id):
     return activity_ids
 
 
-def get_activity_progress(user_id):
-    """Returns the progress of the learners - the explorations, collections,
-    stories and learnt_topics completed by the user and those in progress.
+def get_topics_and_stories_progress(user_id):
+    """Returns the progress of the learners - the stories and learnt_topics
+    completed by the user and those in progress.
 
     Args:
         user_id: str. The id of the learner.
 
     Returns:
-        (LearnerProgress, dict).
-        The first return value is the learner progress domain object
-        corresponding to the particular learner. The second return value
-        is the numbers of the activities that are no longer present.
-        It contains eight keys:
-            - incomplete_explorations: int. The number of incomplete
-                explorations no longer present.
-            - incomplete_collections: int. The number of incomplete collections
-                no longer present.
+        (LearnerProgressInTopicsAndStories, dict).
+        The first return value is the learner progress in topics and stories
+        domain object corresponding to the particular learner.
+        The second return value is the numbers of the activities that are
+        no longer present. It contains three keys:
             - partially_learnt_topics: int. The number of partially learnt
                 topics no longer present.
-            - completed_explorations: int. The number of completed explorations
-                no longer present.
-            - completed_collections: int. The number of completed collections
-                no longer present.
             - completed_stories: int. The number of completed stories no
                 longer present.
             - learnt_topics: int. The number of learnt topics no
                 longer present.
+            - topics_to_learn: int. The number of topics marked to learn.
     """
     activity_ids_in_learner_dashboard = (
         get_learner_dashboard_activities(user_id))
-    completed_exploration_ids = (
-        activity_ids_in_learner_dashboard.completed_exploration_ids)
-    completed_collection_ids = (
-        activity_ids_in_learner_dashboard.completed_collection_ids)
     completed_story_ids = (
         activity_ids_in_learner_dashboard.completed_story_ids)
     learnt_topic_ids = (
         activity_ids_in_learner_dashboard.learnt_topic_ids)
-    incomplete_exploration_ids = (
-        activity_ids_in_learner_dashboard.incomplete_exploration_ids)
-    incomplete_collection_ids = (
-        activity_ids_in_learner_dashboard.incomplete_collection_ids)
     partially_learnt_topic_ids = (
         activity_ids_in_learner_dashboard.partially_learnt_topic_ids)
     topic_ids_to_learn = (
@@ -1797,108 +1782,44 @@ def get_activity_progress(user_id):
         activity_ids_in_learner_dashboard.all_topic_ids)
     untracked_topic_ids = (
         activity_ids_in_learner_dashboard.untracked_topic_ids)
-    exploration_playlist_ids = (
-        activity_ids_in_learner_dashboard.exploration_playlist_ids)
-    collection_playlist_ids = (
-        activity_ids_in_learner_dashboard.collection_playlist_ids)
 
+    unique_topic_ids = list(
+        set(
+            partially_learnt_topic_ids + learnt_topic_ids + topic_ids_to_learn +
+            all_topic_ids + untracked_topic_ids))
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
-                ('ExpSummaryModel', incomplete_exploration_ids),
-                ('CollectionSummaryModel', incomplete_collection_ids),
-                ('TopicSummaryModel', partially_learnt_topic_ids),
-                ('ExpSummaryModel', completed_exploration_ids),
-                ('CollectionSummaryModel', completed_collection_ids),
-                ('StorySummaryModel', completed_story_ids),
-                ('TopicSummaryModel', learnt_topic_ids),
-                ('TopicSummaryModel', topic_ids_to_learn),
-                ('ExpSummaryModel', exploration_playlist_ids),
-                ('CollectionSummaryModel', collection_playlist_ids),
-                ('TopicSummaryModel', all_topic_ids)
+                ('TopicSummaryModel', unique_topic_ids),
+                ('StorySummaryModel', completed_story_ids)
             ]))
 
-    incomplete_exploration_models = activity_models[0]
-    incomplete_collection_models = activity_models[1]
-    partially_learnt_topic_models = activity_models[2]
-    completed_exploration_models = activity_models[3]
-    completed_collection_models = activity_models[4]
-    completed_story_models = activity_models[5]
-    learnt_topic_models = activity_models[6]
-    topics_to_learn_models = activity_models[7]
-    exploration_playlist_models = activity_models[8]
-    collection_playlist_models = activity_models[9]
-    all_topic_models = activity_models[10]
-    untracked_topic_models = [
-        topic_model for topic_model in activity_models[10]
-        if topic_model.id in untracked_topic_ids
-    ]
+    topic_id_to_model_dict = {}
+    for model in activity_models[0]:
+        if model is not None:
+            topic_id_to_model_dict[model.id] = (
+                topic_fetchers.get_topic_summary_from_model(model))
 
-    incomplete_exp_summaries = (
-        [exp_fetchers.get_exploration_summary_from_model(model)
-         if model else None for model in incomplete_exploration_models])
-    incomplete_collection_summaries = (
-        [collection_services.get_collection_summary_from_model(model)
-         if model else None for model in incomplete_collection_models])
+    completed_story_models = activity_models[1]
+
     partially_learnt_topic_summaries = (
-        [topic_fetchers.get_topic_summary_from_model(model)
-         if model else None for model in partially_learnt_topic_models])
-    completed_exp_summaries = (
-        [exp_fetchers.get_exploration_summary_from_model(model)
-         if model else None for model in completed_exploration_models])
-    completed_collection_summaries = (
-        [collection_services.get_collection_summary_from_model(model)
-         if model else None for model in completed_collection_models])
+        [topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict
+         else None for topic_id in partially_learnt_topic_ids])
     completed_story_summaries = (
         [story_fetchers.get_story_summary_from_model(model)
          if model else None for model in completed_story_models])
     learnt_topic_summaries = (
-        [topic_fetchers.get_topic_summary_from_model(model)
-         if model else None for model in learnt_topic_models])
+        [topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict
+         else None for topic_id in learnt_topic_ids])
     topics_to_learn_summaries = (
-        [topic_fetchers.get_topic_summary_from_model(model)
-         if model else None for model in topics_to_learn_models])
-    exploration_playlist_summaries = (
-        [exp_fetchers.get_exploration_summary_from_model(model)
-         if model else None for model in exploration_playlist_models])
-    collection_playlist_summaries = (
-        [collection_services.get_collection_summary_from_model(model)
-         if model else None for model in collection_playlist_models])
+        [topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict
+         else None for topic_id in topic_ids_to_learn])
     all_topic_summaries = (
-        [topic_fetchers.get_topic_summary_from_model(model)
-         if model else None for model in all_topic_models])
+        [topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict
+         else None for topic_id in all_topic_ids])
     untracked_topic_summaries = (
-        [topic_fetchers.get_topic_summary_from_model(model)
-         if model else None for model in untracked_topic_models])
-
-    filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
-        _get_filtered_incomplete_exp_summaries(
-            incomplete_exp_summaries, incomplete_exploration_ids))
-
-    filtered_completed_exp_summaries, nonexistent_completed_exp_ids = (
-        _get_filtered_completed_exp_summaries(
-            completed_exp_summaries, completed_exploration_ids))
-
-    (
-        filtered_completed_collection_summaries,
-        nonexistent_completed_collection_ids,
-        completed_to_incomplete_collection_summaries) = (
-            _get_filtered_completed_collection_summaries(
-                user_id, completed_collection_summaries,
-                completed_collection_ids))
-
-    completed_to_incomplete_collection_titles = []
-    for collection_summary in completed_to_incomplete_collection_summaries:
-        incomplete_collection_summaries.append(collection_summary)
-        completed_to_incomplete_collection_titles.append(
-            collection_summary.title)
-        incomplete_collection_ids.append(collection_summary.id)
-
-    (
-        filtered_incomplete_collection_summaries,
-        nonexistent_incomplete_collection_ids) = (
-            _get_filtered_incomplete_collection_summaries(
-                incomplete_collection_summaries, incomplete_collection_ids))
+        [topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict
+         else None for topic_id in untracked_topic_ids])
 
     (
         filtered_completed_story_summaries,
@@ -1938,16 +1859,6 @@ def get_activity_progress(user_id):
         _get_filtered_topics_to_learn_summaries(
             user_id, topics_to_learn_summaries, topic_ids_to_learn))
 
-    filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
-        _get_filtered_exp_playlist_summaries(
-            exploration_playlist_summaries, exploration_playlist_ids))
-
-    (
-        filtered_collection_playlist_summaries,
-        nonexistent_playlist_collection_ids) = (
-            _get_filtered_collection_playlist_summaries(
-                collection_playlist_summaries, collection_playlist_ids))
-
     filtered_all_topic_summaries = (
         _get_filtered_all_topic_summaries(
             all_topic_summaries, all_topic_ids))
@@ -1956,51 +1867,244 @@ def get_activity_progress(user_id):
         _get_filtered_untracked_topic_summaries(
             untracked_topic_summaries, untracked_topic_ids))
 
-    number_of_nonexistent_activities = {
-        'incomplete_explorations': len(nonexistent_incomplete_exp_ids),
-        'incomplete_collections': len(nonexistent_incomplete_collection_ids),
+    number_of_nonexistent_topics_and_stories = {
         'partially_learnt_topics': len(nonexistent_partially_learnt_topic_ids),
-        'completed_explorations': len(nonexistent_completed_exp_ids),
-        'completed_collections': len(nonexistent_completed_collection_ids),
         'completed_stories': len(nonexistent_completed_story_ids),
         'learnt_topics': len(nonexistent_learnt_topic_ids),
         'topics_to_learn': len(nonexistent_topic_ids_to_learn),
-        'exploration_playlist': len(nonexistent_playlist_exp_ids),
+    }
+
+    _remove_activity_ids_from_incomplete_list(
+        user_id,
+        exploration_ids=[],
+        collection_ids=[],
+        partially_learnt_topic_ids=nonexistent_partially_learnt_topic_ids)
+    _remove_activity_ids_from_completed_list(
+        user_id, [], [],
+        nonexistent_completed_story_ids,
+        nonexistent_learnt_topic_ids)
+    learner_goals_services.remove_topics_from_learn_goal(
+        user_id, nonexistent_topic_ids_to_learn)
+
+    learner_progress_in_topics_and_stories = (
+        learner_progress_domain.LearnerProgressInTopicsAndStories(
+            filtered_partially_learnt_topic_summaries,
+            filtered_completed_story_summaries,
+            filtered_learnt_topic_summaries,
+            filtered_topics_to_learn_summaries,
+            filtered_all_topic_summaries,
+            filtered_untracked_topic_summaries,
+            completed_to_incomplete_story_titles,
+            learnt_to_partially_learnt_topic_titles)
+        )
+
+    return (
+        learner_progress_in_topics_and_stories,
+        number_of_nonexistent_topics_and_stories)
+
+
+def get_collection_progress(user_id):
+    """Returns the progress of the learners collections completed by the user
+    and those in progress.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        (LearnerProgressInCollections, dict).
+        The first return value is the learner progress in collection domain
+        object corresponding to the particular learner. The second return value
+        is the numbers of the activities that are no longer present.
+        It contains two keys:
+            - incomplete_collections: int. The number of incomplete collections
+                no longer present.
+            - completed_collections: int. The number of completed collections
+                no longer present.
+    """
+    activity_ids_in_learner_dashboard = (
+        get_learner_dashboard_activities(user_id))
+    completed_collection_ids = (
+        activity_ids_in_learner_dashboard.completed_collection_ids)
+    incomplete_collection_ids = (
+        activity_ids_in_learner_dashboard.incomplete_collection_ids)
+    collection_playlist_ids = (
+        activity_ids_in_learner_dashboard.collection_playlist_ids)
+
+    unique_collection_ids = list(
+        set(
+            incomplete_collection_ids + completed_collection_ids +
+            collection_playlist_ids))
+    activity_models = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [('CollectionSummaryModel', unique_collection_ids)]))
+
+    collection_id_to_model_dict = {}
+    for model in activity_models[0]:
+        if model is not None:
+            collection_id_to_model_dict[model.id] = (
+                collection_services.get_collection_summary_from_model(model))
+
+    incomplete_collection_summaries = (
+        [collection_id_to_model_dict[collection_id]
+         if collection_id in collection_id_to_model_dict else None
+         for collection_id in incomplete_collection_ids])
+    completed_collection_summaries = (
+        [collection_id_to_model_dict[collection_id]
+         if collection_id in collection_id_to_model_dict else None
+         for collection_id in completed_collection_ids])
+    collection_playlist_summaries = (
+        [collection_id_to_model_dict[collection_id]
+         if collection_id in collection_id_to_model_dict else None
+         for collection_id in collection_playlist_ids])
+
+    (
+        filtered_completed_collection_summaries,
+        nonexistent_completed_collection_ids,
+        completed_to_incomplete_collection_summaries) = (
+            _get_filtered_completed_collection_summaries(
+                user_id, completed_collection_summaries,
+                completed_collection_ids))
+
+    completed_to_incomplete_collection_titles = []
+    for collection_summary in completed_to_incomplete_collection_summaries:
+        incomplete_collection_summaries.append(collection_summary)
+        completed_to_incomplete_collection_titles.append(
+            collection_summary.title)
+        incomplete_collection_ids.append(collection_summary.id)
+
+    (
+        filtered_incomplete_collection_summaries,
+        nonexistent_incomplete_collection_ids) = (
+            _get_filtered_incomplete_collection_summaries(
+                incomplete_collection_summaries, incomplete_collection_ids))
+
+    (
+        filtered_collection_playlist_summaries,
+        nonexistent_playlist_collection_ids) = (
+            _get_filtered_collection_playlist_summaries(
+                collection_playlist_summaries, collection_playlist_ids))
+
+    number_of_nonexistent_collections = {
+        'incomplete_collections': len(nonexistent_incomplete_collection_ids),
+        'completed_collections': len(nonexistent_completed_collection_ids),
         'collection_playlist': len(nonexistent_playlist_collection_ids),
     }
 
     _remove_activity_ids_from_incomplete_list(
         user_id,
-        exploration_ids=nonexistent_incomplete_exp_ids,
+        exploration_ids=[],
         collection_ids=nonexistent_incomplete_collection_ids,
-        partially_learnt_topic_ids=nonexistent_partially_learnt_topic_ids)
+        partially_learnt_topic_ids=[])
     _remove_activity_ids_from_completed_list(
-        user_id, nonexistent_completed_exp_ids,
+        user_id, [],
         nonexistent_completed_collection_ids,
-        nonexistent_completed_story_ids,
-        nonexistent_learnt_topic_ids)
+        [], [])
     _remove_activity_ids_from_playlist(
-        user_id, nonexistent_playlist_exp_ids,
+        user_id, [],
         nonexistent_playlist_collection_ids)
-    learner_goals_services.remove_topics_from_learn_goal(
-        user_id, nonexistent_topic_ids_to_learn)
 
-    learner_progress = learner_progress_domain.LearnerProgress(
-        filtered_incomplete_exp_summaries,
-        filtered_incomplete_collection_summaries,
-        filtered_partially_learnt_topic_summaries,
-        filtered_completed_exp_summaries,
-        filtered_completed_collection_summaries,
-        filtered_completed_story_summaries,
-        filtered_learnt_topic_summaries,
-        filtered_topics_to_learn_summaries,
-        filtered_exp_playlist_summaries,
-        filtered_collection_playlist_summaries,
-        filtered_all_topic_summaries,
-        filtered_untracked_topic_summaries,
-        completed_to_incomplete_collection_titles,
-        completed_to_incomplete_story_titles,
-        learnt_to_partially_learnt_topic_titles)
+    learner_progress_in_collection = (
+        learner_progress_domain.LearnerProgressInCollections(
+            filtered_incomplete_collection_summaries,
+            filtered_completed_collection_summaries,
+            filtered_collection_playlist_summaries,
+            completed_to_incomplete_collection_titles)
+        )
 
     return (
-        learner_progress, number_of_nonexistent_activities)
+        learner_progress_in_collection, number_of_nonexistent_collections)
+
+
+def get_exploration_progress(user_id):
+    """Returns the progress of the learners explorations completed by the user
+    and those in progress.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        (LearnerProgressInExplorations, dict).
+        The first return value is the learner progress in exploration
+        domain object corresponding to the particular learner.
+        The second return value is the numbers of the activities that
+        are no longer present. It contains two keys:
+            - incomplete_explorations: int. The number of incomplete
+                explorations no longer present.
+            - completed_explorations: int. The number of completed explorations
+                no longer present.
+    """
+    activity_ids_in_learner_dashboard = (
+        get_learner_dashboard_activities(user_id))
+    completed_exploration_ids = (
+        activity_ids_in_learner_dashboard.completed_exploration_ids)
+    incomplete_exploration_ids = (
+        activity_ids_in_learner_dashboard.incomplete_exploration_ids)
+    exploration_playlist_ids = (
+        activity_ids_in_learner_dashboard.exploration_playlist_ids)
+
+    unique_exploration_ids = list(
+        set(
+            incomplete_exploration_ids + completed_exploration_ids +
+            exploration_playlist_ids))
+    activity_models = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [('ExpSummaryModel', unique_exploration_ids)]))
+
+    exploration_id_to_model_dict = {}
+    for model in activity_models[0]:
+        if model is not None:
+            exploration_id_to_model_dict[model.id] = (
+                exp_fetchers.get_exploration_summary_from_model(model))
+
+    incomplete_exp_summaries = (
+        [exploration_id_to_model_dict[exp_id]
+         if exp_id in exploration_id_to_model_dict else None
+         for exp_id in incomplete_exploration_ids])
+    completed_exp_summaries = (
+        [exploration_id_to_model_dict[exp_id]
+         if exp_id in exploration_id_to_model_dict else None
+         for exp_id in completed_exploration_ids])
+    exploration_playlist_summaries = (
+        [exploration_id_to_model_dict[exp_id]
+         if exp_id in exploration_id_to_model_dict else None
+         for exp_id in exploration_playlist_ids])
+
+    filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
+        _get_filtered_incomplete_exp_summaries(
+            incomplete_exp_summaries, incomplete_exploration_ids))
+
+    filtered_completed_exp_summaries, nonexistent_completed_exp_ids = (
+        _get_filtered_completed_exp_summaries(
+            completed_exp_summaries, completed_exploration_ids))
+
+    filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
+        _get_filtered_exp_playlist_summaries(
+            exploration_playlist_summaries, exploration_playlist_ids))
+
+    number_of_nonexistent_explorations = {
+        'incomplete_explorations': len(nonexistent_incomplete_exp_ids),
+        'completed_explorations': len(nonexistent_completed_exp_ids),
+        'exploration_playlist': len(nonexistent_playlist_exp_ids),
+    }
+
+    _remove_activity_ids_from_incomplete_list(
+        user_id,
+        exploration_ids=nonexistent_incomplete_exp_ids,
+        collection_ids=[],
+        partially_learnt_topic_ids=[])
+    _remove_activity_ids_from_completed_list(
+        user_id, nonexistent_completed_exp_ids,
+        [], [], [])
+    _remove_activity_ids_from_playlist(
+        user_id, nonexistent_playlist_exp_ids, [])
+
+    learner_progress_in_explorations = (
+        learner_progress_domain.LearnerProgressInExplorations(
+            filtered_incomplete_exp_summaries,
+            filtered_completed_exp_summaries,
+            filtered_exp_playlist_summaries)
+        )
+
+    return (
+        learner_progress_in_explorations,
+        number_of_nonexistent_explorations)

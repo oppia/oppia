@@ -51,123 +51,7 @@ describe('Learner Dashboard Backend API Service', () => {
     url_fragment: 'subtopic-name'
   };
 
-  let sampleDataResults = {
-    incomplete_explorations_list: [{
-      category: 'Arithmetic',
-      created_on_msec: 1515553584276.8,
-      community_owned: false,
-      thumbnail_bg_color: '#d68453',
-      title: 'Equality of Fractions (Recap)',
-      num_views: 760,
-      tags: [
-        'recap',
-        'fractions',
-        'mixed numbers',
-        'improper fractions',
-        'equivalent fractions',
-        'fractions of a group'
-      ],
-      last_updated_msec: 1593864269236.194,
-      human_readable_contributors_summary: {},
-      status: 'public',
-      language_code: 'en',
-      objective: 'Practice the skills from lessons 1-7.',
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      ratings: {
-        1: 0,
-        2: 1,
-        3: 0,
-        4: 0,
-        5: 5
-      },
-      id: '-tMgcP1i_4au',
-      activity_type: 'exploration'
-    }],
-    exploration_playlist: [{
-      category: 'Welcome',
-      created_on_msec: 1564183471833.675,
-      community_owned: true,
-      thumbnail_bg_color: '#992a2b',
-      title: 'Welcome to Oppia!',
-      num_views: 14897,
-      tags: [],
-      last_updated_msec: 1571653541705.924,
-      human_readable_contributors_summary: {},
-      status: 'public',
-      language_code: 'en',
-      objective: "become familiar with Oppia's capabilities",
-      thumbnail_icon_url: '/subjects/Welcome.svg',
-      ratings: {
-        1: 1,
-        2: 1,
-        3: 3,
-        4: 24,
-        5: 46
-      },
-      id: '0',
-      activity_type: 'exploration'
-    }],
-    number_of_unread_threads: 0,
-    thread_summaries: [
-      {
-        status: 'open',
-        author_second_last_message: null,
-        exploration_id: 'JctD1Xvtg1eC',
-        last_message_is_read: true,
-        thread_id:
-          'exploration.JctD1Xvtg1eC.WzE1OTIyMjMzMDM3ODMuMTldWzEyOTk3XQ==',
-        author_last_message: 'nishantwrp',
-        last_updated_msecs: 1592223304062.665,
-        last_message_text: '',
-        original_author_id: 'uid_oijrdjajpkgegqmqqttxsxbbiobexugg',
-        exploration_title: 'What is a negative number?',
-        second_last_message_is_read: false,
-        total_message_count: 1
-      }
-    ],
-    completed_collections_list: [{
-      status: 'public',
-      thumbnail_bg_color: '#d68453',
-      community_owned: false,
-      created_on: 1558593739415.726,
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      language_code: 'en',
-      id: 'GdYIgsfRZwG7',
-      category: 'Arithmetic',
-      title: 'Negative Numbers',
-      last_updated_msec: 1558593926486.329,
-      objective: 'Learn what negative numbers are, and how to use them.',
-      node_count: 5
-    }],
-    collection_playlist: [{
-      status: 'public',
-      thumbnail_bg_color: '#d68453',
-      community_owned: false,
-      created_on: 1558593739415.726,
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      language_code: 'en',
-      id: 'GdYIgsfRZwG7',
-      category: 'Arithmetic',
-      title: 'Negative Numbers',
-      last_updated_msec: 1558593926486.329,
-      objective: 'Learn what negative numbers are, and how to use them.',
-      node_count: 5
-    }],
-    incomplete_collections_list: [{
-      status: 'public',
-      thumbnail_bg_color: '#d68453',
-      community_owned: false,
-      created_on: 1491118537846.88,
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      language_code: 'en',
-      id: '4UgTQUc1tala',
-      category: 'Arithmetic',
-      title: 'Fractions',
-      last_updated_msec: 1527227142150.33,
-      objective:
-        'Learn the basics of fractions with Matthew as he explores a bakery.',
-      node_count: 12
-    }],
+  let sampleTopicsAndStoriesDataResults = {
     completed_stories_list: [{
       id: 'sample_story_id',
       title: 'Story title',
@@ -385,18 +269,150 @@ describe('Learner Dashboard Backend API Service', () => {
         skill_id_2: 'Skill Description 2'
       }
     }],
-    number_of_nonexistent_activities: {
-      completed_collections: 0,
-      incomplete_collections: 0,
-      collection_playlist: 0,
-      incomplete_explorations: 0,
-      exploration_playlist: 0,
-      completed_explorations: 0,
-      completed_stories: 0,
+    number_of_nonexistent_topics_and_stories: {
       incomplete_stories: 0,
       learnt_topics: 0,
       partially_learnt_topics: 0,
       topics_to_learn: 0
+    },
+    user_email: 'user@example.com',
+    completed_to_incomplete_stories: [],
+    learnt_to_partially_learnt_topics: []
+  };
+
+
+  let sampleCollectionsDataResults = {
+    completed_collections_list: [{
+      status: 'public',
+      thumbnail_bg_color: '#d68453',
+      community_owned: false,
+      created_on: 1558593739415.726,
+      thumbnail_icon_url: '/subjects/Arithmetic.svg',
+      language_code: 'en',
+      id: 'GdYIgsfRZwG7',
+      category: 'Arithmetic',
+      title: 'Negative Numbers',
+      last_updated_msec: 1558593926486.329,
+      objective: 'Learn what negative numbers are, and how to use them.',
+      node_count: 5
+    }],
+    collection_playlist: [{
+      status: 'public',
+      thumbnail_bg_color: '#d68453',
+      community_owned: false,
+      created_on: 1558593739415.726,
+      thumbnail_icon_url: '/subjects/Arithmetic.svg',
+      language_code: 'en',
+      id: 'GdYIgsfRZwG7',
+      category: 'Arithmetic',
+      title: 'Negative Numbers',
+      last_updated_msec: 1558593926486.329,
+      objective: 'Learn what negative numbers are, and how to use them.',
+      node_count: 5
+    }],
+    incomplete_collections_list: [{
+      status: 'public',
+      thumbnail_bg_color: '#d68453',
+      community_owned: false,
+      created_on: 1491118537846.88,
+      thumbnail_icon_url: '/subjects/Arithmetic.svg',
+      language_code: 'en',
+      id: '4UgTQUc1tala',
+      category: 'Arithmetic',
+      title: 'Fractions',
+      last_updated_msec: 1527227142150.33,
+      objective:
+        'Learn the basics of fractions with Matthew as he explores a bakery.',
+      node_count: 12
+    }],
+    number_of_nonexistent_collections: {
+      completed_collections: 0,
+      incomplete_collections: 0,
+      collection_playlist: 0,
+    },
+    user_email: 'user@example.com',
+    completed_to_incomplete_collections: [],
+  };
+
+
+  let sampleExplorationDataResults = {
+    incomplete_explorations_list: [{
+      category: 'Arithmetic',
+      created_on_msec: 1515553584276.8,
+      community_owned: false,
+      thumbnail_bg_color: '#d68453',
+      title: 'Equality of Fractions (Recap)',
+      num_views: 760,
+      tags: [
+        'recap',
+        'fractions',
+        'mixed numbers',
+        'improper fractions',
+        'equivalent fractions',
+        'fractions of a group'
+      ],
+      last_updated_msec: 1593864269236.194,
+      human_readable_contributors_summary: {},
+      status: 'public',
+      language_code: 'en',
+      objective: 'Practice the skills from lessons 1-7.',
+      thumbnail_icon_url: '/subjects/Arithmetic.svg',
+      ratings: {
+        1: 0,
+        2: 1,
+        3: 0,
+        4: 0,
+        5: 5
+      },
+      id: '-tMgcP1i_4au',
+      activity_type: 'exploration'
+    }],
+    exploration_playlist: [{
+      category: 'Welcome',
+      created_on_msec: 1564183471833.675,
+      community_owned: true,
+      thumbnail_bg_color: '#992a2b',
+      title: 'Welcome to Oppia!',
+      num_views: 14897,
+      tags: [],
+      last_updated_msec: 1571653541705.924,
+      human_readable_contributors_summary: {},
+      status: 'public',
+      language_code: 'en',
+      objective: "become familiar with Oppia's capabilities",
+      thumbnail_icon_url: '/subjects/Welcome.svg',
+      ratings: {
+        1: 1,
+        2: 1,
+        3: 3,
+        4: 24,
+        5: 46
+      },
+      id: '0',
+      activity_type: 'exploration'
+    }],
+    number_of_unread_threads: 0,
+    thread_summaries: [
+      {
+        status: 'open',
+        author_second_last_message: null,
+        exploration_id: 'JctD1Xvtg1eC',
+        last_message_is_read: true,
+        thread_id:
+          'exploration.JctD1Xvtg1eC.WzE1OTIyMjMzMDM3ODMuMTldWzEyOTk3XQ==',
+        author_last_message: 'nishantwrp',
+        last_updated_msecs: 1592223304062.665,
+        last_message_text: '',
+        original_author_id: 'uid_oijrdjajpkgegqmqqttxsxbbiobexugg',
+        exploration_title: 'What is a negative number?',
+        second_last_message_is_read: false,
+        total_message_count: 1
+      }
+    ],
+    number_of_nonexistent_explorations: {
+      incomplete_explorations: 0,
+      exploration_playlist: 0,
+      completed_explorations: 0,
     },
     completed_explorations_list: [{
       category: 'Welcome',
@@ -427,18 +443,21 @@ describe('Learner Dashboard Backend API Service', () => {
       creator_impact: 0,
       creator_picture_data_url: 'path/to/img'
     }],
-    user_email: 'user@example.com',
-    completed_to_incomplete_collections: [],
-    completed_to_incomplete_stories: [],
-    learnt_to_partially_learnt_topics: []
+    user_email: 'user@example.com'
   };
+
   let sampleSubtopicMastery = {
     topic_id: {
       1: 0
     }
   };
 
-  let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
+  let LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
+    '/learnerdashboardtopicsandstoriesprogresshandler/data');
+  let LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
+    '/learnerdashboardcollectionsprogresshandler/data');
+  let LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
+    '/learnerdashboardexplorationsprogresshandler/data');
   let ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
@@ -456,17 +475,61 @@ describe('Learner Dashboard Backend API Service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch learner dashboard data from the' +
-    ' backend', fakeAsync(() => {
+  it('should successfully fetch learner dashboard topics and stories data ' +
+    'from the backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardTopicsAndStoriesDataAsync()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL);
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
+    req.flush(sampleTopicsAndStoriesDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should successfully fetch learner dashboard collections data ' +
+    'from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardCollectionsDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_COLLECTION_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleCollectionsDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should successfully fetch learner dashboard explorations data ' +
+    'from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardExplorationsDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_EXPLORATION_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleExplorationDataResults);
 
     flushMicrotasks();
 
@@ -521,15 +584,67 @@ describe('Learner Dashboard Backend API Service', () => {
   }
   ));
 
-  it('should use rejection handler if learner dashboard data' +
-    ' backend request failed', fakeAsync(() => {
+  it('should use rejection handler if learner dashboard topics and stories ' +
+    'data backend request failed', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardTopicsAndStoriesDataAsync()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error loading dashboard data.'
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it('should use rejection handler if learner dashboard collections ' +
+    'data backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardCollectionsDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_COLLECTION_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error loading dashboard data.'
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it('should use rejection handler if learner dashboard explorations ' +
+    'data backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardExplorationsDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_EXPLORATION_DATA_URL);
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 'Error loading dashboard data.'

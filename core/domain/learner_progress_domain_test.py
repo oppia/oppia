@@ -23,23 +23,17 @@ from core.domain import learner_progress_domain
 from core.tests import test_utils
 
 
-class LearnerProgressUnitTests(test_utils.GenericTestBase):
-    """Tests the learner progress domain object."""
+class LearnerProgressInTopicsAndStoriesUnitTests(test_utils.GenericTestBase):
+    """Tests the learner progress in topics and stories domain object."""
 
     def test_initialization(self):
         """Tests init method."""
-        user_learner_progress = (learner_progress_domain.LearnerProgress(
-            [], [], [], [], [], [], [], [], [], [], [], [], [], [], []))
+        user_learner_progress = (
+            learner_progress_domain.LearnerProgressInTopicsAndStories(
+                [], [], [], [], [], [], [], []))
 
         self.assertEqual(
-            user_learner_progress.incomplete_exp_summaries, [])
-        self.assertEqual(
-            user_learner_progress.incomplete_collection_summaries, [])
-        self.assertEqual(
             user_learner_progress.partially_learnt_topic_summaries, [])
-        self.assertEqual(user_learner_progress.completed_exp_summaries, [])
-        self.assertEqual(
-            user_learner_progress.completed_collection_summaries, [])
         self.assertEqual(
             user_learner_progress.completed_story_summaries, [])
         self.assertEqual(
@@ -47,13 +41,42 @@ class LearnerProgressUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_learner_progress.topics_to_learn_summaries, [])
         self.assertEqual(
-            user_learner_progress.exploration_playlist_summaries, [])
-        self.assertEqual(
-            user_learner_progress.collection_playlist_summaries, [])
-        self.assertEqual(
             user_learner_progress.all_topic_summaries, [])
         self.assertEqual(
             user_learner_progress.untracked_topic_summaries, [])
+
+
+class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
+    """Tests the learner progress in collections domain object."""
+
+    def test_initialization(self):
+        """Tests init method."""
+        user_learner_progress = (
+            learner_progress_domain.LearnerProgressInCollections(
+                [], [], [], []))
+
+        self.assertEqual(
+            user_learner_progress.incomplete_collection_summaries, [])
+        self.assertEqual(
+            user_learner_progress.completed_collection_summaries, [])
+        self.assertEqual(
+            user_learner_progress.collection_playlist_summaries, [])
+
+
+class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):
+    """Tests the learner progress in explorations domain object."""
+
+    def test_initialization(self):
+        """Tests init method."""
+        user_learner_progress = (
+            learner_progress_domain.LearnerProgressInExplorations(
+                [], [], []))
+
+        self.assertEqual(
+            user_learner_progress.incomplete_exp_summaries, [])
+        self.assertEqual(user_learner_progress.completed_exp_summaries, [])
+        self.assertEqual(
+            user_learner_progress.exploration_playlist_summaries, [])
 
 
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):

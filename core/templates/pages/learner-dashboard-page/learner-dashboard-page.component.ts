@@ -172,44 +172,25 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.progressImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/progress.svg');
 
-    let dashboardDataPromise = (
-      this.learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync());
-    dashboardDataPromise.then(
+    let dashboardTopicAndStoriesDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardTopicsAndStoriesDataAsync());
+    dashboardTopicAndStoriesDataPromise.then(
       responseData => {
-        this.isCurrentFeedbackSortDescending = true;
-        this.currentFeedbackThreadsSortType = (
-          LearnerDashboardPageConstants
-            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-        this.completedExplorationsList = (
-          responseData.completedExplorationsList);
-        this.completedCollectionsList = (
-          responseData.completedCollectionsList);
         this.completedStoriesList = (
           responseData.completedStoriesList);
         this.learntTopicsList = (
           responseData.learntTopicsList);
         this.partiallyLearntTopicsList = (
           responseData.partiallyLearntTopicsList);
-        this.incompleteExplorationsList = (
-          responseData.incompleteExplorationsList);
-        this.incompleteCollectionsList = (
-          responseData.incompleteCollectionsList);
         this.topicsToLearn = (
           responseData.topicsToLearnList);
         this.untrackedTopics = (
           responseData.untrackedTopics);
         this.allTopics = (
           responseData.allTopicsList);
-        this.subscriptionsList = responseData.subscriptionList;
-        this.completedToIncompleteCollections = (
-          responseData.completedToIncompleteCollections);
         this.learntToPartiallyLearntTopics = (
           responseData.learntToPartiallyLearntTopics);
-        this.threadSummaries = responseData.threadSummaries;
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
-        this.explorationPlaylist = responseData.explorationPlaylist;
-        this.collectionPlaylist = responseData.collectionPlaylist;
         this.activeSection = (
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME);
@@ -217,19 +198,69 @@ export class LearnerDashboardPageComponent implements OnInit {
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY
         );
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard topics and stories data');
+        }
+      }
+    );
+
+    let dashboardCollectionsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardCollectionsDataAsync());
+    dashboardCollectionsDataPromise.then(
+      responseData => {
+        this.completedCollectionsList = (
+          responseData.completedCollectionsList);
+        this.incompleteCollectionsList = (
+          responseData.incompleteCollectionsList);
+        this.completedToIncompleteCollections = (
+          responseData.completedToIncompleteCollections);
+        this.collectionPlaylist = responseData.collectionPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard collections data');
+        }
+      }
+    );
+
+    let dashboardExplorationsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardExplorationsDataAsync());
+    dashboardExplorationsDataPromise.then(
+      responseData => {
+        this.isCurrentFeedbackSortDescending = true;
+        this.currentFeedbackThreadsSortType = (
+          LearnerDashboardPageConstants
+            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+        this.completedExplorationsList = (
+          responseData.completedExplorationsList);
+        this.incompleteExplorationsList = (
+          responseData.incompleteExplorationsList);
+        this.subscriptionsList = responseData.subscriptionList;
+        this.threadSummaries = responseData.threadSummaries;
+        this.numberOfUnreadThreads =
+          responseData.numberOfUnreadThreads;
+        this.explorationPlaylist = responseData.explorationPlaylist;
         this.feedbackThreadActive = false;
       }, errorResponseStatus => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
           this.alertsService.addWarning(
-            'Failed to get learner dashboard data');
+            'Failed to get learner dashboard explorations data');
         }
       }
     );
 
     Promise.all([
       userInfoPromise,
-      dashboardDataPromise,
+      dashboardTopicAndStoriesDataPromise,
+      dashboardCollectionsDataPromise,
+      dashboardExplorationsDataPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();

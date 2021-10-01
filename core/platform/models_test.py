@@ -251,6 +251,16 @@ class RegistryUnitTest(test_utils.TestBase):
             self.registry_instance.import_datastore_services(),
             cloud_datastore_services)
 
+    def test_errors_in_datastore_services_functions(self) -> None:
+        """Tests datastore services functions errors."""
+        from core.platform.datastore import cloud_datastore_services
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'Model names should not be duplicated in input list.'):
+            cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('SampleModel', ['id_1', 'id_2']),
+                 ('SampleModel', ['id_3', 'id_4'])]
+            )
+
     def test_import_transaction_services(self) -> None:
         """Tests import transaction services function."""
         from core.platform.transactions import cloud_transaction_services
