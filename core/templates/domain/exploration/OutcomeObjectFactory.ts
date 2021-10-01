@@ -92,8 +92,6 @@ export class Outcome {
   providedIn: 'root'
 })
 export class OutcomeObjectFactory {
-  constructor() {}
-
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
       paramChanges: readonly ParamChangeBackendDict[]): Outcome {

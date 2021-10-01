@@ -24,9 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './lazy-loading.component.html',
   styleUrls: []
 })
-export class LazyLoadingComponent {
-  constructor() {}
-}
+export class LazyLoadingComponent { }
 angular.module('oppia').directive(
   'lazyLoading', downgradeComponent(
     {component: LazyLoadingComponent}));

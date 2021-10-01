@@ -61,8 +61,6 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  constructor() {}
-
   createNew(
       type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
   ): Rule {

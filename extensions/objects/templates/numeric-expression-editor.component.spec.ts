@@ -39,7 +39,6 @@ describe('NumericExpressionEditor', () => {
 
   class MockGuppy {
     static focused = true;
-    constructor(id: string, config: Object) {}
 
     asciimath() {
       return 'Dummy value';

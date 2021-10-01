@@ -48,8 +48,6 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   codemirror: CodeMirror.Editor | undefined;
   autoFocus = false;
 
-  constructor() { }
-
   updateValue(val: string): void {
     this.value = val;
     this.valueChange.emit(val);

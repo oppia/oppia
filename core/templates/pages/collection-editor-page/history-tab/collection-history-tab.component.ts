@@ -24,9 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './collection-history-tab.component.html',
   styleUrls: []
 })
-export class CollectionHistoryTabComponent {
-  constructor() {}
-}
+export class CollectionHistoryTabComponent { }
 
 angular.module('oppia').directive('collectionHistoryTab', downgradeComponent(
   {component: CollectionHistoryTabComponent}));

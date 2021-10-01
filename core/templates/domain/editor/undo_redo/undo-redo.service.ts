@@ -22,11 +22,7 @@ import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
 @Injectable({
   providedIn: 'root'
 })
-export class UndoRedoService extends BaseUndoRedo {
-  constructor() {
-    super();
-  }
-}
+export class UndoRedoService extends BaseUndoRedo { }
 
 angular.module('oppia').factory('UndoRedoService',
   downgradeInjectable(UndoRedoService));

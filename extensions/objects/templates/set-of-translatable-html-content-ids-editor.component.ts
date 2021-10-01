@@ -41,7 +41,6 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
       type: 'html'
     }
   };
-  constructor() { }
 
   ngOnInit(): void {
     if (!this.value) {

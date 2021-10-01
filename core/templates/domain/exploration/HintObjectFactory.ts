@@ -46,8 +46,6 @@ export class Hint {
   providedIn: 'root'
 })
 export class HintObjectFactory {
-  constructor() {}
-
   createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
       SubtitledHtml.createFromBackendDict(

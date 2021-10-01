@@ -35,7 +35,6 @@ export class ProfileLinkTextComponent {
     '/' + this.username
   );
 
-  constructor() {}
   isUsernameLinkable(username: string): boolean {
     return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
   }

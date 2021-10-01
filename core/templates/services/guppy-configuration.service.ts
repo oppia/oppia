@@ -88,8 +88,6 @@ const DIVISION_SYMBOL_DICT = {
 export class GuppyConfigurationService {
   static serviceIsInitialized = false;
 
-  constructor() {}
-
   init(): void {
     if (GuppyConfigurationService.serviceIsInitialized) {
       return;

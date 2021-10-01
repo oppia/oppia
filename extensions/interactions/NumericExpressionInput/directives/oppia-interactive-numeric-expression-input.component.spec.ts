@@ -44,8 +44,6 @@ describe('NumericExpressionInputInteractive', () => {
     }
   };
   class MockGuppy {
-    constructor(id: string, config: Object) {}
-
     asciimath() {
       return 'Dummy value';
     }

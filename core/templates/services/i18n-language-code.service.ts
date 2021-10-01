@@ -39,8 +39,6 @@ export class I18nLanguageCodeService {
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
-  constructor() {}
-
   getCurrentI18nLanguageCode(): string {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     return I18nLanguageCodeService.languageCode;

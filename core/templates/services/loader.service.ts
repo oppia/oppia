@@ -33,8 +33,6 @@ export class LoaderService {
     return LoaderService.loadingMessageChangedEventEmitter;
   }
 
-  constructor() {}
-
   showLoadingScreen(message: string): void {
     // TODO(#9154): Change LoaderService to "this".
     LoaderService.loadingMessageChangedEventEmitter.emit(message);

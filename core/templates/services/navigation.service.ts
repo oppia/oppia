@@ -73,8 +73,6 @@ export class NavigationService {
     }
   };
 
-  constructor() {}
-
   /**
   * Opens the submenu.
   * @param {object} evt

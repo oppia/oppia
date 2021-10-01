@@ -28,8 +28,6 @@ declare global {
 }
 
 class MockGuppy {
-  constructor(id: string, config: Object) {}
-
   engine = {
     end: () => {}
   };

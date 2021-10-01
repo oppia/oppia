@@ -43,7 +43,6 @@ export class PositionOfTermsEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   alwaysEditable = true;
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
-  constructor() { }
 
   ngOnInit(): void {
     this.localValue = this.positionOfTerms[2] as unknown as PositionOfTerm;

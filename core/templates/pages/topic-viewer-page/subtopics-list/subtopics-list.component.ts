@@ -32,7 +32,6 @@ export class SubtopicsListComponent {
   @Input() topicId: string;
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
-  constructor() {}
 }
 
 angular.module('oppia').directive(

@@ -139,8 +139,6 @@ export class ReadOnlyTopic {
   providedIn: 'root'
 })
 export class ReadOnlyTopicObjectFactory {
-  constructor() {}
-
   createFromBackendDict(
       topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map(subtopic => {

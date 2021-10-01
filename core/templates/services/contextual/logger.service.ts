@@ -22,8 +22,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoggerService {
-  constructor() {}
-
   /**
    * Logs a message to console at the debug level.
    * @param msg - A message to log.

@@ -320,7 +320,6 @@ export class StoryContents {
   providedIn: 'root'
 })
 export class StoryContentsObjectFactory {
-  constructor() {}
   createFromBackendDict(
       storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];

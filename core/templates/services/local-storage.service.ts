@@ -33,8 +33,6 @@ import {
   providedIn: 'root'
 })
 export class LocalStorageService {
-  constructor() {}
-
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
   // else storage is undefined or false.

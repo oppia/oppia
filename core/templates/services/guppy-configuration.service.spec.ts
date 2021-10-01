@@ -30,8 +30,6 @@ declare global {
 }
 
 class MockGuppy {
-  constructor(id: string, config: Object) {}
-
   asciimath(): string {
     return 'Dummy value';
   }

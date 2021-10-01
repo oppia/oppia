@@ -35,7 +35,6 @@ import { PredictionResult } from 'domain/classifier/prediction-result.model';
   providedIn: 'root'
 })
 export class SVMPredictionService {
-  constructor() {}
   kernel(
       kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {

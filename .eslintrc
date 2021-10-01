@@ -471,6 +471,7 @@
         "after": true
       }
     ],
+    "@typescript-eslint/no-useless-constructor" : ["error"],
     "wrap-iife": [
       "error",
       "any"

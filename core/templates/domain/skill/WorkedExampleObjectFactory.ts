@@ -57,9 +57,6 @@ export class WorkedExample {
   providedIn: 'root'
 })
 export class WorkedExampleObjectFactory {
-  constructor() {}
-
-
   createFromBackendDict(
       workedExampleDict: WorkedExampleBackendDict): WorkedExample {
     return new WorkedExample(
