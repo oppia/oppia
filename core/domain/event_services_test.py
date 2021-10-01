@@ -24,11 +24,11 @@ import inspect
 import logging
 import re
 
+from core import feconf
 from core.domain import event_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (
     stats_models, exp_models, feedback_models,
