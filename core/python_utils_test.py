@@ -72,18 +72,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             python_utils.url_encode(url_dict, doseq=False),
             'url=http%3A%2F%2Fmyapp%2Fmy%2520test%2F')
 
-    def test_url_retrieve(self):
-        tmp_file = tempfile.NamedTemporaryFile()
-        tmp_file.name = 'temp_file.txt'
-        python_utils.url_retrieve(
-            'http://www.google.com', filename='temp_file.txt')
-
-        with python_utils.open_file('temp_file.txt', 'rb', encoding=None) as f:
-            content = f.read()
-
-        self.assertIn(b'<title>Google</title>', content)
-        tmp_file.close()
-
     def test_url_open(self):
         response = python_utils.url_open('http://www.google.com')
         self.assertEqual(response.getcode(), 200)
