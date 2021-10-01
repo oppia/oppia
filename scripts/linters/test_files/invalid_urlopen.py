@@ -21,9 +21,9 @@ python_linter_test. This file is using urlopen which is not allowed.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import urllib2
+from core import python_utils
 
-import python_utils
+import urllib2
 
 
 class FakeClass(python_utils.OBJECT):
