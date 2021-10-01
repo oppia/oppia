@@ -1417,46 +1417,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
-    def test_pre_accept_validate_content_html(self):
-        self.save_new_default_exploration('exp1', self.author_id)
-        expected_suggestion_dict = self.suggestion_dict
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
-
-        exp_services.update_exploration(
-            self.author_id, 'exp1', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'new_value': {
-                        'content_id': 'content',
-                        'html': '<p>This is a content.</p>'
-                    },
-                    'state_name': 'State A',
-                })
-            ], 'Added state')
-        suggestion.change.state_name = 'State A'
-
-        suggestion.pre_accept_validate()
-
-        suggestion.change.content_html = 'invalid content_html'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The Exploration content has changed since this translation '
-            'was submitted.'
-        ):
-            suggestion.pre_accept_validate()
-
     def test_accept_suggestion_adds_translation_in_exploration(self):
         self.save_new_default_exploration('exp1', self.author_id)
         exploration = exp_fetchers.get_exploration_by_id('exp1')
