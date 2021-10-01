@@ -23,7 +23,9 @@ import heapq
 import logging
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -34,8 +36,6 @@ from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(

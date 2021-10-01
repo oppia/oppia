@@ -1,0 +1,9 @@
+# This file specifies which non-py files need to be included in the Oppia Python
+# package that is generated in order for Apache Beam jobs to be able to run
+# in production. Note that this package is generated
+# by running 'python setup.py sdist' in build.py.
+
+include requirements.txt
+include assets/constants.ts
+include assets/release_constants.json
+include assets/rich_text_components_definitions.ts
