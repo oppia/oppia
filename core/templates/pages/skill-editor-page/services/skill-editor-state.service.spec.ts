@@ -410,7 +410,7 @@ describe('Skill editor state service', () => {
   });
 
   it('should get validation issues for skill', () => {
-    const validationIssues = ["issue 1", "issue 2"];
+    const validationIssues = ['issue 1', 'issue 2'];
     spyOn(skill, 'getValidationIssues').and.returnValue(validationIssues);
     expect(skillEditorStateService.getSkillValidationIssues()).toBe(
       validationIssues);
