@@ -227,8 +227,8 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicTitle = async function(title) {
-    await action.clear('Subtopic Title Field', subtopicTitleField);
-    await action.sendKeys('Subtopic Title Field', subtopicTitleField, title);
+    await subtopicTitleField.clear();
+    await subtopicTitleField.sendKeys(title);
   };
 
   this.changeSubtopicPageContents = async function(content) {
