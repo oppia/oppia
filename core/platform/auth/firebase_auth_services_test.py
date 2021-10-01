@@ -295,7 +295,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             UserNotFoundError. The Firebase account has not been created yet.
         """
         matches = (u for u in self._users_by_uid.values() if u.email == email)
-        user = python_utils.NEXT(matches, None)
+        user = next(matches, None)
         if user is None:
             raise firebase_auth.UserNotFoundError('%s not found' % email)
         return user
@@ -621,7 +621,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 uids: List[str], force_delete: bool = False
         ) -> 'firebase_auth.BatchDeleteAccountsResponse':
             """Mock function that fails according to the input patterns."""
-            error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
+            error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
                 raise error_to_raise
 
@@ -679,7 +679,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 records: List[firebase_admin.auth.ImportUserRecord]
         ) -> firebase_auth.UserImportResult:
             """Mock function that fails according to the input patterns."""
-            error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
+            error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
                 raise error_to_raise
 
