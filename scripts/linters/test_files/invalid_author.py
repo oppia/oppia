@@ -21,7 +21,7 @@ python_linter_test. This file use __author__ tag which is not allowed.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
+from core import python_utils
 
 __author__ = 'Author Name' # The __author__ tag is not allowed to use.
 

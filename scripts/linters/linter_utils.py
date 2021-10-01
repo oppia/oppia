@@ -29,7 +29,7 @@ import sys
 import tempfile
 import threading
 
-import python_utils
+from core import python_utils
 
 
 def memoize(func):

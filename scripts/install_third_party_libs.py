@@ -49,7 +49,7 @@ for package_name, version_number, target_path in PREREQUISITES:
         subprocess.check_call(command_text + uextention_text)
 
 
-import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
