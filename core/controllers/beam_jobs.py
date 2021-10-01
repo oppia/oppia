@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import beam_job_services
-import feconf
 
 from typing import Any, Dict # isort: skip
 
@@ -84,7 +84,7 @@ class BeamJobRunHandler(base.BaseHandler):
         job_name: str = (
             self.normalized_payload.get('job_name')
             if self.normalized_payload else '')
-        beam_job_run = beam_job_services.run_beam_job(job_name)
+        beam_job_run = beam_job_services.run_beam_job(job_name=job_name)
         self.render_json(beam_job_run.to_dict())
 
     @acl_decorators.can_run_any_job
