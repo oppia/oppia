@@ -23,10 +23,10 @@ import collections
 import itertools
 import operator
 
+from core import feconf
+from core import python_utils
 from core.domain import improvements_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))

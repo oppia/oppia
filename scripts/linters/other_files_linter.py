@@ -24,7 +24,7 @@ import json
 import os
 import re
 
-import python_utils
+from core import python_utils
 
 import yaml
 

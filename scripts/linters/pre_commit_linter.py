@@ -64,7 +64,7 @@ import subprocess
 import sys
 import threading
 
-import python_utils
+from core import python_utils
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
@@ -89,7 +89,7 @@ SHARDS = {
         'core/storage/',
         'core/controllers/',
         'core/platform',
-        'jobs/',
+        'core/jobs/',
     ],
     'other': None,
 }

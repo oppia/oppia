@@ -19,14 +19,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
-import python_utils
-import utils
 
 PARAM_NAMES = python_utils.create_enum('feature_a', 'feature_b')  # pylint: disable=invalid-name
 SERVER_MODES = platform_parameter_domain.SERVER_MODES
