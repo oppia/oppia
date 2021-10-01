@@ -593,29 +593,6 @@ def reraise_exception():
     six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
-def is_string(value):
-    """Returns whether value has a string type."""
-    return isinstance(value, six.string_types)
-
-
-def get_args_of_function(func: Callable[..., Any]) -> List[str]:
-    """Returns the argument names of the function.
-
-    Args:
-        func: function. The function to inspect.
-
-    Returns:
-        list(str). The names of the function's arguments.
-
-    Raises:
-        TypeError. The input argument is not a function.
-    """
-    return [
-        name for name, param in inspect.signature(func).parameters.items()
-        if param.kind in (param.POSITIONAL_ONLY, param.POSITIONAL_OR_KEYWORD)
-    ]
-
-
 def create_enum(*sequential):
     """Creates a enumerated constant.
 

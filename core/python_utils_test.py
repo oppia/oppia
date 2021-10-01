@@ -26,6 +26,7 @@ import os
 import sys
 import tempfile
 import unittest
+import inspect
 
 from core import python_utils
 from core.tests import test_utils
@@ -247,16 +248,19 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 self.assertEqual(type(v), str)
 
     def test_is_string(self):
-        self.assertTrue(python_utils.is_string('abc'))
-        self.assertFalse(python_utils.is_string(123))
-        self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
+        self.assertTrue(isinstance('abc', str))
+        self.assertFalse(isinstance(123, str))
+        self.assertFalse(isinstance(['a', 'b', 'c'], str))
 
     def test_get_args_of_function(self):
         def func(a, b, *c, **d): # pylint: disable=unused-argument
             """Does nothing."""
             pass
-        self.assertEqual(
-            python_utils.get_args_of_function(func), ['a', 'b'])
+        args = [
+            name for name, param in inspect.signature(func).parameters.items()
+          if param.kind in (param.POSITIONAL_ONLY, param.POSITIONAL_OR_KEYWORD)
+        ]
+        self.assertEqual(args, ['a', 'b'])
 
     def test_create_enum_method_and_check_its_values(self):
         """Test create_enum method."""

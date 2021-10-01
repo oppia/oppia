@@ -44,7 +44,7 @@ class BaseAuditError(job_run_result.JobRunResult):
             TypeError. When the input message is not a string.
             ValueError. When the input message is empty.
         """
-        if not python_utils.is_string(message):
+        if not isinstance(message, str):
             raise TypeError('message must be a string')
 
         if not message:
