@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import itertools
 import json
+import logging
 import os
 import pkgutil
 
@@ -41,10 +42,10 @@ class Registry(python_utils.OBJECT):
     @classmethod
     def get_all_interaction_ids(cls):
         """Get a list of all interaction ids."""
-        return list(itertools.chain(*[
+        return list(itertools.chain.from_iterable(
             interaction_category['interaction_ids']
             for interaction_category in constants.ALLOWED_INTERACTION_CATEGORIES
-        ]))
+        ))
 
     @classmethod
     def _refresh(cls):
@@ -60,9 +61,12 @@ class Registry(python_utils.OBJECT):
             os.path.join(feconf.INTERACTIONS_DIR, interaction_id)
             for interaction_id in all_interaction_ids]
 
+        logging.info('interaction_ids=%s' % all_interaction_ids)
+
         # Crawl the directories and add new interaction instances to the
         # registry.
         for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
+            logging.info('name=%s' % name)
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
 
