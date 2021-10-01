@@ -25,7 +25,6 @@ import urllib
 from core import feconf
 from core import python_utils
 
-
 from typing import Dict, List, Optional, Union
 
 
