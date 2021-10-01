@@ -493,10 +493,11 @@ class SiteLanguageHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        # We want to make sure that our language code has
-                        # exactly 2 characters, we do so by imposing a regex checking on
-                        # regex checking on the schema by using the is_regex_matched() method in
-                        # method in is_regex_matched method in schema_utils
+                        # NOTE: We want to check and make sure that the
+                        # site_language_code contains only 2 characters
+                        # we will leverage the is_regex_matched method
+                        # in schema_utils by supplenmenting our own 
+                        # regex that checks for 2 characters
                         'regex_pattern': '^[a-zA-Z]{2}$'
                     }],
                 }
