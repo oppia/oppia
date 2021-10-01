@@ -490,9 +490,16 @@ class SiteLanguageHandler(base.BaseHandler):
         'PUT': {
             'site_language_code': {
                 'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': 'en'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        # We want to make sure that our language code has exactly
+                        # 2 characters, we do so by imposing a regex checking on
+                        # the schema by using the is_regex_matched() method in 
+                        # schema_utils.py
+                        'regex_pattern': '^[a-zA-Z]{2}$'
+                    }],
+                }
             }
         }
     }
