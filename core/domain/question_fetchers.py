@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
 from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models
-import feconf
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])

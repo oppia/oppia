@@ -20,11 +20,11 @@ from __future__ import unicode_literals
 import datetime
 import re
 
+from core import feconf
+from core import utils
 from core.domain import question_domain
 from core.domain import state_domain
 from core.tests import test_utils
-import feconf
-import utils
 
 
 class QuestionChangeTest(test_utils.GenericTestBase):
