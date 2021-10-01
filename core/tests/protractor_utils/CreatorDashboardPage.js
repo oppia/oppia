@@ -71,7 +71,7 @@ var CreatorDashboardPage = function() {
     await waitFor.visibilityOf(explorationDashboardCard);
     var filteredExplorationCards = [];
     for (i = 0; i < allExplorationCards.length; i++) {
-      var text = await allExplorationCards[i].getText();
+      var text = action.getText(allExplorationCards[i]);
       // Tile text contains title, possibly followed by newline and text.
       if (
         text.startsWith(explorationTitle + '\n') || text === explorationTitle
