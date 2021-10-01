@@ -94,7 +94,7 @@ var GraphEditor = function(graphInputContainer) {
       await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await vertexElement(i).click();
+        await action.click(`Vertex Element ${i}`, vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -145,9 +145,8 @@ var ListEditor = function(elem) {
     var deleteItemField = await by
       .repeater('item in localValue track by $index')
       .row(index);
-    var deleteItemFieldElem = elem.element(
-      deleteItemField,
-    ).element(deleteListEntryLocator);
+    var deleteItemFieldElem = deleteItemField.element(
+      deleteListEntryLocator);
     await action.click('Delete Item Field Elem', deleteItemFieldElem);
   };
 
@@ -276,14 +275,14 @@ var RichTextEditor = async function(elem) {
         ].includes(componentName)) {
         // RteElementFirst can be found in beginning of RichTextEditor function.
         await action.sendKeys(
-          'First rte Elements',
+          'First RTE Element',
           rteElements.first(),
           protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
       await action.sendKeys(
-        'First rte Elements',
+        'First RTE Element',
         rteElements.first(),
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
@@ -487,11 +486,11 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await action.getText('Entry', entry);
+        return await action.getText('Field Text', entry);
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
-    var fullText = await action.getText('Elem', elem);
+    var fullText = await action.getText('Field Text Element', elem);
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
