@@ -30,6 +30,7 @@ import unittest
 from core import python_utils
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
+from itertools import zip_longest
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -279,12 +280,12 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_zip_longest(self):
         self.assertEqual(
-            [list(g) for g in python_utils.zip_longest(
+            [list(g) for g in zip_longest(
                 [0, 1, 2, 3], [4, 5, 6], [7, 8])],
             [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
         # Zip longest with fillvalue.
         self.assertEqual(
-            [''.join(g) for g in python_utils.zip_longest(
+            [''.join(g) for g in zip_longest(
                 'ABC', 'DE', 'F', fillvalue='x')],
             ['ADF', 'BEx', 'Cxx'])
 

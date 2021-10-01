@@ -66,6 +66,7 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
+from itertools import zip_longest
 
 import elasticsearch
 import requests_mock
@@ -1252,7 +1253,7 @@ class TestBase(unittest.TestCase):
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in python_utils.zip_longest(
+                for args, kwargs in zip_longest(
                     expected_args_iter, expected_kwargs_iter, fillvalue={})
             ]
             if pretty_unused_args:
