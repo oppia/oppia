@@ -60,7 +60,6 @@ PRINT = print
 RANGE = builtins.range
 ROUND = builtins.round
 UNICODE = builtins.str
-ZIP = builtins.zip
 
 
 def SimpleXMLRPCServer( # pylint: disable=invalid-name

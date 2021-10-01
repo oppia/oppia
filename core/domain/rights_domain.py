@@ -251,7 +251,7 @@ class ActivityRights(python_utils.OBJECT):
                 raise Exception(
                     'Public explorations can be viewed by anyone.')
 
-        for role, user_ids in python_utils.ZIP(
+        for role, user_ids in zip(
                 [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
                 [self.owner_ids, self.editor_ids, self.viewer_ids,
                  self.voice_artist_ids]):
