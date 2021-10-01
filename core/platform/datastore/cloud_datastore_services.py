@@ -230,7 +230,7 @@ def fetch_multiple_entities_by_ids_and_models(
     """
     entity_keys: List[Key] = []
     model_names = [model_name for (model_name, _) in ids_and_models]
-    if (len(model_names) != list(set(model_names))):
+    if len(model_names) != list(set(model_names)):
         raise Exception('Model names should not be duplicated in input list.')
     for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
