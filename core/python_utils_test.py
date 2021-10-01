@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import ast
 import builtins
-import inspect
 import io
 import os
 import sys
@@ -246,21 +245,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             for k, v in value[-1].items():
                 self.assertEqual(type(k), str)
                 self.assertEqual(type(v), str)
-
-    def test_is_string(self):
-        self.assertTrue(isinstance('abc', str))
-        self.assertFalse(isinstance(123, str))
-        self.assertFalse(isinstance(['a', 'b', 'c'], str))
-
-    def test_get_args_of_function(self):
-        def func(a, b, *c, **d): # pylint: disable=unused-argument
-            """Does nothing."""
-            pass
-        args = [
-            name for name, param in inspect.signature(func).parameters.items()
-          if param.kind in (param.POSITIONAL_ONLY, param.POSITIONAL_OR_KEYWORD)
-        ]
-        self.assertEqual(args, ['a', 'b'])
 
     def test_create_enum_method_and_check_its_values(self):
         """Test create_enum method."""
