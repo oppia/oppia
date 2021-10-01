@@ -19,11 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import importlib
 import itertools
 import json
-import logging
 import os
-import pkgutil
 
 from core import feconf
 from core import python_utils
@@ -54,24 +53,17 @@ class Registry(python_utils.OBJECT):
         """
         cls._interactions.clear()
 
-        all_interaction_ids = cls.get_all_interaction_ids()
-
-        # Assemble all paths to the interactions.
-        extension_paths = [
-            os.path.join(feconf.INTERACTIONS_DIR, interaction_id)
-            for interaction_id in all_interaction_ids]
-
-        logging.info('interaction_ids=%s' % all_interaction_ids)
-
         # Crawl the directories and add new interaction instances to the
         # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
-            logging.info('name=%s' % name)
-            module = loader.find_module(name).load_module(name)
-            clazz = getattr(module, name)
+        for interaction_id in cls.get_all_interaction_ids():
+            module_path_parts = feconf.INTERACTIONS_DIR.split(os.sep)
+            module_path_parts.extend([interaction_id, interaction_id])
+            module = importlib.import_module('.'.join(module_path_parts))
+            clazz = getattr(module, interaction_id)
 
             ancestor_names = [
-                base_class.__name__ for base_class in clazz.__bases__]
+                base_class.__name__ for base_class in clazz.__bases__
+            ]
             if 'BaseInteraction' in ancestor_names:
                 cls._interactions[clazz.__name__] = clazz()
 
