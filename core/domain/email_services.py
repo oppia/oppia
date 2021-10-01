@@ -19,10 +19,9 @@ from __future__ import unicode_literals
 
 import re
 
+from core import feconf
+from core import python_utils
 from core.platform import models
-
-import feconf
-import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
