@@ -130,7 +130,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
         language_query = cls.query(
             cls.incomplete_translation_language_codes == language_code
-        ).order(cls.incomplete_translation_language_codes)
+        ).order(cls.topic_name)
 
         fetch_result: Tuple[
             Sequence[ExplorationOpportunitySummaryModel],
