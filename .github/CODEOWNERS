@@ -710,11 +710,6 @@
 /core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
 
 
-# Android team
-/core/android_validation_constants*.py @seanlip @BenHenning
-/extensions/interactions/rule_templates.json @seanlip @BenHenning
-
-
 # Critical files.
 #
 # IMPORTANT NOTE: Please ensure that these files are always located at the end
@@ -745,3 +740,6 @@
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
 /.github/workflows/ @DubeySandeep @oppia/automated-qa-reviewers
+# Files needed by the Android team.
+/core/android_validation_constants*.py @seanlip @BenHenning
+/extensions/interactions/rule_templates.json @seanlip @BenHenning
