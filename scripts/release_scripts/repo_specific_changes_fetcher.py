@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 import os
 import re
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'

@@ -23,7 +23,7 @@ import datetime
 import threading
 import time
 import traceback
-import python_utils
+from core import python_utils
 
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []

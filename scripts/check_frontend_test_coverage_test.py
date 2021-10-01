@@ -20,8 +20,9 @@ from __future__ import unicode_literals
 import os
 import subprocess
 import sys
+
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import check_frontend_test_coverage
 

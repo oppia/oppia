@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
 from core.platform import models
-import feconf
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -312,6 +312,44 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.target_id == exp_id
         )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_multiple_suggestions_from_suggestion_ids(
+            cls, suggestion_ids: List[str]
+    ) -> List[Optional['GeneralSuggestionModel']]:
+        """Returns suggestions matching the supplied suggestion IDs.
+
+        Args:
+            suggestion_ids: list(str). Suggestion IDs of suggestions that need
+                to be returned.
+
+        Returns:
+            list(SuggestionModel|None). A list of suggestions in matching the
+            supplied suggestion IDs.
+        """
+        return GeneralSuggestionModel.get_multi(suggestion_ids)
+
+    @classmethod
+    def get_translation_suggestions_in_review_ids_with_exp_id(
+            cls, target_exp_ids: List[str]
+    ) -> List[str]:
+        """Returns IDs of in review translation suggestions matching the
+        supplied target IDs.
+
+        Args:
+            target_exp_ids: list(str). Exploration IDs matching the target ID
+                of the translation suggestions.
+
+        Returns:
+            list(str). A list of IDs of translation suggestions in review
+            with given target_exp_ids.
+        """
+        suggestion_keys = GeneralSuggestionModel.query(
+            cls.status == STATUS_IN_REVIEW,
+            GeneralSuggestionModel.target_id.IN(target_exp_ids)
+            ).fetch(keys_only=True)
+
+        return [suggestion_key.id() for suggestion_key in suggestion_keys]
 
     @classmethod
     def get_translation_suggestion_ids_with_exp_ids(
