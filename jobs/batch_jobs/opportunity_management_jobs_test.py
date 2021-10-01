@@ -46,10 +46,10 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class DeleteExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
+class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = (
-        opportunity_management_jobs.DeleteExplorationOpportunitySummaries)
+        opportunity_management_jobs.DeleteExplorationOpportunitySummariesJob)
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -99,10 +99,11 @@ class DeleteExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
         self.assertEqual(len(all_opportunity_models), 0)
 
 
-class GenerateExplorationOpportunitySummariesTests(job_test_utils.JobTestBase):
+class GenerateExplorationOpportunitySummariesJobTests(
+        job_test_utils.JobTestBase):
 
     JOB_CLASS = (
-        opportunity_management_jobs.GenerateExplorationOpportunitySummaries)
+        opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob)
 
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
