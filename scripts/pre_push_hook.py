@@ -470,7 +470,7 @@ def check_for_backend_python_library_inconsistencies():
                 'Library', 'Requirements Version',
                 'Currently Installed Version'))
         for library_name, version_strings in mismatches.items():
-            python_utils.PRINT('{:<35} |{:<25}|{:<25}'.format(
+            python_utils.PRINT('{!s:<35} |{!s:<25}|{!s:<25}'.format(
                 library_name, version_strings[0], version_strings[1]))
         python_utils.PRINT('\n')
         common.print_each_string_after_two_new_lines([
