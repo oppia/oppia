@@ -221,9 +221,11 @@ var ExplorationEditorPage = function() {
 
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
-    var explorationCategory = await selectionRenderedElement.getText();
-    var explorationLanguage = await expLanguageSelectorElement.$(
-      'option:checked').getText();
+    var explorationCategory = await action.getText(
+      'Selection Rendered Element', selectionRenderedElement);
+    var explorationLanguage = await action.getText(
+      'Exploration Language Selector Element',
+      expLanguageSelectorElement.$('option:checked'));
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
     expect(await expTitle.getAttribute('value')).toMatch(title);
@@ -232,7 +234,9 @@ var ExplorationEditorPage = function() {
     expect(explorationLanguage).toMatch(language);
     for (var i = 0; i < await expTagsSelectionChoiceElements.count(); i++) {
       expect(
-        await expTagsSelectionChoiceElements.get(i).getText()
+        await action.getText(
+          'Exploration Tags Selection Choice Element',
+          expTagsSelectionChoiceElements.get(i))
       ).toMatch(tags[i]);
     }
   };
@@ -393,7 +397,7 @@ var ExplorationEditorPage = function() {
     await waitFor.visibilityOf(
       toastMessage,
       'Online info toast message taking too long to appear.');
-    expect(await toastMessage.getText()).toMatch(
+    expect(await action.getText('Toast Message', toastMessage)).toMatch(
       'Reconnected. Checking whether your changes are mergeable.');
     await waitFor.invisibilityOf(
       toastMessage,
@@ -404,7 +408,7 @@ var ExplorationEditorPage = function() {
     await waitFor.visibilityOf(
       toastMessage,
       'Offline warning toast message taking too long to appear.');
-    expect(await toastMessage.getText()).toMatch(
+    expect(await action.getText('Toast Message', toastMessage)).toMatch(
       'Looks like you are offline. You can continue working, and can save ' +
       'your changes once reconnected.');
     await waitFor.invisibilityOf(
