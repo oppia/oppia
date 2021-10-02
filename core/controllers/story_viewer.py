@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import skill_fetchers
+from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
@@ -99,7 +100,11 @@ class StoryProgressHandler(base.BaseHandler):
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
         'node_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': ('%s[0-9]+' % story_domain.NODE_ID_PREFIX)
+                }]
             }
         }
     }

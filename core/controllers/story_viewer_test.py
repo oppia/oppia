@@ -399,7 +399,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     'invalid_node'
-                ), {}, csrf_token=csrf_token, expected_status_int=404
+                ), {}, csrf_token=csrf_token, expected_status_int=400
             )
 
     def test_post_fails_when_story_is_not_published_in_story_mode(self):
