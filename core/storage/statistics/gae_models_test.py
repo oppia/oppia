@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import types
 
+from core import feconf
 from core.domain import exp_domain
 from core.domain import stats_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 from typing import List
 
