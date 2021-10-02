@@ -3096,7 +3096,7 @@ md-card.preview-conversation-skin-supplemental-card {
   min-width: 200px;
 }
 
-.oppia-modal-information-card .modal-dialog .modal-content md-card {
+.oppia-modal-information-card .modal-dialog .modal-content .mat-card {
   border-radius: 0;
   margin: 0;
   padding: 0;

@@ -17,11 +17,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
