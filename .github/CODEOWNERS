@@ -600,7 +600,7 @@
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
 /core/domain/feedback*.py @nithusha21
-/core/templates/components/ratings/rating-display/rating-display.directive.html @nithusha21
+/core/templates/components/ratings/rating-display/rating-display.component.html @nithusha21
 /core/templates/components/ratings/ @nithusha21
 /core/templates/domain/feedback_message/ @nithusha21
 /core/templates/domain/feedback_thread/ @nithusha21
