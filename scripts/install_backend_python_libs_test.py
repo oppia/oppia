@@ -289,7 +289,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (u'1.1.0.1', u'1.1.1.0'),
-                u'six': (u'1.15.0', None),
+                u'six': (u'1.16.0', None),
                 u'git-dep1': (
                     self.get_git_version_string('git-dep1', 'a'),
                     self.get_git_version_string('git-dep1', 'b')),
@@ -334,7 +334,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('six', '1.15.0'),
+                    'pip', 'install', '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -351,7 +351,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (u'1.1.1', None),
-                u'six': (u'1.15.0', None),
+                u'six': (u'1.16.0', None),
                 u'simplejson': (None, u'3.16.0'),
                 u'bleach': (u'3.1.4', u'3.1.5'),
                 u'callbacks': (u'0.3.0', u'0.2.0'),
@@ -499,7 +499,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'flask-1.1.1.dist-info',
             'flask-10.0.1.dist-info',
             'six',
-            'six-1.15.0.dist-info',
+            'six-1.16.0.dist-info',
             'six-10.13.0.egg-info',
             'google_cloud_datastore-1.15.0.dist-info',
             'google_cloud_datastore-1.13.0.dist-info',
@@ -519,7 +519,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (u'1.1.1', u'10.0.1'),
-                u'six': (u'1.15.0', u'10.13.0'),
+                u'six': (u'1.16.0', u'10.13.0'),
                 u'webencodings': (u'1.1.1', u'1.0.1'),
                 u'google-cloud-datastore': (u'1.15.0', u'1.13.0')
             }
@@ -555,7 +555,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('six', '1.15.0'),
+                    'pip', 'install', '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
