@@ -612,8 +612,7 @@ def get_thread_analytics_multi(exploration_ids):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id,
             model.num_open_threads if model is not None else 0,
             model.num_total_threads if model is not None else 0)
-        for exp_id, model in zip(
-            exploration_ids, feedback_thread_analytics_models)
+        for exp_id, model in zip(exploration_ids, feedback_thread_analytics_models)
     ]
 
 
@@ -735,8 +734,7 @@ def get_exp_thread_summaries(user_id, thread_ids):
     thread_summaries = []
     number_of_unread_threads = 0
     for thread, last_two_message_models, thread_user_model, exp_model in (
-            zip(
-                threads, last_two_message_models_of_threads,
+            zip(threads, last_two_message_models_of_threads,
                 exp_thread_user_models, exp_models)):
         message_ids_read_by_user = (
             () if thread_user_model is None else
@@ -1076,8 +1074,7 @@ def _send_batch_emails(
     """
     can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
-    for recipient_id, can_receive_email in zip(
-            recipient_list, can_recipients_receive_email):
+    for recipient_id, can_receive_email in zip(recipient_list, can_recipients_receive_email):
         if can_receive_email:
             _add_feedback_message_reference_transactional(
                 recipient_id, feedback_message_reference)
@@ -1100,8 +1097,7 @@ def _send_instant_emails(
     """
     can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
-    for recipient_id, can_receive_email in zip(
-            recipient_list, can_recipients_receive_email):
+    for recipient_id, can_receive_email in zip(recipient_list, can_recipients_receive_email):
         if can_receive_email:
             enqueue_feedback_message_instant_email_task_transactional(
                 recipient_id, feedback_message_reference)
@@ -1125,8 +1121,7 @@ def _send_feedback_thread_status_change_emails(
     """
     can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
-    for recipient_id, can_receive_email in zip(
-            recipient_list, can_recipients_receive_email):
+    for recipient_id, can_receive_email in zip(recipient_list, can_recipients_receive_email):
         if can_receive_email:
             _enqueue_feedback_thread_status_change_email_task_transactional(
                 recipient_id, feedback_message_reference, old_status,

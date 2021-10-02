@@ -624,7 +624,7 @@ def create_enum(*sequential):
     Returns:
         dict. Dictionary containing the enumerated constants.
     """
-    enum_values = dict(ZIP(sequential, sequential))
+    enum_values = dict(zip(sequential, sequential))
     try:
         from enum import Enum  # pylint: disable=import-only-modules
 
