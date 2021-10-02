@@ -377,8 +377,7 @@ def apply_change_list(exploration_id, change_list):
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(
-                        list(map(
+                    state.update_param_changes(list(map(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     content = (
