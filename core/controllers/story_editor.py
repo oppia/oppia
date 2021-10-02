@@ -40,7 +40,8 @@ class StoryEditorPage(base.BaseHandler):
                 'type': 'basestring'
             },
             'validators': [{
-                'id': 'is_valid_story_id',
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
             }]
         }
     }
@@ -164,7 +165,8 @@ class StoryPublishHandler(base.BaseHandler):
                 'type': 'basestring'
             },
             'validators': [{
-                'id': 'is_valid_story_id',
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
             }]
         }
     }
