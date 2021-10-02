@@ -599,7 +599,7 @@
     "I18N_PREFERENCES_USERNAME": "Username",
     "I18N_PREFERENCES_USERNAME_NOT_SELECTED": "Not yet selected",
     "I18N_PROFILE_NO_EXPLORATIONS": "This user hasn't created or edited any explorations yet.",
-    "I18N_QUESTION_PLAYER_BOOST_SCORE": "Boost Score",
+    "I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL": "Review Lowest Scored Skill",
     "I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE": "Learn more about your score",
     "I18N_QUESTION_PLAYER_MY_DASHBOARD": "My Dashboard",
     "I18N_QUESTION_PLAYER_NEW_SESSION": "New Session",

@@ -184,7 +184,7 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.getActionButtonIconHtml = function(actionButtonType) {
         var iconHtml = '';
-        if (actionButtonType === 'BOOST_SCORE') {
+        if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
           iconHtml = `<picture>
           <source type="image/webp"
           srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
@@ -205,7 +205,7 @@ angular.module('oppia').component('questionPlayer', {
       };
 
       ctrl.performAction = function(actionButton) {
-        if (actionButton.type === 'BOOST_SCORE') {
+        if (actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL') {
           ctrl.boostScoreModal();
         } else if (actionButton.url) {
           $window.location.href = actionButton.url;
@@ -219,17 +219,17 @@ angular.module('oppia').component('questionPlayer', {
       };
 
       ctrl.getWorstSkillId = function() {
-        var minScore = Number.MAX_VALUE;
-        var worstSkillId = '';
+        var minScore = 0.95;
+        var worstSkillId = [];
         Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
           var skillScoreData = ctrl.scorePerSkillMapping[skillId];
           var scorePercentage = skillScoreData.score / skillScoreData.total;
           if (scorePercentage < minScore) {
             minScore = scorePercentage;
-            worstSkillId = skillId;
+            worstSkillId.push(skillId);
           }
         });
-        return worstSkillId;
+        return worstSkillId.sort();
       };
 
       ctrl.openConceptCardModal = function(skillIds) {
@@ -258,12 +258,14 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.boostScoreModal = function() {
         var worstSkillId = ctrl.getWorstSkillId();
-        ctrl.openConceptCardModal([worstSkillId]);
+        if (ctrl.getWorstSkillId().length !== 0) {
+          ctrl.openConceptCardModal(worstSkillId.slice(0, 3));
+        }
       };
 
       var getClassNameForType = function(actionButtonType) {
-        if (actionButtonType === 'BOOST_SCORE') {
-          return 'boost-score-';
+        if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
+          return 'review-lowest-scored-skill-';
         }
         if (actionButtonType === 'RETRY_SESSION') {
           return 'new-session-';

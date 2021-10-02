@@ -209,7 +209,7 @@ describe('QuestionPlayerComponent', () => {
 
   it('should get the outer class name for action button', () => {
     expect(ctrl.getActionButtonOuterClass('BOOST_SCORE'))
-      .toBe('boost-score-outer');
+      .toBe('review-lowest-scored-skill-outer');
     expect(ctrl.getActionButtonOuterClass('RETRY_SESSION'))
       .toBe('new-session-outer');
     expect(ctrl.getActionButtonOuterClass('DASHBOARD'))
@@ -220,7 +220,7 @@ describe('QuestionPlayerComponent', () => {
 
   it('should get the inner class name for action button', () => {
     expect(ctrl.getActionButtonInnerClass('BOOST_SCORE'))
-      .toBe('boost-score-inner');
+      .toBe('review-lowest-scored-skill-inner');
     expect(ctrl.getActionButtonInnerClass('RETRY_SESSION'))
       .toBe('new-session-inner');
     expect(ctrl.getActionButtonInnerClass('DASHBOARD'))
