@@ -174,11 +174,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.url_parse('http://www.google.com')
         self.assertEqual(response.geturl(), 'http://www.google.com')
 
-    def test_url_join(self):
-        response = python_utils.url_join(
-            'http://www.cwi.nl/%7Eguido/Python.html', 'FAQ.html')
-        self.assertEqual(response, 'http://www.cwi.nl/%7Eguido/FAQ.html')
-
     def test_recursively_convert_to_str_with_dict(self):
         test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
         test_var_2_in_unicode = python_utils.UNICODE('test_var_2')
