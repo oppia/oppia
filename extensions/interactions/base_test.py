@@ -294,7 +294,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # Contents of the file html_field_types_to_rule_specs.json will be
         # verified against this file.
         rule_descriptions_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+            python_utils.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_FILE_PATH))
 
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
