@@ -84,7 +84,6 @@ disallowed-functions-and-replacements-str=
   now=>datetime.datetime.utcnow,
   open=>python_utils.open_file,
   print=>python_utils.PRINT,
-  range=>python_utils.RANGE,
   round=>python_utils.ROUND,
   str=>python_utils.convert_to_bytes or python_utils.UNICODE,
   StringIO=>python_utils.string_io,
