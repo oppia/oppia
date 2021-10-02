@@ -59,13 +59,14 @@ class Registry(python_utils.OBJECT):
                 state_schema_version] = json.loads(
                     python_utils.get_package_file_contents(
                         'extensions',
-                        feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH)
-                )
+                        feconf
+                        .HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
         elif not cached:
             file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
                 state_schema_version)
             spec_file = os.path.join(
-                feconf.LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_DIR,
+                feconf
+                .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,
                 file_name)
 
             try:
