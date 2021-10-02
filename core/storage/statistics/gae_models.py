@@ -23,12 +23,12 @@ import datetime
 import json
 import sys
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1878,12 +1878,12 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             list(str). List of versions corresponding to annotation models
             with given exp_id.
         """
-        return [
-            annotations.version for annotations in
+        annotations_result: Sequence[ExplorationAnnotationsModel] = (
             cls.get_all().filter(
                 cls.exploration_id == exploration_id
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-        ]
+        )
+        return [annotations.version for annotations in annotations_result]
 
     @staticmethod
     def get_model_association_to_user(

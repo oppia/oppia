@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -221,8 +221,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             .order(cls.next_scheduled_check_time)
         )
 
-        classifier_job_models = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+        classifier_job_models: Sequence[ClassifierTrainingJobModel] = (
+            query.fetch(
+                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset))
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 

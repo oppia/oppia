@@ -20,7 +20,10 @@ from __future__ import unicode_literals
 import datetime
 import json
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -30,9 +33,6 @@ from core.domain import takeout_service
 from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (
     app_feedback_report_models, auth_models, base_models, blog_models,
@@ -357,7 +357,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
@@ -808,6 +808,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -1575,9 +1576,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
                 'randomInteger123'): {
                     'scrubbed_by': self.USER_ID_1,
-                    'platform': self.PLATFORM_ANDROID,
                     'ticket_id': self.TICKET_ID,
                     'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                    'local_timezone_offset_hrs': 0,
                     'report_type': self.REPORT_TYPE_SUGGESTION,
                     'category': self.CATEGORY_OTHER,
                     'platform_version': self.PLATFORM_VERSION}}
