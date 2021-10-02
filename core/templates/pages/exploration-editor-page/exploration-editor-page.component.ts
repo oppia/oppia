@@ -258,6 +258,7 @@ angular.module('oppia').component('explorationEditorPage', {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
+
           ExplorationFeaturesService.init(explorationData, featuresData);
 
           StateClassifierMappingService.init(
