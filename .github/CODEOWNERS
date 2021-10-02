@@ -45,7 +45,7 @@
 
 
 # Android team
-/android_validation_constants*.py @seanlip @BenHenning
+/core/android_validation_constants*.py @seanlip @BenHenning
 
 
 # Angular Migration team
@@ -479,19 +479,23 @@
 /core/templates/pages/topics-and-skills-dashboard-page/ @aks681 @seanlip
 
 
-# Infrastructure.
-/jobs/ @vojtechjelinek
-/jobs/transforms @vojtechjelinek
-/jobs/types @vojtechjelinek
+# Beam jobs
+/setup.py @vojtechjelinek @brianrodri
+/MANIFEST.in @vojtechjelinek @brianrodri
+/core/jobs/ @vojtechjelinek
+/core/jobs/transforms @vojtechjelinek
+/core/jobs/types @vojtechjelinek
 /core/templates/domain/jobs/ @vojtechjelinek
+/core/controllers/beam_jobs*.py @brianrodri
+
+# Infrastructure.
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main*.py @DubeySandeep @nithusha21
-/feconf.py @DubeySandeep @nithusha21 @seanlip
-/constants*.py @nithusha21
+/core/feconf.py @DubeySandeep @nithusha21 @seanlip
+/core/constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
-/core/controllers/beam_jobs*.py @brianrodri
 /core/domain/beam_job*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
@@ -526,9 +530,9 @@
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
-/python_utils*.py @DubeySandeep
-/schema_utils*.py @DubeySandeep
-/utils*.py @aks681
+/core/python_utils*.py @DubeySandeep
+/core/schema_utils*.py @DubeySandeep
+/core/utils*.py @aks681
 
 
 # Python typing
@@ -557,7 +561,7 @@
 /core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
 /core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
 /scripts/release_scripts/ @nithusha21 @vojtechjelinek
-/release_constants.json @nithusha21 @vojtechjelinek
+/assets/release_constants.json @nithusha21 @vojtechjelinek
 
 
 # Rich text editor team.

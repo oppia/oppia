@@ -17,12 +17,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import user_services
-import feconf
 
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
