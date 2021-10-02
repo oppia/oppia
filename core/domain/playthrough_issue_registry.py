@@ -18,10 +18,9 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import importlib
 
+import importlib
 import os
-import pkgutil
 
 from core import feconf
 from core import python_utils
