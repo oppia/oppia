@@ -48,7 +48,7 @@ MAX_RECOMMENDATIONS = 10
 SIMILARITY_SCORE_THRESHOLD = 3.0
 
 
-class ComputeExplorationRecommendations(base_jobs.JobBase):
+class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:

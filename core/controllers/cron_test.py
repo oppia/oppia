@@ -680,7 +680,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_kwargs=[{
                 'job_class': (
                     exp_recommendation_computation_jobs
-                    .ComputeExplorationRecommendations),
+                    .ComputeExplorationRecommendationsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
@@ -691,7 +691,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': exp_search_indexing_jobs.IndexExplorationsInSearch,
+                'job_class': (
+                    exp_search_indexing_jobs.IndexExplorationsInSearchJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
@@ -703,7 +704,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
                 'job_class': (
-                    user_stats_computation_jobs.CollectWeeklyDashboardStats),
+                    user_stats_computation_jobs.CollectWeeklyDashboardStatsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
@@ -716,7 +717,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_kwargs=[{
                 'job_class': (
                     suggestion_stats_computation_jobs
-                    .GenerateTranslationContributionStats),
+                    .GenerateTranslationContributionStatsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:

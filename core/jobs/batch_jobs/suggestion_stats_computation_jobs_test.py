@@ -37,10 +37,11 @@ if MYPY:
     [models.NAMES.opportunity, models.NAMES.suggestion])
 
 
-class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
+class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = (
-        suggestion_stats_computation_jobs.GenerateTranslationContributionStats)
+        suggestion_stats_computation_jobs
+        .GenerateTranslationContributionStatsJob)
 
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)

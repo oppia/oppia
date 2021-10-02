@@ -41,7 +41,7 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class CollectWeeklyDashboardStats(base_jobs.JobBase):
+class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """

@@ -36,9 +36,9 @@ if MYPY:
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
+class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = user_stats_computation_jobs.CollectWeeklyDashboardStats
+    JOB_CLASS = user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
 
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)

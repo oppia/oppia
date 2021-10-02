@@ -50,7 +50,7 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class GenerateTranslationContributionStats(base_jobs.JobBase):
+class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:

@@ -41,7 +41,7 @@ datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()
 
 
-class IndexExplorationsInSearch(base_jobs.JobBase):
+class IndexExplorationsInSearchJob(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
     MAX_BATCH_SIZE = 1000

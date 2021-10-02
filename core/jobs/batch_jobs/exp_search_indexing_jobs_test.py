@@ -41,9 +41,9 @@ platform_search_services = models.Registry.import_search_services()
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
-class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
+class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_search_indexing_jobs.IndexExplorationsInSearch
+    JOB_CLASS = exp_search_indexing_jobs.IndexExplorationsInSearchJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -122,7 +122,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
         )
 
         max_batch_size_swap = self.swap(
-            exp_search_indexing_jobs.IndexExplorationsInSearch,
+            exp_search_indexing_jobs.IndexExplorationsInSearchJob,
             'MAX_BATCH_SIZE', 1)
 
         with add_docs_to_index_swap, max_batch_size_swap:

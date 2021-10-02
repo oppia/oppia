@@ -41,10 +41,11 @@ if MYPY:
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
-class ComputeExplorationRecommendationsTests(job_test_utils.JobTestBase):
+class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = (
-        exp_recommendation_computation_jobs.ComputeExplorationRecommendations)
+        exp_recommendation_computation_jobs
+        .ComputeExplorationRecommendationsJob)
 
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
