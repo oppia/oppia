@@ -47,6 +47,7 @@ describe('Full exploration editor', function() {
 
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var parentExplorationId = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
@@ -285,6 +286,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
+    parentExplorationId = await general.getExplorationIdFromEditor();
 
     // Create Refresher Exploration.
     await creatorDashboardPage.get();
@@ -325,8 +327,7 @@ describe('Full exploration editor', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateCollectionButton();
-    await collectionEditorPage.searchForAndAddExistingExploration(
-      'Parent Exploration in collection');
+    await collectionEditorPage.addExistingExploration(parentExplorationId);
     await collectionEditorPage.saveDraft();
     await collectionEditorPage.closeSaveModal();
     await collectionEditorPage.publishCollection();

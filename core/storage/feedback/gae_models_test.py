@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import types
 
+from core import feconf
+from core import utils
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 from typing import Dict
 
