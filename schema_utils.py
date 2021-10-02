@@ -33,7 +33,6 @@ import re
 from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
-from core.domain import story_domain
 from core.domain import user_domain
 import feconf
 import python_utils
@@ -419,6 +418,21 @@ class _Validators(python_utils.OBJECT):
         return len(obj) <= max_value
 
     @staticmethod
+    def has_length(obj: List[str], value: int) -> bool:
+        """Returns True iff the given object (a list) has exact
+        `value` elements.
+
+        Args:
+            obj: list(str). A list of strings.
+            value: int. The number of elements that `obj` should
+                contain.
+
+        Returns:
+            bool. Whether the given object has exact `value` elements.
+        """
+        return len(obj) == value
+
+    @staticmethod
     def is_nonempty(obj: str) -> bool:
         """Returns True iff the given object (a string) is nonempty.
 
@@ -662,23 +676,6 @@ class _Validators(python_utils.OBJECT):
 
         try:
             user_domain.UserSettings.require_valid_username(obj)
-            return True
-        except utils.ValidationError:
-            return False
-
-    @staticmethod
-    def is_valid_story_id(obj: str) -> bool:
-        """Checks if the given obj (a string) is a valid story id.
-
-        Args:
-            obj: str. The string to verify.
-
-        Returns:
-            bool. Whether the given object is a valid story id.
-        """
-
-        try:
-            story_domain.Story.require_valid_story_id(obj)
             return True
         except utils.ValidationError:
             return False
