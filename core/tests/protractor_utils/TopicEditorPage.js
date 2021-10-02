@@ -227,6 +227,8 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicTitle = async function(title) {
+    await waitFor.visibilityOf(
+      subtopicTitleField, 'Subtopic title field if not visible');
     await subtopicTitleField.clear();
     await subtopicTitleField.sendKeys(title);
   };
