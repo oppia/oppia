@@ -37,8 +37,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(allotted_actions, list))
             self.assertEqual(len(set(allotted_actions)), len(allotted_actions))
             for action_name in allotted_actions:
-                self.assertTrue(
-                    isinstance(action_name, str))
+                self.assertTrue(isinstance(action_name, str))
 
     def test_get_all_actions(self):
         with self.assertRaisesRegexp(

@@ -132,11 +132,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(all(hasattr(ca_spec, attr) for attr in [
                 'name', 'description', 'schema', 'default_value']))
 
-            self.assertTrue(
-                isinstance(ca_spec.name, str))
+            self.assertTrue(isinstance(ca_spec.name, str))
             self.assertTrue(self._is_alphanumeric_string(ca_spec.name))
-            self.assertTrue(
-                isinstance(ca_spec.description, str))
+            self.assertTrue(isinstance(ca_spec.description, str))
             self.assertGreater(len(ca_spec.description), 0)
 
             schema_utils_test.validate_schema(ca_spec.schema)
@@ -348,9 +346,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     # accommodate more than one interaction. Corresponding
                     # checks in state_domain.AnswerGroup
                     # get_all_html_content_strings() also needs to be updated.
-                    if isinstance(
-                            html_type_dict['interactionId'],
-                            str):
+                    if isinstance(html_type_dict['interactionId'], str):
                         # The above type check is required because,
                         # all the keys in the generated html type
                         # dict is initialized as defaultdict object.
@@ -678,9 +674,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIsNone(interaction.instructions)
                 self.assertIsNone(interaction.narrow_instructions)
             else:
-                self.assertTrue(
-                    isinstance(
-                        interaction.instructions, str))
+                self.assertTrue(isinstance(interaction.instructions, str))
                 self.assertIsNotNone(interaction.instructions)
                 self.assertIsNotNone(interaction.narrow_instructions)
 
@@ -692,9 +686,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # default_outcome_heading property.
             if interaction.is_linear:
                 self.assertTrue(
-                    isinstance(
-                        interaction.default_outcome_heading,
-                        str)
+                    isinstance(interaction.default_outcome_heading, str)
                     and interaction.default_outcome_heading)
             else:
                 self.assertIsNone(interaction.default_outcome_heading)

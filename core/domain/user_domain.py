@@ -247,8 +247,7 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
 
-        if not isinstance(
-                self.creator_dashboard_display_pref, str):
+        if not isinstance(self.creator_dashboard_display_pref, str):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
@@ -272,11 +271,7 @@ class UserSettings(python_utils.OBJECT):
                 attribute.
         """
         if (not modifiable_user_data.display_alias or
-                not isinstance(
-                    modifiable_user_data.display_alias,
-                    str
-                )
-           ):
+                not isinstance(modifiable_user_data.display_alias, str)):
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s.' %
                 modifiable_user_data.display_alias

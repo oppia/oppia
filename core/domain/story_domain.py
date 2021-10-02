@@ -773,8 +773,7 @@ class Story(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if not isinstance(
-                self.corresponding_topic_id, str):
+        if not isinstance(self.corresponding_topic_id, str):
             raise utils.ValidationError(
                 'Expected corresponding_topic_id should be a string, received: '
                 '%s' % self.corresponding_topic_id)

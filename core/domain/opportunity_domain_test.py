@@ -97,8 +97,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         })
 
     def test_invalid_topic_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_id, str))
+        self.assertTrue(isinstance(self.valid_exp_opp_summary.topic_id, str))
         with self.mock_supported_audio_languages_context:
             # Object with topic_id as string passes the validation check.
             self.valid_exp_opp_summary.validate()
@@ -109,8 +108,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected topic_id to be a string, received 5')
 
     def test_invalid_topic_name_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_name, str))
+        self.assertTrue(isinstance(self.valid_exp_opp_summary.topic_name, str))
 
         with self.mock_supported_audio_languages_context:
             # Object with topic_name as string passes the validation check.
@@ -122,8 +120,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected topic_name to be a string, received True')
 
     def test_invalid_story_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_id, str))
+        self.assertTrue(isinstance(self.valid_exp_opp_summary.story_id, str))
         with self.mock_supported_audio_languages_context:
             # Object with story_id as string passes the validation check.
             self.valid_exp_opp_summary.validate()
@@ -134,8 +131,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected story_id to be a string, received 5')
 
     def test_invalid_story_title_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_title, str))
+        self.assertTrue(isinstance(self.valid_exp_opp_summary.story_title, str))
 
         with self.mock_supported_audio_languages_context:
             # Object with story_title as string passes the validation check.

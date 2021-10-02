@@ -736,17 +736,14 @@ class CheckedProof(BaseObject):
         """
         try:
             assert isinstance(raw, dict)
-            assert isinstance(
-                raw['assumptions_string'], str)
+            assert isinstance(raw['assumptions_string'], str)
             assert isinstance(raw['target_string'], str)
             assert isinstance(raw['proof_string'], str)
             assert raw['correct'] in [True, False]
             if not raw['correct']:
-                assert isinstance(
-                    raw['error_category'], str)
+                assert isinstance(raw['error_category'], str)
                 assert isinstance(raw['error_code'], str)
-                assert isinstance(
-                    raw['error_message'], str)
+                assert isinstance(raw['error_message'], str)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:

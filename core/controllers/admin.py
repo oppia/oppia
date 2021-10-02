@@ -308,8 +308,7 @@ class AdminHandler(base.BaseHandler):
                 (self.user_id, exploration_id))
             exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(),
-                exploration_id)
+                user_services.get_system_user(), exploration_id)
         else:
             raise Exception('Cannot reload an exploration in production.')
 

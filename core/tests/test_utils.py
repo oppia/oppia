@@ -3371,8 +3371,7 @@ class LinterTestBase(GenericTestBase):
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.linter_stdout.append(
-                ' '.join(str(arg) for arg in args))
+            self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 

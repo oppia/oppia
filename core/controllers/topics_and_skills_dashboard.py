@@ -198,15 +198,13 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         sort_by = self.payload.get('sort')
         status = self.payload.get('status')
 
-        if (classroom_name is not None and
-                not isinstance(classroom_name, str)):
+        if (classroom_name is not None and not isinstance(classroom_name, str)):
             raise self.InvalidInputException(
                 'Classroom name should be a string.')
 
         if (urlsafe_start_cursor is not None and
                 not isinstance(urlsafe_start_cursor, str)):
-            raise self.InvalidInputException(
-                'Next Cursor should be a string.')
+            raise self.InvalidInputException('Next Cursor should be a string.')
 
         if (num_skills_to_fetch is None or
                 not isinstance(num_skills_to_fetch, int)):
@@ -214,21 +212,16 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
                 'Number of skills to fetch should be a number.')
 
         if (keywords is not None and (not isinstance(keywords, list) or (
-                not all(
-                    isinstance(keyword, str)
-                    for keyword in keywords)))):
+                not all(isinstance(keyword, str) for keyword in keywords)))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 
-        if (sort_by is not None and
-                not isinstance(sort_by, str)):
+        if (sort_by is not None and not isinstance(sort_by, str)):
             raise self.InvalidInputException(
                 'The value of sort_by should be a string.')
 
-        if (status is not None and
-                not isinstance(status, str)):
-            raise self.InvalidInputException(
-                'Status should be a string.')
+        if (status is not None and not isinstance(status, str)):
+            raise self.InvalidInputException('Status should be a string.')
 
         skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(

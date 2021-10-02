@@ -883,8 +883,7 @@ class Exploration(python_utils.OBJECT):
                 if not answer_group.outcome.dest:
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
-                if not isinstance(
-                        answer_group.outcome.dest, str):
+                if not isinstance(answer_group.outcome.dest, str):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
@@ -892,9 +891,7 @@ class Exploration(python_utils.OBJECT):
                 if not state.interaction.default_outcome.dest:
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
-                if not isinstance(
-                        state.interaction.default_outcome.dest,
-                        str):
+                if not isinstance(state.interaction.default_outcome.dest, str):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)

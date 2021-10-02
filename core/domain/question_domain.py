@@ -1232,8 +1232,7 @@ class Question(python_utils.OBJECT):
         inapplicable_skill_misconception_ids_is_list = isinstance(
             self.inapplicable_skill_misconception_ids, list)
         if not (inapplicable_skill_misconception_ids_is_list and (
-                all(isinstance(
-                    elem, str) for elem in (
+                all(isinstance(elem, str) for elem in (
                         self.inapplicable_skill_misconception_ids)))):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a list '

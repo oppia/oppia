@@ -4994,8 +4994,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            'message'.encode('utf-8'), payload['vm_id'])
+            secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(

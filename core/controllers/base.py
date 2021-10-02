@@ -671,31 +671,26 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(
-                401, {'error': str(exception)})
+            self._render_exception(401, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(
-                400, {'error': str(exception)})
+            self._render_exception(400, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(
-                500, {'error': str(exception)})
+            self._render_exception(500, {'error': str(exception)})
             return
 
         if isinstance(exception, self.TemporaryMaintenanceException):
             self.error(503)
-            self._render_exception(
-                503, {'error': str(exception)})
+            self._render_exception(503, {'error': str(exception)})
             return
 
         self.error(500)
-        self._render_exception(
-            500, {'error': str(exception)})
+        self._render_exception(500, {'error': str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
