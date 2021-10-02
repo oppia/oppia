@@ -103,7 +103,7 @@ RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH = os.path.join(
     'interactions', 'rule_templates.json')
 HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
     'interactions', 'html_field_types_to_rule_specs.json')
-LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_DIR = os.path.join(
+LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
 # A mapping of interaction ids to classifier properties.
