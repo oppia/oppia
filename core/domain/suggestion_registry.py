@@ -21,7 +21,10 @@ from __future__ import unicode_literals
 
 import copy
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -35,9 +38,6 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -638,12 +638,6 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
-        content_html = exploration.get_content_html(
-            self.change.state_name, self.change.content_id)
-        if content_html != self.change.content_html:
-            raise utils.ValidationError(
-                'The Exploration content has changed since this translation '
-                'was submitted.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.

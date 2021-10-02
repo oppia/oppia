@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -28,7 +29,6 @@ from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 

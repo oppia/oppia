@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 
 import re
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 

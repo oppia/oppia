@@ -21,13 +21,13 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import python_utils
+from core import utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
-import python_utils
-import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user

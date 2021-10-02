@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Dict, List, Optional, Sequence
 

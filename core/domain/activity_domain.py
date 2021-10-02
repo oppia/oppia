@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
-import python_utils
+from core import python_utils
+from core.constants import constants
 
 
 class ActivityReference(python_utils.OBJECT):

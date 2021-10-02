@@ -24,15 +24,15 @@ import json
 import numbers
 import sys
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import playthrough_issue_registry
-import feconf
-import python_utils
-import utils
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
