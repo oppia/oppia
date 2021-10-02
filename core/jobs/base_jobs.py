@@ -117,7 +117,10 @@ class JobMetaclass(type):
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
-                cls._JOB_REGISTRY[name] = job_cls
+                if not name.endswith('Job'):
+                    raise TypeError('Job name "%s" must end with "Job"' % name)
+                else:
+                    cls._JOB_REGISTRY[name] = job_cls
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
