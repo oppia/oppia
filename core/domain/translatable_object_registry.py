@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import inspect
 
+from core import python_utils
 from extensions.objects.models import objects
-import python_utils
 
 
 class Registry(python_utils.OBJECT):
