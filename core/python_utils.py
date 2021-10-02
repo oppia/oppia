@@ -241,25 +241,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_join(base_url, relative_url):
-    """Construct a full URL by combining a 'base URL' with another URL using
-    urlparse.urljoin if run under Python 2 and urllib.parse.urljoin if run under
-    Python 3.
-
-    Args:
-        base_url: str. The base URL.
-        relative_url: str. The other URL.
-
-    Returns:
-        str. The full URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urljoin(base_url, relative_url)  # pylint: disable=disallowed-function-calls
-
-
 def url_split(urlstring):
     """Splits a URL using urlparse.urlsplit if run under Python 2 and
     urllib.parse.urlsplit if run under Python 3.
