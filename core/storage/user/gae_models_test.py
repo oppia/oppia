@@ -23,7 +23,6 @@ import datetime
 import types
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import exp_domain
 from core.domain import exp_services

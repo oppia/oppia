@@ -27,7 +27,6 @@ import re
 import sys
 import tokenize
 
-from core import python_utils
 from core.controllers import payload_validator
 
 from .. import docstrings_checker

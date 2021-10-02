@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import question_services
 from core.domain import skill_services

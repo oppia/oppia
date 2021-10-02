@@ -21,7 +21,6 @@ import datetime
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services

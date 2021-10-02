@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import random
 import types
 
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import skill_services

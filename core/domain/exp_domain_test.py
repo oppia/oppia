@@ -24,7 +24,6 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import exp_domain
