@@ -20,11 +20,11 @@ from __future__ import unicode_literals
 import datetime
 import types
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 from mypy_imports import app_feedback_report_models, base_models # isort:skip
 

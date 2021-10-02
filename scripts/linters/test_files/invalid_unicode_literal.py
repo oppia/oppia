@@ -20,7 +20,7 @@ python_linter_test. This file does not contain unicode literal future import.
 
 from __future__ import absolute_import
 
-import python_utils
+from core import python_utils
 
 
 class FakeClass(python_utils.OBJECT):
