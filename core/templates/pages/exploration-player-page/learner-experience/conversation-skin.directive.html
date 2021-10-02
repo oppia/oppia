@@ -104,9 +104,9 @@
     <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" uib-popover-template="'<[getFeedbackPopoverUrl()]>'" popover-trigger="click">
-      <rating-display rating-value="userRating" is-editable="true" on-edit="submitUserRating"
-                      class="conversation-skin-final-ratings-display">
-      </rating-display>
+      <oppia-rating-display [rating-value]="userRating" [is-editable]="true" (edit)="submitUserRating($event)"
+                            class="conversation-skin-final-ratings-display">
+      </oppia-rating-display>
     </div>
   </div>
 
