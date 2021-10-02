@@ -46,7 +46,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             'type': 'list',
             'validators': [{
                 'id': 'has_length_at_least',
-                'min_value': 4,
+                'min_value': 1,
             }],
             'items': {
                 'type': 'custom',
@@ -64,15 +64,6 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [{
-            'content_id': None,
-            'html': ''
-        }, {
-            'content_id': None,
-            'html': ''
-        }, {
-            'content_id': None,
-            'html': ''
-        }, {
             'content_id': None,
             'html': ''
         }],

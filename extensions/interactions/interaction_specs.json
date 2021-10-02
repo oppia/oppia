@@ -642,7 +642,7 @@
           "type": "list",
           "validators": [
             {
-              "min_value": 4,
+              "min_value": 1,
               "id": "has_length_at_least"
             }
           ],
@@ -651,15 +651,6 @@
           }
         },
         "default_value": [{
-          "content_id": null,
-          "html": ""
-        }, {
-          "content_id": null,
-          "html": ""
-        }, {
-          "content_id": null,
-          "html": ""
-        }, {
           "content_id": null,
           "html": ""
         }]
