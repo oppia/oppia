@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
@@ -27,7 +28,6 @@ from core.domain import email_manager
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-import feconf
 from jobs.batch_jobs import exp_recommendation_computation_jobs
 from jobs.batch_jobs import exp_search_indexing_jobs
 from jobs.batch_jobs import suggestion_stats_computation_jobs
@@ -213,8 +213,7 @@ class CronDashboardStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=user_stats_computation_jobs.CollectWeeklyDashboardStats,
-            run_synchronously=False)
+            job_class=user_stats_computation_jobs.CollectWeeklyDashboardStats)
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
@@ -230,8 +229,7 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
         beam_job_services.run_beam_job(
             job_class=(
                 exp_recommendation_computation_jobs
-                .ComputeExplorationRecommendations),
-            run_synchronously=False)
+                .ComputeExplorationRecommendations))
 
 
 class CronActivitySearchRankHandler(base.BaseHandler):
@@ -245,8 +243,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=exp_search_indexing_jobs.IndexExplorationsInSearch,
-            run_synchronously=False)
+            job_class=exp_search_indexing_jobs.IndexExplorationsInSearch)
 
 
 class CronTranslationContributionStatsHandler(base.BaseHandler):
@@ -262,5 +259,4 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
         beam_job_services.run_beam_job(
             job_class=(
                 suggestion_stats_computation_jobs
-                .GenerateTranslationContributionStats),
-            run_synchronously=False)
+                .GenerateTranslationContributionStats))

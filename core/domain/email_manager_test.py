@@ -21,7 +21,9 @@ import datetime
 import logging
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
@@ -34,8 +36,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])

@@ -19,12 +19,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core.constants import constants
 from core.domain import beam_job_domain
+from core.jobs import base_jobs
+from core.jobs import jobs_manager
+from core.jobs import registry as jobs_registry
 from core.platform import models
-from jobs import base_jobs
-from jobs import jobs_manager
-from jobs import registry as jobs_registry
 
 from typing import List, Optional, Type
 
@@ -40,8 +40,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 def run_beam_job(
     job_name: Optional[str] = None,
-    job_class: Optional[Type[base_jobs.JobBase]] = None,
-    run_synchronously: Optional[bool] = None
+    job_class: Optional[Type[base_jobs.JobBase]] = None
 ) -> beam_job_domain.BeamJobRun:
     """Starts a new Apache Beam job and returns metadata about its execution.
 
@@ -50,22 +49,18 @@ def run_beam_job(
             job_class must not be None.
         job_class: type(JobBase). A subclass of JobBase to begin running. This
             value takes precedence over job_name.
-        run_synchronously: bool. Whether to run the job synchronously. If not
-            provided, then the value is decided by whether Oppia is running in
-            emulator mode.
 
     Returns:
         BeamJobRun. Metadata about the run's execution.
     """
     if job_class is None and job_name is None:
-        raise ValueError('Must specify the job class to run')
+        raise ValueError('Must specify the job class or name to run')
     if job_class is None:
         # MyPy is wrong. We know job_name is not None in this branch because if
         # it were, the ValueError above would have been raised.
         job_class = jobs_registry.get_job_class_by_name(job_name) # type: ignore[arg-type]
-    if run_synchronously is None:
-        run_synchronously = constants.EMULATOR_MODE
 
+    run_synchronously = constants.EMULATOR_MODE
     run_model = jobs_manager.run_job(job_class, run_synchronously)
 
     return get_beam_job_run_from_model(run_model)

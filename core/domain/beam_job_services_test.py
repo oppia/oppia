@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 
 import itertools
 
+from core import python_utils
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
+from core.jobs import base_jobs
+from core.jobs import jobs_manager
+from core.jobs import registry as jobs_registry
 from core.platform import models
 from core.tests import test_utils
-from jobs import base_jobs
-from jobs import jobs_manager
-from jobs import registry as jobs_registry
-import python_utils
 
 import apache_beam as beam
 
@@ -145,46 +145,6 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
     def test_run_beam_job_without_args_raises_an_exception(self) -> None:
         with self.assertRaisesRegexp(ValueError, 'Must specify the job'): # type: ignore[no-untyped-call]
             beam_job_services.run_beam_job()
-
-    def test_run_beam_job_synchronously(self) -> None:
-        model = beam_job_services.create_beam_job_run_model('NoOpJob')
-
-        def run_job_mock(
-            job_class: Type[base_jobs.JobBase],
-            run_synchronously: bool
-        ) -> beam_job_models.BeamJobRunModel:
-            """Mock run_job() implementation that runs assertions on input."""
-            self.assertIs(job_class, NoOpJob)
-            self.assertTrue(run_synchronously)
-            return model
-
-        with self.swap(jobs_manager, 'run_job', run_job_mock):
-            run = beam_job_services.run_beam_job(
-                job_class=NoOpJob, run_synchronously=True)
-
-        self.assertEqual(
-            beam_job_services.get_beam_job_run_from_model(model).to_dict(),
-            run.to_dict())
-
-    def test_run_beam_job_asynchronously(self) -> None:
-        model = beam_job_services.create_beam_job_run_model('NoOpJob')
-
-        def run_job_mock(
-            job_class: Type[base_jobs.JobBase],
-            run_synchronously: bool
-        ) -> beam_job_models.BeamJobRunModel:
-            """Mock run_job() implementation that runs assertions on input."""
-            self.assertIs(job_class, NoOpJob)
-            self.assertFalse(run_synchronously)
-            return model
-
-        with self.swap(jobs_manager, 'run_job', run_job_mock):
-            run = beam_job_services.run_beam_job(
-                job_class=NoOpJob, run_synchronously=False)
-
-        self.assertEqual(
-            beam_job_services.get_beam_job_run_from_model(model).to_dict(),
-            run.to_dict())
 
     def test_cancel_beam_job(self) -> None:
         model = beam_job_services.create_beam_job_run_model(
