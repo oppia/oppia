@@ -19,13 +19,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import python_utils
+from core.constants import constants
 from core.domain import search_services
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.types import job_run_result
 from core.platform import models
-from jobs import job_test_utils
-from jobs.batch_jobs import exp_search_indexing_jobs
-from jobs.types import job_run_result
-import python_utils
 
 from typing import Dict, List, Tuple, Union # isort:skip
 
@@ -153,7 +153,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
                 unused_documents: Dict[str, Union[int, str, List[str]]],
                 unused_index_name: str
         ) -> None:
-            raise platform_search_services.SearchException # type: ignore[attr-defined]
+            raise platform_search_services.SearchException
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,

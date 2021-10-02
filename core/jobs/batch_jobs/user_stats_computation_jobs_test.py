@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import user_stats_computation_jobs
+from core.jobs.types import job_run_result
 from core.platform import models
-import feconf
-from jobs import job_test_utils
-from jobs.batch_jobs import user_stats_computation_jobs
-from jobs.types import job_run_result
 
 from typing import cast
 

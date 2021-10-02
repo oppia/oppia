@@ -21,27 +21,11 @@ from __future__ import unicode_literals
 
 from core import feconf
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import validation_jobs
+from core.jobs.batch_jobs import model_validation_jobs
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
-<<<<<<< HEAD:core/jobs/batch_jobs/model_validation_jobs_test.py
-import feconf
-from jobs import job_test_utils
-from jobs.batch_jobs import model_validation_jobs
-from jobs.transforms.validation import base_validation
-from jobs.types import base_validation_errors
-from jobs.types import model_property
-||||||| 80f68e456:jobs/batch_jobs/validation_jobs_test.py
-import feconf
-from jobs import job_test_utils
-from jobs.batch_jobs import validation_jobs
-from jobs.transforms.validation import base_validation
-from jobs.types import base_validation_errors
-from jobs.types import model_property
-=======
->>>>>>> develop:core/jobs/batch_jobs/validation_jobs_test.py
 
 (auth_models, base_models, user_models) = models.Registry.import_models(
     [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])

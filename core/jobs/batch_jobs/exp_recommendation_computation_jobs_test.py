@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core.constants import constants
 from core.domain import recommendations_services
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.types import job_run_result
 from core.platform import models
-from jobs import job_test_utils
-from jobs.batch_jobs import exp_recommendation_computation_jobs
-from jobs.types import job_run_result
 
 from typing import Dict, List, Tuple, Union # isort:skip
 

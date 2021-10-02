@@ -20,12 +20,12 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+from core import python_utils
 from core.domain import recommendations_services
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
-from jobs import base_jobs
-from jobs.io import ndb_io
-from jobs.types import job_run_result
-import python_utils
 
 import apache_beam as beam
 

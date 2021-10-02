@@ -22,17 +22,17 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
-import feconf
-from jobs import base_jobs
-from jobs.io import ndb_io
-from jobs.types import job_run_result
-import python_utils
 
 import apache_beam as beam
 

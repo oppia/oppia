@@ -21,10 +21,10 @@ from __future__ import annotations
 from __future__ import unicode_literals
 
 from core.domain import search_services
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
-from jobs import base_jobs
-from jobs.io import ndb_io
-from jobs.types import job_run_result
 
 import apache_beam as beam
 from typing import Iterable, List, cast
@@ -88,7 +88,7 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
             yield job_run_result.JobRunResult(
                 stdout='SUCCESS %s models indexed' % len(exp_summary_models)
             )
-        except platform_search_services.SearchException: # type: ignore[attr-defined]
+        except platform_search_services.SearchException:
             yield job_run_result.JobRunResult(
                 stderr='FAILURE %s models not indexed' % len(exp_summary_models)
             )

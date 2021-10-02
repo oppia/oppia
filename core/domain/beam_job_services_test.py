@@ -32,7 +32,7 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
-from typing import List, Optional, Type
+from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
