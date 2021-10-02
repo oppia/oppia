@@ -282,9 +282,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     );
     const cachedLanguage = this.translateCacheService.getCachedLanguage();
     let url = new URL(this.windowRef.nativeWindow.location.toString());
-    let i18nLanguage = url.searchParams.get('lang') || cachedLanguage;
+    let i18nLanguageCode = url.searchParams.get('lang') || cachedLanguage;
 
-    if (i18nLanguage) {
+    if (i18nLanguageCode) {
       let supportedSiteLanguagesCodes: string[] = (
         AppConstants.SUPPORTED_SITE_LANGUAGES.map(
           (languageInfo: LanguageInfo) => {
@@ -292,23 +292,25 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           }
         )
       );
-      if (supportedSiteLanguagesCodes.includes(i18nLanguage)) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguage);
+      if (supportedSiteLanguagesCodes.includes(i18nLanguageCode)) {
+        this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguageCode);
       } else {
         let currentLanguageText: string = '';
-        i18nLanguage = cachedLanguage || AppConstants.DEFAULT_LANGUAGE_CODE;
+        i18nLanguageCode = cachedLanguage || AppConstants.DEFAULT_LANGUAGE_CODE;
         AppConstants.SUPPORTED_SITE_LANGUAGES.forEach(element => {
-          if (element.id === i18nLanguage) {
+          if (element.id === i18nLanguageCode) {
             currentLanguageText = element.text;
           }
           this.alertsService.addWarning(
             `Loading in ${currentLanguageText} because the language code ` +
             'provided is invalid.');
-          this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguage);
+          this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguageCode);
         });
       }
-      this.translateCacheService.init();
     }
+    // Translate Cache service should be initialized only after site language is
+    // set according to the URL language parameter.
+    this.translateCacheService.init();
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }

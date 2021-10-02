@@ -50,7 +50,7 @@ describe('I18nLanguageCodeService', () => {
   let alertsService = new MockAlertsService(loggerService);
   let mockWindowRef = new MockWindowRef();
   const i18nLanguageCodeService = new I18nLanguageCodeService (
-    mockWindowRef as WindowRef, alertsService as AlertsService);
+    mockWindowRef as WindowRef);
   let languageCode: string = '';
   let testSubscriptions: Subscription;
   beforeEach(() => {
@@ -81,20 +81,6 @@ describe('I18nLanguageCodeService', () => {
     mockWindowRef.nativeWindow.location = new URL('http://localhost/community?lang=en');
     i18nLanguageCodeService.setUrlLanguageParam('es');
 
-    expect(mockWindowRef.nativeWindow.history.pushState).toHaveBeenCalled();
-  });
-
-  it('should raise warning if lang code is invalid' +
-  ' and load in current lang', () => {
-    spyOn(mockWindowRef.nativeWindow.history, 'pushState');
-    spyOn(i18nLanguageCodeService, 'getCurrentI18nLanguageCode')
-      .and.returnValue('en');
-    mockWindowRef.nativeWindow.location = new URL('http://localhost/community?lang=es');
-    i18nLanguageCodeService.setI18nLanguageCode('invalid');
-
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Loading in "English" because the language code ' +
-      'provided is invalid.');
     expect(mockWindowRef.nativeWindow.history.pushState).toHaveBeenCalled();
   });
 

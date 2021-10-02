@@ -56,8 +56,8 @@ export class I18nLanguageCodeService {
   setI18nLanguageCode(code: string): void {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     I18nLanguageCodeService.languageCode = code;
-    this.setUrlLanguageParam(code);
     I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
+    this.setUrlLanguageParam(code);
   }
 
   setUrlLanguageParam(code: string): void {

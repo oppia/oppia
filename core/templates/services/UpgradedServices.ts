@@ -559,7 +559,7 @@ export class UpgradedServices {
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService(
-      upgradedServices['WindowRef'], upgradedServices['AlertsService']);
+      upgradedServices['WindowRef']);
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageClickInputRulesService'] =
       new ImageClickInputRulesService();
