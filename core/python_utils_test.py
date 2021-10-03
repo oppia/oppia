@@ -93,10 +93,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')
 
-    def test_url_unquote_plus(self):
-        self.assertEqual(
-            python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
-
     def test_divide(self):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
