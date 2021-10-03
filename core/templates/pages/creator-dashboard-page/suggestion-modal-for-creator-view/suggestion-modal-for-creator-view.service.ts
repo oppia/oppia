@@ -21,12 +21,13 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SuggestionModalForCreatorViewComponent } from './suggestion-modal-for-creator-view.component';
 import { SuggestionModalForCreatorViewBackendApiService } from './suggestion-modal-for-creator-view-backend-api.service';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ExtraParams {
-  activeThread: any;
-  suggestionsToReviewList: any;
-  clearActiveThread: any;
-  canReviewActiveThread: any;
+  activeThread;
+  suggestionsToReviewList;
+  clearActiveThread;
+  canReviewActiveThread;
 }
 
 @Injectable({
@@ -132,3 +133,6 @@ export class SuggestionModalForCreatorDashboardService {
   }
 }
 
+angular.module('oppia').factory(
+  'SuggestionModalForCreatorDashboardService',
+  downgradeInjectable(SuggestionModalForCreatorDashboardService));

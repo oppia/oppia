@@ -294,6 +294,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
     SummaryListHeaderComponent,
     SupplementalCardComponent,
     TakeBreakModalComponent,
+    ThreadTableComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,

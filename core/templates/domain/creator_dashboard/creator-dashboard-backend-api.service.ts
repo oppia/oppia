@@ -72,7 +72,7 @@ interface CreatorDashboardDataBackendDict {
   'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
 }
 
-interface CreatorDashboardData {
+export interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
   // 'lastWeekStats' is null for a new creator.
   lastWeekStats: CreatorDashboardStats | null;
