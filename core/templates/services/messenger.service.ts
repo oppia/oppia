@@ -52,20 +52,20 @@ interface ExplorationResetData {
 }
 
 interface MessageValidatorsType {
-  heightChange(payload: HeightChangeData): boolean;
-  explorationLoaded(): boolean;
-  stateTransition(payload: StateTransitionData): boolean;
-  explorationReset(payload: ExplorationResetData): boolean;
-  explorationCompleted(): boolean;
+  heightChange: (payload: HeightChangeData) => boolean;
+  explorationLoaded: () => boolean;
+  stateTransition: (payload: StateTransitionData) => boolean;
+  explorationReset: (payload: ExplorationResetData) => boolean;
+  explorationCompleted: () => boolean;
 }
 
 interface GetPayloadType {
-  heightChange(data: HeightChangeData): HeightChangeData;
-  explorationLoaded(data: ExplorationLoadedData): ExplorationLoadedData;
-  stateTransition(data: StateTransitionData): StateTransitionData;
-  explorationCompleted(
-    data: ExplorationCompletedData): ExplorationCompletedData;
-  explorationReset(data: string): ExplorationResetData;
+  heightChange: (data: HeightChangeData) => HeightChangeData;
+  explorationLoaded: (data: ExplorationLoadedData) => ExplorationLoadedData;
+  stateTransition: (data: StateTransitionData) => StateTransitionData;
+  explorationCompleted: (
+    data: ExplorationCompletedData) => ExplorationCompletedData;
+  explorationReset: (data: string) => ExplorationResetData;
 }
 
 type MessageTitles = typeof ServicesConstants.MESSENGER_PAYLOAD[
