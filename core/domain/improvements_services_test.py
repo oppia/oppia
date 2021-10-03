@@ -171,8 +171,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     def test_fetch_when_number_of_open_tasks_exceed_single_fetch_limit(self):
         tasks = [
             self._new_open_task(state_name='State %d' % (i,))
-            for i in range(
-                int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
+            for i in range(int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
         ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (

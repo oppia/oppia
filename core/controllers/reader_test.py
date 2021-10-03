@@ -342,8 +342,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         skill_ids_for_url = ''
 
         # Create multiple skills, questions and skill links.
-        for _ in range(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+        for _ in range(feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')

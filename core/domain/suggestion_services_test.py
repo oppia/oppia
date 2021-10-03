@@ -2686,8 +2686,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 reviewable_suggestion_email_info.submission_datetime,
                 expected_reviewable_suggestion_email_infos[
                     index].submission_datetime)
-        for index in range(
-                len(reviewable_suggestion_email_infos) - 1):
+        for index in range(len(reviewable_suggestion_email_infos) - 1):
             self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
@@ -3797,8 +3796,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 reviewable_suggestion_email_info.submission_datetime,
                 expected_reviewable_suggestion_email_infos[
                     index].submission_datetime)
-        for index in range(
-                len(reviewable_suggestion_email_infos) - 1):
+        for index in range(len(reviewable_suggestion_email_infos) - 1):
             self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
