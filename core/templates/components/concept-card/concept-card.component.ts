@@ -16,7 +16,7 @@
  * @fileoverview Component for the concept cards viewer.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
@@ -25,7 +25,7 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
   selector: 'oppia-concept-card',
   templateUrl: './concept-card.component.html',
 })
-export class ConceptCardComponent implements OnInit, OnChanges {
+export class ConceptCardComponent implements OnInit {
   @Input() skillIds: string[];
   @Input() index: string | number;
   numberOfWorkedExamplesShown: number;
@@ -49,12 +49,9 @@ export class ConceptCardComponent implements OnInit, OnChanges {
     this.numberOfWorkedExamplesShown++;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.index &&
-      changes.index.currentValue !== changes.index.previousValue
-    ) {
-      this.currentConceptCard = this.conceptCards[changes.index.currentValue];
+  updatePreview(index: string | number): void {
+    if (index) {
+      this.currentConceptCard = this.conceptCards[index];
       if (this.currentConceptCard) {
         this.numberOfWorkedExamplesShown = 0;
         if (this.currentConceptCard.getWorkedExamples().length > 0) {
@@ -72,6 +69,7 @@ export class ConceptCardComponent implements OnInit, OnChanges {
     this.conceptCardBackendApiService.loadConceptCardsAsync(
       this.skillIds
     ).then((conceptCardObjects) => {
+      this.updatePreview(this.index);
       conceptCardObjects.forEach((conceptCardObject) => {
         this.conceptCards.push(conceptCardObject);
       });
