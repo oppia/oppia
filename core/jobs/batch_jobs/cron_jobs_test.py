@@ -36,7 +36,7 @@ import apache_beam as beam
 from typing import Dict, List, Set, Tuple, Union # isort:skip
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import recommendations_models
