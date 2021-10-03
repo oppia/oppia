@@ -380,6 +380,7 @@ import { PageHeadService } from './page-head.service';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
+import { StateDiffModalBackendApiService } from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -692,6 +693,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
+  ['StateDiffModalBackendApiService', StateDiffModalBackendApiService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
   ['StateGraphLayoutService', StateGraphLayoutService],
