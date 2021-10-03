@@ -118,24 +118,6 @@ def redirect_stdout(new_target):
     return impl(new_target)
 
 
-def nullcontext(enter_result=None):
-    """Returns nullcontext from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Args:
-        enter_result: *. The object returned by the nullcontext when entered.
-
-    Returns:
-        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
-        object.
-    """
-    try:
-        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
-    return impl(enter_result=enter_result)
-
-
 def ExitStack(): # pylint: disable=invalid-name
     """Returns ExitStack from contextlib2 if run under Python 2 and from
     contextlib if run under Python 3.
