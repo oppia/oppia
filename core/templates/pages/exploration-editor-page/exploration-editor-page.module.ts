@@ -40,6 +40,7 @@ import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
 
 @NgModule({
   imports: [
@@ -62,6 +63,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
     WelcomeModalComponent,
+    StateDiffModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -74,6 +76,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
     WelcomeModalComponent,
+    StateDiffModalComponent,
   ],
   providers: [
     {

@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import importlib
 import os
-import pkgutil
 
 from core import feconf
 from core import python_utils
@@ -51,21 +51,15 @@ class Registry(python_utils.OBJECT):
         """
         cls._issues.clear()
 
-        all_issue_types = cls.get_all_issue_types()
-
-        # Assemble all paths to the issues.
-        extension_paths = [
-            os.path.join(feconf.ISSUES_DIR, issue_type)
-            for issue_type in all_issue_types]
-
-        # Crawl the directories and add new issue instances to the
-        # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
-            module = loader.find_module(name).load_module(name)
-            clazz = getattr(module, name)
+        for issue_type in cls.get_all_issue_types():
+            module_path_parts = feconf.ISSUES_DIR.split(os.sep)
+            module_path_parts.extend([issue_type, issue_type])
+            module = importlib.import_module('.'.join(module_path_parts))
+            clazz = getattr(module, issue_type)
 
             ancestor_names = [
-                base_class.__name__ for base_class in clazz.__bases__]
+                base_class.__name__ for base_class in clazz.__bases__
+            ]
             if 'BaseExplorationIssueSpec' in ancestor_names:
                 cls._issues[clazz.__name__] = clazz()
 
