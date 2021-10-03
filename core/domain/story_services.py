@@ -222,7 +222,7 @@ def apply_change_list(story_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, story_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def does_story_exist_with_url_fragment(url_fragment):

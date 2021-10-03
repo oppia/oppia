@@ -679,7 +679,7 @@ def apply_change_list(collection_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def validate_exps_in_collection_are_public(collection):
