@@ -26,17 +26,17 @@ import re
 import string
 import struct
 
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import schema_utils_test
+from core import utils
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.tests import test_utils
 from extensions.interactions import base
-import feconf
-import python_utils
-import schema_utils
-import schema_utils_test
-import utils
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
@@ -287,14 +287,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # The file having the information about the assembly of the html in the
         # rule specs.
         html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+            python_utils.get_package_file_contents(
+                'extensions',
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
 
         # The file having the templates for the structure of the rule specs.
         # Contents of the file html_field_types_to_rule_specs.json will be
         # verified against this file.
         rule_descriptions_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+            python_utils.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
 
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.

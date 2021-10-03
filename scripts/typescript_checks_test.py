@@ -21,8 +21,9 @@ import json
 import os
 import subprocess
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
+
 from . import typescript_checks
 
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')

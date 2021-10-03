@@ -32,7 +32,11 @@ import os
 import re
 import unittest
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.controllers import base
 from core.domain import auth_domain
 from core.domain import caching_domain
@@ -60,12 +64,8 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
-import feconf
 import main
 from proto_files import text_classifier_pb2
-import python_utils
-import schema_utils
-import utils
 
 import elasticsearch
 import requests_mock
