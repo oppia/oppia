@@ -33,7 +33,7 @@
  * value.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -46,7 +46,7 @@ import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia
   selector: 'oppia-noninteractive-skillreview',
   templateUrl: './skillreview.component.html'
 })
-export class NoninteractiveSkillreview implements OnInit, OnChanges {
+export class NoninteractiveSkillreview implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -63,13 +63,14 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   ) {}
 
   private _updateViewOnNewSkillSelected(): void {
-    if (!this.skillIdWithValue || !this.textWithValue) {
-      return;
+    if (this.skillIdWithValue) {
+      this.skillId = this.htmlEscaperService.escapedJsonToObj(
+        this.skillIdWithValue) as string;
     }
-    this.skillId = this.htmlEscaperService.escapedJsonToObj(
-      this.skillIdWithValue) as string;
-    this.linkText = this.htmlEscaperService.escapedJsonToObj(
-      this.textWithValue) as string;
+    if (this.textWithValue) {
+      this.linkText = this.htmlEscaperService.escapedJsonToObj(
+        this.textWithValue) as string;
+    }
   }
 
   ngOnInit(): void {
@@ -119,12 +120,6 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
         throw new Error(res);
       }
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.skillIdWithValue || changes.textWithValue) {
-      this._updateViewOnNewSkillSelected();
-    }
   }
 }
 
