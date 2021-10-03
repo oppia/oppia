@@ -212,7 +212,7 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
+              UndoRedoService.getUndoRedoChangeEventEmitter().subscribe(
                 () => setDocumentTitle()
               )
             );

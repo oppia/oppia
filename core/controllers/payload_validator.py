@@ -21,8 +21,8 @@ Also contains a list of handler class names which does not contain the schema.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
-import schema_utils
+from core import python_utils
+from core import schema_utils
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 
