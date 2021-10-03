@@ -26,7 +26,7 @@ import fnmatch
 import os
 import sys
 
-import python_utils
+from core import python_utils
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000

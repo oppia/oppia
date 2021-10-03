@@ -58,7 +58,7 @@ import socket
 import sys
 import threading
 
-import python_utils
+from core import python_utils
 
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]

@@ -20,12 +20,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
+import os
 import pkgutil
 
-import constants
-import feconf
-import python_utils
-import utils
+from core import constants
+from core import feconf
+from core import python_utils
+from core import utils
 
 
 class Registry(python_utils.OBJECT):
@@ -37,9 +38,12 @@ class Registry(python_utils.OBJECT):
     def _refresh(cls):
         """Repopulate the registry."""
         cls._rte_components.clear()
-        with open(
-            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
-            cls._rte_components = constants.parse_json_from_js(f)
+<<<<<<< HEAD
+        package, filepath = os.path.split(
+            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
+        cls._rte_components = constants.parse_json_from_ts(
+            python_utils.get_package_file_contents(package, filepath))
+>>>>>>> c57168ee4017bf92ee49adc70dd236656aacc3b1
 
     @classmethod
     def get_all_rte_components(cls):

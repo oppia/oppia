@@ -44,7 +44,7 @@ import sys
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
-import python_utils  # isort:skip  # pylint: disable=wrong-import-position
+from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -470,7 +470,7 @@ def check_for_backend_python_library_inconsistencies():
                 'Library', 'Requirements Version',
                 'Currently Installed Version'))
         for library_name, version_strings in mismatches.items():
-            python_utils.PRINT('{:<35} |{:<25}|{:<25}'.format(
+            python_utils.PRINT('{!s:<35} |{!s:<25}|{!s:<25}'.format(
                 library_name, version_strings[0], version_strings[1]))
         python_utils.PRINT('\n')
         common.print_each_string_after_two_new_lines([
