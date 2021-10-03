@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import feedback_domain

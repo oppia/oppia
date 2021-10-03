@@ -1077,7 +1077,7 @@ def _send_batch_emails(
     can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
     for recipient_id, can_receive_email in zip(
-        recipient_list, can_recipients_receive_email):
+            recipient_list, can_recipients_receive_email):
         if can_receive_email:
             _add_feedback_message_reference_transactional(
                 recipient_id, feedback_message_reference)
@@ -1101,7 +1101,7 @@ def _send_instant_emails(
     can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
     for recipient_id, can_receive_email in zip(
-        recipient_list, can_recipients_receive_email):
+            recipient_list, can_recipients_receive_email):
         if can_receive_email:
             enqueue_feedback_message_instant_email_task_transactional(
                 recipient_id, feedback_message_reference)
@@ -1126,7 +1126,7 @@ def _send_feedback_thread_status_change_emails(
     can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
     for recipient_id, can_receive_email in zip(
-        recipient_list, can_recipients_receive_email):
+            recipient_list, can_recipients_receive_email):
         if can_receive_email:
             _enqueue_feedback_thread_status_change_email_task_transactional(
                 recipient_id, feedback_message_reference, old_status,
