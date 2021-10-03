@@ -34,8 +34,8 @@ export interface TranslatableItem {
   more: boolean
   dataFormat: string,
   contentType: string,
-  // These properties will be null when the
-  // content is not provided for translation.
+  // These properties will be null when there
+  // is no interaction.
   text: string | string[] | null,
   interactionId: string | null,
   ruleType: string | null
@@ -52,8 +52,8 @@ export class StateAndContent {
     public translation: string | string[],
     public dataFormat: string,
     public contentType: string,
-    // The following two properties are set to null when the
-    // interactionId and ruleType is not provided.
+    // The following two properties are set to null
+    // when they have no interaction.
     public interactionId: string | null,
     public ruleType: string | null
   ) {}
