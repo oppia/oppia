@@ -55,9 +55,9 @@ export class OpportunitiesListItemComponent {
   translatedProgressStyle: { width: string; };
   inReviewProgressStyle: { width: string; };
   untranslatedProgressStyle: { width: string; };
-  isCorrespondingOpportunityDeleted: boolean = false;
-  isTranslationProgressBar: boolean = false;
-  isOpportunityButtonDisabled: boolean = false;
+  correspondingOpportunityDeleted: boolean = false;
+  translationProgressBar: boolean = false;
+  opportunityButtonDisabled: boolean = false;
 
   ngOnInit(): void {
     if (this.opportunity && this.labelRequired) {
@@ -75,7 +75,7 @@ export class OpportunitiesListItemComponent {
         this.progressPercentage = (
           this.opportunity.progressPercentage + '%');
         if (this.opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
-          this.isTranslationProgressBar = true;
+          this.translationProgressBar = true;
           const translatedPercentage = (
             this.opportunity.translationsCount / this.opportunity.totalCount
           ) * 100;
@@ -92,7 +92,7 @@ export class OpportunitiesListItemComponent {
           this.inReviewProgressStyle = {
             width: inReviewTranslationsPercentage + '%'
           };
-          this.isOpportunityButtonDisabled = (
+          this.opportunityButtonDisabled = (
             this.opportunity.translationsCount +
             this.opportunity.inReviewCount >=
             this.opportunity.totalCount);
@@ -104,7 +104,7 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.subheading ===
           ContributorDashboardConstants
             .CORRESPONDING_DELETED_OPPORTUNITY_TEXT) {
-        this.isCorrespondingOpportunityDeleted = true;
+        this.correspondingOpportunityDeleted = true;
       }
     } else {
       this.opportunityDataIsLoading = true;

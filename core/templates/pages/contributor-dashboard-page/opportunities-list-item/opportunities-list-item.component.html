@@ -16,10 +16,10 @@
   </div>
   <div class="oppia-opportunities-progress oppia-animate-fadein" *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
-      <div [hidden]="opportunityDataIsLoading" *ngIf="!isTranslationProgressBar" class="progress">
+      <div [hidden]="opportunityDataIsLoading" *ngIf="!translationProgressBar" class="progress">
         <div class="progress-bar bg-success" role="progressbar" [ngStyle]="progressBarStyle"></div>
       </div>
-      <div [hidden]="opportunityDataIsLoading"  *ngIf="isTranslationProgressBar" class="progress">
+      <div [hidden]="opportunityDataIsLoading"  *ngIf="translationProgressBar" class="progress">
         <div class="progress-bar bg-success" role="progressbar" [ngStyle]="translatedProgressStyle" ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted" container="body" placement="bottom"></div>
         <div class="progress-bar bg-light-green" role="progressbar" [ngStyle]="inReviewProgressStyle" ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review" container="body" placement="bottom"></div>
         <div class="progress-bar bg-light" role="progressbar" [ngStyle]="untranslatedProgressStyle" ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards untranslated" container="body" placement="bottom"></div>
@@ -28,15 +28,15 @@
     </div>
     <div class="oppia-opportunities-progress-label">
       <span class="protractor-test-opportunity-list-item-progress-percentage"
-            *ngIf="isTranslationProgressBar"
+            *ngIf="translationProgressBar"
             [hidden]="opportunityDataIsLoading"
-            [disableTooltip]="!isTranslationProgressBar"
+            [disableTooltip]="!translationProgressBar"
             ngbTooltip="Percentage of accepted translated cards. {{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards remaining."
             placement="bottom">
         ({{ progressPercentage }})
       </span>
       <span class="protractor-test-opportunity-list-item-progress-percentage"
-            *ngIf="!isTranslationProgressBar"
+            *ngIf="!translationProgressBar"
             [hidden]="opportunityDataIsLoading">
         ({{ progressPercentage }})
       </span>
@@ -51,9 +51,9 @@
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <button class="protractor-test-opportunity-list-item-button"
-            [ngClass]="{'oppia-opportunities-button': !isOpportunityButtonDisabled, 'oppia-opportunities-disabled-button': isOpportunityButtonDisabled}"
-            [hidden]="opportunityDataIsLoading || isCorrespondingOpportunityDeleted"
-            [disabled]="isOpportunityButtonDisabled"
+            [ngClass]="{'oppia-opportunities-button': !opportunityButtonDisabled, 'oppia-opportunities-disabled-button': opportunityButtonDisabled}"
+            [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
+            [disabled]="opportunityButtonDisabled"
             (click)="clickActionButton.emit(opportunity.id)">
       {{ opportunity?.actionButtonTitle }}
     </button>
