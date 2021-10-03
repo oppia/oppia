@@ -30,8 +30,8 @@ import threading
 import time
 from unittest import mock
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers

@@ -23,7 +23,7 @@ import glob
 import os
 import subprocess
 
-import python_utils
+from core import python_utils
 from .. import concurrent_task_utils
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
@@ -50,7 +50,9 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/',
     '/.github/CODEOWNERS',
     '/.github/stale.yml',
-    '/.github/workflows/']
+    '/.github/workflows/',
+    '/core/android_validation_constants*.py',
+    '/extensions/interactions/rule_templates.json']
 
 
 class CodeownerLintChecksManager(python_utils.OBJECT):

@@ -24,7 +24,7 @@ import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 
 from . import linter_utils
 from .. import common
