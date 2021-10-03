@@ -67,7 +67,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_DISPLAY_ALIAS = 'display_alias'
 
     def setUp(self) -> None:
-        super(UserSettingsModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
@@ -295,7 +295,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(CompletedActivitiesModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(CompletedActivitiesModelTests, self).setUp()
 
         user_models.CompletedActivitiesModel(
             id=self.USER_1_ID,
@@ -375,7 +375,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(IncompleteActivitiesModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(IncompleteActivitiesModelTests, self).setUp()
 
         user_models.IncompleteActivitiesModel(
             id=self.USER_1_ID,
@@ -452,7 +452,7 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(LearnerGoalsModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(LearnerGoalsModelTests, self).setUp()
 
         user_models.LearnerGoalsModel(
             id=self.USER_1_ID,
@@ -526,7 +526,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     EXP_VERSION = 1
 
     def setUp(self) -> None:
-        super(ExpUserLastPlaythroughModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExpUserLastPlaythroughModelTest, self).setUp()
 
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID_1, self.EXP_ID_0),
@@ -666,7 +666,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(LearnerPlaylistModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(LearnerPlaylistModelTests, self).setUp()
 
         user_models.LearnerPlaylistModel(
             id=self.USER_ID_1,
@@ -738,7 +738,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserContributionsModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserContributionsModelTests, self).setUp()
         # User A has no created explorations, one edited exploration.
         # User B has two created and edited explorations.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
@@ -839,7 +839,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserEmailPreferencesModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserEmailPreferencesModelTests, self).setUp()
 
         user_models.UserEmailPreferencesModel(id=self.USER_ID_1).put()
         user_models.UserEmailPreferencesModel(
@@ -929,7 +929,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserSubscriptionsModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserSubscriptionsModelTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com'
@@ -1050,7 +1050,7 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserSubscribersModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserSubscribersModelTests, self).setUp()
 
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
@@ -1107,7 +1107,7 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserRecentChangesBatchModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserRecentChangesBatchModelTests, self).setUp()
 
         user_models.UserRecentChangesBatchModel(id=self.USER_ID_1).put()
         user_models.UserRecentChangesBatchModel(
@@ -1193,7 +1193,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserStatsModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(UserStatsModelTest, self).setUp()
 
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -1304,7 +1304,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     EXP_ID_THREE = 'exp_id_three'
 
     def setUp(self) -> None:
-        super(ExplorationUserDataModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExplorationUserDataModelTest, self).setUp()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_1_ID, self.EXP_ID_ONE),
             user_id=self.USER_1_ID,
@@ -1491,7 +1491,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     COMPLETED_EXPLORATION_IDS_2 = ['exp_id_4', 'exp_id_5', 'exp_id_6']
 
     def setUp(self) -> None:
-        super(CollectionProgressModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(CollectionProgressModelTests, self).setUp()
 
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1),
@@ -1601,7 +1601,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     COMPLETED_NODE_IDS_2 = ['node_id_a']
 
     def setUp(self) -> None:
-        super(StoryProgressModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(StoryProgressModelTests, self).setUp()
         user_models.StoryProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
             user_id=self.USER_ID_1,
@@ -1728,7 +1728,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserQueryModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserQueryModelTests, self).setUp()
 
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
@@ -1902,7 +1902,7 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserBulkEmailsModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserBulkEmailsModelTests, self).setUp()
 
         user_models.UserBulkEmailsModel(id=self.USER_ID_1).put()
         user_models.UserBulkEmailsModel(id=self.USER_ID_2, deleted=True).put()
@@ -1938,7 +1938,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     DEGREE_OF_MASTERY = 0.5
 
     def setUp(self) -> None:
-        super(UserSkillMasteryModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserSkillMasteryModelTests, self).setUp()
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_1_ID, self.SKILL_ID_1),
@@ -2077,7 +2077,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserContributionProficiencyModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(UserContributionProficiencyModelTests, self).setUp()
 
         user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
@@ -2470,7 +2470,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(PendingDeletionRequestModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(PendingDeletionRequestModelTests, self).setUp()
 
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,

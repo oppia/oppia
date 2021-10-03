@@ -75,7 +75,7 @@ angular.module('oppia').component('reviewTestPage', {
           function(result) {
             var skillIdList = [];
             var skillDescriptions = [];
-            PageTitleService.setPageTitle(
+            PageTitleService.setDocumentTitle(
               'Review Test: ' + result.storyName + ' - Oppia');
             for (var skillId in result.skillDescriptions) {
               skillIdList.push(skillId);

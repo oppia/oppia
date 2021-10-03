@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -195,7 +195,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def query_new_and_pending_training_jobs(
             cls, offset: int
-    ) -> Tuple[List['ClassifierTrainingJobModel'], int]:
+    ) -> Tuple[Sequence['ClassifierTrainingJobModel'], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -221,11 +221,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             .order(cls.next_scheduled_check_time)
         )
 
-        classifier_job_models = cast(
-            List[ClassifierTrainingJobModel],
+        classifier_job_models: Sequence[ClassifierTrainingJobModel] = (
             query.fetch(
-                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
-        )
+                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset))
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 

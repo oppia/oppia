@@ -24,10 +24,10 @@ import feconf
 
 from apache_beam.options import pipeline_options
 
-from typing import List, Optional # isort: skip
+from typing import List, Optional
 
 
-class JobOptions(pipeline_options.PipelineOptions):
+class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
@@ -61,9 +61,8 @@ class JobOptions(pipeline_options.PipelineOptions):
             # Needed by GoogleCloudOptions.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
-            # TODO(#11475): Figure out what these values should be. We can't run
-            # unit tests on DataflowRunner unless they have a valid GCS path.
-            temp_location='gs://todo/todo', staging_location='gs://todo/todo',
+            temp_location=feconf.DATAFLOW_TEMP_LOCATION,
+            staging_location=feconf.DATAFLOW_STAGING_LOCATION,
             **job_options)
 
     @classmethod

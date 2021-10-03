@@ -3883,7 +3883,294 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V52
+    YAML_CONTENT_V53 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 48
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V54 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 54
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 49
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V54
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -4014,7 +4301,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 52
+schema_version: 54
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4118,7 +4405,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 47
+states_schema_version: 49
 tags: []
 title: Title
 """)
@@ -4267,7 +4554,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 52
+schema_version: 54
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4381,7 +4668,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 47
+states_schema_version: 49
 tags: []
 title: Title
 """)
@@ -4492,7 +4779,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 52
+schema_version: 54
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4568,7 +4855,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 47
+states_schema_version: 49
 tags: []
 title: Title
 """)
@@ -5585,6 +5872,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
             'old_value': 3,
             'property_name': 'next_content_id_index',
             'new_value': 4,
@@ -5854,6 +6159,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None,
             'property_name': 'widget_id',
             'new_value': 'NumericInput',
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -7644,6 +7967,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None,
             'new_value': 'NumericInput'
         }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
             'property_name': 'next_content_id_index',
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
@@ -8043,6 +8384,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id',
             'old_value': None
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': 3,
@@ -9654,6 +10013,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 'NumericInput',
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
             'old_value': 1,
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
@@ -10060,6 +10437,24 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'widget_id',
                 'new_value': 'NumericInput',
                 'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'state_name': 'Introduction',
+                'old_value':
+                {
+                    'requireNonnegativeInput':
+                    {
+                        'value': True
+                    }
+                },
+                'property_name': 'widget_customization_args',
+                'new_value':
+                {
+                    'requireNonnegativeInput':
+                    {
+                        'value': False
+                    }
+                },
+                'cmd': 'edit_state_property'
             }), exp_domain.ExplorationChange({
                 'old_value': 1,
                 'cmd': 'edit_state_property',

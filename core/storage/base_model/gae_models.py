@@ -398,7 +398,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_all(
-            cls, include_deleted: bool = False
+            cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
     ) -> datastore_services.Query:
         """Gets iterable of all entities of this class.
 
@@ -447,7 +447,7 @@ class BaseModel(datastore_services.Model):
             query: datastore_services.Query,
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List[SELF_BASE_MODEL], Optional[str], bool]:
+    ) -> Tuple[Sequence[SELF_BASE_MODEL], Optional[str], bool]:
         """Fetches a page of entities sorted by their last_updated attribute in
         descending order (newly updated first).
 
@@ -478,16 +478,18 @@ class BaseModel(datastore_services.Model):
         )
 
         last_updated_query = query.order(-cls.last_updated)
-        query_models, next_cursor, _ = last_updated_query.fetch_page(
-            page_size, start_cursor=start_cursor)
+        fetch_result: Tuple[
+            Sequence[SELF_BASE_MODEL], datastore_services.Cursor, bool
+        ] = last_updated_query.fetch_page(page_size, start_cursor=start_cursor)
+        query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = last_updated_query.fetch_page(
+        fetch_result = last_updated_query.fetch_page(
             page_size + 1, start_cursor=start_cursor)
-        base_model_results = cast(List[SELF_BASE_MODEL], query_models)
+        plus_one_query_models, _, _ = fetch_result
         # The urlsafe returns bytes and we need to decode them to string.
         return (
-            base_model_results,
+            query_models,
             (next_cursor.urlsafe().decode('utf-8') if next_cursor else None),
             len(plus_one_query_models) == page_size + 1
         )
@@ -710,7 +712,7 @@ class BaseCommitLogEntryModel(BaseModel):
             cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[str], bool]:
+    ) -> Tuple[Sequence[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[str], bool]:
         """Fetches a list of all the commits sorted by their last updated
         attribute.
 
@@ -1121,6 +1123,9 @@ class VersionedModel(BaseModel):
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
+            # We need the cast here in order to convey to MyPy that all these
+            # lists can be merged together for the purpose of putting them into
+            # the datastore.
             entities = (
                 cast(List[BaseModel], snapshot_metadata_models) +
                 cast(List[BaseModel], snapshot_content_models) +
@@ -1429,6 +1434,8 @@ class VersionedModel(BaseModel):
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
 
+        # We need the cast here to make sure that returned_models only contains
+        # BaseSnapshotMetadataModel and not None.
         returned_models_without_none = cast(
             List[BaseSnapshotMetadataModel], returned_models)
         return [{
@@ -1582,11 +1589,9 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
-        metadata_models = cast(
-            List[BaseSnapshotMetadataModel],
-            cls.query(cls.committer_id == user_id).fetch(
-                projection=[cls.commit_type, cls.commit_message])
-        )
+        metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(
+            cls.committer_id == user_id
+        ).fetch(projection=[cls.commit_type, cls.commit_message])
         user_data = {}
         for metadata_model in metadata_models:
             user_data[metadata_model.id] = {
