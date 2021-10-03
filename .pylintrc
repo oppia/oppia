@@ -82,7 +82,6 @@ disallowed-functions-and-replacements-str=
   map=>python_utils.MAP,
   next=>python_utils.NEXT,
   now=>datetime.datetime.utcnow,
-  open=>python_utils.open_file,
   print=>python_utils.PRINT,
   range=>python_utils.RANGE,
   round=>python_utils.ROUND,
