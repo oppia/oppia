@@ -229,7 +229,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
-
     {
         'regexp': re.compile(r'urllib(2)?\..*urlopen\('),
         'message': 'Please use python_utils.url_open().',
