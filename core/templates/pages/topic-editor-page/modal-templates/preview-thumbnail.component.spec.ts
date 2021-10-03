@@ -68,7 +68,7 @@ describe('Preview Thumbnail Component', function() {
   });
 
   it('should throw error if no image is present for a preview', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+    spyOn(contextService, 'getEntityType').and.returnValue('');
     expect(() => {
       componentInstance.ngOnInit();
     }).toThrowError('No image present for preview');
