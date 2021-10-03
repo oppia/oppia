@@ -238,7 +238,7 @@
     ],
     "9": [
         "core.storage.app_feedback_report.gae_models_test",
-        "core.jobs.batch_jobs.validation_jobs_test",
+        "core.jobs.batch_jobs.model_validation_jobs_test",
         "core.jobs.base_jobs_test",
         "core.jobs.decorators.validation_decorators_test",
         "core.jobs.io.ndb_io_test",
