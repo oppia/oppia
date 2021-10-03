@@ -241,18 +241,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 self.assertEqual(type(k), str)
                 self.assertEqual(type(v), str)
 
-    def test_is_string(self):
-        self.assertTrue(python_utils.is_string('abc'))
-        self.assertFalse(python_utils.is_string(123))
-        self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
-
-    def test_get_args_of_function(self):
-        def func(a, b, *c, **d): # pylint: disable=unused-argument
-            """Does nothing."""
-            pass
-        self.assertEqual(
-            python_utils.get_args_of_function(func), ['a', 'b'])
-
     def test_create_enum_method_and_check_its_values(self):
         """Test create_enum method."""
         enums = python_utils.create_enum('first', 'second', 'third')
