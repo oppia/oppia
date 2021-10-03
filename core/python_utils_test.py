@@ -162,11 +162,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.url_parse('http://www.google.com')
         self.assertEqual(response.geturl(), 'http://www.google.com')
 
-    def test_url_join(self):
-        response = python_utils.url_join(
-            'http://www.cwi.nl/%7Eguido/Python.html', 'FAQ.html')
-        self.assertEqual(response, 'http://www.cwi.nl/%7Eguido/FAQ.html')
-
     def test_recursively_convert_to_str_with_dict(self):
         test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
         test_var_2_in_unicode = python_utils.UNICODE('test_var_2')
@@ -233,18 +228,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             for k, v in value[-1].items():
                 self.assertEqual(type(k), str)
                 self.assertEqual(type(v), str)
-
-    def test_is_string(self):
-        self.assertTrue(python_utils.is_string('abc'))
-        self.assertFalse(python_utils.is_string(123))
-        self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
-
-    def test_get_args_of_function(self):
-        def func(a, b, *c, **d): # pylint: disable=unused-argument
-            """Does nothing."""
-            pass
-        self.assertEqual(
-            python_utils.get_args_of_function(func), ['a', 'b'])
 
     def test_create_enum_method_and_check_its_values(self):
         """Test create_enum method."""
