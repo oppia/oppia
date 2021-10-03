@@ -23,7 +23,7 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PreviewThumbnailComponent } from './preview-thumbnail.component';
 import { ContextService } from 'services/context.service';
 
-fdescribe('Preview Thumbnail Component', function() {
+describe('Preview Thumbnail Component', function() {
   let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;

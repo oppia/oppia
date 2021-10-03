@@ -22,7 +22,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
 import { FilteredChoicesFieldComponent } from './filtered-choices-field.component';
 
-describe('Filtered Choices Field Component', () => {
+fdescribe('Filtered Choices Field Component', () => {
   let componentInstance: FilteredChoicesFieldComponent;
   let fixture: ComponentFixture<FilteredChoicesFieldComponent>;
 
