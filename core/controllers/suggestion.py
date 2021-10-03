@@ -39,22 +39,108 @@ from core.domain import suggestion_services
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
+    
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                }
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                }
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_version_at_submission':
+            {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'change': {
+               'schema': {
+                   'type': 'dict',
+                   'properties':
+                    [
+                       {
+                        'name': 'cmd',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                       },
+                       {
+                        'name': 'state_name',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                       },
+                       {
+                        'name': 'content_id',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                       },
+                       {
+                        'name': 'language_code',
+                         'schema': {
+                             'type': 'basestring'
+                         },
+                         'default': None
+                       },
+                       {
+                        'name': 'content_html',
+                        'schema': {
+                            'type': 'html'
+                        }
+                       },
+                       {
+                        'name': 'translation_html',
+                        'schema': {
+                            'type': 'html'
+                        }
+                       },
+                       {
+                        'name': 'data_format',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                       }
+                    ]
+               }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_suggest_changes
     def post(self):
         """Handles POST requests."""
-        if (self.payload.get('suggestion_type') ==
+        if (self.normalized_payload.get('suggestion_type') ==
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
 
         try:
             suggestion = suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                self.payload.get('target_type'), self.payload.get('target_id'),
-                self.payload.get('target_version_at_submission'),
-                self.user_id, self.payload.get('change'),
-                self.payload.get('description'))
+                self.normalized_payload.get('suggestion_type'),
+                self.normalized_payload.get('target_type'), self.normalized_payload.get('target_id'),
+                self.normalized_payload.get('target_version_at_submission'),
+                self.user_id, self.normalized_payload.get('change'),
+                self.normalized_payload.get('description'))
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
