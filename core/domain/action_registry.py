@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import importlib
 import os
-import pkgutil
 
 from core import feconf
 from core import python_utils
@@ -51,18 +51,11 @@ class Registry(python_utils.OBJECT):
         """
         cls._actions.clear()
 
-        all_action_types = cls.get_all_action_types()
-
-        # Assemble all paths to the actions.
-        extension_paths = [
-            os.path.join(feconf.ACTIONS_DIR, action_type)
-            for action_type in all_action_types]
-
-        # Crawl the directories and add new action instances to the
-        # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
-            module = loader.find_module(name).load_module(name)
-            clazz = getattr(module, name)
+        for action_type in cls.get_all_action_types():
+            module_path_parts = feconf.ACTIONS_DIR.split(os.sep)
+            module_path_parts.extend([action_type, action_type])
+            module = importlib.import_module('.'.join(module_path_parts))
+            clazz = getattr(module, action_type)
 
             ancestor_names = [
                 base_class.__name__ for base_class in clazz.__bases__]

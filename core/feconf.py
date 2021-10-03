@@ -97,16 +97,14 @@ VISUALIZATIONS_DIR = os.path.join(
 VISUALIZATIONS_DIR_FOR_JS = os.path.join(
     'local_compiled_js', 'extensions', 'visualizations')
 
-OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
-    'extensions', 'objects', 'object_defaults.json')
-RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
-HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions',
-    'html_field_types_to_rule_specs.json')
-LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR = os.path.join(
-    os.getcwd(), 'extensions', 'interactions',
-    'legacy_html_field_types_to_rule_specs_by_state_version')
+OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH = os.path.join(
+    'objects', 'object_defaults.json')
+RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH = os.path.join(
+    'interactions', 'rule_templates.json')
+HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
+    'interactions', 'html_field_types_to_rule_specs.json')
+LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
+    'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
