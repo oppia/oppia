@@ -90,6 +90,8 @@
     "core/templates/components/on-screen-keyboard/on-screen-keyboard.component.spec.ts",
     "core/templates/components/skills-mastery-list/skills-mastery-list.constants.ts",
     "core/templates/components/state-directives/answer-group-editor/summary-list-header.component.ts",
+    "core/templates/components/filter-fields/filtered-choices-field/filtered-choices-field.component.ts",
+    "core/templates/components/filter-fields/filtered-choices-field/filtered-choices-field.component.spec.ts",
     "core/templates/components/state-directives/outcome-editor/outcome-feedback-editor.component.ts",
     "core/templates/components/state-directives/outcome-editor/outcome-feedback-editor.component.spec.ts",
     "core/templates/components/summary-tile/collection-summary-tile.component.ts",
