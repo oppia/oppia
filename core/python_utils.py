@@ -192,7 +192,7 @@ def get_args_of_function_node(function_node, args_to_ignore):
         ]
 
 
-<<<<<<< HEAD:python_utils.py
+<<<<<<< HEAD:core/python_utils.py
 def url_join(base_url, relative_url):
     """Construct a full URL by combining a 'base URL' with another URL using
     urlparse.urljoin if run under Python 2 and urllib.parse.urljoin if run under
@@ -202,7 +202,7 @@ def get_package_file_contents(package: str, filepath: str) -> str:
     are loaded by the Python code directly, like constants.ts or
     rich_text_components.json. This function is needed to make loading these
     files work even when Oppia is packaged.
->>>>>>> c57168ee4017bf92ee49adc70dd236656aacc3b1:core/python_utils.py
+>>>>>>> d3c8da6f4397f884ce885f733ee1045a2e490c61:python_utils.py
 
     Args:
         package: str. The package where the file is located.
