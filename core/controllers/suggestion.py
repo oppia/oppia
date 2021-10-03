@@ -39,7 +39,7 @@ from core.domain import suggestion_services
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
-    
+
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
