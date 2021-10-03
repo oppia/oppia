@@ -87,6 +87,8 @@ import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-fi
 import { ConceptCardComponent } from './concept-card/concept-card.component';
 import { ScoreRingComponent } from './score-ring/score-ring.component';
 import { CompletionGraphComponent } from './statistics-directives/completion-graph.component';
+import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
+import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 
 // Pipes.
@@ -103,7 +105,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 @NgModule({
   imports: [
@@ -167,9 +168,10 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     QuestionDifficultySelectorComponent,
-    SelectSkillModalComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
+    SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -232,6 +234,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
     KeyboardShortcutHelpModalComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
     SearchBarComponent,
@@ -287,6 +290,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
     FilterForMatchingSubstringPipe,
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
