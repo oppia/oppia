@@ -77,6 +77,8 @@
     "core/templates/components/entity-creation-services/exploration-creation.service.spec.ts",
     "core/templates/components/entity-creation-services/skill-creation.service.ts",
     "core/templates/components/entity-creation-services/skill-creation.service.spec.ts",
+    "core/templates/components/filter-fields/filtered-choices-field/filtered-choices-field.component.ts",
+    "core/templates/components/filter-fields/filtered-choices-field/filtered-choices-field.component.spec.ts",
     "core/templates/components/forms/custom-forms-directives/audio-file-uploader.component.ts",
     "core/templates/components/forms/custom-forms-directives/audio-file-uploader.component.spec.ts",
     "core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.ts",
