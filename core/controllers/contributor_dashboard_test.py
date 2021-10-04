@@ -75,7 +75,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -116,7 +116,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -488,7 +488,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -512,7 +512,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'

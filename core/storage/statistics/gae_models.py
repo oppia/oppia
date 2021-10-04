@@ -1543,7 +1543,7 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
@@ -2055,7 +2055,7 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in python_utils.RANGE(
+                    for shard_id in range(
                         1, main_shard.shard_count + 1)]
                 all_models += cast(
                     List[StateAnswersModel], cls.get_multi(shard_ids))
@@ -2135,7 +2135,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in python_utils.RANGE(1, len(sharded_answer_lists)):
+        for i in range(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)

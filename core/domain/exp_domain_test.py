@@ -24,7 +24,6 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import exp_domain
@@ -519,7 +518,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
 
-        for i in python_utils.RANGE(8):
+        for i in range(8):
             self.exploration.add_states(['State%s' % i])
             self.exploration.states['State%s' % i].card_is_checkpoint = True
             self.set_interaction_for_state(
@@ -2822,7 +2821,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        for version_num in python_utils.RANGE(
+        for version_num in range(
                 feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
                 current_states_schema_version):
             self.assertTrue(hasattr(
@@ -2841,7 +2840,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        for version_num in python_utils.RANGE(
+        for version_num in range(
                 exp_domain.Exploration.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 current_exp_schema_version):
             self.assertTrue(hasattr(

@@ -1989,7 +1989,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         id_base = 'id:'
         self.assertEqual(
             len(self.learner_answer_details.learner_answer_info_list), 1)
-        for i in python_utils.RANGE(36):
+        for i in range(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
                 id_base + python_utils.UNICODE(
                     i), answer, answer_details, created_on)

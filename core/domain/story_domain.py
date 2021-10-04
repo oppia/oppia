@@ -1020,7 +1020,7 @@ class Story(python_utils.OBJECT):
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+        for index in range(len(story_contents_dict['nodes'])):
             story_contents_dict['nodes'][index]['thumbnail_filename'] = None
             story_contents_dict['nodes'][index]['thumbnail_bg_color'] = None
         return story_contents_dict
@@ -1076,7 +1076,7 @@ class Story(python_utils.OBJECT):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_STORY, story_id))
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+        for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
                 constants.ASSET_TYPE_THUMBNAIL,
                 story_contents_dict['nodes'][index]['thumbnail_filename'])

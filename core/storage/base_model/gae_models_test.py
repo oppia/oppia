@@ -195,7 +195,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
 
     def test_put_multi(self) -> None:
-        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
+        models_1 = [base_models.BaseModel() for _ in range(3)]
         for model in models_1:
             self.assertIsNone(model.created_on)
             self.assertIsNone(model.last_updated)
@@ -289,7 +289,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self) -> None:
         ids: Set[str] = set([])
-        for _ in python_utils.RANGE(100):
+        for _ in range(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 
@@ -674,7 +674,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_version_numbers = python_utils.RANGE(1, model.version + 1)
+        model_version_numbers = range(1, model.version + 1)
         model_snapshot_ids = [
             model.get_snapshot_id(model.id, version_number)
             for version_number in model_version_numbers]
@@ -695,7 +695,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_1_version_numbers = python_utils.RANGE(1, model_1.version + 1)
+        model_1_version_numbers = range(1, model_1.version + 1)
         model_1_snapshot_ids = [
             model_1.get_snapshot_id(model_1.id, version_number)
             for version_number in model_1_version_numbers]
@@ -704,7 +704,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model_2 = TestVersionedModel(id=model_2_id)
         model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_2_version_numbers = python_utils.RANGE(1, model_2.version + 1)
+        model_2_version_numbers = range(1, model_2.version + 1)
         model_2_snapshot_ids = [
             model_2.get_snapshot_id(model_2.id, version_number)
             for version_number in model_2_version_numbers]

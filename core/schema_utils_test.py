@@ -1220,11 +1220,11 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
         valid_user_id_list = [
             'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in python_utils.RANGE(0, 5)
+            for i in range(0, 5)
         ]
         big_user_id_list = [
             'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in python_utils.RANGE(0, 7)
+            for i in range(0, 7)
         ]
         mappings = [
             (

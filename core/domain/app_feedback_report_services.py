@@ -599,7 +599,7 @@ def reassign_ticket(
                     List[app_feedback_report_models.AppFeedbackReportModel],
                     optional_report_models)
                 latest_timestamp = report_models[0].submitted_on
-                for index in python_utils.RANGE(1, len(report_models)):
+                for index in range(1, len(report_models)):
                     if report_models[index].submitted_on > (
                             latest_timestamp):
                         latest_timestamp = (

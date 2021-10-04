@@ -384,7 +384,7 @@ def _parse_port_ranges(pool_str):
         if start < 1 or end > 65535:
             logging.info('Ignoring out of bounds port range %r.', range_str)
             continue
-        ports.update(set(python_utils.RANGE(start, end + 1)))
+        ports.update(set(range(start, end + 1)))
     return ports
 
 

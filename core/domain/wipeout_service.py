@@ -768,7 +768,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         config_related_models = [
             model for model in snapshot_metadata_models
             if model.get_unversioned_instance_id() == config_id]
-        for i in python_utils.RANGE(
+        for i in range(
                 0,
                 len(config_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -861,7 +861,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
             model for model in commit_log_models
             if getattr(model, commit_log_model_field_name) == activity_id
         ]
-        for i in python_utils.RANGE(
+        for i in range(
                 0,
                 len(activity_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -1049,7 +1049,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             ]
         )
 
-        for i in python_utils.RANGE(
+        for i in range(
                 0,
                 len(activity_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -1097,7 +1097,7 @@ def _remove_user_id_from_contributors_in_summary_models(
         summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
 
-    for i in python_utils.RANGE(
+    for i in range(
             0,
             len(related_summary_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -1151,7 +1151,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
         pending_deletion_request.pseudonymizable_entity_mappings[
             models.NAMES.app_feedback_report.value])
 
-    for i in python_utils.RANGE(
+    for i in range(
             0, len(feedback_report_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         _pseudonymize_models_transactional(
@@ -1261,7 +1261,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             model for model in general_suggestion_models
             if model.id == feedback_id
         ]
-        for i in python_utils.RANGE(
+        for i in range(
                 0,
                 len(feedback_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -1320,7 +1320,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     suggestion_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
             models.NAMES.suggestion.value])
-    for i in python_utils.RANGE(
+    for i in range(
             0,
             len(voiceover_application_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):

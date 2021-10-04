@@ -4327,7 +4327,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
+        for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -4357,7 +4357,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
+        for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -4735,7 +4735,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             'add_documents_to_index',
             add_docs_counter)
 
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             self.save_new_valid_exploration(
                 all_exp_ids[i],
                 self.owner_id,
@@ -4744,7 +4744,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         # We're only publishing the first 4 explorations, so we're not
         # expecting the last exploration to be indexed.
-        for i in python_utils.RANGE(4):
+        for i in range(4):
             rights_manager.publish_exploration(
                 self.owner, expected_exp_ids[i])
 

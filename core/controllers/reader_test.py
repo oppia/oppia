@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -343,8 +342,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         skill_ids_for_url = ''
 
         # Create multiple skills, questions and skill links.
-        for _ in python_utils.RANGE(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+        for _ in range(feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
@@ -357,7 +355,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         # Create additional skills with user skill mastery > 0.0,
         # so that these are filtered out correctly.
-        for _ in python_utils.RANGE(5):
+        for _ in range(5):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')

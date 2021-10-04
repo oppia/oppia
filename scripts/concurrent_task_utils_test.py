@@ -173,7 +173,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_multiple_task(self):
         task_list = []
-        for _ in python_utils.RANGE(6):
+        for _ in range(6):
             task = concurrent_task_utils.create_task(
                 test_function('unused_arg'), False, self.semaphore)
             task_list.append(task)
@@ -184,7 +184,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_exception(self):
         task_list = []
-        for _ in python_utils.RANGE(6):
+        for _ in range(6):
             task = concurrent_task_utils.create_task(
                 test_function, True, self.semaphore)
             task_list.append(task)

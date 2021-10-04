@@ -177,7 +177,7 @@ def run_webpack_compilation(source_maps=False):
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
-    for _ in python_utils.RANGE(max_tries):
+    for _ in range(max_tries):
         try:
             managed_webpack_compiler = (
                 servers.managed_webpack_compiler(use_source_maps=source_maps))
@@ -307,7 +307,7 @@ def main(args=None):
     policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
-        for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
+        for attempt_num in range(1, MAX_RETRY_COUNT + 1):
             python_utils.PRINT('***Attempt %d.***' % attempt_num)
             output, return_code = run_tests(parsed_args)
 

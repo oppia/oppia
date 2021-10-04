@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -93,7 +92,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(5)]
+        ) for i in range(5)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -768,7 +767,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(5)]
+        ) for i in range(5)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)

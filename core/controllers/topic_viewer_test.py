@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import question_services
 from core.domain import skill_services
@@ -316,7 +315,7 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
-        for index in python_utils.RANGE(number_of_questions):
+        for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -367,7 +366,7 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
-        for index in python_utils.RANGE(number_of_questions):
+        for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -401,11 +400,11 @@ class TopicPageDataHandlerTests(
         number_of_questions = [1, 2, 2]
         self.topic_id = 'new_topic'
         skill_ids = (
-            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+            [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
-        for index in python_utils.RANGE(number_of_skills):
+        for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -419,12 +418,12 @@ class TopicPageDataHandlerTests(
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        for i in python_utils.RANGE(number_of_skills):
+        for i in range(number_of_skills):
             self.save_new_skill(
                 skill_ids[i], self.admin_id,
                 description='Skill Description')
-        for i in python_utils.RANGE(number_of_skills):
-            for j in python_utils.RANGE(number_of_questions[i]):
+        for i in range(number_of_skills):
+            for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
@@ -450,11 +449,11 @@ class TopicPageDataHandlerTests(
         number_of_questions[46] = 2
         self.topic_id = 'new_topic'
         skill_ids = (
-            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+            [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
-        for index in python_utils.RANGE(number_of_skills):
+        for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -468,12 +467,12 @@ class TopicPageDataHandlerTests(
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        for i in python_utils.RANGE(number_of_skills):
+        for i in range(number_of_skills):
             self.save_new_skill(
                 skill_ids[i], self.admin_id,
                 description='Skill Description')
-        for i in python_utils.RANGE(number_of_skills):
-            for j in python_utils.RANGE(number_of_questions[i]):
+        for i in range(number_of_skills):
+            for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
@@ -501,11 +500,11 @@ class TopicPageDataHandlerTests(
         number_of_questions[29] = 10
         self.topic_id = 'new_topic'
         skill_ids = (
-            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+            [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
-        for index in python_utils.RANGE(number_of_skills):
+        for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -519,12 +518,12 @@ class TopicPageDataHandlerTests(
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        for i in python_utils.RANGE(number_of_skills):
+        for i in range(number_of_skills):
             self.save_new_skill(
                 skill_ids[i], self.admin_id,
                 description='Skill Description')
-        for i in python_utils.RANGE(number_of_skills):
-            for j in python_utils.RANGE(number_of_questions[i]):
+        for i in range(number_of_skills):
+            for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
