@@ -23,7 +23,7 @@ from core import python_utils
 from extensions.objects.models import objects
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.

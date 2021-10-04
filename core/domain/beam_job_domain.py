@@ -35,7 +35,7 @@ if MYPY:  # pragma: no cover
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 
-class BeamJob(python_utils.OBJECT):
+class BeamJob:
     """Encapsulates the definition of an Apache Beam job.
 
     Attributes:
@@ -71,7 +71,7 @@ class BeamJob(python_utils.OBJECT):
         return {'name': self.name}
 
 
-class BeamJobRun(python_utils.OBJECT):
+class BeamJobRun:
     """Encapsulates an individual execution of an Apache Beam job.
 
     Attributes:
@@ -165,7 +165,7 @@ class BeamJobRun(python_utils.OBJECT):
         }
 
 
-class AggregateBeamJobRunResult(python_utils.OBJECT):
+class AggregateBeamJobRunResult:
     """Encapsulates the complete result of an Apache Beam job run.
 
     Attributes:

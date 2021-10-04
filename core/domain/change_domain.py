@@ -95,7 +95,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
                     attribute_name, cmd_name, actual_value))
 
 
-class BaseChange(python_utils.OBJECT):
+class BaseChange:
     """Domain object for changes made to storage models' domain objects."""
 
     # The list of allowed commands of a change domain object. Each item in the

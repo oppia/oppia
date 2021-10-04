@@ -31,7 +31,7 @@ from core.platform import models
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT = {

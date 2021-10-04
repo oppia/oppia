@@ -29,7 +29,7 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all actions."""
 
     # Dict mapping action IDs to instances of the actions.

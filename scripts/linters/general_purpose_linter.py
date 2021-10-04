@@ -241,12 +241,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'object\):'),
-        'message': 'Please use python_utils.OBJECT.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
 ]
 
 BAD_PATTERNS_MAP = {

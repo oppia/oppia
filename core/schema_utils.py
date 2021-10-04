@@ -274,7 +274,7 @@ def get_validator(validator_id: str) -> Callable[..., bool]:
     return _Validators.get(validator_id)
 
 
-class Normalizers(python_utils.OBJECT):
+class Normalizers:
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -356,7 +356,7 @@ class Normalizers(python_utils.OBJECT):
         return ' '.join(obj.split())
 
 
-class _Validators(python_utils.OBJECT):
+class _Validators:
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is

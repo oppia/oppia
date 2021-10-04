@@ -28,7 +28,7 @@ from core.platform import models
     models.Registry.import_models([models.NAMES.improvements]))
 
 
-class TaskEntry(python_utils.OBJECT):
+class TaskEntry:
     """Domain object representing an actionable task from the improvements tab.
 
     Attributes:

@@ -28,7 +28,7 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-class ModelProperty(python_utils.OBJECT):
+class ModelProperty:
     """Represents a Property in a BaseModel subclass."""
 
     __slots__ = ('_model_kind', '_property_name')

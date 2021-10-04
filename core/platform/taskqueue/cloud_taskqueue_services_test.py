@@ -36,7 +36,7 @@ from typing import Any, Dict, Optional
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_taskqueue_services."""
 
-    class Response(python_utils.OBJECT):
+    class Response:
         """Mock for the response object that is returned from a Cloud
         Tasks query.
         """

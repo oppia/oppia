@@ -346,7 +346,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_stats_a, state_stats_c)
 
     def test_equality_with_different_class(self):
-        class DifferentStats(python_utils.OBJECT):
+        class DifferentStats:
             """A different class."""
 
             pass
@@ -388,7 +388,7 @@ class StateStatsTests(test_utils.GenericTestBase):
                 10, 11, 10, 12, 10, 13, 10, 14, 15, 10, 16))
 
     def test_aggregate_from_different_stats(self):
-        class DifferentStats(python_utils.OBJECT):
+        class DifferentStats:
             """A different class."""
 
             pass
@@ -538,7 +538,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(session_state_stats_a, session_state_stats_c)
 
     def test_equality_with_different_class(self):
-        class DifferentStats(python_utils.OBJECT):
+        class DifferentStats:
             """A different class."""
 
             pass
@@ -1857,7 +1857,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
 
-    class MockCalculationOutputObjectWithUnknownType(python_utils.OBJECT):
+    class MockCalculationOutputObjectWithUnknownType:
         pass
 
     def setUp(self):

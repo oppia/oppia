@@ -84,7 +84,7 @@ class DerivedDoFn(DoFn):
         pass
 
 
-class NotDoFn(python_utils.OBJECT):
+class NotDoFn:
     """Class that does not inherit from DoFn."""
 
     def process(self, unused_item):

@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core import python_utils
 
 
-class LearnerProgressInTopicsAndStories(python_utils.OBJECT):
+class LearnerProgressInTopicsAndStories:
     """Domain object for the progress of the learner in topics and stories."""
 
     def __init__(
@@ -70,7 +70,7 @@ class LearnerProgressInTopicsAndStories(python_utils.OBJECT):
             learnt_to_partially_learnt_topic_titles)
 
 
-class LearnerProgressInCollections(python_utils.OBJECT):
+class LearnerProgressInCollections:
     """Domain object for the progress of the learner in collections."""
 
     def __init__(
@@ -101,7 +101,7 @@ class LearnerProgressInCollections(python_utils.OBJECT):
             completed_to_incomplete_collection_titles)
 
 
-class LearnerProgressInExplorations(python_utils.OBJECT):
+class LearnerProgressInExplorations:
     """Domain object for the progress of the learner in explorations."""
 
     def __init__(
@@ -122,7 +122,7 @@ class LearnerProgressInExplorations(python_utils.OBJECT):
         self.exploration_playlist_summaries = exploration_playlist
 
 
-class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
+class ActivityIdsInLearnerDashboard:
     """Domain object for ids of the activities completed, currently being
     completed, in the playlist or goals of the user.
     """

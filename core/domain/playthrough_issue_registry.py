@@ -29,7 +29,7 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all issues."""
 
     # Dict mapping issue types to instances of the issues.

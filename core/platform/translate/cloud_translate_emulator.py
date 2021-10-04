@@ -25,7 +25,7 @@ from core import python_utils
 from core import utils
 
 
-class CloudTranslateEmulator(python_utils.OBJECT):
+class CloudTranslateEmulator:
     """The emulator mocks the translate_text function from the Cloud Translate
     API. This emulator can be used in backend testing, or a local dev
     environment without access to the Cloud Translate API. Expected responses

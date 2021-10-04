@@ -48,7 +48,7 @@ _MODEL_TYPES_BY_BASE_CLASS = {
 }
 
 
-class AuditsExisting(python_utils.OBJECT):
+class AuditsExisting:
     """Decorator for registering DoFns that audit storage models.
 
     DoFns registered by this decorator should assume that the models they
@@ -141,7 +141,7 @@ class AuditsExisting(python_utils.OBJECT):
         }
 
 
-class RelationshipsOf(python_utils.OBJECT):
+class RelationshipsOf:
     """Decorator for describing {Model.property: Model.ID} relationships.
 
     This decorator adds a domain-specific language (DSL) for defining the
