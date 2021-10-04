@@ -24,7 +24,6 @@ import contextlib
 import datetime
 import re
 
-from core import python_utils
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.types import job_run_result

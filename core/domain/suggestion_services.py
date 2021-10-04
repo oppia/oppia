@@ -24,7 +24,6 @@ import logging
 import re
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers

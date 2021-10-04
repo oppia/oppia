@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import pickle
 
-from core import python_utils
 from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils

@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import re
 
-from core import python_utils
 from core.constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils

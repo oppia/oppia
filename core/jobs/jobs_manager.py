@@ -24,7 +24,6 @@ import logging
 import pprint
 
 from core import feconf
-from core import python_utils
 from core.domain import beam_job_services
 from core.jobs import base_jobs
 from core.jobs import job_options

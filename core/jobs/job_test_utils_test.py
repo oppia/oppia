@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from unittest import mock
 
-from core import python_utils
 from core.jobs import job_test_utils
 from core.platform import models
 from core.tests import test_utils

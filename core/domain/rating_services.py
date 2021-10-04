@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services

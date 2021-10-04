@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base

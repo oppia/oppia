@@ -29,7 +29,6 @@ import copy
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services

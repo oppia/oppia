@@ -23,7 +23,6 @@ import inspect
 import json
 import re
 
-from core import python_utils
 from core import schema_utils_test
 from core.tests import test_utils
 from extensions.objects.models import objects
