@@ -206,7 +206,7 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.performAction = function(actionButton) {
         if (actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL') {
-          ctrl.boostScoreModal();
+          ctrl.reviewLowestScoredSkillsModal();
         } else if (actionButton.url) {
           $window.location.href = actionButton.url;
         }
@@ -218,18 +218,22 @@ angular.module('oppia').component('questionPlayer', {
           ctrl.questionPlayerConfig.resultActionButtons.length > 0);
       };
 
-      ctrl.getWorstSkillId = function() {
+      ctrl.getWorstSkillIds = function() {
         var minScore = 0.95;
         var worstSkillId = [];
         Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
           var skillScoreData = ctrl.scorePerSkillMapping[skillId];
           var scorePercentage = skillScoreData.score / skillScoreData.total;
           if (scorePercentage < minScore) {
-            minScore = scorePercentage;
-            worstSkillId.push(skillId);
+            worstSkillId.push([scorePercentage, skillId]);
           }
         });
-        return worstSkillId.sort();
+        worstSkillId.sort().slice(0, 3);
+        var lowestScoredSkills = [];
+        for (let i = 0; i < worstSkillId.length; i++) {
+          lowestScoredSkills.push(worstSkillId[i][1]);
+        }
+        return lowestScoredSkills;
       };
 
       ctrl.openConceptCardModal = function(skillIds) {
@@ -256,10 +260,10 @@ angular.module('oppia').component('questionPlayer', {
       };
 
 
-      ctrl.boostScoreModal = function() {
-        var worstSkillId = ctrl.getWorstSkillId();
-        if (ctrl.getWorstSkillId().length !== 0) {
-          ctrl.openConceptCardModal(worstSkillId.slice(0, 3));
+      ctrl.reviewLowestScoredSkillsModal = function() {
+        var reviewLowestScoredSkill = ctrl.getWorstSkillIds();
+        if (reviewLowestScoredSkill.length !== 0) {
+          ctrl.openConceptCardModal(reviewLowestScoredSkill);
         }
       };
 
