@@ -121,8 +121,7 @@ class FeedbackThread(python_utils.OBJECT):
         """
         return [
             self._get_full_message_id(i) if i >= 0 else None
-            for i in python_utils.RANGE(
-                self.message_count - 1, self.message_count - 3, -1)
+            for i in range(self.message_count - 1, self.message_count - 3, -1)
         ]
 
 
