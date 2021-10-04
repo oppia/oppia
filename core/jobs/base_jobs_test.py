@@ -85,6 +85,13 @@ class JobMetaclassTests(test_utils.TestBase):
                 def __init__(self) -> None:
                     pass
 
+    def test_raises_type_error_if_job_name_not_suffixed_with_job(self) -> None:
+        with self.assertRaisesRegexp(TypeError, 'must end with "Job"'): # type: ignore[no-untyped-call]
+            class FooBar(base_jobs.JobBase, metaclass=MockJobMetaclass): # pylint: disable=unused-variable
+                """Job class that does not have a name ending with "Job"."""
+
+                pass
+
 
 class JobBaseTests(job_test_utils.PipelinedTestBase):
 

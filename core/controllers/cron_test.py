@@ -30,7 +30,10 @@ from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-from core.jobs.batch_jobs import cron_jobs
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs
+from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.platform import models
 from core.tests import test_utils
 import main
@@ -675,7 +678,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.ComputeExplorationRecommendations
+                'job_class': (
+                    exp_recommendation_computation_jobs
+                    .ComputeExplorationRecommendationsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
@@ -686,7 +691,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.IndexExplorationsInSearch
+                'job_class': (
+                    exp_search_indexing_jobs.IndexExplorationsInSearchJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
@@ -697,7 +703,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.CollectWeeklyDashboardStats
+                'job_class': (
+                    user_stats_computation_jobs.CollectWeeklyDashboardStatsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
@@ -708,7 +715,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         swap_with_checks = self.swap_with_checks(
             beam_job_services, 'run_beam_job', lambda **_: None,
             expected_kwargs=[{
-                'job_class': cron_jobs.GenerateTranslationContributionStats
+                'job_class': (
+                    suggestion_stats_computation_jobs
+                    .GenerateTranslationContributionStatsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:

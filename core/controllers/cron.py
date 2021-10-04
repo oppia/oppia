@@ -28,7 +28,10 @@ from core.domain import email_manager
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-from core.jobs.batch_jobs import cron_jobs
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs
+from core.jobs.batch_jobs import user_stats_computation_jobs
 
 
 class CronModelsCleanupHandler(base.BaseHandler):
@@ -210,7 +213,8 @@ class CronDashboardStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.CollectWeeklyDashboardStats)
+            job_class=(
+                user_stats_computation_jobs.CollectWeeklyDashboardStatsJob))
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
@@ -224,7 +228,9 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.ComputeExplorationRecommendations)
+            job_class=(
+                exp_recommendation_computation_jobs
+                .ComputeExplorationRecommendationsJob))
 
 
 class CronActivitySearchRankHandler(base.BaseHandler):
@@ -238,7 +244,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.IndexExplorationsInSearch)
+            job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob)
 
 
 class CronTranslationContributionStatsHandler(base.BaseHandler):
@@ -252,4 +258,6 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=cron_jobs.GenerateTranslationContributionStats)
+            job_class=(
+                suggestion_stats_computation_jobs
+                .GenerateTranslationContributionStatsJob))
