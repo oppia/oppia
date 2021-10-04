@@ -608,6 +608,7 @@
 	"I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "註冊 Session 逾時",
 	"I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "很抱歉，您的註冊 Session 已逾時。請點擊「繼續註冊」來重新流程。",
 	"I18N_REVIEW_TEST_PAGE_BREADCRUMB": "複習測試",
+	"I18N_SAVE_PROGRESS": "請登入或註冊來保存您的進度，並遊玩下一個課程。",
 	"I18N_SHARE_LESSON": "分享這個課程",
 	"I18N_SHOW_SOLUTION_BUTTON": "顯示解決方式",
 	"I18N_SIDEBAR_ABOUT_LINK": "關於 Oppia",
