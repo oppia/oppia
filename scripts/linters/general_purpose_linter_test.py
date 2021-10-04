@@ -60,7 +60,6 @@ INVALID_BYPASS_FLAG = os.path.join(
     LINTER_TESTS_DIR, 'invalid_bypass_flag.ts')
 
 # PY filepaths.
-INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
 INVALID_REQUEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_request.py')
 INVALID_NO_NEWLINE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_no_newline.py')
