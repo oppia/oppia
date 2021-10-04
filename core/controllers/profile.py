@@ -489,7 +489,8 @@ class SiteLanguageHandler(base.BaseHandler):
     # code is valid. We choose the regex to be
     # ^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$
     # This pattern can detect language code like "en", "en-US"
-    # "ah-Hant-TW", "EN-au"
+    # "ah-Hant-TW", "EN-au".
+    regex_pat = '^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$'
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -498,8 +499,7 @@ class SiteLanguageHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': 
-                        '^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$'
+                        'regex_pattern': regex_pat
                     }],
                 }
             }
