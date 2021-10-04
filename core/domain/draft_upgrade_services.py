@@ -139,7 +139,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             new_value['choices']['value'][value_index][
                                 'html'
                             ] = conversion_fn(value['html'])
-                        elif isinstance(value, (str, bytes)):
+                        elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
             elif (change.property_name ==

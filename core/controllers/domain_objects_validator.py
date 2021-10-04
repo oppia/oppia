@@ -51,7 +51,7 @@ def validate_new_config_property_values(obj):
         obj: dict. Data that needs to be validated.
     """
     for (name, value) in obj.items():
-        if not isinstance(name, (str, bytes)):
+        if not isinstance(name, str):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)

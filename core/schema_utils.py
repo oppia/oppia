@@ -176,7 +176,7 @@ def normalize_against_schema(
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
-        assert isinstance(obj, (str, bytes)), (
+        assert isinstance(obj, str), (
             'Expected string, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:

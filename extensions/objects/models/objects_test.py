@@ -933,10 +933,10 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                     # Comparing types here is necessary because 0 == False in
                     # Python. We handle the string case separately since Python
                     # treats str and unicode as different types.
-                    if isinstance(member.default_value, (str, bytes)):
+                    if isinstance(member.default_value, str):
                         self.assertIsInstance(
                             member.normalize(member.default_value),
-                            (str, bytes), msg=type_error_message)
+                            str, msg=type_error_message)
                     else:
                         self.assertIsInstance(
                             member.normalize(member.default_value),

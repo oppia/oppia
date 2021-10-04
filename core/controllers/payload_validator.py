@@ -72,7 +72,7 @@ def validate(
         if (
                 allow_string_to_bool_conversion and
                 arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
-                and isinstance(handler_args[arg_key], (str, bytes))
+                and isinstance(handler_args[arg_key], str)
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))

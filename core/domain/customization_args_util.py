@@ -93,7 +93,7 @@ def validate_customization_args_and_values(
 
     # Check for extra invalid keys.
     for arg_name in customization_args.keys():
-        if not isinstance(arg_name, (str, bytes)):
+        if not isinstance(arg_name, str):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:
