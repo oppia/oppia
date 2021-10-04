@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import collection_domain
@@ -716,8 +715,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-        for version_num in python_utils.RANGE(
-                1, current_collection_schema_version):
+        for version_num in range(1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
@@ -734,8 +732,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        for version_num in python_utils.RANGE(
-                1, current_collection_schema_version):
+        for version_num in range(1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_v%s_dict_to_v%s_dict' % (
