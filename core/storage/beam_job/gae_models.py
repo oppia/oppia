@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import enum
 import uuid
 
+from core import python_utils
+from core import utils
 from core.platform import models
-import python_utils
-import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
