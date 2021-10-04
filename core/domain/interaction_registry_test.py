@@ -89,16 +89,19 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
     def test_interaction_registry(self):
         """Do some sanity checks on the interaction registry."""
         self.assertEqual(
-            len(interaction_registry.Registry.get_all_interactions()),
-            len(set(interaction_registry.Registry.get_all_interaction_ids())))
+            {
+                type(i).__name__
+                for i in interaction_registry.Registry.get_all_interactions()
+            },
+            set(interaction_registry.Registry.get_all_interaction_ids()))
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
 
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
-            len(list(specs_dict.keys())),
-            len(set(interaction_registry.Registry.get_all_interaction_ids())))
+            set(specs_dict.keys()),
+            set(interaction_registry.Registry.get_all_interaction_ids()))
 
         terminal_interactions_count = 0
         for item in specs_dict.values():
