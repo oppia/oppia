@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 from core.constants import constants
 from core.domain import search_services
 from core.jobs import job_test_utils
@@ -122,7 +121,8 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         )
 
         max_batch_size_swap = self.swap(
-            cron_jobs.IndexExplorationsInSearch, 'MAX_BATCH_SIZE', 1)
+            exp_search_indexing_jobs.IndexExplorationsInSearchJob,
+            'MAX_BATCH_SIZE', 1)
 
         with add_docs_to_index_swap, max_batch_size_swap:
             self.assert_job_output_is([
@@ -152,7 +152,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                 unused_documents: Dict[str, Union[int, str, List[str]]],
                 unused_index_name: str
         ) -> None:
-            raise platform_search_services.SearchException # type: ignore[attr-defined]
+            raise platform_search_services.SearchException
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,

@@ -27,8 +27,6 @@ from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import cast
-
 MYPY = False
 if MYPY:
     from mypy_imports import user_models
