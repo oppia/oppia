@@ -24,8 +24,6 @@ import os
 import re
 import subprocess
 
-from core import python_utils
-
 from .. import common
 from .. import concurrent_task_utils
 
