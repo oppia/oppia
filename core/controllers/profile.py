@@ -176,7 +176,7 @@ class PreferencesHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'is_at_most_char',
+                        'id': 'has_length_at_most',
                         'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
                     }]
                 }
@@ -379,7 +379,7 @@ class SignupHandler(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': False
+                'default_value': None
             }
         }
     }
@@ -413,19 +413,20 @@ class SignupHandler(base.BaseHandler):
             'can_receive_email_updates')
         bulk_email_signup_message_should_be_shown = False
 
-        bulk_email_signup_message_should_be_shown = (
-            user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-        )
-        if bulk_email_signup_message_should_be_shown:
-            self.render_json({
-                'bulk_email_signup_message_should_be_shown': (
-                    bulk_email_signup_message_should_be_shown)
-            })
-            return
+        if can_receive_email_updates is not None:
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    self.user_id, can_receive_email_updates,
+                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            )
+            if bulk_email_signup_message_should_be_shown:
+                self.render_json({
+                    'bulk_email_signup_message_should_be_shown': (
+                        bulk_email_signup_message_should_be_shown)
+                })
+                return
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered_account = (
