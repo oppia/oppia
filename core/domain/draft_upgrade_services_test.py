@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
