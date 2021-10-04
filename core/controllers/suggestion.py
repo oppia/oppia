@@ -70,53 +70,52 @@ class SuggestionHandler(base.BaseHandler):
             'change': {
                'schema': {
                    'type': 'dict',
-                   'properties':
-                    [
+                   'properties': [
                        {
-                        'name': 'cmd',
-                        'schema': {
-                            'type': 'basestring'
-                        }
+                            'name': 'cmd',
+                            'schema': {
+                                'type': 'basestring'
+                            }
                        },
                        {
-                        'name': 'state_name',
-                        'schema': {
-                            'type': 'basestring'
-                        }
+                            'name': 'state_name',
+                            'schema': {
+                                'type': 'basestring'
+                            }
                        },
                        {
-                        'name': 'content_id',
-                        'schema': {
-                            'type': 'basestring'
-                        }
+                            'name': 'content_id',
+                            'schema': {
+                                'type': 'basestring'
+                            }
                        },
                        {
-                        'name': 'language_code',
-                         'schema': {
-                             'type': 'basestring'
-                         },
-                         'default': None
+                            'name': 'language_code',
+                            'schema': {
+                                'type': 'basestring'
+                            },
+                            'default': None
                        },
                        {
-                        'name': 'content_html',
-                        'schema': {
-                            'type': 'html'
-                        }
+                            'name': 'content_html',
+                            'schema': {
+                                'type': 'html'
+                            }
                        },
                        {
-                        'name': 'translation_html',
-                        'schema': {
-                            'type': 'html'
-                        }
+                            'name': 'translation_html',
+                            'schema': {
+                                'type': 'html'
+                            }
                        },
                        {
-                        'name': 'data_format',
-                        'schema': {
-                            'type': 'basestring'
-                        }
+                            'name': 'data_format',
+                            'schema': {
+                                'type': 'basestring'
+                            }
                        }
                     ]
-               }
+                }
             },
             'description': {
                 'schema': {
