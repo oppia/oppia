@@ -41,7 +41,7 @@ class UtilsTests(test_utils.GenericTestBase):
         alist = ['a', 'b', 'c', 'd']
         results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
 
-        for i in python_utils.RANGE(len(alist) + 1):
+        for i in range(len(alist) + 1):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
 
@@ -703,7 +703,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_grouper(self) -> None:
         self.assertEqual(
-            [list(g) for g in utils.grouper(python_utils.RANGE(7), 3)],
+            [list(g) for g in utils.grouper(range(7), 3)],
             [[0, 1, 2], [3, 4, 5], [6, None, None]])
         # Returns an iterable of iterables, so we need to combine them into
         # strings for easier comparison.

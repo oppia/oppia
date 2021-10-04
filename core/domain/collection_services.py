@@ -596,7 +596,7 @@ def get_collection_ids_matching_query(
     returned_collection_ids = []
     search_offset = offset
 
-    for _ in python_utils.RANGE(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -914,7 +914,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = list(python_utils.RANGE(1, current_version + 1))
+    version_nums = list(range(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)

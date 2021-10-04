@@ -159,8 +159,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         # learner goals.
         # Add feconf.MAX_CURRENT_GOALS_COUNT - 2 activities to reach
         # the maximum limit.
-        for topic_id in python_utils.RANGE(
-                2, feconf.MAX_CURRENT_GOALS_COUNT + 1):
+        for topic_id in range(2, feconf.MAX_CURRENT_GOALS_COUNT + 1):
             self.post_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_GOALS_DATA_URL,

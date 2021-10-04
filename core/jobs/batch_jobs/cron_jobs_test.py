@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import recommendations_services
@@ -36,7 +35,7 @@ import apache_beam as beam
 from typing import Dict, List, Set, Tuple, Union # isort:skip
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import recommendations_models
@@ -100,7 +99,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
             ])
 
     def test_indexes_non_deleted_models(self) -> None:
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             exp_summary = self.create_model(
                 exp_models.ExpSummaryModel,
                 id='abcd%s' % i,
@@ -131,7 +130,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
                         'rank': 20,
                     }],
                     search_services.SEARCH_INDEX_EXPLORATIONS
-                ) for i in python_utils.RANGE(5)
+                ) for i in range(5)
             ]
         )
 
