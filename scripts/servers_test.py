@@ -691,7 +691,7 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
             outputs=[b'abc', b'Built at: 123', b'def']))
         str_io = python_utils.string_io()
-        self.exit_stack.enter_context(python_utils.redirect_stdout(str_io))
+        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(servers.managed_webpack_compiler(
@@ -715,7 +715,7 @@ class ManagedProcessTests(test_utils.TestBase):
         # NOTE: The 'Built at: ' message is never printed.
         self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
         str_io = python_utils.string_io()
-        self.exit_stack.enter_context(python_utils.redirect_stdout(str_io))
+        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
         self.assertRaisesRegexp(
             IOError, 'First build never completed',
