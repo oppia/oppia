@@ -3175,13 +3175,21 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             .checker.config.disallowed_functions_and_replacements_str) = [
                 'datetime.datetime.now=>datetime.datetime.utcnow',
                 'self.assertEquals=>self.assertEqual',
+                'b.next=>python_utils.NEXT',
+                'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
             ]
         self.checker_test_object.checker.open()
 
-        (call1, call2) = astroid.extract_node(
+        (
+            call1, call2, call3,
+            call4, call5
+            ) = astroid.extract_node(
             """
         datetime.datetime.now() #@
         self.assertEquals() #@
+        str(1) #@
+        b.next() #@
+        b.a.next() #@
         """)
 
         message_replace_disallowed_datetime = testutils.Message(
@@ -3198,12 +3206,33 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             confidence=interfaces.UNDEFINED
         )
 
+        message_replace_disallowed_str = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call3,
+            args=(
+                'str', 'python_utils.convert_to_bytes or python_utils.UNICODE'
+            ),
+            confidence=interfaces.UNDEFINED
+        )
+
+        message_replace_disallowed_next = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call4,
+            args=('b.next', 'python_utils.NEXT'),
+            confidence=interfaces.UNDEFINED
+        )
+
         with self.checker_test_object.assertAddsMessages(
             message_replace_disallowed_datetime,
-            message_replace_disallowed_assert_equals
+            message_replace_disallowed_assert_equals,
+            message_replace_disallowed_str,
+            message_replace_disallowed_next
         ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)
+            self.checker_test_object.checker.visit_call(call4)
+            self.checker_test_object.checker.visit_call(call5)
 
     def test_disallowed_removals_regex(self):
         (
