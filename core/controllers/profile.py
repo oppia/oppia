@@ -485,6 +485,11 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    # We want to impose regex to check whether the language
+    # code is valid. We choose the regex to be
+    # ^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$
+    # This pattern can detect language code like "en", "en-US"
+    # "ah-Hant-TW", "EN-au"
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -493,7 +498,8 @@ class SiteLanguageHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': '^[a-zA-Z]{2}$'
+                        'regex_pattern': 
+                        '^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$'
                     }],
                 }
             }
