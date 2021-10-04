@@ -100,7 +100,7 @@ def run_webpack_compilation():
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
-    for _ in python_utils.RANGE(max_tries):
+    for _ in range(max_tries):
         try:
             with servers.managed_webpack_compiler() as proc:
                 proc.wait()
