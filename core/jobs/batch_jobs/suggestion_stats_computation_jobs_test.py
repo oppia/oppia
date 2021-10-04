@@ -28,6 +28,10 @@ from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+import apache_beam as beam
+
+from typing import Dict, List, Set, Tuple, Union
+
 MYPY = False
 if MYPY:
     from mypy_imports import opportunity_models
@@ -35,6 +39,8 @@ if MYPY:
 
 (opportunity_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.suggestion])
+
+StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
 class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
@@ -341,3 +347,266 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
                 datetime.date.today() - datetime.timedelta(days=1)
             ]
         )
+
+
+class CombineStatsTests(job_test_utils.PipelinedTestBase):
+
+    def create_test_pipeline(
+        self, entry_stats: StatsType
+    ) -> beam.PCollection[Dict[str, Union[int, Set[datetime.date]]]]:
+        """Creates testing pipeline with some entry stats.
+
+        Args:
+            entry_stats: StatsType. The stast with which to start the pipeline.
+
+        Returns:
+            PCollection. The testing pipeline to be executed.
+        """
+        return (
+            self.pipeline
+            | beam.Create(entry_stats)
+            | beam.CombineValues(
+                suggestion_stats_computation_jobs.CombineStats())
+            | beam.Values()  # pylint: disable=no-value-for-parameter
+            | beam.Map(lambda stats: stats.to_dict())
+        )
+
+    def test_correctly_combine_one_in_review_stat_not_edited_by_reviewer(
+        self
+    ) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key',
+            [{
+                'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
+                'edited_by_reviewer': False,
+                'content_word_count': 5,
+                'last_updated_date': '2021-05-01'
+            }]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
+            'language_code': None,
+            'contributor_user_id': None,
+            'topic_id': None,
+            'submitted_translations_count': 1,
+            'submitted_translation_word_count': 5,
+            'accepted_translations_count': 0,
+            'accepted_translations_without_reviewer_edits_count': 0,
+            'accepted_translation_word_count': 0,
+            'rejected_translations_count': 0,
+            'rejected_translation_word_count': 0,
+            'contribution_dates': {datetime.date(2021, 5, 1)}
+        }])
+
+    def test_correctly_combine_one_in_review_stat_edited_by_reviewer(
+        self
+    ) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key',
+            [{
+                'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
+                'edited_by_reviewer': True,
+                'content_word_count': 10,
+                'last_updated_date': '2021-05-05'
+            }]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
+            'language_code': None,
+            'contributor_user_id': None,
+            'topic_id': None,
+            'submitted_translations_count': 1,
+            'submitted_translation_word_count': 10,
+            'accepted_translations_count': 0,
+            'accepted_translations_without_reviewer_edits_count': 0,
+            'accepted_translation_word_count': 0,
+            'rejected_translations_count': 0,
+            'rejected_translation_word_count': 0,
+            'contribution_dates': {datetime.date(2021, 5, 5)}
+        }])
+
+    def test_correctly_combine_one_accepted_stat_edited_by_reviewer(
+        self
+    ) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key',
+            [{
+                'suggestion_status': suggestion_models.STATUS_ACCEPTED,
+                'edited_by_reviewer': True,
+                'content_word_count': 15,
+                'last_updated_date': '2019-05-05'
+            }]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
+            'language_code': None,
+            'contributor_user_id': None,
+            'topic_id': None,
+            'submitted_translations_count': 1,
+            'submitted_translation_word_count': 15,
+            'accepted_translations_count': 1,
+            'accepted_translations_without_reviewer_edits_count': 0,
+            'accepted_translation_word_count': 15,
+            'rejected_translations_count': 0,
+            'rejected_translation_word_count': 0,
+            'contribution_dates': {datetime.date(2019, 5, 5)}
+        }])
+
+    def test_correctly_combine_one_accepted_stat_not_edited_by_reviewer(
+        self
+    ) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key',
+            [{
+                'suggestion_status': suggestion_models.STATUS_ACCEPTED,
+                'edited_by_reviewer': False,
+                'content_word_count': 20,
+                'last_updated_date': '2021-05-05'
+            }]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
+            'language_code': None,
+            'contributor_user_id': None,
+            'topic_id': None,
+            'submitted_translations_count': 1,
+            'submitted_translation_word_count': 20,
+            'accepted_translations_count': 1,
+            'accepted_translations_without_reviewer_edits_count': 1,
+            'accepted_translation_word_count': 20,
+            'rejected_translations_count': 0,
+            'rejected_translation_word_count': 0,
+            'contribution_dates': {datetime.date(2021, 5, 5)}
+        }])
+
+    def test_correctly_combine_one_rejected_stat_not_edited_by_reviewer(
+        self
+    ) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key',
+            [{
+                'suggestion_status': suggestion_models.STATUS_REJECTED,
+                'edited_by_reviewer': False,
+                'content_word_count': 25,
+                'last_updated_date': '2021-05-05'
+            }]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
+            'language_code': None,
+            'contributor_user_id': None,
+            'topic_id': None,
+            'submitted_translations_count': 1,
+            'submitted_translation_word_count': 25,
+            'accepted_translations_count': 0,
+            'accepted_translations_without_reviewer_edits_count': 0,
+            'accepted_translation_word_count': 0,
+            'rejected_translations_count': 1,
+            'rejected_translation_word_count': 25,
+            'contribution_dates': {datetime.date(2021, 5, 5)}
+        }])
+
+    def test_correctly_combine_multiple_stats_with_same_key(self) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key',
+            [
+                {
+                    'suggestion_status': suggestion_models.STATUS_ACCEPTED,
+                    'edited_by_reviewer': False,
+                    'content_word_count': 3,
+                    'last_updated_date': '2021-05-05'
+                },
+                {
+                    'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
+                    'edited_by_reviewer': False,
+                    'content_word_count': 7,
+                    'last_updated_date': '2021-05-06'
+                },
+                {
+                    'suggestion_status': suggestion_models.STATUS_REJECTED,
+                    'edited_by_reviewer': False,
+                    'content_word_count': 11,
+                    'last_updated_date': '2021-05-05'
+                },
+                {
+                    'suggestion_status': suggestion_models.STATUS_ACCEPTED,
+                    'edited_by_reviewer': True,
+                    'content_word_count': 13,
+                    'last_updated_date': '2021-05-05'
+                }
+            ]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
+            'language_code': None,
+            'contributor_user_id': None,
+            'topic_id': None,
+            'submitted_translations_count': 4,
+            'submitted_translation_word_count': 34,
+            'accepted_translations_count': 2,
+            'accepted_translations_without_reviewer_edits_count': 1,
+            'accepted_translation_word_count': 16,
+            'rejected_translations_count': 1,
+            'rejected_translation_word_count': 11,
+            'contribution_dates': {
+                datetime.date(2021, 5, 5), datetime.date(2021, 5, 6)
+            }
+        }])
+
+    def test_correctly_combine_multiple_stats_with_different_key(self) -> None:
+        entry_stats: StatsType = [(
+            'key.key.key1',
+            [
+                {
+                    'suggestion_status': suggestion_models.STATUS_ACCEPTED,
+                    'edited_by_reviewer': False,
+                    'content_word_count': 3,
+                    'last_updated_date': '2021-05-05'
+                },
+                {
+                    'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
+                    'edited_by_reviewer': False,
+                    'content_word_count': 7,
+                    'last_updated_date': '2021-05-06'
+                }
+            ]
+        ), (
+            'key.key.key2',
+            [
+                {
+                    'suggestion_status': suggestion_models.STATUS_REJECTED,
+                    'edited_by_reviewer': False,
+                    'content_word_count': 11,
+                    'last_updated_date': '2021-05-05'
+                },
+                {
+                    'suggestion_status': suggestion_models.STATUS_ACCEPTED,
+                    'edited_by_reviewer': True,
+                    'content_word_count': 13,
+                    'last_updated_date': '2021-05-05'
+                }
+            ]
+        )]
+        self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [
+            {
+                'language_code': None,
+                'contributor_user_id': None,
+                'topic_id': None,
+                'submitted_translations_count': 2,
+                'submitted_translation_word_count': 24,
+                'accepted_translations_count': 1,
+                'accepted_translations_without_reviewer_edits_count': 0,
+                'accepted_translation_word_count': 13,
+                'rejected_translations_count': 1,
+                'rejected_translation_word_count': 11,
+                'contribution_dates': {datetime.date(2021, 5, 5)}
+            }, {
+                'language_code': None,
+                'contributor_user_id': None,
+                'topic_id': None,
+                'submitted_translations_count': 2,
+                'submitted_translation_word_count': 10,
+                'accepted_translations_count': 1,
+                'accepted_translations_without_reviewer_edits_count': 1,
+                'accepted_translation_word_count': 3,
+                'rejected_translations_count': 0,
+                'rejected_translation_word_count': 0,
+                'contribution_dates': {
+                    datetime.date(2021, 5, 6), datetime.date(2021, 5, 5)
+                }
+            },
+        ])

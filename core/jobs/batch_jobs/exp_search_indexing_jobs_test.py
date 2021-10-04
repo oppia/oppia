@@ -86,7 +86,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             ])
 
     def test_indexes_non_deleted_models(self) -> None:
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             exp_summary = self.create_model(
                 exp_models.ExpSummaryModel,
                 id='abcd%s' % i,
@@ -117,13 +117,12 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                         'rank': 20,
                     }],
                     search_services.SEARCH_INDEX_EXPLORATIONS
-                ) for i in python_utils.RANGE(5)
+                ) for i in range(5)
             ]
         )
 
         max_batch_size_swap = self.swap(
-            exp_search_indexing_jobs.IndexExplorationsInSearchJob,
-            'MAX_BATCH_SIZE', 1)
+            cron_jobs.IndexExplorationsInSearch, 'MAX_BATCH_SIZE', 1)
 
         with add_docs_to_index_swap, max_batch_size_swap:
             self.assert_job_output_is([
@@ -153,7 +152,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                 unused_documents: Dict[str, Union[int, str, List[str]]],
                 unused_index_name: str
         ) -> None:
-            raise platform_search_services.SearchException
+            raise platform_search_services.SearchException # type: ignore[attr-defined]
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,

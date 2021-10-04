@@ -430,7 +430,7 @@ class BaseModel(datastore_services.Model):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(MAX_RETRIES):
+        for _ in range(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH
@@ -975,7 +975,7 @@ class VersionedModel(BaseModel):
         if force_deletion:
             current_version = self.version
 
-            version_numbers = python_utils.RANGE(1, current_version + 1)
+            version_numbers = range(1, current_version + 1)
             snapshot_ids = [
                 self.get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
@@ -1052,7 +1052,7 @@ class VersionedModel(BaseModel):
             all_models_content_keys = []
             all_models_commit_keys: List[datastore_services.Key] = []
             for model in versioned_models:
-                model_version_numbers = python_utils.RANGE(1, model.version + 1)
+                model_version_numbers = range(1, model.version + 1)
                 model_snapshot_ids = [
                     model.get_snapshot_id(model.id, version_number)
                     for version_number in model_version_numbers]
@@ -1086,7 +1086,7 @@ class VersionedModel(BaseModel):
                 all_models_commit_keys +
                 versioned_models_keys
             )
-            for i in python_utils.RANGE(
+            for i in range(
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
