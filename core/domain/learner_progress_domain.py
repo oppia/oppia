@@ -19,8 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
-
 
 class LearnerProgressInTopicsAndStories:
     """Domain object for the progress of the learner in topics and stories."""

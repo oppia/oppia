@@ -24,7 +24,6 @@ import inspect
 import itertools
 import re
 
-from core import python_utils
 from core.jobs import job_utils
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property

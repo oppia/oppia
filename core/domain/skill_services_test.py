@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_domain

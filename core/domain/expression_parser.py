@@ -35,7 +35,6 @@ from __future__ import unicode_literals
 import collections
 import re
 
-from core import python_utils
 from core.constants import constants
 
 _OPENING_PARENS = ['[', '{', '(']

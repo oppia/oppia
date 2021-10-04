@@ -25,7 +25,6 @@ import inspect
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 
 

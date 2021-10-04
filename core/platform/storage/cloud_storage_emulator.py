@@ -23,7 +23,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import mimetypes
 
 from core import feconf
-from core import python_utils
 
 import redis
 

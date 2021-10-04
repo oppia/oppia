@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 

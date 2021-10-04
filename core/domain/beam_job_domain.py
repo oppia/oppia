@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import datetime
 
-from core import python_utils
 from core import utils
 from core.jobs import base_jobs
 from core.platform import models

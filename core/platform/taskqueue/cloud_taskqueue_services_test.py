@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 import json
 
-from core import python_utils
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
