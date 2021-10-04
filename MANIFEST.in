@@ -3,7 +3,11 @@
 # in production. Note that this package is generated
 # by running 'python setup.py sdist' in build.py.
 
-include requirements.txt
 include assets/constants.ts
 include assets/release_constants.json
 include assets/rich_text_components_definitions.ts
+include extensions/interactions/html_field_types_to_rule_specs.json
+include extensions/interactions/legacy_interaction_specs_by_state_version/*.json
+include extensions/interactions/rule_templates.json
+include extensions/objects/object_defaults.json
+include requirements.txt

@@ -453,6 +453,7 @@
     "wrap-iife": [
       "error",
       "any"
-    ]
+    ],
+    "@typescript-eslint/method-signature-style": ["error"]
   }
 }

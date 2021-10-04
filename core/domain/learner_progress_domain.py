@@ -22,53 +22,33 @@ from __future__ import unicode_literals
 from core import python_utils
 
 
-class LearnerProgress(python_utils.OBJECT):
-    """Domain object for the progress of the learner."""
+class LearnerProgressInTopicsAndStories(python_utils.OBJECT):
+    """Domain object for the progress of the learner in topics and stories."""
 
     def __init__(
-            self, incomplete_exp_summaries,
-            incomplete_collection_summaries,
-            partially_learnt_topic_summaries, completed_exp_summaries,
-            completed_collection_summaries, completed_story_summaries,
+            self,
+            partially_learnt_topic_summaries,
+            completed_story_summaries,
             learnt_topic_summaries, topics_to_learn_summaries,
-            exploration_playlist, collection_playlist,
             all_topic_summaries, untracked_topic_summaries,
-            completed_to_incomplete_collection_titles,
             completed_to_incomplete_story_titles,
             learnt_to_partially_learnt_topic_titles):
         """Constructs a LearnerProgress domain object.
 
         Args:
-            incomplete_exp_summaries: list(ExplorationSummary). The summaries
-                of the explorations partially completed by the learner.
-            incomplete_collection_summaries: list(CollectionSummary). The
-                summaries of the collections partially completed by the
-                learner.
             partially_learnt_topic_summaries: list(TopicSummary). The
                 summaries of the topics partially learnt by the
                 learner.
-            completed_exp_summaries: list(ExplorationSummary). The summaries of
-                the explorations partially completed by the learner.
-            completed_collection_summaries: list(CollectionSummary). The
-                summaries of the collections partially completed by the learner.
             completed_story_summaries: list(StorySummary). The
                 summaries of the stories completed by the learner.
             learnt_topic_summaries: list(TopicSummary). The
                 summaries of the topics learnt by the learner.
             topics_to_learn_summaries: list(TopicSummary). The
                 summaries of the topics to learn.
-            exploration_playlist: list(ExplorationSummary). The summaries of the
-                explorations in the learner playlist.
-            collection_playlist: list(CollectionSummary). The summaries of the
-                collections in the learner playlist.
             all_topic_summaries: list(TopicSummary). The summaries of the topics
                 in the edit goals.
             untracked_topic_summaries: list(TopicSummary). The summaries of the
                 topics not tracked for the user.
-            completed_to_incomplete_collection_titles: list(CollectionSummary).
-                The summaries corresponding to those collections which have
-                been moved to the in progress section on account of new
-                explorations being added to them.
             completed_to_incomplete_story_titles: list(StorySummary).
                 The summaries corresponding to those stories which have
                 been moved to the in progress section on account of new
@@ -78,24 +58,68 @@ class LearnerProgress(python_utils.OBJECT):
                 been moved to the in progress section on account of new
                 stories being added to them.
         """
-        self.incomplete_exp_summaries = incomplete_exp_summaries
-        self.incomplete_collection_summaries = incomplete_collection_summaries
         self.partially_learnt_topic_summaries = partially_learnt_topic_summaries
-        self.completed_exp_summaries = completed_exp_summaries
-        self.completed_collection_summaries = completed_collection_summaries
         self.completed_story_summaries = completed_story_summaries
         self.learnt_topic_summaries = learnt_topic_summaries
         self.topics_to_learn_summaries = topics_to_learn_summaries
-        self.exploration_playlist_summaries = exploration_playlist
-        self.collection_playlist_summaries = collection_playlist
         self.all_topic_summaries = all_topic_summaries
         self.untracked_topic_summaries = untracked_topic_summaries
-        self.completed_to_incomplete_collections = (
-            completed_to_incomplete_collection_titles)
         self.completed_to_incomplete_stories = (
             completed_to_incomplete_story_titles)
         self.learnt_to_partially_learnt_topics = (
             learnt_to_partially_learnt_topic_titles)
+
+
+class LearnerProgressInCollections(python_utils.OBJECT):
+    """Domain object for the progress of the learner in collections."""
+
+    def __init__(
+            self,
+            incomplete_collection_summaries,
+            completed_collection_summaries,
+            collection_playlist,
+            completed_to_incomplete_collection_titles,):
+        """Constructs a LearnerProgress domain object.
+
+        Args:
+            incomplete_collection_summaries: list(CollectionSummary). The
+                summaries of the collections partially completed by the
+                learner.
+            completed_collection_summaries: list(CollectionSummary). The
+                summaries of the collections partially completed by the learner.
+            collection_playlist: list(CollectionSummary). The summaries of the
+                collections in the learner playlist.
+            completed_to_incomplete_collection_titles: list(CollectionSummary).
+                The summaries corresponding to those collections which have
+                been moved to the in progress section on account of new
+                explorations being added to them.
+        """
+        self.incomplete_collection_summaries = incomplete_collection_summaries
+        self.completed_collection_summaries = completed_collection_summaries
+        self.collection_playlist_summaries = collection_playlist
+        self.completed_to_incomplete_collections = (
+            completed_to_incomplete_collection_titles)
+
+
+class LearnerProgressInExplorations(python_utils.OBJECT):
+    """Domain object for the progress of the learner in explorations."""
+
+    def __init__(
+            self, incomplete_exp_summaries, completed_exp_summaries,
+            exploration_playlist):
+        """Constructs a LearnerProgress domain object.
+
+        Args:
+            incomplete_exp_summaries: list(ExplorationSummary). The summaries
+                of the explorations partially completed by the learner.
+            completed_exp_summaries: list(ExplorationSummary). The summaries of
+                the explorations partially completed by the learner.
+            exploration_playlist: list(ExplorationSummary). The summaries of the
+                explorations in the learner playlist.
+        """
+        self.incomplete_exp_summaries = incomplete_exp_summaries
+        self.completed_exp_summaries = completed_exp_summaries
+        self.exploration_playlist_summaries = exploration_playlist
 
 
 class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
