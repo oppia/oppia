@@ -29,7 +29,7 @@ from .. import common
 from .. import concurrent_task_utils
 
 
-class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
+class ThirdPartyCSSLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, config_path, files_to_lint):

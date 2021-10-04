@@ -26,7 +26,7 @@ from core import python_utils
 import urllib2
 
 
-class FakeClass(python_utils.OBJECT):
+class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):

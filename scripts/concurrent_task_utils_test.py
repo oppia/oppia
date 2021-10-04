@@ -115,7 +115,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         )
 
     def test_task_thread_with_verbose_mode_enabled(self):
-        class HelperTests(python_utils.OBJECT):
+        class HelperTests:
             def test_show(self):
                 return concurrent_task_utils.TaskResult('name', True, [], [])
             def test_perform_all_check(self):
@@ -138,7 +138,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             'name check failed')
 
     def test_task_thread_with_task_report_disabled(self):
-        class HelperTests(python_utils.OBJECT):
+        class HelperTests:
             def test_show(self):
                 return concurrent_task_utils.TaskResult(
                     None, None, None, ['msg'])

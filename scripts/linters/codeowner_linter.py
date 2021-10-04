@@ -55,7 +55,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/extensions/interactions/rule_templates.json']
 
 
-class CodeownerLintChecksManager(python_utils.OBJECT):
+class CodeownerLintChecksManager:
     """Manages codeowner checks."""
 
     def __init__(self, file_cache):

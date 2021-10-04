@@ -340,7 +340,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
     return failed, total_error_count, error_messages
 
 
-class GeneralPurposeLinter(python_utils.OBJECT):
+class GeneralPurposeLinter:
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
     """

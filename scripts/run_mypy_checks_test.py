@@ -90,7 +90,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
         def mock_popen_user_prefix_error_call(
                 cmd_tokens, *unused_args, **unused_kwargs):
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object that gives user-prefix error."""
 
                 def __init__(self):

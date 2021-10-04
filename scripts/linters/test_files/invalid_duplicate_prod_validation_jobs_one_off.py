@@ -30,7 +30,7 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-class BaseModelValidator(python_utils.OBJECT):
+class BaseModelValidator:
     errors = collections.defaultdict(list)
     external_instance_details = {}
 

@@ -25,7 +25,7 @@ from core import utils
 from core.domain import calculation_registry
 
 
-class BaseVisualization(python_utils.OBJECT):
+class BaseVisualization:
     """Base class for definitions of visualizations."""
 
     # Option specifications for the visualization, including their descriptions

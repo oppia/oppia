@@ -23,7 +23,7 @@ from core import python_utils
 from extensions import domain
 
 
-class BaseLearnerActionSpec(python_utils.OBJECT):
+class BaseLearnerActionSpec:
     """Base action definition class.
 
     This class is not meant to be user-editable. The only methods in it should
