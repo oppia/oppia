@@ -44,8 +44,8 @@ import json
 import re
 import subprocess
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 from scripts import common
 
 

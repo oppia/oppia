@@ -21,17 +21,19 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 from core.tests import test_utils
 
-import feconf
-from mypy_imports import app_feedback_report_models
-import python_utils
-import utils
+from typing import List
 
-from typing import List # isort:skip # pylint: disable=unused-import
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -1196,9 +1198,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'The ticket name should be a string')
 
     def test_validation_ticket_name_too_long_fails(self) -> None:
-        long_name = 'too long'
-        for _ in python_utils.RANGE(constants.MAXIMUM_TICKET_NAME_LENGTH):
-            long_name += 'x'
+        long_name = 'too long' + 'x' * constants.MAXIMUM_TICKET_NAME_LENGTH
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(
             self.ticket_obj,
