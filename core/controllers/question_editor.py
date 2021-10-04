@@ -197,7 +197,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
             'version': {
                 'schema': {
                     'type': 'int'
-                }
+                },
+                'default_value': None
             },
             'commit_message': {
                 'schema': {
