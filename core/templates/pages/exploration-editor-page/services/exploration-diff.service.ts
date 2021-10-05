@@ -213,7 +213,7 @@ export class ExplorationDiffService {
             (!directionForwards && change.cmd === 'delete_state')) {
           if (!stateIds.hasOwnProperty(explorationChangeAddState.state_name)) {
             let newId = this._generateNewId();
-            stateIds[(explorationChangeAddState).state_name] = newId;
+            stateIds[(change as ExplorationChangeAddState).state_name] = newId;
           }
           let currentStateId = (
             stateIds[explorationChangeAddState.state_name]);
