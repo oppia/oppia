@@ -226,7 +226,7 @@ export class ExplorationDiffService {
               explorationChangeAddState).state_name;
           } else {
             stateData[currentStateId] = {
-              newestStateName: (explorationChangeAddState).state_name,
+              newestStateName: (change as ExplorationChangeAddState).state_name,
               originalStateName: (
                 explorationChangeAddState).state_name,
               stateProperty: this.STATE_PROPERTY_ADDED

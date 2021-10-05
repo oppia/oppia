@@ -198,13 +198,13 @@ export class ExplorationImprovementsTaskRegistryService {
       const playthroughIssuesByType = group(
         playthroughIssuesByStateName.get(stateName) || [], p => p.issueType);
       const cstPlaythroughIssues = (
-        playthroughIssuesByType.get('CyclicStateTransitions') as
-         CstPlaythroughIssue[]);
+        playthroughIssuesByType.get('CyclicStateTransitions')
+       ) as CstPlaythroughIssue[];
       const eqPlaythroughIssues = (
         playthroughIssuesByType.get('EarlyQuit') as EqPlaythroughIssue[]);
       const misPlaythroughIssues = (
-        playthroughIssuesByType.get('MultipleIncorrectSubmissions') as
-         MisPlaythroughIssue[]);
+        playthroughIssuesByType.get('MultipleIncorrectSubmissions')
+       )as MisPlaythroughIssue[];
 
       this.registerNewStateTasks(
         stateName,
