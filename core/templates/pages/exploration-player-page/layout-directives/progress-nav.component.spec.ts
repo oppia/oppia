@@ -25,6 +25,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
@@ -41,6 +42,8 @@ describe('Progress nav component', () => {
   let explorationPlayerStateService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
+  let windowDimensionsService: WindowDimensionsService;
+  let explorationEngineService: ExplorationEngineService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
@@ -78,6 +81,8 @@ describe('Progress nav component', () => {
       ExplorationPlayerStateService);
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
   });
 
   afterEach(() => {
@@ -97,12 +102,15 @@ describe('Progress nav component', () => {
       .and.returnValue(mockDisplayedCardIndexChangedEventEmitter);
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockOnHelpCardAvailableEventEmitter);
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+
     componentInstance.ngOnInit();
     mockDisplayedCardIndexChangedEventEmitter.emit();
     mockOnHelpCardAvailableEventEmitter.emit({
       hasContinueButton: true
     } as HelpCardEventResponse);
     tick();
+
     expect(componentInstance.isIframed).toEqual(isIframed);
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
     expect(componentInstance.helpCardHasContinueButton).toBeTrue();
@@ -122,22 +130,111 @@ describe('Progress nav component', () => {
     spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(mockDisplayedCard, 'getInteractionId').and.returnValue('Continue');
+
     componentInstance.updateDisplayedCardInfo();
-    tick(100);
+    tick();
 
     expect(playerTranscriptService.getNumCards).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
     expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
   }));
 
-  it('should tell if interaction have special case for mobile', () => {
+  it('should return true if interaction has special case for mobile', () => {
     spyOn(browserCheckerService, 'isMobileDevice')
-      .and.returnValues(true, false);
-    componentInstance.interactionId = '';
+      .and.returnValue(true);
+    componentInstance.interactionId = 'ItemSelectionInput';
     expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-      .toBeFalse();
-    expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-      .toBeFalse();
+      .toBeTrue();
     expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
+  });
+
+  it('should not resolve special case for interaction if in desktop mode',
+    () => {
+      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
+      componentInstance.interactionCustomizationArgs = {
+        maxAllowableSelectionCount: {
+          value: 2
+        }
+      };
+      componentInstance.interactionId = 'ItemSelectionInput';
+
+      expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
+        .toBeTrue();
+      expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
+    });
+
+  it('should tell if window can show two cards', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1);
+
+    expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
+  });
+
+  it('should tell if generic submit button should be shown', () => {
+    spyOn(componentInstance, 'doesInteractionHaveSpecialCaseForMobile')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'doesInteractionHaveNavSubmitButton')
+      .and.returnValue(false);
+
+    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeTrue();
+    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();
+  });
+
+  it('should tell if continue button should be shown', () => {
+    componentInstance.conceptCardIsBeingShown = true;
+
+    expect(componentInstance.shouldContinueButtonBeShown()).toBeTrue();
+
+    componentInstance.conceptCardIsBeingShown = false;
+    componentInstance.interactionIsInline = false;
+
+    expect(componentInstance.shouldContinueButtonBeShown()).toBeFalse();
+  });
+
+  it('should change card', () => {
+    componentInstance.transcriptLength = 5;
+    spyOn(playerPositionService, 'recordNavigationButtonClick');
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(explorationEngineService.onUpdateActiveStateIfInEditor, 'emit');
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('');
+    spyOn(playerPositionService, 'changeCurrentQuestion');
+
+    componentInstance.changeCard(0);
+
+    expect(playerPositionService.recordNavigationButtonClick)
+      .toHaveBeenCalled();
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalled();
+    expect(explorationEngineService.onUpdateActiveStateIfInEditor.emit)
+      .toHaveBeenCalled();
+    expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
+    expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
+
+    expect(() => {
+      componentInstance.changeCard(-1);
+    }).toThrowError('Target card index out of bounds.');
+  });
+
+  it('should tell if interaction have submit nav button', () => {
+    componentInstance.interactionId = 'ImageClickInput';
+
+    expect(componentInstance.doesInteractionHaveNavSubmitButton()).toBeFalse();
+
+    componentInstance.interactionId = 'not_valid';
+
+    expect(() => {
+      componentInstance.doesInteractionHaveNavSubmitButton();
+    }).toThrowError();
+  });
+
+  it('should update displayed card info when view updates', () => {
+    spyOn(componentInstance, 'updateDisplayedCardInfo');
+    componentInstance.lastDisplayedCard = null;
+    componentInstance.displayedCard = mockDisplayedCard;
+
+    componentInstance.ngOnChanges();
+
+    expect(componentInstance.lastDisplayedCard).toEqual(mockDisplayedCard);
+    expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
   });
 });
