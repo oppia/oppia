@@ -41,17 +41,10 @@ from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-<<<<<<< HEAD
-import feconf
 from proto_files import exploration_pb2
 from proto_files import languages_pb2
 from proto_files import objects_pb2
 from proto_files import state_pb2
-import python_utils
-import schema_utils
-import utils
-=======
->>>>>>> a530c7e4d5274b646afc7dd7040d13c7ed45b829
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
