@@ -44,10 +44,6 @@
 /scripts/ @DubeySandeep
 
 
-# Android team
-/core/android_validation_constants*.py @seanlip @BenHenning
-
-
 # Angular Migration team
 /core/controllers/oppia_root*.py @srijanreddy98 @darksun27
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
@@ -744,3 +740,6 @@
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
 /.github/workflows/ @DubeySandeep @oppia/automated-qa-reviewers
+# Files needed by the Android team.
+/core/android_validation_constants*.py @seanlip @BenHenning
+/extensions/interactions/rule_templates.json @seanlip @BenHenning

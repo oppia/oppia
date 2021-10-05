@@ -169,7 +169,7 @@ def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_model_list)
 
 
-def _create_exploration_opportunity_summary(topic, story, exploration):
+def create_exp_opportunity_summary(topic, story, exploration):
     """Create an ExplorationOpportunitySummary object with the given topic,
     story and exploration object.
 
@@ -272,7 +272,7 @@ def _create_exploration_opportunities(story, topic, exp_ids):
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
-            _create_exploration_opportunity_summary(
+            create_exp_opportunity_summary(
                 topic, story, exploration))
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
@@ -881,7 +881,7 @@ def regenerate_opportunities_related_to_topic(
     for story in stories:
         for exp_id in story.story_contents.get_all_linked_exp_ids():
             exploration_opportunity_summary_list.append(
-                _create_exploration_opportunity_summary(
+                create_exp_opportunity_summary(
                     topic, story, exp_ids_to_exp[exp_id]))
 
     _save_multi_exploration_opportunity_summary(
