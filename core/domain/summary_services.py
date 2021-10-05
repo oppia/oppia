@@ -91,7 +91,7 @@ def get_human_readable_contributors_summary(contributors_summary):
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in python_utils.RANGE(len(contributor_ids))
+        for ind in range(len(contributor_ids))
     }
 
 

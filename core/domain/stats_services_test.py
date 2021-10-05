@@ -954,7 +954,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
-            for _ in python_utils.RANGE(num_times_answered_incorrectly))
+            for _ in range(num_times_answered_incorrectly))
         actions.append({
             'action_type': 'ExplorationQuit',
             'action_customization_args': {

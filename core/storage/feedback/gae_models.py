@@ -217,7 +217,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             Exception. There were too many collisions with existing thread IDs
                 when attempting to generate a new thread ID.
         """
-        for _ in python_utils.RANGE(_MAX_RETRIES):
+        for _ in range(_MAX_RETRIES):
             thread_id = (
                 '%s.%s.%s%s' % (
                     entity_type,
