@@ -1245,7 +1245,7 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
-    def get_version( # type: ignore[return]
+    def get_version(
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
