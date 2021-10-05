@@ -93,10 +93,11 @@ export class Subtopic {
     let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
       constants.VALID_URL_FRAGMENT_REGEX);
-    if (this._urlFragment !== null) {
-      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
-        issues.push('Subtopic url fragment is invalid.');
-      }
+    if (
+      this._urlFragment &&
+      !VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)
+    ) {
+      issues.push('Subtopic url fragment is invalid.');
     }
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
@@ -190,9 +191,9 @@ export class Subtopic {
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: null,
-      thumbnail_bg_color: null,
-      url_fragment: null
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      url_fragment: ''
     }, {});
   }
 }
