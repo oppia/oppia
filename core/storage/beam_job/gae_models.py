@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import enum
 import uuid
 
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -39,7 +38,7 @@ def _get_new_model_id(model_class: base_models.BaseModel) -> str:
     Returns:
         str. The new ID.
     """
-    for _ in python_utils.RANGE(_MAX_ID_GENERATION_ATTEMPTS):
+    for _ in range(_MAX_ID_GENERATION_ATTEMPTS):
         new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
         if model_class.get(new_id, strict=False) is None:
             return new_id
