@@ -238,7 +238,7 @@
     ],
     "9": [
         "core.storage.app_feedback_report.gae_models_test",
-        "core.jobs.batch_jobs.validation_jobs_test",
+        "core.jobs.batch_jobs.model_validation_jobs_test",
         "core.jobs.base_jobs_test",
         "core.jobs.decorators.validation_decorators_test",
         "core.jobs.io.ndb_io_test",
@@ -268,8 +268,11 @@
     ],
     "10": [
         "core.domain.moderator_services_test",
+        "core.jobs.batch_jobs.exp_recommendation_computation_jobs_test",
+        "core.jobs.batch_jobs.exp_search_indexing_jobs_test",
+        "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
+        "core.jobs.batch_jobs.user_stats_computation_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
-        "core.jobs.batch_jobs.cron_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
         "scripts.linters.js_ts_linter_test",
