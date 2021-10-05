@@ -31,6 +31,7 @@ import string
 import sys
 import time
 import unicodedata
+import urllib
 import zlib
 
 from core import feconf
@@ -395,7 +396,7 @@ def set_url_query_parameter(
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = python_utils.url_split(url) # type: ignore[no-untyped-call]
+    scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
     query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
