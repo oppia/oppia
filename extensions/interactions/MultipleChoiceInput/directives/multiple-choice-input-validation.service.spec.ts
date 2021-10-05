@@ -82,7 +82,9 @@ describe('MultipleChoiceInputValidationService', () => {
       choices: {
         value: [
           new SubtitledHtml('Option 1', ''),
-          new SubtitledHtml('Option 2', '')
+          new SubtitledHtml('Option 2', ''),
+          new SubtitledHtml('Option 3', ''),
+          new SubtitledHtml('Option 4', '')
         ]
       },
       showChoicesInShuffledOrder: {
@@ -128,8 +130,21 @@ describe('MultipleChoiceInputValidationService', () => {
       'Expected customization arguments to have property: choices');
   });
 
+  it('should expect at least four choices', () => {
+    customizationArguments.choices.value = [
+      new SubtitledHtml('1', '')
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please enter at least four choices.'
+    }]);
+  });
+
   it('should expect non-empty and unique choices', () => {
-    customizationArguments.choices.value[0].html = '';
+    customizationArguments.choices.value[3].html = '';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -138,7 +153,7 @@ describe('MultipleChoiceInputValidationService', () => {
       message: 'Please ensure the choices are nonempty.'
     }]);
 
-    customizationArguments.choices.value[0].html = 'Option 2';
+    customizationArguments.choices.value[3].html = 'Option 2';
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
