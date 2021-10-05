@@ -3184,7 +3184,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             call1, call2, call3,
             call4, call5
             ) = astroid.extract_node(
-            """
+                """
         datetime.datetime.now() #@
         self.assertEquals() #@
         str(1) #@
