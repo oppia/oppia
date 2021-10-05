@@ -27,7 +27,6 @@ import re
 import sys
 import tokenize
 
-from core import python_utils
 from core.controllers import payload_validator
 
 from .. import docstrings_checker
@@ -302,7 +301,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 line_length = len(line)
                 escape_character_found = False
                 in_string = False
-                for char_num in python_utils.RANGE(line_length):
+                for char_num in range(line_length):
                     char = line[char_num]
                     if in_string and (
                             char == escape_character_indicator or

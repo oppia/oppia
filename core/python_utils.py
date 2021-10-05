@@ -53,7 +53,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-RANGE = builtins.range
 ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
