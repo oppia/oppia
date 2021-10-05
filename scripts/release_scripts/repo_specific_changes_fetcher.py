@@ -21,6 +21,7 @@ to release summary file.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import argparse
 import os
 import re
 
@@ -32,7 +33,11 @@ GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_SCHEMA_VERSION_CONSTANT_NAMES = [
     'CURRENT_STATE_SCHEMA_VERSION', 'CURRENT_COLLECTION_SCHEMA_VERSION']
-FECONF_FILEPATH = os.path.join('', 'feconf.py')
+FECONF_FILEPATH = os.path.join('core', 'feconf.py')
+
+
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument('--release_tag', type=str)
 
 
 def get_changed_schema_version_constant_names(release_tag_to_diff_against):
@@ -157,3 +162,17 @@ def get_changes(release_tag_to_diff_against):
             changes.append('* %s\n' % item)
 
     return changes
+
+
+def main(args=None):
+    """Main method for fetching repos specific changes."""
+    options = _PARSER.parse_args(args=args)
+    changes = get_changes(options.release_tag)
+    for change in changes:
+        python_utils.PRINT(change)
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when deploy.py is used as a script.
+if __name__ == '__main__':  # pragma: no cover
+    main()
