@@ -21,8 +21,6 @@ python_linter_test. This file is using pylint id which is not allowed.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
-
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""

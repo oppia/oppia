@@ -23,8 +23,6 @@ from __future__ import unicode_literals
 
 import urllib2
 
-from core import python_utils
-
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""

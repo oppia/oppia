@@ -19,8 +19,6 @@ python_linter_test. This file does not contain Copyright message.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
-
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""

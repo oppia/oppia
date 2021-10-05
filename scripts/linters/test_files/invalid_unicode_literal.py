@@ -20,8 +20,6 @@ python_linter_test. This file does not contain unicode literal future import.
 
 from __future__ import absolute_import
 
-from core import python_utils
-
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
