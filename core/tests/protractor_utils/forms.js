@@ -486,11 +486,11 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await action.getText('Field Text', entry);
+        return await entry.getText();
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
-    var fullText = await action.getText('Field Text Element', elem);
+    var fullText = await elem.getText();
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
@@ -647,7 +647,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       scrollBarWebElement = await scrollBarElements.last().getWebElement();
     }
     while (true) {
-      // This is used to match and scroll the text in codeMirror to a point
+      // This is used to match and scroll the text in codemirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
       await browser.executeScript(
@@ -667,9 +667,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var totalCount = await lineNumberElements.count();
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = await lineNumberElements.get(i);
-        var lineNumber = await action.getText(
-          'Line Number Element',
-          lineNumberElement);
+        var lineNumber = await lineNumberElement.getText();
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -677,7 +675,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
           codeMirrorLineBackgroundLocator).isPresent();
-        var text = await action.getText('Line Element', lineElement);
+        var text = await lineElement.getText();
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
