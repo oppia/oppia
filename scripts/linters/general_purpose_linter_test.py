@@ -173,7 +173,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-
     def test_invalid_use_of_unquote_plus(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_UNQUOTE_PLUS_FILEPATH], FILE_CACHE)
