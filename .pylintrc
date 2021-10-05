@@ -71,9 +71,6 @@ forbidden-imports=
 
 disallowed-functions-and-replacements-str=
   assertEquals=>self.assertEqual,
-  iteritems=>items,
-  iterkeys=>keys,
-  itervalues=>values,
   now=>datetime.datetime.utcnow,
 
 disallowed-functions-and-replacements-regex=
