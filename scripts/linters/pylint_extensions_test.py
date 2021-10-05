@@ -3449,7 +3449,7 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
                 def fake_method(self, name):
                     yield (name, name)
             class MyObject: #@
-                python_utils.with_metaclass(FakeClass)
+                future.utils.with_metaclass(FakeClass)
                 def __init__(self, fake_arg):
                     self.fake_arg = fake_arg
             """)

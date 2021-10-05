@@ -2146,7 +2146,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
 
 class DisallowDunderMetaclassChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "__metaclass__" and
-    enforcing use of "python_utils.with_metaclass()" instead.
+    enforcing use of "future.utils.with_metaclass()" instead.
     """
 
     __implements__ = interfaces.IAstroidChecker
@@ -2155,9 +2155,9 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0034': (
-            'Please use python_utils.with_metaclass() instead of __metaclass__',
+            'Please use future.utils.with_metaclass() instead of __metaclass__',
             'no-dunder-metaclass',
-            'Enforce usage of python_utils.with_metaclass() '
+            'Enforce usage of future.utils.with_metaclass() '
             'instead of __metaclass__'
         )
     }
