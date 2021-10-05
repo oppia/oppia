@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import learner_goals_services
 from core.domain import learner_progress_services
@@ -188,7 +187,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
     def test_number_of_topics_cannot_exceed_max(self):
         # Add MAX_CURRENT_GOALS_COUNT topics.
         topic_ids = ['SAMPLE_TOPIC_ID_%s' % index for index in (
-            python_utils.RANGE(0, MAX_CURRENT_GOALS_COUNT))]
+            range(0, MAX_CURRENT_GOALS_COUNT))]
         for topic_id in topic_ids:
             learner_progress_services.validate_and_add_topic_to_learn_goal(
                 self.viewer_id, topic_id)

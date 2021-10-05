@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -100,7 +99,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             base_search_rank)
 
         # A user can (down-)rate an exploration at most once.
-        for i in python_utils.RANGE(50):
+        for i in range(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_1', self.EXP_ID, 1)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
@@ -108,7 +107,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank - 5)
 
-        for i in python_utils.RANGE(50):
+        for i in range(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_%s' % i, self.EXP_ID, 1)
 

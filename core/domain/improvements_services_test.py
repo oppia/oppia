@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.platform import models
@@ -172,8 +171,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     def test_fetch_when_number_of_open_tasks_exceed_single_fetch_limit(self):
         tasks = [
             self._new_open_task(state_name='State %d' % (i,))
-            for i in python_utils.RANGE(
-                int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
+            for i in range(int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
         ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (
@@ -248,7 +246,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     def test_fetch_ignores_obsolete_tasks(self):
         tasks = [
             self._new_obsolete_task(state_name='State %d' % (i,))
-            for i in python_utils.RANGE(50)
+            for i in range(50)
         ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (
@@ -307,7 +305,7 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
     def setUp(self):
         super(FetchExplorationTaskHistoryPageTests, self).setUp()
         task_entries = []
-        for i in python_utils.RANGE(1, 26):
+        for i in range(1, 26):
             task_entry = self._new_resolved_task(
                 state_name='State %d' % (i,), exploration_version=i)
             task_entry.resolved_on = (
