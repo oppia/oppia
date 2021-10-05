@@ -237,23 +237,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_split(urlstring):
-    """Splits a URL using urlparse.urlsplit if run under Python 2 and
-    urllib.parse.urlsplit if run under Python 3.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlsplit(urlstring)  # pylint: disable=disallowed-function-calls
-
-
 def url_parse(urlstring):
     """Parse a URL into six components using urlparse.urlparse if run under
     Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds

@@ -91,7 +91,6 @@ disallowed-functions-and-replacements-str=
   urllib.urlparse.unquote=>python_utils.urllib_unquote,
   urlparse.parse_qs=>python_utils.parse_query_string,
   urlparse.urlparse=>python_utils.url_parse,
-  urlparse.urlsplit=>python_utils.url_split,
   urlparse.urlunsplit=>python_utils.url_unsplit,
   zip=>python_utils.ZIP
 
