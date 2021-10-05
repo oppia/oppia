@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for Version diff visualization component.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 describe('VersionDiffVisualizationComponent', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
-  let $uibModal = null;
-  let $q = null;
+  let ngbModal: NgbModal = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -29,11 +31,11 @@ describe('VersionDiffVisualizationComponent', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
+    ngbModal = TestBed.inject(NgbModal);
 
     ctrl = $componentController('versionDiffVisualization', {
       $scope: $scope,
+      NgbModal: ngbModal
     }, {
       getDiffData: () => {
         return {
@@ -169,37 +171,35 @@ describe('VersionDiffVisualizationComponent', () => {
 
   it('should open state diff modal when user clicks on a state in' +
     ' difference graph', () => {
-    let newState, oldStateName, newStateName, oldState, headers;
-    spyOn($uibModal, 'open').and.callFake((options) => {
-      newState = options.resolve.newState();
-      newStateName = options.resolve.newStateName();
-      oldState = options.resolve.oldState();
-      oldStateName = options.resolve.oldStateName();
-      headers = options.resolve.headers();
-
-      return {
-        result: $q.resolve()
+    class MockComponentInstance {
+      compoenentInstance: {
+        newState: null,
+        newStateName: 'A',
+        oldState: null,
+        oldStateName: 'B',
+        headers: {
+          leftPane: undefined,
+          rightPane: undefined,
+        }
       };
+    }
+
+    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+      return <NgbModalRef>({
+        componentInstance: MockComponentInstance,
+        result: Promise.resolve()
+      });
     });
 
     ctrl.$onInit();
     ctrl.onClickStateInDiffGraph(2);
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-    expect(newState).toBe(null);
-    expect(oldState).toBe(null);
-    expect(newStateName).toBe('B');
-    expect(oldStateName).toBe('A');
-    expect(headers).toEqual({
-      leftPane: undefined,
-      rightPane: undefined
-    });
+    expect(spyObj).toHaveBeenCalled();
   });
 
   it('should open state diff modal and return old and new states when' +
     ' when user clicks on a state in difference graph', () => {
-    let newState, oldStateName, newStateName, oldState, headers;
     spyOn(ctrl, 'getDiffData').and.returnValue(
       {
         nodes: {
@@ -219,42 +219,46 @@ describe('VersionDiffVisualizationComponent', () => {
         }
       }
     );
-    spyOn($uibModal, 'open').and.callFake((options) => {
-      newState = options.resolve.newState();
-      newStateName = options.resolve.newStateName();
-      oldState = options.resolve.oldState();
-      oldStateName = options.resolve.oldStateName();
-      headers = options.resolve.headers();
 
-      return {
-        result: $q.resolve()
+    class MockComponentInstance {
+      compoenentInstance: {
+        newState: {},
+        newStateName: 'A',
+        oldState: {},
+        oldStateName: 'B',
+        headers: {
+          leftPane: undefined,
+          rightPane: undefined,
+        }
       };
+    }
+
+    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+      return <NgbModalRef>({
+        componentInstance: MockComponentInstance,
+        result: Promise.resolve()
+      });
     });
 
     ctrl.$onInit();
     ctrl.onClickStateInDiffGraph(1);
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-    expect(newState).toEqual({});
-    expect(oldState).toEqual({});
-    expect(newStateName).toBe('A');
-    expect(oldStateName).toBe('B');
-    expect(headers).toEqual({
-      leftPane: undefined,
-      rightPane: undefined
-    });
+    expect(spyObj).toHaveBeenCalled();
   });
 
   it('should close state diff modal when user clicks cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
+    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+      return <NgbModalRef>({
+        componentInstance: {},
+        result: Promise.reject()
+      });
     });
 
     ctrl.$onInit();
     ctrl.onClickStateInDiffGraph(2);
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(spyObj).toHaveBeenCalled();
   });
 });

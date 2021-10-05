@@ -22,15 +22,14 @@ from __future__ import unicode_literals
 import datetime
 import json
 
+from core import python_utils
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
-import python_utils
 
 from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
-
 from typing import Any, Dict, Optional
 
 
@@ -74,8 +73,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 task,
                 {
                     'app_engine_http_request': {
-                        'http_method': (
-                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'http_method': tasks_v2.types.HttpMethod.POST,
                         'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'
@@ -124,8 +122,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 task,
                 {
                     'app_engine_http_request': {
-                        'http_method': (
-                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'http_method': tasks_v2.types.HttpMethod.POST,
                         'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'
