@@ -24,7 +24,6 @@ import copy
 import itertools
 import logging
 import re
-import yaml
 
 from core import android_validation_constants
 from core import feconf
@@ -39,6 +38,8 @@ from core.domain import param_domain
 from core.domain import rules_registry
 from core.domain import translatable_object_registry
 from extensions.objects.models import objects
+
+import yaml
 
 
 class AnswerGroup(python_utils.OBJECT):

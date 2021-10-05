@@ -33,7 +33,6 @@ import math
 import os
 import pprint
 import zipfile
-import yaml
 
 from core import android_validation_constants
 from core import feconf
@@ -63,6 +62,8 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
+
+import yaml
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
