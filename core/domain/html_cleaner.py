@@ -23,10 +23,10 @@ import html
 import json
 import logging
 
-from constants import constants
+from core import python_utils
+from core.constants import constants
 from core.domain import fs_domain
 from core.domain import rte_component_registry
-import python_utils
 
 import bleach
 import bs4

@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -43,8 +44,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -343,8 +342,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         skill_ids_for_url = ''
 
         # Create multiple skills, questions and skill links.
-        for _ in python_utils.RANGE(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+        for _ in range(feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
@@ -357,7 +355,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         # Create additional skills with user skill mastery > 0.0,
         # so that these are filtered out correctly.
-        for _ in python_utils.RANGE(5):
+        for _ in range(5):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')

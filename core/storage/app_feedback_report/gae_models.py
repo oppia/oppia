@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Any, Dict, List, Optional, Sequence, TypeVar
 
@@ -274,7 +274,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         submitted_datetime_in_msec = utils.get_time_in_millisecs(
             submitted_on_datetime)
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
@@ -542,7 +542,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         """
         current_datetime_in_msec = utils.get_time_in_millisecs(
             datetime.datetime.utcnow())
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
                 ticket_name, base_models.ID_LENGTH)
             random_hash = utils.convert_to_hash(

@@ -21,7 +21,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_domain
@@ -39,8 +40,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     feedback_models, opportunity_models, story_models, suggestion_models
@@ -93,7 +92,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(5)]
+        ) for i in range(5)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -768,7 +767,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(5)]
+        ) for i in range(5)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)

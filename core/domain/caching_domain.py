@@ -24,7 +24,7 @@ should therefore be independent of the specific storage models used.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
+from core import python_utils
 
 
 class MemoryCacheStats(python_utils.OBJECT):

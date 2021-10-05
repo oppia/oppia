@@ -30,8 +30,8 @@ import threading
 import time
 from unittest import mock
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
@@ -96,7 +96,7 @@ class ManagedProcessTests(test_utils.TestBase):
             stdout = b''.join(b'%b\n' % o for o in outputs)
             child_procs = [
                 scripts_test_utils.PopenStub(pid=i, unresponsive=unresponsive)
-                for i in python_utils.RANGE(pid + 1, pid + 1 + num_children)
+                for i in range(pid + 1, pid + 1 + num_children)
             ]
             return scripts_test_utils.PopenStub(
                 pid=pid, stdout=stdout, unresponsive=unresponsive,
