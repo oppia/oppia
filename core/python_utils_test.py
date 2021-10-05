@@ -93,10 +93,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')
 
-    def test_url_unquote_plus(self):
-        self.assertEqual(
-            python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
-
     def test_divide(self):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
@@ -240,18 +236,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             for k, v in value[-1].items():
                 self.assertEqual(type(k), str)
                 self.assertEqual(type(v), str)
-
-    def test_is_string(self):
-        self.assertTrue(python_utils.is_string('abc'))
-        self.assertFalse(python_utils.is_string(123))
-        self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
-
-    def test_get_args_of_function(self):
-        def func(a, b, *c, **d): # pylint: disable=unused-argument
-            """Does nothing."""
-            pass
-        self.assertEqual(
-            python_utils.get_args_of_function(func), ['a', 'b'])
 
     def test_create_enum_method_and_check_its_values(self):
         """Test create_enum method."""
