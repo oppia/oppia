@@ -20,6 +20,7 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { ContextService } from 'services/context.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @Component({
   selector: 'oppia-outcome-feedback-editor',
@@ -33,9 +34,11 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   OUTCOME_FEEDBACK_SCHEMA!: object;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService) {}
+    private contextService: ContextService,
+    private loggerService: LoggerService) {}
 
   ngOnInit(): void {
+    this.loggerService.info('outcome feedback editor');
     this.OUTCOME_FEEDBACK_SCHEMA = {
       type: 'html',
       ui_config: {

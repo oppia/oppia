@@ -54,13 +54,14 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    'ExternalSaveService', 'StateEditorService',
+    '$log', 'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
-        ExternalSaveService, StateEditorService,
+        $log, ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
+      $log.info('outcome editor component');
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.isInQuestionMode = function() {
