@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import random
 import types
 
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import skill_services
@@ -530,7 +529,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
             self
     ) -> None:
-        skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
+        skill_ids = ['skill_id%s' % number for number in range(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
@@ -738,7 +737,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model4])
 
     def test_request_too_many_skills_raises_error(self) -> None:
-        skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
+        skill_ids = ['skill_id%s' % number for number in range(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
