@@ -1285,7 +1285,7 @@ class VersionedModel(BaseModel):
         except cls.EntityNotFoundError as e:
             if not strict:
                 return None
-            raise e # type: ignore[no-untyped-call]
+            raise e
 
     @classmethod
     def get_multi_versions(
