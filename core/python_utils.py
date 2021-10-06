@@ -20,14 +20,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import inspect
 import io
 import itertools
 import os
 import pkgutil
 import sys
-
-from typing import Any, Callable, List # isort: skip
 
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
@@ -57,7 +54,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-RANGE = builtins.range
 ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
@@ -241,42 +237,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_join(base_url, relative_url):
-    """Construct a full URL by combining a 'base URL' with another URL using
-    urlparse.urljoin if run under Python 2 and urllib.parse.urljoin if run under
-    Python 3.
-
-    Args:
-        base_url: str. The base URL.
-        relative_url: str. The other URL.
-
-    Returns:
-        str. The full URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urljoin(base_url, relative_url)  # pylint: disable=disallowed-function-calls
-
-
-def url_split(urlstring):
-    """Splits a URL using urlparse.urlsplit if run under Python 2 and
-    urllib.parse.urlsplit if run under Python 3.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlsplit(urlstring)  # pylint: disable=disallowed-function-calls
-
-
 def url_parse(urlstring):
     """Parse a URL into six components using urlparse.urlparse if run under
     Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds
@@ -366,24 +326,6 @@ def url_quote(content):
     except ImportError:
         import urllib as urlparse
     return urlparse.quote(content)
-
-
-def url_unquote_plus(content):
-    """Unquotes a string and replace plus signs by spaces, as required for
-    unquoting HTML form values using urllib.unquote_plus if run under Python 2
-    and urllib.parse.unquote_plus if run under Python 3.
-
-    Args:
-        content: str. The string to be unquoted.
-
-    Returns:
-        str. The unquoted string.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urllib as urlparse
-    return urlparse.unquote_plus(content)
 
 
 def url_encode(query, doseq=False):
@@ -591,29 +533,6 @@ def reraise_exception():
     # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
     exec_info = sys.exc_info()
     six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
-
-
-def is_string(value):
-    """Returns whether value has a string type."""
-    return isinstance(value, six.string_types)
-
-
-def get_args_of_function(func: Callable[..., Any]) -> List[str]:
-    """Returns the argument names of the function.
-
-    Args:
-        func: function. The function to inspect.
-
-    Returns:
-        list(str). The names of the function's arguments.
-
-    Raises:
-        TypeError. The input argument is not a function.
-    """
-    return [
-        name for name, param in inspect.signature(func).parameters.items()
-        if param.kind in (param.POSITIONAL_ONLY, param.POSITIONAL_OR_KEYWORD)
-    ]
 
 
 def create_enum(*sequential):
