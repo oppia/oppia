@@ -35,6 +35,7 @@ export class I18nLanguageCodeService {
    */
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
+
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 

@@ -40,24 +40,14 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {},
-      toString() {
-        return 'http://localhost/community';
-      }
+      reload: () => {}
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
-    gtag: () => {},
-    history: {
-      pushState(data, title: string, url?: string | null) {}
-    }
+    gtag: () => {}
   };
-}
-
-class mockURL extends URL {
-  reload: () => {};
 }
 
 describe('TopNavigationBarComponent', () => {
@@ -408,7 +398,6 @@ describe('TopNavigationBarComponent', () => {
       isLoggedIn: () => true
     } as UserInfo);
     spyOn(userBackendApiService, 'updatePreferredSiteLanguageAsync').and.stub();
-    mockWindowRef.nativeWindow.location = new mockURL('http://localhost/community?lang=es');
     component.currentLanguageCode = 'en';
     component.currentLanguageText = 'English';
 

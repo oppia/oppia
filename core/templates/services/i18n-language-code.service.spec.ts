@@ -22,7 +22,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Subscription } from 'rxjs';
 
 describe('I18nLanguageCodeService', () => {
-  const i18nLanguageCodeService = new I18nLanguageCodeService ();
+  const i18nLanguageCodeService = new I18nLanguageCodeService();
   let languageCode: string = '';
   let testSubscriptions: Subscription;
   beforeEach(() => {
