@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import html
 import json
 import logging
+import urllib
 
-from core import python_utils
 from core.constants import constants
 from core.domain import fs_domain
 from core.domain import rte_component_registry
@@ -49,7 +49,7 @@ def filter_a(tag, name, value):
     if name in ('title', 'target'):
         return True
     if name == 'href':
-        url_components = python_utils.url_split(value)
+        url_components = urllib.parse.urlsplit(value)
         if url_components[0] in ['http', 'https']:
             return True
         logging.error('Found invalid URL href: %s' % value)
