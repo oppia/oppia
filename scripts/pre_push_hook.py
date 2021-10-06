@@ -71,7 +71,7 @@ STRICT_TYPESCRIPT_CHECKS_CMDS = [
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
-class ChangedBranch(python_utils.OBJECT):
+class ChangedBranch:
     """Context manager class that changes branch when there are modified files
     that need to be linted. It does not change branch when modified files are
     not committed.
