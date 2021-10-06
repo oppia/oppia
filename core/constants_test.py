@@ -23,7 +23,6 @@ from core import constants
 from core import feconf
 from core import python_utils
 from core.tests import test_utils
-import re
 
 
 class ConstantsTests(test_utils.GenericTestBase):
@@ -124,14 +123,12 @@ class ConstantsTests(test_utils.GenericTestBase):
             set(rtl_audio_languages) & set(ltr_content_languages)
         )
         self.assertFalse(conflicts)
-    
+
     def test_language_code_conforms_to_regex(self) -> None:
         """Test the language code in SUPPORTED_CONTENT_LANGUAGES,
         SUPPORTED_SITE_LANGUAGES, and SUPPORTED_AUDIO_LANGUAGES
-        conforms to the regex defined in core/feconf.py
+        conforms to the regex defined in core/feconf.py.
         """
-        REGEX_PATTERN = feconf.LANGUAGE_CODE_REGEX
-        # print(constants.constants.SUPPORTED_CONTENT_LANGUAGES)
         supported_content_language_code = [
             language[u'code']
             for language
@@ -139,7 +136,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         ]
         supported_site_language_code = [
             language[u'id']
-            for language 
+            for language
             in constants.constants.SUPPORTED_SITE_LANGUAGES
         ]
         supported_audio_language_code = [
@@ -149,17 +146,16 @@ class ConstantsTests(test_utils.GenericTestBase):
         ]
         self.assert_matches_regexps(
             supported_content_language_code,
-            [feconf.LANGUAGE_CODE_REGEX 
+            [feconf.LANGUAGE_CODE_REGEX
             for i in range(len(supported_content_language_code))],
             full_match=True)
         self.assert_matches_regexps(
             supported_site_language_code,
-            [feconf.LANGUAGE_CODE_REGEX 
-            for i in range(len(supported_site_language_code))], 
+            [feconf.LANGUAGE_CODE_REGEX
+            for i in range(len(supported_site_language_code))],
             full_match=True)
         self.assert_matches_regexps(
             supported_audio_language_code,
-            [feconf.LANGUAGE_CODE_REGEX 
-            for i in range(len(supported_audio_language_code))], 
+            [feconf.LANGUAGE_CODE_REGEX
+            for i in range(len(supported_audio_language_code))],
             full_match=True)
-            
