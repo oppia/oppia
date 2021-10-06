@@ -111,7 +111,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         explorations = (
             exp_fetchers
             .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-                self.EXP_1_ID, list(python_utils.RANGE(1, latest_version + 1)))
+                self.EXP_1_ID, list(range(1, latest_version + 1)))
         )
 
         self.assertEqual(len(explorations), 3)
