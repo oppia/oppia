@@ -32,6 +32,7 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Voiceover } from 'domain/exploration/voiceover.model';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 
 describe('State card object factory', () => {
@@ -200,5 +201,39 @@ describe('State card object factory', () => {
 
     _sampleCard.setLastOppiaResponse('response_3');
     expect(_sampleCard.getLastOppiaResponse()).toEqual('response_3');
+  });
+
+  it('should return null when calling \'getLastAnswer\'' +
+    'if there is no last answer', () => {
+    expect(_sampleCard.getLastAnswer()).toEqual(null);
+  });
+
+  it('should return voiceovers when calling ' +
+    '\'getVoiceovers\'', () => {
+    const expectedResults = {
+      en: new Voiceover('filename1.mp3', 100000, false, 10),
+      hi: new Voiceover('filename2.mp3', 11000, false, 0.11)
+    };
+    expect(_sampleCard.getVoiceovers()).toEqual(expectedResults);
+  });
+
+  it('should return current interaction id when calling ' +
+    '\'getInteractionId\'', () => {
+    expect(_sampleCard.getInteractionId()).toEqual('TextInput');
+  });
+
+  it('should return interaction customization arguments when calling ' +
+    '\'getInteractionCustomizationArgs\'', () => {
+    const expectedResults = {
+      rows: {
+        value: 1
+      },
+      placeholder: {
+        value: new SubtitledUnicode(
+          'Type your answer here.', '')
+      }
+    } as InteractionCustomizationArgs;
+    expect(_sampleCard.getInteractionCustomizationArgs())
+      .toEqual(expectedResults);
   });
 });
