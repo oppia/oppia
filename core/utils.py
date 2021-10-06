@@ -1118,7 +1118,7 @@ def grouper(
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-any-return, no-untyped-call]
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def partition(

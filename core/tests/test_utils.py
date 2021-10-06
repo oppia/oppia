@@ -26,6 +26,7 @@ import datetime
 import functools
 import inspect
 import itertools
+from itertools import zip_longest
 import json
 import logging
 import os
@@ -66,7 +67,6 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
-from itertools import zip_longest
 
 import elasticsearch
 import requests_mock
