@@ -99,7 +99,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(5, 2), 2)
 
     def test_with_metaclass(self):
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             """Test baseclass."""
 
             pass

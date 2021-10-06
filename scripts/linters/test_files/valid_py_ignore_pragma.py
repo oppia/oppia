@@ -22,11 +22,9 @@ uses a pragma to ignore this invalid call.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
-
 __author__ = "Something" # disable-bad-pattern-check
 
-class FakeClass(python_utils.OBJECT):
+class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):
