@@ -266,10 +266,11 @@ describe('Story node editor directive', function() {
       .and.returnValue(null);
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }
+        ) as NgbModalRef;
     });
 
     $scope.addPrerequisiteSkillId();
@@ -302,10 +303,10 @@ describe('Story node editor directive', function() {
       .and.returnValue(null);
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
     });
 
     $scope.addAcquiredSkillId();
