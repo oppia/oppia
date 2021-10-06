@@ -54,7 +54,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-RANGE = builtins.range
 ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
@@ -238,23 +237,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_split(urlstring):
-    """Splits a URL using urlparse.urlsplit if run under Python 2 and
-    urllib.parse.urlsplit if run under Python 3.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlsplit(urlstring)  # pylint: disable=disallowed-function-calls
-
-
 def url_parse(urlstring):
     """Parse a URL into six components using urlparse.urlparse if run under
     Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds
@@ -344,24 +326,6 @@ def url_quote(content):
     except ImportError:
         import urllib as urlparse
     return urlparse.quote(content)
-
-
-def url_unquote_plus(content):
-    """Unquotes a string and replace plus signs by spaces, as required for
-    unquoting HTML form values using urllib.unquote_plus if run under Python 2
-    and urllib.parse.unquote_plus if run under Python 3.
-
-    Args:
-        content: str. The string to be unquoted.
-
-    Returns:
-        str. The unquoted string.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urllib as urlparse
-    return urlparse.unquote_plus(content)
 
 
 def url_encode(query, doseq=False):
