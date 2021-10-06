@@ -202,8 +202,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_third_party.return_json(temp_file),
             {'Testing': 'install_third_party'})
 
-    def test_manifest_syntax_testing_with_valid_syntax(self):
-        install_third_party.test_manifest_syntax(
+    def test_dependencies_syntax_testing_with_valid_syntax(self):
+        install_third_party.test_dependencies_syntax(
             'files', {
                 'url': 'https://github.com/yui/yuicompressor/v2.4.8#md5=123456',
                 'files': ['yuicompressor-2.4.8.jar'],
@@ -211,13 +211,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 'targetDirPrefix': 'yuicompressor-',
                 'downloadFormat': 'files'})
 
-    def test_manifest_syntax_with_missing_mandatory_key(self):
+    def test_dependencies_syntax_with_missing_mandatory_key(self):
         print_arr = []
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
-            install_third_party.test_manifest_syntax(
+            install_third_party.test_dependencies_syntax(
                 'files', {
                     'files': ['yuicompressor-2.4.8.jar'],
                     'version': '2.4.8',
@@ -226,13 +226,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertTrue(
             'This key is missing or misspelled: "url".' in print_arr)
 
-    def test_manifest_syntax_with_extra_optional_key(self):
+    def test_dependencies_syntax_with_extra_optional_key(self):
         print_arr = []
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
-            install_third_party.test_manifest_syntax(
+            install_third_party.test_dependencies_syntax(
                 'zip', {
                     'url': 'https://github.com/jsocol/bleach/v3.1.0.zip',
                     'version': '3.1.0',
@@ -244,13 +244,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'Only one of these keys pair must be used: '
             '"rootDir, rootDirPrefix".' in print_arr)
 
-    def test_manifest_syntax_with_invalid_url(self):
+    def test_dependencies_syntax_with_invalid_url(self):
         print_arr = []
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
-            install_third_party.test_manifest_syntax(
+            install_third_party.test_dependencies_syntax(
                 'tar', {
                     'version': '4.7.1',
                     'downloadFormat': 'tar',
@@ -264,7 +264,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'This url https://python.org/packages/beautifulsoup4-4.7.1.zip is '
             'invalid for tar file format.' in print_arr)
 
-    def test_validate_manifest_with_correct_syntax(self):
+    def test_validate_dependencies_with_correct_syntax(self):
         def mock_return_json(unused_filepath):
             return {
                 'dependencies': {
@@ -278,9 +278,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap:
-            install_third_party.validate_manifest('filepath')
+            install_third_party.validate_dependencies('filepath')
 
-    def test_validate_manifest_with_missing_download_format(self):
+    def test_validate_dependencies_with_missing_download_format(self):
         def mock_return_json(unused_filepath):
             return {
                 'dependencies': {
@@ -301,18 +301,18 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 '\'targetDirPrefix\': \'yuicompressor-\'}'
             )
         ):
-            install_third_party.validate_manifest('filepath')
+            install_third_party.validate_dependencies('filepath')
 
     def test_function_calls(self):
         check_function_calls = {
-            'validate_manifest_is_called': False,
+            'validate_dependencies_is_called': False,
             'download_files_is_called': False,
             'download_and_unzip_files_is_called': False,
             'download_and_untar_files_is_called': False,
             'install_backend_python_libs_is_called': False
         }
         expected_check_function_calls = {
-            'validate_manifest_is_called': True,
+            'validate_dependencies_is_called': True,
             'download_files_is_called': True,
             'download_and_unzip_files_is_called': True,
             'download_and_untar_files_is_called': True,
@@ -351,8 +351,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'rootDir': 'bootstrap-4.3.1-dist',
                             'targetDir': 'bootstrap'}}}}
 
-        def mock_validate_manifest(unused_filepath):
-            check_function_calls['validate_manifest_is_called'] = True
+        def mock_validate_dependencies(unused_filepath):
+            check_function_calls['validate_dependencies_is_called'] = True
         def mock_download_files(
                 unused_source_url_root, unused_target_dir,
                 unused_source_filenames):
@@ -370,7 +370,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         validate_swap = self.swap(
-            install_third_party, 'validate_manifest', mock_validate_manifest)
+            install_third_party,
+            'validate_dependencies',
+            mock_validate_dependencies
+        )
         download_files_swap = self.swap(
             install_third_party, 'download_files', mock_download_files)
         unzip_files_swap = self.swap(

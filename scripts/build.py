@@ -72,7 +72,7 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
 # interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
-MANIFEST_FILE_PATH = os.path.join('manifest.json')
+DEPENDENCIES_FILE_PATH = os.path.join('dependencies.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
@@ -467,7 +467,7 @@ def get_dependency_directory(dependency):
 
     Args:
         dependency: dict(str, str). Dictionary representing single dependency
-            from manifest.json.
+            from dependencies.json.
 
     Returns:
         str. Dependency directory.
@@ -533,7 +533,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
         list(str). List of paths to font files that need to be copied.
     """
     if 'fontsPath' not in dependency_bundle:
-        # Skip dependency bundles in manifest.json that do not have
+        # Skip dependency bundles in dependencies.json that do not have
         # fontsPath property.
         return []
     fonts_path = dependency_bundle['fontsPath']
@@ -549,7 +549,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
 
 def get_dependencies_filepaths():
-    """Extracts dependencies filepaths from manifest.json file into
+    """Extracts dependencies filepaths from dependencies.json file into
     a dictionary.
 
     Returns:
@@ -563,10 +563,10 @@ def get_dependencies_filepaths():
         'css': [],
         'fonts': []
     }
-    with python_utils.open_file(MANIFEST_FILE_PATH, 'r') as json_file:
-        manifest = json.loads(
+    with python_utils.open_file(DEPENDENCIES_FILE_PATH, 'r') as json_file:
+        dependencies_json = json.loads(
             json_file.read(), object_pairs_hook=collections.OrderedDict)
-    frontend_dependencies = manifest['dependencies']['frontend']
+    frontend_dependencies = dependencies_json['dependencies']['frontend']
     for dependency in frontend_dependencies.values():
         if 'bundle' in dependency:
             dependency_dir = get_dependency_directory(dependency)
