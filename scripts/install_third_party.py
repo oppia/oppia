@@ -24,8 +24,8 @@ import os
 import subprocess
 import sys
 import tarfile
-import zipfile
 import urllib.request as urlrequest
+import zipfile
 
 from core import python_utils
 
