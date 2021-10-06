@@ -23,8 +23,9 @@ import pathlib
 import shutil
 import subprocess
 import sys
-import zipfile
 import urllib.request as urlrequest
+import zipfile
+
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 

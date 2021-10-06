@@ -23,8 +23,9 @@ import os
 import shutil
 import subprocess
 import tempfile
-import zipfile
 import urllib.request as urlrequest
+import zipfile
+
 
 from core import python_utils
 from core.tests import test_utils

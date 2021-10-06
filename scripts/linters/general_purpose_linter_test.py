@@ -189,7 +189,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    
     def test_invalid_use_of_urlopen(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_URLOPEN_FILEPATH], FILE_CACHE)
