@@ -1998,34 +1998,6 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
-        """Converts from version 48 to 49. Version 49 adds
-        requireNonnegativeInput customization arg to NumericInput
-        interaction which allows creators to set input should be greater
-        than or equal to zero.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'NumericInput':
-                customization_args = state_dict['interaction'][
-                    'customization_args']
-                customization_args.update({
-                    'requireNonnegativeInput': {
-                        'value': False
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
     def _convert_states_v49_dict_to_v50_dict(cls, exp_id, states_dict):
         """Converts from version 49 to 50. Version 50 contains the attribute
         image_sizes_in_bytes for subtitled_html.
@@ -2083,7 +2055,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
