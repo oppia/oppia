@@ -29,7 +29,6 @@ import copy
 import json
 import re
 import string
-import yaml
 
 from core import feconf
 from core import python_utils
@@ -42,6 +41,8 @@ from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
+
+import yaml
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
