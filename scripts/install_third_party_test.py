@@ -25,6 +25,7 @@ import subprocess
 import tarfile
 import tempfile
 import zipfile
+import urllib.request as urlrequest
 
 from core import python_utils
 from core.tests import test_utils
@@ -103,7 +104,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
             install_third_party.download_files(
                 'source_url', 'target_dir', ['file1', 'file2'])
