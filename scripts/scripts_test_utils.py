@@ -22,12 +22,10 @@ from __future__ import unicode_literals
 import io
 import signal
 
-from core import python_utils
-
 import psutil
 
 
-class PopenStub(python_utils.OBJECT):
+class PopenStub:
     """Stubs the API of psutil.Popen() to make unit tests less expensive.
 
     Starting a new process for every unit test is intrinsically more expensive

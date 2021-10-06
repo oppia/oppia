@@ -29,7 +29,7 @@ from core import python_utils
 from core.constants import constants
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all interactions."""
 
     # Dict mapping interaction ids to instances of the interactions.
