@@ -118,7 +118,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
         self.assert_same_list_elements(
-            ['27:1: E302 expected 2 blank lines, found 1'],
+            ['25:1: E302 expected 2 blank lines, found 1'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

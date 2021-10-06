@@ -217,7 +217,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     ), flags=re.X | re.S | re.M)
 
 
-class ASTDocStringChecker(python_utils.OBJECT):
+class ASTDocStringChecker:
     """Checks that docstrings meet the code style."""
 
     def __init__(self):

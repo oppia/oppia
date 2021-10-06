@@ -30,7 +30,7 @@ from core.domain import html_cleaner
 BLOG_POST_ID_LENGTH = 12
 
 
-class BlogPost(python_utils.OBJECT):
+class BlogPost:
     """Domain object for an Oppia Blog Post."""
 
     def __init__(
@@ -330,7 +330,7 @@ class BlogPost(python_utils.OBJECT):
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
 
-class BlogPostSummary(python_utils.OBJECT):
+class BlogPostSummary:
     """Domain object for Blog Post Summary."""
 
     def __init__(
@@ -536,7 +536,7 @@ class BlogPostSummary(python_utils.OBJECT):
         }
 
 
-class BlogPostRights(python_utils.OBJECT):
+class BlogPostRights:
     """Domain object for Blog Post rights."""
 
     def __init__(self, blog_post_id, editor_ids, blog_post_is_published=False):

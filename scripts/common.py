@@ -749,7 +749,7 @@ def fix_third_party_imports() -> None:
     sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
-class CD(python_utils.OBJECT):
+class CD:
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

@@ -36,7 +36,7 @@ from scripts import scripts_test_utils
 import pkg_resources
 
 
-class Distribution(python_utils.OBJECT):
+class Distribution:
     """Mock distribution object containing python library information."""
 
     def __init__(self, library_name, version_string, metadata_dict):
@@ -101,7 +101,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_write(msg):
             self.file_arr.append(msg)
 
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def seek(self, start, stop): # pylint: disable=missing-docstring
                 pass
             def read(self): # pylint: disable=missing-docstring
@@ -109,7 +109,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             def write(self, buf): # pylint: disable=missing-docstring
                 mock_write(buf)
 
-        class MockOpenFile(python_utils.OBJECT):
+        class MockOpenFile:
             def __init__(self, path=None, mode=None):
                 self.path = path
                 self.mode = mode
@@ -131,7 +131,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen = self.swap(
             subprocess, 'Popen', mock_check_call)
 
-        class MockErrorProcess(python_utils.OBJECT):
+        class MockErrorProcess:
 
             def __init__(self):
                 self.returncode = 1
@@ -400,7 +400,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         }
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -450,7 +450,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         }
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):

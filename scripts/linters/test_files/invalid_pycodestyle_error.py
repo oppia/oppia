@@ -22,9 +22,7 @@ class defintion but two newlines are required on line 26.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
-
-class FakeClass(python_utils.OBJECT):
+class FakeClass:
     """This is a fake docstring for valid syntax purposes."""
 
     def __init__(self, fake_arg):

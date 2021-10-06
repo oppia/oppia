@@ -19,10 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 
-
-class TakeoutData(python_utils.OBJECT):
+class TakeoutData:
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(self, user_data, user_images):
@@ -39,7 +37,7 @@ class TakeoutData(python_utils.OBJECT):
         self.user_images = user_images
 
 
-class TakeoutImage(python_utils.OBJECT):
+class TakeoutImage:
     """Domain object for storing Base64 image data and the Takeout export path
     for a single image.
     """
@@ -56,7 +54,7 @@ class TakeoutImage(python_utils.OBJECT):
         self.image_export_path = image_export_path
 
 
-class TakeoutImageReplacementInstruction(python_utils.OBJECT):
+class TakeoutImageReplacementInstruction:
     """Domain object for storing the instructions for replacing a user image
     with a path corresponding to a file in the final zip.
     """

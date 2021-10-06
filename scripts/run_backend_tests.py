@@ -161,7 +161,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TestingTaskSpec(python_utils.OBJECT):
+class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):

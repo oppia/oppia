@@ -417,7 +417,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -466,7 +466,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             check_function_calls['download_and_unzip_files_is_called'] = True
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -513,7 +513,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -558,7 +558,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             return False
 
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -596,7 +596,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):

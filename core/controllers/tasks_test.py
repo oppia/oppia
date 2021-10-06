@@ -135,7 +135,7 @@ class TasksTests(test_utils.EmailTestBase):
         """Tests SuggestionEmailHandler functionality."""
 
         user_id_b = self.user_id_b
-        class MockActivityRights(python_utils.OBJECT):
+        class MockActivityRights:
             def __init__(
                     self, exploration_id, owner_ids, editor_ids,
                     voice_artist_ids, viewer_ids, community_owned=False,

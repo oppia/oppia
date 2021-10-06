@@ -48,7 +48,7 @@ class StaleAuthSessionError(Exception):
     pass
 
 
-class AuthClaims(python_utils.OBJECT):
+class AuthClaims:
     """Domain object for holding onto essential Claims about an authorized user.
 
     A Claim is a piece of information about a user (e.g. name, mailing address,
@@ -89,7 +89,7 @@ class AuthClaims(python_utils.OBJECT):
         return not self == other
 
 
-class UserAuthDetails(python_utils.OBJECT):
+class UserAuthDetails:
     """Domain object representing a user's authentication details.
 
     There are two distinct types of user accounts: "full" and "profile".

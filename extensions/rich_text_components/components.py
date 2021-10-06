@@ -31,7 +31,7 @@ from extensions.objects.models import objects
 import bs4
 
 
-class BaseRteComponent(python_utils.OBJECT):
+class BaseRteComponent:
     """Base Rte Component class.
 
     This is the superclass for rich text components in Oppia, such as

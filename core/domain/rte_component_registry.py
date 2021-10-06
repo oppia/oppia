@@ -29,7 +29,7 @@ from core import python_utils
 from core import utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all custom rich-text components."""
 
     _rte_components = {}

@@ -434,7 +434,7 @@ def with_metaclass(meta, *bases):
 
     Example:
 
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             pass
 
         class FormType(type):

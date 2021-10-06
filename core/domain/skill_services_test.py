@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_domain
@@ -96,7 +95,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
     def test_apply_change_list_with_invalid_property_name(self):
-        class MockSkillChange(python_utils.OBJECT):
+        class MockSkillChange:
             def __init__(self, cmd, property_name):
                 self.cmd = cmd
                 self.property_name = property_name

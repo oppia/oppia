@@ -1482,7 +1482,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_yield_type_func_node,
             missing_yield_type_yield_node) = astroid.extract_node(
                 """
-        class Test(python_utils.OBJECT):
+        class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -1523,7 +1523,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_return_type_func_node,
             missing_return_type_return_node) = astroid.extract_node(
                 """
-        class Test(python_utils.OBJECT):
+        class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -1602,7 +1602,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         valid_raise_node = astroid.extract_node(
             """
-        class Test(python_utils.OBJECT):
+        class Test:
             raise Exception #@
         """)
         with self.checker_test_object.assertNoMessages():
@@ -3399,7 +3399,7 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
         metaclass_node = astroid.extract_node(
             """
-            class FakeClass(python_utils.OBJECT):
+            class FakeClass:
                 def __init__(self, fake_arg):
                     self.fake_arg = fake_arg
                 def fake_method(self, name):
@@ -3443,7 +3443,7 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
         metaclass_node = astroid.extract_node(
             """
-            class FakeClass(python_utils.OBJECT):
+            class FakeClass:
                 def __init__(self, fake_arg):
                     self.fake_arg = fake_arg
                 def fake_method(self, name):

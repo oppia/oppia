@@ -38,7 +38,7 @@ MailgunQueryType = Tuple[
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    class Response(python_utils.OBJECT):
+    class Response:
         """Class to mock python_utils.url_open responses."""
 
         def __init__(

@@ -61,7 +61,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
 MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
 
-class ExplorationStats(python_utils.OBJECT):
+class ExplorationStats:
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
@@ -242,7 +242,7 @@ class ExplorationStats(python_utils.OBJECT):
             })
 
 
-class StateStats(python_utils.OBJECT):
+class StateStats:
     """Domain object representing analytics data for an exploration's state.
     Instances of these domain objects pertain to the exploration ID and version
     as well.
@@ -547,7 +547,7 @@ class StateStats(python_utils.OBJECT):
             self.num_completions_v2)
 
 
-class SessionStateStats(python_utils.OBJECT):
+class SessionStateStats:
     """Domain object representing analytics data for a specific state of an
     exploration, aggregated during a continuous learner session.
     """
@@ -651,7 +651,7 @@ class SessionStateStats(python_utils.OBJECT):
             session_state_stats_dict['num_completions'])
 
 
-class ExplorationIssues(python_utils.OBJECT):
+class ExplorationIssues:
     """Domain object representing the exploration to issues mapping for an
     exploration.
     """
@@ -737,7 +737,7 @@ class ExplorationIssues(python_utils.OBJECT):
             issue.validate()
 
 
-class Playthrough(python_utils.OBJECT):
+class Playthrough:
     """Domain object representing a learner playthrough."""
 
     def __init__(
@@ -852,7 +852,7 @@ class Playthrough(python_utils.OBJECT):
             action.validate()
 
 
-class ExplorationIssue(python_utils.OBJECT):
+class ExplorationIssue:
     """Domain object representing an exploration issue."""
 
     def __init__(
@@ -983,7 +983,7 @@ class ExplorationIssue(python_utils.OBJECT):
                     '%s' % type(playthrough_id))
 
 
-class LearnerAction(python_utils.OBJECT):
+class LearnerAction:
     """Domain object representing a learner action."""
 
     def __init__(self, action_type, action_customization_args, schema_version):
@@ -1081,7 +1081,7 @@ class LearnerAction(python_utils.OBJECT):
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
 # objects and determine if we should enforce an upper bound for
 # submitted_answer_list.
-class StateAnswers(python_utils.OBJECT):
+class StateAnswers:
     """Domain object containing answers submitted to an exploration state."""
 
     def __init__(
@@ -1164,7 +1164,7 @@ class StateAnswers(python_utils.OBJECT):
                     self.schema_version))
 
 
-class SubmittedAnswer(python_utils.OBJECT):
+class SubmittedAnswer:
     """Domain object representing an answer submitted to a state."""
 
     # NOTE TO DEVELOPERS: do not use the rule_spec_str and answer_str
@@ -1314,7 +1314,7 @@ class SubmittedAnswer(python_utils.OBJECT):
                 self.classification_categorization)
 
 
-class AnswerOccurrence(python_utils.OBJECT):
+class AnswerOccurrence:
     """Domain object that represents a specific answer that occurred some number
     of times.
     """
@@ -1360,7 +1360,7 @@ class AnswerOccurrence(python_utils.OBJECT):
             answer_occurrence_dict['frequency'])
 
 
-class AnswerCalculationOutput(python_utils.OBJECT):
+class AnswerCalculationOutput:
     """Domain object superclass that represents the output of an answer
     calculation.
     """
@@ -1477,7 +1477,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         })
 
 
-class StateAnswersCalcOutput(python_utils.OBJECT):
+class StateAnswersCalcOutput:
     """Domain object that represents output of calculations operating on
     state answers.
     """
@@ -1551,7 +1551,7 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
                     python_utils.UNICODE(output_data)))
 
 
-class LearnerAnswerDetails(python_utils.OBJECT):
+class LearnerAnswerDetails:
     """Domain object that represents the answer details submitted by the
     learner.
     """
@@ -1752,7 +1752,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
         self.state_reference = new_state_reference
 
 
-class LearnerAnswerInfo(python_utils.OBJECT):
+class LearnerAnswerInfo:
     """Domain object containing the answer details submitted by the learner."""
 
     def __init__(

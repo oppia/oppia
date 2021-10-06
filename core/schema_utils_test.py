@@ -1338,7 +1338,7 @@ def validation_method_for_testing(obj: Dict[str, Any]) -> None:
         raise Exception('Missing arg_b in argument.')
 
 
-class ValidateClassForTesting(python_utils.OBJECT):
+class ValidateClassForTesting:
     """Class to test 'object_class' key of schema."""
 
     def __init__(self, arg_a: str, arg_b: str) -> None:

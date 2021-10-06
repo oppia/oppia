@@ -24,10 +24,8 @@ should therefore be independent of the specific storage models used.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 
-
-class MemoryCacheStats(python_utils.OBJECT):
+class MemoryCacheStats:
     """Domain object for an Oppia memory profile object that contains
     information about the memory cache.
     """

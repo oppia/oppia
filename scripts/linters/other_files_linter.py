@@ -79,7 +79,7 @@ THIRD_PARTY_LIBS = [
 ]
 
 
-class CustomLintChecksManager(python_utils.OBJECT):
+class CustomLintChecksManager:
     """Manages other files lint checks."""
 
     def __init__(self, file_cache):

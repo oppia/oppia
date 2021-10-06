@@ -142,7 +142,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         thread_id = 'thread_%s' % exp_id[-1]
         return '.'.join([entity_type, exp_id, thread_id])
 
-    class MockExploration(python_utils.OBJECT):
+    class MockExploration:
         """Mocks an exploration. To be used only for testing."""
 
         def __init__(self, exploration_id, states):
@@ -976,7 +976,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'data_format': 'html'
     }
 
-    class MockExploration(python_utils.OBJECT):
+    class MockExploration:
         """Mocks an exploration. To be used only for testing."""
 
         def __init__(self, exploration_id, states):

@@ -26,7 +26,7 @@ from core import feconf
 from core import python_utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of rules."""
 
     _state_schema_version_to_html_field_types_to_rule_specs = {}

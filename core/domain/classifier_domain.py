@@ -29,7 +29,7 @@ from core.platform import models
     [models.NAMES.classifier])
 
 
-class ClassifierTrainingJob(python_utils.OBJECT):
+class ClassifierTrainingJob:
     """Domain object for a classifier training job.
 
     A classifier training job is an abstraction of a request made by Oppia
@@ -365,7 +365,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                 self.algorithm_version)
 
 
-class StateTrainingJobsMapping(python_utils.OBJECT):
+class StateTrainingJobsMapping:
     """Domain object for a state-to-training job mapping model.
 
     This object represents a one-to-many relation between a particular state
@@ -498,7 +498,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
                         self.algorithm_ids_to_job_ids[algorithm_id]))
 
 
-class OppiaMLAuthInfo(python_utils.OBJECT):
+class OppiaMLAuthInfo:
     """Domain object containing information necessary for authentication
     of Oppia ML.
 

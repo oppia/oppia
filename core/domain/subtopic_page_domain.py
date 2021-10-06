@@ -71,7 +71,7 @@ class SubtopicPageChange(change_domain.BaseChange):
     }]
 
 
-class SubtopicPageContents(python_utils.OBJECT):
+class SubtopicPageContents:
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
@@ -150,7 +150,7 @@ class SubtopicPageContents(python_utils.OBJECT):
                 'written_translations']))
 
 
-class SubtopicPage(python_utils.OBJECT):
+class SubtopicPage:
     """Domain object for a Subtopic page."""
 
     def __init__(

@@ -19,10 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 
-
-class Classroom(python_utils.OBJECT):
+class Classroom:
     """Domain object for a classroom."""
 
     def __init__(

@@ -172,7 +172,7 @@ class StoryChange(change_domain.BaseChange):
     }]
 
 
-class StoryNode(python_utils.OBJECT):
+class StoryNode:
     """Domain object describing a node in the exploration graph of a
     story.
     """
@@ -468,7 +468,7 @@ class StoryNode(python_utils.OBJECT):
                     'The story node with ID %s points to itself.' % node_id)
 
 
-class StoryContents(python_utils.OBJECT):
+class StoryContents:
     """Domain object representing the story_contents dict."""
 
     def __init__(self, story_nodes, initial_node_id, next_node_id):
@@ -637,7 +637,7 @@ class StoryContents(python_utils.OBJECT):
         return story_contents
 
 
-class Story(python_utils.OBJECT):
+class Story:
     """Domain object for an Oppia Story."""
 
     def __init__(
@@ -1524,7 +1524,7 @@ class Story(python_utils.OBJECT):
         self.story_contents.initial_node_id = new_initial_node_id
 
 
-class StorySummary(python_utils.OBJECT):
+class StorySummary:
     """Domain object for Story Summary."""
 
     def __init__(

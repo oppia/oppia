@@ -97,7 +97,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -116,7 +116,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             str_attr = 'foo'
 
             @classmethod
@@ -134,7 +134,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num
@@ -663,7 +663,7 @@ class EmailMockTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
-class SwapWithCheckTestClass(python_utils.OBJECT):
+class SwapWithCheckTestClass:
     """Dummy class for testing check_with_swap. This class stores a few dummy
     functions.
     """

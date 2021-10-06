@@ -37,7 +37,7 @@ from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
 
-class BaseEventHandler(python_utils.OBJECT):
+class BaseEventHandler:
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by

@@ -40,7 +40,7 @@ from core.domain import translatable_object_registry
 from extensions.objects.models import objects
 
 
-class AnswerGroup(python_utils.OBJECT):
+class AnswerGroup:
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
     rules are ORed together. Answer groups may also support a classifier
@@ -262,7 +262,7 @@ class AnswerGroup(python_utils.OBJECT):
         return answer_group_dict
 
 
-class Hint(python_utils.OBJECT):
+class Hint:
     """Value object representing a hint."""
 
     def __init__(self, hint_content):
@@ -320,7 +320,7 @@ class Hint(python_utils.OBJECT):
         return hint_dict
 
 
-class Solution(python_utils.OBJECT):
+class Solution:
     """Value object representing a solution.
 
     A solution consists of answer_is_exclusive, correct_answer and an
@@ -463,7 +463,7 @@ class Solution(python_utils.OBJECT):
         return solution_dict
 
 
-class InteractionInstance(python_utils.OBJECT):
+class InteractionInstance:
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
@@ -932,7 +932,7 @@ class InteractionInstance(python_utils.OBJECT):
         return customization_args
 
 
-class InteractionCustomizationArg(python_utils.OBJECT):
+class InteractionCustomizationArg:
     """Object representing an interaction's customization argument.
     Any SubtitledHtml or SubtitledUnicode values in the customization argument
     value are represented as their respective domain objects here, rather than a
@@ -1209,7 +1209,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         return result
 
 
-class Outcome(python_utils.OBJECT):
+class Outcome:
     """Value object representing an outcome of an interaction. An outcome
     consists of a destination state, feedback to show the user, and any
     parameter changes.
@@ -1349,7 +1349,7 @@ class Outcome(python_utils.OBJECT):
         return outcome_dict
 
 
-class Voiceover(python_utils.OBJECT):
+class Voiceover:
     """Value object representing an voiceover."""
 
     def to_dict(self):
@@ -1451,7 +1451,7 @@ class Voiceover(python_utils.OBJECT):
                 self.duration_secs)
 
 
-class WrittenTranslation(python_utils.OBJECT):
+class WrittenTranslation:
     """Value object representing a written translation for a content.
 
     Here, "content" could mean a string or a list of strings. The latter arises,
@@ -1546,7 +1546,7 @@ class WrittenTranslation(python_utils.OBJECT):
                 self.needs_update)
 
 
-class WrittenTranslations(python_utils.OBJECT):
+class WrittenTranslations:
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
@@ -1840,7 +1840,7 @@ class WrittenTranslations(python_utils.OBJECT):
         return written_translations_dict
 
 
-class RecordedVoiceovers(python_utils.OBJECT):
+class RecordedVoiceovers:
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
     through their content_id.
@@ -1999,7 +1999,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
             self.voiceovers_mapping.pop(content_id, None)
 
 
-class RuleSpec(python_utils.OBJECT):
+class RuleSpec:
     """Value object representing a rule specification."""
 
     def __init__(self, rule_type, inputs):
@@ -2199,7 +2199,7 @@ class RuleSpec(python_utils.OBJECT):
         return rule_spec_dict
 
 
-class SubtitledHtml(python_utils.OBJECT):
+class SubtitledHtml:
     """Value object representing subtitled HTML."""
 
     def __init__(self, content_id, html):
@@ -2280,7 +2280,7 @@ class SubtitledHtml(python_utils.OBJECT):
         return cls(content_id, '')
 
 
-class SubtitledUnicode(python_utils.OBJECT):
+class SubtitledUnicode:
     """Value object representing subtitled unicode."""
 
     def __init__(self, content_id, unicode_str):
@@ -2351,7 +2351,7 @@ class SubtitledUnicode(python_utils.OBJECT):
         return cls(content_id, '')
 
 
-class TranslatableItem(python_utils.OBJECT):
+class TranslatableItem:
     """Value object representing item that can be translated."""
 
     DATA_FORMAT_HTML = 'html'
@@ -2401,7 +2401,7 @@ class TranslatableItem(python_utils.OBJECT):
         }
 
 
-class State(python_utils.OBJECT):
+class State:
     """Domain object for a state."""
 
     def __init__(

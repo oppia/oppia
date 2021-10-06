@@ -41,7 +41,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         }
         self.printed_messages = []
 
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def __init__(self, lcov_items_list):
                 self.lcov_items_list = lcov_items_list
 

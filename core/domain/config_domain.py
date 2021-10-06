@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core.constants import constants
 from core.domain import caching_services
@@ -169,7 +168,7 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
-class ConfigProperty(python_utils.OBJECT):
+class ConfigProperty:
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -307,7 +306,7 @@ class ConfigProperty(python_utils.OBJECT):
             value, self._schema, global_validators=email_validators)
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are

@@ -24,7 +24,7 @@ from core import utils
 from core.constants import constants
 
 
-class ExplorationOpportunitySummary(python_utils.OBJECT):
+class ExplorationOpportunitySummary:
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
@@ -224,7 +224,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                         language_code, self.content_count, count))
 
 
-class SkillOpportunity(python_utils.OBJECT):
+class SkillOpportunity:
     """The domain object for skill opportunities."""
 
     def __init__(

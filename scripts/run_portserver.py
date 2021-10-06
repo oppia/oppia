@@ -174,7 +174,7 @@ def _should_allocate_port(pid):
     return True
 
 
-class _PortInfo(python_utils.OBJECT):
+class _PortInfo:
     """Container class for information about a given port assignment.
 
     Attributes:
@@ -192,7 +192,7 @@ class _PortInfo(python_utils.OBJECT):
         self.start_time = 0
 
 
-class _PortPool(python_utils.OBJECT):
+class _PortPool:
     """Manage available ports for processes.
 
     Ports are reclaimed when the reserving process exits and the reserved port
@@ -274,7 +274,7 @@ class _PortPool(python_utils.OBJECT):
         self._port_queue.append(port_info)
 
 
-class _PortServerRequestHandler(python_utils.OBJECT):
+class _PortServerRequestHandler:
     """A class to handle port allocation and status requests.
 
     Allocates ports to process ids via the dead simple port server protocol
@@ -388,7 +388,7 @@ def _parse_port_ranges(pool_str):
     return ports
 
 
-class Server(python_utils.OBJECT):
+class Server:
     """Manages the portserver server.
 
     Attributes:
