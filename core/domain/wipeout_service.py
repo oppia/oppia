@@ -1279,6 +1279,11 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             request object to be saved in the datastore.
     """
     user_id = pending_deletion_request.user_id
+
+    suggestion_models.TranslationContributionStatsModel.apply_deletion_policy(
+        user_id
+    )
+
     voiceover_application_class = (
         suggestion_models.GeneralVoiceoverApplicationModel)
 
