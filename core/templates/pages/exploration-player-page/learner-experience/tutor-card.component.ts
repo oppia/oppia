@@ -46,7 +46,6 @@ import { PlayerPositionService } from '../services/player-position.service';
   templateUrl: './tutor-card.component.html',
 })
 export class TutorCardComponent {
-  @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
