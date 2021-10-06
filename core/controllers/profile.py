@@ -485,11 +485,11 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    # Currently the language code we use consists 
+    # Currently the language code we use consists
     # of this 3 types: 1) 'en', 2) 'kab' and 3) 'hi-en'.
     # Currently we are keeping out language code ISO 639 compatible
-    # We want to impose a regex to check and enforce 
-    # the schame types. The regex lives in core/feconf.py 
+    # We want to impose a regex to check and enforce
+    # the schame types. The regex lives in core/feconf.py.
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
