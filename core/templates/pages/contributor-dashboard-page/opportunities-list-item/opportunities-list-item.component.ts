@@ -94,7 +94,7 @@ export class OpportunitiesListItemComponent {
           };
           this.opportunityButtonDisabled = (
             this.opportunity.translationsCount +
-            this.opportunity.inReviewCount >=
+            this.opportunity.inReviewCount ==
             this.opportunity.totalCount);
         } else {
           this.progressBarStyle = { width: this.progressPercentage };
