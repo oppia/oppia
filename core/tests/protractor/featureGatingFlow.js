@@ -27,6 +27,11 @@ describe('Feature Gating Flow', function() {
   var agDummyFeatureIndicator = element(
     by.css('.protractor-test-angular-dummy-feature-indicator'));
 
+  // Indicator in Angular component that is visible if the dummy_feature
+  // is enabled, and the backend dummy handler is also enabled.
+  var agDummyHandlerIndicator = agDummyFeatureIndicator.element(
+    by.css('.protractor-test-angular-dummy-handler-indicator'));
+
   // Indicator in AngularJS directive that is visible if the dummy_feature
   // is enabled, and the feature status is successfully loaded in the
   // AngularJS directive.
@@ -78,6 +83,26 @@ describe('Feature Gating Flow', function() {
     var dummy = await adminPage.getDummyFeatureElement();
 
     expect(await dummy.isPresent()).toBe(true);
+    await users.logout();
+  });
+
+  it('should reset when a different user signs in', async() => {
+    await users.createAndLoginCurriculumAdminUser(
+      'admin4@featureGatingFlow.com', 'featuregating4');
+    await adminPage.getFeaturesTab();
+    var dummy = await adminPage.getDummyFeatureElement();
+    await adminPage.enableFeatureForDev(dummy);
+
+    await users.logout();
+
+    await users.createAndLoginCurriculumAdminUser(
+      'admin5@featureGatingFlow.com', 'featuregating5');
+    await adminPage.getFeaturesTab();
+
+    expect(await agDummyFeatureIndicator.isPresent()).toBe(false);
+    expect(await agDummyHandlerIndicator.isPresent()).toBe(false);
+    expect(await ajsDummyFeatureIndicator.isPresent()).toBe(false);
+
     await users.logout();
   });
 });
