@@ -206,7 +206,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_URLOPEN_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 45: Please use python_utils.url_open().'],
+            ['Line 43: Please use python_utils.url_open().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
