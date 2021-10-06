@@ -54,14 +54,13 @@ angular.module('oppia').component('outcomeEditor', {
   template: require('./outcome-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$log', 'ExternalSaveService', 'StateEditorService',
+    'ExternalSaveService', 'StateEditorService',
     'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
     'INTERACTION_SPECS',
     function(
-        $log, ExternalSaveService, StateEditorService,
+        ExternalSaveService, StateEditorService,
         StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
         INTERACTION_SPECS) {
-      $log.info('outcome editor component');
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.isInQuestionMode = function() {
@@ -105,6 +104,10 @@ angular.module('oppia').component('outcomeEditor', {
             ctrl.cancelThisDestinationEdit();
           }
         }
+      };
+
+      ctrl.isFeedbackLengthExceeded = function(outcome) {
+        return (outcome.feedback._html.length > 200);
       };
 
       ctrl.isSelfLoop = function(outcome) {

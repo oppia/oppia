@@ -39,7 +39,6 @@ angular.module('oppia').controller('AddHintModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-
     $scope.HINT_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -51,6 +50,9 @@ angular.module('oppia').controller('AddHintModalController', [
     $scope.tmpHint = '';
     $scope.addHintForm = {};
     $scope.hintIndex = StateHintsService.displayed.length + 1;
+    $scope.isHintLengthExceeded = function(tmpHint) {
+      return (tmpHint.length > 200);
+    };
     $scope.saveHint = function() {
       var contentId = GenerateContentIdService.getNextStateId(
         COMPONENT_NAME_HINT);

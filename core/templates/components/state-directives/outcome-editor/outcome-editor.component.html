@@ -18,6 +18,17 @@
   outcome-editor .oppia-incorrect-text {
     color: rgb(243, 13, 13);
   }
+  .oppia-outcome-feedback-length-exceeded-error {
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
 </style>
 <div ng-if="!$ctrl.feedbackEditorIsOpen && $ctrl.displayFeedback"
      title="<[$ctrl.isEditable() ? 'Edit feedback' : '']>"
@@ -63,6 +74,10 @@
     </oppia-outcome-feedback-editor>
   </form>
 
+  <div ng-if="$ctrl.isFeedbackLengthExceeded($ctrl.outcome)" class="oppia-outcome-feedback-length-exceeded-error">
+    The feedback length is too long. Please make it under 200 characters.
+  </div>
+
   <div class="oppia-rule-save-cancel-buttons">
     <div class="float-right">
       <button type="button"
@@ -72,7 +87,7 @@
       </button>
       <button type="button"
               class="btn btn-success protractor-test-save-outcome-feedback"
-              ng-disabled="$ctrl.invalidStateAfterFeedbackSave() || $ctrl.editOutcomeForm.editFeedbackForm.$invalid"
+              ng-disabled="$ctrl.invalidStateAfterFeedbackSave() || $ctrl.editOutcomeForm.editFeedbackForm.$invalid || $ctrl.isFeedbackLengthExceeded($ctrl.outcome)"
               ng-click="$ctrl.saveThisFeedback(true)">
         Save Feedback
       </button>

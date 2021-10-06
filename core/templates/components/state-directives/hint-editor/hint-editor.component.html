@@ -36,6 +36,10 @@
       </div>
     </form>
 
+    <div ng-if="$ctrl.isHintLengthExceeded($ctrl.hint)" class="oppia-outcome-feedback-length-exceeded-error">
+      The hint length is too long. Please make it under 200 characters.
+    </div>
+
     <div class="oppia-rule-save-cancel-buttons">
       <div class="float-right">
         <button type="button"
@@ -45,7 +49,7 @@
         </button>
         <button type="button"
                 class="btn btn-success protractor-test-save-hint-edit"
-                ng-disabled="!$ctrl.hint.hintContent.html || $ctrl.editHintForm.$invalid"
+                ng-disabled="!$ctrl.hint.hintContent.html || $ctrl.editHintForm.$invalid || $ctrl.isHintLengthExceeded($ctrl.hint)"
                 ng-click="$ctrl.saveThisHint()">
           Save
         </button>
@@ -55,3 +59,16 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-outcome-feedback-length-exceeded-error {
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>

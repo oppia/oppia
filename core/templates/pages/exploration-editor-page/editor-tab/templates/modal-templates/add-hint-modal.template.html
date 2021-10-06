@@ -14,14 +14,27 @@
       </schema-based-editor>
     </div>
   </form>
+  <div ng-if="isHintLengthExceeded(tmpHint)" class="oppia-outcome-feedback-length-exceeded-error">
+    The hint length is too long. Please make it under 200 characters.
+  </div>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-cancel-hint" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint">Save Hint</button>
+  <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint || isHintLengthExceeded(tmpHint)">Save Hint</button>
 </div>
 
 <style>
+  .oppia-outcome-feedback-length-exceeded-error {
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   @media screen and (max-width: 768px) {
     .add-hint-modal .modal-dialog,
     .add-hint-modal .modal-content {
