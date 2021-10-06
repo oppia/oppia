@@ -98,17 +98,15 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    var explorationsCardByName = [];
-    for (i = 0; i < allExplorationCardElements.length; i++) {
-      var cardTitle = allExplorationCardElements[i].element(cardTitleCss);
-      await waitFor.visibilityOf(
-        cardTitle,
-        'Card Title is not present or taking too long to display');
-      var title = await cardTitle.getText();
-      if (title === explorationName) {
-        explorationsCardByName.push(allExplorationCardElements[i]);
-      }
-    }
+    var explorationsCardByName = await allExplorationCardElements.filter(
+      async function(card) {
+        var cardTitle = card.element(cardTitleCss);
+        await waitFor.visibilityOf(
+          cardTitle,
+          'CardTitle is not present or taking too long to display');
+        var title = await cardTitle.getText();
+        return title === explorationName;
+      });
 
     if (await explorationsCardByName.length === 0) {
       throw new Error(
