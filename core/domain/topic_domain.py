@@ -259,7 +259,7 @@ class TopicRightsChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
 
 
-class StoryReference(python_utils.OBJECT):
+class StoryReference:
     """Domain object for a Story reference."""
 
     def __init__(self, story_id, story_is_published):
@@ -329,7 +329,7 @@ class StoryReference(python_utils.OBJECT):
                 self.story_is_published)
 
 
-class Subtopic(python_utils.OBJECT):
+class Subtopic:
     """Domain object for a Subtopic."""
 
     def __init__(
@@ -486,7 +486,7 @@ class Subtopic(python_utils.OBJECT):
                 'Expected all skill ids to be distinct.')
 
 
-class Topic(python_utils.OBJECT):
+class Topic:
     """Domain object for an Oppia Topic."""
 
     def __init__(
@@ -1737,7 +1737,7 @@ class Topic(python_utils.OBJECT):
         return len(url_fragments_list) == len(url_fragments_set)
 
 
-class TopicSummary(python_utils.OBJECT):
+class TopicSummary:
     """Domain object for Topic Summary."""
 
     def __init__(
@@ -1945,7 +1945,7 @@ class TopicSummary(python_utils.OBJECT):
         }
 
 
-class TopicRights(python_utils.OBJECT):
+class TopicRights:
     """Domain object for topic rights."""
 
     def __init__(self, topic_id, manager_ids, topic_is_published):
