@@ -1779,7 +1779,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(
             commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
+        for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -1809,7 +1809,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
+        for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -1850,7 +1850,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             'add_documents_to_index',
             add_docs_counter)
 
-        for ind in python_utils.RANGE(5):
+        for ind in range(5):
             self.save_new_valid_collection(
                 all_collection_ids[ind],
                 self.owner_id,
@@ -1859,7 +1859,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         # We're only publishing the first 4 collections, so we're not
         # expecting the last collection to be indexed.
-        for ind in python_utils.RANGE(4):
+        for ind in range(4):
             rights_manager.publish_collection(
                 self.owner, expected_collection_ids[ind])
 
