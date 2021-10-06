@@ -18,7 +18,7 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
@@ -59,6 +59,7 @@ describe('Translation opportunities component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+        NgbTooltipModule
       ],
       declarations: [
         AngularHtmlBindWrapperDirective,
@@ -104,6 +105,9 @@ describe('Translation opportunities component', () => {
         content_count: 1,
         translation_counts: {
           en: 2
+        },
+        translation_in_review_counts: {
+          en: 2
         }
       }),
       ExplorationOpportunitySummary.createFromBackendDict({
@@ -113,6 +117,9 @@ describe('Translation opportunities component', () => {
         chapter_title: 'Chapter title 2',
         content_count: 2,
         translation_counts: {
+          en: 4
+        },
+        translation_in_review_counts: {
           en: 4
         }
       })

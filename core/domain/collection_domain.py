@@ -28,11 +28,11 @@ import json
 import re
 import string
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
-import feconf
-import python_utils
-import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -783,7 +783,7 @@ class Collection(python_utils.OBJECT):
         """
         exploration_just_unlocked = None
 
-        for index in python_utils.RANGE(0, len(self.nodes) - 1):
+        for index in range(len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
                 exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
