@@ -74,7 +74,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
 

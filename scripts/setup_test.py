@@ -24,6 +24,7 @@ import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
 from core import python_utils
 from core.tests import test_utils
@@ -217,7 +218,7 @@ class SetupTests(test_utils.GenericTestBase):
             check_function_calls['remove_is_called'] = True
 
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         open_swap = self.swap(tarfile, 'open', mock_open)
         extract_swap = self.swap(tarfile.TarFile, 'extractall', mock_extractall)
         close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
@@ -385,7 +386,7 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
@@ -429,7 +430,7 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
