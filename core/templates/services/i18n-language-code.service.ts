@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,9 +38,7 @@ export class I18nLanguageCodeService {
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
-  constructor(
-    private windowRef: WindowRef,
-  ) {}
+  constructor() {}
 
   getCurrentI18nLanguageCode(): string {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
@@ -57,13 +54,6 @@ export class I18nLanguageCodeService {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     I18nLanguageCodeService.languageCode = code;
     I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
-    this.setUrlLanguageParam(code);
-  }
-
-  setUrlLanguageParam(code: string): void {
-    let url = new URL(this.windowRef.nativeWindow.location.toString());
-    url.searchParams.set('lang', code);
-    this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
   }
 
   get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {

@@ -60,7 +60,7 @@
  *       variables and emitting an event to inform that angular has finished
  *       loading
  */
- interface LanguageInfo {
+interface LanguageInfo {
   id: string;
   text: string;
   direction: string;
@@ -69,7 +69,7 @@
 import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheService } from 'ngx-translate-cache';
+import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -101,6 +101,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { CookieService } from 'ngx-cookie';
 import { AlertsService } from 'services/alerts.service';
 
 const componentMap = {
@@ -139,6 +140,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static alertsService: AlertsService;
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
+  static cookieService: CookieService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
@@ -157,6 +159,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   constructor(
     private alertsService: AlertsService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private cookieService: CookieService,
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -169,6 +172,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private reviewTestBackendApiService: ReviewTestBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private translateService: TranslateService,
+    private translateCacheSettings: TranslateCacheSettings,
     private translateCacheService: TranslateCacheService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -205,6 +209,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       this.alertsService);
     OppiaAngularRootComponent.classroomBackendApiService = (
       this.classroomBackendApiService);
+    OppiaAngularRootComponent.cookieService = (this.cookieService);
     OppiaAngularRootComponent.i18nLanguageCodeService = (
       this.i18nLanguageCodeService);
     OppiaAngularRootComponent.ngZone = this.ngZone;
@@ -271,7 +276,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => {
         this.translateService.use(code);
-        for (var i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
+        for (let i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
           if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
             this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
             break;
@@ -280,11 +285,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         this.documentAttributeCustomizationService.addAttribute('lang', code);
       }
     );
-    const cachedLanguage = this.translateCacheService.getCachedLanguage();
-    let url = new URL(this.windowRef.nativeWindow.location.toString());
-    let i18nLanguageCode = url.searchParams.get('lang') || cachedLanguage;
 
-    if (i18nLanguageCode) {
+    let url = new URL(this.windowRef.nativeWindow.location.toString());
+    const searchParams = url.searchParams;
+
+    if (searchParams.has('lang')) {
       let supportedSiteLanguagesCodes: string[] = (
         AppConstants.SUPPORTED_SITE_LANGUAGES.map(
           (languageInfo: LanguageInfo) => {
@@ -292,25 +297,23 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           }
         )
       );
-      if (supportedSiteLanguagesCodes.includes(i18nLanguageCode)) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguageCode);
+      let siteLanguageCode = searchParams.get('lang');
+      if (supportedSiteLanguagesCodes.includes(siteLanguageCode)) {
+        this.cookieService.put(
+          this.translateCacheSettings.cacheName, siteLanguageCode);
       } else {
-        let currentLanguageText: string = '';
-        i18nLanguageCode = cachedLanguage || AppConstants.DEFAULT_LANGUAGE_CODE;
-        AppConstants.SUPPORTED_SITE_LANGUAGES.forEach(element => {
-          if (element.id === i18nLanguageCode) {
-            currentLanguageText = element.text;
-          }
-          this.alertsService.addWarning(
-            `Loading in ${currentLanguageText} because the language code ` +
-            'provided is invalid.');
-          this.i18nLanguageCodeService.setI18nLanguageCode(i18nLanguageCode);
-        });
+        url.searchParams.delete('lang');
+        this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
       }
     }
-    // Translate Cache service should be initialized only after site language is
-    // set according to the URL language parameter.
+
+    // Translate Cache service should be initialized after translation cache
+    // is set according to the URL language parameter.
     this.translateCacheService.init();
+
+    const cachedLanguage = this.translateCacheService.getCachedLanguage();
+    this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }

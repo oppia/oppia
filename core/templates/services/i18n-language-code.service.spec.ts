@@ -19,38 +19,10 @@
 import { EventEmitter } from '@angular/core';
 
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { AlertsService } from './alerts.service';
-import { WindowRef } from './contextual/window-ref.service';
 import { Subscription } from 'rxjs';
-import { LoggerService } from './contextual/logger.service';
-
-class MockWindowRef {
-  nativeWindow = {
-    location: {
-      pathname: '/',
-      href: '',
-      toString() {
-        return 'http://localhost/community';
-      }
-    },
-    history: {
-      pushState(data: {}, title: string, url?: string | null) {}
-    }
-  };
-}
-
-class MockAlertsService extends AlertsService {
-  addWarning() {
-    return null;
-  }
-}
 
 describe('I18nLanguageCodeService', () => {
-  let loggerService = new LoggerService();
-  let alertsService = new MockAlertsService(loggerService);
-  let mockWindowRef = new MockWindowRef();
-  const i18nLanguageCodeService = new I18nLanguageCodeService (
-    mockWindowRef as WindowRef);
+  const i18nLanguageCodeService = new I18nLanguageCodeService ();
   let languageCode: string = '';
   let testSubscriptions: Subscription;
   beforeEach(() => {
@@ -58,7 +30,6 @@ describe('I18nLanguageCodeService', () => {
     testSubscriptions.add(
       i18nLanguageCodeService.onI18nLanguageCodeChange
         .subscribe((code: string) => languageCode = code));
-    spyOn(alertsService, 'addWarning');
   });
 
   afterEach(() => {
@@ -74,14 +45,6 @@ describe('I18nLanguageCodeService', () => {
     i18nLanguageCodeService.setI18nLanguageCode('es');
     const latestCode = i18nLanguageCodeService.getCurrentI18nLanguageCode();
     expect(latestCode).toBe('es');
-  });
-
-  it('should set the url lang parameter', () => {
-    spyOn(mockWindowRef.nativeWindow.history, 'pushState');
-    mockWindowRef.nativeWindow.location = new URL('http://localhost/community?lang=en');
-    i18nLanguageCodeService.setUrlLanguageParam('es');
-
-    expect(mockWindowRef.nativeWindow.history.pushState).toHaveBeenCalled();
   });
 
   it('should get event emitter for loading of preferred language codes', () => {
