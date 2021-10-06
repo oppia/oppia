@@ -19,17 +19,19 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-from mypy_imports import ( # isort:skip
-    app_feedback_report_models, transaction_services) # isort:skip
+from typing import Any, Dict, List, Optional, cast
 
-from typing import Dict, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
+    from mypy_imports import transaction_services
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -597,7 +599,7 @@ def reassign_ticket(
                     List[app_feedback_report_models.AppFeedbackReportModel],
                     optional_report_models)
                 latest_timestamp = report_models[0].submitted_on
-                for index in python_utils.RANGE(1, len(report_models)):
+                for index in range(1, len(report_models)):
                     if report_models[index].submitted_on > (
                             latest_timestamp):
                         latest_timestamp = (

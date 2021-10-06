@@ -26,7 +26,7 @@ import shutil
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 
 from .. import common
 from .. import concurrent_task_utils

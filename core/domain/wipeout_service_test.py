@@ -20,7 +20,8 @@ from __future__ import unicode_literals
 import datetime
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -44,8 +45,6 @@ from core.domain import wipeout_domain
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     app_feedback_report_models, auth_models, blog_models,
@@ -186,6 +185,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.add_user_role(
             self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -434,6 +435,26 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'exp_id',
             self.user_2_id,
             feconf.ROLE_EDITOR)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertFalse(exp_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertTrue(exp_summary_model.community_owned)
+
+    def test_pre_delete_user_exploration_ownership_is_released_with_voice_art(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            self.user_1_actions,
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST)
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertFalse(exp_summary_model.community_owned)
@@ -2133,7 +2154,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_feedbacks_are_pseudonymized(self):
         feedback_thread_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_thread_models.append(
                 feedback_models.GeneralFeedbackThreadModel(
                     id='feedback-%s' % i,
@@ -2148,7 +2169,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
                 feedback_thread_models)
         feedback_message_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
                 feedback_models.GeneralFeedbackMessageModel(
                     id='message-%s' % i,
@@ -4868,7 +4889,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_blog_post_models_are_pseudonymized(self):
         blog_post_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_models_list.append(
                 blog_models.BlogPostModel(
                     id='blogmodel-%s' % i,
@@ -4884,7 +4905,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             blog_models.BlogPostModel.update_timestamps_multi(
                 blog_post_models_list)
         blog_post_summary_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_summary_models_list.append(
                 blog_models.BlogPostSummaryModel(
                     id='blogmodel-%s' % i,
@@ -4901,7 +4922,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_models_list)
 
         blog_post_rights_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_rights_models_list.append(
                 blog_models.BlogPostRightsModel(
                     id='blogmodel-%s' % i,
