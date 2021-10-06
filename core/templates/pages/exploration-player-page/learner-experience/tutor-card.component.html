@@ -18,7 +18,7 @@
            [ngClass]="getContentAudioHighlightClass()"
            [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
-          <angular-html-bind-wrapper class="protractor-test-conversation-content"
+          <angular-html-bind-wrapper classStr="protractor-test-conversation-content"
                                      [htmlData]="displayedCard.getContentHtml()">
           </angular-html-bind-wrapper>
         </div>
@@ -82,7 +82,7 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind-wrapper class="protractor-test-conversation-input"
+          <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
           </angular-html-bind-wrapper>
         </div>
