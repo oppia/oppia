@@ -485,11 +485,11 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    # We want to impose regex to check whether the language
-    # code is valid. We choose the regex to be
-    # ^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$
-    # This pattern can detect language code like "en", "en-US"
-    # "ah-Hant-TW", "EN-au".
+    # Currently the language code we use consists 
+    # of this 3 types: 1) 'en', 2) 'kab' and 3) 'hi-en'.
+    # Currently we are keeping out language code ISO 639 compatible
+    # We want to impose a regex to check and enforce 
+    # the schame types. The regex lives in core/feconf.py 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -498,7 +498,7 @@ class SiteLanguageHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': '^[a-z]{2,4}([-]([a-z]{2}))?$'
+                        'regex_pattern': feconf.LANGUAGE_CODE_REGEX
                     }],
                 }
             }
