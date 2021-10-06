@@ -188,9 +188,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_UNQUOTE_PLUS_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 45: Please use python_utils.url_unquote_plus().'],
-            lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
