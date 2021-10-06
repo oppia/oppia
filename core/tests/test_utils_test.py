@@ -24,12 +24,12 @@ import os
 import re
 from unittest import mock
 
-from constants import constants
+from core import python_utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 import webapp2
 
@@ -313,7 +313,7 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         self.assertEqual(wrapped_function.times_called, 0)
 
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             self.assertEqual(wrapped_function(i), i ** 2)
             self.assertEqual(wrapped_function.times_called, i + 1)
 
@@ -330,7 +330,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             function, MockError('Dummy Exception'),
             test_utils.FailingFunction.INFINITY)
 
-        for i in python_utils.RANGE(20):
+        for i in range(20):
             with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 

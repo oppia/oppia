@@ -17,9 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.domain import user_services
-import python_utils
-import utils
 
 
 class FeedbackThread(python_utils.OBJECT):
@@ -121,8 +121,7 @@ class FeedbackThread(python_utils.OBJECT):
         """
         return [
             self._get_full_message_id(i) if i >= 0 else None
-            for i in python_utils.RANGE(
-                self.message_count - 1, self.message_count - 3, -1)
+            for i in range(self.message_count - 1, self.message_count - 3, -1)
         ]
 
 

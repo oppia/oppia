@@ -86,6 +86,7 @@ import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 
@@ -166,8 +167,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     QuestionDifficultySelectorComponent,
-    SelectSkillModalComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
+    SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -230,6 +232,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     KeyboardShortcutHelpModalComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
@@ -285,6 +288,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     FilterForMatchingSubstringPipe,
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,

@@ -20,9 +20,8 @@ from __future__ import unicode_literals
 import datetime
 import os
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
-
 from scripts import flake_checker
 
 import requests
