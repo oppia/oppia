@@ -138,6 +138,11 @@ describe('Progress nav component', () => {
     expect(playerTranscriptService.getNumCards).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
     expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
+    expect(componentInstance.helpCardHasContinueButton).toBeFalse();
+    expect(componentInstance.interactionIsInline).toEqual(
+      mockDisplayedCard.isInteractionInline());
+    expect(componentInstance.interactionCustomizationArgs).toEqual(
+      mockDisplayedCard.getInteractionCustomizationArgs());
   }));
 
   it('should return true if interaction has special case for mobile', () => {
@@ -148,6 +153,16 @@ describe('Progress nav component', () => {
       .toBeTrue();
     expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
   });
+
+  it('should return false if interaction id is not item selection input',
+    () => {
+      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
+      componentInstance.interactionId = 'not item selection input';
+
+      expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
+        .toBeFalse();
+      expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
+    });
 
   it('should not resolve special case for interaction if in desktop mode',
     () => {
