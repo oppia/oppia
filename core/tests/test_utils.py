@@ -26,7 +26,6 @@ import datetime
 import functools
 import inspect
 import itertools
-from itertools import zip_longest
 import json
 import logging
 import os
@@ -1253,7 +1252,7 @@ class TestBase(unittest.TestCase):
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in zip_longest(
+                for args, kwargs in itertools.zip_longest(
                     expected_args_iter, expected_kwargs_iter, fillvalue={})
             ]
             if pretty_unused_args:
