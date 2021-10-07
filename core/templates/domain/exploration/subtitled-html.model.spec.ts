@@ -25,7 +25,8 @@ describe('SubtitledHtml model', () => {
   beforeEach(() => {
     subtitledHtml = SubtitledHtml.createFromBackendDict({
       content_id: 'content_id',
-      html: '<p>some html</p>'
+      html: '<p>some html</p>',
+      image_sizes_in_bytes: {}
     });
   });
 
@@ -54,13 +55,14 @@ describe('SubtitledHtml model', () => {
   it('should convert to backend dict correctly', () => {
     expect(subtitledHtml.toBackendDict()).toEqual({
       content_id: 'content_id',
-      html: '<p>some html</p>'
+      html: '<p>some html</p>',
+      image_sizes_in_bytes: {}
     });
   });
 
   it('should create default object', () => {
     const defaultSubtitledHtml =
-     SubtitledHtml.createDefault('test html', 'content_id');
+     SubtitledHtml.createDefault('test html', 'content_id', {});
     expect(defaultSubtitledHtml.html).toEqual('test html');
     expect(defaultSubtitledHtml.contentId).toEqual('content_id');
   });

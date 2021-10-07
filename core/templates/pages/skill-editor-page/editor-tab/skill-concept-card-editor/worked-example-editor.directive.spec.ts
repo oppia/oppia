@@ -58,10 +58,12 @@ describe('Worked example editor directive', function() {
       question: {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 1',
         content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       },
     };
 

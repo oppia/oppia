@@ -35,7 +35,7 @@ describe('Create new skill modal', () => {
   let contextService: ContextService;
   let skillObjectFactory: SkillObjectFactory;
   let testObj: SubtitledHtml = SubtitledHtml
-    .createDefault('test_html', 'test_id');
+    .createDefault('test_html', 'test_id', {});
   let ngbActiveModal: NgbActiveModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillCreationService: SkillCreationService;
@@ -139,7 +139,8 @@ describe('Create new skill modal', () => {
       .toEqual('test_html');
     expect(componentInstance.newExplanationObject).toEqual({
       html: 'test_html',
-      content_id: 'test_id'
+      content_id: 'test_id',
+      image_sizes_in_bytes: {}
     });
   });
 

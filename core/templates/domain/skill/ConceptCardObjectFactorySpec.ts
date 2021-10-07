@@ -37,27 +37,32 @@ describe('Concept card object factory', () => {
     example1 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       }
     };
     example2 = {
       question: {
         html: 'worked example question 2',
-        content_id: 'worked_example_q_2'
+        content_id: 'worked_example_q_2',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 2',
-        content_id: 'worked_example_e_2'
+        content_id: 'worked_example_e_2',
+        image_sizes_in_bytes: {}
       }
     };
     conceptCardDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_sizes_in_bytes: {}
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {
@@ -84,18 +89,18 @@ describe('Concept card object factory', () => {
           conceptCardObjectFactory.createFromBackendDict(conceptCardDict);
     expect(conceptCard.getExplanation()).toEqual(
       SubtitledHtml.createDefault(
-        'test explanation', 'explanation'));
+        'test explanation', 'explanation', {}));
     expect(conceptCard.getWorkedExamples()).toEqual([
       workedExampleObjectFactory.create(
         SubtitledHtml.createDefault(
-          'worked example question 1', 'worked_example_q_1'),
+          'worked example question 1', 'worked_example_q_1', {}),
         SubtitledHtml.createDefault(
-          'worked example explanation 1', 'worked_example_e_1')),
+          'worked example explanation 1', 'worked_example_e_1', {})),
       workedExampleObjectFactory.create(
         SubtitledHtml.createDefault(
-          'worked example question 2', 'worked_example_q_2'),
+          'worked example question 2', 'worked_example_q_2', {}),
         SubtitledHtml.createDefault(
-          'worked example explanation 2', 'worked_example_e_2'))
+          'worked example explanation 2', 'worked_example_e_2', {}))
     ]);
   });
 

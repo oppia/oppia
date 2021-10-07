@@ -78,21 +78,25 @@ describe('Skill object factory', () => {
     example1 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       }
     };
     example2 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       }
     };
 
@@ -101,6 +105,7 @@ describe('Skill object factory', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_sizes_in_bytes: {}
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {
@@ -170,7 +175,7 @@ describe('Skill object factory', () => {
   it('should throw validation errors', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.getConceptCard().setExplanation(
-      SubtitledHtml.createDefault('', 'review_material'));
+      SubtitledHtml.createDefault('', 'review_material', {}));
     expect(skill.getValidationIssues()).toEqual([
       'There should be review material in the concept card.',
       'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +

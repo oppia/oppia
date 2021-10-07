@@ -50,7 +50,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_sizes_in_bytes: {}
         }
       });
     });
@@ -61,7 +62,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_sizes_in_bytes: {}
         }
       };
 
@@ -79,7 +81,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is the correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_sizes_in_bytes: {}
         }
       };
 
@@ -140,7 +143,7 @@ describe('Solution object factory', () => {
     it('should get oppia short answer', () => {
       const interaction = new Interaction([], [], {
         choices: {
-          value: [new SubtitledHtml('This is a choice', '')]
+          value: [new SubtitledHtml('This is a choice', '', {})]
         }
       }, null, [], '0', null);
       const expectedShortAnswerHtml = {
@@ -158,7 +161,7 @@ describe('Solution object factory', () => {
     it('should throw an error if Interaction\'s id is null', () => {
       const interaction = new Interaction([], [], {
         choices: {
-          value: [new SubtitledHtml('This is a choice', '')]
+          value: [new SubtitledHtml('This is a choice', '', {})]
         }
       }, null, [], null, null);
 
@@ -173,7 +176,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_sizes_in_bytes: {}
         }
       });
 
@@ -186,7 +190,8 @@ describe('Solution object factory', () => {
     it('should change the explanation correctly', () => {
       const newExplanation = new SubtitledHtml(
         'This is the new explanation to the answer',
-        'solution'
+        'solution',
+        {}
       );
       solution.setExplanation(newExplanation);
 

@@ -83,10 +83,12 @@ describe('Skill update service', () => {
       question: {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 1',
         content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       },
     };
 
@@ -94,10 +96,12 @@ describe('Skill update service', () => {
       question: {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 2',
         content_id: 'worked_example_e_2',
+        image_sizes_in_bytes: {}
       },
     };
 
@@ -105,6 +109,7 @@ describe('Skill update service', () => {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_sizes_in_bytes: {}
       },
       worked_examples: [example1, example2],
       recorded_voiceovers: {
@@ -154,7 +159,7 @@ describe('Skill update service', () => {
 
     skillUpdateService.setConceptCardExplanation(
       skill,
-      SubtitledHtml.createDefault('new explanation', 'explanation')
+      SubtitledHtml.createDefault('new explanation', 'explanation', {})
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
@@ -163,23 +168,26 @@ describe('Skill update service', () => {
         old_value: {
           html: 'test explanation',
           content_id: 'explanation',
+          image_sizes_in_bytes: {}
         },
         new_value: {
           html: 'new explanation',
           content_id: 'explanation',
+          image_sizes_in_bytes: {}
         },
       },
     ]);
 
     expect(skill.getConceptCard().getExplanation()).toEqual(
-      SubtitledHtml.createDefault('new explanation', 'explanation')
+      SubtitledHtml.createDefault('new explanation', 'explanation', {})
     );
 
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getExplanation()).toEqual(
       SubtitledHtml.createDefault(
         'test explanation',
-        'explanation'
+        'explanation',
+        {}
       )
     );
   });
@@ -407,10 +415,12 @@ describe('Skill update service', () => {
       question: {
         html: 'worked example question 3',
         content_id: 'worked_example_q_3',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 3',
         content_id: 'worked_example_e_3',
+        image_sizes_in_bytes: {}
       },
     };
 
@@ -475,10 +485,12 @@ describe('Skill update service', () => {
       question: {
         html: 'new question 1',
         content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'new explanation 1',
         content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       },
     };
 

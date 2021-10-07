@@ -77,7 +77,7 @@ export class SubtopicPageContents {
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     recordedVoiceovers.addContentId('content');
     return new SubtopicPageContents(
-      SubtitledHtml.createDefault('', 'content'),
+      SubtitledHtml.createDefault('', 'content', {}),
       recordedVoiceovers);
   }
 

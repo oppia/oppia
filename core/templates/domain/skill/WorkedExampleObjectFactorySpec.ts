@@ -31,11 +31,13 @@ describe('Worked example object factory', () => {
     workedExampleBackendDict = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
+        image_sizes_in_bytes: {}
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
+        content_id: 'worked_example_e_1',
+        image_sizes_in_bytes: {}
       }
     };
   });
@@ -46,10 +48,10 @@ describe('Worked example object factory', () => {
         workedExampleBackendDict));
     expect(workedExample.getQuestion()).toEqual(
       SubtitledHtml.createDefault(
-        'worked example question 1', 'worked_example_q_1'));
+        'worked example question 1', 'worked_example_q_1', {}));
     expect(workedExample.getExplanation()).toEqual(
       SubtitledHtml.createDefault(
-        'worked example explanation 1', 'worked_example_e_1'));
+        'worked example explanation 1', 'worked_example_e_1', {}));
   });
 
   it('should convert to a backend dictionary', () => {

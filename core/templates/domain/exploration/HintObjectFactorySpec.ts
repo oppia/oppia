@@ -36,13 +36,15 @@ describe('Hint object factory', () => {
     expect(testHint.toBackendDict()).toEqual({
       hint_content: {
         html: '<p>Some Hint</p>',
-        content_id: 'content_id'
+        content_id: 'content_id',
+        image_sizes_in_bytes: {}
       }
     });
     expect(hof.createFromBackendDict({
       hint_content: {
         html: '<p>Some Hint</p>',
-        content_id: 'content_id'
+        content_id: 'content_id',
+        image_sizes_in_bytes: {}
       }
     })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>'));
   }));
@@ -52,7 +54,8 @@ describe('Hint object factory', () => {
       hof.createFromBackendDict({
         hint_content: {
           html: '<p>Some Hint</p>',
-          content_id: 'content_id'
+          content_id: 'content_id',
+        image_sizes_in_bytes: {}
         }
       })
     );
