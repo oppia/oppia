@@ -179,7 +179,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-class Misconception(python_utils.OBJECT):
+class Misconception:
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -287,7 +287,7 @@ class Misconception(python_utils.OBJECT):
                 self.feedback)
 
 
-class Rubric(python_utils.OBJECT):
+class Rubric:
     """Domain object describing a skill rubric."""
 
     def __init__(self, difficulty, explanations):
@@ -355,7 +355,7 @@ class Rubric(python_utils.OBJECT):
                     explanation)
 
 
-class WorkedExample(python_utils.OBJECT):
+class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
     def __init__(self, question, explanation):
@@ -423,7 +423,7 @@ class WorkedExample(python_utils.OBJECT):
         return worked_example
 
 
-class SkillContents(python_utils.OBJECT):
+class SkillContents:
     """Domain object representing the skill_contents dict."""
 
     def __init__(
@@ -526,7 +526,7 @@ class SkillContents(python_utils.OBJECT):
         return skill_contents
 
 
-class Skill(python_utils.OBJECT):
+class Skill:
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -1533,7 +1533,7 @@ class Skill(python_utils.OBJECT):
         self.misconceptions[index].feedback = feedback
 
 
-class SkillSummary(python_utils.OBJECT):
+class SkillSummary:
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -1626,7 +1626,7 @@ class SkillSummary(python_utils.OBJECT):
         }
 
 
-class AugmentedSkillSummary(python_utils.OBJECT):
+class AugmentedSkillSummary:
     """Domain object for Augmented Skill Summary, which has all the properties
     of SkillSummary along with the topic names to which the skill is assigned
     and the classroom names to which the topics are assigned.
@@ -1689,7 +1689,7 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         }
 
 
-class TopicAssignment(python_utils.OBJECT):
+class TopicAssignment:
     """Domain object for Topic Assignment, which provides the details of a
     single topic (and, if applicable, the subtopic within that topic) to which
     the skill is assigned.
@@ -1727,7 +1727,7 @@ class TopicAssignment(python_utils.OBJECT):
         }
 
 
-class UserSkillMastery(python_utils.OBJECT):
+class UserSkillMastery:
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id, skill_id, degree_of_mastery):
