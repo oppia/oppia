@@ -1249,10 +1249,6 @@ CLOUD_DATASTORE_EMULATOR_PORT = 8089
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 FIREBASE_EMULATOR_PORT = 9099
 
-# The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live on in the
-# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
-FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
 # duration expires, a new cookie will need to be generated. Generating a new
 # cookie requires the user to sign-in _explicitly_.

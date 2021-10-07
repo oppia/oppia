@@ -124,7 +124,7 @@ describe('PlatformFeatureService', () => {
 
     it('should save results in sessionStorage after loading.', fakeAsync(() => {
       const sessionId = 'session_id';
-      mockCookie(`SACSID=${sessionId}`);
+      mockCookie(`session=${sessionId}`);
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       const timestamp = Date.now();
@@ -147,46 +147,10 @@ describe('PlatformFeatureService', () => {
       expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
-    it(
-      'should use SACSID instead of dev_appserver_login as sessionId when' +
-      ' saving results.', fakeAsync(() => {
-        const sessionId = 'session_id';
-        mockCookie(`SACSID=${sessionId}; dev_appserver_login=should_not_use`);
-
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
-
-        flushMicrotasks();
-        const sessionItem = (
-          windowRef.nativeWindow.sessionStorage.getItem('SAVED_FEATURE_FLAGS'));
-        expect(sessionItem).not.toBeNull();
-        if (sessionItem !== null) {
-          expect(JSON.parse(sessionItem).sessionId).toEqual(sessionId);
-        }
-      })
-    );
-
-    it(
-      'should use dev_app_server_login as sessionId when no SACSID is set',
-      fakeAsync(() => {
-        const sessionId = 'session_id';
-        mockCookie(`dev_appserver_login=${sessionId}`);
-
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
-
-        flushMicrotasks();
-        const sessionItem = (
-          windowRef.nativeWindow.sessionStorage.getItem('SAVED_FEATURE_FLAGS'));
-        expect(sessionItem).not.toBeNull();
-        if (sessionItem !== null) {
-          expect(JSON.parse(sessionItem).sessionId).toEqual(sessionId);
-        }
-      })
-    );
-
     it('should load from sessionStorage if there are valid results.', fakeAsync(
       () => {
         const sessionId = 'session_id';
-        mockCookie(`SACSID=${sessionId}`);
+        mockCookie(`session=${sessionId}`);
         mockSessionStore({
           SAVED_FEATURE_FLAGS: JSON.stringify({
             sessionId: sessionId,
@@ -212,7 +176,7 @@ describe('PlatformFeatureService', () => {
     it('should load from server if saved results have expired.',
       fakeAsync(() => {
         const sessionId = 'session_id';
-        mockCookie(`SACSID=${sessionId}`);
+        mockCookie(`session=${sessionId}`);
         mockSessionStore({
           SAVED_FEATURE_FLAGS: JSON.stringify({
             sessionId: sessionId,
@@ -239,7 +203,7 @@ describe('PlatformFeatureService', () => {
       'should load from server if sessionId of saved result does not match.',
       fakeAsync(() => {
         const sessionId = 'session_id';
-        mockCookie(`SACSID=${sessionId}`);
+        mockCookie(`session=${sessionId}`);
         mockSessionStore({
           SAVED_FEATURE_FLAGS: JSON.stringify({
             sessionId: 'different session id',
@@ -268,7 +232,7 @@ describe('PlatformFeatureService', () => {
     it('should load from server if the stored features don\'t match with' +
       ' feature list', fakeAsync(() => {
       const sessionId = 'session_id';
-      mockCookie(`SACSID=${sessionId}`);
+      mockCookie(`session=${sessionId}`);
       mockSessionStore({
         SAVED_FEATURE_FLAGS: JSON.stringify({
           sessionId: sessionId,
