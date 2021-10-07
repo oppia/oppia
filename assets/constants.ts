@@ -5668,6 +5668,11 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
+  // The name of the cookie Oppia will place the session cookie into. The name
+  // is arbitrary. If it is changed later on, then the cookie will live on in
+  // the users' browsers as garbage (although it'd expire eventually).
+  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
+
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.
