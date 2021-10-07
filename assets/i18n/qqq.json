@@ -98,6 +98,7 @@
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Text displayed in the blog post editor page. - Error text of the dialog shown to upload a thumbnail image. This error is shown when the file uploaded by the user is not an image.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Text displayed in the blog post editor page. - Text of the dailog that opens when the user clicks to upload thumbnail image for the blog post.",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Text displayed in blog dashboard page and in blog post editor navbar. - It is shown as the tille of an untitled blog post.",
+	"I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE": "Warning message displayed below state content editor. - When the content written by user in editor mode results in a card more than 4500 characters in learner mode.",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Warning message displayed below state content editor. - When the content written by user in editor mode results in a card longer than 630px in learner mode.",
 	"I18N_CHAPTER_COMPLETION": "The congratulatory message shown on successful completion of a chapter.",
 	"I18N_CLASSROOM_CALLOUT_BUTTON": "Text displayed inside a button in the callout to the classroom page which is present in the library page.",
