@@ -176,6 +176,7 @@ why they need to be overriden.  */
 }
 
 .md-button.oppia-learner-confirm-button,
+.mat-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
 .md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;

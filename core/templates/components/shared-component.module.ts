@@ -70,6 +70,7 @@ import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thum
 import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edit-thumbnail-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { ProgressNavComponent } from 'pages/exploration-player-page/layout-directives/progress-nav.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
@@ -163,6 +164,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    ProgressNavComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
     RubricsEditorComponent,
@@ -225,6 +227,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    ProgressNavComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
@@ -287,6 +290,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeFeedbackEditorComponent,
+    ProgressNavComponent,
     SearchBarComponent,
     QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
