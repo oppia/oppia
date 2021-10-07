@@ -2021,7 +2021,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
-            current_states_schema_version, init_state_name):
+            current_states_schema_version, init_state_name, exp_id):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -2038,6 +2038,7 @@ class Exploration(python_utils.OBJECT):
             current_states_schema_version: int. The current states
                 schema version.
             init_state_name: str. Name of initial state.
+            exp_id: str. The ID of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -2047,6 +2048,9 @@ class Exploration(python_utils.OBJECT):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
+        elif current_states_schema_version == 49:
+            versioned_exploration_states['states'] = conversion_fn(
+                exp_id, versioned_exploration_states['states'])
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])

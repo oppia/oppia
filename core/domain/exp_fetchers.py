@@ -39,7 +39,8 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-def _migrate_states_schema(versioned_exploration_states, init_state_name):
+def _migrate_states_schema(
+        versioned_exploration_states, init_state_name, exp_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -57,6 +58,7 @@ def _migrate_states_schema(versioned_exploration_states, init_state_name):
             - states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
         init_state_name: str. Name of initial state.
+        exp_id: str. The ID of the exploration.
 
     Raises:
         Exception. The given states_schema_version is invalid.
@@ -77,7 +79,7 @@ def _migrate_states_schema(versioned_exploration_states, init_state_name):
            feconf.CURRENT_STATE_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states,
-            states_schema_version, init_state_name)
+            states_schema_version, init_state_name, exp_id)
         states_schema_version += 1
 
 
