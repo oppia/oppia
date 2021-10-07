@@ -131,26 +131,26 @@ class ConstantsTests(test_utils.GenericTestBase):
         """
         supported_content_lang_codes = [
             language['code'] 
-            for language in constants.SUPPORTED_CONTENT_LANGUAGES
+            for language in constants.constants.SUPPORTED_CONTENT_LANGUAGES
         ]
         supported_site_lang_codes = [
-            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+            language['id'] for language in constants.constants.SUPPORTED_SITE_LANGUAGES
         ]
         supported_audio_lang_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id'] for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         ]
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
-            supported_content_lang_code,
+            supported_content_lang_codes,
             [feconf.LANGUAGE_CODE_REGEX] * len(supported_content_lang_codes),
             full_match=True
         )
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
-            supported_site_lang_code,
-            [feconf.LANGUAGE_CODE_REGEX] * len(supported_site_lang_code)],
+            supported_site_lang_codes,
+            [feconf.LANGUAGE_CODE_REGEX] * len(supported_site_lang_codes),
             full_match=True
         )
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
-            supported_audio_lang_code,
-            [feconf.LANGUAGE_CODE_REGEX] * len(supported_audio_lang_code),
+            supported_audio_lang_codes,
+            [feconf.LANGUAGE_CODE_REGEX] * len(supported_audio_lang_codes),
             full_match=True
         )
