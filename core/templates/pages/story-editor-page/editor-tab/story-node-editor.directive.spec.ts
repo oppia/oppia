@@ -270,7 +270,7 @@ describe('Story node editor directive', function() {
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
         }
-        ) as NgbModalRef;
+      ) as NgbModalRef;
     });
 
     $scope.addPrerequisiteSkillId();

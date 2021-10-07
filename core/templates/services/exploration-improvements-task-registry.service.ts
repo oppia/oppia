@@ -204,7 +204,7 @@ export class ExplorationImprovementsTaskRegistryService {
         playthroughIssuesByType.get('EarlyQuit') as EqPlaythroughIssue[]);
       const misPlaythroughIssues = (
         playthroughIssuesByType.get('MultipleIncorrectSubmissions')
-       ) as MisPlaythroughIssue[];
+      ) as MisPlaythroughIssue[];
 
       this.registerNewStateTasks(
         stateName,
