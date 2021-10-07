@@ -54,7 +54,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
 
@@ -434,7 +433,7 @@ def with_metaclass(meta, *bases):
 
     Example:
 
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             pass
 
         class FormType(type):
