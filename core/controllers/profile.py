@@ -420,8 +420,6 @@ class ExportAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_EXPORT:
-            raise self.PageNotFoundException
 
         # Retrieve user data.
         user_takeout_object = takeout_service.export_data_for_user(
