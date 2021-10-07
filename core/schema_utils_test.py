@@ -1220,11 +1220,11 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
         valid_user_id_list = [
             'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in python_utils.RANGE(0, 5)
+            for i in range(0, 5)
         ]
         big_user_id_list = [
             'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in python_utils.RANGE(0, 7)
+            for i in range(0, 7)
         ]
         mappings = [
             (
@@ -1338,7 +1338,7 @@ def validation_method_for_testing(obj: Dict[str, Any]) -> None:
         raise Exception('Missing arg_b in argument.')
 
 
-class ValidateClassForTesting(python_utils.OBJECT):
+class ValidateClassForTesting:
     """Class to test 'object_class' key of schema."""
 
     def __init__(self, arg_a: str, arg_b: str) -> None:
