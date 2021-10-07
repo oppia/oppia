@@ -103,6 +103,16 @@ describe('MultipleChoiceInputValidationService', () => {
         inputs: {
           x: 1
         }
+      }, {
+        rule_type: 'Equals',
+        inputs: {
+          x: 2
+        }
+      }, {
+        rule_type: 'Equals',
+        inputs: {
+          x: 3
+        }
       }].map(
         ruleDict => rof.createFromBackendDict(ruleDict, 'MultipleChoiceInput')),
       goodDefaultOutcome,
