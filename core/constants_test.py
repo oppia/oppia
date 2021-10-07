@@ -130,9 +130,8 @@ class ConstantsTests(test_utils.GenericTestBase):
         conforms to the regex defined in core/feconf.py.
         """
         supported_content_lang_codes = [
-            language[u'code']
-            for language
-            in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+            language['code'] 
+            for language in constants.SUPPORTED_CONTENT_LANGUAGES
         ]
         supported_site_language_code = [
             language[u'id']
