@@ -66,6 +66,14 @@ angular.module('oppia').directive('stateContentEditor', [
             StateContentService, StateEditorService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          $scope.isCardContentLengthLimitReached = function() {
+            if (StateContentService.displayed === undefined) {
+              return false;
+            }
+            var content = StateContentService.displayed.html;
+            return (content.length > 4500);
+          };
+
           $scope.isCardHeightLimitReached = function() {
             var shadowPreviewCard = $(
               '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
