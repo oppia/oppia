@@ -145,12 +145,12 @@ class ConstantsTests(test_utils.GenericTestBase):
             full_match=True
         )
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
-            supported_site_language_code,
-            [feconf.LANGUAGE_CODE_REGEX
-            for i in range(len(supported_site_language_code))],
-            full_match=True)
+            supported_site_lang_code,
+            [feconf.LANGUAGE_CODE_REGEX] * len(supported_site_lang_code)],
+            full_match=True
+        )
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
-            supported_audio_language_code,
-            [feconf.LANGUAGE_CODE_REGEX
-            for i in range(len(supported_audio_language_code))],
-            full_match=True)
+            supported_audio_lang_code,
+            [feconf.LANGUAGE_CODE_REGEX] * len(supported_audio_lang_code),
+            full_match=True
+        )
