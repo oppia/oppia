@@ -129,7 +129,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         SUPPORTED_SITE_LANGUAGES, and SUPPORTED_AUDIO_LANGUAGES
         conforms to the regex defined in core/feconf.py.
         """
-        supported_content_language_code = [
+        supported_content_lang_codes = [
             language[u'code']
             for language
             in constants.constants.SUPPORTED_CONTENT_LANGUAGES
