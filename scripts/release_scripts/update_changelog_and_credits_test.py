@@ -463,7 +463,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'ask_user_to_confirm_gets_called': 3,
             'is_order_of_sections_valid_gets_called': 2
         }
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def readlines(self):
                 """Read lines of the file object."""
 
