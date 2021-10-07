@@ -405,8 +405,7 @@ class DeleteAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def delete(self):
         """Handles DELETE requests."""
-        if not True:
-            raise self.PageNotFoundException
+        raise self.PageNotFoundException
 
         wipeout_service.pre_delete_user(self.user_id)
         self.render_json({'success': True})

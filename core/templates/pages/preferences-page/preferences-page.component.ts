@@ -245,7 +245,6 @@ export class PreferencesPageComponent {
       this.loaderService.hideLoadingScreen();
     });
 
-    this.userCanDeleteAccount = true;
     this.userCanExportAccount = AppConstants.ENABLE_ACCOUNT_EXPORT;
     this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
