@@ -43,4 +43,4 @@ jobs:
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "A frontend test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+          webhook-url: https://webhooktest.com/864ab4699a2e48a9a9e68a85d02264b3
