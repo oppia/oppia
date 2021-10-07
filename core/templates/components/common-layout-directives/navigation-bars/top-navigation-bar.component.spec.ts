@@ -398,6 +398,7 @@ describe('TopNavigationBarComponent', () => {
       isLoggedIn: () => true
     } as UserInfo);
     spyOn(userBackendApiService, 'updatePreferredSiteLanguageAsync').and.stub();
+
     component.currentLanguageCode = 'en';
     component.currentLanguageText = 'English';
 

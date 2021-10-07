@@ -286,6 +286,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       }
     );
 
+    // Code to load site according to the language parameter in URL if present.
     let url = new URL(this.windowRef.nativeWindow.location.toString());
     const searchParams = url.searchParams;
 
@@ -311,8 +312,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     // is set according to the URL language parameter.
     this.translateCacheService.init();
 
-    const cachedLanguage = this.translateCacheService.getCachedLanguage();
-    this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+    const cachedLanguageCode = (
+      this.translateCacheService.getCachedLanguage());
+    if (cachedLanguageCode) {
+      this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguageCode);
+    }
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

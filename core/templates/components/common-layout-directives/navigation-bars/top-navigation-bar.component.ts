@@ -174,6 +174,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       if (userInfo.getPreferredSiteLanguageCode()) {
         this.i18nLanguageCodeService.setI18nLanguageCode(
           userInfo.getPreferredSiteLanguageCode());
+
+        // This removes language parameter from URL if present as we load
+        // the webpage in preffered site language.
+        this.removeUrlLangParam();
       }
       this.currentLanguageCode = (
         this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
@@ -268,6 +272,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           this.currentLanguageCode);
       }
     });
+    this.removeUrlLangParam();
+  }
+
+  removeUrlLangParam(): void {
+    let url = new URL(this.windowRef.nativeWindow.location.toString());
+    if (url.searchParams.has('lang')) {
+      url.searchParams.delete('lang');
+      this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
+    }
   }
 
   onLoginButtonClicked(): void {
