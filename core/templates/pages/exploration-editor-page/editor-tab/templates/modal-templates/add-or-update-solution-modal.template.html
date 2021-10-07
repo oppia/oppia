@@ -34,14 +34,29 @@
       </div>
     </div>
   </form>
+  <div ng-if="isSolutionExplanationLengthExceeded(data.explanationHtml)" class="oppia-outcome-feedback-length-exceeded-error">
+    The solution explanation is too long. Please make it under 200 characters.
+  </div>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           ng-click="saveSolution()"
-          ng-disabled="data.correctAnswer === null || !data.explanationHtml || isSubmitButtonDisabled()"
+          ng-disabled="data.correctAnswer === null || !data.explanationHtml || isSubmitButtonDisabled() || isSolutionExplanationLengthExceeded(data.explanationHtml)"
           title="Check if the solution corresponds to a correct answer and save it.">
     Check and Save Solution
   </button>
 </div>
+<style>
+  .oppia-outcome-feedback-length-exceeded-error {
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>

@@ -110,6 +110,10 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
       return interactionSpecs.show_generic_submit_button;
     };
 
+    $scope.isSolutionExplanationLengthExceeded = function(solExplanation) {
+      return (solExplanation.length > 200);
+    };
+
     $scope.saveSolution = function() {
       if (typeof $scope.data.answerIsExclusive === 'boolean' &&
           $scope.data.correctAnswer !== null &&
