@@ -130,14 +130,16 @@ class ConstantsTests(test_utils.GenericTestBase):
         conforms to the regex defined in core/feconf.py.
         """
         supported_content_lang_codes = [
-            language['code'] 
-            for language in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+            language['code'] for language
+            in constants.constants.SUPPORTED_CONTENT_LANGUAGES
         ]
         supported_site_lang_codes = [
-            language['id'] for language in constants.constants.SUPPORTED_SITE_LANGUAGES
+            language['id'] for language
+            in constants.constants.SUPPORTED_SITE_LANGUAGES
         ]
         supported_audio_lang_codes = [
-            language['id'] for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id'] for language
+            in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         ]
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
             supported_content_lang_codes,
