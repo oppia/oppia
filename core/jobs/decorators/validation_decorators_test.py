@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import collections
 import re
 
-from core import python_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import model_property
 from core.platform import models
@@ -84,7 +83,7 @@ class DerivedDoFn(DoFn):
         pass
 
 
-class NotDoFn(python_utils.OBJECT):
+class NotDoFn:
     """Class that does not inherit from DoFn."""
 
     def process(self, unused_item):
