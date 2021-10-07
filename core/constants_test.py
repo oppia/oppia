@@ -137,9 +137,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
         ]
         supported_audio_lang_codes = [
-            language[u'id']
-            for language
-            in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
         ]
         self.assert_matches_regexps( # type: ignore[no-untyped-call]
             supported_content_language_code,
