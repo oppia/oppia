@@ -995,7 +995,7 @@ class InteractionInstance(python_utils.OBJECT):
             .convert_customization_args_dict_to_customization_args(
                 interaction_id,
                 interaction_dict['customization_args']))
-        ca_specs = interaction_registry.get_interaction_by_id(
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
             interaction_id).customization_arg_specs
 
         for ca_spec in ca_specs:
@@ -1246,9 +1246,11 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
 
         if is_subtitled_html_spec:
-            value['image_sizes_in_bytes'] = (
+            print("***")
+            print(value)
+            value.image_sizes_in_bytes = (
                 html_cleaner.get_image_sizes_in_bytes_from_html(
-                    value['html'],
+                    value.html,
                     entity_type,
                     entity_id))
         elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
@@ -3072,13 +3074,20 @@ class State(python_utils.OBJECT):
         self.written_translations.mark_written_translations_as_needing_update(
             content_id)
 
-    def update_content(self, content):
+    def update_content(self, content, entity_type, entity_id):
         """Update the content of this state.
 
         Args:
             content: SubtitledHtml. Representation of updated content.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
+        # Update the image_sizes_in_bytes dict with the images contained
+        # in the html here.
+        content.image_sizes_in_bytes = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                content.html,
+                entity_type,
+                entity_id))
         self.content = content
 
     def update_param_changes(self, param_changes):

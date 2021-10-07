@@ -365,6 +365,8 @@ def apply_change_list(exploration_id, change_list):
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
         to_param_domain = param_domain.ParamChange.from_dict
+        print("*********")
+        print(change_list)
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
@@ -381,10 +383,19 @@ def apply_change_list(exploration_id, change_list):
                         list(python_utils.MAP(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                    print("State property content change is called...")
+                    print("Printing change.new_value here...")
+                    print(change.new_value)
                     content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
+                    print("State content from_dict worked successfully")
                     content.validate()
-                    state.update_content(content)
+                    print("Content validated successfully")
+                    state.update_content(
+                        content,
+                        feconf.ENTITY_TYPE_EXPLORATION,
+                        exploration_id)
+                    print("Content updated successfully...")
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)

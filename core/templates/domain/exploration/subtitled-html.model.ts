@@ -20,6 +20,7 @@
 export interface SubtitledHtmlBackendDict {
   'content_id': string | null;
   'html': string;
+  'image_sizes_in_bytes': object | null;
 }
 
 export class SubtitledHtml {
@@ -28,15 +29,24 @@ export class SubtitledHtml {
   // but not saved. Before the 'SubtitledHtml' object is saved into a State,
   // the 'content_id' should be set to a string.
   _contentId: string | null;
-  constructor(html: string, contentId: string | null) {
+  // A null 'image_sizes_in_bytes' indicates that the dictionary mapping
+  // with the rich text images to its size in bytes is not computed yet. This
+  // operation is done in the backend, before saving the SubtitledHtml in a
+  // model.
+  _imageSizesInBytes: object | null;
+  constructor(html: string,
+              contentId: string | null,
+              imageSizesInBytes: object | null) {
     this._html = html;
     this._contentId = contentId;
+    this._imageSizesInBytes = imageSizesInBytes;
   }
 
   toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
-      content_id: this._contentId
+      content_id: this._contentId,
+      image_sizes_in_bytes: this._imageSizesInBytes
     };
   }
 
@@ -62,10 +72,11 @@ export class SubtitledHtml {
   static createFromBackendDict(
       subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
-      subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
+      subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id,
+      subtitledHtmlBackendDict.image_sizes_in_bytes);
   }
 
-  static createDefault(html: string, contentId: string): SubtitledHtml {
-    return new SubtitledHtml(html, contentId);
+  static createDefault(html: string, contentId: string, imageSizesInBytes: object | null): SubtitledHtml {
+    return new SubtitledHtml(html, contentId, imageSizesInBytes);
   }
 }

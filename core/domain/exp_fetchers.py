@@ -169,7 +169,10 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states, init_state_name)
+        _migrate_states_schema(
+            versioned_exploration_states,
+            init_state_name,
+            exploration_model.id)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
