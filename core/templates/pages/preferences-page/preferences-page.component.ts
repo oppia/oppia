@@ -246,7 +246,6 @@ export class PreferencesPageComponent {
     });
 
     this.userCanDeleteAccount = AppConstants.ENABLE_ACCOUNT_DELETION;
-    this.userCanExportAccount = AppConstants.ENABLE_ACCOUNT_EXPORT;
     this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();
