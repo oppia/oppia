@@ -33,12 +33,12 @@
                              displayed-card="displayedCard">
           </supplemental-card>
         </div>
-        <progress-nav on-submit="submitAnswerFromProgressNav()"
-                      submit-button-is-disabled="submitButtonIsDisabled()"
-                      displayed-card="displayedCard"
-                      submit-button-is-shown="!answerIsBeingProcessed"
-                      on-click-continue-button="showUpcomingCard()">
-        </progress-nav>
+        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
+                            [submit-button-is-disabled]="submitButtonIsDisabled()"
+                            [displayed-card]="displayedCard"
+                            [submit-button-is-shown]="!answerIsBeingProcessed"
+                            (click-continue-button)="showUpcomingCard()">
+        </oppia-progress-nav>
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
