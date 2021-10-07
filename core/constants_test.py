@@ -133,7 +133,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             language['code'] 
             for language in constants.SUPPORTED_CONTENT_LANGUAGES
         ]
-        supported_site_language_code = [
+        supported_site_lang_codes = [
             language[u'id']
             for language
             in constants.constants.SUPPORTED_SITE_LANGUAGES
