@@ -54,7 +54,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
 
