@@ -317,15 +317,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
         self.logout()
 
-    def test_update_preferences_with_invalid_update_type_raises_exception(self):
-        self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        with self.assertRaisesRegexp(Exception, 'Invalid update type:'):
-            self.put_json(
-                feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'invalid_update_type'},
-                csrf_token=csrf_token)
-        self.logout()
 
 
 class LongUserBioHandlerTests(test_utils.GenericTestBase):
