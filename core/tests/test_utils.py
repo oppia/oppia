@@ -199,7 +199,7 @@ def get_storage_model_classes():
                     yield clazz
 
 
-class ElasticSearchStub(python_utils.OBJECT):
+class ElasticSearchStub:
     """This stub class mocks the functionality of ES in
     elastic_search_services.py.
 
@@ -514,7 +514,7 @@ class ElasticSearchStub(python_utils.OBJECT):
         }
 
 
-class AuthServicesStub(python_utils.OBJECT):
+class AuthServicesStub:
     """Test-only implementation of the public API in core.platform.auth."""
 
     def __init__(self):
@@ -765,7 +765,7 @@ class AuthServicesStub(python_utils.OBJECT):
         self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
-class TaskqueueServicesStub(python_utils.OBJECT):
+class TaskqueueServicesStub:
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.taskqueue taskqueue services API.
     """
@@ -866,7 +866,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         return self._client.get_tasks(queue_name=queue_name)
 
 
-class MemoryCacheServicesStub(python_utils.OBJECT):
+class MemoryCacheServicesStub:
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.cache cache services API.
     """
@@ -1046,7 +1046,7 @@ class TestBase(unittest.TestCase):
         """
         captured_logs = []
 
-        class ListStream(python_utils.OBJECT):
+        class ListStream:
             """Stream-like object that appends writes to the captured logs."""
 
             def write(self, msg):
@@ -3404,7 +3404,7 @@ class LinterTestBase(GenericTestBase):
         self.assertEqual(failed_count, expected_failed_count)
 
 
-class EmailMessageMock(python_utils.OBJECT):
+class EmailMessageMock:
     """Mock for core.platform.models email services messages."""
 
     def __init__(
@@ -3622,7 +3622,7 @@ class ClassifierTestBase(GenericEmailTestBase):
         return classifier_data_proto
 
 
-class FunctionWrapper(python_utils.OBJECT):
+class FunctionWrapper:
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
     methods for more info.
