@@ -29,6 +29,7 @@ from unittest import mock
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import user_services
 from core.platform import models
@@ -64,7 +65,7 @@ RecordsPartitionTupleType = Tuple[
 ]
 
 
-class FirebaseAdminSdkStub(python_utils.OBJECT):
+class FirebaseAdminSdkStub:
     """Helper class for swapping the Firebase Admin SDK with a stateful stub.
 
     NOT INTENDED TO BE USED DIRECTLY. Just install it and then interact with the
@@ -949,7 +950,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         if id_token:
             req.headers['Authorization'] = 'Bearer %s' % id_token
         if session_cookie:
-            req.cookies[feconf.FIREBASE_SESSION_COOKIE_NAME] = session_cookie
+            req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = (
+                session_cookie)
         return req
 
     def create_response(
@@ -967,7 +969,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         res = webapp2.Response()
         if session_cookie:
             res.set_cookie(
-                feconf.FIREBASE_SESSION_COOKIE_NAME, value=session_cookie)
+                constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
+                value=session_cookie)
         return res
 
 

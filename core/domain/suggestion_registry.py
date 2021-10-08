@@ -42,7 +42,7 @@ from core.platform import models
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(python_utils.OBJECT):
+class BaseSuggestion:
     """Base class for a suggestion.
 
     Attributes:
@@ -986,7 +986,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
 
 
-class BaseVoiceoverApplication(python_utils.OBJECT):
+class BaseVoiceoverApplication:
     """Base class for a voiceover application."""
 
     def __init__(self):
@@ -1198,7 +1198,7 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
 }
 
 
-class CommunityContributionStats(python_utils.OBJECT):
+class CommunityContributionStats:
     """Domain object for the CommunityContributionStatsModel.
 
     Attributes:
@@ -1399,7 +1399,7 @@ class CommunityContributionStats(python_utils.OBJECT):
                     self.question_reviewer_count)))
 
 
-class TranslationContributionStats(python_utils.OBJECT):
+class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
     def __init__(
@@ -1473,7 +1473,7 @@ class TranslationContributionStats(python_utils.OBJECT):
         }
 
 
-class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
+class ReviewableSuggestionEmailInfo:
     """Stores key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.

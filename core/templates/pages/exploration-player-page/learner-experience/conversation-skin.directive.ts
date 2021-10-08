@@ -31,7 +31,7 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'correctness-footer.component.ts');
 require(
-  'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
+  'pages/exploration-player-page/layout-directives/progress-nav.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'learner-answer-info-card.component.ts');
@@ -1426,6 +1426,12 @@ angular.module('oppia').directive('conversationSkin', [
               ContentTranslationManagerService
                 .onStateCardContentUpdate.subscribe(
                   () => $rootScope.$applyAsync())
+            );
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.displayedCardIndexChangedEventEmitter
+                .subscribe(
+                  () => $rootScope.$applyAsync()
+                )
             );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {

@@ -27,7 +27,7 @@ from core import schema_utils
 from core.constants import constants
 
 
-class BaseObject(python_utils.OBJECT):
+class BaseObject:
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as

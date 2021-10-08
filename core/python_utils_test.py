@@ -26,6 +26,7 @@ import os
 import sys
 import tempfile
 import unittest
+import urllib
 
 from core import python_utils
 from core.tests import test_utils
@@ -98,7 +99,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(5, 2), 2)
 
     def test_with_metaclass(self):
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             """Test baseclass."""
 
             pass
@@ -142,7 +143,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.geturl(), 'http://www.google.com')
 
     def test_url_unsplit(self):
-        response = python_utils.url_split('http://www.google.com')
+        response = urllib.parse.urlsplit('http://www.google.com')
         self.assertEqual(
             python_utils.url_unsplit(response), 'http://www.google.com')
 

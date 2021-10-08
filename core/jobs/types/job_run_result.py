@@ -30,7 +30,7 @@ from typing import Any, List, Tuple # isort: skip
 MAX_OUTPUT_BYTES = 1500
 
 
-class JobRunResult(python_utils.OBJECT):
+class JobRunResult:
     """Encapsulates the result of a job run.
 
     The stdout and stderr are string values analogous to a program's stdout and

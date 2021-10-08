@@ -39,7 +39,7 @@ UserQueryParams.__new__.__defaults__ = (None,) * len(
     UserQueryParams._fields)
 
 
-class UserQuery(python_utils.OBJECT):
+class UserQuery:
     """Domain object for the UserQueryModel."""
 
     def __init__(

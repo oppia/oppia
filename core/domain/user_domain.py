@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 
 
-class UserSettings(python_utils.OBJECT):
+class UserSettings:
     """Value object representing a user's settings.
 
     Attributes:
@@ -423,7 +423,7 @@ class UserSettings(python_utils.OBJECT):
         self.roles = [default_role]
 
 
-class UserActionsInfo(python_utils.OBJECT):
+class UserActionsInfo:
     """A class representing information of user actions.
     Attributes:
         user_id: str. The unique ID of the user.
@@ -464,7 +464,7 @@ class UserActionsInfo(python_utils.OBJECT):
         return self._actions
 
 
-class UserContributions(python_utils.OBJECT):
+class UserContributions:
     """Value object representing a user's contributions.
 
     Attributes:
@@ -533,7 +533,7 @@ class UserContributions(python_utils.OBJECT):
                         exploration_id))
 
 
-class UserGlobalPrefs(python_utils.OBJECT):
+class UserGlobalPrefs:
     """Domain object for user global email preferences.
 
     Attributes:
@@ -579,7 +579,7 @@ class UserGlobalPrefs(python_utils.OBJECT):
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
 
-class UserExplorationPrefs(python_utils.OBJECT):
+class UserExplorationPrefs:
     """Domain object for user exploration email preferences.
 
     Attributes:
@@ -625,7 +625,7 @@ class UserExplorationPrefs(python_utils.OBJECT):
         }
 
 
-class ExpUserLastPlaythrough(python_utils.OBJECT):
+class ExpUserLastPlaythrough:
     """Domain object for an exploration last playthrough model."""
 
     def __init__(
@@ -652,7 +652,7 @@ class ExpUserLastPlaythrough(python_utils.OBJECT):
         self.last_played_state_name = last_played_state_name
 
 
-class IncompleteActivities(python_utils.OBJECT):
+class IncompleteActivities:
     """Domain object for the incomplete activities model."""
 
     def __init__(
@@ -742,7 +742,7 @@ class IncompleteActivities(python_utils.OBJECT):
         self.partially_learnt_topic_ids.remove(partially_learnt_topic_id)
 
 
-class CompletedActivities(python_utils.OBJECT):
+class CompletedActivities:
     """Domain object for the activities completed by learner model."""
 
     def __init__(
@@ -832,7 +832,7 @@ class CompletedActivities(python_utils.OBJECT):
         self.learnt_topic_ids.remove(learnt_topic_id)
 
 
-class LearnerGoals(python_utils.OBJECT):
+class LearnerGoals:
     """Domain object for the learner goals model."""
 
     def __init__(
@@ -870,7 +870,7 @@ class LearnerGoals(python_utils.OBJECT):
         }
 
 
-class LearnerPlaylist(python_utils.OBJECT):
+class LearnerPlaylist:
     """Domain object for the learner playlist model."""
 
     def __init__(
@@ -937,7 +937,7 @@ class LearnerPlaylist(python_utils.OBJECT):
         self.collection_ids.remove(collection_id)
 
 
-class UserContributionProficiency(python_utils.OBJECT):
+class UserContributionProficiency:
     """Domain object for UserContributionProficiencyModel."""
 
     def __init__(self, user_id, score_category, score, onboarding_email_sent):
@@ -975,7 +975,7 @@ class UserContributionProficiency(python_utils.OBJECT):
         self.onboarding_email_sent = True
 
 
-class UserContributionRights(python_utils.OBJECT):
+class UserContributionRights:
     """Domain object for the UserContributionRightsModel."""
 
     def __init__(
@@ -1046,7 +1046,7 @@ class UserContributionRights(python_utils.OBJECT):
                 'found: %s' % type(self.can_submit_questions))
 
 
-class ModifiableUserData(python_utils.OBJECT):
+class ModifiableUserData:
     """Domain object to represent the new values in a UserSettingsModel change
     submitted by the Android client.
     """
