@@ -1485,8 +1485,8 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 # example '/access_validation_handler/validate_access_to_splash_page'.
 ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'
 
-# Regex to check for valid format of language code
-# Currently we use language code consists of the below types
-# 1) 'en', 2) 'kab', and 3) 'hi-en'.
-# Currently we are keeping out language code ISO 639 compatible.
+# Regex to check for valid format of language code.
+# Currently, we use language code consists of the below types
+# 'en', 'kab', and 'hi-en'. We are also keeping our language 
+# codes ISO 639 compatible.
 LANGUAGE_CODE_REGEX = '^[a-z]{2,4}([-]([a-z]{2,}))?$'
