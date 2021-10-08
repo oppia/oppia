@@ -70,7 +70,8 @@ describe('State card object factory', () => {
         dest: '(untitled state)',
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         param_changes: [],
         labelled_as_correct: false,

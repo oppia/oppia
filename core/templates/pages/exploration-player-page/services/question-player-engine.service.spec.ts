@@ -56,7 +56,8 @@ describe('Question player engine service ', () => {
         solicit_answer_details: false,
         content: {
           content_id: '1',
-          html: 'Question 1'
+          html: 'Question 1',
+          image_sizes_in_bytes: {}
         },
         written_translations: {
           translations_mapping: {
@@ -73,7 +74,8 @@ describe('Question player engine service ', () => {
               dest: 'State 1',
               feedback: {
                 content_id: 'feedback_1',
-                html: '<p>Try Again.</p>'
+                html: '<p>Try Again.</p>',
+                image_sizes_in_bytes: {}
               },
               param_changes: [],
               refresher_exploration_id: null,
@@ -92,7 +94,8 @@ describe('Question player engine service ', () => {
               dest: 'State 2',
               feedback: {
                 content_id: 'feedback_2',
-                html: '<p>Try Again.</p>'
+                html: '<p>Try Again.</p>',
+                image_sizes_in_bytes: {}
               },
               param_changes: [],
               refresher_exploration_id: null,
@@ -114,7 +117,8 @@ describe('Question player engine service ', () => {
             param_changes: [],
             feedback: {
               content_id: 'feedback_id',
-              html: '<p>Dummy Feedback</p>'
+              html: '<p>Dummy Feedback</p>',
+              image_sizes_in_bytes: {}
             }
           },
           id: 'TextInput',
@@ -134,7 +138,8 @@ describe('Question player engine service ', () => {
             {
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p>This is a hint.</p>'
+                html: '<p>This is a hint.</p>',
+                image_sizes_in_bytes: {}
               }
             }
           ],
@@ -142,7 +147,8 @@ describe('Question player engine service ', () => {
             correct_answer: 'Solution',
             explanation: {
               content_id: 'solution',
-              html: '<p>This is a solution.</p>'
+              html: '<p>This is a solution.</p>',
+              image_sizes_in_bytes: {}
             },
             answer_is_exclusive: false
           }
@@ -175,7 +181,8 @@ describe('Question player engine service ', () => {
         solicit_answer_details: false,
         content: {
           content_id: '1',
-          html: 'Question 1'
+          html: 'Question 1',
+          image_sizes_in_bytes: {}
         },
         written_translations: {
           translations_mapping: {
@@ -196,7 +203,8 @@ describe('Question player engine service ', () => {
             param_changes: [],
             feedback: {
               content_id: 'feedback_id',
-              html: '<p>Dummy Feedback</p>'
+              html: '<p>Dummy Feedback</p>',
+              image_sizes_in_bytes: {}
             }
           },
           id: 'TextInput',
@@ -216,7 +224,8 @@ describe('Question player engine service ', () => {
             {
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p>This is a hint.</p>'
+                html: '<p>This is a hint.</p>',
+                image_sizes_in_bytes: {}
               }
             }
           ],
@@ -224,7 +233,8 @@ describe('Question player engine service ', () => {
             correct_answer: 'Solution',
             explanation: {
               content_id: 'solution',
-              html: '<p>This is a solution.</p>'
+              html: '<p>This is a solution.</p>',
+              image_sizes_in_bytes: {}
             },
             answer_is_exclusive: false
           }
@@ -256,7 +266,8 @@ describe('Question player engine service ', () => {
         solicit_answer_details: false,
         content: {
           content_id: '2',
-          html: 'Question 2'
+          html: 'Question 2',
+          image_sizes_in_bytes: {}
         },
         written_translations: {
           translations_mapping: {
@@ -277,7 +288,8 @@ describe('Question player engine service ', () => {
             param_changes: [],
             feedback: {
               content_id: 'feedback_id',
-              html: '<p>Dummy Feedback</p>'
+              html: '<p>Dummy Feedback</p>',
+              image_sizes_in_bytes: {}
             }
           },
           id: 'TextInput',
@@ -297,7 +309,8 @@ describe('Question player engine service ', () => {
             {
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p>This is a hint.</p>'
+                html: '<p>This is a hint.</p>',
+                image_sizes_in_bytes: {}
               }
             }
           ],
@@ -305,7 +318,8 @@ describe('Question player engine service ', () => {
             correct_answer: 'Solution',
             explanation: {
               content_id: 'solution',
-              html: '<p>This is a solution.</p>'
+              html: '<p>This is a solution.</p>',
+              image_sizes_in_bytes: {}
             },
             answer_is_exclusive: false
           }
@@ -337,7 +351,8 @@ describe('Question player engine service ', () => {
         solicit_answer_details: false,
         content: {
           content_id: '3',
-          html: 'Question 3'
+          html: 'Question 3',
+          image_sizes_in_bytes: {}
         },
         written_translations: {
           translations_mapping: {
@@ -358,7 +373,8 @@ describe('Question player engine service ', () => {
             param_changes: [],
             feedback: {
               content_id: 'feedback_id',
-              html: '<p>Dummy Feedback</p>'
+              html: '<p>Dummy Feedback</p>',
+              image_sizes_in_bytes: {}
             }
           },
           id: 'TextInput',
@@ -378,7 +394,8 @@ describe('Question player engine service ', () => {
             {
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p>This is a hint.</p>'
+                html: '<p>This is a hint.</p>',
+                image_sizes_in_bytes: {}
               }
             }
           ],
@@ -386,7 +403,8 @@ describe('Question player engine service ', () => {
             correct_answer: 'Solution',
             explanation: {
               content_id: 'solution',
-              html: '<p>This is a solution.</p>'
+              html: '<p>This is a solution.</p>',
+              image_sizes_in_bytes: {}
             },
             answer_is_exclusive: false
           }

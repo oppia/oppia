@@ -174,7 +174,8 @@ describe('Exploration editor tab component', function() {
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
-          html: 'First State Content'
+          html: 'First State Content',
+          image_sizes_in_bytes: {}
         },
         interaction: {
           id: 'TextInput',
@@ -191,7 +192,8 @@ describe('Exploration editor tab component', function() {
               dest: 'unused',
               feedback: {
                 content_id: 'feedback_1',
-                html: ''
+                html: '',
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -202,7 +204,8 @@ describe('Exploration editor tab component', function() {
             dest: 'default',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -213,7 +216,8 @@ describe('Exploration editor tab component', function() {
             answer_is_exclusive: false,
             explanation: {
               html: 'Solution explanation',
-              content_id: 'content_4'
+              content_id: 'content_4',
+              image_sizes_in_bytes: {}
             }
           },
           hints: []
@@ -253,7 +257,8 @@ describe('Exploration editor tab component', function() {
         card_is_checkpoint: false,
         content: {
           content_id: 'content',
-          html: 'Second State Content'
+          html: 'Second State Content',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -277,7 +282,8 @@ describe('Exploration editor tab component', function() {
               dest: 'unused',
               feedback: {
                 content_id: 'feedback_1',
-                html: ''
+                html: '',
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -288,7 +294,8 @@ describe('Exploration editor tab component', function() {
             dest: 'default',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -399,12 +406,14 @@ describe('Exploration editor tab component', function() {
     expect(explorationStatesService.getState('First State').content).toEqual(
       SubtitledHtml.createFromBackendDict({
         content_id: 'content',
-        html: 'First State Content'
+        html: 'First State Content',
+        image_sizes_in_bytes: {}
       }));
 
     var displayedValue = SubtitledHtml.createFromBackendDict({
       content_id: 'content',
-      html: 'First State Content Changed'
+      html: 'First State Content Changed',
+      image_sizes_in_bytes: {}
     });
     ctrl.saveStateContent(displayedValue);
 
@@ -462,7 +471,8 @@ describe('Exploration editor tab component', function() {
           dest: 'unused',
           feedback: {
             content_id: 'feedback_1',
-            html: ''
+            html: '',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -476,7 +486,8 @@ describe('Exploration editor tab component', function() {
         dest: 'Second State',
         feedback: {
           content_id: 'feedback_1',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -500,7 +511,8 @@ describe('Exploration editor tab component', function() {
         dest: 'default',
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -511,7 +523,8 @@ describe('Exploration editor tab component', function() {
       dest: 'Second State',
       feedback: {
         content_id: 'default_outcome_changed',
-        html: 'This is the default outcome changed'
+        html: 'This is the default outcome changed',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -558,7 +571,8 @@ describe('Exploration editor tab component', function() {
         answer_is_exclusive: false,
         explanation: {
           html: 'Solution explanation',
-          content_id: 'content_4'
+          content_id: 'content_4',
+          image_sizes_in_bytes: {}
         }
       }));
 
@@ -567,7 +581,8 @@ describe('Exploration editor tab component', function() {
       answer_is_exclusive: true,
       explanation: {
         html: 'Solution complete explanation',
-        content_id: 'content_4'
+        content_id: 'content_4',
+        image_sizes_in_bytes: {}
       }
     });
     ctrl.saveSolution(displayedValue);
@@ -586,7 +601,8 @@ describe('Exploration editor tab component', function() {
     var displayedValue = [hintObjectFactory.createFromBackendDict({
       hint_content: {
         content_id: '',
-        html: 'This is a hint'
+        html: 'This is a hint',
+        image_sizes_in_bytes: {}
       }
     })];
     ctrl.saveHints(displayedValue);

@@ -79,6 +79,7 @@ describe('Editor state service', () => {
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
+              image_sizes_in_bytes: {}
             },
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
@@ -95,6 +96,7 @@ describe('Editor state service', () => {
         feedback: {
           content_id: '',
           html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -120,6 +122,7 @@ describe('Editor state service', () => {
         explanation: {
           content_id: '2',
           html: 'test_explanation1',
+          image_sizes_in_bytes: {}
         },
       },
     });
@@ -212,8 +215,8 @@ describe('Editor state service', () => {
     const customizationArgsForMultipleChoiceInput = {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', ''),
-          new SubtitledHtml('Choice 2', '')
+          new SubtitledHtml('Choice 1', '', {}),
+          new SubtitledHtml('Choice 2', '', {})
         ]
       }
     };
@@ -253,8 +256,8 @@ describe('Editor state service', () => {
     const customizationArgsForItemSelectionAndDragAndDropInput = {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', 'ca_choices_0'),
-          new SubtitledHtml('Choice 2', 'ca_choices_1')
+          new SubtitledHtml('Choice 1', 'ca_choices_0', {}),
+          new SubtitledHtml('Choice 2', 'ca_choices_1', {})
         ]
       }
     };
@@ -292,8 +295,8 @@ describe('Editor state service', () => {
     expect(ecs.getAnswerChoices('', {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', ''),
-          new SubtitledHtml('Choice 2', '')
+          new SubtitledHtml('Choice 1', '', {}),
+          new SubtitledHtml('Choice 2', '', {})
         ]
       }
     })).toBeNull();
@@ -484,6 +487,7 @@ describe('Editor state service', () => {
       explanation: {
         content_id: '2',
         html: 'test_explanation1_new',
+        image_sizes_in_bytes: {}
       },
     });
     ecs.setInteraction(mockInteraction);
@@ -493,6 +497,7 @@ describe('Editor state service', () => {
       explanation: {
         content_id: '2',
         html: 'test_explanation1',
+        image_sizes_in_bytes: {}
       },
     }));
     ecs.setInteractionSolution(newSolution);
@@ -503,7 +508,8 @@ describe('Editor state service', () => {
     let newHints = [hof.createFromBackendDict({
       hint_content: {
         content_id: '',
-        html: 'This is a hint'
+        html: 'This is a hint',
+        image_sizes_in_bytes: {}
       }
     })];
     ecs.setInteraction(mockInteraction);

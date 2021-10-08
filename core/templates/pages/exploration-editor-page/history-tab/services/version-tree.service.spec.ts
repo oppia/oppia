@@ -104,11 +104,13 @@ describe('Versions tree service', () => {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          content_id: '2'
+          content_id: '2',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           html: '',
-          content_id: '1'
+          content_id: '1',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],
@@ -200,11 +202,13 @@ describe('Versions tree service', () => {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          content_id: '2'
+          content_id: '2',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           html: '',
-          content_id: '1'
+          content_id: '1',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }]);

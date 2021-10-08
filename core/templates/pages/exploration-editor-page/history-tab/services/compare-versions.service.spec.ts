@@ -78,7 +78,8 @@ describe('Compare versions service', function() {
         var newStateData = {
           content: {
             content_id: 'content',
-            html: statesDetails[stateName].contentStr
+            html: statesDetails[stateName].contentStr,
+            image_sizes_in_bytes: {}
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -93,7 +94,8 @@ describe('Compare versions service', function() {
               dest: 'default',
               feedback: {
                 content_id: 'default_outcome',
-                html: ''
+                html: '',
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -146,11 +148,13 @@ describe('Compare versions service', function() {
         state_name: 'A',
         new_value: {
           content_id: 'content',
-          html: 'Some text'
+          html: 'Some text',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           content_id: 'content',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],
@@ -208,11 +212,13 @@ describe('Compare versions service', function() {
         state_name: 'C',
         new_value: {
           content_id: 'content',
-          html: 'More text'
+          html: 'More text',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           content_id: 'content',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],
@@ -257,11 +263,13 @@ describe('Compare versions service', function() {
         state_name: 'A',
         new_value: {
           content_id: 'content',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           content_id: 'content',
-          html: 'Some text'
+          html: 'Some text',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],
@@ -764,11 +772,13 @@ describe('Compare versions service', function() {
         state_name: 'D',
         new_value: {
           content_id: 'content',
-          html: 'Some text'
+          html: 'Some text',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           content_id: 'content',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],
@@ -1034,11 +1044,13 @@ describe('Compare versions service', function() {
         state_name: 'D',
         new_value: {
           content_id: 'content',
-          html: 'Some text'
+          html: 'Some text',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           content_id: 'content',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],
@@ -1053,11 +1065,13 @@ describe('Compare versions service', function() {
         state_name: 'D',
         new_value: {
           content_id: 'content',
-          html: 'Some text'
+          html: 'Some text',
+          image_sizes_in_bytes: {}
         },
         old_value: {
           content_id: 'content',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         property_name: 'property'
       }],

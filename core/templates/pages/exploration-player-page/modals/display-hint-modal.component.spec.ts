@@ -103,7 +103,7 @@ describe('Display hint modal', () => {
   it('should intialize', () => {
     let contentId: string = 'content_id';
     let recordedVoiceovers = new RecordedVoiceovers({});
-    let hint = new SubtitledHtml('html', contentId);
+    let hint = new SubtitledHtml('html', contentId, {});
     let displayedCard = new StateCard(
       'test_name', 'content', 'interaction', null, [],
       recordedVoiceovers, null, contentId, null);

@@ -92,7 +92,8 @@ describe('Exploration improvements task registrar service', () => {
       classifier_model_id: null,
       content: {
         content_id: 'content',
-        html: ''
+        html: '',
+        image_sizes_in_bytes: {}
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -116,7 +117,8 @@ describe('Exploration improvements task registrar service', () => {
           dest: 'new state',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -129,7 +131,8 @@ describe('Exploration improvements task registrar service', () => {
           correct_answer: 'answer',
           explanation: {
             content_id: 'solution',
-            html: '<p>This is an explanation.</p>'
+            html: '<p>This is an explanation.</p>',
+            image_sizes_in_bytes: {}
           }
         },
         id: 'TextInput'

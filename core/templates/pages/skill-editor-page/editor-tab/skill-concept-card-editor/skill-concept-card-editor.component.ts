@@ -137,13 +137,13 @@ angular.module('oppia').component('skillConceptCardEditor', {
               GenerateContentIdService.getNextId(
                 $scope.skill.getConceptCard().getRecordedVoiceovers(
                 ).getAllContentIds(),
-                COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
+                COMPONENT_NAME_WORKED_EXAMPLE.QUESTION), {}),
             SubtitledHtml.createDefault(
               result.workedExampleExplanationHtml,
               GenerateContentIdService.getNextId(
                 $scope.skill.getConceptCard().getRecordedVoiceovers(
                 ).getAllContentIds(),
-                COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
+                COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION), {})
           );
           SkillUpdateService.addWorkedExample(
             $scope.skill, newExample);

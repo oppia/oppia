@@ -78,7 +78,7 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
       actionCustomizationArgs: {
         feedback: {
           value: SubtitledHtml.createDefault(
-            'This is the {{answer}}', '1')
+            'This is the {{answer}}', '1', {})
         },
         submitted_answer: {
           value: ''

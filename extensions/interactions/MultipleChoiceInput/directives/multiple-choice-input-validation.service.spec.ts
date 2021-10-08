@@ -58,7 +58,8 @@ describe('MultipleChoiceInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -70,7 +71,8 @@ describe('MultipleChoiceInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -81,8 +83,8 @@ describe('MultipleChoiceInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Option 1', ''),
-          new SubtitledHtml('Option 2', '')
+          new SubtitledHtml('Option 1', '', {}),
+          new SubtitledHtml('Option 2', '', {})
         ]
       },
       showChoicesInShuffledOrder: {

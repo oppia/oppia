@@ -65,7 +65,8 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
@@ -77,7 +78,8 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Third State',
       feedback: {
         html: '<p>great job!</p>',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: true,
       param_changes: [],
@@ -88,10 +90,10 @@ describe('DragAndDropSortInputValidationService', () => {
     customizationArgs = {
       choices: {
         value: [
-          new SubtitledHtml('a', 'ca_0'),
-          new SubtitledHtml('b', 'ca_1'),
-          new SubtitledHtml('c', 'ca_2'),
-          new SubtitledHtml('d', 'ca_3')
+          new SubtitledHtml('a', 'ca_0', {}),
+          new SubtitledHtml('b', 'ca_1', {}),
+          new SubtitledHtml('c', 'ca_2', {}),
+          new SubtitledHtml('d', 'ca_3', {})
         ]
       },
       allowMultipleItemsInSamePosition: {
@@ -102,9 +104,9 @@ describe('DragAndDropSortInputValidationService', () => {
     badCustomizationArgs = {
       choices: {
         value: [
-          new SubtitledHtml('a', 'ca_0'),
-          new SubtitledHtml('b', null),
-          new SubtitledHtml('c', 'ca_2'),
+          new SubtitledHtml('a', 'ca_0', {}),
+          new SubtitledHtml('b', null, {}),
+          new SubtitledHtml('c', 'ca_2', {}),
         ]
       },
       allowMultipleItemsInSamePosition: {
@@ -256,7 +258,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect at least two choices', () => {
     customizationArgs.choices.value = [
-      new SubtitledHtml('1', '')
+      new SubtitledHtml('1', '', {})
     ];
 
     var warnings = validatorService.getAllWarnings(
@@ -290,7 +292,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
-    customizationArgs.choices.value.push(new SubtitledHtml('d', ''));
+    customizationArgs.choices.value.push(new SubtitledHtml('d', '', {}));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, [], goodDefaultOutcome);

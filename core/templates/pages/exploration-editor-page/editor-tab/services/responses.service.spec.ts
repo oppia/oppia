@@ -74,7 +74,7 @@ describe('Responses Service', () => {
       shof: SubtitledHtml,
       answerIsExclusive: true,
       correctAnswer: 'This is the correct answer',
-      explanation: new SubtitledHtml('', 'tesster'),
+      explanation: new SubtitledHtml('', 'tesster', {}),
       toBackendDict: jasmine.createSpy('toBackendDict'),
       getSummary: jasmine.createSpy('getSummary'),
       setCorrectAnswer: jasmine.createSpy('setCorrectAnswer'),
@@ -96,6 +96,7 @@ describe('Responses Service', () => {
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
+              image_sizes_in_bytes: {}
             },
             refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
@@ -112,6 +113,7 @@ describe('Responses Service', () => {
         feedback: {
           content_id: '',
           html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -134,6 +136,7 @@ describe('Responses Service', () => {
         explanation: {
           content_id: '2',
           html: 'test_explanation1',
+          image_sizes_in_bytes: {}
         },
       },
     });
@@ -147,6 +150,7 @@ describe('Responses Service', () => {
             feedback: {
               content_id: 'feedback_1',
               html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: true,
             param_changes: [],
@@ -171,6 +175,7 @@ describe('Responses Service', () => {
         feedback: {
           content_id: '',
           html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: true,
         param_changes: [],
@@ -193,6 +198,7 @@ describe('Responses Service', () => {
         explanation: {
           content_id: '2',
           html: 'test_explanation1',
+          image_sizes_in_bytes: {}
         },
       },
     });
@@ -278,7 +284,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        feedback: new SubtitledHtml('', 'This is a new feedback text'),
+        feedback: new SubtitledHtml('', 'This is a new feedback text', {}),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
         labelledAsCorrect: true,
@@ -332,7 +338,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        feedback: new SubtitledHtml('', 'This is a new feedback text'),
+        feedback: new SubtitledHtml('', 'This is a new feedback text', {}),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
         labelledAsCorrect: true,
@@ -343,7 +349,7 @@ describe('Responses Service', () => {
         isConfusing: jasmine.createSpy('isConfusing'),
       },
       taggedSkillMisconceptionId: '',
-      feedback: new SubtitledHtml('', 'This is a new feedback text'),
+      feedback: new SubtitledHtml('', 'This is a new feedback text', {}),
       dest: 'State',
       refresherExplorationId: 'test',
       missingPrerequisiteSkillId: 'test_skill_id',
@@ -399,7 +405,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        feedback: new SubtitledHtml('', 'This is a new feedback text'),
+        feedback: new SubtitledHtml('', 'This is a new feedback text', {}),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
         labelledAsCorrect: true,

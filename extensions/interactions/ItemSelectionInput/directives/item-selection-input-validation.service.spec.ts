@@ -65,7 +65,8 @@ describe('ItemSelectionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -76,9 +77,9 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Selection 1', 'ca_0'),
-          new SubtitledHtml('Selection 2', 'ca_1'),
-          new SubtitledHtml('Selection 3', 'ca_2')
+          new SubtitledHtml('Selection 1', 'ca_0', {}),
+          new SubtitledHtml('Selection 2', 'ca_1', {}),
+          new SubtitledHtml('Selection 3', 'ca_2', {})
         ]
       },
       maxAllowableSelectionCount: {
@@ -91,8 +92,8 @@ describe('ItemSelectionInputValidationService', () => {
     badCustomizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Selection 1', 'ca_0'),
-          new SubtitledHtml('Selection 2', null),
+          new SubtitledHtml('Selection 1', 'ca_0', {}),
+          new SubtitledHtml('Selection 2', null, {}),
         ]
       },
       maxAllowableSelectionCount: {
@@ -252,7 +253,7 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
     customizationArguments.choices.value[0] = (
-      new SubtitledHtml('', ''));
+      new SubtitledHtml('', '', {}));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -271,7 +272,7 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
     customizationArguments.choices.value.push(
-      new SubtitledHtml('Selection 3', 'ca_4'));
+      new SubtitledHtml('Selection 3', 'ca_4', {}));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -347,8 +348,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should warn user when user selects more than one answer choice', () => {
     customizationArguments.choices.value =
-      [new SubtitledHtml('Selection 1', 'ca_0'),
-        new SubtitledHtml('Selection 2', 'ca_1')];
+      [new SubtitledHtml('Selection 1', 'ca_0', {}),
+        new SubtitledHtml('Selection 2', 'ca_1', {})];
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [agof.createNew(
@@ -482,7 +483,7 @@ describe('ItemSelectionInputValidationService', () => {
     goodDefaultOutcome.feedback.html = '';
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.choices.value =
-    [new SubtitledHtml('Selection 3', 'ca_2')];
+    [new SubtitledHtml('Selection 3', 'ca_2', {})];
     let answerGroups = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',

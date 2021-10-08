@@ -62,7 +62,8 @@ describe('Content translation manager service', () => {
       dest: 'dest_default',
       feedback: {
         content_id: 'default_outcome',
-        html: '<p>en default outcome</p>'
+        html: '<p>en default outcome</p>',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -83,7 +84,8 @@ describe('Content translation manager service', () => {
         dest: 'dest_1',
         feedback: {
           content_id: 'outcome_1',
-          html: '<p>en feedback</p>'
+          html: '<p>en feedback</p>',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -97,7 +99,8 @@ describe('Content translation manager service', () => {
       {
         hint_content: {
           html: '<p>en hint</p>',
-          content_id: 'hint_0'
+          content_id: 'hint_0',
+          image_sizes_in_bytes: {}
         }
       }
     ];
@@ -107,7 +110,8 @@ describe('Content translation manager service', () => {
       correct_answer: 'This is a correct answer!',
       explanation: {
         content_id: 'solution',
-        html: '<p>en solution</p>'
+        html: '<p>en solution</p>',
+        image_sizes_in_bytes: {}
       }
     };
 
@@ -315,7 +319,7 @@ describe('Content translation manager service', () => {
         }
       }
     });
-    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let content = new SubtitledHtml('<p>en content</p>', 'content', {});
     let translatedHtml = ctms.getTranslatedHtml(
       writtenTranslations, 'fr', content);
     expect(translatedHtml).toEqual('<p>en content</p>');
@@ -333,7 +337,7 @@ describe('Content translation manager service', () => {
         }
       }
     });
-    let content = new SubtitledHtml('<p>en content</p>', null);
+    let content = new SubtitledHtml('<p>en content</p>', null, {});
     expect(() => {
       ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
     }).toThrowError('Content ID does not exist');
@@ -354,7 +358,7 @@ describe('Content translation manager service', () => {
         }
       }
     });
-    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let content = new SubtitledHtml('<p>en content</p>', 'content', {});
     let translatedHtml = ctms.getTranslatedHtml(
       writtenTranslations, 'pt', content);
     expect(translatedHtml).toEqual('<p>en content</p>');
@@ -372,7 +376,7 @@ describe('Content translation manager service', () => {
         }
       }
     });
-    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let content = new SubtitledHtml('<p>en content</p>', 'content', {});
     let translatedHtml = ctms.getTranslatedHtml(
       writtenTranslations, 'fr', content);
     expect(translatedHtml).toEqual('<p>fr content</p>');
@@ -429,7 +433,8 @@ describe('Content translation manager service', () => {
           dest: 'dest_1',
           feedback: {
             content_id: 'outcome_1',
-            html: '<p>en feedback</p>'
+            html: '<p>en feedback</p>',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],

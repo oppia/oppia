@@ -83,7 +83,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         Hola: {
           content: {
             content_id: '',
-            html: 'This is Hola State'
+            html: 'This is Hola State',
+            image_sizes_in_bytes: {}
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -99,6 +100,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
+                  image_sizes_in_bytes: {}
                 },
               },
               training_data: ['Answer2']
@@ -117,6 +119,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
+                image_sizes_in_bytes: {}
               },
             },
             hints: [],
@@ -138,7 +141,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             dest: '',
             feedback: {
               content_id: 'feedback_2',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
           },
           rule_specs: [{
@@ -157,6 +161,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           feedback: {
             content_id: 'feedback_1',
             html: '',
+            image_sizes_in_bytes: {}
           },
         },
         confirmed_unclassified_answers: [],
@@ -229,7 +234,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         '<oppia-response-text-input answer="&amp;quot;Answer2&' +
         'amp;quot;"></oppia-response-text-input>');
       expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtml.createDefault('', 'feedback_1'));
+        SubtitledHtml.createDefault('', 'feedback_1', {}));
       expect($scope.newAnswerOutcomeDest).toBe('(try again)');
       expect($scope.newAnswerIsAlreadyResolved).toBe(true);
     });
@@ -243,7 +248,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         '<oppia-response-text-input answer="&amp;quot;Answer1&' +
         'amp;quot;"></oppia-response-text-input>');
       expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtml.createDefault('', 'feedback_1'));
+        SubtitledHtml.createDefault('', 'feedback_1', {}));
       expect($scope.newAnswerOutcomeDest).toBe('(try again)');
       expect($scope.newAnswerIsAlreadyResolved).toBe(false);
       expect(addSuccessMessageSpy).toHaveBeenCalledWith(
@@ -286,7 +291,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         Hola: {
           content: {
             content_id: '',
-            html: 'This is Hola State'
+            html: 'This is Hola State',
+            image_sizes_in_bytes: {}
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -302,6 +308,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
+                  image_sizes_in_bytes: {}
                 },
               },
               training_data: ['Answer2']
@@ -320,6 +327,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
+                image_sizes_in_bytes: {}
               },
             },
             hints: [],
@@ -341,7 +349,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             dest: '',
             feedback: {
               content_id: 'feedback_2',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
           },
           rule_specs: [],
@@ -352,6 +361,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           feedback: {
             content_id: 'feedback_1',
             html: '',
+            image_sizes_in_bytes: {}
           },
         },
         confirmed_unclassified_answers: [],
@@ -415,7 +425,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         Hola: {
           content: {
             content_id: '',
-            html: 'This is Hola State'
+            html: 'This is Hola State',
+            image_sizes_in_bytes: {}
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -431,6 +442,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
+                  image_sizes_in_bytes: {}
                 },
               },
               training_data: ['Answer2']
@@ -449,6 +461,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
+                image_sizes_in_bytes: {}
               },
             },
             hints: [],
@@ -470,7 +483,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             dest: '',
             feedback: {
               content_id: 'feedback_2',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
           },
           rule_specs: [],
@@ -481,6 +495,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           feedback: {
             content_id: 'feedback_1',
             html: '',
+            image_sizes_in_bytes: {}
           },
         },
         confirmed_unclassified_answers: [],

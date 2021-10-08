@@ -99,7 +99,8 @@ describe('State translation component', function() {
     Introduction: {
       content: {
         content_id: 'content_1',
-        html: 'Introduction Content'
+        html: 'Introduction Content',
+        image_sizes_in_bytes: {}
       },
       interaction: {
         id: 'TextInput',
@@ -136,7 +137,8 @@ describe('State translation component', function() {
             dest: 'unused',
             feedback: {
               content_id: 'feedback_1',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
           }
         }, {
@@ -145,7 +147,8 @@ describe('State translation component', function() {
             dest: 'unused',
             feedback: {
               content_id: 'feedback_2',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
           }
         }],
@@ -153,7 +156,8 @@ describe('State translation component', function() {
           dest: 'default',
           feedback: {
             content_id: 'default_outcome',
-            html: 'Default Outcome'
+            html: 'Default Outcome',
+            image_sizes_in_bytes: {}
           },
         },
         solution: {
@@ -161,18 +165,21 @@ describe('State translation component', function() {
           answer_is_exclusive: false,
           explanation: {
             html: 'Solution explanation',
-            content_id: 'solution_1'
+            content_id: 'solution_1',
+            image_sizes_in_bytes: {}
           }
         },
         hints: [{
           hint_content: {
             html: 'Hint 1',
-            content_id: 'hint_1'
+            content_id: 'hint_1',
+            image_sizes_in_bytes: {}
           }
         }, {
           hint_content: {
             html: 'Hint 2',
-            content_id: 'hint_2'
+            content_id: 'hint_2',
+            image_sizes_in_bytes: {}
           }
         }]
       },
@@ -203,7 +210,8 @@ describe('State translation component', function() {
     Introduction: {
       content: {
         content_id: 'content_1',
-        html: 'Introduction Content'
+        html: 'Introduction Content',
+        image_sizes_in_bytes: {}
       },
       interaction: {
         id: 'TextInput',
@@ -223,7 +231,8 @@ describe('State translation component', function() {
           dest: 'default',
           feedback: {
             content_id: 'default_outcome',
-            html: 'Default Outcome'
+            html: 'Default Outcome',
+            image_sizes_in_bytes: {}
           },
         },
         solution: {
@@ -231,18 +240,21 @@ describe('State translation component', function() {
           answer_is_exclusive: false,
           explanation: {
             html: 'Solution explanation',
-            content_id: 'solution_1'
+            content_id: 'solution_1',
+            image_sizes_in_bytes: {}
           }
         },
         hints: [{
           hint_content: {
             html: 'Hint 1',
-            content_id: 'hint_1'
+            content_id: 'hint_1',
+            image_sizes_in_bytes: {}
           }
         }, {
           hint_content: {
             html: 'Hint 2',
-            content_id: 'hint_2'
+            content_id: 'hint_2',
+            image_sizes_in_bytes: {}
           }
         }]
       },
@@ -270,7 +282,8 @@ describe('State translation component', function() {
     Introduction: {
       content: {
         content_id: 'content_1',
-        html: 'Introduction Content'
+        html: 'Introduction Content',
+        image_sizes_in_bytes: {}
       },
       interaction: {
         id: 'Continue',
@@ -287,7 +300,8 @@ describe('State translation component', function() {
           dest: 'default',
           feedback: {
             content_id: 'default_outcome',
-            html: 'Default Outcome'
+            html: 'Default Outcome',
+            image_sizes_in_bytes: {}
           },
         },
         solution: {
@@ -295,18 +309,21 @@ describe('State translation component', function() {
           answer_is_exclusive: false,
           explanation: {
             html: 'Solution explanation',
-            content_id: 'solution_1'
+            content_id: 'solution_1',
+            image_sizes_in_bytes: {}
           }
         },
         hints: [{
           hint_content: {
             html: 'Hint 1',
-            content_id: 'hint_1'
+            content_id: 'hint_1',
+            image_sizes_in_bytes: {}
           }
         }, {
           hint_content: {
             html: 'Hint 2',
-            content_id: 'hint_2'
+            content_id: 'hint_2',
+            image_sizes_in_bytes: {}
           }
         }]
       },
@@ -334,7 +351,8 @@ describe('State translation component', function() {
     Introduction: {
       content: {
         content_id: 'content_1',
-        html: 'Introduction Content'
+        html: 'Introduction Content',
+        image_sizes_in_bytes: {}
       },
       interaction: {
         id: 'TextInput',
@@ -516,7 +534,7 @@ describe('State translation component', function() {
 
     it('should get customization argument translatable customization' +
       ' arguments', () => {
-      let content = SubtitledHtml.createDefault('', '');
+      let content = SubtitledHtml.createDefault('', '', {});
       let translatableCa = (
         $scope.getInteractionCustomizationArgTranslatableContents({
           testingCustArgs: {
@@ -738,7 +756,8 @@ describe('State translation component', function() {
     it('should get subtitled html data translation', function() {
       var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
-        html: 'This is the html'
+        html: 'This is the html',
+        image_sizes_in_bytes: {}
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('Translation');
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
@@ -931,7 +950,8 @@ describe('State translation component', function() {
     it('should get subtitled data', function() {
       var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
-        html: 'This is the html'
+        html: 'This is the html',
+        image_sizes_in_bytes: {}
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('This is the html');
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
@@ -971,7 +991,8 @@ describe('State translation component', function() {
         Introduction: {
           content: {
             content_id: 'content_1',
-            html: 'Introduction Content'
+            html: 'Introduction Content',
+            image_sizes_in_bytes: {}
           },
           interaction: {
             id: 'TextInput',
@@ -993,7 +1014,8 @@ describe('State translation component', function() {
                 dest: 'unused',
                 feedback: {
                   content_id: 'feedback_1',
-                  html: ''
+                  html: '',
+                  image_sizes_in_bytes: {}
                 },
                 labelled_as_correct: false,
                 param_changes: [],
@@ -1004,7 +1026,8 @@ describe('State translation component', function() {
               dest: 'default',
               feedback: {
                 content_id: 'default_outcome',
-                html: 'Default Outcome'
+                html: 'Default Outcome',
+                image_sizes_in_bytes: {}
               },
             },
             solution: {
@@ -1012,18 +1035,21 @@ describe('State translation component', function() {
               answer_is_exclusive: false,
               explanation: {
                 html: 'Solution explanation',
-                content_id: 'solution_1'
+                content_id: 'solution_1',
+                image_sizes_in_bytes: {}
               }
             },
             hints: [{
               hint_content: {
                 html: 'Hint 1',
-                content_id: 'hint_1'
+                content_id: 'hint_1',
+                image_sizes_in_bytes: {}
               }
             }, {
               hint_content: {
                 html: 'Hint 2',
-                content_id: 'hint_2'
+                content_id: 'hint_2',
+                image_sizes_in_bytes: {}
               }
             }]
           },
@@ -1195,7 +1221,7 @@ describe('State translation component', function() {
         testCa: {
           value: {
             unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
-            html: [SubtitledHtml.createDefault('', 'ca_1')]
+            html: [SubtitledHtml.createDefault('', 'ca_1', {})]
           }
         }
       });

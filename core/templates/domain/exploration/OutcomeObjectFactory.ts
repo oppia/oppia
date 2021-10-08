@@ -100,7 +100,7 @@ export class OutcomeObjectFactory {
     return new Outcome(
       dest,
       SubtitledHtml.createDefault(
-        feedbackText, feedbackTextId),
+        feedbackText, feedbackTextId, {}),
       false,
       paramChanges,
       null,

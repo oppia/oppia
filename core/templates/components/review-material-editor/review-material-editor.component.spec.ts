@@ -86,6 +86,6 @@ describe('Review Material Editor Component', () => {
 
     expect(ctrl.onSaveExplanation)
       .toHaveBeenCalledWith(SubtitledHtml.createDefault(
-        ctrl.editableExplanation, 'explanation'));
+        ctrl.editableExplanation, 'explanation', {}));
   });
 });

@@ -82,7 +82,7 @@ describe('Skill editor main tab Component', function() {
     urlInterpolationService = $injector.get('UrlInterpolationService');
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
-        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION, {}),
       [],
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {

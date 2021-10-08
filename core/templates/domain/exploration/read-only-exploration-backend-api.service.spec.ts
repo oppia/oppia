@@ -50,7 +50,8 @@ describe('Read only exploration backend API service', () => {
           next_content_id_index: null,
           content: {
             html: '',
-            content_id: 'content'
+            content_id: 'content',
+            image_sizes_in_bytes: {}
           },
           interaction: {
             customization_args: {},
@@ -62,7 +63,8 @@ describe('Read only exploration backend API service', () => {
               dest: 'Introduction',
               feedback: {
                 html: '',
-                content_id: 'content'
+                content_id: 'content',
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: true,
               refresher_exploration_id: 'exp',

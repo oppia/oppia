@@ -84,7 +84,8 @@ describe('TrainingDataService', function() {
       State: {
         content: {
           content_id: 'content',
-          html: 'State Content'
+          html: 'State Content',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -107,7 +108,8 @@ describe('TrainingDataService', function() {
               dest: 'State',
               feedback: {
                 content_id: 'feedback_1',
-                html: 'Feedback'
+                html: 'Feedback',
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -130,7 +132,8 @@ describe('TrainingDataService', function() {
             dest: 'State',
             feedback: {
               content_id: 'default_outcome',
-              html: 'Default'
+              html: 'Default',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],

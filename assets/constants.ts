@@ -5613,7 +5613,8 @@ export default {
     "linked_skill_id": null,
     "content": {
       "html": "",
-      "content_id": "content"
+      "content_id": "content",
+      "image_sizes_in_bytes": {}
     },
     "interaction": {
       "id": null,
@@ -5623,7 +5624,8 @@ export default {
         "dest": "Introduction",
         "feedback": {
           "content_id": "default_outcome",
-          "html": ""
+          "html": "",
+          "image_sizes_in_bytes": {}
         },
         "labelled_as_correct": false,
         "param_changes": [],

@@ -72,9 +72,9 @@ describe('Learner Action Render Service', function() {
           id: 'MultipleChoiceInput',
           customizationArgs: {
             choices: {value: [
-              new SubtitledHtml('Choice1', ''),
-              new SubtitledHtml('Choice2', ''),
-              new SubtitledHtml('Choice3', '')
+              new SubtitledHtml('Choice1', '', {}),
+              new SubtitledHtml('Choice2', '', {}),
+              new SubtitledHtml('Choice3', '', {})
             ]},
             showChoicesInShuffledOrder: {value: true}
           }

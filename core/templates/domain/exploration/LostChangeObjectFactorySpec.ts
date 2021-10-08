@@ -61,11 +61,13 @@ describe('Lost Change Object Factory', () => {
       state_name: 'Edited state name',
       new_value: {
         html: 'newValue',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       old_value: {
         html: 'oldValue',
-        content_id: ''
+        content_id: '',
+        image_sizes_in_bytes: {}
       },
       property_name: 'content'
     });
@@ -74,12 +76,14 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.getStatePropertyValue(
       <string[] | Object>lostChange.newValue)).toEqual({
       html: 'newValue',
-      content_id: ''
+      content_id: '',
+      image_sizes_in_bytes: {}
     });
     expect(lostChange.getStatePropertyValue(
       <string[] | Object>lostChange.oldValue)).toEqual({
       html: 'oldValue',
-      content_id: ''
+      content_id: '',
+      image_sizes_in_bytes: {}
     });
     expect(lostChange.isOutcomeFeedbackEqual()).toBeFalse();
     expect(lostChange.isFeedbackEqual()).toBeFalse();
@@ -179,7 +183,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -187,7 +192,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'default',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12', {}),
         html: '<p>Correct</p>',
         rules: [{
           type: 'Type1',
@@ -202,7 +207,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -210,7 +216,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'default',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12', {}),
         html: '<p>Correct</p>',
         rules: [{
           type: 'Type1',
@@ -235,7 +241,7 @@ describe('Lost Change Object Factory', () => {
       new_value: {
         outcome: undefined,
         dest: 'dest2',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12', {}),
         html: '',
         rules: [{
           type: 'Type2',
@@ -248,7 +254,7 @@ describe('Lost Change Object Factory', () => {
       old_value: {
         outcome: undefined,
         dest: 'dest1',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12', {}),
         html: '',
         rules: [{
           type: 'Type1',
@@ -272,7 +278,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_1',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -280,7 +287,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest2',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12', {}),
         html: '',
         rules: [{
           type: 'Type2',
@@ -295,7 +302,8 @@ describe('Lost Change Object Factory', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_1',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -303,7 +311,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest1',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12', {}),
         html: '',
         rules: [{
           type: 'Type1',

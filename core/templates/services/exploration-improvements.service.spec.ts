@@ -78,6 +78,7 @@ describe('ExplorationImprovementsService', function() {
     content: {
       content_id: 'content',
       html: '',
+      image_sizes_in_bytes: {}
     },
     recorded_voiceovers: {
       voiceovers_mapping: {
@@ -102,6 +103,7 @@ describe('ExplorationImprovementsService', function() {
         feedback: {
           content_id: 'default_outcome',
           html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -115,6 +117,7 @@ describe('ExplorationImprovementsService', function() {
         explanation: {
           content_id: 'solution',
           html: '<p>This is an explanation.</p>',
+          image_sizes_in_bytes: {}
         },
       },
       id: 'TextInput',

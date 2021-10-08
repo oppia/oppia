@@ -57,7 +57,8 @@ describe('Audio preloader service', () => {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: '<p>State 1 Content</p>'
+          html: '<p>State 1 Content</p>',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -77,7 +78,8 @@ describe('Audio preloader service', () => {
           default_outcome: {
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             dest: 'State 3',
             param_changes: [],
@@ -112,6 +114,7 @@ describe('Audio preloader service', () => {
         content: {
           content_id: 'content',
           html: 'Congratulations, you have finished!',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -153,7 +156,8 @@ describe('Audio preloader service', () => {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: '<p>State 2 Content</p>'
+          html: '<p>State 2 Content</p>',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -173,7 +177,8 @@ describe('Audio preloader service', () => {
           default_outcome: {
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             dest: 'State 3',
             param_changes: [],
@@ -208,6 +213,7 @@ describe('Audio preloader service', () => {
         content: {
           content_id: 'content',
           html: '<p>Introduction Content</p>',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -229,7 +235,8 @@ describe('Audio preloader service', () => {
             dest: 'Introduction',
             feedback: {
               content_id: 'default_outcome',
-              html: '<p>Try again.</p>'
+              html: '<p>Try again.</p>',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -258,7 +265,8 @@ describe('Audio preloader service', () => {
               dest: 'State 1',
               feedback: {
                 content_id: 'feedback_1',
-                html: "<p>Let's go to State 1</p>"
+                html: "<p>Let's go to State 1</p>",
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -279,7 +287,8 @@ describe('Audio preloader service', () => {
               dest: 'State 2',
               feedback: {
                 content_id: 'feedback_2',
-                html: "<p>Let's go to State 2</p>"
+                html: "<p>Let's go to State 2</p>",
+                image_sizes_in_bytes: {}
               },
               labelled_as_correct: false,
               param_changes: [],

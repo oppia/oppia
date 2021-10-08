@@ -122,7 +122,7 @@ export class CreateNewSkillModalComponent {
     const explanationObject: SubtitledHtml =
     SubtitledHtml.createDefault(
       this.bindableDict.displayedConceptCardExplanation,
-      AppConstants.COMPONENT_NAME_EXPLANATION);
+      AppConstants.COMPONENT_NAME_EXPLANATION, {});
     this.newExplanationObject = explanationObject.toBackendDict();
     this.bindableDict.displayedConceptCardExplanation = (
       explanationObject.html);

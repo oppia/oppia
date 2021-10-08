@@ -102,7 +102,8 @@ describe('Question update service', function() {
       classifier_model_id: 0,
       content: {
         html: 'old content',
-        content_id: 'content'
+        content_id: 'content',
+        image_sizes_in_bytes: {}
       },
       param_changes: [],
       interaction: {
@@ -118,7 +119,8 @@ describe('Question update service', function() {
             dest: 'Me Llamo',
             feedback: {
               content_id: 'feedback_1',
-              html: 'buen trabajo!'
+              html: 'buen trabajo!',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: true
           }
@@ -136,7 +138,8 @@ describe('Question update service', function() {
           dest: 'Hola',
           feedback: {
             content_id: 'default_outcome',
-            html: 'try again!'
+            html: 'try again!',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false
         },
@@ -164,7 +167,8 @@ describe('Question update service', function() {
       classifier_model_id: 0,
       content: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_sizes_in_bytes: {}
       },
       param_changes: [],
       interaction: {
@@ -180,7 +184,8 @@ describe('Question update service', function() {
             dest: 'Me Llamo',
             feedback: {
               content_id: 'feedback_1',
-              html: 'buen trabajo!'
+              html: 'buen trabajo!',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: true
           }
@@ -198,7 +203,8 @@ describe('Question update service', function() {
           dest: 'Hola',
           feedback: {
             content_id: 'default_outcome',
-            html: 'try again!'
+            html: 'try again!',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false
         },
@@ -247,7 +253,7 @@ describe('Question update service', function() {
     var updateFunction = function() {
       var stateData = sampleQuestion.getStateData();
       stateData.content = SubtitledHtml.createDefault(
-        'test content', 'content');
+        'test content', 'content', {});
     };
     QuestionUpdateService.setQuestionStateData(
       sampleQuestion, updateFunction);

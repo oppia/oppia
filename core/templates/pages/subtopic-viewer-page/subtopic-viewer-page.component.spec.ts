@@ -54,7 +54,8 @@ describe('Subtopic viewer page', function() {
       page_contents: {
         subtitled_html: {
           content_id: '',
-          html: 'This is a html'
+          html: 'This is a html',
+          image_sizes_in_bytes: {}
         },
         recorded_voiceovers: {
           voiceovers_mapping: {}

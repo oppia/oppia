@@ -55,7 +55,7 @@ describe('Hint object factory', () => {
         hint_content: {
           html: '<p>Some Hint</p>',
           content_id: 'content_id',
-        image_sizes_in_bytes: {}
+          image_sizes_in_bytes: {}
         }
       })
     );

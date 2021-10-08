@@ -67,7 +67,7 @@ describe('Skill Editor Navbar Directive', function() {
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
-        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION, {}),
       [],
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {

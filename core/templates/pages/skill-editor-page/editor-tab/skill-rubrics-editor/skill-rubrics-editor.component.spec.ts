@@ -52,6 +52,7 @@ describe('skillRubricsEditor', function() {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
+        image_sizes_in_bytes: {}
       },
       worked_examples: [],
       recorded_voiceovers: {

@@ -73,7 +73,7 @@ describe('Add Or Update Solution Modal Controller', function() {
       answerEditorHtml = {
         answerIsExclusive: true,
         explanation: SubtitledHtml.createDefault(
-          'Explanation html', 'cont_1')
+          'Explanation html', 'cont_1', {})
       };
 
       stateSolutionService.init('', answerEditorHtml);

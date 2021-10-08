@@ -453,7 +453,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict),
         rules: [{
@@ -508,7 +509,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict),
         rules: [{
@@ -524,7 +526,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict),
         rules: [{
@@ -580,7 +583,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict),
         rules: [{
@@ -635,7 +639,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict)),
       old_value: <LostChangeValue>{},
@@ -695,7 +700,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict)),
       old_value: <LostChangeValue>(
@@ -703,7 +709,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -760,7 +767,8 @@ describe('Changes in Human Readable Form Component', () => {
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
-            html: 'Html'
+            html: 'Html',
+            image_sizes_in_bytes: {}
           },
         } as OutcomeBackendDict),
         rules: [{

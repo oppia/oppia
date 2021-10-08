@@ -43,7 +43,8 @@ describe('State hints service', () => {
     const value = [{
       hint_content: {
         html: '<p>math</p>',
-        content_id: 'hint_1'
+        content_id: 'hint_1',
+        image_sizes_in_bytes: {}
       }
     }].map(item => hof.createFromBackendDict(item));
     shs.init(StateName, value);

@@ -34,9 +34,10 @@ export class SubtitledHtml {
   // operation is done in the backend, before saving the SubtitledHtml in a
   // model.
   _imageSizesInBytes: object | null;
-  constructor(html: string,
-              contentId: string | null,
-              imageSizesInBytes: object | null) {
+  constructor(
+      html: string,
+      contentId: string | null,
+      imageSizesInBytes: object | null) {
     this._html = html;
     this._contentId = contentId;
     this._imageSizesInBytes = imageSizesInBytes;
@@ -76,7 +77,10 @@ export class SubtitledHtml {
       subtitledHtmlBackendDict.image_sizes_in_bytes);
   }
 
-  static createDefault(html: string, contentId: string, imageSizesInBytes: object | null): SubtitledHtml {
+  static createDefault(
+      html: string,
+      contentId: string,
+      imageSizesInBytes: object | null): SubtitledHtml {
     return new SubtitledHtml(html, contentId, imageSizesInBytes);
   }
 }

@@ -63,12 +63,13 @@ describe('Extension Tag Assembler Service', () => {
     const element = $('<p>');
     const interactionCustomizationArgs = {
       test: {value: {
-        attr: [new SubtitledHtml('html', 'ca_id')]
+        attr: [new SubtitledHtml('html', 'ca_id', {})]
       }}
     };
     const expectedElement = '<p test-with-value="{&amp;quot;attr&amp;quot;:' +
       '[{&amp;quot;html&amp;quot;:&amp;quot;html&amp;quot;,&amp;quot;' +
-      'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;}]}"></p>';
+      'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;,' +
+      '&amp;quot;image_sizes_in_bytes&amp;quot;:{}}]}"></p>';
 
     expect(etas.formatCustomizationArgAttrs(
       element, interactionCustomizationArgs).get(0).outerHTML).toEqual(

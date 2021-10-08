@@ -531,8 +531,8 @@ describe('Customize Interaction Modal Controller', function() {
       stateInteractionIdService.displayed = 'MultipleChoiceInput';
       stateCustomizationArgsService.displayed = {
         choices: {value: [
-          new SubtitledHtml('<p>1</p>', null),
-          new SubtitledHtml('<p>2</p>', null)
+          new SubtitledHtml('<p>1</p>', null, {}),
+          new SubtitledHtml('<p>2</p>', null, {})
         ]},
         showChoicesInShuffledOrder: {value: false}
       };
@@ -540,8 +540,8 @@ describe('Customize Interaction Modal Controller', function() {
       $scope.save();
       expect(stateCustomizationArgsService.displayed).toEqual({
         choices: {value: [
-          new SubtitledHtml('<p>1</p>', 'ca_choices_0'),
-          new SubtitledHtml('<p>2</p>', 'ca_choices_1')
+          new SubtitledHtml('<p>1</p>', 'ca_choices_0', {}),
+          new SubtitledHtml('<p>2</p>', 'ca_choices_1', {})
         ]},
         showChoicesInShuffledOrder: {value: false}
       });

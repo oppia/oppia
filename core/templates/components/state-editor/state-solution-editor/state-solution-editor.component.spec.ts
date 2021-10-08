@@ -42,7 +42,7 @@ describe('StateSolutionEditorComponent', () => {
   let answerEditorHtml = {
     answerIsExclusive: true,
     explanation: SubtitledHtml.createDefault(
-      'Explanation html', 'cont_1')
+      'Explanation html', 'cont_1', {})
   };
 
   beforeEach(angular.mock.module('oppia'));
@@ -79,7 +79,8 @@ describe('StateSolutionEditorComponent', () => {
       correct_answer: 'This is a correct answer!',
       explanation: {
         content_id: 'solution',
-        html: 'This is the explanation to the answer'
+        html: 'This is the explanation to the answer',
+        image_sizes_in_bytes: {}
       }
     });
 

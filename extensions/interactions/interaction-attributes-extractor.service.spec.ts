@@ -41,7 +41,8 @@ describe('Interaction attributes extractor service', () => {
     () => {
       const choicesWithValue = hes.objToEscapedJson([{
         content_id: 'ca_placeholder_0',
-        html: 'Enter here.'
+        html: 'Enter here.',
+        image_sizes_in_bytes: {}
       }]);
       const allowMultipleItemsInSamePositionWithValue = hes.objToEscapedJson(
         true
@@ -56,7 +57,7 @@ describe('Interaction attributes extractor service', () => {
         attributes
       );
       expect(caValues).toEqual({
-        choices: [new SubtitledHtml('Enter here.', 'ca_placeholder_0')],
+        choices: [new SubtitledHtml('Enter here.', 'ca_placeholder_0', {})],
         allowMultipleItemsInSamePosition: true
       });
     });

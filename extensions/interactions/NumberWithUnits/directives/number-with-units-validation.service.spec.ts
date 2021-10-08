@@ -80,7 +80,8 @@ describe('NumberWithUnitsValidationService', () => {
       dest: 'Second State',
       feedback: {
         content_id: null,
-        html: ''
+        html: '',
+        image_sizes_in_bytes: {}
       },
       labelled_as_correct: false,
       param_changes: [],

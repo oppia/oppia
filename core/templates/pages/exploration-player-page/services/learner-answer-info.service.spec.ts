@@ -49,7 +49,8 @@ describe('Learner answer info service', () =>{
     stateDict = {
       content: {
         content_id: 'content',
-        html: 'content'
+        html: 'content',
+        image_sizes_in_bytes: {}
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -75,7 +76,8 @@ describe('Learner answer info service', () =>{
             dest: 'outcome 1',
             feedback: {
               content_id: 'feedback_1',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -98,7 +100,8 @@ describe('Learner answer info service', () =>{
             dest: 'outcome 2',
             feedback: {
               content_id: 'feedback_2',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -137,7 +140,8 @@ describe('Learner answer info service', () =>{
           dest: 'default',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],

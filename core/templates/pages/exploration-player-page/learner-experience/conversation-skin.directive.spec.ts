@@ -232,27 +232,32 @@ describe('Conversation skin directive', function() {
     conceptCardDict = {
       explanation: {
         html: 'test explanation 1',
-        content_id: 'explanation_1'
+        content_id: 'explanation_1',
+        image_sizes_in_bytes: {}
       },
       worked_examples: [
         {
           question: {
             html: 'worked example question 1',
-            content_id: 'worked_example_q_1'
+            content_id: 'worked_example_q_1',
+            image_sizes_in_bytes: {}
           },
           explanation: {
             html: 'worked example explanation 1',
-            content_id: 'worked_example_e_1'
+            content_id: 'worked_example_e_1',
+            image_sizes_in_bytes: {}
           }
         },
         {
           question: {
             html: 'worked example question 1',
-            content_id: 'worked_example_q_1'
+            content_id: 'worked_example_q_1',
+            image_sizes_in_bytes: {}
           },
           explanation: {
             html: 'worked example explanation 1',
-            content_id: 'worked_example_e_1'
+            content_id: 'worked_example_e_1',
+            image_sizes_in_bytes: {}
           }
         }
       ],
@@ -340,7 +345,8 @@ describe('Conversation skin directive', function() {
     stateDict = {
       content: {
         content_id: 'content',
-        html: 'content'
+        html: 'content',
+        image_sizes_in_bytes: {}
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -366,7 +372,8 @@ describe('Conversation skin directive', function() {
             dest: 'outcome 1',
             feedback: {
               content_id: 'feedback_1',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -387,7 +394,8 @@ describe('Conversation skin directive', function() {
             dest: 'outcome 2',
             feedback: {
               content_id: 'feedback_2',
-              html: ''
+              html: '',
+              image_sizes_in_bytes: {}
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -417,7 +425,8 @@ describe('Conversation skin directive', function() {
           dest: 'default',
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -443,7 +452,8 @@ describe('Conversation skin directive', function() {
       default_outcome: {
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         dest: 'State 3',
         param_changes: [],
@@ -473,11 +483,13 @@ describe('Conversation skin directive', function() {
           value: [
             {
               content_id: 'ca_choices_0',
-              html: '<p>test</p>'
+              html: '<p>test</p>',
+              image_sizes_in_bytes: {}
             },
             {
               content_id: 'ca_choices_1',
-              html: '<p>test3</p>'
+              html: '<p>test3</p>',
+              image_sizes_in_bytes: {}
             }
           ]
         }
@@ -492,7 +504,8 @@ describe('Conversation skin directive', function() {
         param_changes: [],
         feedback: {
           content_id: 'default_outcome',
-          html: '<p>try again</p>'
+          html: '<p>try again</p>',
+          image_sizes_in_bytes: {}
         },
         missing_prerequisite_skill_id: null
       }
@@ -505,7 +518,8 @@ describe('Conversation skin directive', function() {
         dest: 'default',
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
+          image_sizes_in_bytes: {}
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -1207,6 +1221,7 @@ describe('Conversation skin directive', function() {
               feedback: {
                 html: '',
                 content_id: 'This is a new feedback text',
+                image_sizes_in_bytes: {}
               },
               refresher_exploration_id: 'test',
               missing_prerequisite_skill_id: 'test_skill_id',
@@ -1223,6 +1238,7 @@ describe('Conversation skin directive', function() {
           feedback: {
             content_id: '',
             html: '',
+            image_sizes_in_bytes: {}
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -1245,6 +1261,7 @@ describe('Conversation skin directive', function() {
           explanation: {
             content_id: '2',
             html: 'test_explanation1',
+            image_sizes_in_bytes: {}
           },
         },
       };
