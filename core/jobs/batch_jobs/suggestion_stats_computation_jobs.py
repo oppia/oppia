@@ -240,8 +240,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
         )
         word_count = translation['content_word_count']
         suggestion_date = datetime.datetime.strptime(
-            python_utils.UNICODE(translation['last_updated_date']), '%Y-%m-%d'
-        ).date()
+            str(translation['last_updated_date']), '%Y-%m-%d').date()
         return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
             accumulator.language_code,
             accumulator.contributor_user_id,

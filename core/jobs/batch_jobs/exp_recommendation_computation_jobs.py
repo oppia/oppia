@@ -114,9 +114,8 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
         """
         sorted_similarities = sorted(
             similarities, reverse=True, key=lambda x: x['similarity_score'])
-        return [
-            python_utils.UNICODE(item['exp_id']) for item in sorted_similarities
-        ][:MAX_RECOMMENDATIONS]
+        return [str(item['exp_id']) for item in sorted_similarities][
+            :MAX_RECOMMENDATIONS]
 
     @staticmethod
     def _create_recommendation(
