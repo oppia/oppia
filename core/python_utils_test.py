@@ -27,11 +27,11 @@ import sys
 import tempfile
 import unittest
 import urllib
+from itertools import zip_longest
 
 from core import python_utils
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
-from itertools import zip_longest
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):

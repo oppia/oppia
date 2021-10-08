@@ -37,7 +37,6 @@ import zlib
 from core import feconf
 from core import python_utils
 from core.constants import constants
-from itertools import zip_longest
 
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
@@ -1118,7 +1117,7 @@ def grouper(
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return zip_longest(*args, fillvalue=fillvalue)
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 def partition(
