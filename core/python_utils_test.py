@@ -22,12 +22,12 @@ from __future__ import unicode_literals
 import ast
 import builtins
 import io
+import itertools
 import os
 import sys
 import tempfile
 import unittest
 import urllib
-from itertools import zip_longest
 
 from core import python_utils
 from core.tests import test_utils
@@ -256,12 +256,12 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_zip_longest(self):
         self.assertEqual(
-            [list(g) for g in zip_longest(
+            [list(g) for g in itertools.zip_longest(
                 [0, 1, 2, 3], [4, 5, 6], [7, 8])],
             [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
         # Zip longest with fillvalue.
         self.assertEqual(
-            [''.join(g) for g in zip_longest(
+            [''.join(g) for g in itertools.zip_longest(
                 'ABC', 'DE', 'F', fillvalue='x')],
             ['ADF', 'BEx', 'Cxx'])
 
