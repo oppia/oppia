@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -115,7 +114,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             Returns:
                 float. The rounded average value of rating.
             """
-            return python_utils.ROUND(
+            return round(
                 rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         subscribed_exploration_summaries = (
