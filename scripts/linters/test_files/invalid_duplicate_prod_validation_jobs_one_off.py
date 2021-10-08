@@ -23,14 +23,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
-from core import python_utils
 from core.platform import models
 
 (user_models,) = (models.Registry.import_models([models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
-class BaseModelValidator(python_utils.OBJECT):
+class BaseModelValidator:
     errors = collections.defaultdict(list)
     external_instance_details = {}
 
