@@ -158,7 +158,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 visualization specs to be validated.
         """
         _answer_visualizations_specs_schema = [
-            ('id', str), ('options', dict),
+            ('id', str),
+            ('options', dict),
             ('calculation_id', str),
             ('addressed_info_is_supported', bool)]
         _answer_visualization_keys = [

@@ -837,7 +837,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(invalid_tags), 5)
         for invalid_tag in invalid_tags:
-            self.assertTrue(str(invalid_tag) in expected_invalid_tags)
+            self.assertIn(str(invalid_tag), expected_invalid_tags)
 
     def test_extract_svg_filenames_in_math_rte_components(self):
         """Test that the extract_svg_filenames_in_math_rte_components

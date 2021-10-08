@@ -1069,8 +1069,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' % (
                         type(self.final_reviewer_id)))
             if self.status == suggestion_models.STATUS_REJECTED:
-                if not isinstance(
-                        self.rejection_message, str):
+                if not isinstance(self.rejection_message, str):
                     raise utils.ValidationError(
                         'Expected rejection_message to be a string for a '
                         'rejected application, received %s' % type(

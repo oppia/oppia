@@ -2221,8 +2221,11 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, str(exploration_version),
-            state_name, str(shard_id)])
+            exploration_id,
+            str(exploration_version),
+            state_name,
+            str(shard_id)
+        ])
 
     # TODO(#13523): Change answer lists to TypedDict/Domain Object
     # to remove Any used below.

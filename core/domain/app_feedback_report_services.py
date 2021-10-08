@@ -501,8 +501,7 @@ def save_feedback_report_to_storage(
             app_context.only_allows_wifi_download_and_update),
         'automatically_update_topics': str(
             app_context.automatically_update_topics),
-        'account_is_profile_admin': str(
-            app_context.account_is_profile_admin)
+        'account_is_profile_admin': str(app_context.account_is_profile_admin)
     }
 
     if new_incoming_report:

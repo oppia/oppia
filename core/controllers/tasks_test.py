@@ -347,9 +347,9 @@ class TasksTests(test_utils.EmailTestBase):
 
         headers = {
             # Need to convert to bytes since test app doesn't allow unicode.
-            'X-Appengine-QueueName': 'queue'.encode('utf-8'),
-            'X-Appengine-TaskName': 'None'.encode('utf-8'),
-            'X-AppEngine-Fake-Is-Admin': '1'.encode('utf-8')
+            'X-Appengine-QueueName': b'queue',
+            'X-Appengine-TaskName': b'None',
+            'X-AppEngine-Fake-Is-Admin': b'1'
         }
         csrf_token = self.get_new_csrf_token()
 

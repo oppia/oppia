@@ -188,8 +188,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], str))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
             self):
@@ -203,8 +202,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], str))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_does_not_throw_for_deleted_topics(self):
         topic_services.delete_topic(self.admin_id, self.topic_id)
@@ -216,8 +214,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], str))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data(self):
         response = self.get_json(
@@ -229,8 +226,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], str))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_voiceover_opportunity_data(self):
         response = self.get_json(
@@ -243,8 +239,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], str))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -256,8 +251,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 response['opportunities'],
                 [self.expected_skill_opportunity_dict_0])
             self.assertTrue(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], str))
+            self.assertIsInstance(response['next_cursor'], str)
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
@@ -269,9 +263,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_skill_opportunity_dict_1])
             self.assertFalse(next_response['more'])
-            self.assertTrue(
-                isinstance(
-                    next_response['next_cursor'], str))
+            self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination_multiple_fetches(self):
         # Unassign topic 0 from the classroom.
@@ -338,8 +330,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     }
                 ])
             self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], str))
+            self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -350,8 +341,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], str))
+            self.assertIsInstance(response['next_cursor'], str)
 
             next_response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
@@ -365,9 +355,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
-            self.assertTrue(
-                isinstance(
-                    next_response['next_cursor'], str))
+            self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_voiceover_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -378,8 +366,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], str))
+            self.assertIsInstance(response['next_cursor'], str)
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
@@ -391,8 +378,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
-            self.assertTrue(isinstance(
-                next_response['next_cursor'], str))
+            self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):

@@ -334,8 +334,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
 
         if (
                 not isinstance(self.payload.get('translation_html'), str)
-                and
-                not isinstance(self.payload.get('translation_html'), list)
+                and not isinstance(self.payload.get('translation_html'), list)
         ):
             raise self.InvalidInputException(
                 'The parameter \'translation_html\' should be a string or a' +
