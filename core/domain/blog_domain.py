@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import re
 
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import html_cleaner

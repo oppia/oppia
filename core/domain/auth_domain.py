@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import collections
 
-from core import python_utils
 from core import utils
 
 # Auth ID refers to an identifier that links many Identity Providers to a single

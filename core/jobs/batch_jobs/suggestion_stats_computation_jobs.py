@@ -23,7 +23,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services

@@ -155,7 +155,7 @@ def normalize_against_schema(
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
-        # TODO (#14028) use just one type.
+        # TODO(#14028): Use just one type.
         assert isinstance(obj, (str, bytes)), (
             'Expected unicode HTML string, received %s' % obj)
         if isinstance(obj, bytes):
@@ -178,12 +178,12 @@ def normalize_against_schema(
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
-        # TODO (#14028) use just one type.
+        # TODO(#14028): Use just one type.
         assert isinstance(obj, (str, bytes)), (
             'Expected string, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
-        # TODO (#14028) use just one type.
+        # TODO(#14028): Use just one type.
         assert isinstance(obj, (str, bytes)), (
             'Expected unicode string, received %s' % obj)
         if isinstance(obj, bytes):
@@ -194,7 +194,7 @@ def normalize_against_schema(
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
-        # TODO (#14028) use just one type.
+        # TODO(#14028): Use just one type.
         assert obj is None or isinstance(obj, (str, bytes)), (
             'Expected unicode string or None, received %s' % obj)
         if obj is not None:

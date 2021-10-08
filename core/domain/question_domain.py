@@ -25,7 +25,6 @@ import datetime
 import re
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants

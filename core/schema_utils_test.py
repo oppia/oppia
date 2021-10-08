@@ -23,7 +23,6 @@ import inspect
 import re
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core.domain import email_manager
 from core.tests import test_utils

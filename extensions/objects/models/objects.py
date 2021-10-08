@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import copy
 import json
 
-from core import python_utils
 from core import schema_utils
 from core.constants import constants
 
