@@ -20,7 +20,10 @@ from __future__ import unicode_literals
 import datetime
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -49,9 +52,6 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (
     audit_models, blog_models, exp_models, opportunity_models,

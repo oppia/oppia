@@ -17,12 +17,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.domain import user_services
-import python_utils
-import utils
 
 
-class FeedbackThread(python_utils.OBJECT):
+class FeedbackThread:
     """Domain object for a feedback thread.
 
     Attributes:
@@ -121,12 +121,11 @@ class FeedbackThread(python_utils.OBJECT):
         """
         return [
             self._get_full_message_id(i) if i >= 0 else None
-            for i in python_utils.RANGE(
-                self.message_count - 1, self.message_count - 3, -1)
+            for i in range(self.message_count - 1, self.message_count - 3, -1)
         ]
 
 
-class FeedbackMessage(python_utils.OBJECT):
+class FeedbackMessage:
     """Domain object for a feedback message.
 
     Attributes:
@@ -199,7 +198,7 @@ class FeedbackMessage(python_utils.OBJECT):
         }
 
 
-class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
+class FullyQualifiedMessageIdentifier:
     """Domain object representing the full identifier of a message in a
     feedback thread.
 
@@ -213,7 +212,7 @@ class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
         self.message_id = message_id
 
 
-class FeedbackAnalytics(python_utils.OBJECT):
+class FeedbackAnalytics:
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -247,7 +246,7 @@ class FeedbackAnalytics(python_utils.OBJECT):
         }
 
 
-class FeedbackMessageReference(python_utils.OBJECT):
+class FeedbackMessageReference:
     """Domain object for feedback message references.
 
     Attributes:
@@ -278,7 +277,7 @@ class FeedbackMessageReference(python_utils.OBJECT):
         }
 
 
-class FeedbackThreadSummary(python_utils.OBJECT):
+class FeedbackThreadSummary:
     """Domain object for the summary of a particular thread.
 
     Attributes:

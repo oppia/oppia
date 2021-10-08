@@ -24,7 +24,7 @@ import json
 import os
 import re
 
-import python_utils
+from core import python_utils
 
 import yaml
 
@@ -79,7 +79,7 @@ THIRD_PARTY_LIBS = [
 ]
 
 
-class CustomLintChecksManager(python_utils.OBJECT):
+class CustomLintChecksManager:
     """Manages other files lint checks."""
 
     def __init__(self, file_cache):
