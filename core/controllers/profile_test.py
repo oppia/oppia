@@ -685,7 +685,7 @@ class SignupTests(test_utils.GenericTestBase):
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': 'Hasta la vista!'},
+            {'agreed_to_terms': False},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn('you will need to accept', response_dict['error'])
 

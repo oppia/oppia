@@ -179,7 +179,8 @@ class PreferencesHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
                     }]
-                }
+                },
+                'default_value': None
             }
         }
     }
@@ -358,7 +359,8 @@ class SignupHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_valid_username_string'
                     }]
-                }
+                },
+                'default_value': None
             },
             'agreed_to_terms': {
                 'schema': {
@@ -373,7 +375,8 @@ class SignupHandler(base.BaseHandler):
                         constants.DASHBOARD_TYPE_LEARNER,
                         constants.DASHBOARD_TYPE_CREATOR
                     ]
-                }
+                },
+                'default_value': None
             },
             'can_receive_email_updates': {
                 'schema': {
