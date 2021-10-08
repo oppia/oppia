@@ -317,6 +317,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
         self.logout()
 
+
 class LongUserBioHandlerTests(test_utils.GenericTestBase):
     USERNAME_A = 'a'
     EMAIL_A = 'a@example.com'
