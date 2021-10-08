@@ -42,7 +42,6 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
