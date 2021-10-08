@@ -7,7 +7,8 @@
        [href]="OPPIA_AVATAR_LINK_URL"
        target="_blank"
        rel="noopener">
-      <img class="conversation-skin-oppia-avatar"
+      <img [ngStyle]="isLanguageRTL() ? {'right': '-15px'} : {'left': '-15px'}"
+           class="conversation-skin-oppia-avatar"
            [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
     </a>
     <button type="button" class="conversation-skin-close-help-card-button protractor-test-close-help-card-button"
@@ -74,7 +75,6 @@
   }
 
   .conversation-skin-help-card .conversation-skin-oppia-avatar {
-    left: -15px;
     top: 12px;
   }
 
