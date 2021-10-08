@@ -342,7 +342,9 @@ class AdminHandler(base.BaseHandler):
         state.update_next_content_id_index(1)
         state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml(
-            '1', question_content, {}))
+            '1', question_content, {}),
+            feconf.ENTITY_TYPE_QUESTION,
+            question_id)
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
         recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')

@@ -1639,7 +1639,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content',
                 'html': '<p>This is content</p>',
                 'image_sizes_in_bytes': {}
-            }))
+            }),
+            'test-entity',
+            'test-entity-id')
 
         self.set_interaction_for_state(state, 'TextInput')
 

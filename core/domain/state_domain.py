@@ -1246,8 +1246,6 @@ class InteractionCustomizationArg:
             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
 
         if is_subtitled_html_spec:
-            print("***")
-            print(value)
             value.image_sizes_in_bytes = (
                 html_cleaner.get_image_sizes_in_bytes_from_html(
                     value.html,
@@ -3079,6 +3077,8 @@ class State:
 
         Args:
             content: SubtitledHtml. Representation of updated content.
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
         # Update the image_sizes_in_bytes dict with the images contained
