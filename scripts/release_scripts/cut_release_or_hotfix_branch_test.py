@@ -68,7 +68,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'ask_user_to_confirm_is_called': True
         }
 
-        class MockResponse(python_utils.OBJECT):
+        class MockResponse:
             def getcode(self):
                 """Mock getcode function for mock response object."""
 

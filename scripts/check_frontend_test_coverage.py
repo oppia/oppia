@@ -97,7 +97,7 @@ NOT_FULLY_COVERED_FILENAMES = [
 ]
 
 
-class LcovStanzaRelevantLines(python_utils.OBJECT):
+class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
     def __init__(self, stanza):
