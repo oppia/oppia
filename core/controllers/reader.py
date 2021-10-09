@@ -271,6 +271,23 @@ class ExplorationHandler(base.BaseHandler):
 class PretestHandler(base.BaseHandler):
     """Provides subsequent pretest questions after initial batch."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
