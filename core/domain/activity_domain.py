@@ -82,8 +82,9 @@ class ActivityReference:
         }
 
     @classmethod
-    def from_dict(cls, activity_reference_dict: Dict[str, str]
-    ) -> ActivityReference:
+    def from_dict(
+        cls, activity_reference_dict: Dict[str, str]
+    ) -> 'ActivityReference':
         """Return the ActivityReference object from a dict.
 
         Args:
