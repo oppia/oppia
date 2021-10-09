@@ -217,8 +217,10 @@
         "ignoreConsecutiveComments": true
       }
     ],
+    // The following must be off so that we can enable
+    // "@typescript-eslint/comma-spacing".
     "comma-spacing": [
-      "error",
+      "off",
       {
         "before": false,
         "after": true
@@ -264,8 +266,10 @@
       }
     ],
     "key-spacing": "error",
+    // The following must be off so that we can enable
+    // "@typescript-eslint/keyword-spacing".
     "keyword-spacing": [
-      "error",
+      "off",
       {
         "before": true,
         "after": true
@@ -369,8 +373,10 @@
       "error",
       "always"
     ],
+    // The following must be off so that we can enable
+    // "@typescript-eslint/space-before-function-paren".
     "space-before-function-paren": [
-      "error",
+      "off",
       {
         "anonymous": "never",
         "asyncArrow": "never",
@@ -453,6 +459,28 @@
       "error",
       "any"
     ],
-    "@typescript-eslint/method-signature-style": ["error"]
+    "@typescript-eslint/method-signature-style": ["error"],
+    "@typescript-eslint/space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "asyncArrow": "never",
+        "named": "never"
+      }
+    ],
+    "@typescript-eslint/keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "@typescript-eslint/comma-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ]
   }
 }
