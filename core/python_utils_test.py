@@ -38,15 +38,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     Python 3.
     """
 
-    def test_get_args_of_function_node(self):
-        function_txt = b"""def _mock_function(arg1, arg2):
-                      pass"""
-
-        ast_node = ast.walk(ast.parse(function_txt))
-        function_node = [n for n in ast_node if isinstance(n, ast.FunctionDef)]
-        args_list = python_utils.get_args_of_function_node(function_node[0], [])
-        self.assertEqual(args_list, ['arg1', 'arg2'])
-
     def test_open_file(self):
         with python_utils.open_file(
                 os.path.join('core', 'python_utils.py'), 'r'

@@ -224,23 +224,6 @@ class ASTDocStringChecker:
         pass
 
     @classmethod
-    def get_args_list_from_function_definition(cls, function_node):
-        """Extracts the arguments from a function definition.
-        Ignores class specific arguments (self and cls).
-
-        Args:
-            function_node: ast.FunctionDef. Represents a function.
-
-        Returns:
-            list(str). The args for a function as listed in the function
-            definition.
-        """
-        # Ignore self and cls args.
-        args_to_ignore = ['self', 'cls']
-        return python_utils.get_args_of_function_node(
-            function_node, args_to_ignore)
-
-    @classmethod
     def build_regex_from_args(cls, function_args):
         """Builds a regex string from a function's arguments to match against
         the docstring. Ensures the docstring contains an 'Args' header, and
@@ -302,20 +285,3 @@ class ASTDocStringChecker:
             if regex_result is None:
                 results.append('Arg ordering error in docstring.')
         return results
-
-    @classmethod
-    def check_docstrings_arg_order(cls, function_node):
-        """Extracts the arguments from a function definition.
-
-        Args:
-            function_node: ast node object. Represents a function.
-
-        Returns:
-            list(str). List of docstring errors associated with
-            the function. If the function has no errors, the list is empty.
-        """
-        func_def_args = cls.get_args_list_from_function_definition(
-            function_node)
-        docstring = ast.get_docstring(function_node)
-        func_result = cls.compare_arg_order(func_def_args, docstring)
-        return func_result

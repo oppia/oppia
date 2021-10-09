@@ -179,30 +179,6 @@ class ASTDocstringsCheckerTest(unittest.TestCase):
         sample_string = '     This is a sample string.'
         self.assertEqual(docstrings_checker.space_indentation(sample_string), 5)
 
-    def test_check_docstrings_arg_order(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-
-        ast_file = ast.walk(ast.parse(
-            """
-def func(test_var_one, test_var_two): #@
-    \"\"\"Function to test docstring parameters.
-
-    Args:
-        test_var_one: int. First test variable.
-        test_var_two: str. Second test variable.
-
-    Returns:
-        int. The test result.
-    \"\"\"
-    result = test_var_one + test_var_two
-    return result"""))
-
-        func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
-        self.assertEqual(len(func_defs), 1)
-
-        func_result = docstring_checker.check_docstrings_arg_order(func_defs[0])
-        self.assertEqual(func_result, [])
-
     def test_possible_exc_types_with_inference_error(self):
 
         @contextlib.contextmanager

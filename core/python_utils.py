@@ -147,30 +147,6 @@ def string_io(buffer_value=''):
     return StringIO(buffer_value)  # pylint: disable=disallowed-function-calls
 
 
-def get_args_of_function_node(function_node, args_to_ignore):
-    """Extracts the arguments from a function definition.
-
-    Args:
-        function_node: ast.FunctionDef. Represents a function.
-        args_to_ignore: list(str). Ignore these arguments in a function
-            definition.
-
-    Returns:
-        list(str). The args for a function as listed in the function
-        definition.
-    """
-    try:
-        return [
-            a.arg
-            for a in function_node.args.args
-            if a.arg not in args_to_ignore
-        ]
-    except AttributeError:
-        return [
-            a.id for a in function_node.args.args if a.id not in args_to_ignore
-        ]
-
-
 def open_file(filename, mode, encoding='utf-8', newline=None):
     """Open file and return a corresponding file object.
 
