@@ -175,8 +175,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.i18nLanguageCodeService.setI18nLanguageCode(
           userInfo.getPreferredSiteLanguageCode());
 
-        // This removes language parameter from URL if present as we load
-        // the webpage in preffered site language.
+        // This removes the language parameter from the URL if it is present,
+        // since, when the user is logged in, we load the webpage in their
+        // preferred site language.
         this.removeUrlLangParam();
       }
       this.currentLanguageCode = (
@@ -272,6 +273,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           this.currentLanguageCode);
       }
     });
+    // When user changes site language, it will override the lang parameter in
+    // the URL and render it invalid, so we remove it (if it's present) to avoid
+    // confusion.
     this.removeUrlLangParam();
   }
 

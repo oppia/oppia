@@ -40,13 +40,19 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {}
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
-    gtag: () => {}
+    gtag: () => {},
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
   };
 }
 
@@ -469,4 +475,62 @@ describe('TopNavigationBarComponent', () => {
     expect(component.username).toBe('username1');
     expect(component.profilePageUrl).toBe('/profile/username1');
   }));
+
+  it('should remove language param from URL if user has preffered' +
+  ' language', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
+    spyOn(component, 'removeUrlLangParam');
+    // Window location.toString() will return URL with language param 'es'.
+    expect(mockWindowRef.nativeWindow.location.toString()).toBe(
+      'http://localhost:8181/?lang=es');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.removeUrlLangParam).toHaveBeenCalled();
+    expect(
+      i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith('en');
+  }));
+
+  it('should not remove URL lang param when preffered language is' +
+  'not set for the user', fakeAsync (() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      null, 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    spyOn(component, 'removeUrlLangParam');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.removeUrlLangParam).not.toHaveBeenCalled();
+  }));
+
+  it('should remove language paramater from URL', () => {
+    spyOn(mockWindowRef.nativeWindow.history, 'pushState');
+    expect(mockWindowRef.nativeWindow.location.toString()).toBe(
+      'http://localhost:8181/?lang=es');
+
+    component.removeUrlLangParam();
+
+    expect(mockWindowRef.nativeWindow.history.pushState)
+      .toHaveBeenCalledWith({}, '', 'http://localhost:8181/');
+  });
+
+  it('should remove URL language param when user initiates site' +
+  'language change', () => {
+    spyOn(component, 'removeUrlLangParam');
+    expect(mockWindowRef.nativeWindow.location.toString()).toBe(
+      'http://localhost:8181/?lang=es');
+
+    component.changeLanguage('en', 'English');
+
+    expect(component.removeUrlLangParam).toHaveBeenCalled();
+  });
 });

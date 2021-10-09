@@ -17,37 +17,47 @@
  */
 
 import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheService } from 'ngx-translate-cache';
-
-import { ComponentFixture, TestBed, async, fakeAsync, tick} from
+import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { ComponentFixture, TestBed, async } from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
-
+import { CookieModule, CookieService } from 'ngx-cookie';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
-
-class mockURL extends URL {
-  readonly ancestorOrigins: DOMStringList;
-  reload: () => {};
-  replace: () => {};
-  assign: () => {};
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
+    },
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
+  };
 }
 
 describe('OppiaAngularRootComponent', function() {
   let emitSpy: jasmine.Spy;
   let windowRef: WindowRef;
+  let cookieService: CookieService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RichTextComponentsModule],
+      imports: [HttpClientTestingModule,
+        RichTextComponentsModule,
+        CookieModule.forRoot()],
       declarations: [OppiaAngularRootComponent],
       providers: [
         {
@@ -69,14 +79,36 @@ describe('OppiaAngularRootComponent', function() {
             use: () => {}
           }
         },
+        {
+          provide: TranslateCacheSettings,
+          useValue: {
+            cacheName: 'sampleCache'
+          }
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        MetaTagCustomizationService,
+        {
+          provide: DocumentAttributeCustomizationService,
+          useValue: {
+            addAttribute: (attr, code) => {}
+          }
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(OppiaAngularRootComponent);
     component = fixture.componentInstance;
-
+    windowRef = TestBed.inject(WindowRef);
+    cookieService = TestBed.inject(CookieService);
+    let metaTagCustomizationService = (
+      TestBed.inject(MetaTagCustomizationService));
     emitSpy = spyOn(component.initialized, 'emit');
+    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags')
+      .and.returnValue();
   }));
 
   it('should only intialize rteElements once', () => {
@@ -94,15 +126,38 @@ describe('OppiaAngularRootComponent', function() {
     expect(emitSpy).toHaveBeenCalled();
   });
 
-  it('should set site language according to URL', fakeAsync(() => {
-    let i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    windowRef = TestBed.inject(WindowRef);
-    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
-    windowRef.nativeWindow.location = new mockURL('http://localhost/search/find?lang=es');
-    component.ngAfterViewInit();
-    tick(151);
+  it('should set cache language according to URL lang param', () => {
+    // Window location is 'http://localhost:8181/?lang=es'.
+    spyOn(cookieService, 'put');
 
-    expect(i18nLanguageCodeService.setI18nLanguageCode)
-      .toHaveBeenCalledWith('es');
-  }));
+    component.ngAfterViewInit();
+
+    expect(cookieService.put).toHaveBeenCalledWith('sampleCache', 'es');
+    expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
+  });
+
+  it('should remove language param from URL if it is invalid', () => {
+    spyOn(cookieService, 'put');
+    spyOn(windowRef.nativeWindow.location, 'toString')
+      .and.returnValue('http://localhost:8181/?lang=invalid');
+
+    component.ngAfterViewInit();
+
+    // Translation cache should not be updated as the language param
+    // is invalid.
+    expect(cookieService.put).not.toHaveBeenCalledWith();
+    expect(component.url.toString()).toBe('http://localhost:8181/');
+  });
+
+  it('should not update translation cache if no language param is present in' +
+  'URL', () => {
+    spyOn(windowRef.nativeWindow.location, 'toString')
+      .and.returnValue('http://localhost:8181');
+    spyOn(cookieService, 'put');
+
+    component.ngAfterViewInit();
+
+    expect(cookieService.put).not.toHaveBeenCalledWith();
+    expect(component.url.toString()).toBe('http://localhost:8181/');
+  });
 });

@@ -185,20 +185,17 @@ export class SearchBarComponent implements OnInit, OnDestroy {
           this.searchQuery, this.selectionDetails.categories.selections,
           this.selectionDetails.languageCodes.selections
         );
+        let url = new URL(this.windowRef.nativeWindow.location.toString());
+        let siteLangCode: string | null = url.searchParams.get('lang');
+        url.search = '?q=' + searchUrlQueryString;
         if (
           this.windowRef.nativeWindow.location.pathname === ('/search/find')) {
-          let url = new URL(this.windowRef.nativeWindow.location.toString());
-          let siteLangCode: string | null = url.searchParams.get('lang');
-          url.search = '?q=' + searchUrlQueryString;
           if (siteLangCode) {
             url.searchParams.append('lang', siteLangCode);
           }
           this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
         } else {
-          let url = new URL(this.windowRef.nativeWindow.location.toString());
-          let siteLangCode: string | null = url.searchParams.get('lang');
           url.pathname = '/search/find';
-          url.search = '?q=' + searchUrlQueryString;
           if (siteLangCode) {
             url.searchParams.append('lang', siteLangCode);
           }
