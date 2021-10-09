@@ -53,13 +53,13 @@
         </oppia-learner-answer-info-card>
       </div>
       <div ng-if="!getCanAskLearnerForAnswerInfo()">
-        <progress-nav on-submit="submitAnswerFromProgressNav()"
-                      is-learn-again-button="isLearnAgainButton()"
-                      submit-button-is-disabled="isSubmitButtonDisabled()"
-                      displayed-card="displayedCard"
-                      submit-button-is-shown="!answerIsBeingProcessed"
-                      on-click-continue-button="showUpcomingCard()">
-        </progress-nav>
+        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
+                            [is-learn-again-button]="isLearnAgainButton"
+                            [submit-button-is-disabled]="isSubmitButtonDisabled()"
+                            [displayed-card]="displayedCard"
+                            [submit-button-is-shown]="!answerIsBeingProcessed"
+                            (click-continue-button)="showUpcomingCard()">
+        </oppia-progress-nav>
       </div>
       <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
@@ -104,9 +104,9 @@
     <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" uib-popover-template="'<[getFeedbackPopoverUrl()]>'" popover-trigger="click">
-      <rating-display rating-value="userRating" is-editable="true" on-edit="submitUserRating"
-                      class="conversation-skin-final-ratings-display">
-      </rating-display>
+      <oppia-rating-display [rating-value]="userRating" [is-editable]="true" (edit)="submitUserRating($event)"
+                            class="conversation-skin-final-ratings-display">
+      </oppia-rating-display>
     </div>
   </div>
 

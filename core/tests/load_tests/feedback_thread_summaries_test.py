@@ -24,7 +24,6 @@ from __future__ import unicode_literals
 import time
 
 from core import feconf
-from core import python_utils
 from core.domain import feedback_services
 from core.tests import test_utils
 
@@ -61,7 +60,7 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         # all the summaries is less than 0.2s. However since it seems to take
         # longer on Travis, the constant has been set to 1.7s.
         # Create 100 threads.
-        for _ in python_utils.RANGE(100):
+        for _ in range(100):
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
@@ -73,7 +72,7 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         for thread in threadlist:
             thread_ids.append(thread.id)
             # Create 5 messages in each thread.
-            for _ in python_utils.RANGE(5):
+            for _ in range(5):
                 feedback_services.create_message(
                     thread.id, self.user_id, None, None, 'editor message')
 
