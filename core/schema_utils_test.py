@@ -883,6 +883,17 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_username_string('oppia'))
         self.assertFalse(is_valid_username_string(''))
 
+    def test_has_length(self) -> None:
+        """Tests if static method has_length returns true iff
+        given list has length of the given value.
+        """
+        has_length = schema_utils.get_validator('has_length')
+
+        self.assertTrue(has_length(['abcd', 'ab'], 2))
+
+        self.assertFalse(has_length(['efg'], 2))
+        self.assertFalse(has_length(['efg', 'ghj', 'huij'], 2))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""

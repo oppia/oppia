@@ -34,6 +34,21 @@ from core.domain import topic_services
 class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_edit_story
     def get(self, _):
         """Handles GET requests."""
@@ -144,6 +159,26 @@ class StoryPublishHandler(base.BaseHandler):
     """A data handler for publishing and unpublishing stories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'new_story_status_is_public': {
+                'schema': {
+                    'type': 'bool'
+                },
+            }
+        }
+    }
 
     @acl_decorators.can_edit_story
     def put(self, story_id):
@@ -151,10 +186,8 @@ class StoryPublishHandler(base.BaseHandler):
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         topic_id = story.corresponding_topic_id
 
-        new_story_status_is_public = self.payload.get(
+        new_story_status_is_public = self.normalized_payload.get(
             'new_story_status_is_public')
-        if not isinstance(new_story_status_is_public, bool):
-            raise self.InvalidInputException
 
         if new_story_status_is_public:
             topic_services.publish_story(topic_id, story_id, self.user_id)

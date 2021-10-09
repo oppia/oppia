@@ -793,7 +793,7 @@ class Story:
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
-        if len(story_id) != 12:
+        if len(story_id) != constants.STORY_ID_LENGTH:
             raise utils.ValidationError('Invalid story id.')
 
     @classmethod
