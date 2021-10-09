@@ -700,21 +700,25 @@ class SignupTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {'username': '', 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('Schema validation for \'username\' failed: Validation failed: is_valid_username_string ({}) for object', response_dict['error'])
+        self.assertIn(
+            'Schema validation for \'username\' failed: Validation failed: is_valid_username_string ({}) for object', 
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {'username': '!a!', 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'Schema validation for \'username\' failed: Validation failed: is_valid_username_string ({}) for object !a!', response_dict['error'])
+            'Schema validation for \'username\' failed: Validation failed: is_valid_username_string ({}) for object !a!', 
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {'username': self.UNICODE_TEST_STRING, 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'Schema validation for \'username\' failed: Validation failed: is_valid_username_string ({}) for object unicode ¡马!', response_dict['error'])
+            'Schema validation for \'username\' failed: Validation failed: is_valid_username_string ({}) for object unicode ¡马!', 
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
