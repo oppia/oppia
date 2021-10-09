@@ -173,12 +173,13 @@ class PreferencesHandler(base.BaseHandler):
                 }
             },
             'data': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
-                    }]
+                'type': 'list',
+                    'items': {
+                        'type': 'unicode',
+                        'validators': [{
+                            'id': 'has_length_at_most',
+                            'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
+                        }]
                 },
                 'default_value': None
             }
