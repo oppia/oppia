@@ -60,7 +60,6 @@ INVALID_BYPASS_FLAG = os.path.join(
     LINTER_TESTS_DIR, 'invalid_bypass_flag.ts')
 
 # PY filepaths.
-INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
 INVALID_REQUEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_request.py')
 INVALID_NO_NEWLINE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_no_newline.py')
@@ -142,7 +141,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_AUTHOR_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 26: Please remove author tags from this file.'],
+            ['Line 24: Please remove author tags from this file.'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -152,10 +151,10 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_NDB_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 31: Please use datastore_services instead of ndb'],
+            ['Line 29: Please use datastore_services instead of ndb'],
             lint_task_report.trimmed_messages)
         self.assert_same_list_elements(
-            ['Line 34: Please use datastore_services instead of ndb'],
+            ['Line 32: Please use datastore_services instead of ndb'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -165,7 +164,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_PYLINT_ID_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
-            'Line 43: Please remove pylint exclusion if it is unnecessary,'
+            'Line 41: Please remove pylint exclusion if it is unnecessary,'
             ' or make it human readable with a sentence instead of an id. '
             'The id-to-message list can be seen '
             'here->http://pylint-messages.wikidot.com/all-codes'
@@ -185,7 +184,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_URLENCODE_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 46: Please use python_utils.url_encode().'],
+            ['Line 44: Please use python_utils.url_encode().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -195,7 +194,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_URLRETRIEVE_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 46: Please use python_utils.url_retrieve().'],
+            ['Line 44: Please use python_utils.url_retrieve().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -205,7 +204,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_URLOPEN_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 45: Please use python_utils.url_open().'],
+            ['Line 43: Please use python_utils.url_open().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -215,17 +214,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             [INVALID_REQUEST_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
-            ['Line 47: Please use python_utils.url_request().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_object(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_OBJECT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 25: Please use python_utils.OBJECT.'],
+            ['Line 45: Please use python_utils.url_request().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -270,7 +259,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
             [INVALID_TODO_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
-            'Line 33: Please assign TODO comments to a user in the format'
+            'Line 31: Please assign TODO comments to a user in the format'
             ' TODO(username): XXX.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

@@ -275,7 +275,7 @@ def get_validator(validator_id: str) -> Callable[..., bool]:
     return _Validators.get(validator_id)
 
 
-class Normalizers(python_utils.OBJECT):
+class Normalizers:
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -330,7 +330,7 @@ class Normalizers(python_utils.OBJECT):
         """
         if obj == '':
             return obj
-        url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
+        url_components = urllib.parse.urlsplit(obj)
         quoted_url_components = (
             urllib.parse.quote(component) for component in url_components)
         raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
@@ -357,7 +357,7 @@ class Normalizers(python_utils.OBJECT):
         return ' '.join(obj.split())
 
 
-class _Validators(python_utils.OBJECT):
+class _Validators:
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is

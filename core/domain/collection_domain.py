@@ -167,7 +167,7 @@ class CollectionChange(change_domain.BaseChange):
     }]
 
 
-class CollectionNode(python_utils.OBJECT):
+class CollectionNode:
     """Domain object describing a node in the exploration graph of a
     collection. The node contains the reference to
     its exploration (its ID).
@@ -232,7 +232,7 @@ class CollectionNode(python_utils.OBJECT):
         return cls(exploration_id)
 
 
-class Collection(python_utils.OBJECT):
+class Collection:
     """Domain object for an Oppia collection."""
 
     def __init__(
@@ -783,7 +783,7 @@ class Collection(python_utils.OBJECT):
         """
         exploration_just_unlocked = None
 
-        for index in python_utils.RANGE(0, len(self.nodes) - 1):
+        for index in range(len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
                 exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
@@ -1052,7 +1052,7 @@ class Collection(python_utils.OBJECT):
                     'collection.')
 
 
-class CollectionSummary(python_utils.OBJECT):
+class CollectionSummary:
     """Domain object for an Oppia collection summary."""
 
     def __init__(
