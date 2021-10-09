@@ -28,7 +28,7 @@ from core.domain import object_registry
 from core.domain import value_generators_domain
 
 
-class ParamSpec(python_utils.OBJECT):
+class ParamSpec:
     """Value object for an exploration parameter specification."""
 
     SUPPORTED_OBJ_TYPES = {
@@ -84,7 +84,7 @@ class ParamSpec(python_utils.OBJECT):
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
-class ParamChange(python_utils.OBJECT):
+class ParamChange:
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):

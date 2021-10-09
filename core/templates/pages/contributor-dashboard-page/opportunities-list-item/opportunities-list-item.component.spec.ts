@@ -77,7 +77,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.progressBarStyle).toEqual({
           width: '50%'
         });
-        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
+        expect(component.correspondingOpportunityDeleted).toBe(false);
       });
 
     describe('when opportunity subheading corresponds to deleted ' +
@@ -90,9 +90,9 @@ describe('Opportunities List Item Component', () => {
         component.ngOnInit();
       });
 
-      it('should initialize isCorrespondingOpportunityDeleted to true',
+      it('should initialize correspondingOpportunityDeleted to true',
         () => {
-          expect(component.isCorrespondingOpportunityDeleted).toBe(true);
+          expect(component.correspondingOpportunityDeleted).toBe(true);
         });
     });
   });
@@ -127,8 +127,8 @@ describe('Opportunities List Item Component', () => {
         });
         expect(component.opportunityHeadingTruncationLength).toBe(35);
         expect(component.progressPercentage).toBe('50%');
-        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
-        expect(component.isTranslationProgressBar).toBe(true);
+        expect(component.correspondingOpportunityDeleted).toBe(false);
+        expect(component.translationProgressBar).toBe(true);
       });
 
     describe('when opportunity subheading corresponds to deleted ' +
@@ -141,9 +141,9 @@ describe('Opportunities List Item Component', () => {
         component.ngOnInit();
       });
 
-      it('should initialize isCorrespondingOpportunityDeleted to true',
+      it('should initialize correspondingOpportunityDeleted to true',
         () => {
-          expect(component.isCorrespondingOpportunityDeleted).toBe(true);
+          expect(component.correspondingOpportunityDeleted).toBe(true);
         });
     });
   });
@@ -168,7 +168,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.labelText).toBe(undefined);
         expect(component.labelStyle).toBe(undefined);
         expect(component.opportunityHeadingTruncationLength).toBe(40);
-        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
+        expect(component.correspondingOpportunityDeleted).toBe(false);
       });
   });
 });
