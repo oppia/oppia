@@ -939,7 +939,8 @@ def is_parsable_as_xml(xml_string):
     Returns:
         bool. Whether xml_string is parsable as XML or not.
     """
-    if not isinstance(xml_string, bytes):
+    # TODO(#14028): Use just one type.
+    if not isinstance(xml_string, (str, bytes)):
         return False
     try:
         defusedxml.ElementTree.fromstring(xml_string)
