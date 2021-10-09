@@ -72,8 +72,6 @@ INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
 INVALID_QUOTE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_quote.py')
-INVALID_URLENCODE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_urlencode.py')
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
 INVALID_MERGE_CONFLICT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_merge_conflict.py')
