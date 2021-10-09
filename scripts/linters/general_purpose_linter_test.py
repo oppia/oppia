@@ -181,19 +181,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_use_of_urlencode(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_URLENCODE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-<<<<<<< HEAD
-=======
-        self.assert_same_list_elements(
-            ['Line 44: Please use python_utils.url_encode().'],
-            lint_task_report.trimmed_messages)
->>>>>>> ef5cdda31cc68f2100f940621b0f468d9fd53a6e
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
     def test_invalid_use_of_urlretrieve(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_URLRETRIEVE_FILEPATH], FILE_CACHE)
