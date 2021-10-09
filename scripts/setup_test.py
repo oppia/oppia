@@ -465,6 +465,16 @@ class SetupTests(test_utils.GenericTestBase):
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
 
+    def test_chrome_bin_setup_with_brave_browser(self):
+        def mock_isfile(path):
+            return path == '/usr/bin/brave'
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/brave')
+
     def test_chrome_bin_setup_with_chromium_browser(self):
         def mock_isfile(path):
             return path == '/usr/bin/chromium-browser'

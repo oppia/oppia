@@ -282,7 +282,7 @@ def open_new_tab_in_browser_if_possible(url):
         python_utils.PRINT(
             'Please open the following link in browser: %s' % url)
         return
-    browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
+    browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
