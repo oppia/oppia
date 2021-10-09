@@ -54,8 +54,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-RANGE = builtins.range
-ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
 
@@ -97,25 +95,6 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         addr, requestHandler=requestHandler, logRequests=logRequests,
         allow_none=allow_none, encoding=encoding,
         bind_and_activate=bind_and_activate)
-
-
-def redirect_stdout(new_target):
-    """Returns redirect_stdout from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Args:
-        new_target: FileLike. The file-like object all messages printed to
-            stdout will be redirected to.
-
-    Returns:
-        contextlib.redirect_stdout or contextlib2.redirect_stdout. The
-        redirect_stdout object.
-    """
-    try:
-        from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
-    return impl(new_target)
 
 
 def nullcontext(enter_result=None):
@@ -236,23 +215,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
-
-
-def url_split(urlstring):
-    """Splits a URL using urlparse.urlsplit if run under Python 2 and
-    urllib.parse.urlsplit if run under Python 3.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlsplit(urlstring)  # pylint: disable=disallowed-function-calls
 
 
 def url_parse(urlstring):
@@ -452,7 +414,7 @@ def with_metaclass(meta, *bases):
 
     Example:
 
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             pass
 
         class FormType(type):
