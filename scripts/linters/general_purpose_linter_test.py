@@ -71,8 +71,6 @@ INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
 INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
-INVALID_UNQUOTE_PLUS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_urlunquote_plus.py')
 INVALID_URLENCODE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlencode.py')
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
@@ -169,13 +167,6 @@ class PythonLintTests(test_utils.LinterTestBase):
             'The id-to-message list can be seen '
             'here->http://pylint-messages.wikidot.com/all-codes'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_unquote_plus(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_UNQUOTE_PLUS_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
