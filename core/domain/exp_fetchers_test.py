@@ -19,14 +19,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -111,7 +111,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         explorations = (
             exp_fetchers
             .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-                self.EXP_1_ID, list(python_utils.RANGE(1, latest_version + 1)))
+                self.EXP_1_ID, list(range(1, latest_version + 1)))
         )
 
         self.assertEqual(len(explorations), 3)

@@ -21,10 +21,9 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import utils
+from core.jobs import base_jobs
 from core.platform import models
-from jobs import base_jobs
-import python_utils
-import utils
 
 from typing import Dict, List, Type, Union # isort: skip
 
@@ -35,7 +34,7 @@ if MYPY:  # pragma: no cover
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 
-class BeamJob(python_utils.OBJECT):
+class BeamJob:
     """Encapsulates the definition of an Apache Beam job.
 
     Attributes:
@@ -71,7 +70,7 @@ class BeamJob(python_utils.OBJECT):
         return {'name': self.name}
 
 
-class BeamJobRun(python_utils.OBJECT):
+class BeamJobRun:
     """Encapsulates an individual execution of an Apache Beam job.
 
     Attributes:
@@ -165,7 +164,7 @@ class BeamJobRun(python_utils.OBJECT):
         }
 
 
-class AggregateBeamJobRunResult(python_utils.OBJECT):
+class AggregateBeamJobRunResult:
     """Encapsulates the complete result of an Apache Beam job run.
 
     Attributes:

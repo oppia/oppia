@@ -24,7 +24,11 @@ import copy
 import datetime
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -35,10 +39,6 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 from pylatexenc import latex2text
 
@@ -131,7 +131,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
     ]
 
 
-class Question(python_utils.OBJECT):
+class Question:
     """Domain object for a question."""
 
     def __init__(
@@ -533,7 +533,7 @@ class Question(python_utils.OBJECT):
                 max_existing_content_id_index + 1)
             return question_state_dict
 
-        class ContentIdCounter(python_utils.OBJECT):
+        class ContentIdCounter:
             """This helper class is used to keep track of
             next_content_id_index and new_content_ids, and provides a
             function to generate new content_ids.
@@ -810,7 +810,7 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        class ContentIdCounter(python_utils.OBJECT):
+        class ContentIdCounter:
             """This helper class is used to keep track of
             next_content_id_index and new_content_ids, and provides a
             function to generate new content_ids.
@@ -1397,7 +1397,7 @@ class Question(python_utils.OBJECT):
         self.question_state_data = question_state_data
 
 
-class QuestionSummary(python_utils.OBJECT):
+class QuestionSummary:
     """Domain object for Question Summary."""
 
     def __init__(
@@ -1480,7 +1480,7 @@ class QuestionSummary(python_utils.OBJECT):
                 'strings, received %s' % self.misconception_ids)
 
 
-class QuestionSkillLink(python_utils.OBJECT):
+class QuestionSkillLink:
     """Domain object for Question Skill Link.
 
     Attributes:
@@ -1520,7 +1520,7 @@ class QuestionSkillLink(python_utils.OBJECT):
         }
 
 
-class MergedQuestionSkillLink(python_utils.OBJECT):
+class MergedQuestionSkillLink:
     """Domain object for the Merged Question Skill Link object, returned to the
     editors.
 

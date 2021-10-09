@@ -4,7 +4,8 @@
                              (clickActionButton)="clickActionButton.emit($event)"
                              [progressBarRequired]="progressBarRequired"
                              [labelRequired]="labelRequired"
-                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
+                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
+                             [opportunityType]="opportunityType">
     </oppia-opportunities-list-item>
   </div>
   <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
