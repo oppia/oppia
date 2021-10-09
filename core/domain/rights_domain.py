@@ -51,7 +51,7 @@ DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
 DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
 
 
-class ActivityRights(python_utils.OBJECT):
+class ActivityRights:
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """

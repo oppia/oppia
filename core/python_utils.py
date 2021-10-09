@@ -54,7 +54,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-ROUND = builtins.round
 UNICODE = builtins.str
 
 
@@ -95,25 +94,6 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         addr, requestHandler=requestHandler, logRequests=logRequests,
         allow_none=allow_none, encoding=encoding,
         bind_and_activate=bind_and_activate)
-
-
-def redirect_stdout(new_target):
-    """Returns redirect_stdout from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Args:
-        new_target: FileLike. The file-like object all messages printed to
-            stdout will be redirected to.
-
-    Returns:
-        contextlib.redirect_stdout or contextlib2.redirect_stdout. The
-        redirect_stdout object.
-    """
-    try:
-        from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
-    return impl(new_target)
 
 
 def nullcontext(enter_result=None):
@@ -433,7 +413,7 @@ def with_metaclass(meta, *bases):
 
     Example:
 
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             pass
 
         class FormType(type):
