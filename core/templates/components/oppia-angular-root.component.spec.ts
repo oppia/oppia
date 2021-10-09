@@ -150,7 +150,7 @@ describe('OppiaAngularRootComponent', function() {
   });
 
   it('should not update translation cache if no language param is present in' +
-  'URL', () => {
+  ' URL', () => {
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181');
     spyOn(cookieService, 'put');

@@ -476,8 +476,8 @@ describe('TopNavigationBarComponent', () => {
     expect(component.profilePageUrl).toBe('/profile/username1');
   }));
 
-  it('should remove language param from URL if user has preffered' +
-  ' language', fakeAsync(() => {
+  it('should remove language param from URL if user has a preffered' +
+  ' site language', fakeAsync(() => {
     let userInfo = new UserInfo(
       ['USER_ROLE'], true, false, false, false, true,
       'en', 'username1', 'tester@example.com', true
@@ -497,7 +497,7 @@ describe('TopNavigationBarComponent', () => {
       i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith('en');
   }));
 
-  it('should not remove URL lang param when preffered language is' +
+  it('should not remove URL lang param when preffered site language is' +
   'not set for the user', fakeAsync (() => {
     let userInfo = new UserInfo(
       ['USER_ROLE'], true, false, false, false, true,
