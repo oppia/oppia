@@ -27,7 +27,6 @@ import tempfile
 import urllib.request as urlrequest
 import zipfile
 
-
 from core import python_utils
 from core.tests import test_utils
 
