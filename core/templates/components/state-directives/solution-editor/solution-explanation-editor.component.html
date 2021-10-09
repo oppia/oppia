@@ -29,7 +29,7 @@
       </schema-based-editor>
     </div>
 
-    <div ng-if="$ctrl.isSolutionExplanationLengthExceeded($ctrl.StateSolutionService.displayed.explanation.html)" class="oppia-outcome-feedback-length-exceeded-error">
+    <div ng-if="$ctrl.isSolutionExplanationLengthExceeded($ctrl.StateSolutionService.displayed.explanation.html)" class="oppia-solution-length-exceeded-error">
       The solution explanation is too long. Please make it under 200 characters.
     </div>
 
@@ -53,7 +53,7 @@
   </div>
 </div>
 <style>
-  .oppia-outcome-feedback-length-exceeded-error {
+  .oppia-solution-length-exceeded-error {
     background-color: #f8d7da;
     border: 0.0625rem solid #dc3545;
     border-radius: 0.25rem;

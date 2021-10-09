@@ -381,4 +381,16 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.savedOutcome.refresherExplorationId).toBe(null);
     expect(ctrl.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
+
+  it('should check if outcome feedback has length of atmost 200 characters',
+    () => {
+      let text = 'Feedback Text ';
+      let outcome1 = OutcomeObjectFactory.createNew(
+        'State Name', '1', text, []);
+      expect(ctrl.isFeedbackLengthExceeded(outcome1)).toBe(false);
+
+      let outcome2 = OutcomeObjectFactory.createNew(
+        'State Name', '1', text.repeat(15), []);
+      expect(ctrl.isFeedbackLengthExceeded(outcome2)).toBe(true);
+    });
 });

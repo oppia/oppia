@@ -113,4 +113,16 @@ describe('SolutionExplanationEditorComponent', () => {
 
     expect(ctrl.explanationEditorIsOpen).toBe(false);
   });
+
+  it('should check if solution explanation length has exceeded 200 characters',
+    () => {
+      var solutionExplanation = 'Solution explanation';
+      var solutionExplanationHtml = '<p> ' + solutionExplanation + ' </p>';
+      expect(ctrl.isSolutionExplanationLengthExceeded(solutionExplanationHtml))
+        .toBe(false);
+      solutionExplanationHtml = (
+        '<p> ' + solutionExplanation.repeat(15) + ' </p>');
+      expect(ctrl.isSolutionExplanationLengthExceeded(solutionExplanationHtml))
+        .toBe(true);
+    });
 });
