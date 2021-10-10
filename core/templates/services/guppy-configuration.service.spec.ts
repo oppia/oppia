@@ -74,7 +74,7 @@ let guppyConfigurationService: GuppyConfigurationService;
 
 describe('GuppyConfigurationService', () => {
   beforeAll(() => {
-    guppyConfigurationService = TestBed.get(GuppyConfigurationService);
+    guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
     window.Guppy = MockGuppy;
   });
 
