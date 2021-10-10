@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import copy
+import logging
 
 from constants import constants
 from core.domain import config_domain
@@ -641,9 +642,10 @@ class SuggestionTranslateContent(BaseSuggestion):
         content_html = exploration.get_content_html(
             self.change.state_name, self.change.content_id)
         if content_html != self.change.content_html:
-            raise utils.ValidationError(
-                'The Exploration content has changed since this translation '
-                'was submitted.')
+            logging.warning(
+                'The exploration content has changed since this translation '
+                'was submitted. Original content: %s. Suggestion change '
+                'content: %s' % (content_html, self.change.content_html))
 
     def accept(self, commit_message):
         """Accepts the suggestion.
