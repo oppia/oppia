@@ -301,7 +301,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         this.cookieService.put(
           this.translateCacheSettings.cacheName, siteLanguageCode);
       } else {
-        // Incase the case where the URL contains an invalid language code, we
+        // In the case where the URL contains an invalid language code, we
         // load the site using last cached language code and remove the language
         // param from the URL.
         this.url.searchParams.delete('lang');
