@@ -35,6 +35,9 @@ class MockGuppy {
   asciimath(): string {
     return 'Dummy value';
   }
+
+  'import_text'(value: string): void {}
+
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
     handler({focused: true});
