@@ -127,18 +127,25 @@ describe('OppiaAngularRootComponent', function() {
   });
 
   it('should set cache language according to URL lang param', () => {
-    // Window location is 'http://localhost:8181/?lang=es'.
-    spyOn(cookieService, 'put');
+    // Setting 'en' as cache language code.
+    cookieService.put('sampleCache', 'en');
+    // This sets the url to 'http://localhost:8181/?lang=es'
+    // when initialized.
+    expect(windowRef.nativeWindow.location.toString())
+      .toBe('http://localhost:8181/?lang=es');
+    expect(cookieService.get('sampleCache')).toBe('en');
 
     component.ngAfterViewInit();
 
-    expect(cookieService.put).toHaveBeenCalledWith('sampleCache', 'es');
+    expect(cookieService.get('sampleCache')).toBe('es');
     expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
+    cookieService.put('sampleCache', 'en');
     spyOn(cookieService, 'put');
-    // This sets the url to 'http://localhost:8181/?lang=invalid'.
+    // This sets the url to 'http://localhost:8181/?lang=invalid'
+    // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/?lang=invalid');
 
@@ -147,12 +154,14 @@ describe('OppiaAngularRootComponent', function() {
     // Translation cache should not be updated as the language param
     // is invalid.
     expect(cookieService.put).not.toHaveBeenCalledWith();
+    expect(cookieService.get('sampleCache')).toBe('en');
     expect(component.url.toString()).toBe('http://localhost:8181/');
   });
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
-    // This sets the url to 'http://localhost:8181/'.
+    cookieService.put('sampleCache', 'en');
+    // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181');
     spyOn(cookieService, 'put');
@@ -161,5 +170,6 @@ describe('OppiaAngularRootComponent', function() {
 
     expect(cookieService.put).not.toHaveBeenCalledWith();
     expect(component.url.toString()).toBe('http://localhost:8181/');
+    expect(cookieService.get('sampleCache')).toBe('en');
   });
 });

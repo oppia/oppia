@@ -501,7 +501,7 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it('should not remove URL lang param when preferred site language is' +
-  'not set for the user', fakeAsync (() => {
+  ' not set for the user', fakeAsync (() => {
     // Preferred language code in userInfo has been set to null.
     let userInfo = new UserInfo(
       ['USER_ROLE'], true, false, false, false, true,
@@ -521,7 +521,7 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it('should remove URL language param when user initiates site' +
-  'language change', () => {
+  ' language change', () => {
     component.ngOnInit();
     expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
 
