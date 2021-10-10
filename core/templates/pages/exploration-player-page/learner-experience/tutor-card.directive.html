@@ -1,7 +1,6 @@
 <oppia-audio-bar ng-if="showAudioBar()"></oppia-audio-bar>
-<div ng-style="isLanguageRTL() ? {'text-align': 'right'} : {'text-align': 'left'}" class="oppia-learner-view-card"
-     ng-class="{'animate-card-width': startCardChangeAnimation}"
-     ng-style="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
+<div ng-style="{'text-align': isLanguageRTL() ? 'right' : 'left', 'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}" class="oppia-learner-view-card"
+     ng-class="{'animate-card-width': startCardChangeAnimation}">
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">

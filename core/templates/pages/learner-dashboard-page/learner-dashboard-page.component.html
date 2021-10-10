@@ -1,5 +1,5 @@
 <background-banner *ngIf="!checkMobileView() || (checkMobileView() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div [ngStyle]="isLanguageRTL() ? {'text-align': 'right'} : {'text-align': 'left'}" class="oppia-learner-dashboard-container position-relative" [ngStyle]="checkMobileView() && {'min-height': '85.5vh'}">
+<div [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'min-height': checkMobileView() ? '85.5vh': 'auto'}" class="oppia-learner-dashboard-container position-relative">
   <div class="row oppia-row"
        [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
