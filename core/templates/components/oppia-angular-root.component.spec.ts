@@ -131,8 +131,8 @@ describe('OppiaAngularRootComponent', function() {
     cookieService.put('sampleCache', 'en');
     // This sets the url to 'http://localhost:8181/?lang=es'
     // when initialized.
-    expect(windowRef.nativeWindow.location.toString())
-      .toBe('http://localhost:8181/?lang=es');
+    spyOn(windowRef.nativeWindow.location, 'toString')
+      .and.returnValue('http://localhost:8181/?lang=es');
     expect(cookieService.get('sampleCache')).toBe('en');
 
     component.ngAfterViewInit();
