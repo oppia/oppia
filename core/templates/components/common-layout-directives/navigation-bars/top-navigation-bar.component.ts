@@ -180,7 +180,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         // This removes the language parameter from the URL if it is present,
         // since, when the user is logged in and has a preferred site language,
         // we always choose the language code based on their preferred site
-        // language to load the webpage, overiding the URL language parameter.
+        // language to load the webpage, overriding the URL language parameter.
         this.removeUrlLangParam();
       }
       this.currentLanguageCode = (
