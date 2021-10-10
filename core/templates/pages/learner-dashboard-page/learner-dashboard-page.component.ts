@@ -42,6 +42,7 @@ import { UserService } from 'services/user.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
@@ -141,6 +142,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     private deviceInfoService: DeviceInfoService,
     private dateTimeFormatService: DateTimeFormatService,
     private focusManagerService: FocusManagerService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService:
       LearnerDashboardBackendApiService,
     private loaderService: LoaderService,
@@ -280,6 +282,10 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   setActiveSection(newActiveSectionName: string): void {

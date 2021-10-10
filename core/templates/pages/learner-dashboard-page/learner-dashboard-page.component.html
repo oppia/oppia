@@ -1,9 +1,9 @@
 <background-banner *ngIf="!checkMobileView() || (checkMobileView() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div class="oppia-learner-dashboard-container position-relative" [ngStyle]="checkMobileView() && {'min-height': '85.5vh'}">
+<div [ngStyle]="isLanguageRTL() ? {'text-align': 'right'} : {'text-align': 'left'}" class="oppia-learner-dashboard-container position-relative" [ngStyle]="checkMobileView() && {'min-height': '85.5vh'}">
   <div class="row oppia-row"
        [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
-    <div class="col-md-3 oppia-learner-dashboard-side-content"
+    <div [ngStyle]="isLanguageRTL() ? {'padding-right': '100px'} : {'padding-left': '100px'}" class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!checkMobileView()">
       <mat-card class="oppia-learner-dashboard-main-menu">
         <h4 class="oppia-learner-dashboard-menu protractor-test-home-section"
@@ -474,7 +474,6 @@
 
   .oppia-learner-dashboard-side-content {
     min-width: 241px;
-    padding-left: 100px;
     width: 20%;
   }
 
@@ -885,6 +884,5 @@
     font-weight: bold;
     margin-right: 14px;
     margin-top: 8px;
-    text-align: right;
   }
 </style>

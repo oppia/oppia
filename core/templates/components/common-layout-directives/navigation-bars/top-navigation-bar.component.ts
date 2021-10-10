@@ -253,6 +253,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   changeLanguage(languageCode: string, languageText: string): void {
     this.currentLanguageCode = languageCode;
     this.currentLanguageText = languageText;

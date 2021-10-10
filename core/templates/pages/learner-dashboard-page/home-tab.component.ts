@@ -21,6 +21,7 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
  @Component({
    selector: 'oppia-home-tab',
@@ -39,11 +40,16 @@ export class HomeTabComponent {
 
   constructor(
     private deviceInfoService: DeviceInfoService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   ngOnInit(): void {
     this.width = this.widthConst * (this.currentGoals.length);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getTimeOfDay(): string {

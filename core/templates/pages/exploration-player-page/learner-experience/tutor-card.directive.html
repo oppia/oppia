@@ -94,7 +94,8 @@
          class="conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction-container">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i ng-if="canWindowShowTwoCards() && !isLanguageRTL()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i ng-if="canWindowShowTwoCards() && isLanguageRTL()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C4;</i>
         <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
     </div>
