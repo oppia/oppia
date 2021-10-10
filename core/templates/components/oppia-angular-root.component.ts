@@ -139,7 +139,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
 
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
-  static cookieService: CookieService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
@@ -151,7 +150,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static translateService: TranslateService;
   static translateCacheService: TranslateCacheService;
-  static windowRef: WindowRef;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
@@ -205,7 +203,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     });
     OppiaAngularRootComponent.classroomBackendApiService = (
       this.classroomBackendApiService);
-    OppiaAngularRootComponent.cookieService = this.cookieService;
     OppiaAngularRootComponent.i18nLanguageCodeService = (
       this.i18nLanguageCodeService);
     OppiaAngularRootComponent.ngZone = this.ngZone;
@@ -221,7 +218,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.translateService = this.translateService;
     OppiaAngularRootComponent.translateCacheService = (
       this.translateCacheService);
-    OppiaAngularRootComponent.windowRef = this.windowRef;
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
@@ -297,27 +293,27 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       if (supportedSiteLanguageCodes.includes(siteLanguageCode)) {
         // When translation cache is initialized, language code stored in cookie
         // is used to set the site language. To have a single source of truth,
-        // we directly update the language code in cookie using URL before
+        // we first directly update the language code in cookie using URL before
         // intializing the translation cache, so that we always read the
         // language code from the cookie to set site language. This removes
         // the need of continously syncing URL lang param and cache, and
-        // avoid race conditions.
+        // avoids race conditions.
         this.cookieService.put(
           this.translateCacheSettings.cacheName, siteLanguageCode);
       } else {
-        // Incase URL contains an invalid language code, we load the site in
-        // last cached language code and remove the language param from the URL.
+        // Incase the case where the URL contains an invalid language code, we
+        // load the site using last cached language code and remove the language
+        // param from the URL.
         this.url.searchParams.delete('lang');
         this.windowRef.nativeWindow.history.pushState(
           {}, '', this.url.toString());
       }
     }
 
-    // Translate Cache service should be initialized after translation cache
-    // is set according to the URL language parameter (if present) to avoid
-    // loading the site first in language code stored in cookie and then
-    // according to the URL language param. This helps in avoiding race
-    // conditions and load the site only according to the URL language param.
+    // The translateCacheService should only be initialized after the
+    // translation cache is set according to the URL language parameter (if
+    // present).This avoids race conditions between the URL language parameter
+    // and the language code stored in the local cookie.
     this.translateCacheService.init();
 
     const cachedLanguageCode = (

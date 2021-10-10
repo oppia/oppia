@@ -138,6 +138,7 @@ describe('OppiaAngularRootComponent', function() {
 
   it('should remove language param from URL if it is invalid', () => {
     spyOn(cookieService, 'put');
+    // This sets the url to 'http://localhost:8181/?lang=invalid'.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/?lang=invalid');
 
@@ -151,6 +152,7 @@ describe('OppiaAngularRootComponent', function() {
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
+    // This sets the url to 'http://localhost:8181/'.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181');
     spyOn(cookieService, 'put');

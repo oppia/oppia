@@ -51,6 +51,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText: string;
   @Input() subheaderText: string;
 
+  url: URL;
   currentLanguageCode: string;
   currentLanguageText: string;
   isModerator: boolean;
@@ -132,6 +133,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.getProfileImageDataAsync();
     this.currentUrl =
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
+    this.url = new URL(this.windowRef.nativeWindow.location.toString());
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
@@ -176,8 +178,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           userInfo.getPreferredSiteLanguageCode());
 
         // This removes the language parameter from the URL if it is present,
-        // since, when the user is logged in, we load the webpage in their
-        // preferred site language.
+        // since, when the user is logged in and has a preferred site language,
+        // we always choose the language code based on their preferred site
+        // language to load the webpage, overiding the URL language parameter.
         this.removeUrlLangParam();
       }
       this.currentLanguageCode = (
@@ -280,10 +283,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   removeUrlLangParam(): void {
-    let url = new URL(this.windowRef.nativeWindow.location.toString());
-    if (url.searchParams.has('lang')) {
-      url.searchParams.delete('lang');
-      this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
+    if (this.url.searchParams.has('lang')) {
+      this.url.searchParams.delete('lang');
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', this.url.toString());
     }
   }
 
