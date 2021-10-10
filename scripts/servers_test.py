@@ -35,6 +35,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
+from contextlib import ExitStack
 
 import psutil
 
@@ -47,7 +48,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def setUp(self):
         super(ManagedProcessTests, self).setUp()
-        self.exit_stack = python_utils.ExitStack()
+        self.exit_stack = ExitStack()
 
     def tearDown(self):
         try:
@@ -130,7 +131,7 @@ class ManagedProcessTests(test_utils.TestBase):
         new_makedirs = test_utils.CallCounter(
             lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw))
 
-        with python_utils.ExitStack() as exit_stack:
+        with ExitStack() as exit_stack:
             exit_stack.enter_context(self.swap(os.path, 'exists', new_exists))
             exit_stack.enter_context(self.swap(shutil, 'rmtree', new_rmtree))
             exit_stack.enter_context(self.swap(os, 'makedirs', new_makedirs))

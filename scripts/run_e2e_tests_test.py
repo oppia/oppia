@@ -32,6 +32,7 @@ from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 from scripts import scripts_test_utils
 from scripts import servers
+from contextlib import ExitStack
 
 CHROME_DRIVER_VERSION = '77.0.3865.40'
 MOCK_RERUN_POLICIES = {
@@ -57,7 +58,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RunE2ETestsTests, self).setUp()
-        self.exit_stack = python_utils.ExitStack()
+        self.exit_stack = ExitStack()
 
     def tearDown(self):
         try:

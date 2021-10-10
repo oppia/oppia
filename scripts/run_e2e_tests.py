@@ -29,6 +29,7 @@ from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import servers
+from contextlib import ExitStack
 
 MAX_RETRY_COUNT = 3
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -234,7 +235,7 @@ def run_tests(args):
 
     install_third_party_libraries(args.skip_install)
 
-    with python_utils.ExitStack() as stack:
+    with ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:
