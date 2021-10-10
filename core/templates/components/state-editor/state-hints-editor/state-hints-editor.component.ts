@@ -61,7 +61,7 @@ angular.module('oppia').component('stateHintsEditor', {
   },
   template: require('./state-hints-editor.component.html'),
   controller: [
-    '$filter', '$log', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$scope', '$uibModal', 'AlertsService',
     'EditabilityService', 'ExternalSaveService',
     'StateEditorService', 'StateHintsService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -69,14 +69,13 @@ angular.module('oppia').component('stateHintsEditor', {
     'UrlInterpolationService', 'WindowDimensionsService',
     'INTERACTION_SPECS',
     function(
-        $filter, $log, $scope, $uibModal, AlertsService,
+        $filter, $scope, $uibModal, AlertsService,
         EditabilityService, ExternalSaveService,
         StateEditorService, StateHintsService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolutionService,
         UrlInterpolationService, WindowDimensionsService,
         INTERACTION_SPECS) {
-      $log.info('state hints editor');
       var ctrl = this;
       $scope.getHintButtonText = function() {
         var hintButtonText = '+ ADD HINT';
