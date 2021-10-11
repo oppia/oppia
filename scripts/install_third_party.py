@@ -291,8 +291,8 @@ def validate_dependencies(filepath):
             test_dependencies_syntax(download_format, dependency_contents)
 
 
-def download_dependencies_file(filepath):
-    """This download all files to the required folders
+def download_all_dependencies(filepath):
+    """This download all files to the required folders.
 
     Args:
         filepath: str. The path to the json file.
@@ -454,7 +454,7 @@ def main(args=None):
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
     install_backend_python_libs.main()
-    download_dependencies_file(DEPENDENCIES_FILE_PATH)
+    download_all_dependencies(DEPENDENCIES_FILE_PATH)
     install_redis_cli()
     install_elasticsearch_dev_server()
 

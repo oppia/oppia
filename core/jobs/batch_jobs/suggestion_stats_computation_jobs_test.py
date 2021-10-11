@@ -365,7 +365,7 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
         return (
             self.pipeline
             | beam.Create(entry_stats)
-            | beam.CombineValues(
+            | beam.CombinePerKey(
                 suggestion_stats_computation_jobs.CombineStats())
             | beam.Values()  # pylint: disable=no-value-for-parameter
             | beam.Map(lambda stats: stats.to_dict())

@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 from . import App
 
@@ -43,8 +43,15 @@ class UidIdentifier(UserIdentifier):
 
     def __init__(self, uid: str): ...
 
+    @property
+    def uid(self) -> str: ...
+
 
 class GetUsersResult:
+
+    def __init__(
+        self, users: Sequence[UserRecord], not_found: Sequence[UserIdentifier]
+    ) -> None: ...
 
     @property
     def users(self) -> List[UserRecord]: ...
@@ -84,7 +91,7 @@ def delete_user(uid: str) -> None: ...
 def get_user(uid: str) -> UserRecord: ...
 
 
-def get_users(uid: List[UserIdentifier]) -> GetUsersResult: ...
+def get_users(uids: List[UserIdentifier]) -> GetUsersResult: ...
 
 
 def set_custom_user_claims(

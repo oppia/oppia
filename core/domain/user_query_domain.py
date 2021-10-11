@@ -31,7 +31,7 @@ attribute_names = [ # pylint: disable=invalid-name
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
 UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
-    'UserQueryParams', attribute_names)
+    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names))
 
 
 class UserQuery(python_utils.OBJECT):
