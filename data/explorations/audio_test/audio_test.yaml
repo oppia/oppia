@@ -9,7 +9,7 @@ objective: Try out playing audio on Oppia
 param_changes: []
 param_specs: {}
 proto_size_in_bytes: 0
-schema_version: 47
+schema_version: 55
 states:
   Finish:
     classifier_model_id: null

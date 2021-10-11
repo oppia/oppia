@@ -668,7 +668,8 @@ class Exploration(python_utils.OBJECT):
 
         exp_android_proto = cls.to_exploration_proto(
             exploration_id, title, 0, init_state_name, exploration.states)
-        exp_android_proto_size = int(exp_android_proto.ByteSize())
+        exp_android_proto_size = cls.calculate_size_of_proto(
+            exp_android_proto)
         cls.update_proto_size_in_bytes(cls, exp_android_proto_size)
         return exploration
 
@@ -2060,7 +2061,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2245,8 +2246,8 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
-        """Converts a v53 exploration dict into a v54 exploration dict.
-        Version 54 contains exploration size.
+        """Converts a v54 exploration dict into a v54 exploration dict.
+        Version 55 contains exploration size.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2296,6 +2297,11 @@ class Exploration(python_utils.OBJECT):
                     cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                     cls.CURRENT_EXP_SCHEMA_VERSION))
 
+        if exploration_schema_version == 41:
+            exploration_dict = cls._convert_v42_dict_to_v43_dict(
+                exploration_dict)
+            exploration_schema_version = 42
+
         if exploration_schema_version == 46:
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
                 exploration_dict)
@@ -2335,6 +2341,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
                 exploration_dict)
             exploration_schema_version = 54
+
+        if exploration_schema_version == 54:
+            exploration_dict = cls._convert_v54_dict_to_v55_dict(
+                exploration_dict)
+            exploration_schema_version = 55
 
         return exploration_dict
 
@@ -2519,7 +2530,8 @@ class Exploration(python_utils.OBJECT):
             title: str. The exploration title.
             version: int. The version of the exploration.
             init_state_name: str. The name of the initial state.
-            states: State. The state domain object.
+            states: list. The list of state
+                domain objects.
 
         Returns:
             Proto Object. The exploration proto object.
@@ -4605,6 +4617,10 @@ class Exploration(python_utils.OBJECT):
         )
 
         return misconception_proto
+
+    @classmethod
+    def calculate_size_of_proto(cls, proto):
+        return int(proto.ByteSize())
 
 
 class ExplorationSummary(python_utils.OBJECT):
