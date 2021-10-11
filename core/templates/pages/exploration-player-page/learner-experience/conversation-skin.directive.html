@@ -37,29 +37,28 @@
                       !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
-      <tutor-card displayed-card="displayedCard"
-                  is-learn-again-button="isLearnAgainButton()"
-                  avatar-image-is-shown="true"
-                  start-card-change-animation="startCardChangeAnimation">
-      </tutor-card>
+      <oppia-tutor-card [displayed-card]="displayedCard"
+                        [avatar-image-is-shown]="true"
+                        [start-card-change-animation]="startCardChangeAnimation">
+      </oppia-tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           displayed-card="displayedCard"
-                           is-learn-again-button="isLearnAgainButton()">
-        </supplemental-card>
+        <oppia-supplemental-card (click-continue-button)="showUpcomingCard()"
+                                 [displayed-card]="displayedCard"
+                                 [is-learn-again-button]="isLearnAgainButton()">
+        </oppia-supplemental-card>
       </div>
       <div ng-if="getCanAskLearnerForAnswerInfo()">
         <oppia-learner-answer-info-card (submit-answer)="submitAnswer($event.currentAnswer, $event.rulesService)">
         </oppia-learner-answer-info-card>
       </div>
       <div ng-if="!getCanAskLearnerForAnswerInfo()">
-        <progress-nav on-submit="submitAnswerFromProgressNav()"
-                      is-learn-again-button="isLearnAgainButton()"
-                      submit-button-is-disabled="isSubmitButtonDisabled()"
-                      displayed-card="displayedCard"
-                      submit-button-is-shown="!answerIsBeingProcessed"
-                      on-click-continue-button="showUpcomingCard()">
-        </progress-nav>
+        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
+                            [is-learn-again-button]="isLearnAgainButton"
+                            [submit-button-is-disabled]="isSubmitButtonDisabled()"
+                            [displayed-card]="displayedCard"
+                            [submit-button-is-shown]="!answerIsBeingProcessed"
+                            (click-continue-button)="showUpcomingCard()">
+        </oppia-progress-nav>
       </div>
       <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
@@ -79,10 +78,10 @@
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <div class="supplemental-card-parent-container">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           displayed-card="displayedCard"
-                           is-learn-again-button="isLearnAgainButton()">
-        </supplemental-card>
+        <oppia-supplemental-card (click-continue-button)="showUpcomingCard()"
+                                 [displayed-card]="displayedCard"
+                                 [is-learn-again-button]="isLearnAgainButton()">
+        </oppia-supplemental-card>
         <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                      ng-click="submitAnswerFromProgressNav()"
@@ -104,9 +103,9 @@
     <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" uib-popover-template="'<[getFeedbackPopoverUrl()]>'" popover-trigger="click">
-      <rating-display rating-value="userRating" is-editable="true" on-edit="submitUserRating"
-                      class="conversation-skin-final-ratings-display">
-      </rating-display>
+      <oppia-rating-display [rating-value]="userRating" [is-editable]="true" (edit)="submitUserRating($event)"
+                            class="conversation-skin-final-ratings-display">
+      </oppia-rating-display>
     </div>
   </div>
 

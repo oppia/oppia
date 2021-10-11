@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core.constants import constants
+from core.domain import beam_job_services
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
@@ -28,19 +30,22 @@ from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs
+from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import main
 
 import webtest
 
 (
-    exp_models, job_models,
+    app_feedback_report_models, exp_models, job_models,
     suggestion_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.job,
-    models.NAMES.suggestion, models.NAMES.user
+    models.NAMES.app_feedback_report, models.NAMES.exploration,
+    models.NAMES.job, models.NAMES.suggestion, models.NAMES.user
 ])
 
 
@@ -48,6 +53,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
     FIVE_WEEKS = datetime.timedelta(weeks=5)
     NINE_WEEKS = datetime.timedelta(weeks=9)
+    FOURTEEN_WEEKS = datetime.timedelta(weeks=14)
 
     def setUp(self):
         super(CronJobTests, self).setUp()
@@ -138,6 +144,76 @@ class CronJobTests(test_utils.GenericTestBase):
             self.get_json('/cron/models/cleanup')
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
+    def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        report_timestamp = (
+            datetime.datetime.utcnow() - self.FOURTEEN_WEEKS)
+        report_submitted_timestamp = report_timestamp
+        ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)
+        android_report_info = {
+            'user_feedback_selected_items': [],
+            'user_feedback_other_text_input': 'add an admin',
+            'event_logs': ['event1', 'event2'],
+            'logcat_logs': ['logcat1', 'logcat2'],
+            'package_version_code': 1,
+            'build_fingerprint': 'example_fingerprint_id',
+            'network_type': 'wifi',
+            'android_device_language_locale_code': 'en',
+            'entry_point_info': {
+                'entry_point_name': 'crash',
+            },
+            'text_size': 'medium_text_size',
+            'only_allows_wifi_download_and_update': True,
+            'automatically_update_topics': False,
+            'account_is_profile_admin': False
+        }
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                'android', report_submitted_timestamp))
+        report_model = (
+            app_feedback_report_models.AppFeedbackReportModel(
+                id=report_id,
+                platform='android',
+                ticket_id='%s.%s.%s' % (
+                    'random_hash',
+                    ticket_creation_timestamp.second,
+                    '16CharString1234'),
+                submitted_on=report_submitted_timestamp,
+                local_timezone_offset_hrs=0,
+                report_type='suggestion',
+                category='other_suggestion',
+                platform_version='0.1-alpha-abcdef1234',
+                android_device_country_locale_code='in',
+                android_device_model='Pixel 4a',
+                android_sdk_version=23,
+                entry_point='navigation_drawer',
+                text_language_code='en',
+                audio_language_code='en',
+                android_report_info=android_report_info,
+                android_report_info_schema_version=1))
+        report_model.created_on = report_timestamp
+        report_model.update_timestamps(update_last_updated_time=False)
+        report_model.put()
+
+        with self.testapp_swap:
+            self.get_html_response(
+                '/cron/app_feedback_report/scrub_expiring_reports')
+
+        scrubbed_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id))
+        scrubbed_report_info = scrubbed_model.android_report_info
+        self.assertEqual(
+            scrubbed_model.scrubbed_by,
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+        self.assertEqual(
+            scrubbed_report_info['user_feedback_other_text_input'], '')
+        self.assertEqual(
+            scrubbed_report_info['event_logs'], [])
+        self.assertEqual(
+            scrubbed_report_info['logcat_logs'], [])
 
     def test_cron_user_deletion_handler(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -596,3 +672,54 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self._assert_reviewable_suggestion_email_infos_are_equal(
             self.reviewable_suggestion_email_infos[2],
             self.expected_reviewable_suggestion_email_infos[2])
+
+    def test_cron_exploration_recommendations_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    exp_recommendation_computation_jobs
+                    .ComputeExplorationRecommendationsJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/explorations/recommendations')
+
+    def test_cron_activity_search_rank_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    exp_search_indexing_jobs.IndexExplorationsInSearchJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/explorations/search_rank')
+
+    def test_cron_dashboard_stats_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    user_stats_computation_jobs.CollectWeeklyDashboardStatsJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/users/dashboard_stats')
+
+    def test_cron_translation_contribution_stats_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    suggestion_stats_computation_jobs
+                    .GenerateTranslationContributionStatsJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response(
+                '/cron/suggestions/translation_contribution_stats')

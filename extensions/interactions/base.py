@@ -40,13 +40,12 @@ from __future__ import unicode_literals
 import copy
 import json
 
+from core import feconf
+from core import python_utils
 from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
-import feconf
-import python_utils
-import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
@@ -58,7 +57,7 @@ DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
-class BaseInteraction(python_utils.OBJECT):
+class BaseInteraction:
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should
@@ -179,7 +178,8 @@ class BaseInteraction(python_utils.OBJECT):
             return self._cached_rules_dict
 
         rules_index_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+            python_utils.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
