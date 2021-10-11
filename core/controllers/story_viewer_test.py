@@ -398,8 +398,18 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
-                    'invalid_node'
+                    'node_0000'
                 ), {}, csrf_token=csrf_token, expected_status_int=404
+            )
+
+    def test_post_fails_when_node_id_schema_is_invalid(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    'invalid_node'
+                ), {}, csrf_token=csrf_token, expected_status_int=400
             )
 
     def test_post_fails_when_story_is_not_published_in_story_mode(self):
