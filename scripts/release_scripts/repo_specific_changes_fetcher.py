@@ -37,7 +37,12 @@ FECONF_FILEPATH = os.path.join('core', 'feconf.py')
 
 
 _PARSER = argparse.ArgumentParser()
-_PARSER.add_argument('--release_tag', type=str)
+_PARSER.add_argument(
+    '--release_tag',
+    required=True,
+    type=str,
+    help='The release tag from which to fetch the changes.'
+)
 
 
 def get_changed_schema_version_constant_names(release_tag_to_diff_against):
@@ -165,11 +170,10 @@ def get_changes(release_tag_to_diff_against):
 
 
 def main(args=None):
-    """Main method for fetching repos specific changes."""
+    """Main method for fetching repo specific changes."""
     options = _PARSER.parse_args(args=args)
     changes = get_changes(options.release_tag)
-    for change in changes:
-        python_utils.PRINT(change)
+    python_utils.PRINT('\n'.join(changes))
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
