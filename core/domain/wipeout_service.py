@@ -951,7 +951,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             if isinstance(model, rights_snapshot_metadata_model_class)]
         for rights_snapshot_metadata_model in rights_snapshot_metadata_models:
             for commit_cmd in rights_snapshot_metadata_model.commit_cmds:
-                user_id_attribute_names = python_utils.NEXT(
+                user_id_attribute_names = next(
                     cmd['user_id_attribute_names']
                     for cmd in allowed_commands
                     if cmd['name'] == commit_cmd['cmd']

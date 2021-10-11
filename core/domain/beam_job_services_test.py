@@ -85,7 +85,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             BeamJobRunModel. The new model.
         """
         if job_id is None:
-            job_id = python_utils.NEXT(self._id_iter)
+            job_id = next(self._id_iter)
         return beam_job_models.BeamJobRunModel(
             id=job_id, dataflow_job_id=dataflow_job_id, job_name=job_name,
             latest_job_state=job_state)

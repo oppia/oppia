@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 from core.domain import expression_parser
 from core.tests import test_utils
 
@@ -86,25 +85,25 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         """Tests for tokenize method."""
         expression = 'a+b'
         expected_output = ['a', '+', 'b']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '53.4 - 6/alpha'
         expected_output = ['53.4', '-', '6', '/', 'alpha']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'a^0.5 + (-zeta)'
         expected_output = ['a', '^', '0.5', '+', '(', '-', 'zeta', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'sqrt(3/[-A])'
         expected_output = ['sqrt', '(', '3', '/', '(', '-', 'A', ')', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
@@ -112,73 +111,73 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         expected_output = [
             'abs', '(', 'sqrt', '(', '3', ')', ')', '*', '4', '/', '2',
             '^', '3']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = ''
         expected_output = []
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '3.4^4.3/0.0005 * {9}'
         expected_output = ['3.4', '^', '4.3', '/', '0.0005', '*', '(', '9', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'ab'
         expected_output = ['a', '*', 'b']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'a**bc'
         expected_output = ['a', '*', '*', 'b', '*', 'c']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'Alpha'
         expected_output = ['A', '*', 'l', '*', 'p', '*', 'h', '*', 'a']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'alpha'
         expected_output = ['alpha']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'alphax'
         expected_output = ['alpha', '*', 'x']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'xalpha'
         expected_output = ['x', '*', 'alpha']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '2.2gamma/23'
         expected_output = ['2.2', '*', 'gamma', '/', '23']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '2pir^2/2'
         expected_output = ['2', '*', 'pi', '*', 'r', '^', '2', '/', '2']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'sigmaepsilon'
         expected_output = ['sigma', '*', 'epsilon']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
@@ -186,13 +185,13 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         expected_output = [
             'sqrt', '(', 'epsilon', '*', 'psi', '-', '2', '*', 'a', '*',
             'beta', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'alphasqrt(3/4)'
         expected_output = ['alpha', '*', 'sqrt', '(', '3', '/', '4', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
@@ -200,7 +199,7 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         expected_output = [
             'tan', '(', 'theta', ')', '*', 'cos', '(',
             'theta', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
@@ -208,14 +207,14 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         expected_output = [
             '(', 'a', '+', 'b', ')', '*',
             '(', 'a', '-', 'b', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'xsqrt(2)x'
         expected_output = [
             'x', '*', 'sqrt', '(', '2', ')', '*', 'x']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
@@ -223,7 +222,7 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         expected_output = [
             'sin', '(', 'pi', ')', '*', '(', 'a', '-', 'x', '^',
             '2', '*', 'alpha', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
@@ -231,7 +230,7 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         expected_output = [
             'cosh', '(', '3', '*', 'a', '*', '45', '*', 'theta', ')',
             '+', 'sin', '(', 'x', '*', '(', 'theta', ')', ')']
-        actual_output = python_utils.MAP(
+        actual_output = map(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 

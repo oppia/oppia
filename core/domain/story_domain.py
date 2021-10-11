@@ -511,7 +511,7 @@ class StoryContents:
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if python_utils.NEXT((
+                if next((
                         node for node in self.nodes
                         if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
