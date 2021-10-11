@@ -18,11 +18,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
 import os
 import subprocess
 import sys
 import time
-import contextlib
 
 from core import python_utils
 from core.tests import test_utils
