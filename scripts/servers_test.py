@@ -932,7 +932,7 @@ class ManagedProcessTests(test_utils.TestBase):
             common, 'is_x64_architecture', value=True))
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'inplace_replace_file_context',
-            lambda *_: python_utils.nullcontext(), expected_args=[
+            lambda *_: contextlib.nullcontext(), expected_args=[
                 (
                     common.CHROME_PROVIDER_FILE_PATH,
                     re.escape('this.osArch = os.arch();'),
