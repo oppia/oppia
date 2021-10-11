@@ -19,10 +19,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
-import contextlib
 
 from core import python_utils
 from core.constants import constants
