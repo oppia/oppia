@@ -31,11 +31,11 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   templateUrl: './exploration-footer.component.html'
 })
 export class ExplorationFooterComponent {
-  explorationId: string;
-  iframed: boolean;
-  windowIsNarrow: boolean;
+  explorationId!: string;
+  iframed!: boolean;
+  windowIsNarrow!: boolean;
   contributorNames: string[] = [];
-  resizeSubscription: Subscription;
+  resizeSubscription!: Subscription;
 
   constructor(
     private contextService: ContextService,
