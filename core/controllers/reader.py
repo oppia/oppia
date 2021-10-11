@@ -26,6 +26,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator as objects_validator
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
@@ -345,6 +346,12 @@ class StorePlaythroughHandler(base.BaseHandler):
                         stats_domain.Playthrough)
                 }
             },
+            'playthrough_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None,
+            }
         }
     }
 
@@ -381,49 +388,46 @@ class StatsEventsHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def _require_aggregated_stats_are_valid(self, aggregated_stats):
-        """Checks whether the aggregated stats dict has the correct keys.
-
-        Args:
-            aggregated_stats: dict. Dict comprising of aggregated stats.
-        """
-        exploration_stats_properties = [
-            'num_starts',
-            'num_actual_starts',
-            'num_completions'
-        ]
-        state_stats_properties = [
-            'total_answers_count',
-            'useful_feedback_count',
-            'total_hit_count',
-            'first_hit_count',
-            'num_times_solution_viewed',
-            'num_completions'
-        ]
-
-        for exp_stats_property in exploration_stats_properties:
-            if exp_stats_property not in aggregated_stats:
-                raise self.InvalidInputException(
-                    '%s not in aggregated stats dict.' % (exp_stats_property))
-        for state_name in aggregated_stats['state_stats_mapping']:
-            for state_stats_property in state_stats_properties:
-                if state_stats_property not in aggregated_stats[
-                        'state_stats_mapping'][state_name]:
-                    raise self.InvalidInputException(
-                        '%s not in state stats mapping of %s in aggregated '
-                        'stats dict.' % (state_stats_property, state_name))
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'aggregated_stats': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        objects_validator.validate_aggregated_stats),
+                }
+            },
+            'exp_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        aggregated_stats = self.payload.get('aggregated_stats')
-        exp_version = self.payload.get('exp_version')
+        aggregated_stats = self.normalized_payload.get('aggregated_stats')
+        exp_version = self.normalized_payload.get('exp_version')
         if exp_version is None:
             raise self.InvalidInputException(
                 'NONE EXP VERSION: Stats aggregation')
-        try:
-            self._require_aggregated_stats_are_valid(aggregated_stats)
-        except self.InvalidInputException as e:
-            logging.exception(e)
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})

@@ -190,8 +190,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StartedTranslationTutorialEventHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
-    'StatsEventsHandler',
-    'StorePlaythroughHandler',
     'StoryUrlFragmentHandler',
     'SubtopicPageDataHandler',
     'SubtopicViewerPage',
