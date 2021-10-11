@@ -90,14 +90,13 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
-    'tutor-card.directive.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
 ]
 
 
-class LcovStanzaRelevantLines(python_utils.OBJECT):
+class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
     def __init__(self, stanza):

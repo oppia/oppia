@@ -19,10 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 
-
-class CustomizationArgSpec(python_utils.OBJECT):
+class CustomizationArgSpec:
     """Value object for a customization arg specification."""
 
     def __init__(self, name, description, schema, default_value):
