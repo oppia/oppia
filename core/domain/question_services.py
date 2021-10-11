@@ -21,7 +21,6 @@ import copy
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import opportunity_services
@@ -568,7 +567,7 @@ def apply_change_list(question_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, question_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_question(committer_id, question, change_list, commit_message):

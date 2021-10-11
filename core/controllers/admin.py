@@ -290,7 +290,7 @@ class AdminHandler(base.BaseHandler):
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+            raise e
 
     def _reload_exploration(self, exploration_id):
         """Reloads the exploration in dev_mode corresponding to the given

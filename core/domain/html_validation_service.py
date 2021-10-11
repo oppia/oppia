@@ -844,7 +844,7 @@ def add_math_content_to_math_rte_components(html_string):
                         python_utils.UNICODE(e)
                     )
                 )
-                python_utils.reraise_exception()
+                raise e
             math_content_dict = {
                 'raw_latex': normalized_raw_latex,
                 'svg_filename': ''

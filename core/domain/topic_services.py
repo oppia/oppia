@@ -345,7 +345,7 @@ def apply_change_list(topic_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, topic_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_topic(committer_id, topic, commit_message, change_list):

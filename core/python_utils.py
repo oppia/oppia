@@ -42,7 +42,6 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -504,16 +503,6 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def reraise_exception():
-    """Reraise exception with complete stacktrace."""
-    # TODO(#11547): This method can be replace by 'raise e' after we migrate
-    # to Python 3.
-    # This code is needed in order to reraise the error properly with
-    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-    exec_info = sys.exc_info()
-    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def create_enum(*sequential):
