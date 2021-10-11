@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
 import importlib
 import inspect
 import io
@@ -28,7 +29,6 @@ import os
 import re
 import sys
 import types
-import contextlib
 
 from core import feconf
 from core import python_utils
