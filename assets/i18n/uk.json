@@ -98,6 +98,7 @@
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Помилка: Не вдалося прочитати файл зображення.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Додати мініатюру",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Без назви",
+	"I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE": "Вміст цієї картки задовгий. Будь ласка, зберігайте його нижче 4500 символів, щоб зберегти.",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Ця картка досить довга, і студенти можуть втратити інтерес. Подумайте про скорочення або розбиття на дві карти.",
 	"I18N_CHAPTER_COMPLETION": "Вітаємо з завершенням розділу!",
 	"I18N_CLASSROOM_CALLOUT_BUTTON": "Дослідити",
