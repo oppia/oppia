@@ -85,6 +85,8 @@ import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
+import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
@@ -142,6 +144,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -186,6 +189,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TruncateAndCapitalizePipe,
+    TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     UploadActivityModalComponent,
@@ -200,6 +204,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     ExplorationFooterComponent,
@@ -238,6 +243,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SummaryListHeaderComponent,
     SupplementalCardComponent,
     ThumbnailDisplayComponent,
+    TutorCardComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     UploadActivityModalComponent,
@@ -267,6 +273,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -306,6 +313,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TutorCardComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,
