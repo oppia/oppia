@@ -220,20 +220,15 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.getWorstSkillIds = function() {
         var minScore = 0.95;
-        var worstSkillId = [];
+        var worstSkillIds = [];
         Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
           var skillScoreData = ctrl.scorePerSkillMapping[skillId];
           var scorePercentage = skillScoreData.score / skillScoreData.total;
           if (scorePercentage < minScore) {
-            worstSkillId.push([scorePercentage, skillId]);
+            worstSkillIds.push([scorePercentage, skillId]);
           }
         });
-        worstSkillId.sort().slice(0, 3);
-        var lowestScoredSkills = [];
-        for (let i = 0; i < worstSkillId.length; i++) {
-          lowestScoredSkills.push(worstSkillId[i][1]);
-        }
-        return lowestScoredSkills;
+        return worstSkillIds.sort().slice(0, 3).map(info => info[1]);
       };
 
       ctrl.openConceptCardModal = function(skillIds) {
