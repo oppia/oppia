@@ -19,20 +19,22 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
 import datetime
 import itertools
 import json
 import logging
 from unittest import mock
 
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
@@ -40,10 +42,8 @@ from firebase_admin import exceptions as firebase_exceptions
 from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
 import webapp2
 
-
 MYPY = False
 if MYPY: # pragma: no cover
-    import contextlib  # pylint: disable=unused-import
     from mypy_imports import auth_models
 
 auth_models, user_models = (
@@ -65,7 +65,7 @@ RecordsPartitionTupleType = Tuple[
 ]
 
 
-class FirebaseAdminSdkStub(python_utils.OBJECT):
+class FirebaseAdminSdkStub:
     """Helper class for swapping the Firebase Admin SDK with a stateful stub.
 
     NOT INTENDED TO BE USED DIRECTLY. Just install it and then interact with the
@@ -124,7 +124,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def __init__(self) -> None:
         self._users_by_uid: Dict[str, firebase_auth.UserRecord] = {}
         self._uid_by_session_cookie: Dict[str, str] = {}
-        self._swap_stack = None
+        self._swap_stack: Optional[contextlib.ExitStack] = None
         self._test: Optional[test_utils.TestBase] = None
 
     def install(self, test: test_utils.TestBase) -> None:
@@ -137,7 +137,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
         self._test = test
 
-        with python_utils.ExitStack() as swap_stack: # type: ignore[no-untyped-call]
+        with contextlib.ExitStack() as swap_stack:
             for name in self._IMPLEMENTED_SDK_FUNCTION_NAMES:
                 swap_stack.enter_context(
                     test.swap(firebase_auth, name, getattr(self, name)))
@@ -910,7 +910,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
-        super(FirebaseAuthServicesTestBase, self).tearDown() # type: ignore[no-untyped-call]
+        super(FirebaseAuthServicesTestBase, self).tearDown()
 
     def capture_logging(
             self, min_level: int = logging.INFO
@@ -951,7 +951,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         if id_token:
             req.headers['Authorization'] = 'Bearer %s' % id_token
         if session_cookie:
-            req.cookies[feconf.FIREBASE_SESSION_COOKIE_NAME] = session_cookie
+            req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = (
+                session_cookie)
         return req
 
     def create_response(
@@ -969,7 +970,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         res = webapp2.Response()
         if session_cookie:
             res.set_cookie(
-                feconf.FIREBASE_SESSION_COOKIE_NAME, value=session_cookie)
+                constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
+                value=session_cookie)
         return res
 
 

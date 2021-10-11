@@ -377,7 +377,9 @@ import { LibraryPageBackendApiService } from 'pages/library-page/services/librar
 import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PageHeadService } from './page-head.service';
+import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
+import { StateDiffModalBackendApiService } from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -425,6 +427,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
+  ['CollectionEditorRoutingService', CollectionEditorRoutingService],
   ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
@@ -688,6 +691,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
+  ['StateDiffModalBackendApiService', StateDiffModalBackendApiService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
   ['StateGraphLayoutService', StateGraphLayoutService],

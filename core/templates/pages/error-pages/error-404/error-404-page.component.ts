@@ -33,7 +33,7 @@ export class Error404PageComponent implements OnInit {
     private pageTitleService: PageTitleService) {}
 
   ngOnInit(): void {
-    this.pageTitleService.setPageTitle('Error 404 - Oppia');
+    this.pageTitleService.setDocumentTitle('Error 404 - Oppia');
   }
 
   getStaticImageUrl(imagePath: string): string {

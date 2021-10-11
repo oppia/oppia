@@ -145,6 +145,16 @@ export class QuestionPlayerEngineService {
       errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
+    let currentIndex = questionDicts.length;
+    let randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      [questionDicts[currentIndex], questionDicts[randomIndex]] = [
+        questionDicts[randomIndex], questionDicts[currentIndex]];
+    }
     for (let i = 0; i < questionDicts.length; i++) {
       this.addQuestion(
         this.questionObjectFactory.createFromBackendDict(questionDicts[i]));

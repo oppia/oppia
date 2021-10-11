@@ -19,7 +19,10 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -37,9 +40,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (suggestion_models, feedback_models, user_models) = (
     models.Registry.import_models(
@@ -142,7 +142,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         thread_id = 'thread_%s' % exp_id[-1]
         return '.'.join([entity_type, exp_id, thread_id])
 
-    class MockExploration(python_utils.OBJECT):
+    class MockExploration:
         """Mocks an exploration. To be used only for testing."""
 
         def __init__(self, exploration_id, states):
@@ -976,7 +976,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'data_format': 'html'
     }
 
-    class MockExploration(python_utils.OBJECT):
+    class MockExploration:
         """Mocks an exploration. To be used only for testing."""
 
         def __init__(self, exploration_id, states):
@@ -1358,7 +1358,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
-        for i in python_utils.RANGE(len(suggestions) - 1):
+        for i in range(len(suggestions) - 1):
             self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
@@ -1451,7 +1451,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
-        for i in python_utils.RANGE(len(suggestions) - 1):
+        for i in range(len(suggestions) - 1):
             self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
@@ -1886,7 +1886,7 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
             self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}
-        for index in python_utils.RANGE(1, 4):
+        for index in range(1, 4):
             key = 'category%s' % python_utils.UNICODE(index)
             expected_scores_dict[key] = index
 
@@ -2686,8 +2686,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 reviewable_suggestion_email_info.submission_datetime,
                 expected_reviewable_suggestion_email_infos[
                     index].submission_datetime)
-        for index in python_utils.RANGE(
-                len(reviewable_suggestion_email_infos) - 1):
+        for index in range(len(reviewable_suggestion_email_infos) - 1):
             self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
@@ -3797,8 +3796,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 reviewable_suggestion_email_info.submission_datetime,
                 expected_reviewable_suggestion_email_infos[
                     index].submission_datetime)
-        for index in python_utils.RANGE(
-                len(reviewable_suggestion_email_infos) - 1):
+        for index in range(len(reviewable_suggestion_email_infos) - 1):
             self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[

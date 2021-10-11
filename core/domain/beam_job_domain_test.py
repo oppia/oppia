@@ -21,11 +21,15 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import utils
 from core.domain import beam_job_domain
+from core.jobs.batch_jobs import model_validation_jobs
 from core.platform import models
 from core.tests import test_utils
-from jobs.batch_jobs import validation_jobs
-import utils
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import beam_job_models
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
@@ -34,11 +38,12 @@ class BeamJobTests(test_utils.TestBase):
 
     NOW = datetime.datetime.utcnow()
 
-    def test_usage(self):
-        job = beam_job_domain.BeamJob(validation_jobs.AuditAllStorageModelsJob)
+    def test_usage(self) -> None:
+        job = beam_job_domain.BeamJob(
+            model_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.name, 'AuditAllStorageModelsJob')
 
-    def test_in_terminal_state(self):
+    def test_in_terminal_state(self) -> None:
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.CANCELLED.value,
             self.NOW, self.NOW, True)
@@ -85,8 +90,9 @@ class BeamJobTests(test_utils.TestBase):
         self.assertFalse(stopped_beam_job_run.in_terminal_state)
         self.assertFalse(unknown_beam_job_run.in_terminal_state)
 
-    def test_to_dict(self):
-        job = beam_job_domain.BeamJob(validation_jobs.AuditAllStorageModelsJob)
+    def test_to_dict(self) -> None:
+        job = beam_job_domain.BeamJob(
+            model_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.to_dict(), {'name': 'AuditAllStorageModelsJob'})
 
 
@@ -94,7 +100,7 @@ class BeamJobRunTests(test_utils.TestBase):
 
     NOW = datetime.datetime.utcnow()
 
-    def test_usage(self):
+    def test_usage(self) -> None:
         run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True)
 
@@ -105,7 +111,7 @@ class BeamJobRunTests(test_utils.TestBase):
         self.assertEqual(run.job_updated_on, self.NOW)
         self.assertTrue(run.job_is_synchronous)
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True)
 
@@ -121,13 +127,13 @@ class BeamJobRunTests(test_utils.TestBase):
 
 class AggregateBeamJobRunResultTests(test_utils.TestBase):
 
-    def test_usage(self):
+    def test_usage(self) -> None:
         result = beam_job_domain.AggregateBeamJobRunResult('abc', '123')
 
         self.assertEqual(result.stdout, 'abc')
         self.assertEqual(result.stderr, '123')
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         result = beam_job_domain.AggregateBeamJobRunResult('abc', '123')
 
         self.assertEqual(result.to_dict(), {

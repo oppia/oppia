@@ -23,11 +23,11 @@ import datetime
 import re
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 from typing import Dict, List, Set, Union, cast
 
@@ -46,7 +46,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         for entity in base_models.BaseModel.get_all():
             entity.delete()
 
-        super(BaseModelUnitTests, self).tearDown() # type: ignore[no-untyped-call]
+        super(BaseModelUnitTests, self).tearDown()
 
     def test_get_deletion_policy(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -117,7 +117,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
         all_models = base_models.BaseModel.get_all()
         self.assertEqual(all_models.count(), 1)
-        base_model = cast(base_models.BaseModel, all_models.get())
+        base_model = all_models.get()
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert base_model is not None
         self.assertEqual(base_model, model)
 
         model_id = base_model.id
@@ -126,7 +129,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.delete()
         all_models = base_models.BaseModel.get_all()
         self.assertEqual(all_models.count(), 0)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
             'Entity for class BaseModel with id 4 not found'
         ):
@@ -192,7 +195,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
 
     def test_put_multi(self) -> None:
-        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
+        models_1 = [base_models.BaseModel() for _ in range(3)]
         for model in models_1:
             self.assertIsNone(model.created_on)
             self.assertIsNone(model.last_updated)
@@ -286,7 +289,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self) -> None:
         ids: Set[str] = set([])
-        for _ in python_utils.RANGE(100):
+        for _ in range(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 
@@ -306,7 +309,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
     MODEL_ID = 'model1'
 
     def setUp(self) -> None:
-        super(BaseHumanMaintainedModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(BaseHumanMaintainedModelTests, self).setUp()
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self: base_models.BaseHumanMaintainedModel) -> None:
             """Function to modify and save the entities used for testing
@@ -671,7 +674,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_version_numbers = python_utils.RANGE(1, model.version + 1)
+        model_version_numbers = range(1, model.version + 1)
         model_snapshot_ids = [
             model.get_snapshot_id(model.id, version_number)
             for version_number in model_version_numbers]
@@ -692,7 +695,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_1_version_numbers = python_utils.RANGE(1, model_1.version + 1)
+        model_1_version_numbers = range(1, model_1.version + 1)
         model_1_snapshot_ids = [
             model_1.get_snapshot_id(model_1.id, version_number)
             for version_number in model_1_version_numbers]
@@ -701,7 +704,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model_2 = TestVersionedModel(id=model_2_id)
         model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_2_version_numbers = python_utils.RANGE(1, model_2.version + 1)
+        model_2_version_numbers = range(1, model_2.version + 1)
         model_2_snapshot_ids = [
             model_2.get_snapshot_id(model_2.id, version_number)
             for version_number in model_2_version_numbers]

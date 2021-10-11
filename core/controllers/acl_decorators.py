@@ -23,7 +23,10 @@ import functools
 import logging
 import re
 
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classifier_services
@@ -42,8 +45,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-import feconf
-import utils
 
 from typing import Any, Callable # isort: skip
 
@@ -3418,6 +3419,9 @@ def can_edit_entity(handler):
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_BLOG_POST:
+            return (
+                can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs))
         else:
             raise self.PageNotFoundException
 
@@ -3594,3 +3598,52 @@ def can_update_suggestion(handler):
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
+
+
+def is_from_oppia_android(handler):
+    """Decorator to check whether the request was sent from Oppia Android.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_from_oppia_android(self, **kwargs):
+        """Checks whether the request was sent from Oppia Android.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia Android request.
+        """
+        headers = self.request.headers
+        api_key = headers['api_key']
+        app_package_name = headers['app_package_name']
+        app_version_name = headers['app_version_name']
+        app_version_code = headers['app_version_code']
+
+        version_name_matches = (
+            android_validation_constants.APP_VERSION_WITH_HASH_REGEXP.match(
+                app_version_name))
+        version_code_is_positive_int = app_version_code.isdigit() and (
+            int(app_version_code) > 0)
+        if (
+                api_key != android_validation_constants.ANDROID_API_KEY or
+                app_package_name != (
+                    android_validation_constants.ANDROID_APP_PACKAGE_NAME) or
+                not version_name_matches or
+                not version_code_is_positive_int):
+            raise self.UnauthorizedUserException(
+                'The incoming request is not a valid Oppia Android request.')
+        return handler(self, **kwargs)
+
+    test_is_from_oppia_android.__wrapped__ = True
+
+    return test_is_from_oppia_android

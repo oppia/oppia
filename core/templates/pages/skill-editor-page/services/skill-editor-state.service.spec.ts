@@ -439,7 +439,7 @@ describe('Skill editor state service', () => {
     expect(successCb).toHaveBeenCalledWith(true);
   }));
 
-  it('should fail toupdate the skill description when ' +
+  it('should fail to update the skill description when ' +
     'description is empty', fakeAsync(() => {
     spyOn(fakeSkillBackendApiService, 'doesSkillWithDescriptionExistAsync')
       .and.callThrough();

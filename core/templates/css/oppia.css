@@ -176,6 +176,7 @@ why they need to be overriden.  */
 }
 
 .md-button.oppia-learner-confirm-button,
+.mat-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
 .md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;
@@ -3096,7 +3097,7 @@ md-card.preview-conversation-skin-supplemental-card {
   min-width: 200px;
 }
 
-.oppia-modal-information-card .modal-dialog .modal-content md-card {
+.oppia-modal-information-card .modal-dialog .modal-content .mat-card {
   border-radius: 0;
   margin: 0;
   padding: 0;
@@ -4731,4 +4732,21 @@ div.oppia-issues-learner-action {
 .oppia-navigation-button[disabled] {
   color: #bdc3c7;
   cursor: default;
+}
+.conversation-skin-help-card-content {
+  max-height: 235px;
+  overflow-y: auto;
+  width: 270px;
+}
+
+.oppia-typeahead-form .dropdown-item.active {
+  color: #212529;
+}
+
+/*
+ * This ensures that when mat select is invoked from a modal, the mat options
+ * are not covered by the it.
+ */
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 10000 !important;
 }

@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
+from core import utils
 from core.platform import models
-import python_utils
-import utils
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -118,7 +118,7 @@ class BlogPostModel(base_models.BaseModel):
             Exception. There were too many collisions with existing blog post
                 IDs when attempting to generate a new blog post ID.
         """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             blog_post_id = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),

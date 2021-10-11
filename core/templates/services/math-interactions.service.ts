@@ -125,8 +125,11 @@ export class MathInteractionsService {
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
-    } catch (err) {
-      this.warningText = this.cleanErrorMessage(err.message, expressionString);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.warningText = (
+          this.cleanErrorMessage(err.message, expressionString));
+      }
       return false;
     }
     this.warningText = '';

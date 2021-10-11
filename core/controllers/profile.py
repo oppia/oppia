@@ -23,7 +23,9 @@ import logging
 import re
 import zipfile
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -34,8 +36,6 @@ from core.domain import takeout_service
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
-import utils
 
 
 class ProfileHandler(base.BaseHandler):
@@ -237,6 +237,11 @@ class ProfilePictureHandler(base.BaseHandler):
     picture is uploaded.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
@@ -255,6 +260,20 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, username):
@@ -377,6 +396,11 @@ class SignupHandler(base.BaseHandler):
 
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def delete(self):

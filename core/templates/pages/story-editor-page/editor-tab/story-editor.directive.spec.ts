@@ -174,7 +174,7 @@ describe('Story editor Directive having two story nodes', function() {
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should not rearrange nodes if staring node is same ' +
+  it('should not rearrange nodes if starting node is same ' +
     'as the end node', function() {
     let storyUpdateSpy = spyOn(StoryUpdateService, 'rearrangeNodeInStory');
 

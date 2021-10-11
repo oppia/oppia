@@ -107,7 +107,7 @@ def update_timestamps_multi(
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
+def put_multi(entities: Sequence[Model]) -> List[str]:
     """Stores a sequence of Model instances.
 
     Args:
@@ -116,7 +116,7 @@ def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(entities)
+    return ndb.put_multi(list(entities))
 
 
 @transaction_services.run_in_transaction_wrapper
@@ -148,8 +148,14 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
 
 # Here Any is used in the type annotation because it mimics the types defined in
 # the stubs for this library.
-def query_everything(**kwargs: Dict[str, Any]) -> ndb.Query:
-    """Returns a query that targets every single entity in the datastore."""
+def query_everything(**kwargs: Dict[str, Any]) -> Query:
+    """Returns a query that targets every single entity in the datastore.
+
+    IMPORTANT: DO NOT USE THIS FUNCTION OUTSIDE OF UNIT TESTS. Querying
+    everything in the datastore is almost always a bad idea, ESPECIALLY in
+    production. Always prefer querying for specific models and combining them
+    afterwards.
+    """
     return ndb.Query(**kwargs)
 
 
@@ -214,12 +220,18 @@ def fetch_multiple_entities_by_ids_and_models(
         ids_and_models: list(tuple(str, list(str))). The ids and their
             corresponding model names for which we have to fetch entities.
 
+    Raises:
+        Exception. Model names should not be duplicated in input list.
+
     Returns:
         list(list(datastore_services.Model)). The model instances corresponding
         to the ids and models. The models corresponding to the same tuple in the
         input are grouped together.
     """
     entity_keys: List[Key] = []
+    model_names = [model_name for (model_name, _) in ids_and_models]
+    if len(model_names) != len(list(set(model_names))):
+        raise Exception('Model names should not be duplicated in input list.')
     for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
         entity_keys = (

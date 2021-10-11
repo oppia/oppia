@@ -20,8 +20,9 @@ from __future__ import unicode_literals
 import collections
 import os
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
+
 from . import create_topological_sort_of_all_services
 
 MOCK_DIRECTORY_NAMES = [os.path.join('core', 'tests', 'services_sources')]
@@ -63,7 +64,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 'CTest.service.ts', 'ATestFactory.ts'}
 
             self.assertEqual(
-                sorted(adj_list.keys()), sorted(expected_adj_list.keys())) # pylint: disable=dict-keys-not-iterating
+                sorted(adj_list.keys()), sorted(expected_adj_list.keys()))
 
             for key in adj_list:
                 self.assertEqual(
