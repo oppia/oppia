@@ -38,7 +38,6 @@ import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.c
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
-
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';

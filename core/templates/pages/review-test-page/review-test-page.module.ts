@@ -40,10 +40,6 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
-  declarations: [
-  ],
-  entryComponents: [
-  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
