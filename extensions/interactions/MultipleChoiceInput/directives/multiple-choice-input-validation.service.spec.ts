@@ -175,7 +175,7 @@ describe('MultipleChoiceInputValidationService', () => {
 
   it('should validate answer group rules refer to valid choices only once',
     () => {
-      goodAnswerGroups[0].rules[0].inputs.x = 2;
+      goodAnswerGroups[0].rules[0].inputs.x = 4;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
