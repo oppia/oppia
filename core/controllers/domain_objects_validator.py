@@ -41,7 +41,7 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    return exp_domain.ExplorationChange(obj)
+    exp_domain.ExplorationChange(obj)
 
 
 def validate_new_config_property_values(obj):
