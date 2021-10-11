@@ -19,8 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('OutcomeEditorComponent', () => {
+describe('OutcomeEditorComponent', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;

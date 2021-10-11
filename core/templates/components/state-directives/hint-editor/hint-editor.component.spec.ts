@@ -19,8 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('HintEditorComponent', () => {
+describe('HintEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
