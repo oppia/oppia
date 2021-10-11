@@ -4620,6 +4620,14 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def calculate_size_of_proto(cls, proto):
+        """Calculate the byte size of the proto object.
+
+        Args:
+            proto: proto object. The proto object.
+
+        Returns:
+            Int. The byte size of the proto object.
+        """
         return int(proto.ByteSize())
 
 
