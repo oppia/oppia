@@ -436,7 +436,7 @@ describe('Skill editor state service', () => {
     skillEditorStateService.loadSkill('skill_id_1');
     tick(1000);
     expect(skillEditorStateService.getSkillValidationIssues()).toEqual([]);
-  })); 
+  }));
 
   it('should update the skill description when calling ' +
     '\'updateExistenceOfSkillDescription\'', fakeAsync(() => {
