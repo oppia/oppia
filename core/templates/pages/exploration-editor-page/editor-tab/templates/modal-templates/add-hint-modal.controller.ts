@@ -39,6 +39,7 @@ angular.module('oppia').controller('AddHintModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+
     $scope.HINT_FORM_SCHEMA = {
       type: 'html',
       ui_config: {

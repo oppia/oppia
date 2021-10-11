@@ -29,7 +29,7 @@
       </schema-based-editor>
     </div>
 
-    <div ng-if="$ctrl.isSolutionExplanationLengthExceeded($ctrl.StateSolutionService.displayed.explanation.html)" class="oppia-solution-length-exceeded-error">
+    <div ng-if="$ctrl.isSolutionExplanationLengthExceeded()" class="oppia-length-validation-error">
       The solution explanation is too long. Please make it under 200 characters.
     </div>
 
@@ -42,7 +42,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.html || $ctrl.isSolutionExplanationLengthExceeded($ctrl.StateSolutionService.displayed.explanation.html)"
+                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.html || $ctrl.isSolutionExplanationLengthExceeded()"
                 ng-click="$ctrl.saveThisExplanation()">
           Save
         </button>
@@ -52,15 +52,3 @@
     </div>
   </div>
 </div>
-<style>
-  .oppia-solution-length-exceeded-error {
-    align-items: center;
-    background-color: #f8d7da;
-    border: 0.0625rem solid #dc3545;
-    border-radius: 0.25rem;
-    color: #dc3545;
-    display: flex;
-    justify-content: center;
-    padding: 0.25rem;
-  }
-</style>

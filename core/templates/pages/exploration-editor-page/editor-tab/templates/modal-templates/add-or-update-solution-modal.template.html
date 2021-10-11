@@ -34,7 +34,7 @@
       </div>
     </div>
   </form>
-  <div ng-if="isSolutionExplanationLengthExceeded(data.explanationHtml)" class="oppia-solution-length-exceeded-error">
+  <div ng-if="isSolutionExplanationLengthExceeded(data.explanationHtml)" class="oppia-length-validation-error">
     The solution explanation is too long. Please make it under 200 characters.
   </div>
 </div>
@@ -48,15 +48,3 @@
     Check and Save Solution
   </button>
 </div>
-<style>
-  .oppia-solution-length-exceeded-error {
-    align-items: center;
-    background-color: #f8d7da;
-    border: 0.0625rem solid #dc3545;
-    border-radius: 0.25rem;
-    color: #dc3545;
-    display: flex;
-    justify-content: center;
-    padding: 0.25rem;
-  }
-</style>

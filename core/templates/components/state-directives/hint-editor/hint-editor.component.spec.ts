@@ -19,7 +19,8 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('HintEditorComponent', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('HintEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -141,19 +142,19 @@ describe('HintEditorComponent', () => {
 
   it('should check if hint length exceeded 200 characters', () => {
     var hintText = 'This is a hint ';
-    var hint1 = {
+
+    ctrl.hint = {
       hintContent: {
-        _contentId: '1',
-        _html: '<p> ' + hintText + '</p>'
+        _html: '<p> ' + hintText + ' </p>'
       }
     };
-    var hint2 = {
+    expect(ctrl.isHintLengthExceeded()).toBe(false);
+
+    ctrl.hint = {
       hintContent: {
-        _contentId: '2',
-        _html: '<p> ' + hintText.repeat(14) + '</p>'
+        _html: '<p> ' + hintText.repeat(15) + ' </p>'
       }
     };
-    expect(ctrl.isHintLengthExceeded(hint1)).toBe(false);
-    expect(ctrl.isHintLengthExceeded(hint2)).toBe(true);
+    expect(ctrl.isHintLengthExceeded()).toBe(true);
   });
 });

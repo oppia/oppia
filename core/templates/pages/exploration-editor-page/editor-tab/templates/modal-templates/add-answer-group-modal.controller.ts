@@ -120,6 +120,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
             $scope.tmpTaggedSkillMisconceptionId)),
         reopen: reopen
       });
+
       $scope.$on('$destroy', function() {
         eventBusGroup.unsubscribe();
       });

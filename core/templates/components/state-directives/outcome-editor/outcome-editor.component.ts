@@ -106,8 +106,8 @@ angular.module('oppia').component('outcomeEditor', {
         }
       };
 
-      ctrl.isFeedbackLengthExceeded = function(outcome) {
-        return (outcome.feedback._html.length > 200);
+      ctrl.isFeedbackLengthExceeded = function() {
+        return (ctrl.outcome.feedback._html.length > 200);
       };
 
       ctrl.isSelfLoop = function(outcome) {

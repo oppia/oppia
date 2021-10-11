@@ -19,7 +19,8 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('SolutionExplanationEditorComponent', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('SolutionExplanationEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -117,12 +118,21 @@ describe('SolutionExplanationEditorComponent', () => {
   it('should check if solution explanation length has exceeded 200 characters',
     () => {
       var solutionExplanation = 'Solution explanation';
-      var solutionExplanationHtml = '<p> ' + solutionExplanation + ' </p>';
-      expect(ctrl.isSolutionExplanationLengthExceeded(solutionExplanationHtml))
-        .toBe(false);
-      solutionExplanationHtml = (
-        '<p> ' + solutionExplanation.repeat(15) + ' </p>');
-      expect(ctrl.isSolutionExplanationLengthExceeded(solutionExplanationHtml))
-        .toBe(true);
+
+      StateSolutionService.displayed = {
+        explanation: {
+          contentId: 'contentID',
+          html: '<p> ' + solutionExplanation + ' </p>'
+        }
+      };
+      expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(false);
+
+      StateSolutionService.displayed = {
+        explanation: {
+          contentId: 'contentID',
+          html: '<p> ' + solutionExplanation.repeat(15) + ' </p>'
+        }
+      };
+      expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(true);
     });
 });
