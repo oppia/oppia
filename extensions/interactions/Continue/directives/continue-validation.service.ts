@@ -54,7 +54,7 @@ export class ContinueValidationService {
     if (customizationArgs.buttonText.value.unicode.length > 20) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'The button text should be less than 20 characters.'
+        message: 'The button text should be at most 20 characters.'
       });
     }
     return warningsList;
