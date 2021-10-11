@@ -316,6 +316,38 @@ class PretestHandler(base.BaseHandler):
 class StorePlaythroughHandler(base.BaseHandler):
     """Commits a playthrough recorded on the frontend to storage."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'issue_schema_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                },
+            },
+            'playthrough_data': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': (
+                        stats_domain.Playthrough)
+                }
+            },
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests. Appends to existing list of playthroughs or
@@ -324,11 +356,12 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        issue_schema_version = self.payload.get('issue_schema_version')
+        issue_schema_version = self.normalized_payload.get(
+            'issue_schema_version')
         if issue_schema_version is None:
             raise self.InvalidInputException('missing issue_schema_version')
 
-        playthrough_data = self.payload.get('playthrough_data')
+        playthrough_data = self.normalized_payload.get('playthrough_data')
         try:
             playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
         except utils.ValidationError as e:
