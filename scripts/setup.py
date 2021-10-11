@@ -213,6 +213,9 @@ def main(args=None):
     elif os.path.isfile('/usr/bin/chromium-browser'):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
+    elif os.path.isfile('/usr/bin/brave'):
+        # Arch Linux.
+        chrome_bin = '/usr/bin/brave'
     elif os.path.isfile('/usr/bin/chromium'):
         # Arch Linux.
         chrome_bin = '/usr/bin/chromium'
