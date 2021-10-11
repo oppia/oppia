@@ -19,11 +19,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
 import copy
 import logging
 import os
 import re
-import contextlib
 
 from core import feconf
 from core import python_utils
