@@ -158,7 +158,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
 
     def test_email_sent_on_failed_job(self):
 
-        class FakeTrainingJob(python_utils.OBJECT):
+        class FakeTrainingJob:
             """Fake training class to invoke failed job functions."""
 
             def __init__(self):
