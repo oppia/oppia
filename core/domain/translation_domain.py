@@ -19,11 +19,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 
-class MachineTranslation(python_utils.OBJECT):
+class MachineTranslation:
     """Domain object for machine translation of exploration content."""
 
     def __init__(

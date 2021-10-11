@@ -113,7 +113,7 @@ require(
   'learner-local-nav.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'learner-view-info.directive.ts');
+  'learner-view-info.component.ts');
 
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');

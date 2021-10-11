@@ -68,7 +68,7 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -161,7 +161,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TestingTaskSpec(python_utils.OBJECT):
+class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):
@@ -399,10 +399,6 @@ def main(args=None):
             concurrent_task_utils.execute_tasks(tasks, semaphore)
         except Exception:
             task_execution_failed = True
-
-        for task in tasks:
-            if task.exception:
-                concurrent_task_utils.log(task.exception.args[0])
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')

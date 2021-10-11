@@ -24,8 +24,8 @@ import json
 import subprocess
 import sys
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts.release_scripts import cut_release_or_hotfix_branch
 
@@ -68,7 +68,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'ask_user_to_confirm_is_called': True
         }
 
-        class MockResponse(python_utils.OBJECT):
+        class MockResponse:
             def getcode(self):
                 """Mock getcode function for mock response object."""
 

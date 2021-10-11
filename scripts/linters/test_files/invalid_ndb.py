@@ -23,8 +23,6 @@ from __future__ import unicode_literals
 
 import datetime
 
-import python_utils
-
 from google.appengine.ext import ndb
 
 

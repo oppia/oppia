@@ -19,6 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
+from core import utils
 # TODO(#13594): After the domain layer is refactored to be independent of
 # the storage layer, the disable=invalid-import will
 # be removed.
@@ -30,9 +33,6 @@ from __future__ import unicode_literals
 # won't be accessible.
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
@@ -183,7 +183,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = {}
-        feedback_models = (
+        feedback_models: Sequence[GeneralFeedbackThreadModel] = (
             cls.get_all().filter(cls.original_author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
@@ -217,7 +217,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             Exception. There were too many collisions with existing thread IDs
                 when attempting to generate a new thread ID.
         """
-        for _ in python_utils.RANGE(_MAX_RETRIES):
+        for _ in range(_MAX_RETRIES):
             thread_id = (
                 '%s.%s.%s%s' % (
                     entity_type,
@@ -368,7 +368,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
 
         user_data = {}
-        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
+        feedback_models: Sequence[GeneralFeedbackMessageModel] = (
+            cls.get_all().filter(cls.author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
