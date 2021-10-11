@@ -50,6 +50,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import contextlib
 import importlib
 import inspect
 import json
@@ -61,8 +62,6 @@ import sys
 import threading
 import time
 import unittest
-import contextlib
-
 
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
