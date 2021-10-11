@@ -97,22 +97,23 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         bind_and_activate=bind_and_activate)
 
 
-def nullcontext(enter_result=None):
-    """Returns nullcontext from contextlib2 if run under Python 2 and from
+def redirect_stdout(new_target):
+    """Returns redirect_stdout from contextlib2 if run under Python 2 and from
     contextlib if run under Python 3.
 
     Args:
-        enter_result: *. The object returned by the nullcontext when entered.
+        new_target: FileLike. The file-like object all messages printed to
+            stdout will be redirected to.
 
     Returns:
-        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
-        object.
+        contextlib.redirect_stdout or contextlib2.redirect_stdout. The
+        redirect_stdout object.
     """
     try:
-        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
+        from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
-    return impl(enter_result=enter_result)
+        from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
+    return impl(new_target)
 
 
 def ExitStack(): # pylint: disable=invalid-name
