@@ -28,6 +28,7 @@ import os
 import re
 import sys
 import types
+import contextlib
 
 from core import feconf
 from core import python_utils
@@ -44,7 +45,6 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-from contextlib import ExitStack
 import main
 
 import webapp2
@@ -382,7 +382,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '/logout', expected_status_int=200)
 
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
-        with ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -399,7 +399,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
-        with ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -417,7 +417,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_signup_attempt_on_wrong_page_fails(self):
-        with ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -457,7 +457,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
-        with ExitStack() as context_stack:
+        with contextlib.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()

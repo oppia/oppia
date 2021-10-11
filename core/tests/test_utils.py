@@ -66,7 +66,6 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
-from contextlib import ExitStack
 
 import elasticsearch
 import requests_mock
@@ -533,7 +532,7 @@ class AuthServicesStub(python_utils.OBJECT):
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -1821,7 +1820,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',

@@ -61,6 +61,7 @@ import sys
 import threading
 import time
 import unittest
+import contextlib
 
 
 from . import install_third_party_libs
@@ -72,7 +73,6 @@ from core import python_utils  # isort:skip  pylint: disable=wrong-import-positi
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from contextlib import ExitStack
 
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
@@ -346,7 +346,7 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    with ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_cloud_datastore_emulator())
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:

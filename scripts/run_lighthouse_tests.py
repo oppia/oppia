@@ -22,13 +22,13 @@ import argparse
 import os
 import subprocess
 import sys
+import contextlib
 
 from core import python_utils
 from core.constants import constants
 from scripts import build
 from scripts import common
 from scripts import servers
-from contextlib import ExitStack
 
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
@@ -197,7 +197,7 @@ def main(args=None):
         build.main(args=[])
         run_webpack_compilation()
 
-    with ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         stack.enter_context(common.inplace_replace_file_context(
             common.CONSTANTS_FILE_PATH,
             '"ENABLE_ACCOUNT_DELETION": .*',
