@@ -45,7 +45,6 @@ import itertools
 import operator
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -63,7 +62,7 @@ UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES = frozenset([
 ])
 
 
-class HashableAnswer(python_utils.OBJECT):
+class HashableAnswer:
     """Wraps answer with object that can be placed into sets and dicts."""
 
     def __init__(self, answer):
@@ -151,7 +150,7 @@ def _get_top_unresolved_answers_by_frequency(
     ])
 
 
-class BaseCalculation(python_utils.OBJECT):
+class BaseCalculation:
     """Base calculation class.
 
     This is the superclass for all calculations used to generate interaction

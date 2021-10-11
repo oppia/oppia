@@ -55,7 +55,7 @@ MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
 GAE_PLATFORM = 'gae'
 
 
-class Platform(python_utils.OBJECT):
+class Platform:
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
@@ -388,7 +388,7 @@ class _Gae(Platform):
     NAME = 'gae'
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Platform-agnostic interface for retrieving platform-specific
     modules.
     """

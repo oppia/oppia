@@ -25,11 +25,10 @@ import inspect
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 
 
-class BaseValueGenerator(python_utils.OBJECT):
+class BaseValueGenerator:
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -72,7 +71,7 @@ class BaseValueGenerator(python_utils.OBJECT):
             'generate_value() method has not yet been implemented')
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Maintains a registry of all the value generators.
 
     Attributes:

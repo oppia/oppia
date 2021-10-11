@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 from core.jobs import job_utils
 from core.platform import models
 
@@ -28,7 +27,7 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-class ModelProperty(python_utils.OBJECT):
+class ModelProperty:
     """Represents a Property in a BaseModel subclass."""
 
     __slots__ = ('_model_kind', '_property_name')

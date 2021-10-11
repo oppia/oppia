@@ -53,13 +53,13 @@
         </oppia-learner-answer-info-card>
       </div>
       <div ng-if="!getCanAskLearnerForAnswerInfo()">
-        <progress-nav on-submit="submitAnswerFromProgressNav()"
-                      is-learn-again-button="isLearnAgainButton()"
-                      submit-button-is-disabled="isSubmitButtonDisabled()"
-                      displayed-card="displayedCard"
-                      submit-button-is-shown="!answerIsBeingProcessed"
-                      on-click-continue-button="showUpcomingCard()">
-        </progress-nav>
+        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
+                            [is-learn-again-button]="isLearnAgainButton"
+                            [submit-button-is-disabled]="isSubmitButtonDisabled()"
+                            [displayed-card]="displayedCard"
+                            [submit-button-is-shown]="!answerIsBeingProcessed"
+                            (click-continue-button)="showUpcomingCard()">
+        </oppia-progress-nav>
       </div>
       <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
