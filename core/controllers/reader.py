@@ -365,14 +365,9 @@ class StorePlaythroughHandler(base.BaseHandler):
         """
         issue_schema_version = self.normalized_payload.get(
             'issue_schema_version')
-        if issue_schema_version is None:
-            raise self.InvalidInputException('missing issue_schema_version')
 
         playthrough_data = self.normalized_payload.get('playthrough_data')
-        try:
-            playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
 
         exp_issues = stats_services.get_exp_issues(
             exploration_id, playthrough.exp_version)
@@ -425,9 +420,6 @@ class StatsEventsHandler(base.BaseHandler):
     def post(self, exploration_id):
         aggregated_stats = self.normalized_payload.get('aggregated_stats')
         exp_version = self.normalized_payload.get('exp_version')
-        if exp_version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Stats aggregation')
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})
