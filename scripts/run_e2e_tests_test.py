@@ -49,7 +49,7 @@ def mock_managed_process(*unused_args, **unused_kwargs):
         Context manager. A context manager that always yields a mock
         process.
     """
-    return python_utils.nullcontext(
+    return contextlib.nullcontext(
         enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
@@ -273,7 +273,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_work_with_non_ascii_chars(self):
         def mock_managed_protractor_server(**unused_kwargs):  # pylint: disable=unused-argument
-            return python_utils.nullcontext(
+            return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
                     alive=False))

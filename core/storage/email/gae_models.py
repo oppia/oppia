@@ -159,7 +159,7 @@ class SentEmailModel(base_models.BaseModel):
         """
         id_prefix = '%s.' % intent
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
