@@ -98,46 +98,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
 
-    def test_with_metaclass(self):
-        class BaseForm:
-            """Test baseclass."""
-
-            pass
-
-        class FormType1(type):
-            """Test metaclass."""
-
-            pass
-
-        class FormType2(type):
-            """Test metaclass."""
-
-            pass
-
-        class Form(python_utils.with_metaclass(FormType1, BaseForm)): # pylint: disable=inherit-non-class
-            """Test class."""
-
-            pass
-
-        self.assertTrue(isinstance(Form, FormType1))
-        self.assertFalse(isinstance(Form, FormType2))
-        self.assertTrue(issubclass(Form, BaseForm))
-
-    def test_with_metaclass_without_bases(self):
-        class FormType(type):
-            """Test metaclass."""
-
-            pass
-
-        class Form(python_utils.with_metaclass(FormType)): # pylint: disable=inherit-non-class
-            """Test class."""
-
-            def __init__(self):
-                pass
-
-        self.assertTrue(isinstance(Form, FormType))
-        self.assertTrue(issubclass(Form, python_utils.OBJECT))
-
     def test_convert_to_bytes(self):
         string1 = 'Home'
         string2 = u'Лорем'
