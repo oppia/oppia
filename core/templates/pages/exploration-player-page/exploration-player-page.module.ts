@@ -44,6 +44,8 @@ import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { FutureTutorCardComponent } from './learner-experience/future-tutor-card.component';
+import { ConversationSkinFinalSummary } from './learner-experience/conversation-skin-final-summary.component';
 
 @NgModule({
   imports: [
@@ -60,21 +62,25 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    ConversationSkinFinalSummary,
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
+    FutureTutorCardComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
+    ConversationSkinFinalSummary,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
+    FutureTutorCardComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
