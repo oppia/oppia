@@ -174,6 +174,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.getPreferredSiteLanguageCode()) {
+        // TODO(#14052): FInd a better way to structure and encapsulate language
+        // translations related code.
         this.i18nLanguageCodeService.setI18nLanguageCode(
           userInfo.getPreferredSiteLanguageCode());
 

@@ -82,7 +82,10 @@ describe('OppiaAngularRootComponent', function() {
         {
           provide: TranslateCacheSettings,
           useValue: {
-            cacheName: 'sampleCache'
+            // We directly return name of cache in which language key code
+            // will be stored, mocking TranslateCacheSettings where a cache name
+            // is generated using injection token.
+            cacheName: 'CACHED_LANG_KEY'
           }
         },
         {
@@ -128,21 +131,21 @@ describe('OppiaAngularRootComponent', function() {
 
   it('should set cache language according to URL lang param', () => {
     // Setting 'en' as cache language code.
-    cookieService.put('sampleCache', 'en');
+    cookieService.put('CACHED_LANG_KEY', 'en');
     // This sets the url to 'http://localhost:8181/?lang=es'
     // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/?lang=es');
-    expect(cookieService.get('sampleCache')).toBe('en');
+    expect(cookieService.get('CACHED_LANG_KEY')).toBe('en');
 
     component.ngAfterViewInit();
 
-    expect(cookieService.get('sampleCache')).toBe('es');
+    expect(cookieService.get('CACHED_LANG_KEY')).toBe('es');
     expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
-    cookieService.put('sampleCache', 'en');
+    cookieService.put('CACHED_LANG_KEY', 'en');
     spyOn(cookieService, 'put');
     // This sets the url to 'http://localhost:8181/?lang=invalid'
     // when initialized.
@@ -154,13 +157,13 @@ describe('OppiaAngularRootComponent', function() {
     // Translation cache should not be updated as the language param
     // is invalid.
     expect(cookieService.put).not.toHaveBeenCalledWith();
-    expect(cookieService.get('sampleCache')).toBe('en');
+    expect(cookieService.get('CACHED_LANG_KEY')).toBe('en');
     expect(component.url.toString()).toBe('http://localhost:8181/');
   });
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
-    cookieService.put('sampleCache', 'en');
+    cookieService.put('CACHED_LANG_KEY', 'en');
     // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181');
@@ -170,6 +173,6 @@ describe('OppiaAngularRootComponent', function() {
 
     expect(cookieService.put).not.toHaveBeenCalledWith();
     expect(component.url.toString()).toBe('http://localhost:8181/');
-    expect(cookieService.get('sampleCache')).toBe('en');
+    expect(cookieService.get('CACHED_LANG_KEY')).toBe('en');
   });
 });
