@@ -143,4 +143,4 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         with get_changes_swap, print_swap:
             repo_specific_changes_fetcher.main(args=['--release_tag', 'tag'])
 
-        self.assertEqual(printed_lines, ['change1', 'change2', 'change3'])
+        self.assertEqual(printed_lines, ['change1\nchange2\nchange3'])
