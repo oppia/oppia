@@ -47,7 +47,6 @@ import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-or
 
 
 BASESTRING = past.builtins.basestring
-INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
