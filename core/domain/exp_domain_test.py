@@ -3329,6 +3329,14 @@ title: Title
         self.assertEqual(
             exploration_proto.init_state_name,
             exploration.init_state_name)
+        
+        for (state_name, state) in exploration.states.items():
+            self.assertEqual(
+                exploration_proto.states[state_name].content.content_id,
+                state.content.content_id)
+            self.assertEqual(
+                exploration_proto.states[state_name].content.html,
+                state.content.html)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
