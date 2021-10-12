@@ -19,13 +19,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from typing import List
+
 
 class Classroom:
     """Domain object for a classroom."""
 
     def __init__(
-            self, name, url_fragment, topic_ids,
-            course_details, topic_list_intro):
+            self, name: str, url_fragment: str, topic_ids: List[int],
+            course_details: str, topic_list_intro: str) -> None:
         """Constructs a Classroom domain object.
 
         Args:
