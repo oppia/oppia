@@ -24,7 +24,6 @@ import subprocess
 import sys
 import time
 
-from core import python_utils
 from core.tests import test_utils
 from scripts import build
 from scripts import common
