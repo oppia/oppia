@@ -54,7 +54,11 @@ class QuestionsListHandler(base.BaseHandler):
         'GET': {
             'offset': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             }
         }
@@ -63,10 +67,8 @@ class QuestionsListHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-        try:
-            offset = int(self.normalized_request.get('offset'))
-        except Exception:
-            raise self.InvalidInputException('Invalid offset')
+
+        offset = int(self.normalized_request.get('offset'))
 
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
