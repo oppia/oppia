@@ -29,6 +29,7 @@ from unittest import mock
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import user_services
 from core.platform import models
@@ -64,7 +65,7 @@ RecordsPartitionTupleType = Tuple[
 ]
 
 
-class FirebaseAdminSdkStub(python_utils.OBJECT):
+class FirebaseAdminSdkStub:
     """Helper class for swapping the Firebase Admin SDK with a stateful stub.
 
     NOT INTENDED TO BE USED DIRECTLY. Just install it and then interact with the
@@ -295,7 +296,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             UserNotFoundError. The Firebase account has not been created yet.
         """
         matches = (u for u in self._users_by_uid.values() if u.email == email)
-        user = python_utils.NEXT(matches, None)
+        user = next(matches, None)
         if user is None:
             raise firebase_auth.UserNotFoundError('%s not found' % email)
         return user
@@ -621,7 +622,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 uids: List[str], force_delete: bool = False
         ) -> 'firebase_auth.BatchDeleteAccountsResponse':
             """Mock function that fails according to the input patterns."""
-            error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
+            error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
                 raise error_to_raise
 
@@ -679,7 +680,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 records: List[firebase_admin.auth.ImportUserRecord]
         ) -> firebase_auth.UserImportResult:
             """Mock function that fails according to the input patterns."""
-            error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
+            error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
                 raise error_to_raise
 
@@ -950,7 +951,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         if id_token:
             req.headers['Authorization'] = 'Bearer %s' % id_token
         if session_cookie:
-            req.cookies[feconf.FIREBASE_SESSION_COOKIE_NAME] = session_cookie
+            req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = (
+                session_cookie)
         return req
 
     def create_response(
@@ -968,7 +970,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         res = webapp2.Response()
         if session_cookie:
             res.set_cookie(
-                feconf.FIREBASE_SESSION_COOKIE_NAME, value=session_cookie)
+                constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
+                value=session_cookie)
         return res
 
 

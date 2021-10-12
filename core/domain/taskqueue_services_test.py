@@ -29,7 +29,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     """Tests for domain taskqueue services."""
 
     def test_exception_raised_when_deferred_payload_is_not_serializable(self):
-        class NonSerializableArgs(python_utils.OBJECT):
+        class NonSerializableArgs:
             """Object that is not JSON serializable."""
 
             def __init__(self):
