@@ -84,7 +84,7 @@ describe('OppiaAngularRootComponent', function() {
           useValue: {
             // We directly return name of cache in which language key code
             // will be stored, mocking TranslateCacheSettings where a cache name
-            // is generated using injection token.
+            // is generated using injection token which comes from angular.
             cacheName: 'CACHED_LANG_KEY'
           }
         },
