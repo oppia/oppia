@@ -520,6 +520,8 @@
     "core/templates/services/interaction-rules-registry.service.spec.ts",
     "core/templates/services/interaction-specs.service.ts",
     "core/templates/services/interaction-specs.service.spec.ts",
+    "core/templates/services/internet-connectivity.service.ts",
+    "core/templates/services/internet-connectivity.service.spec.ts",    
     "core/templates/services/keyboard-shortcut.service.ts",
     "core/templates/services/keyboard-shortcut.service.spec.ts",
     "core/templates/services/loader.service.ts",
