@@ -42,7 +42,6 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -54,8 +53,6 @@ MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-RANGE = builtins.range
-ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
 
@@ -116,24 +113,6 @@ def redirect_stdout(new_target):
     except ImportError:
         from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
     return impl(new_target)
-
-
-def nullcontext(enter_result=None):
-    """Returns nullcontext from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Args:
-        enter_result: *. The object returned by the nullcontext when entered.
-
-    Returns:
-        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
-        object.
-    """
-    try:
-        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
-    return impl(enter_result=enter_result)
 
 
 def ExitStack(): # pylint: disable=invalid-name
@@ -236,23 +215,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
-
-
-def url_split(urlstring):
-    """Splits a URL using urlparse.urlsplit if run under Python 2 and
-    urllib.parse.urlsplit if run under Python 3.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlsplit(urlstring)  # pylint: disable=disallowed-function-calls
 
 
 def url_parse(urlstring):
@@ -452,7 +414,7 @@ def with_metaclass(meta, *bases):
 
     Example:
 
-        class BaseForm(python_utils.OBJECT):
+        class BaseForm:
             pass
 
         class FormType(type):
@@ -541,16 +503,6 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def reraise_exception():
-    """Reraise exception with complete stacktrace."""
-    # TODO(#11547): This method can be replace by 'raise e' after we migrate
-    # to Python 3.
-    # This code is needed in order to reraise the error properly with
-    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-    exec_info = sys.exc_info()
-    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def create_enum(*sequential):
