@@ -3323,9 +3323,11 @@ title: Title
 
         self.assertEqual(exploration_proto.id, exploration.id)
         self.assertEqual(exploration_proto.title, exploration.title)
-        self.assertEqual(exploration_proto.content_version,
+        self.assertEqual(
+            exploration_proto.content_version,
             exploration.version)
-        self.assertEqual(exploration_proto.init_state_name,
+        self.assertEqual(
+            exploration_proto.init_state_name,
             exploration.init_state_name)
 
 
