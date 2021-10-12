@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, Injectable, NgZone } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
+import { Subscription, timer, throwError } from 'rxjs';
 import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -61,6 +61,8 @@ export class InternetConnectivityService {
               return (
                 this._serverConnectionBackendApiService
                   .fetchConnectionCheckResultAsync());
+            } else {
+              return throwError('No Internet');
             }
           }),
           retryWhen(errors => errors.pipe(
