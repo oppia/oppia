@@ -3302,23 +3302,31 @@ title: Title
             Exception, 'Expected proto size to be a int, received 1'):
             exploration.validate()
 
-    def test_proto_exploration_size_is_correct(self):
+    def test_proto_calculation_is_correct(self):
+        """Test proto size calculation function."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp_id', self.sample_yaml_content_for_proto)
-        proto_exploration = exp_domain.Exploration.to_exploration_proto(
+        exploration_proto = exp_domain.Exploration.to_exploration_proto(
             exploration.id, exploration.title, exploration.version,
             exploration.init_state_name, exploration.states)
 
-        proto_exploration_size = int(proto_exploration.ByteSize())
-        self.assertEqual(proto_exploration_size, 6502)
+        exploration_proto_size = exp_domain.Exploration.calculate_size_of_proto(
+            exploration_proto)
+        self.assertEqual(exploration_proto_size, 6502)
 
-    def test_subtitled_html_proto_is_correct(self):
-        content = state_domain.SubtitledHtml('id_1', '<p>content</p>')
-        expected_subtitled_html_proto = (
-            exp_domain.Exploration.to_subtitled_html_proto(content))
+    def test_exploration_proto_is_correct(self):
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp_id', self.sample_yaml_content_for_proto)
+        exploration_proto = exp_domain.Exploration.to_exploration_proto(
+            exploration.id, exploration.title, exploration.version,
+            exploration.init_state_name, exploration.states)
 
-        self.assertEqual(expected_subtitled_html_proto.content_id, 'id_1')
-        self.assertEqual(expected_subtitled_html_proto.html, '<p>content</p>')
+        self.assertEqual(exploration_proto.id, exploration.id)
+        self.assertEqual(exploration_proto.title, exploration.title)
+        self.assertEqual(exploration_proto.content_version,
+            exploration.version)
+        self.assertEqual(exploration_proto.init_state_name,
+            exploration.init_state_name)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
