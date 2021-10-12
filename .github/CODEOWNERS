@@ -536,7 +536,7 @@
 /mypy_imports.py @hardikkat24 @vojtechjelinek
 /mypy_requirements.txt @hardikkat24 @vojtechjelinek
 /stubs/ @hardikkat24 @vojtechjelinek
-/scripts/run_mypy_checks*.py @hardikkat24 @vojtechjelinek
+/scripts/run_mypy_checks*.py @hardikkat24 @vojtechjelinek @sajalasati
 
 
 # Restricted pages.
