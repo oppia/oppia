@@ -173,10 +173,10 @@ def validate_aggregated_stats(aggregated_stats):
             if exp_stats_property not in aggregated_stats:
                 raise base.BaseHandler.InvalidInputException(
                     '%s not in aggregated stats dict.' % (exp_stats_property))
-        for state_name in aggregated_stats['state_stats_mapping']:
+        state_stats_mapping = aggregated_stats['state_stats_mapping']
+        for state_name in state_stats_mapping:
             for state_stats_property in state_stats_properties:
-                if state_stats_property not in aggregated_stats[
-                        'state_stats_mapping'][state_name]:
+                if state_stats_property not in state_stats_mapping[state_name]:
                     raise base.BaseHandler.InvalidInputException(
                         '%s not in state stats mapping of %s in aggregated '
                         'stats dict.' % (state_stats_property, state_name))
