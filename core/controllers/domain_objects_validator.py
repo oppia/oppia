@@ -21,7 +21,6 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import logging
 
 from core import python_utils
 from core.constants import constants
@@ -168,17 +167,14 @@ def validate_aggregated_stats(aggregated_stats):
         'num_times_solution_viewed',
         'num_completions'
     ]
-    try:
-        for exp_stats_property in exploration_stats_properties:
-            if exp_stats_property not in aggregated_stats:
+    for exp_stats_property in exploration_stats_properties:
+        if exp_stats_property not in aggregated_stats:
+            raise base.BaseHandler.InvalidInputException(
+                '%s not in aggregated stats dict.' % (exp_stats_property))
+    state_stats_mapping = aggregated_stats['state_stats_mapping']
+    for state_name in state_stats_mapping:
+        for state_stats_property in state_stats_properties:
+            if state_stats_property not in state_stats_mapping[state_name]:
                 raise base.BaseHandler.InvalidInputException(
-                    '%s not in aggregated stats dict.' % (exp_stats_property))
-        state_stats_mapping = aggregated_stats['state_stats_mapping']
-        for state_name in state_stats_mapping:
-            for state_stats_property in state_stats_properties:
-                if state_stats_property not in state_stats_mapping[state_name]:
-                    raise base.BaseHandler.InvalidInputException(
-                        '%s not in state stats mapping of %s in aggregated '
-                        'stats dict.' % (state_stats_property, state_name))
-    except base.BaseHandler.InvalidInputException as e:
-        logging.exception(e)
+                    '%s not in state stats mapping of %s in aggregated '
+                    'stats dict.' % (state_stats_property, state_name))
