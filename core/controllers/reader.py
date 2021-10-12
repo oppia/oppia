@@ -342,8 +342,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             'playthrough_data': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': (
-                        stats_domain.Playthrough)
+                    'object_class': stats_domain.Playthrough
                 }
             },
             'playthrough_id': {
