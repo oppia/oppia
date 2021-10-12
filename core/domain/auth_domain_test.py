@@ -42,6 +42,7 @@ class AuthClaimsTests(test_utils.TestBase):
     def test_rejects_empty_auth_id(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'auth_id must not be empty'):
+            # Since auth_id (first argument) is str type, we cannot use None.
             auth_domain.AuthClaims(None, None, False) # type: ignore[arg-type]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'auth_id must not be empty'):

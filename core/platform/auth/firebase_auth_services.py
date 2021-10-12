@@ -584,5 +584,8 @@ def _create_auth_claims(
     role_is_super_admin = (
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
-    return auth_domain.AuthClaims( # type: ignore[no-untyped-call]
-        auth_id, email, role_is_super_admin=role_is_super_admin)
+    # Mypy is wrong here. We know both auth_id is a str
+    # and email is a optional str.
+    # But Mypy shows they are Union[str, bool, None]
+    return auth_domain.AuthClaims(
+        auth_id, email, role_is_super_admin=role_is_super_admin) # type: ignore[arg-type]
