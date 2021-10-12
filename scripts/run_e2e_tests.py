@@ -23,6 +23,7 @@ import os
 import subprocess
 import sys
 
+from core import python_utils
 from core.constants import constants
 from scripts import build
 from scripts import common
