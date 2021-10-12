@@ -406,35 +406,6 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def with_metaclass(meta, *bases):
-    """Python 2 & 3 helper for installing metaclasses.
-
-    Example:
-
-        class BaseForm:
-            pass
-
-        class FormType(type):
-            pass
-
-        class Form(with_metaclass(FormType, BaseForm)):
-            pass
-
-    Args:
-        meta: type. The metaclass to install on the derived class.
-        *bases: tuple(class). The base classes to install on the derived class.
-            When empty, `object` will be the sole base class.
-
-    Returns:
-        class. A proxy class that mutates the classes which inherit from it to
-        install the input meta class and inherit from the input base classes.
-        The proxy class itself does not actually become one of the base classes.
-    """
-    if not bases:
-        bases = (OBJECT,)
-    return future.utils.with_metaclass(meta, *bases)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
