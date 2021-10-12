@@ -58,7 +58,7 @@ import socket
 import sys
 import threading
 
-import python_utils
+from core import python_utils
 
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
@@ -174,7 +174,7 @@ def _should_allocate_port(pid):
     return True
 
 
-class _PortInfo(python_utils.OBJECT):
+class _PortInfo:
     """Container class for information about a given port assignment.
 
     Attributes:
@@ -192,7 +192,7 @@ class _PortInfo(python_utils.OBJECT):
         self.start_time = 0
 
 
-class _PortPool(python_utils.OBJECT):
+class _PortPool:
     """Manage available ports for processes.
 
     Ports are reclaimed when the reserving process exits and the reserved port
@@ -274,7 +274,7 @@ class _PortPool(python_utils.OBJECT):
         self._port_queue.append(port_info)
 
 
-class _PortServerRequestHandler(python_utils.OBJECT):
+class _PortServerRequestHandler:
     """A class to handle port allocation and status requests.
 
     Allocates ports to process ids via the dead simple port server protocol
@@ -384,11 +384,11 @@ def _parse_port_ranges(pool_str):
         if start < 1 or end > 65535:
             logging.info('Ignoring out of bounds port range %r.', range_str)
             continue
-        ports.update(set(python_utils.RANGE(start, end + 1)))
+        ports.update(set(range(start, end + 1)))
     return ports
 
 
-class Server(python_utils.OBJECT):
+class Server:
     """Manages the portserver server.
 
     Attributes:

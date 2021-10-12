@@ -19,11 +19,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
-import python_utils
+from core import python_utils
+from core.constants import constants
 
 
-class ActivityReference(python_utils.OBJECT):
+class ActivityReference:
     """Domain object for an activity reference.
 
     An activity is a piece of learning material that can be created in Oppia.
@@ -90,7 +90,7 @@ class ActivityReference(python_utils.OBJECT):
             activity_reference_dict['type'], activity_reference_dict['id'])
 
 
-class ActivityReferences(python_utils.OBJECT):
+class ActivityReferences:
     """Domain object for a list of activity references.
 
     Attributes:

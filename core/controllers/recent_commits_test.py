@@ -19,10 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -100,7 +99,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})
         self.assertFalse(response_dict['more'])
-        for i in python_utils.RANGE(feconf.COMMIT_LIST_PAGE_SIZE * 2):
+        for i in range(feconf.COMMIT_LIST_PAGE_SIZE * 2):
             entity_id = 'my_entity_%s' % i
             exp_id = 'exp_%s' % i
 

@@ -21,18 +21,20 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 from core.platform import models
 from core.tests import test_utils
 
-import feconf
-from mypy_imports import app_feedback_report_models
-import python_utils
-import utils
+from typing import Dict, List, Sequence, cast
 
-from typing import Dict, Optional, Type, List, Any, Sequence, cast # isort:skip # pylint: disable=unused-import
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -1060,7 +1062,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_obj, self.android_ticket_obj)
         older_timestamp = (
             self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=1))
-        for i in python_utils.RANGE(1, 4):
+        for i in range(1, 4):
             # Set timestamps in increasing timestamp order so that the test will
             # iterate through them all and reassign the latest timestamp.
             temp_timestamp = (

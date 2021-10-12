@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 MYPY = False
 if MYPY: # pragma: no cover

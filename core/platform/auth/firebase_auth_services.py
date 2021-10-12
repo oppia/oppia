@@ -56,18 +56,17 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.platform import models
-import feconf
-import python_utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 from typing import Dict, List, Optional, Union
 import webapp2
-
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -126,7 +125,7 @@ def establish_auth_session(
         _get_id_token(request), feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
     response.set_cookie(
-        feconf.FIREBASE_SESSION_COOKIE_NAME,
+        constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
         value=fresh_cookie,
         max_age=feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         overwrite=True,
@@ -146,7 +145,7 @@ def destroy_auth_session(response: webapp2.Response) -> None:
     Args:
         response: webapp2.Response. Response to clear the cookies from.
     """
-    response.delete_cookie(feconf.FIREBASE_SESSION_COOKIE_NAME)
+    response.delete_cookie(constants.FIREBASE_AUTH_SESSION_COOKIE_NAME)
 
 
 def get_auth_claims_from_request(
@@ -508,7 +507,7 @@ def _get_session_cookie(request: webapp2.Request) -> Optional[str]:
         str|None. Value of the session cookie authorizing the signed in user, if
         present, otherwise None.
     """
-    return request.cookies.get(feconf.FIREBASE_SESSION_COOKIE_NAME)
+    return request.cookies.get(constants.FIREBASE_AUTH_SESSION_COOKIE_NAME)
 
 
 def _get_id_token(request: webapp2.Request) -> Optional[str]:

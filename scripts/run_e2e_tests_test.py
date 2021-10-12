@@ -18,13 +18,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
 import os
 import subprocess
 import sys
 import time
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
@@ -48,7 +49,7 @@ def mock_managed_process(*unused_args, **unused_kwargs):
         Context manager. A context manager that always yields a mock
         process.
     """
-    return python_utils.nullcontext(
+    return contextlib.nullcontext(
         enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
@@ -196,17 +197,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         run_e2e_tests.build_js_files(False)
 
-    def test_build_js_files_in_prod_mode_with_deparallelize_terser(self):
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[
-                {'args': ['--prod_env', '--deparallelize_terser']},
-            ]))
-
-        run_e2e_tests.build_js_files(False, deparallelize_terser=True)
-
     def test_build_js_files_in_prod_mode_with_source_maps(self):
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'run_cmd', lambda *_: None, called=False))
@@ -283,7 +273,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_work_with_non_ascii_chars(self):
         def mock_managed_protractor_server(**unused_kwargs):  # pylint: disable=unused-argument
-            return python_utils.nullcontext(
+            return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
                     alive=False))

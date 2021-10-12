@@ -22,6 +22,9 @@ from __future__ import unicode_literals
 import collections
 import logging
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import caching_services
 from core.domain import feedback_services
 from core.domain import opportunity_services
@@ -37,9 +40,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -345,7 +345,7 @@ def apply_change_list(topic_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, topic_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_topic(committer_id, topic, commit_message, change_list):
