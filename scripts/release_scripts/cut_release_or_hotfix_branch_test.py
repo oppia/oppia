@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import builtins
 import json
 import subprocess
 import sys
@@ -135,7 +136,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             mock_verify_hotfix_number)
         self.open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        self.input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        self.input_swap = self.swap(builtins, 'input', mock_input)
         self.ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
 
@@ -371,7 +372,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_input():
             return 'n'
 
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:
