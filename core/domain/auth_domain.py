@@ -24,6 +24,8 @@ import collections
 from core import python_utils
 from core import utils
 
+from typing import Any, Dict, Optional
+
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
 # would all map to a single Auth ID.
@@ -62,21 +64,23 @@ class AuthClaims:
         role_is_super_admin: bool. Whether the user has super admin privileges.
     """
 
-    def __init__(self, auth_id, email, role_is_super_admin):
+    def __init__(
+        self, auth_id: str, email: Optional[str],
+        role_is_super_admin: bool) -> None:
         if not auth_id:
             raise Exception('auth_id must not be empty')
         self.auth_id = auth_id
         self.email = email
         self.role_is_super_admin = role_is_super_admin
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
             self.auth_id, self.email, self.role_is_super_admin)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.auth_id, self.email, self.role_is_super_admin))
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> Any:
         # https://docs.python.org/2/library/constants.html#NotImplemented.
         return NotImplemented if not isinstance(other, AuthClaims) else (
             (self.auth_id, self.email, self.role_is_super_admin) ==
@@ -102,22 +106,22 @@ class UserAuthDetails:
     """
 
     def __init__(
-            self, user_id, gae_id, firebase_auth_id, parent_user_id,
-            deleted=False):
+            self, user_id: str, gae_id: str, firebase_auth_id: str,
+            parent_user_id: str, deleted: bool = False) -> None:
         self.user_id = user_id
         self.gae_id = gae_id
         self.firebase_auth_id = firebase_auth_id
         self.parent_user_id = parent_user_id
         self.deleted = deleted
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             'UserAuthDetails(user_id=%r, gae_id=%r, firebase_auth_id=%r, '
             'parent_user_id=%r, deleted=%r)' % (
                 self.user_id, self.gae_id, self.firebase_auth_id,
                 self.parent_user_id, self.deleted))
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks whether user_id, gae_id, firebase_auth_id, and parent_user_id
         are valid.
 
@@ -171,7 +175,7 @@ class UserAuthDetails:
                     self.gae_id, self.firebase_auth_id, self.parent_user_id))
 
     @property
-    def auth_id(self):
+    def auth_id(self) -> str:
         """Returns the auth ID corresponding to the user account, if any.
 
         This method is a utility for simplifying code that doesn't care about
@@ -182,11 +186,11 @@ class UserAuthDetails:
         """
         return self.firebase_auth_id or self.gae_id
 
-    def is_full_user(self):
+    def is_full_user(self) -> bool:
         """Returns whether self refers to a full user account."""
         return self.auth_id is not None
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Returns values corresponding to UserAuthDetailsModel's properties.
 
         This method is a utility for assigning values to UserAuthDetailsModel:

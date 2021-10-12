@@ -54,8 +54,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/app_feedback_report_validators_test.py',
     'core/domain/audit_validators.py',
     'core/domain/audit_validators_test.py',
-    'core/domain/auth_domain.py',
-    'core/domain/auth_domain_test.py',
     'core/domain/auth_jobs_one_off.py',
     'core/domain/auth_jobs_one_off_test.py',
     'core/domain/auth_services.py',
