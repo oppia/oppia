@@ -676,7 +676,7 @@ class AuthServicesStub:
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return python_utils.NEXT(
+        return next(
             (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
             None)
 
@@ -1222,13 +1222,13 @@ class TestBase(unittest.TestCase):
             self.longMessage = True
 
             if expected_args:
-                next_args = python_utils.NEXT(expected_args_iter, None)
+                next_args = next(expected_args_iter, None)
                 self.assertEqual(
                     args, next_args, msg='*args to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))
 
             if expected_kwargs:
-                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                next_kwargs = next(expected_kwargs_iter, None)
                 self.assertEqual(
                     kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))
@@ -2299,7 +2299,6 @@ title: Title
             self, url, data, headers=None, csrf_token=None,
             expected_status_int=200, upload_files=None, use_payload=True,
             source=None):
-
         """Post an object to the server by JSON; return the received object.
 
         Args:
@@ -2622,7 +2621,7 @@ title: Title
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
-                from_state, python_utils.NEXT(interaction_ids))
+                from_state, next(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
             if correctness_feedback_enabled:
                 from_state.interaction.default_outcome.labelled_as_correct = (

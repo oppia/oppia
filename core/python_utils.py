@@ -39,10 +39,8 @@ sys.path.insert(0, _CERTIFI_PATH)
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -95,22 +93,23 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         bind_and_activate=bind_and_activate)
 
 
-def nullcontext(enter_result=None):
-    """Returns nullcontext from contextlib2 if run under Python 2 and from
+def redirect_stdout(new_target):
+    """Returns redirect_stdout from contextlib2 if run under Python 2 and from
     contextlib if run under Python 3.
 
     Args:
-        enter_result: *. The object returned by the nullcontext when entered.
+        new_target: FileLike. The file-like object all messages printed to
+            stdout will be redirected to.
 
     Returns:
-        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
-        object.
+        contextlib.redirect_stdout or contextlib2.redirect_stdout. The
+        redirect_stdout object.
     """
     try:
-        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
+        from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
-    return impl(enter_result=enter_result)
+        from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
+    return impl(new_target)
 
 
 def ExitStack(): # pylint: disable=invalid-name
@@ -479,16 +478,6 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def reraise_exception():
-    """Reraise exception with complete stacktrace."""
-    # TODO(#11547): This method can be replace by 'raise e' after we migrate
-    # to Python 3.
-    # This code is needed in order to reraise the error properly with
-    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-    exec_info = sys.exc_info()
-    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def create_enum(*sequential):
