@@ -122,7 +122,7 @@ describe('Schema Default Value Service', () => {
     } as Schema;
     expect(
       sdvs.getDefaultValue(schema)
-    ).toEqual(new SubtitledHtml('', null));
+    ).toEqual(new SubtitledHtml('', ''));
   });
 
   it('should get default value if schema type is SubtitledUnicode', () => {

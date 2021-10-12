@@ -103,7 +103,7 @@ describe('DragAndDropSortInputValidationService', () => {
       choices: {
         value: [
           new SubtitledHtml('a', 'ca_0'),
-          new SubtitledHtml('b', null),
+          new SubtitledHtml('b', 'ca_1'),
           new SubtitledHtml('c', 'ca_2'),
         ]
       },

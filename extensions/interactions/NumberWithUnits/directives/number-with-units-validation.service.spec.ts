@@ -79,7 +79,7 @@ describe('NumberWithUnitsValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        content_id: null,
+        content_id: '',
         html: ''
       },
       labelled_as_correct: false,
