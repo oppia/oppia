@@ -440,7 +440,7 @@ class SignupHandler(base.BaseHandler):
             self.render_json({})
             return
 
-        if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
+        if not agreed_to_terms:
             raise self.InvalidInputException(
                 'In order to edit explorations on this site, you will '
                 'need to accept the license terms.')
