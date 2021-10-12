@@ -1565,7 +1565,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
-            'playthrough_id': None
         }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 

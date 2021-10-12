@@ -345,12 +345,6 @@ class StorePlaythroughHandler(base.BaseHandler):
                     'object_class': stats_domain.Playthrough
                 }
             },
-            'playthrough_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None,
-            }
         }
     }
 
