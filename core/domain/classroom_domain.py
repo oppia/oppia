@@ -26,7 +26,7 @@ class Classroom:
     """Domain object for a classroom."""
 
     def __init__(
-            self, name: str, url_fragment: str, topic_ids: List[int],
+            self, name: str, url_fragment: str, topic_ids: List[str],
             course_details: str, topic_list_intro: str) -> None:
         """Constructs a Classroom domain object.
 
