@@ -278,7 +278,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       }
     );
 
-    // TODO(#14052): FInd a better way to structure and encapsulate language
+    // TODO(#14052): Find a better way to structure and encapsulate language
     // translations related code.
     // Code to load site according to the language parameter in URL if present.
     this.url = new URL(this.windowRef.nativeWindow.location.toString());
