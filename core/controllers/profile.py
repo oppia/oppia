@@ -492,8 +492,7 @@ class SiteLanguageHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': feconf.LANGUAGE_CODE_REGEX
+                        'id': 'is_valid_language_code'
                     }],
                 }
             }
