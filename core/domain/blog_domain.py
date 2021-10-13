@@ -105,9 +105,9 @@ class BlogPost:
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
-        assert self.thumbnail_filename is not None
-        self.require_valid_thumbnail_filename(
-            self.thumbnail_filename, strict=strict)
+        if isinstance(self.thumbnail_filename, str):
+            self.require_valid_thumbnail_filename(
+                self.thumbnail_filename, strict=strict)
 
         if not isinstance(self.content, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -304,8 +304,8 @@ class BlogPost:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the blog post.
         """
-        assert self.thumbnail_filename is not None
-        self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if isinstance(self.thumbnail_filename, str):
+            self.require_valid_thumbnail_filename(self.thumbnail_filename)
         self.thumbnail_filename = new_thumbnail_filename
 
     def update_content(self, content: str) -> None:
@@ -416,9 +416,9 @@ class BlogPostSummary:
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
-        assert self.thumbnail_filename is not None
-        self.require_valid_thumbnail_filename(
-            self.thumbnail_filename, strict=strict)
+        if isinstance(self.thumbnail_filename, str):
+            self.require_valid_thumbnail_filename(
+                self.thumbnail_filename, strict=strict)
 
         if not isinstance(self.summary, python_utils.BASESTRING):
             raise utils.ValidationError(
