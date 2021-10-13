@@ -58,7 +58,7 @@ export class DisplaySolutionModalComponent {
 
   ngOnInit(): void {
     this.solution = this.hintsAndSolutionManagerService.displaySolution();
-    this.solutionContentId = this.solution.explanation.contentId;
+    this.solutionContentId = this.solution.explanation.contentId as string;
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();

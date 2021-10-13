@@ -41,7 +41,7 @@ let MockAngularHtmlBindWrapperDirective = function(
     inputs: options.inputs,
     outputs: options.outputs
   };
-  return <Directive>Directive(metadata)(class _ { });
+  return Directive(metadata)(class _ { }) as Directive;
 };
 
 describe('Display Solution Modal', () => {
@@ -122,10 +122,10 @@ describe('Display Solution Modal', () => {
 
   it('should intialize', () => {
     let contentId: string = 'content_id';
-    let interaction = <Interaction>({});
-    let writtenTranslations = <WrittenTranslations>({});
+    let interaction = {} as Interaction;
+    let writtenTranslations = {} as WrittenTranslations;
     let recordedVoiceovers = new RecordedVoiceovers({});
-    let audioTranslation = <AudioTranslationLanguageService>({});
+    let audioTranslation = {} as AudioTranslationLanguageService;
     let displayedCard = new StateCard(
       'test_name', 'content', 'interaction', interaction, [],
       recordedVoiceovers, writtenTranslations, contentId, audioTranslation);
