@@ -590,6 +590,8 @@
     "extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts",
     "extensions/interactions/CodeRepl/directives/code-repl-validation.service.ts",
     "extensions/interactions/CodeRepl/directives/code-repl-validation.service.spec.ts",
+    "extensions/interactions/CodeRepl/directives/oppia-response-code-repl.component.ts",
+    "extensions/interactions/CodeRepl/directives/oppia-response-code-repl.component.spec.ts",
     "extensions/interactions/CodeRepl/directives/oppia-short-response-code-repl.component.ts",
     "extensions/interactions/Continue/directives/continue-rules.service.ts",
     "extensions/interactions/Continue/directives/continue-validation.service.ts",
