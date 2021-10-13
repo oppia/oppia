@@ -1782,7 +1782,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator_id)
             self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(
@@ -1794,7 +1794,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator2_id)
             self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(

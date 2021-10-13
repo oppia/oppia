@@ -725,7 +725,7 @@ def apply_change_list(skill_id, change_list, committer_id):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, skill_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_skill(committer_id, skill, commit_message, change_list):
