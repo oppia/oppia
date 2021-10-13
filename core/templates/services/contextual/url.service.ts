@@ -341,7 +341,7 @@ export class UrlService {
     }
     if (urlParams.hasOwnProperty('collection_id')) {
       return urlParams.collection_id;
-    }collection_id
+    }
     return null;
   }
 
