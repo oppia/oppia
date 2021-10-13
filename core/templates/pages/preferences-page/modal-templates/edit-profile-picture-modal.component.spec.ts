@@ -80,8 +80,11 @@ describe('Edit Profile Picture Modal Component', () => {
     const arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
     let file = new File([arrayBuffer], 'filename.mp3');
+
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+
+    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {

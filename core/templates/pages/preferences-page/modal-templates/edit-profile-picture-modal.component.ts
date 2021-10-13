@@ -70,9 +70,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         this.uploadedImage = decodeURIComponent(
           (<FileReader>e.target).result as string);
       }
-      if (!(this.changeDetectorRef as ViewRef).destroyed) {
-        this.changeDetectorRef.detectChanges();
-      }
+      this.changeDetectorRef.detectChanges();
       this.initializeCropper();
     };
 
