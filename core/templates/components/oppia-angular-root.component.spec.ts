@@ -35,6 +35,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
 const CACHE_KEY_FOR_TESTS: string = 'CACHED_LANG_KEY';
+
 class MockWindowRef {
   nativeWindow = {
     location: {

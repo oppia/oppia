@@ -161,7 +161,7 @@ def managed_dev_appserver(
     # OK to use shell=True here because we are not passing anything that came
     # from an untrusted user, only other callers of the script, so there's no
     # risk of shell-injection attacks.
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         proc = stack.enter_context(managed_process(
             dev_appserver_args, human_readable_name='GAE Development Server',
             shell=True, env=env))
@@ -249,7 +249,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         data_dir_exists = os.path.exists(
             common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
         if clear_datastore and data_dir_exists:
@@ -385,7 +385,7 @@ def managed_webpack_compiler(
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
 
-    with python_utils.ExitStack() as exit_stack:
+    with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
@@ -537,7 +537,7 @@ def managed_webdriver_server(chrome_version=None):
         '--versions.chrome', chrome_version,
     ])
 
-    with python_utils.ExitStack() as exit_stack:
+    with contextlib.ExitStack() as exit_stack:
         if common.is_windows_os():
             # NOTE: webdriver-manager (version 13.0.0) uses `os.arch()` to
             # determine the architecture of the operating system, however, this
