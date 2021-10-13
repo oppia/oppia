@@ -2679,9 +2679,9 @@ class State:
         try:
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
-        except Exception:
+        except Exception as e:
             logging.exception('Bad state dict: %s' % str(state_dict))
-            python_utils.reraise_exception()
+            raise e
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
