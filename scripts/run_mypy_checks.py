@@ -62,8 +62,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/base_model_validators_test.py',
     'core/domain/beam_job_validators.py',
     'core/domain/beam_job_validators_test.py',
-    'core/domain/blog_domain.py',
-    'core/domain/blog_domain_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
     'core/domain/blog_validators.py',

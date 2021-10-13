@@ -18,6 +18,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from typing import List
 
 from core import utils
 from core.constants import constants
@@ -29,86 +30,87 @@ from core.tests import test_utils
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     """Tests for blog post domain objects."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(BlogPostDomainUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
 
-        self.blog_post = blog_services.create_new_blog_post(self.user_id_a)
+        self.blog_post = blog_services.create_new_blog_post(self.user_id_a)  # type: ignore[no-untyped-call]
 
-    def _assert_strict_validation_error(self, expected_error_substring):
+    def _assert_strict_validation_error(self, expected_error_substring: str) -> None:
         """Checks that the blog post passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate(strict=True)
 
-    def _assert_validation_error(self, expected_error_substring):
+    def _assert_validation_error( # type: ignore[override]
+    self, expected_error_substring: str) -> None:
         """Checks that the blog post passes validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate()
 
-    def _assert_valid_tags_for_blog_post(self, expected_error_substring, tags):
+    def _assert_valid_tags_for_blog_post(self, expected_error_substring: str, tags: List[str]) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_tags(tags, False)
 
     def _assert_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring, thumbnail_filename):
+            self, expected_error_substring: str, thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
                 thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring, thumbnail_filename):
+            self, expected_error_substring: str, thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
                 thumbnail_filename, strict=True)
 
     def _assert_strict_valid_title_for_blog_post(
-            self, expected_error_substring, title):
+            self, expected_error_substring: str, title: str) -> None:
         """Checks that blog post passes strict validation for title."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_title(title, True)
 
     def _assert_valid_title_for_blog_post(
-            self, expected_error_substring, title):
+            self, expected_error_substring: str, title: str) -> None:
         """Checks that blog post passes validation for title."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_title(title, False)
 
     def _assert_valid_url_fragment_for_blog_post(
-            self, expected_error_substring, url):
+            self, expected_error_substring: str, url: str) -> None:
         """Checks that blog post passes validation for url."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_url_fragment(url)
 
     def _assert_valid_blog_post_id_for_blog_post(
-            self, expected_error_substring, blog_id):
+            self, expected_error_substring: str, blog_id: str) -> None:
         """Checks that blog post passes validation for id."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_blog_post_id(blog_id)
 
-    def test_blog_post_id_validation_for_blog_post(self):
+    def test_blog_post_id_validation_for_blog_post(self) -> None:
         self._assert_valid_blog_post_id_for_blog_post(
-            'Blog Post ID should be a string, received: 10', 10)
+            'Blog Post ID should be a string, received: 10', 10) # type: ignore[arg-type]
         self._assert_valid_blog_post_id_for_blog_post(
-            r'Blog Post ID should be a string, received: \[10\]', [10])
+            r'Blog Post ID should be a string, received: \[10\]', [10]) # type: ignore[arg-type]
         self._assert_valid_blog_post_id_for_blog_post(
             'Blog ID abcdef is invalid', 'abcdef')
 
-    def test_thumbnail_filename_validation_for_blog_post(self):
+    def test_thumbnail_filename_validation_for_blog_post(self) -> None:
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Expected image filename to be a string, received 10', 10)
+            'Expected image filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Image filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename_for_blog_post(
@@ -122,18 +124,19 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Thumbnail filename should not be empty', '')
 
-    def test_blog_post_thumbnail_filename_in_strict_mode(self):
+    def test_blog_post_thumbnail_filename_in_strict_mode(self) -> None:
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
-            'Expected thumbnail filename to be a string, received: None.', None)
+            'Expected thumbnail filename to be a string, received: None.', None) # type: ignore[arg-type]
 
-    def test_title_without_non_strict_validation(self):
-        self._assert_valid_title_for_blog_post('Title should be a string', 50)
+    def test_title_without_non_strict_validation(self) -> None:
+        self._assert_valid_title_for_blog_post(
+            'Title should be a string', 50) # type: ignore[arg-type]
         self._assert_valid_title_for_blog_post(
             'Blog Post title should at most have 40 chars, received:'
             ' Very long and therefore an invalid blog post title',
             'Very long and therefore an invalid blog post title')
 
-    def test_title_with_strict_validation(self):
+    def test_title_with_strict_validation(self) -> None:
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
@@ -142,19 +145,19 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             % 'ABC12& heloo', 'ABC12& heloo')
 
     def _assert_strict_valid_tags_for_blog_post(
-            self, expected_error_substring, tags):
+            self, expected_error_substring: str, tags: List[str]) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_tags(tags, True)
 
-    def test_tags_validation_in_strict_mode(self):
+    def test_tags_validation_in_strict_mode(self) -> None:
         self._assert_strict_valid_tags_for_blog_post(
             'Atleast one tag should be selected', [])
 
-    def test_url_fragment_validation(self):
+    def test_url_fragment_validation(self) -> None:
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field must be a string. Received 0.', 0)
+            'Blog Post URL Fragment field must be a string. Received 0.', 0) # type: ignore[arg-type]
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
         self._assert_valid_url_fragment_for_blog_post(
@@ -171,28 +174,28 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
         blog_domain.BlogPost.require_valid_url_fragment('oppia-in-covid19')
 
-    def test_update_title(self):
+    def test_update_title(self) -> None:
         self.assertEqual(self.blog_post.title, '')
         self.blog_post.update_title('Blog Post Title')
         self.assertEqual(self.blog_post.title, 'Blog Post Title')
 
-    def test_update_thumbnail(self):
+    def test_update_thumbnail(self) -> None:
         self.assertEqual(self.blog_post.thumbnail_filename, None)
         self.blog_post.update_thumbnail_filename('Thumbnail.svg')
         self.assertEqual(self.blog_post.thumbnail_filename, 'Thumbnail.svg')
 
-    def test_update_url_fragment(self):
+    def test_update_url_fragment(self) -> None:
         current_url_fragment = ''
         self.assertEqual(self.blog_post.url_fragment, current_url_fragment)
         self.blog_post.update_url_fragment('url-fragment')
         self.assertEqual(self.blog_post.url_fragment, 'url-fragment')
 
-    def test_update_tags(self):
+    def test_update_tags(self) -> None:
         self.assertEqual(self.blog_post.tags, [])
         self.blog_post.update_tags(['tag'])
         self.assertEqual(self.blog_post.tags, ['tag'])
 
-    def test_blog_post_contents_export_import(self):
+    def test_blog_post_contents_export_import(self) -> None:
         """Test that to_dict and from_dict preserve all data within a
         blog post contents object.
         """
@@ -202,23 +205,23 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_contents_from_dict.to_dict(), blog_post_contents_dict)
 
-    def test_update_content(self):
+    def test_update_content(self) -> None:
         self.assertEqual(self.blog_post.content, '')
         self.blog_post.update_content('<p>Hello</p>')
         self.assertEqual(self.blog_post.content, '<p>Hello</p>')
 
-    def test_tags_validation_for_blog_post(self):
+    def test_tags_validation_for_blog_post(self) -> None:
         """"Tests tags validation for blog post."""
 
         self._assert_valid_tags_for_blog_post(
             'Expected \'tags\' to be a list, received: this should be a list',
-            'this should be a list')
+            'this should be a list') # type: ignore[arg-type]
         self._assert_valid_tags_for_blog_post(
             'Expected each tag in \'tags\' to be a string,' +
-            ' received: ''\'%s\'' % 123, [123])
+            ' received: ''\'%s\'' % 123, [123]) # type: ignore[list-item]
         self._assert_valid_tags_for_blog_post(
             'Expected each tag in \'tags\' to be a string,' +
-            ' received: ''\'%s\'' % 123, ['abc', 123])
+            ' received: ''\'%s\'' % 123, ['abc', 123]) # type: ignore[list-item]
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain alphanumeric characters and spaces, '
             'received: \'%s\'' % 'Alpha@', ['Alpha@'])
@@ -236,14 +239,14 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Tag should not be empty.', ['abc', ''])
 
-    def test_blog_post_passes_validate(self):
+    def test_blog_post_passes_validate(self) -> None:
         """Tests validation for blog post."""
         self.blog_post.validate(strict=False)
         self.blog_post.content = 123
         self._assert_validation_error(
             'Expected contents to be a string, received: 123')
 
-    def test_blog_post_passes_strict_validation(self):
+    def test_blog_post_passes_strict_validation(self) -> None:
         """Tests strict validation for blog post."""
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 'thumbnail.svg'
@@ -257,24 +260,24 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
 class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(BlogPostRightsDomainUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
+        self.user_id_b = self.get_user_id_from_email('b@example.com') # type: ignore[no-untyped-call]
 
-        blog_post = blog_services.create_new_blog_post(self.user_id_a)
+        blog_post = blog_services.create_new_blog_post(self.user_id_a) # type: ignore[no-untyped-call]
         self.blog_post_id = blog_post.id
         self.blog_post_rights = (
-            blog_services.get_blog_post_rights(self.blog_post_id))
+            blog_services.get_blog_post_rights(self.blog_post_id)) # type: ignore[no-untyped-call]
 
-    def test_is_editor(self):
+    def test_is_editor(self) -> None:
         self.assertTrue(self.blog_post_rights.is_editor(self.user_id_a))
         self.assertFalse(self.blog_post_rights.is_editor(self.user_id_b))
 
-    def test_to_human_readable_dict(self):
+    def test_to_human_readable_dict(self) -> None:
         """Checks conversion of BlogPostRights to dict."""
         expected_dict = {
             'blog_post_id': self.blog_post_id,
@@ -286,34 +289,34 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 
 class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(BlogPostSummaryUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
-        blog_post = blog_services.create_new_blog_post(self.user_id_a)
+        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
+        blog_post = blog_services.create_new_blog_post(self.user_id_a) # type: ignore[no-untyped-call]
         self.blog_post_id = blog_post.id
         self.blog_post_summary = (
-            blog_services.get_blog_post_summary_by_id(self.blog_post_id))
+            blog_services.get_blog_post_summary_by_id(self.blog_post_id))  # type: ignore[no-untyped-call]
 
     def _assert_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring, thumbnail_filename):
+            self, expected_error_substring: str, thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
                 thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring, thumbnail_filename):
+            self, expected_error_substring: str, thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
                 thumbnail_filename, strict=True)
 
-    def test_thumbnail_filename_validation_for_blog_post(self):
+    def test_thumbnail_filename_validation_for_blog_post(self) -> None:
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Expected image filename to be a string, received 10', 10)
+            'Expected image filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Image filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename_for_blog_post(
@@ -327,46 +330,47 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Thumbnail filename should not be empty', '')
 
-    def test_blog_post_thumbnail_filename_in_strict_mode(self):
+    def test_blog_post_thumbnail_filename_in_strict_mode(self) -> None:
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
-            'Expected thumbnail filename to be a string, received: None.', None)
+            'Expected thumbnail filename to be a string, received: None.', None) # type: ignore[arg-type]
 
     def _assert_strict_valid_title_for_blog_post(
-            self, expected_error_substring, title):
+            self, expected_error_substring: str, title: str) -> None:
         """Checks that blog post passes strict validation for title."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_title(title, True)
 
     def _assert_valid_title_for_blog_post(
-            self, expected_error_substring, title):
+            self, expected_error_substring: str, title: str) -> None:
         """Checks that blog post passes validation for title."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_title(title, False)
 
     def _assert_valid_url_fragment_for_blog_post(
-            self, expected_error_substring, url):
+            self, expected_error_substring: str, url: str) -> None:
         """Checks that blog post passes validation for url."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_url_fragment(url)
 
-    def _assert_valid_tags_for_blog_post(self, expected_error_substring, tags):
+    def _assert_valid_tags_for_blog_post(
+        self, expected_error_substring: str, tags: List[str]) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_tags(tags, False)
 
     def _assert_strict_valid_tags_for_blog_post(
-            self, expected_error_substring, tags):
+            self, expected_error_substring: str, tags: List[str]) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_tags(tags, True)
 
-    def test_title_validation(self):
-        self._assert_valid_title_for_blog_post('Title should be a string', 50)
+    def test_title_validation(self) -> None:
+        self._assert_valid_title_for_blog_post('Title should be a string', 50) # type: ignore[arg-type]
         self._assert_valid_title_for_blog_post(
             'blog post title should at most have 40 chars, received:'
             ' Very long and therefore an invalid blog post title',
@@ -374,9 +378,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
 
-    def test_url_fragment_validation(self):
+    def test_url_fragment_validation(self) -> None:
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field must be a string. Received 0.', 0)
+            'Blog Post URL Fragment field must be a string. Received 0.', 0) # type: ignore[arg-type]
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
         self._assert_valid_url_fragment_for_blog_post(
@@ -393,26 +397,27 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
         blog_domain.BlogPostSummary.require_valid_url_fragment('oppia-covid19')
 
-    def _assert_strict_validation_error(self, expected_error_substring):
+    def _assert_strict_validation_error(self, expected_error_substring: str) -> None:
         """Checks that the blog post passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate(strict=True)
 
-    def _assert_validation_error(self, expected_error_substring):
+    def _assert_validation_error( # type: ignore[override]
+    self, expected_error_substring: str) -> None:
         """Checks that the blog post passes validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate()
 
-    def test_blog_post_summary_passes_validate(self):
+    def test_blog_post_summary_passes_validate(self) -> None:
         """Tests validation for blog post summary."""
         self.blog_post_summary.validate(strict=False)
         self.blog_post_summary.summary = 123
         self._assert_validation_error(
             'Expected summary to be a string, received: 123')
 
-    def test_blog_post_summary_passes_strict_validation(self):
+    def test_blog_post_summary_passes_strict_validation(self) -> None:
         """Tests blog post summary passes validation in strict mode."""
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 'thumbnail.svg'
@@ -424,18 +429,18 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
 
-    def test_tags_validation_for_blog_post(self):
+    def test_tags_validation_for_blog_post(self) -> None:
         """"Tests tags validation for blog post."""
 
         self._assert_valid_tags_for_blog_post(
             'Expected \'tags\' to be a list, received: this should be a list',
-            'this should be a list')
+            'this should be a list') # type: ignore[arg-type]
         self._assert_valid_tags_for_blog_post(
             'Expected each tag in \'tags\' to be a string,' +
-            ' received: ''\'%s\'' % 123, [123])
+            ' received: ''\'%s\'' % 123, [123]) # type: ignore[list-item]
         self._assert_valid_tags_for_blog_post(
             'Expected each tag in \'tags\' to be a string,' +
-            ' received: ''\'%s\'' % 123, ['abc', 123])
+            ' received: ''\'%s\'' % 123, ['abc', 123]) # type: ignore[list-item]
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain alphanumeric characters and spaces, '
             'received: \'%s\'' % 'Alpha@', ['Alpha@'])
@@ -453,6 +458,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Tag should not be empty.', ['abc', ''])
 
-    def test_tags_validation_in_strict_mode(self):
+    def test_tags_validation_in_strict_mode(self) -> None:
         self._assert_strict_valid_tags_for_blog_post(
             'Atleast one tag should be selected', [])
