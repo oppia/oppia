@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
@@ -234,7 +235,7 @@ def run_tests(args):
 
     install_third_party_libraries(args.skip_install)
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:

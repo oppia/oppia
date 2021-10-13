@@ -24,7 +24,6 @@ import subprocess
 import sys
 import time
 
-from core import python_utils
 from core.tests import test_utils
 from scripts import build
 from scripts import common
@@ -58,7 +57,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RunE2ETestsTests, self).setUp()
-        self.exit_stack = python_utils.ExitStack()
+        self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
