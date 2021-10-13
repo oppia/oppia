@@ -113,20 +113,6 @@ def redirect_stdout(new_target):
     return impl(new_target)
 
 
-def ExitStack(): # pylint: disable=invalid-name
-    """Returns ExitStack from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Returns:
-        contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
-    """
-    try:
-        from contextlib import ExitStack as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import ExitStack as impl  # pylint: disable=import-only-modules
-    return impl()
-
-
 def string_io(buffer_value=''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
