@@ -18,13 +18,14 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from typing import List
 
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.tests import test_utils
+
+from typing import List
 
 
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):
@@ -37,7 +38,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
         self.blog_post = blog_services.create_new_blog_post(self.user_id_a)  # type: ignore[no-untyped-call]
 
-    def _assert_strict_validation_error(self, expected_error_substring: str) -> None:
+    def _assert_strict_validation_error(
+        self,
+        expected_error_substring: str) -> None:
         """Checks that the blog post passes strict validation."""
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -50,14 +53,19 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate()
 
-    def _assert_valid_tags_for_blog_post(self, expected_error_substring: str, tags: List[str]) -> None:
+    def _assert_valid_tags_for_blog_post(
+        self,
+        expected_error_substring: str,
+        tags: List[str]) -> None:
         """Checks that the blog post tags passes validation."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_tags(tags, False)
 
     def _assert_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring: str, thumbnail_filename: str) -> None:
+            self,
+            expected_error_substring: str,
+            thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -65,7 +73,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring: str, thumbnail_filename: str) -> None:
+            self,
+            expected_error_substring: str,
+            thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -299,7 +309,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_summary_by_id(self.blog_post_id))  # type: ignore[no-untyped-call]
 
     def _assert_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring: str, thumbnail_filename: str) -> None:
+            self,
+            expected_error_substring: str,
+            thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -307,7 +319,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-            self, expected_error_substring: str, thumbnail_filename: str) -> None:
+            self,
+            expected_error_substring: str,
+            thumbnail_filename: str) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -397,7 +411,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
         blog_domain.BlogPostSummary.require_valid_url_fragment('oppia-covid19')
 
-    def _assert_strict_validation_error(self, expected_error_substring: str) -> None:
+    def _assert_strict_validation_error(
+        self, expected_error_substring: str) -> None:
         """Checks that the blog post passes strict validation."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
