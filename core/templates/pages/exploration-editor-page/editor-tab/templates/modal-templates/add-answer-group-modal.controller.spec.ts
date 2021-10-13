@@ -149,7 +149,7 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should check if outcome feedback has length of atmost 200 characters',
+  it('should check if outcome feedback has length of atmost 1000 characters',
     function() {
       var text = 'Feedback Text ';
       var outcome1 = outcomeObjectFactory.createNew(
@@ -157,7 +157,7 @@ describe('Add Answer Group Modal Controller', function() {
       expect($scope.isFeedbackLengthExceeded(outcome1)).toBe(false);
 
       var outcome2 = outcomeObjectFactory.createNew(
-        'State Name', '1', text.repeat(15), []);
+        'State Name', '1', text.repeat(75), []);
       expect($scope.isFeedbackLengthExceeded(outcome2)).toBe(true);
     });
 

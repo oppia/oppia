@@ -139,7 +139,7 @@ describe('HintEditorComponent', () => {
     expect(ctrl.hintEditorIsOpen).toBe(false);
   });
 
-  it('should check if hint length exceeded 200 characters', () => {
+  it('should check if hint length exceeded 500 characters', () => {
     var hintText = 'This is a hint ';
 
     ctrl.hint = {
@@ -151,7 +151,7 @@ describe('HintEditorComponent', () => {
 
     ctrl.hint = {
       hintContent: {
-        _html: '<p> ' + hintText.repeat(15) + ' </p>'
+        _html: '<p> ' + hintText.repeat(35) + ' </p>'
       }
     };
     expect(ctrl.isHintLengthExceeded()).toBe(true);

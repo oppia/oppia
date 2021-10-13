@@ -101,7 +101,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     };
 
     $scope.isFeedbackLengthExceeded = function(tmpOutcome) {
-      return (tmpOutcome.feedback._html.length > 200);
+      return (tmpOutcome.feedback._html.length > 1000);
     };
 
     $scope.addAnswerGroupForm = {};

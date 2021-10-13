@@ -382,7 +382,7 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
-  it('should check if outcome feedback has length of atmost 200 characters',
+  it('should check if outcome feedback has length of atmost 1000 characters',
     () => {
       let text = 'Feedback Text ';
 
@@ -395,7 +395,7 @@ describe('OutcomeEditorComponent', () => {
 
       ctrl.outcome = {
         feedback: {
-          _html: '<p> ' + text.repeat(15) + ' </p>'
+          _html: '<p> ' + text.repeat(75) + ' </p>'
         }
       };
       expect(ctrl.isFeedbackLengthExceeded()).toBe(true);

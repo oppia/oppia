@@ -183,7 +183,7 @@ describe('Add Or Update Solution Modal Controller', function() {
 
     it('should show solution explanation length validation error',
       function() {
-        var solutionExplanation = 'Explanation html '.repeat(15);
+        var solutionExplanation = 'Solution explanation'.repeat(180);
         expect($scope.isSolutionExplanationLengthExceeded(solutionExplanation))
           .toBe(true);
       });

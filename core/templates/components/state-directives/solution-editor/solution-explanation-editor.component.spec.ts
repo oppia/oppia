@@ -129,7 +129,7 @@ describe('SolutionExplanationEditorComponent', () => {
       StateSolutionService.displayed = {
         explanation: {
           contentId: 'contentID',
-          html: '<p> ' + solutionExplanation.repeat(15) + ' </p>'
+          html: '<p> ' + solutionExplanation.repeat(180) + ' </p>'
         }
       };
       expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(true);
