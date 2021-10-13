@@ -21,7 +21,6 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-
 from core import python_utils
 from core.constants import constants
 from core.controllers import base
@@ -153,6 +152,9 @@ def validate_aggregated_stats(aggregated_stats):
 
     Args:
         aggregated_stats: dict. Data that needs to be validated.
+        
+    Raises:
+        InvalidInputException. Property not in aggregated stats dict.
     """
     exploration_stats_properties = [
         'num_starts',
