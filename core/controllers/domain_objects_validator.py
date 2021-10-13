@@ -152,7 +152,7 @@ def validate_aggregated_stats(aggregated_stats):
 
     Args:
         aggregated_stats: dict. Data that needs to be validated.
-        
+
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
     """
