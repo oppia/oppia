@@ -3,7 +3,9 @@ instance_class: F2
 # The "version" line is added here so that MR jobs can run locally (see issue
 # #6534 on oppia/oppia).
 version: default
-entrypoint: gunicorn -b :$PORT main:app
+# Timeout is set to 60 so that the gunicorn workers don't die while sending
+# the Apache Beam jobs to Google Cloud Dataflow.
+entrypoint: gunicorn --timeout 60 --bind :$PORT main:app
 
 inbound_services:
 - warmup
