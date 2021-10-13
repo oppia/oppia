@@ -1461,6 +1461,14 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             )
         )
 
+    def swap_get_users_to_raise_error(self) -> ContextManager[None]:
+        """Swaps the get_user function so that it always fails."""
+        return self.swap_to_always_raise(
+            firebase_auth,
+            'get_users',
+            firebase_exceptions.FirebaseError(message='error', code='E111')
+        )
+
     def swap_delete_user_to_always_fail(self) -> ContextManager[None]:
         """Swaps the delete_user function so that it always fails."""
         return self.swap_to_always_raise(
@@ -1501,7 +1509,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             firebase_auth_services
             .verify_external_auth_associations_are_deleted(self.user_id))
 
-    def test_delete_external_auth_associations_when_get_user_fails(
+    def test_delete_external_auth_associations_when_get_users_fails(
             self
     ) -> None:
         firebase_auth_services.delete_external_auth_associations(self.user_id)
@@ -1516,3 +1524,26 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.assertTrue(
             firebase_auth_services
             .verify_external_auth_associations_are_deleted(self.user_id))
+
+    def test_delete_external_auth_associations_when_get_users_raise_error(
+            self
+    ) -> None:
+        firebase_auth_services.delete_external_auth_associations(self.user_id)
+
+        self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
+
+        with self.swap_get_users_to_raise_error():
+            with self.capture_logging() as logs:
+                self.assertFalse(
+                    firebase_auth_services
+                        .verify_external_auth_associations_are_deleted(
+                            self.user_id))
+                self.assertEqual(len(logs), 1)
+                self.assertEqual(
+                    logs[0].split('\n')[0],
+                    '[WIPEOUT] Firebase Admin SDK failed! Stack trace:'
+                )
+
+        self.assertTrue(
+            firebase_auth_services
+                .verify_external_auth_associations_are_deleted(self.user_id))
