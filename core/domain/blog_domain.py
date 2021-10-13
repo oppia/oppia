@@ -18,15 +18,16 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from datetime import datetime
 
+import datetime
 import re
-from typing import Any, Dict, List, Optional
 
 from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import html_cleaner
+
+from typing import Any, Dict, List, Optional
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
@@ -36,8 +37,11 @@ class BlogPost:
     """Domain object for an Oppia Blog Post."""
 
     def __init__(
-            self, blog_post_id :str, author_id :str, title :str, content: str, url_fragment: str, tags: List[str],
-            thumbnail_filename: Optional[str] = None, last_updated: Optional[datetime] = None, published_on : Optional[datetime] = None):
+            self, blog_post_id: str, author_id: str, title: str,
+            content: str, url_fragment: str, tags: List[str],
+            thumbnail_filename: Optional[str] = None,
+            last_updated: Optional[datetime.datetime] = None,
+            published_on: Optional[datetime.datetime] = None):
         """Constructs a BlogPost domain object.
 
         Args:
@@ -64,7 +68,8 @@ class BlogPost:
         self.published_on = published_on
 
     @classmethod
-    def require_valid_thumbnail_filename(cls, thumbnail_filename: str, strict: bool = False) -> None:
+    def require_valid_thumbnail_filename(
+        cls, thumbnail_filename: str, strict: bool = False) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
@@ -291,7 +296,8 @@ class BlogPost:
         self.require_valid_url_fragment(new_url_fragment)
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename(self, new_thumbnail_filename: Optional[str] = None) -> None:
+    def update_thumbnail_filename(
+        self, new_thumbnail_filename: Optional[str] = None) -> None:
         """Updates the thumbnail filename of a blog post object.
 
         Args:
@@ -338,8 +344,14 @@ class BlogPostSummary:
     """Domain object for Blog Post Summary."""
 
     def __init__(
-            self, blog_post_id: str, author_id: str, title: str, summary: str, url_fragment: str, tags: List[str],
-            thumbnail_filename: Optional[str]=None, last_updated: Optional[datetime]=None, published_on: Optional[datetime]=None):
+            self, blog_post_id: str,
+            author_id: str, title: str,
+            summary: str,
+            url_fragment: str,
+            tags: List[str],
+            thumbnail_filename: Optional[str]=None,
+            last_updated: Optional[datetime.datetime]=None,
+            published_on: Optional[datetime.datetime]=None):
         """Constructs a Blog Post Summary domain object.
 
         Args:
@@ -367,7 +379,8 @@ class BlogPostSummary:
         self.published_on = published_on
 
     @classmethod
-    def require_valid_thumbnail_filename(cls, thumbnail_filename: str, strict: bool =False)-> None:
+    def require_valid_thumbnail_filename(
+        cls, thumbnail_filename: str, strict: bool =False) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
@@ -544,7 +557,9 @@ class BlogPostSummary:
 class BlogPostRights:
     """Domain object for Blog Post rights."""
 
-    def __init__(self, blog_post_id: str, editor_ids: List[str], blog_post_is_published: bool =False) -> None:
+    def __init__(
+        self, blog_post_id: str, editor_ids: List[str],
+        blog_post_is_published: bool =False) -> None:
         """Constructs a BlogPostRights domain object.
 
         Args:
