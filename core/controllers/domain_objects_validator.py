@@ -38,19 +38,29 @@ def validate_exploration_change(obj):
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        ExplorationChange. Returns an ExplorationChange object.
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj)
+    return exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values(obj):
+def validate_new_config_property_values(config_properties_dict):
     """Validates new config property values.
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, *). Returns a dict for new config properties.
     """
-    for (name, value) in obj.items():
+
+    # Returns a dict because config property does represent a domain class
+    # directly but config property dict is used to set properties individually
+    # which require other data like committer_id. Hence from here dict is
+    # returned to the controller layer.
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
                 'config property name should be a string, received'
@@ -61,7 +71,7 @@ def validate_new_config_property_values(obj):
 
         config_property.normalize(value)
 
-    return obj
+    return config_properties_dict
 
 
 def validate_change_dict_for_blog_post(change_dict):

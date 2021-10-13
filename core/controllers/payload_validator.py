@@ -27,15 +27,29 @@ from core import schema_utils
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
+def get_schema_type(arg_schema: dict[str, Any]) -> str:
+    """This method returns the schema type for an argument by accepting the
+    schema for the corresponding argument.
+
+    Args:
+        arg_schema: dict(str, *). Schema for an argument.
+
+    Returns:
+        str. Returns schema type by extracting it from schema.
+    """
+        return arg_schema['schema']['type']
+
+
 # This function recursively uses the schema dictionary and handler_args, and
 # passes their values to itself as arguments, so their type is Any.
 # See: https://github.com/python/mypy/issues/731
-def validate(
+def validate_arguments_against_schema(
         handler_args: Any,
         handler_args_schemas: Any,
         allowed_extra_args: bool,
         allow_string_to_bool_conversion: bool = False
-) -> Tuple[Dict[str, Any], List[str]]:
+    ) -> Tuple[Dict[str, Any], List[str]]:
+
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
@@ -53,16 +67,22 @@ def validate(
     """
     # Collect all errors and present them at once.
     errors = []
+    # Dictionary to hold normalizad values of arguments after validation.
     normalized_value = {}
+
     for arg_key, arg_schema in handler_args_schemas.items():
 
         if arg_key not in handler_args or handler_args[arg_key] is None:
-            if ('default_value' in arg_schema and
-                    arg_schema['default_value'] is None):
-                # Skip validation for optional cases.
+            if (
+                    'default_value' in arg_schema and
+                    arg_schema['default_value'] is None
+            ):
+                # Skip validation because the argument is optional.
                 continue
-            elif ('default_value' in arg_schema and
-                  arg_schema['default_value'] is not None):
+            elif (
+                    'default_value' in arg_schema and
+                    arg_schema['default_value'] is not None
+            ):
                 handler_args[arg_key] = arg_schema['default_value']
             elif 'default_value' not in arg_schema:
                 errors.append('Missing key in handler args: %s.' % arg_key)
@@ -72,7 +92,7 @@ def validate(
         # but from API request they are received as string type.
         if (
                 allow_string_to_bool_conversion and
-                arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
+                get_schema_type(arg_schema) == schema_utils.SCHEMA_TYPE_BOOL
                 and isinstance(handler_args[arg_key], python_utils.BASESTRING)
         ):
             handler_args[arg_key] = (

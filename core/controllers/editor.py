@@ -196,12 +196,7 @@ class ExplorationHandler(EditorHandler):
                 % (exploration.version, version))
 
         commit_message = self.normalized_payload.get('commit_message')
-        change_list_dict = self.normalized_payload.get('change_list')
-
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
+        change_list = self.normalized_payload.get('change_list')
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
@@ -1072,13 +1067,9 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
         # validation.
-        change_list_dict = self.normalized_payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
-
+        change_list = self.normalized_payload.get('change_list')
         version = self.normalized_payload.get('version')
+
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
