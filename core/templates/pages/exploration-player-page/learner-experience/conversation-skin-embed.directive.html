@@ -1,22 +1,11 @@
-  <!--
-  Off-screen preview of the next card in order to pre-determine the target
-  height for the card content transition animation.
-  -->
-<div class="conversation-skin-future-tutor-card" aria-hidden="true">
-  <div class="oppia-learner-view-card-content">
-    <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
-                         html-data="nextCard.getContentHtml()">
-      </angular-html-bind>
-    </div>
-    <div ng-if="upcomingInlineInteractionHtml">
-      <div class="conversation-skin-inline-interaction">
-        <angular-html-bind html-data="upcomingInlineInteractionHtml">
-        </angular-html-bind>
-      </div>
-    </div>
-  </div>
-</div>
+<!--
+Off-screen preview of the next card in order to pre-determine the target
+height for the card content transition animation.
+-->
+<oppia-off-screen-preview [next-card-content-html]="nextCard.getContentHtml()"
+                          [upcoming-inline-interaction-html]="upcomingInlineInteractionHtml">
+</oppia-off-screen-preview>
+
 <div class="embedded-body">
   <section role="main" ng-if="hasFullyLoaded">
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"

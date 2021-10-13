@@ -2,9 +2,9 @@
   Off-screen preview of the next card in order to pre-determine the target
   height for the card content transition animation.
 -->
-<oppia-future-tutor-card [next-card-content-html]="nextCard.getContentHtml()"
-                         [upcoming-inline-interaction-html]="upcomingInlineInteractionHtml">
-</oppia-future-tutor-card>
+<oppia-off-screen-preview [next-card-content-html]="nextCard.getContentHtml()"
+                          [upcoming-inline-interaction-html]="upcomingInlineInteractionHtml">
+</oppia-off-screen-preview>
 
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" ng-if="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
@@ -75,17 +75,17 @@
   </div>
 </div>
 
-<oppia-conversation-skin-final-summary ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-                                       [user-is-logged-in]="isLoggedIn"
-                                       [exploration-is-in-preview-mode]="isInPreviewMode"
-                                       [question-player-config]="questionPlayerConfig"
-                                       [in-story-mode]="inStoryMode"
-                                       [story-viewer-url]="storyViewerUrl"
-                                       [collection-summary]="collectionSummary"
-                                       [is-refresher-exploration]="isRefresherExploration"
-                                       [recommended-exploration-summaries]="recommendedExplorationSummaries"
-                                       [parent-exploration-ids]="parentExplorationIds">
-</oppia-conversation-skin-final-summary>
+<oppia-ratings-and-recommendations ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                   [user-is-logged-in]="isLoggedIn"
+                                   [exploration-is-in-preview-mode]="isInPreviewMode"
+                                   [question-player-config]="questionPlayerConfig"
+                                   [in-story-mode]="inStoryMode"
+                                   [story-viewer-url]="storyViewerUrl"
+                                   [collection-summary]="collectionSummary"
+                                   [is-refresher-exploration]="isRefresherExploration"
+                                   [recommended-exploration-summaries]="recommendedExplorationSummaries"
+                                   [parent-exploration-ids]="parentExplorationIds">
+</oppia-ratings-and-recommendations>
 
 <!-- These styles must be embedded within the directive script tags, since
 otherwise they will interfere with the iframed conversation skin directive.

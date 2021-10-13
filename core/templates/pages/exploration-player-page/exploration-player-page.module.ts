@@ -44,8 +44,9 @@ import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { FutureTutorCardComponent } from './learner-experience/future-tutor-card.component';
-import { ConversationSkinFinalSummary } from './learner-experience/conversation-skin-final-summary.component';
+import { ToastrModule } from 'ngx-toastr';
+import { OffScreenPreviewComponent } from './learner-experience/off-screen-preview.component';
+import { RatingsAndRecommendationsComponent } from './learner-experience/ratings-and-recommendations.component';
 
 @NgModule({
   imports: [
@@ -62,29 +63,29 @@ import { ConversationSkinFinalSummary } from './learner-experience/conversation-
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    ConversationSkinFinalSummary,
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
-    FutureTutorCardComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerViewInfoComponent,
+    OffScreenPreviewComponent,
+    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
-    ConversationSkinFinalSummary,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
-    FutureTutorCardComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
+    OffScreenPreviewComponent,
+    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
@@ -112,7 +113,6 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

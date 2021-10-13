@@ -23,10 +23,10 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 
 @Component({
-  selector: 'oppia-future-tutor-card',
-  templateUrl: './future-tutor-card.component.html'
+  selector: 'oppia-off-screen-preview',
+  templateUrl: './off-screen-preview.component.html'
 })
-export class FutureTutorCardComponent {
+export class OffScreenPreviewComponent {
   @Input() nextCardContentHtml!: string;
   @Input() upcomingInlineInteractionHtml!: string;
 
@@ -43,7 +43,7 @@ export class FutureTutorCardComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaFutureTutorCard',
+angular.module('oppia').directive('oppiaOffScreenPreview',
   downgradeComponent({
-    component: FutureTutorCardComponent
+    component: OffScreenPreviewComponent
   }));

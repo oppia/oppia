@@ -28,10 +28,10 @@ import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
 
 @Component({
-  selector: 'oppia-conversation-skin-final-summary',
-  templateUrl: './conversation-skin-final-summary.component.html'
+  selector: 'oppia-ratings-and-recommendations',
+  templateUrl: './ratings-and-recommendations.component.html'
 })
-export class ConversationSkinFinalSummary {
+export class RatingsAndRecommendationsComponent {
   @Input() userIsLoggedIn: boolean;
   @Input() explorationIsInPreviewMode: boolean;
   @Input() questionPlayerConfig;
@@ -94,7 +94,7 @@ export class ConversationSkinFinalSummary {
   }
 }
 
-angular.module('oppia').directive('oppiaConversationSkinFinalSummary',
+angular.module('oppia').directive('oppiaRatingsAndRecommendations',
   downgradeComponent({
-    component: ConversationSkinFinalSummary
+    component: RatingsAndRecommendationsComponent
   }) as angular.IDirectiveFactory);
