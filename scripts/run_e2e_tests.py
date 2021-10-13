@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
@@ -177,7 +178,7 @@ def run_webpack_compilation(source_maps=False):
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
-    for _ in python_utils.RANGE(max_tries):
+    for _ in range(max_tries):
         try:
             managed_webpack_compiler = (
                 servers.managed_webpack_compiler(use_source_maps=source_maps))
@@ -234,7 +235,7 @@ def run_tests(args):
 
     install_third_party_libraries(args.skip_install)
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:
@@ -307,7 +308,7 @@ def main(args=None):
     policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
-        for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
+        for attempt_num in range(1, MAX_RETRY_COUNT + 1):
             python_utils.PRINT('***Attempt %d.***' % attempt_num)
             output, return_code = run_tests(parsed_args)
 
