@@ -27,7 +27,7 @@ from core import schema_utils
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
-def get_schema_type(arg_schema: dict[str, Any]) -> str:
+def get_schema_type(arg_schema):
     """This method returns the schema type for an argument by accepting the
     schema for the corresponding argument.
 
@@ -37,7 +37,7 @@ def get_schema_type(arg_schema: dict[str, Any]) -> str:
     Returns:
         str. Returns schema type by extracting it from schema.
     """
-        return arg_schema['schema']['type']
+    return arg_schema['schema']['type']
 
 
 # This function recursively uses the schema dictionary and handler_args, and

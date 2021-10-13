@@ -66,11 +66,12 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         ]
         for handler_args, handler_args_schema, error_msg in (
                 list_of_invalid_args_with_schema_and_errors):
-            normalized_value, errors = payload_validator.validate(
-                handler_args,
-                handler_args_schema,
-                allowed_extra_args=False,
-                allow_string_to_bool_conversion=False
+            normalized_value, errors = (
+                payload_validator.validate_arguments_against_schema(
+                    handler_args,
+                    handler_args_schema,
+                    allowed_extra_args=False,
+                    allow_string_to_bool_conversion=False)
             )
 
             self.assertEqual(normalized_value, {})
@@ -124,11 +125,12 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         ]
         for handler_args, handler_args_schema, normalized_value_for_args in (
                 list_of_valid_args_with_schmea):
-            normalized_value, errors = payload_validator.validate(
-                handler_args,
-                handler_args_schema,
-                allowed_extra_args=False,
-                allow_string_to_bool_conversion=True
+            normalized_value, errors = (
+                payload_validator.validate_arguments_against_schema(
+                    handler_args,
+                    handler_args_schema,
+                    allowed_extra_args=False,
+                    allow_string_to_bool_conversion=True)
             )
 
             self.assertEqual(normalized_value, normalized_value_for_args)

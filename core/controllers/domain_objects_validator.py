@@ -61,6 +61,8 @@ def validate_new_config_property_values(config_properties_dict):
     # directly but config property dict is used to set properties individually
     # which require other data like committer_id. Hence from here dict is
     # returned to the controller layer.
+
+    for (name, value) in config_properties_dict.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
                 'config property name should be a string, received'
