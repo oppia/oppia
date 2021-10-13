@@ -34,6 +34,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
+const CACHE_KEY_FOR_TESTS: string = 'CACHED_LANG_KEY';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -85,7 +86,7 @@ describe('OppiaAngularRootComponent', function() {
             // We directly return name of cache in which language key code
             // will be stored, mocking TranslateCacheSettings where a cache name
             // is generated using injection token which comes from angular.
-            cacheName: 'CACHED_LANG_KEY'
+            cacheName: CACHE_KEY_FOR_TESTS
           }
         },
         {
@@ -131,21 +132,21 @@ describe('OppiaAngularRootComponent', function() {
 
   it('should set cache language according to URL lang param', () => {
     // Setting 'en' as cache language code.
-    cookieService.put('CACHED_LANG_KEY', 'en');
+    cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
     // This sets the url to 'http://localhost:8181/?lang=es'
     // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/?lang=es');
-    expect(cookieService.get('CACHED_LANG_KEY')).toBe('en');
+    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
 
     component.ngAfterViewInit();
 
-    expect(cookieService.get('CACHED_LANG_KEY')).toBe('es');
+    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('es');
     expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
-    cookieService.put('CACHED_LANG_KEY', 'en');
+    cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
     spyOn(cookieService, 'put');
     // This sets the url to 'http://localhost:8181/?lang=invalid'
     // when initialized.
@@ -157,13 +158,13 @@ describe('OppiaAngularRootComponent', function() {
     // Translation cache should not be updated as the language param
     // is invalid.
     expect(cookieService.put).not.toHaveBeenCalledWith();
-    expect(cookieService.get('CACHED_LANG_KEY')).toBe('en');
+    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
     expect(component.url.toString()).toBe('http://localhost:8181/');
   });
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
-    cookieService.put('CACHED_LANG_KEY', 'en');
+    cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
     // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181');
@@ -173,6 +174,6 @@ describe('OppiaAngularRootComponent', function() {
 
     expect(cookieService.put).not.toHaveBeenCalledWith();
     expect(component.url.toString()).toBe('http://localhost:8181/');
-    expect(cookieService.get('CACHED_LANG_KEY')).toBe('en');
+    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
   });
 });
