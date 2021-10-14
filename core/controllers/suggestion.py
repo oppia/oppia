@@ -27,6 +27,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import html_cleaner
@@ -39,22 +40,67 @@ from core.domain import suggestion_services
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
-
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = { 
+        'POST': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                }
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                }
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_version_at_submission':
+            {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'change': {
+               'schema': {
+                   'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_change
+                    )
+               }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+    
     @acl_decorators.can_suggest_changes
     def post(self):
         """Handles POST requests."""
-        if (self.payload.get('suggestion_type') ==
+        if (self.normalized_payload.get('suggestion_type') ==
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
 
         try:
             suggestion = suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                self.payload.get('target_type'), self.payload.get('target_id'),
-                self.payload.get('target_version_at_submission'),
-                self.user_id, self.payload.get('change'),
-                self.payload.get('description'))
+                self.normalized_payload.get('suggestion_type'),
+                self.normalized_payload.get('target_type'), self.normalized_payload.get('target_id'),
+                self.normalized_payload.get('target_version_at_submission'),
+                self.user_id, self.normalized_payload.get('change'),
+                self.normalized_payload.get('description'))
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
