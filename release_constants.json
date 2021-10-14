@@ -3,7 +3,7 @@
     "APP_YAML_PATH": "app.yaml",
     "BLOCKING_BUG_MILESTONE_NUMBER": 39,
     "BRANCH_TYPE_HOTFIX": "hotfix",
-    "BRANCH_TYPE_RELEASE": "release",
+    "BRANCH_TYPE_RELEASE": "",
     "BUILD_MODULE_TARGET": "scripts.build",
     "CHANGELOG_HEADER": "### Changelog:\n",
     "COMMIT_HISTORY_HEADER": "### Commit History:\n",
