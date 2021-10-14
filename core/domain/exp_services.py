@@ -570,7 +570,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
