@@ -459,21 +459,17 @@ export class SvgEditorComponent implements OnInit {
       obj: fabric.Object,
       groupedObjects: fabric.Object[][]
   ): fabric.Object[][] {
-    // Checks if the id starts with 'group' to identify whether the
-    // svg objects are grouped together.
-    if (objId.startsWith('group')) {
-      // The objId is of the form "group" + number.
-      const GROUP_ID_PREFIX_LENGTH = 5;
-      const groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
-      // Checks whether the object belongs to an already existing group
-      // or not.
-      if (groupedObjects.length <= groupId) {
-        groupedObjects.push([]);
-      }
-      obj.toSVG = this.createCustomToSVG(
-        obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
-      groupedObjects[groupId].push(obj);
+    // The objId is of the form "group" + number.
+    const GROUP_ID_PREFIX_LENGTH = 5;
+    const groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
+    // Checks whether the object belongs to an already existing group
+    // or not.
+    if (groupedObjects.length <= groupId) {
+      groupedObjects.push([]);
     }
+    obj.toSVG = this.createCustomToSVG(
+      obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
+    groupedObjects[groupId].push(obj);
     return groupedObjects;
   }
 
@@ -573,7 +569,9 @@ export class SvgEditorComponent implements OnInit {
           let groupedObjects = [];
           objects.forEach((obj, index) => {
             const objId = elements[index].id;
-            if (objId !== '') {
+            // Checks if the id starts with 'group' to identify whether the
+            // svg objects are grouped together.
+            if (objId.startsWith('group')) {
               groupedObjects = this.loadGroupedObject(
                 objId, obj, groupedObjects);
             } else {

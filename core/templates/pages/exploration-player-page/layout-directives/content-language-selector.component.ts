@@ -37,7 +37,7 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
-  selector: 'content-language-selector',
+  selector: 'oppia-content-language-selector',
   templateUrl: './content-language-selector.component.html',
   styleUrls: []
 })
@@ -109,5 +109,5 @@ export class ContentLanguageSelectorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'contentLanguageSelector',
+  'oppiaContentLanguageSelector',
   downgradeComponent({component: ContentLanguageSelectorComponent}));
