@@ -22,6 +22,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import python_utils
+from core import feconf 
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -29,10 +30,24 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
-
+from core.domain import question_domain
 from typing import Dict, Optional, Union
 
 
+def validate_change(obj):
+    """Validates Exploration and Question domain change.
+    
+    Args:
+        obj: dict. Data that needs to be validated.
+    """
+    if(obj['cmd'] in feconf.LIST_CMD_EXPLORATION_CHANGE):
+        exp_domain.ExplorationChange(obj)
+    elif(obj['cmd'] in feconf.LIST_CMD_QUESTION_CHANGE):
+        question_domain.QuestionChange(obj)
+    else:
+        raise base.BaseHandler.InvalidInputException('%s cmd is'
+        'not allowed.'% obj['cmd'])
+ 
 def validate_exploration_change(obj):
     """Validates exploration change.
 
