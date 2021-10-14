@@ -38,12 +38,18 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
         run: for run in {1..100}; do PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage; done
-      - name: Uploading karma coverage report as Artifacts
+      - name: Changelist
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: karma-coverage-report
           path: /home/runner/work/oppia/karma_coverage_reports/core/templates/pages/exploration-editor-page/services/change-list.service.ts.html
+      - name: Save Validation
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: karma-coverage-report
+          path: /home/runner/work/oppia/karma_coverage_reports/core/templates/pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component.ts.html
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
