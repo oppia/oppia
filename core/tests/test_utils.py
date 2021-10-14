@@ -532,7 +532,7 @@ class AuthServicesStub:
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -1820,7 +1820,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
