@@ -30,7 +30,10 @@ import copy
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import collection_domain
@@ -42,9 +45,6 @@ from core.domain import search_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -596,7 +596,7 @@ def get_collection_ids_matching_query(
     returned_collection_ids = []
     search_offset = offset
 
-    for _ in python_utils.RANGE(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -679,7 +679,7 @@ def apply_change_list(collection_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def validate_exps_in_collection_are_public(collection):
@@ -914,7 +914,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = list(python_utils.RANGE(1, current_version + 1))
+    version_nums = list(range(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)

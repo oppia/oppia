@@ -19,6 +19,7 @@
 
 export default {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   // The term 'staging' is used instead of the classroom url fragment field
@@ -5458,7 +5459,6 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
-      "LogicProof",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",
@@ -5584,12 +5584,13 @@ export default {
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
-  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5668,7 +5669,10 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
-  "BEAM_JOBS_ARE_ENABLED": false,
+  // The name of the cookie Oppia will place the session cookie into. The name
+  // is arbitrary. If it is changed later on, then the cookie will live on in
+  // the users' browsers as garbage (although it'd expire eventually).
+  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5680,6 +5684,9 @@ export default {
 
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
+  // A regular expression for allowed characters for thumbnail filename.
+  "VALID_THUMBNAIL_FILENAME_REGEX": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
 
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
@@ -5942,18 +5949,6 @@ export default {
         }]
       },
       "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
     }
   ],
 
@@ -5973,10 +5968,37 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         },
         {
-          "PROPERTY_TYPE": "property",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About foundation | Oppia",
+      "META": []
+    },
+    "CLASSROOM": {
+      "ROUTE": "learn/:classroom_url_fragment",
+      "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
         }
       ]
     },
@@ -6155,11 +6177,170 @@ export default {
         }
       ]
     },
+    "DELETE_ACCOUNT": {
+      "ROUTE": "delete-account",
+      "TITLE": "Delete Account | Oppia",
+      "META": []
+    },
+    "LIBRARY_INDEX": {
+      "ROUTE": "community-library",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_RECENTLY_PUBLISHED": {
+      "ROUTE": "community-library/recently-published",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_SEARCH": {
+      "ROUTE": "search/find",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_TOP_RATED": {
+      "ROUTE": "community-library/top-rated",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "PENDING_ACCOUNT_DELETION": {
+      "ROUTE": "pending-account-deletion",
+      "TITLE": "Pending Account Deletion | Oppia",
+      "META": []
+    },
+    "PREFERENCES": {
+      "ROUTE": "preferences",
+      "TITLE": "Preferences | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Change your Oppia profile settings and preferences"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Change your Oppia profile settings and preferences"
+        }
+      ]
+    },
+    "PROFILE": {
+      "ROUTE": "profile/:username_fragment",
+      "TITLE": "Profile | Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "RELEASE_COORDINATOR_PAGE": {
+      "ROUTE": "release-coordinator",
+      "TITLE": "Oppia Release Coordinator Panel",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "SPLASH": {
+      "ROUTE": "",
+      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "STORY_VIEWER": {
+      // eslint-disable-next-line max-len
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
+      "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
     "VOLUNTEER": {
       "ROUTE": "volunteer",
       "TITLE": "Volunteer | Oppia",
       "META": []
     }
+  },
+
+  "STEWARDS_LANDING_PAGE": {
+    "ROUTES": ["parents", "partners", "nonprofits", "teachers", "volunteers"],
+    "TITLE": "Getting Started with Oppia",
+    "META": []
   },
 
   // A dict representing available landing pages, having subject as a key

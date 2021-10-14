@@ -20,15 +20,15 @@ from __future__ import unicode_literals
 import copy
 import json
 
-import android_validation_constants
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
-import feconf
-import python_utils
-import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -179,7 +179,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-class Misconception(python_utils.OBJECT):
+class Misconception:
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -287,7 +287,7 @@ class Misconception(python_utils.OBJECT):
                 self.feedback)
 
 
-class Rubric(python_utils.OBJECT):
+class Rubric:
     """Domain object describing a skill rubric."""
 
     def __init__(self, difficulty, explanations):
@@ -355,7 +355,7 @@ class Rubric(python_utils.OBJECT):
                     explanation)
 
 
-class WorkedExample(python_utils.OBJECT):
+class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
     def __init__(self, question, explanation):
@@ -423,7 +423,7 @@ class WorkedExample(python_utils.OBJECT):
         return worked_example
 
 
-class SkillContents(python_utils.OBJECT):
+class SkillContents:
     """Domain object representing the skill_contents dict."""
 
     def __init__(
@@ -526,7 +526,7 @@ class SkillContents(python_utils.OBJECT):
         return skill_contents
 
 
-class Skill(python_utils.OBJECT):
+class Skill:
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -997,6 +997,21 @@ class Skill(python_utils.OBJECT):
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
+    def _convert_skill_contents_v3_dict_to_v4_dict(cls, skill_contents_dict):
+        """Converts v3 skill contents to the v4 schema. The v4 schema
+        fixes HTML encoding issues.
+
+        Args:
+            skill_contents_dict: dict. The v3 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.fix_incorrectly_encoded_chars)
+
+    @classmethod
     def update_skill_contents_from_model(
             cls, versioned_skill_contents, current_version):
         """Converts the skill_contents blob contained in the given
@@ -1102,6 +1117,25 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict):
+        """Converts v4 misconception schema to the v5 schema. The v5 schema
+        fixes HTML encoding issues.
+
+        Args:
+            misconception_dict: dict. The v4 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['notes'] = (
+            html_validation_service.fix_incorrectly_encoded_chars(
+                misconception_dict['notes']))
+        misconception_dict['feedback'] = (
+            html_validation_service.fix_incorrectly_encoded_chars(
+                misconception_dict['feedback']))
+        return misconception_dict
+
+    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -1151,6 +1185,24 @@ class Skill(python_utils.OBJECT):
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
                 html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                    explanation))
+        return rubric_dict
+
+    @classmethod
+    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict):
+        """Converts v4 rubric schema to the v5 schema. The v4 schema
+        fixes HTML encoding issues.
+
+        Args:
+            rubric_dict: dict. The v4 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        for explanation_index, explanation in enumerate(
+                rubric_dict['explanations']):
+            rubric_dict['explanations'][explanation_index] = (
+                html_validation_service.fix_incorrectly_encoded_chars(
                     explanation))
         return rubric_dict
 
@@ -1481,7 +1533,7 @@ class Skill(python_utils.OBJECT):
         self.misconceptions[index].feedback = feedback
 
 
-class SkillSummary(python_utils.OBJECT):
+class SkillSummary:
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -1574,7 +1626,7 @@ class SkillSummary(python_utils.OBJECT):
         }
 
 
-class AugmentedSkillSummary(python_utils.OBJECT):
+class AugmentedSkillSummary:
     """Domain object for Augmented Skill Summary, which has all the properties
     of SkillSummary along with the topic names to which the skill is assigned
     and the classroom names to which the topics are assigned.
@@ -1637,7 +1689,7 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         }
 
 
-class TopicAssignment(python_utils.OBJECT):
+class TopicAssignment:
     """Domain object for Topic Assignment, which provides the details of a
     single topic (and, if applicable, the subtopic within that topic) to which
     the skill is assigned.
@@ -1675,7 +1727,7 @@ class TopicAssignment(python_utils.OBJECT):
         }
 
 
-class UserSkillMastery(python_utils.OBJECT):
+class UserSkillMastery:
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id, skill_id, degree_of_mastery):

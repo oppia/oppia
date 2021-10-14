@@ -35,7 +35,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   @Input() aspectRatio!: string;
   @Input() classes!: string[];
   @Input() background!: string;
-  // This property will be null when the SVG uploaded is not a valid.
+  // This property will be null when the SVG uploaded is not valid.
   imageSourceInView: SafeResourceUrl | null = null;
   height = '180px';
   width = '320px';

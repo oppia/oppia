@@ -17,8 +17,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.tests import test_utils
-import feconf
 
 
 class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
@@ -54,31 +54,3 @@ class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
             '/learn/maths/fractions', expected_status_int=302)
         self.assertEqual(
             'http://localhost/math/fractions', response.headers['location'])
-
-
-class OldStewardsRedirectPageTest(test_utils.GenericTestBase):
-    """Test for redirecting the old stewards pages to the volunteer page."""
-
-    def test_nonprofits_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL, expected_status_int=301)
-        self.assertEqual(
-            'http://localhost/volunteer', response.headers['location'])
-
-    def test_parents_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_PARENTS_LANDING_PAGE_URL, expected_status_int=301)
-        self.assertEqual(
-            'http://localhost/volunteer', response.headers['location'])
-
-    def test_teachers_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL, expected_status_int=301)
-        self.assertEqual(
-            'http://localhost/volunteer', response.headers['location'])
-
-    def test_volunteers_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL, expected_status_int=301)
-        self.assertEqual(
-            'http://localhost/volunteer', response.headers['location'])

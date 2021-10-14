@@ -79,7 +79,10 @@ export class MathInteractionsService {
         '" and "' + symbol2 + '".');
     }
     if (
-      errorMessage === 'Cannot read property \'column\' of undefined.') {
+      errorMessage === 'Cannot read property \'column\' of undefined.' ||
+      errorMessage === 'Cannot read properties of undefined ' +
+        '(reading \'column\').'
+    ) {
       let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {
@@ -122,8 +125,11 @@ export class MathInteractionsService {
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
-    } catch (err) {
-      this.warningText = this.cleanErrorMessage(err.message, expressionString);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.warningText = (
+          this.cleanErrorMessage(err.message, expressionString));
+      }
       return false;
     }
     this.warningText = '';

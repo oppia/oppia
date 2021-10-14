@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -53,7 +53,7 @@ class ExplorationRecommendationsModel(
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -88,7 +88,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

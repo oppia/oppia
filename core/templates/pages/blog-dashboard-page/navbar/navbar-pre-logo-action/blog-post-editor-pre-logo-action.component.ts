@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Component for the navbar pre-logo-action
- *  of the story viewer.
+ *  of the blog dashboard.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';

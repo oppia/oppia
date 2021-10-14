@@ -27,8 +27,8 @@ import shutil
 import subprocess
 import sys
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
 from scripts import scripts_test_utils
@@ -36,7 +36,7 @@ from scripts import scripts_test_utils
 import pkg_resources
 
 
-class Distribution(python_utils.OBJECT):
+class Distribution:
     """Mock distribution object containing python library information."""
 
     def __init__(self, library_name, version_string, metadata_dict):
@@ -101,7 +101,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_write(msg):
             self.file_arr.append(msg)
 
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def seek(self, start, stop): # pylint: disable=missing-docstring
                 pass
             def read(self): # pylint: disable=missing-docstring
@@ -109,7 +109,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             def write(self, buf): # pylint: disable=missing-docstring
                 mock_write(buf)
 
-        class MockOpenFile(python_utils.OBJECT):
+        class MockOpenFile:
             def __init__(self, path=None, mode=None):
                 self.path = path
                 self.mode = mode
@@ -131,17 +131,20 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen = self.swap(
             subprocess, 'Popen', mock_check_call)
 
-        class MockErrorProcess(python_utils.OBJECT):
+        class MockErrorProcess:
 
             def __init__(self):
                 self.returncode = 1
 
             def communicate(self):
                 """Return required method."""
-                return b'', b'can\'t combine user with prefix'
+                return '', 'can\'t combine user with prefix'
 
-        def mock_check_call_error(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
+        def mock_check_call_error(cmd_tokens, **kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
+            if kwargs.get('encoding') != 'utf-8':
+                raise AssertionError(
+                    'Popen should have been called with encoding="utf-8"')
             return MockErrorProcess()
 
         self.swap_Popen_error = self.swap(
@@ -286,7 +289,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (u'1.1.0.1', u'1.1.1.0'),
-                u'six': (u'1.15.0', None),
+                u'six': (u'1.16.0', None),
                 u'git-dep1': (
                     self.get_git_version_string('git-dep1', 'a'),
                     self.get_git_version_string('git-dep1', 'b')),
@@ -331,7 +334,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('six', '1.15.0'),
+                    'pip', 'install', '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -348,7 +351,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (u'1.1.1', None),
-                u'six': (u'1.15.0', None),
+                u'six': (u'1.16.0', None),
                 u'simplejson': (None, u'3.16.0'),
                 u'bleach': (u'3.1.4', u'3.1.5'),
                 u'callbacks': (u'0.3.0', u'0.2.0'),
@@ -397,7 +400,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         }
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -447,7 +450,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         }
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -496,7 +499,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'flask-1.1.1.dist-info',
             'flask-10.0.1.dist-info',
             'six',
-            'six-1.15.0.dist-info',
+            'six-1.16.0.dist-info',
             'six-10.13.0.egg-info',
             'google_cloud_datastore-1.15.0.dist-info',
             'google_cloud_datastore-1.13.0.dist-info',
@@ -516,7 +519,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (u'1.1.1', u'10.0.1'),
-                u'six': (u'1.15.0', u'10.13.0'),
+                u'six': (u'1.16.0', u'10.13.0'),
                 u'webencodings': (u'1.1.1', u'1.0.1'),
                 u'google-cloud-datastore': (u'1.15.0', u'1.13.0')
             }
@@ -552,7 +555,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('six', '1.15.0'),
+                    'pip', 'install', '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -591,8 +594,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency-5-0.5.3-py2.7.egg-info',
-                'dependency_6-0.5.3-py2.7.egg-info',
+                'dependency-5-0.5.3-py3.7.egg-info',
+                'dependency_6-0.5.3-py3.7.egg-info',
             ]
 
         def mock_is_dir(unused_path):

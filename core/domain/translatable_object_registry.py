@@ -20,10 +20,9 @@ from __future__ import unicode_literals
 import inspect
 
 from extensions.objects.models import objects
-import python_utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
@@ -39,7 +38,7 @@ class Registry(python_utils.OBJECT):
         # Add new object instances to the registry.
         for name, clazz in inspect.getmembers(
                 objects, predicate=inspect.isclass):
-            if name.startswith('Base'):
+            if name.endswith('_test') or name.startswith('Base'):
                 continue
 
             ancestor_names = [
@@ -48,9 +47,8 @@ class Registry(python_utils.OBJECT):
             # subclasses of BaseTranslatableObject, despite starting with the
             # string 'Translatable'. So we need to do verification based on the
             # class's ancestors.
-            if 'BaseTranslatableObject' not in ancestor_names:
-                continue
-            cls._translatable_objects_dict[clazz.__name__] = clazz
+            if 'BaseTranslatableObject' in ancestor_names:
+                cls._translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_all_class_names(cls):

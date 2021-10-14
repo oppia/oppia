@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -28,9 +28,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { ContentLanguageSelectorComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -41,9 +38,12 @@ import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.c
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
+import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
+import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -55,26 +55,30 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    NgbPopoverModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    ContentLanguageSelectorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
+    LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
-    ContentLanguageSelectorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
+    LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
@@ -88,6 +92,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -98,6 +106,7 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

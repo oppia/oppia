@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
+import importlib
 import inspect
 import io
 import json
@@ -28,24 +30,22 @@ import re
 import sys
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import main
-import python_utils
-import utils
 
 import webapp2
 import webtest
@@ -99,6 +99,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     TEST_EDITOR_USERNAME = 'testeditoruser'
     DELETED_USER_EMAIL = 'deleted.user@example.com'
     DELETED_USER_USERNAME = 'deleteduser'
+    PARTIALLY_LOGGED_IN_USER_EMAIL = 'partial@example.com'
 
     class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
@@ -161,6 +162,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         deleted_user_model.deleted = True
         deleted_user_model.update_timestamps()
         deleted_user_model.put()
+
+        # Create a new user but do not submit their registration form.
+        user_services.create_new_user(
+            self.get_auth_id_from_email(self.PARTIALLY_LOGGED_IN_USER_EMAIL),
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -232,16 +238,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'must-revalidate, no-cache, no-store'
         )
 
-    def test_root_redirect_rules_for_logged_in_learners(self):
-        self.login(self.TEST_LEARNER_EMAIL)
-
-        # Since by default the homepage for all logged in users is the
-        # learner dashboard, going to '/' should redirect to the learner
-        # dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner-dashboard', response.headers['location'])
-        self.logout()
-
     def test_root_redirect_rules_for_deleted_user_prod_mode(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
@@ -253,66 +249,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn('pending-account-deletion', response.headers['location'])
-
-    def test_root_redirect_rules_for_users_with_no_user_contribution_model(
-            self):
-        self.login(self.TEST_LEARNER_EMAIL)
-        # Delete the UserContributionModel.
-        user_id = user_services.get_user_id_from_username(
-            self.TEST_LEARNER_USERNAME)
-        user_contribution_model = user_models.UserContributionsModel.get(
-            user_id)
-        user_contribution_model.delete()
-
-        # Since by default the homepage for all logged in users is the
-        # learner dashboard, going to '/' should redirect to the learner
-        # dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner-dashboard', response.headers['location'])
-        self.logout()
-
-    def test_root_redirect_rules_for_logged_in_creators(self):
-        self.login(self.TEST_CREATOR_EMAIL)
-        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        # Set the default dashboard as creator dashboard.
-        user_services.update_user_default_dashboard(
-            creator_user_id, constants.DASHBOARD_TYPE_CREATOR)
-
-        # Since the default dashboard has been set as creator dashboard, going
-        # to '/' should redirect to the creator dashboard.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('creator-dashboard', response.headers['location'])
-
-    def test_root_redirect_rules_for_logged_in_editors(self):
-        self.login(self.TEST_CREATOR_EMAIL)
-        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.get_user_actions_info(creator_user_id)
-        editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
-        exploration_id = '1_en_test_exploration'
-        self.save_new_valid_exploration(
-            exploration_id, creator_user_id, title='Test',
-            category='Test', language_code='en')
-        rights_manager.assign_role_for_exploration(
-            creator, exploration_id, editor_user_id,
-            rights_domain.ROLE_EDITOR)
-        self.logout()
-        self.login(self.TEST_EDITOR_EMAIL)
-        exp_services.update_exploration(
-            editor_user_id, exploration_id, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'edited title'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'category',
-                'new_value': 'edited category'
-            })], 'Change title and category')
-
-        # Since user has edited one exploration created by another user,
-        # going to '/' should redirect to the dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('dashboard', response.headers['location'])
-        self.logout()
 
     def test_get_with_invalid_return_type_logs_correct_warning(self):
         # Modify the testapp to use the mock handler.
@@ -376,19 +312,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_dev_mode_cannot_be_true_on_production(self):
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['feconf']
         server_software_swap = self.swap(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
-            # This pragma is needed since we are re-importing under
-            # invalid conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import feconf  # pylint: disable-all
+            # This reloads the feconf module so that all the checks in
+            # the module are reexecuted.
+            importlib.reload(feconf)  # pylint: disable-all
 
     def test_frontend_error_handler(self):
         observed_log_messages = []
@@ -409,13 +340,49 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
 
+    def test_no_redirection_for_cron_jobs(self):
+        # Valid URL, where user now has permissions.
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email('admin@example.com')
+        self.get_json('/cron/models/cleanup', expected_status_int=200)
+        self.logout()
+
+        # Valid URL, but user does not have permissions.
+        self.get_json(
+            'https://oppiaserver.appspot.com/cron/models/cleanup',
+            expected_status_int=401)
+
+        # Invalid URL.
+        self.get_html_response(
+            'https://oppiaserver.appspot.com/cron/unknown',
+            expected_status_int=404)
+
     def test_splash_redirect(self):
         # Tests that the old '/splash' URL is redirected to '/'.
         response = self.get_html_response('/splash', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
 
+    def test_partially_logged_in_redirect(self):
+        login_context = self.login_context(
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+
+        with login_context:
+            response = self.get_html_response(
+                '/splash', expected_status_int=302)
+            self.assertEqual(
+                response.location,
+                'http://localhost/logout?redirect_url=/splash')
+
+    def test_no_partially_logged_in_redirect_from_logout(self):
+        login_context = self.login_context(
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+
+        with login_context:
+            response = self.get_html_response(
+                '/logout', expected_status_int=200)
+
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -432,7 +399,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -450,7 +417,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_signup_attempt_on_wrong_page_fails(self):
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -463,7 +430,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ))
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<oppia-splash-page-root></oppia-splash-page-root>',
+                b'<oppia-root></oppia-root>',
                 response.body
             )
 
@@ -490,7 +457,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
-        with python_utils.ExitStack() as context_stack:
+        with contextlib.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()
@@ -517,8 +484,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<oppia-library-page-root>', response.body)
-        self.assertNotIn(b'<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
+        self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_html_response_is_not_rejected_when_user_is_release_coordinator(
@@ -530,8 +497,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<oppia-library-page-root>', response.body)
-        self.assertNotIn(b'<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
+        self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):
@@ -1090,65 +1057,60 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
         }
         num_handlers_checked = 0
         for url in main.URLS:
-            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
-            # are tuples. So, below check is to pick only those which have
-            # a RedirectRoute associated with it.
-            if isinstance(url, main.routes.RedirectRoute):
-                clazz = url.handler
-                num_handlers_checked += 1
-                all_base_classes = [base_class.__name__ for base_class in
-                                    (inspect.getmro(clazz))]
-                # Check that it is a subclass of 'BaseHandler'.
-                if 'BaseHandler' in all_base_classes:
-                    class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
-                    # Check that any class with a get handler has a
-                    # GET_HANDLER_ERROR_RETURN_TYPE that's one of
-                    # the allowed values.
-                    if 'get' in clazz.__dict__.keys():
-                        self.assertIn(
-                            class_return_type,
-                            handler_type_to_name_endings_dict)
-                    class_name = clazz.__name__
-                    # BulkEmailWebhookEndpoint is a unique class, compared to
-                    # others, since it is never called from the frontend, and so
-                    # the error raised here on it - 'Please ensure that the name
-                    # of this class ends with 'Page'' - doesn't apply.
-                    # It is only called from the bulk email provider via a
-                    # webhook to update Oppia's database.
-                    if class_name == 'BulkEmailWebhookEndpoint':
-                        continue
-                    file_name = inspect.getfile(clazz)
-                    line_num = inspect.getsourcelines(clazz)[1]
-                    allowed_class_ending = handler_type_to_name_endings_dict[
-                        class_return_type]
-                    # Check that the name of the class ends with
-                    # the proper word if it has a get function.
-                    if 'get' in clazz.__dict__.keys():
-                        message = (
-                            'Please ensure that the name of this class '
-                            'ends with \'%s\'' % allowed_class_ending)
-                        error_message = (
-                            '%s --> Line %s: %s'
-                            % (file_name, line_num, message))
-                        with self.subTest(class_name):
-                            self.assertTrue(
-                                class_name.endswith(allowed_class_ending),
-                                msg=error_message)
+            clazz = url.handler
+            num_handlers_checked += 1
+            all_base_classes = [
+                base_class.__name__ for base_class in inspect.getmro(clazz)]
 
-                    # Check that the name of the class ends with 'Handler'
-                    # if it does not has a get function.
-                    else:
-                        message = (
-                            'Please ensure that the name of this class '
-                            'ends with \'Handler\'')
-                        error_message = (
-                            '%s --> Line %s: %s'
-                            % (file_name, line_num, message))
-                        with self.subTest(class_name):
-                            self.assertTrue(class_name.endswith('Handler'),
-                                            msg=error_message)
+            # Check that it is a subclass of 'BaseHandler'.
+            if 'BaseHandler' in all_base_classes:
+                class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
+                # Check that any class with a get handler has a
+                # GET_HANDLER_ERROR_RETURN_TYPE that's one of
+                # the allowed values.
+                if 'get' in clazz.__dict__.keys():
+                    self.assertIn(
+                        class_return_type, handler_type_to_name_endings_dict)
+                class_name = clazz.__name__
+                # BulkEmailWebhookEndpoint is a unique class, compared to
+                # others, since it is never called from the frontend, and so
+                # the error raised here on it - 'Please ensure that the name
+                # of this class ends with 'Page'' - doesn't apply.
+                # It is only called from the bulk email provider via a
+                # webhook to update Oppia's database.
+                if class_name == 'BulkEmailWebhookEndpoint':
+                    continue
+                file_name = inspect.getfile(clazz)
+                line_num = inspect.getsourcelines(clazz)[1]
+                allowed_class_ending = (
+                    handler_type_to_name_endings_dict[class_return_type])
+                # Check that the name of the class ends with
+                # the proper word if it has a get function.
+                if 'get' in clazz.__dict__.keys():
+                    message = (
+                        'Please ensure that the name of this class '
+                        'ends with \'%s\'' % allowed_class_ending)
+                    error_message = (
+                        '%s --> Line %s: %s' % (file_name, line_num, message))
+                    with self.subTest(class_name):
+                        self.assertTrue(
+                            class_name.endswith(allowed_class_ending),
+                            msg=error_message)
 
-        self.assertGreater(num_handlers_checked, 150)
+                # Check that the name of the class ends with 'Handler'
+                # if it does not has a get function.
+                else:
+                    message = (
+                        'Please ensure that the name of this class '
+                        'ends with \'Handler\'')
+                    error_message = (
+                        '%s --> Line %s: %s'
+                        % (file_name, line_num, message))
+                    with self.subTest(class_name):
+                        self.assertTrue(
+                            class_name.endswith('Handler'), msg=error_message)
+
+        self.assertGreater(num_handlers_checked, 275)
 
 
 class IframeRestrictionTests(test_utils.GenericTestBase):
@@ -1512,7 +1474,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     default_value_schema = {arg: schema}
 
                     _, errors = payload_validator.validate(
-                        default_value, default_value_schema, True)
+                        default_value,
+                        default_value_schema,
+                        allowed_extra_args=True,
+                        allow_string_to_bool_conversion=False
+                    )
                     if len(errors) == 0:
                         continue
                     self.log_line(
@@ -1711,6 +1677,12 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                         'type': 'basestring'
                     },
                     'default_value': 'random_exp_id'
+                },
+                'apply_draft': {
+                    'schema': {
+                        'type': 'bool'
+                    },
+                    'default_value': False
                 }
             }
         }
@@ -1801,7 +1773,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp3):
-            self.get_json('/mock_play_exploration')
+            self.get_json('/mock_play_exploration?apply_draft=true')
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp4):

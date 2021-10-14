@@ -22,7 +22,7 @@ require(
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require(
-  'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
+  'pages/exploration-player-page/learner-experience/tutor-card.component.ts');
 require(
   'components/question-directives/question-player/' +
     'question-player.component.ts');
@@ -43,11 +43,15 @@ angular.module('oppia').component('skillPreviewTab', {
   template: require('./skill-preview-tab.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$rootScope', '$scope', 'ContextService', 'QuestionBackendApiService',
-    'QuestionPlayerEngineService', 'SkillEditorStateService', 'UrlService',
+    '$rootScope', '$scope', 'ContextService', 'CurrentInteractionService',
+    'ExplorationPlayerStateService',
+    'QuestionBackendApiService', 'QuestionPlayerEngineService',
+    'SkillEditorStateService', 'UrlService',
     function(
-        $rootScope, $scope, ContextService, QuestionBackendApiService,
-        QuestionPlayerEngineService, SkillEditorStateService, UrlService) {
+        $rootScope, $scope, ContextService, CurrentInteractionService,
+        ExplorationPlayerStateService,
+        QuestionBackendApiService, QuestionPlayerEngineService,
+        SkillEditorStateService, UrlService) {
       var ctrl = this;
       var QUESTION_COUNT = 20;
       const INTERACTION_TYPES = {
@@ -71,7 +75,11 @@ angular.module('oppia').component('skillPreviewTab', {
             INTERACTION_TYPES[interaction]);
         }
         ctrl.skill = SkillEditorStateService.getSkill();
-        ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().html;
+        ctrl.htmlData = (
+          ctrl.skill ?
+          ctrl.skill.getConceptCard().getExplanation().html :
+          'loading review material'
+        );
 
         QuestionBackendApiService.fetchQuestionsAsync(
           [ctrl.skillId], QUESTION_COUNT, false).then((response) => {
@@ -85,6 +93,9 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.directiveSubscriptions.add(
           SkillEditorStateService.onSkillChange.subscribe(
             () => $rootScope.$applyAsync()));
+        CurrentInteractionService.setOnSubmitFn(() => {
+          ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+        });
       };
 
       ctrl.initializeQuestionCard = function(card) {

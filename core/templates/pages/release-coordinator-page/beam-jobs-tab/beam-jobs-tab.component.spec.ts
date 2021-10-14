@@ -19,7 +19,7 @@
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
@@ -63,11 +63,12 @@ describe('Beam Jobs Tab Component', () => {
   const beamJobs = [fooJob, barJob, bazJob];
 
   const runningFooJob = (
-    new BeamJobRun('123', 'FooJob', 'RUNNING', [], 0, 0, false));
+    new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false));
   const pendingBarJob = (
-    new BeamJobRun('456', 'BarJob', 'PENDING', [], 0, 0, false));
-  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', [], 0, 0, false);
+    new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false));
+  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
+  const terminalBeamJobRuns = [doneBarJob];
 
   beforeEach(waitForAsync(async() => {
     TestBed.configureTestingModule({
@@ -145,24 +146,30 @@ describe('Beam Jobs Tab Component', () => {
       .toBeObservable(expectedNames, {e: [], n: beamJobs.map(j => j.name)});
     m.expect(component.beamJobRuns)
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
+
+    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
-  it('should return empty array when jobs fail to load', marbles(async(m) => {
+  it('should return empty array when jobs fail to load', marbles(m => {
     const beamJobs = m.hot('^-#', null, new Error('err'));
     const expectedNames = ' e-e';
     spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
 
     fixture.detectChanges();
     m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
+
+    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
-  it('should return empty array when runs fail to load', marbles(async(m) => {
+  it('should return empty array when runs fail to load', marbles(m => {
     const beamJobRuns = m.hot('^-#', null, new Error('err'));
     const expectedRuns = '     e-e';
     spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
 
     fixture.detectChanges();
     m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
+
+    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
   it('should update the table when the job name input changes', async() => {
@@ -187,6 +194,8 @@ describe('Beam Jobs Tab Component', () => {
 
     expect(await autocomplete.getOptions()).toHaveSize(2);
     expect(await table.getRows()).toHaveSize(2);
+
+    component.ngOnDestroy();
   });
 
   it('should deselect a job after changing the input', async() => {
@@ -205,6 +214,8 @@ describe('Beam Jobs Tab Component', () => {
     fixture.detectChanges();
 
     expect(component.selectedJob).toBeNull();
+
+    component.ngOnDestroy();
   });
 
   it('should add a new job after starting a new job run', async() => {
@@ -212,7 +223,7 @@ describe('Beam Jobs Tab Component', () => {
     const input = await loader.getHarness(MatInputHarness);
 
     const newPendingFooJob = (
-      new BeamJobRun('123', 'FooJob', 'PENDING', [], 0, 0, false));
+      new BeamJobRun('123', 'FooJob', 'PENDING', 0, 0, false));
     const startNewJobSpy = spyOn(backendApiService, 'startNewBeamJob')
       .and.returnValue(of(newPendingFooJob));
 
@@ -223,7 +234,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).not.toContain(newPendingFooJob);
 
     const startNewButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'Start New'
+      text: 'play_arrow'
     }));
     await startNewButton.click();
 
@@ -235,9 +246,11 @@ describe('Beam Jobs Tab Component', () => {
     await confirmButton.click();
     await fixture.whenStable();
 
-    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob, []);
+    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
+
+    component.ngOnDestroy();
   });
 
   it('should cancel the job and update its status', async() => {
@@ -245,7 +258,7 @@ describe('Beam Jobs Tab Component', () => {
     const input = await loader.getHarness(MatInputHarness);
 
     const cancellingFooJob = (
-      new BeamJobRun('123', 'FooJob', 'CANCELLED', [], 0, 0, false));
+      new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false));
     const cancelBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
       .and.returnValue(of(cancellingFooJob));
 
@@ -273,6 +286,8 @@ describe('Beam Jobs Tab Component', () => {
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).not.toContain(runningFooJob);
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
+
+    component.ngOnDestroy();
   });
 
   it('should show the job output', async() => {
@@ -300,5 +315,43 @@ describe('Beam Jobs Tab Component', () => {
 
     expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(doneBarJob);
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+
+    component.ngOnDestroy();
   });
+
+  it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
+    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
+      .and.returnValue(of(beamJobRuns));
+
+    fixture.detectChanges();
+
+    // The first time is called by ngOnInit().
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
+
+    tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
+    fixture.detectChanges();
+
+    // The second time is called out by our interval refresh timer.
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
+
+    component.ngOnDestroy();
+  }));
+
+  it('should not refresh beam jobs if all jobs are terminal', fakeAsync(() => {
+    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
+      .and.returnValue(of(terminalBeamJobRuns));
+
+    fixture.detectChanges();
+
+    // The first time is called by ngOnInit().
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
+
+    tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
+    fixture.detectChanges();
+
+    // The second time should not be called out, because all jobs are terminal.
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
+
+    component.ngOnDestroy();
+  }));
 });

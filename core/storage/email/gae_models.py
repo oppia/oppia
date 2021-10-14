@@ -21,21 +21,19 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
-    from mypy_imports import user_models # pylint: disable=unused-import
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -105,7 +103,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since emails were sent
         to them.
         """
@@ -161,7 +159,7 @@ class SentEmailModel(base_models.BaseModel):
         """
         id_prefix = '%s.' % intent
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
@@ -221,7 +219,7 @@ class SentEmailModel(base_models.BaseModel):
             cls,
             email_hash: str,
             sent_datetime_lower_bound: Optional[datetime.datetime] = None
-    ) -> List['SentEmailModel']:
+    ) -> Sequence['SentEmailModel']:
         """Returns all messages with a given email_hash.
 
         This also takes an optional sent_datetime_lower_bound argument,
@@ -256,9 +254,7 @@ class SentEmailModel(base_models.BaseModel):
         if sent_datetime_lower_bound is not None:
             query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
 
-        messages = cast(List[SentEmailModel], query.fetch())
-
-        return messages
+        return query.fetch()
 
     @classmethod
     def _generate_hash(
@@ -369,7 +365,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since the emails were sent
         to them.
         """

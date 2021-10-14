@@ -51,12 +51,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText: string;
   @Input() subheaderText: string;
 
+  url: URL;
   currentLanguageCode: string;
   currentLanguageText: string;
   isModerator: boolean;
   isCurriculumAdmin: boolean;
   isTopicManager: boolean;
   isSuperAdmin: boolean;
+  isBlogAdmin: boolean;
+  isBlogPostEditor: boolean;
   userIsLoggedIn: boolean;
   username: string;
   currentUrl: string;
@@ -130,6 +133,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.getProfileImageDataAsync();
     this.currentUrl =
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
+    this.url = new URL(this.windowRef.nativeWindow.location.toString());
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
@@ -170,8 +174,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.getPreferredSiteLanguageCode()) {
+        // TODO(#14052): Find a better way to structure and encapsulate language
+        // translations related code.
         this.i18nLanguageCodeService.setI18nLanguageCode(
           userInfo.getPreferredSiteLanguageCode());
+
+        // This removes the language parameter from the URL if it is present,
+        // since, when the user is logged in and has a preferred site language,
+        // we always choose the language code based on their preferred site
+        // language to load the webpage, overriding the URL language parameter.
+        this.removeUrlLangParam();
       }
       this.currentLanguageCode = (
         this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
@@ -184,6 +196,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
+      this.isBlogAdmin = userInfo.isBlogAdmin();
+      this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.username = userInfo.getUsername();
       if (this.username) {
@@ -228,6 +242,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         (code) => {
           if (this.currentLanguageCode !== code) {
             this.currentLanguageCode = code;
+            this.supportedSiteLanguages.forEach(element => {
+              if (element.id === this.currentLanguageCode) {
+                this.currentLanguageText = element.text;
+              }
+            });
             this.changeDetectorRef.detectChanges();
           }
         })
@@ -259,6 +278,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           this.currentLanguageCode);
       }
     });
+    // When user changes site language, it will override the lang parameter in
+    // the URL and render it invalid, so we remove it (if it's present) to avoid
+    // confusion.
+    this.removeUrlLangParam();
+  }
+
+  removeUrlLangParam(): void {
+    if (this.url.searchParams.has('lang')) {
+      this.url.searchParams.delete('lang');
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', this.url.toString());
+    }
   }
 
   onLoginButtonClicked(): void {

@@ -19,12 +19,12 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import skill_domain
 from core.domain import state_domain
 from core.tests import test_utils
-import feconf
-import utils
 
 
 class SkillDomainUnitTests(test_utils.GenericTestBase):
@@ -223,7 +223,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
 
-        self.skill.misconceptions_schema_version = 4
+        self.skill.misconceptions_schema_version = 5
         self.skill.rubric_schema_version = 100
         self._assert_validation_error(
             'Expected rubric schema version to be %s' %

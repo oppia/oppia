@@ -21,14 +21,13 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
 from core.domain import taskqueue_services
 from core.platform.taskqueue import dev_mode_taskqueue_services
 from core.tests import test_utils
-import feconf
 
 import requests
-
-from typing import Any, Dict, Optional # isort:skip
+from typing import Any, Dict, Optional
 
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):

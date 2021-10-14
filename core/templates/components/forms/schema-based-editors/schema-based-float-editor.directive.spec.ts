@@ -58,11 +58,18 @@ describe('Schema Based Float Editor Directive', () => {
   }));
 
   it('should set directive properties on initialization', () => {
+    ctrl.uiConfig = () => {
+      return {
+        checkRequireNonnegativeInput: false
+      };
+    };
+
     expect(ctrl.hasLoaded).toBe(undefined);
     expect(ctrl.isUserCurrentlyTyping).toBe(undefined);
     expect(ctrl.hasFocusedAtLeastOnce).toBe(undefined);
     expect(ctrl.errorString).toBe(undefined);
     expect(ctrl.localValue).toBe(undefined);
+    expect(ctrl.checkRequireNonnegativeInputValue).toBe(undefined);
 
     ctrl.$onInit();
     $timeout.flush(50);
@@ -72,6 +79,8 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.hasFocusedAtLeastOnce).toBe(false);
     expect(ctrl.errorString).toBe('');
     expect(ctrl.localValue).toBe(0.0);
+    expect(ctrl.checkRequireNonnegativeInputValue).toBe(false);
+    expect(ctrl.uiConfig().checkRequireNonnegativeInput).toBe(false);
   });
 
   it('should validate float value', () => {

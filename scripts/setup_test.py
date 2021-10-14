@@ -25,9 +25,8 @@ import subprocess
 import sys
 import tarfile
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import clean
 from . import common
@@ -39,7 +38,7 @@ TEST_DATA_DIR = os.path.join('core', 'tests', 'data', '')
 MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common.YARN_VERSION)
 
 
-class MockCD(python_utils.OBJECT):
+class MockCD:
     """Mock for context manager for changing the current working directory."""
 
     def __init__(self, unused_new_path):
@@ -465,6 +464,16 @@ class SetupTests(test_utils.GenericTestBase):
                 with self.get_swap, isfile_swap:
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
+
+    def test_chrome_bin_setup_with_brave_browser(self):
+        def mock_isfile(path):
+            return path == '/usr/bin/brave'
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/brave')
 
     def test_chrome_bin_setup_with_chromium_browser(self):
         def mock_isfile(path):

@@ -11,7 +11,7 @@
             </a>
           </li>
           <li>
-            <a href="http://oppiafoundation.org/"
+            <a href="/about-foundation"
                [innerHTML]="'I18N_FOOTER_OPPIA_FOUNDATION' | translate">
             </a>
           </li>
@@ -52,6 +52,7 @@
           </li>
           <li>
             <a href="/community-library"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
                [innerHTML]="'I18N_FOOTER_BROWSE_LIBRARY' | translate">
             </a>
           </li>
@@ -67,7 +68,8 @@
         <h3 [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
-            <a href="https://oppiafoundation.org/volunteer"
+            <a href="/volunteer"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                [innerHTML]="'I18N_HEADING_VOLUNTEER' | translate">
             </a>
           </li>

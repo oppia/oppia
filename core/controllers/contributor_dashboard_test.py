@@ -17,21 +17,23 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -73,40 +75,24 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
-        topic_id = '0'
+        self.topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic', 'abbrev', 'description')
-        topic.thumbnail_filename = 'thumbnail.svg'
-        topic.thumbnail_bg_color = '#C6DCDA'
-        topic.subtopics = [
-            topic_domain.Subtopic(
-                1, 'Title', ['skill_id_3'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-three')]
-        topic.next_subtopic_id = 2
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(topic_id, self.admin_id)
-
+            self.topic_id, 'topic', 'abbrev', 'description')
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
-        self.skill_ids = [self.skill_id_0, self.skill_id_1]
-        for skill_id in self.skill_ids:
-            self.save_new_skill(
-                skill_id, self.admin_id, description='skill_description')
-            topic_services.add_uncategorized_skill(
-                self.admin_id, topic_id, skill_id)
+        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
 
         # Add skill opportunity topic to a classroom.
         config_services.set_property(
             self.admin_id, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math-one',
-                'topic_ids': [topic_id],
+                'topic_ids': [self.topic_id],
                 'course_details': '',
                 'topic_list_intro': ''
             }])
@@ -130,7 +116,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -163,7 +149,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 0',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
 
         self.expected_opportunity_dict_2 = {
@@ -172,7 +159,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 1',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
@@ -220,6 +208,19 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 
+    def test_get_skill_opportunity_data_does_not_throw_for_deleted_topics(self):
+        topic_services.delete_topic(self.admin_id, self.topic_id)
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={})
+
+        self.assertEqual(
+            response['opportunities'], [])
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
+
     def test_get_translation_opportunity_data(self):
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
@@ -256,7 +257,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'],
                 [self.expected_skill_opportunity_dict_0])
-            self.assertFalse(response['more'])
+            self.assertTrue(response['more'])
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -273,6 +274,74 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(
                 isinstance(
                     next_response['next_cursor'], python_utils.BASESTRING))
+
+    def test_get_skill_opportunity_data_pagination_multiple_fetches(self):
+        # Unassign topic 0 from the classroom.
+        config_services.revert_property(
+            self.admin_id, 'classroom_pages_data')
+
+        # Create a new topic.
+        topic_id = '1'
+        topic_name = 'topic1'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, 'url-fragment', 'description')
+        skill_id_2 = 'skill_id_2'
+        skill_id_3 = 'skill_id_3'
+        skill_id_4 = 'skill_id_4'
+        skill_id_5 = 'skill_id_5'
+        self._publish_valid_topic(
+            topic, [skill_id_2, skill_id_3, skill_id_4, skill_id_5])
+
+        # Add new topic to a classroom.
+        config_services.set_property(
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math-one',
+                'topic_ids': [topic_id],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
+
+        # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
+        # fetched first. Since skill_id_0, skill_id_1 are not linked to a
+        # classroom, another fetch will be made to retrieve skill_id_3,
+        # skill_id_4, skill_id_5 to fulfill the page size.
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
+            response = self.get_json(
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={})
+            self.assertEqual(len(response['opportunities']), 4)
+            self.assertEqual(
+                response['opportunities'],
+                [
+                    {
+                        'id': skill_id_2,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    },
+                    {
+                        'id': skill_id_3,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    },
+                    {
+                        'id': skill_id_4,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    },
+                    {
+                        'id': skill_id_5,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name
+                    }
+                ])
+            self.assertFalse(response['more'])
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -360,6 +429,44 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
                 expected_status_int=404)
 
+    def _publish_valid_topic(self, topic, uncategorized_skill_ids):
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        subtopic_id = 1
+        subtopic_skill_id = 'subtopic_skill_id' + topic.id
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic.id))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+        for skill_id in uncategorized_skill_ids:
+            self.save_new_skill(
+                skill_id, self.admin_id, description='skill_description')
+            topic_services.add_uncategorized_skill(
+                self.admin_id, topic.id, skill_id)
+
 
 class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
@@ -381,7 +488,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -405,7 +512,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'

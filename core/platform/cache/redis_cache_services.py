@@ -19,13 +19,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
 from core.domain import caching_domain
-import feconf
-import python_utils
 
 import redis
-
-from typing import Dict, List, Optional, cast # isort:skip
+from typing import Dict, List, Optional, cast
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(

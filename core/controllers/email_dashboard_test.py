@@ -17,11 +17,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import user_query_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models, email_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.email])
@@ -100,7 +100,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_fewer_than_n_exps': 'None',
                     'edited_at_least_n_exps': None,
                     'created_collection': True,
-                    'used_logic_proof_interaction': False,
                     'fake_key': 2
                 }}, csrf_token=csrf_token, expected_status_int=400)
 
@@ -118,7 +117,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
                     'created_collection': True,
-                    'used_logic_proof_interaction': False,
                 }}, csrf_token=csrf_token)
 
         self.logout()

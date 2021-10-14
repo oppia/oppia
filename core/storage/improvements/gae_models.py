@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -143,15 +143,13 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        task_entry_models = cast(
-            List[TaskEntryModel],
-            cls.query(cls.resolver_id == user_id).fetch()
-        )
-        cls.delete_multi(task_entry_models)
+        task_entry_keys = (
+            cls.query(cls.resolver_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(task_entry_keys)
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users resolve tasks.
         """

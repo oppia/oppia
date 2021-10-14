@@ -23,7 +23,9 @@ import datetime
 import json
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
@@ -33,10 +35,8 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
-import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -158,7 +158,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
 
     def test_email_sent_on_failed_job(self):
 
-        class FakeTrainingJob(python_utils.OBJECT):
+        class FakeTrainingJob:
             """Fake training class to invoke failed job functions."""
 
             def __init__(self):
@@ -392,12 +392,24 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': new_exp.init_state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'NumericInput'
-        })]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': new_exp.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'NumericInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': new_exp.init_state_name,
+                'new_value': {
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                }
+            })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(

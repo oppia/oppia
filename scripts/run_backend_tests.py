@@ -50,6 +50,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import contextlib
 import importlib
 import inspect
 import json
@@ -62,13 +63,12 @@ import threading
 import time
 import unittest
 
-
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -161,7 +161,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TestingTaskSpec(python_utils.OBJECT):
+class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):
@@ -345,7 +345,7 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_cloud_datastore_emulator())
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
@@ -399,11 +399,6 @@ def main(args=None):
             concurrent_task_utils.execute_tasks(tasks, semaphore)
         except Exception:
             task_execution_failed = True
-
-        for task in tasks:
-            if task.exception:
-                concurrent_task_utils.log(
-                    python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
@@ -501,13 +496,13 @@ def main(args=None):
             [sys.executable, COVERAGE_MODULE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing'],
-            stdout=subprocess.PIPE)
+            stdout=subprocess.PIPE, encoding='utf-8')
 
         report_stdout, _ = process.communicate()
         python_utils.PRINT(report_stdout)
 
         coverage_result = re.search(
-            rb'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
         if (coverage_result.group('total') != '100'
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')

@@ -39,8 +39,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val) => {}
+      replace: (val: string) => {}
     },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -85,6 +86,8 @@ describe('CreateActivityButtonComponent', () => {
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
@@ -110,6 +113,8 @@ describe('CreateActivityButtonComponent', () => {
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
     isQuestionAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     canCreateCollections: () => false,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',

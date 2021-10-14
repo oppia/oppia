@@ -30,17 +30,17 @@ import json
 import re
 import string
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -68,7 +68,8 @@ STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
 # Deprecated state properties.
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
-    'content_ids_to_audio_translations')  # Deprecated in state schema v27.
+    # Deprecated in state schema v27.
+    'content_ids_to_audio_translations')
 
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
@@ -96,6 +97,10 @@ DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
 # 'data_format', 'content_html' and 'translation_html' parameters.
 CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
+# This takes additional 'content_id', 'language_code' and 'state_name'
+# parameters.
+CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
+    'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
 CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
     'mark_written_translations_as_needing_update')
@@ -303,6 +308,15 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
+        'name': CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+        'required_attribute_names': [
+            'content_id',
+            'language_code',
+            'state_name'
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
         'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
         'required_attribute_names': ['content_id', 'state_name'],
         'optional_attribute_names': [],
@@ -342,7 +356,7 @@ class ExplorationChange(change_domain.BaseChange):
         'delete_gadget', 'rename_gadget']
 
 
-class ExplorationCommitLogEntry(python_utils.OBJECT):
+class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
     def __init__(
@@ -410,7 +424,7 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
         }
 
 
-class ExpVersionReference(python_utils.OBJECT):
+class ExpVersionReference:
     """Value object representing an exploration ID and a version number."""
 
     def __init__(self, exp_id, version):
@@ -451,7 +465,7 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected version to be an int, received %s' % self.version)
 
 
-class ExplorationVersionsDiff(python_utils.OBJECT):
+class ExplorationVersionsDiff:
     """Domain object for the difference between two versions of an Oppia
     exploration.
 
@@ -516,7 +530,7 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         }
 
 
-class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
+class VersionedExplorationInteractionIdsMapping:
     """Domain object representing the mapping of state names to interaction ids
     in an exploration.
     """
@@ -534,7 +548,7 @@ class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration(python_utils.OBJECT):
+class Exploration:
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -1873,33 +1887,37 @@ class Exploration(python_utils.OBJECT):
 
         for state_dict in states_dict.values():
             list_of_subtitled_unicode_content_ids = []
-            customisation_args = (
-                state_domain.InteractionInstance
-                .convert_customization_args_dict_to_customization_args(
-                    state_dict['interaction']['id'],
-                    state_dict['interaction']['customization_args']))
-            for ca_name in customisation_args:
-                list_of_subtitled_unicode_content_ids.extend(
-                    state_domain.InteractionCustomizationArg
-                    .traverse_by_schema_and_get(
-                        customisation_args[ca_name].schema,
-                        customisation_args[ca_name].value,
-                        [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
-                        lambda subtitled_unicode: subtitled_unicode.content_id
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                customisation_args = (
+                    state_domain.InteractionInstance
+                    .convert_customization_args_dict_to_customization_args(
+                        state_dict['interaction']['id'],
+                        state_dict['interaction']['customization_args']))
+                for ca_name in customisation_args:
+                    list_of_subtitled_unicode_content_ids.extend(
+                        state_domain.InteractionCustomizationArg
+                        .traverse_by_schema_and_get(
+                            customisation_args[ca_name].schema,
+                            customisation_args[ca_name].value,
+                            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                            lambda subtitled_unicode:
+                            subtitled_unicode.content_id
+                        )
                     )
-                )
-            translations_mapping = (
-                state_dict['written_translations']['translations_mapping'])
-            for content_id in translations_mapping:
-                if content_id in list_of_subtitled_unicode_content_ids:
-                    for language_code in translations_mapping[content_id]:
-                        written_translation = (
-                            translations_mapping[content_id][language_code])
-                        written_translation['data_format'] = (
-                            schema_utils.SCHEMA_TYPE_UNICODE)
-                        written_translation['translation'] = (
-                            html_cleaner.strip_html_tags(
-                                written_translation['translation']))
+                translations_mapping = (
+                    state_dict['written_translations']['translations_mapping'])
+                for content_id in translations_mapping:
+                    if content_id in list_of_subtitled_unicode_content_ids:
+                        for language_code in translations_mapping[content_id]:
+                            written_translation = (
+                                translations_mapping[content_id][language_code])
+                            written_translation['data_format'] = (
+                                schema_utils.SCHEMA_TYPE_UNICODE)
+                            written_translation['translation'] = (
+                                html_cleaner.strip_html_tags(
+                                    written_translation['translation']))
         return states_dict
 
     @classmethod
@@ -1918,9 +1936,64 @@ class Exploration(python_utils.OBJECT):
         """
 
         for state_dict in states_dict.values():
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service
+                    .convert_svg_diagram_tags_to_image_tags)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
+        """Converts from version 47 to 48. Version 48 fixes encoding issues in
+        HTML fields.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service.fix_incorrectly_encoded_chars)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
+        """Converts from version 48 to 49. Version 49 adds
+        requireNonnegativeInput customization arg to NumericInput
+        interaction which allows creators to set input should be greater
+        than or equal to zero.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'NumericInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                })
+
         return states_dict
 
     @classmethod
@@ -1960,7 +2033,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 52
+    CURRENT_EXP_SCHEMA_VERSION = 54
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2100,6 +2173,50 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
+        """Converts a v52 exploration dict into a v53 exploration dict.
+        Version 53 fixes encoding issues in HTML fields.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v51.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v52.
+        """
+
+        exploration_dict['schema_version'] = 53
+
+        exploration_dict['states'] = cls._convert_states_v47_dict_to_v48_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 48
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v53_dict_to_v54_dict(cls, exploration_dict):
+        """Converts a v53 exploration dict into a v54 exploration dict.
+        Adds a new customization arg to NumericInput interaction
+        which allows creators to set input greator than or equal to zero.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v53.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v54.
+        """
+        exploration_dict['schema_version'] = 54
+
+        exploration_dict['states'] = cls._convert_states_v48_dict_to_v49_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 49
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2164,6 +2281,16 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v51_dict_to_v52_dict(
                 exploration_dict)
             exploration_schema_version = 52
+
+        if exploration_schema_version == 52:
+            exploration_dict = cls._convert_v52_dict_to_v53_dict(
+                exploration_dict)
+            exploration_schema_version = 53
+
+        if exploration_schema_version == 53:
+            exploration_dict = cls._convert_v53_dict_to_v54_dict(
+                exploration_dict)
+            exploration_schema_version = 54
 
         return exploration_dict
 
@@ -2338,7 +2465,7 @@ class Exploration(python_utils.OBJECT):
         return html_list
 
 
-class ExplorationSummary(python_utils.OBJECT):
+class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
@@ -2348,7 +2475,7 @@ class ExplorationSummary(python_utils.OBJECT):
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
-            first_published_msec):
+            first_published_msec, deleted=False):
         """Initializes a ExplorationSummary domain object.
 
         Args:
@@ -2386,6 +2513,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 when the exploration model was last updated.
             first_published_msec: int. Time in milliseconds since the Epoch,
                 when the exploration was first published.
+            deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id
         self.title = title
@@ -2407,6 +2535,7 @@ class ExplorationSummary(python_utils.OBJECT):
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
+        self.deleted = deleted
 
     def validate(self):
         """Validates various properties of the ExplorationSummary.
@@ -2623,7 +2752,7 @@ class ExplorationSummary(python_utils.OBJECT):
         self.contributor_ids = list(self.contributors_summary.keys())
 
 
-class ExplorationChangeMergeVerifier(python_utils.OBJECT):
+class ExplorationChangeMergeVerifier:
     """Class to check for mergeability.
 
     Attributes:
@@ -3012,6 +3141,8 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                     change_is_mergeable = True
                 if not self.changed_properties[state_name]:
                     change_is_mergeable = True
+            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE:
+                change_is_mergeable = True
             elif change.cmd == CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE:
                 change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:

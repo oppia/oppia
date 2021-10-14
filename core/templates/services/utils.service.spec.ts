@@ -159,24 +159,52 @@ describe('Utils Service', () => {
   });
 
   it('should determine when an element is overflowing', () => {
-    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', [''], {
+    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', [], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 500, scrollHeight: 300,
     });
     expect(uts.isOverflowing(elWithHorizontalOverflow)).toBeTrue();
 
-    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', [''], {
+    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', [], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 600,
     });
     expect(uts.isOverflowing(elWithVerticalOverflow)).toBeTrue();
 
-    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', [''], {
+    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', [], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 300,
     });
     expect(uts.isOverflowing(elWithoutOverflow)).toBeFalse();
 
     expect(uts.isOverflowing(null)).toBeFalse();
+  });
+
+  describe('getting safe return URLs', () => {
+    // An array of (inputUrl, expectedUrl) tuples.
+    const testCases: [string, string][] = [
+      ['javascript:alert(0)', '/'],
+      ['data:text/html,<script>alert(0)</script>', '/'],
+      ['>\'>"><img src=x onerror=alert(0)>', '/'],
+      ['https://evil.com', '/'],
+      ['evil.com', '/'],
+      ['//evil.com', '/'],
+      ['///', '/'],
+      ['%', '/'],
+      ['a', '/'],
+      ['/', '/'],
+      ['/learner-dashboard', '/learner-dashboard'],
+    ];
+
+    for (const [inputUrl, expectedUrl] of testCases) {
+      it('should return ' + expectedUrl + ' from ' + inputUrl, () => {
+        expect(uts.getSafeReturnUrl(inputUrl)).toEqual(expectedUrl);
+      });
+
+      const encodedInputUrl = encodeURIComponent(inputUrl);
+      it('should return ' + expectedUrl + ' from ' + encodedInputUrl, () => {
+        expect(uts.getSafeReturnUrl(encodedInputUrl)).toEqual(expectedUrl);
+      });
+    }
   });
 });

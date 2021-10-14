@@ -86,8 +86,7 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
-  // 'topicSummaryDicts' is null if no summary is provided for a topic.
-  topicSummaries: CreatorTopicSummary[] | null;
+  topicSummaries: CreatorTopicSummary[];
 }
 
 @Injectable({
@@ -175,7 +174,7 @@ export class CreatorDashboardBackendApiService {
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
               topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
-                topicSummaryDict))) : null)
+                topicSummaryDict))) : [])
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
@@ -184,6 +183,12 @@ export class CreatorDashboardBackendApiService {
 
   async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardDataAsync();
+  }
+
+  async postExplorationViewAsync(newViewType: string): Promise<void> {
+    return this.http.post<void>('/creatordashboardhandler/data', {
+      display_preference: newViewType
+    }).toPromise();
   }
 }
 

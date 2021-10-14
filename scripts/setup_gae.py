@@ -23,7 +23,7 @@ import subprocess
 import sys
 import tarfile
 
-import python_utils
+from core import python_utils
 
 from . import common
 
@@ -59,8 +59,8 @@ def main(args=None):
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding
-            # lines (GAE_DIR and GCLOUD_PATH) in release_constants.json should
-            # also be updated.
+            # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
+            # should also be updated.
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',

@@ -35,7 +35,6 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 export class DisplayHintModalComponent {
   index: number;
   COMPONENT_NAME_HINT: string;
-  isHint: boolean = true;
   hint: SubtitledHtml;
   displayedCard: StateCard;
   recordedVoiceovers: RecordedVoiceovers;

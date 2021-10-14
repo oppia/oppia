@@ -17,14 +17,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
+from core.constants import constants
 from core.tests import test_utils
 
 
 class OppiaRootPageTests(test_utils.GenericTestBase):
 
-    def test_oppia_root_page(self):
-        # type: () -> None
+    def test_oppia_root_page(self) -> None:
         """Tests access to the unified entry page."""
         for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
             if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:

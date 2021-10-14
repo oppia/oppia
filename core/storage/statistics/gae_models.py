@@ -23,12 +23,12 @@ import datetime
 import json
 import sys
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-from typing import Any, Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -130,7 +130,7 @@ class StateCounterModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -208,7 +208,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -284,7 +284,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -358,7 +358,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -494,7 +494,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -646,7 +646,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -792,7 +792,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -890,7 +890,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1019,7 +1019,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1096,7 +1096,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1176,7 +1176,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1369,7 +1369,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1472,7 +1472,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """All playthrough issue data is anonymized and contains no data
         directly corresponding to users. For specifics on the data included in
         this model, see:
@@ -1519,7 +1519,7 @@ class PlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """All playthrough data is anonymized and contains no data directly
         corresponding to users. For specifics on the data included in this
         model, see:
@@ -1543,7 +1543,7 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
@@ -1771,7 +1771,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1878,18 +1878,16 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             list(str). List of versions corresponding to annotation models
             with given exp_id.
         """
-        return [
-            annotations.version for annotations in
-            cast(
-                List[ExplorationAnnotationsModel],
-                cls.get_all().filter(
-                    cls.exploration_id == exploration_id
-                ).fetch(feconf.DEFAULT_QUERY_LIMIT))
-        ]
+        annotations_result: Sequence[ExplorationAnnotationsModel] = (
+            cls.get_all().filter(
+                cls.exploration_id == exploration_id
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+        return [annotations.version for annotations in annotations_result]
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2057,11 +2055,10 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in python_utils.RANGE(
+                    for shard_id in range(
                         1, main_shard.shard_count + 1)]
                 all_models += cast(
-                    List[StateAnswersModel],
-                    cls.get_multi(shard_ids))
+                    List[StateAnswersModel], cls.get_multi(shard_ids))
             return all_models
         else:
             return None
@@ -2138,7 +2135,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in python_utils.RANGE(1, len(sharded_answer_lists)):
+        for i in range(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
@@ -2300,7 +2297,7 @@ class StateAnswersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2354,7 +2351,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

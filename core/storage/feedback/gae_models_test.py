@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 
 import types
 
+from core import feconf
+from core import utils
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -64,7 +64,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(FeedbackThreadModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(FeedbackThreadModelTest, self).setUp()
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
@@ -273,7 +273,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         test_export_text = 'Export test text.'
         test_export_received_via_email = False
 
-        self.signup('export_author_1@example.com', 'exportAuthor1') # type: ignore[no-untyped-call]
+        self.signup('export_author_1@example.com', 'exportAuthor1')
         test_export_author_id = (
             self.get_user_id_from_email('export_author_1@example.com')) # type: ignore[no-untyped-call]
 
@@ -332,7 +332,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     MESSAGE_IDS_READ_IN_THREAD_C = [5, 6, 7, 8, 9]
 
     def setUp(self) -> None:
-        super(FeedbackThreadUserModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(FeedbackThreadUserModelTest, self).setUp()
         model = feedback_models.GeneralFeedbackThreadUserModel.create(
             self.USER_ID_A, self.THREAD_ID_A)
         model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_A

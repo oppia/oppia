@@ -40,6 +40,9 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     var _UPDATE_TRANSLATION_HANDLER_URL = (
       '/updatetranslationsuggestionhandler/<suggestion_id>'
     );
+    var _UPDATE_QUESTION_HANDLER_URL = (
+      '/updatequestionsuggestionhandler/<suggestion_id>'
+    );
 
     var _fetchSuggestionsAsync = async function(url) {
       return $http.get(url).then(function(res) {
@@ -132,6 +135,35 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return $http.put(url, {
           translation_html: translationHtml
+        }).then(function() {
+          onSuccess(suggestionId);
+        }, () => onFailure && onFailure(suggestionId));
+      },
+      updateQuestionSuggestionAsync: async function(
+          suggestionId, skillDifficulty, questionStateData, imagesData,
+          onSuccess, onFailure) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _UPDATE_QUESTION_HANDLER_URL, {
+            suggestion_id: suggestionId
+          });
+        const payload = {
+          skill_difficulty: skillDifficulty,
+          question_state_data: questionStateData
+        };
+        const body = new FormData();
+        body.append('payload', JSON.stringify(payload));
+        imagesData.forEach(obj => {
+          if (obj.imageBlob !== null) {
+            body.append(obj.filename, obj.imageBlob);
+          }
+        });
+        return $http({
+          method: 'POST',
+          url,
+          data: body,
+          headers: {
+            'Content-Type': undefined
+          },
         }).then(function() {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));

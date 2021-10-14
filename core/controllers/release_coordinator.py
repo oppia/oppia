@@ -17,19 +17,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
-import feconf
-
-
-class ReleaseCoordinatorPage(base.BaseHandler):
-    """Handler for the release cordinator page."""
-
-    @acl_decorators.can_access_release_coordinator_page
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('release-coordinator-page.mainpage.html')
 
 
 class MemoryCacheHandler(base.BaseHandler):

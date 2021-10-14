@@ -25,7 +25,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
@@ -63,13 +63,14 @@ import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/lea
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
-import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thumbnail-uploader.component';
 import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edit-thumbnail-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { ProgressNavComponent } from 'pages/exploration-player-page/layout-directives/progress-nav.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
@@ -82,6 +83,12 @@ import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-so
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
+import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
+import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
+import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
+import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 
 
 // Pipes.
@@ -113,6 +120,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     NgBootstrapModule,
     DynamicContentModule,
     FormsModule,
+    ReactiveFormsModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -136,6 +144,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -143,6 +152,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FilteredChoicesFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
@@ -151,14 +161,17 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    ProgressNavComponent,
     QuestionDifficultySelectorComponent,
-    SelectSkillModalComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
+    SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -171,10 +184,12 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     WrapTextWithEllipsisPipe,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TruncateAndCapitalizePipe,
+    TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     UploadActivityModalComponent,
@@ -189,10 +204,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FilteredChoicesFieldComponent,
+    MultiSelectionFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
@@ -214,14 +232,18 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    ProgressNavComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     ThumbnailDisplayComponent,
+    TutorCardComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     UploadActivityModalComponent,
@@ -251,6 +273,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -258,18 +281,23 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    MultiSelectionFieldComponent,
+    FilteredChoicesFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
+    ProfileLinkImageComponent,
     PreviewThumbnailComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeFeedbackEditorComponent,
+    ProgressNavComponent,
     SearchBarComponent,
     QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
@@ -279,11 +307,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SupplementalCardComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TutorCardComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,

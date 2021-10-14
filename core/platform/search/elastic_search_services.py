@@ -21,12 +21,12 @@ API.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
 
 import elasticsearch
 
-from typing import Any, Dict, List, Optional, Tuple, Union # isort:skip
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
@@ -39,6 +39,12 @@ ES = elasticsearch.Elasticsearch(
     http_auth=(
         (feconf.ES_USERNAME, feconf.ES_PASSWORD)
         if feconf.ES_CLOUD_ID else None), timeout=30)
+
+
+class SearchException(Exception):
+    """Exception used when some search operation is unsuccessful."""
+
+    pass
 
 
 def _create_index(index_name: str) -> None:
@@ -73,7 +79,7 @@ def add_documents_to_index(
         index_name: str. The name of the index to insert the document into.
 
     Raises:
-        Exception. A document cannot be added to the index.
+        SearchException. A document cannot be added to the index.
     """
     assert isinstance(index_name, python_utils.BASESTRING)
 
@@ -88,8 +94,7 @@ def add_documents_to_index(
             response = ES.index(index_name, document, id=document['id'])
 
         if response is None or response['_shards']['failed'] > 0:
-            raise Exception(
-                'Failed to add document to index.')
+            raise SearchException('Failed to add document to index.')
 
 
 def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:

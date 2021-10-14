@@ -22,15 +22,15 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-from typing import Any, Dict, List, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -66,10 +66,8 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
-        saved_exploration = cast(
-            exp_models.ExplorationModel,
-            exp_models.ExplorationModel.get_all().fetch(limit=1)[0]
-        )
+        saved_exploration: exp_models.ExplorationModel = (
+            exp_models.ExplorationModel.get_all().fetch(limit=1)[0])
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
@@ -150,11 +148,16 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
     EXPLORATION_ID_4 = '4'
-    USER_ID_1 = 'id_1'  # Related to all three explorations
-    USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
-    USER_ID_3 = 'id_3'  # Related to no explorations
-    USER_ID_4 = 'id_4'  # Related to one collection and then removed from it
-    USER_ID_COMMITTER = 'id_5'  # User id used in commits
+    # Related to all three explorations.
+    USER_ID_1 = 'id_1'
+    # Related to a subset of the three explorations.
+    USER_ID_2 = 'id_2'
+    # Related to no explorations.
+    USER_ID_3 = 'id_3'
+    # Related to one collection and then removed from it.
+    USER_ID_4 = 'id_4'
+    # User id used in commits.
+    USER_ID_COMMITTER = 'id_5'
     USER_ID_4_OLD = 'id_4_old'
     USER_ID_4_NEW = 'id_4_new'
     USER_ID_5_OLD = 'id_5_old'
@@ -163,7 +166,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_NEW = 'id_6_new'
 
     def setUp(self) -> None:
-        super(ExplorationRightsModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExplorationRightsModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -378,10 +381,11 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
     USER_ID_3 = 'id_3'
-    USER_ID_COMMITTER = 'id_4'  # User id used in commits
+    # User id used in commits.
+    USER_ID_COMMITTER = 'id_4'
 
     def setUp(self) -> None:
-        super(ExplorationRightsModelRevertUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExplorationRightsModelRevertUnitTest, self).setUp()
         self.exploration_model = exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -618,7 +622,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_NEW = 'id_3_new'
 
     def setUp(self) -> None:
-        super(ExpSummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExpSummaryModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',

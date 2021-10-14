@@ -25,13 +25,12 @@ import shutil
 import subprocess
 import sys
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 import pkg_resources
 
 from . import common
-
 
 # This is the version that is set in install_prerequisites.sh.
 OPPIA_REQUIRED_PIP_VERSION = '21.2.3'
@@ -396,8 +395,6 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
-    # TODO(#11474): The '-py2.7' suffix might be used in some metadata directory
-    # names, this will need to be changed after the Python 3 migration.
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
@@ -413,12 +410,7 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s-py3.7.egg-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s-py3.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
-        normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (library_name, version_string)),
-        normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
+                library_name.replace('-', '_'), version_string))
     }
 
 
@@ -477,17 +469,17 @@ def _run_pip_command(cmd_parts):
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
     process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        encoding='utf-8')
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-    elif b'can\'t combine user with prefix' in stderr:
+    elif 'can\'t combine user with prefix' in stderr:
         python_utils.PRINT('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
     else:
-        # Error output is in bytes, we need to decode the line to print it.
-        python_utils.PRINT(stderr.decode('utf-8'))
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
