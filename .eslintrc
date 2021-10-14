@@ -116,11 +116,6 @@
         "core/tests/protractor_utils/*.js",
         "core/tests/protractor_desktop/*.js"
       ],
-      "excludedFiles": [
-        "CreatorDashboardPage.js",
-        "LibraryPage.js",
-        "ProfilePage.js"
-      ],
       "rules": {
         "oppia/protractor-practices": "error"
       }
