@@ -324,7 +324,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             feconf.PREFERENCES_DATA_URL,
             payload=None,
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('Missing key in handler args: update_type.',
+        self.assertIn(
+            'Missing key in handler args: update_type.',
         response_dict['error'])
         self.logout()
 
