@@ -47,7 +47,7 @@ def validate_change(obj):
         question_domain.QuestionChange(obj)
     else:
         raise base.BaseHandler.InvalidInputException(
-            '%s cmd is' 'not allowed.' % obj['cmd']
+            '%s cmd is not allowed.' % obj['cmd']
         )
 
 
