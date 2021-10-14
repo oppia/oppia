@@ -72,6 +72,7 @@ forbidden-imports=
 disallowed-functions-and-replacements-str=
   assertEquals=>self.assertEqual,
   now=>datetime.datetime.utcnow,
+  beam.CombineValues=>beam.CombinePerKey
 
 disallowed-functions-and-replacements-regex=
   \.put_async\(=>put,

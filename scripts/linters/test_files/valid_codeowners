@@ -12,7 +12,7 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
-/manifest.json @vojtechjelinek
+/dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek

@@ -39,10 +39,10 @@ WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
 
 APP_YAML_FILEPATH = os.path.join(os.getcwd(), 'app_dev.yaml')
 
-MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
+DEPENDENCIES_JSON_FILE_PATH = os.path.join(os.getcwd(), 'dependencies.json')
 PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH = len('.d.ts')
-_DEPENDENCY_SOURCE_MANIFEST = 'manifest.json'
+_DEPENDENCY_SOURCE_DEPENDENCIES_JSON = 'dependencies.json'
 _DEPENDENCY_SOURCE_PACKAGE = 'package.json'
 
 WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
@@ -55,19 +55,19 @@ THIRD_PARTY_LIBS = [
     {
         'name': 'Guppy',
         'dependency_key': 'guppy',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
+        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
         'type_defs_filename_prefix': 'guppy-defs-'
     },
     {
         'name': 'Skulpt',
         'dependency_key': 'skulpt-dist',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
+        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
         'type_defs_filename_prefix': 'skulpt-defs-'
     },
     {
         'name': 'MIDI',
         'dependency_key': 'midiJs',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
+        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
@@ -140,8 +140,8 @@ class CustomLintChecksManager:
         failed = False
         error_messages = []
 
-        manifest = json.load(python_utils.open_file(
-            MANIFEST_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
+        dependencies_json = json.load(python_utils.open_file(
+            DEPENDENCIES_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
 
         package = json.load(python_utils.open_file(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
@@ -152,9 +152,10 @@ class CustomLintChecksManager:
         for third_party_lib in THIRD_PARTY_LIBS:
             lib_dependency_source = third_party_lib['dependency_source']
 
-            if lib_dependency_source == _DEPENDENCY_SOURCE_MANIFEST:
+            if lib_dependency_source == _DEPENDENCY_SOURCE_DEPENDENCIES_JSON:
                 lib_version = (
-                    manifest[third_party_lib['dependency_key']]['version'])
+                    dependencies_json[
+                        third_party_lib['dependency_key']]['version'])
 
             elif lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
                 lib_version = package[third_party_lib['dependency_key']]

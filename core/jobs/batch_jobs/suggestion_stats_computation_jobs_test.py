@@ -40,7 +40,7 @@ if MYPY:
 (opportunity_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.suggestion])
 
-StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
+StatsType = List[Tuple[str, Dict[str, Union[bool, int, str]]]]
 
 
 class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
@@ -365,7 +365,7 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
         return (
             self.pipeline
             | beam.Create(entry_stats)
-            | beam.CombineValues(
+            | beam.CombinePerKey(
                 suggestion_stats_computation_jobs.CombineStats())
             | beam.Values()  # pylint: disable=no-value-for-parameter
             | beam.Map(lambda stats: stats.to_dict())
@@ -376,12 +376,12 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
     ) -> None:
         entry_stats: StatsType = [(
             'key.key.key',
-            [{
+            {
                 'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
                 'edited_by_reviewer': False,
                 'content_word_count': 5,
                 'last_updated_date': '2021-05-01'
-            }]
+            }
         )]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
             'language_code': None,
@@ -402,12 +402,12 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
     ) -> None:
         entry_stats: StatsType = [(
             'key.key.key',
-            [{
+            {
                 'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
                 'edited_by_reviewer': True,
                 'content_word_count': 10,
                 'last_updated_date': '2021-05-05'
-            }]
+            }
         )]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
             'language_code': None,
@@ -428,12 +428,12 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
     ) -> None:
         entry_stats: StatsType = [(
             'key.key.key',
-            [{
+            {
                 'suggestion_status': suggestion_models.STATUS_ACCEPTED,
                 'edited_by_reviewer': True,
                 'content_word_count': 15,
                 'last_updated_date': '2019-05-05'
-            }]
+            }
         )]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
             'language_code': None,
@@ -454,12 +454,12 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
     ) -> None:
         entry_stats: StatsType = [(
             'key.key.key',
-            [{
+            {
                 'suggestion_status': suggestion_models.STATUS_ACCEPTED,
                 'edited_by_reviewer': False,
                 'content_word_count': 20,
                 'last_updated_date': '2021-05-05'
-            }]
+            }
         )]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
             'language_code': None,
@@ -480,12 +480,12 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
     ) -> None:
         entry_stats: StatsType = [(
             'key.key.key',
-            [{
+            {
                 'suggestion_status': suggestion_models.STATUS_REJECTED,
                 'edited_by_reviewer': False,
                 'content_word_count': 25,
                 'last_updated_date': '2021-05-05'
-            }]
+            }
         )]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
             'language_code': None,
@@ -502,35 +502,40 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
         }])
 
     def test_correctly_combine_multiple_stats_with_same_key(self) -> None:
-        entry_stats: StatsType = [(
-            'key.key.key',
-            [
+        entry_stats: StatsType = [
+            (
+                'key.key.key',
                 {
                     'suggestion_status': suggestion_models.STATUS_ACCEPTED,
                     'edited_by_reviewer': False,
                     'content_word_count': 3,
                     'last_updated_date': '2021-05-05'
                 },
+            ), (
+                'key.key.key',
                 {
                     'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
                     'edited_by_reviewer': False,
                     'content_word_count': 7,
                     'last_updated_date': '2021-05-06'
                 },
-                {
+            ), (
+                'key.key.key', {
                     'suggestion_status': suggestion_models.STATUS_REJECTED,
                     'edited_by_reviewer': False,
                     'content_word_count': 11,
                     'last_updated_date': '2021-05-05'
                 },
+            ), (
+                'key.key.key',
                 {
                     'suggestion_status': suggestion_models.STATUS_ACCEPTED,
                     'edited_by_reviewer': True,
                     'content_word_count': 13,
                     'last_updated_date': '2021-05-05'
                 }
-            ]
-        )]
+            )
+        ]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [{
             'language_code': None,
             'contributor_user_id': None,
@@ -548,39 +553,41 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
         }])
 
     def test_correctly_combine_multiple_stats_with_different_key(self) -> None:
-        entry_stats: StatsType = [(
-            'key.key.key1',
-            [
+        entry_stats: StatsType = [
+            (
+                'key.key.key1',
                 {
                     'suggestion_status': suggestion_models.STATUS_ACCEPTED,
                     'edited_by_reviewer': False,
                     'content_word_count': 3,
                     'last_updated_date': '2021-05-05'
                 },
+            ), (
+                'key.key.key1',
                 {
                     'suggestion_status': suggestion_models.STATUS_IN_REVIEW,
                     'edited_by_reviewer': False,
                     'content_word_count': 7,
                     'last_updated_date': '2021-05-06'
                 }
-            ]
-        ), (
-            'key.key.key2',
-            [
+            ), (
+                'key.key.key2',
                 {
                     'suggestion_status': suggestion_models.STATUS_REJECTED,
                     'edited_by_reviewer': False,
                     'content_word_count': 11,
                     'last_updated_date': '2021-05-05'
                 },
+            ), (
+                'key.key.key2',
                 {
                     'suggestion_status': suggestion_models.STATUS_ACCEPTED,
                     'edited_by_reviewer': True,
                     'content_word_count': 13,
                     'last_updated_date': '2021-05-05'
                 }
-            ]
-        )]
+            )
+        ]
         self.assert_pcoll_equal(self.create_test_pipeline(entry_stats), [
             {
                 'language_code': None,
