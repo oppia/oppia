@@ -98,7 +98,8 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    var explorationsCardByName = await allExplorationCardElements.filter(
+    var explorationsCardByName =
+    await allExplorationCardElements.filter( //eslint-disable-line
       async function(card) {
         var cardTitle = card.element(cardTitleCss);
         await waitFor.visibilityOf(

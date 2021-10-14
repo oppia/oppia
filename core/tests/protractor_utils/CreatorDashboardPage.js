@@ -69,14 +69,15 @@ var CreatorDashboardPage = function() {
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    return await allExplorationCards.filter(async function(tile) {
-      var text = await tile.getText();
-      // Tile text contains title, possibly followed by newline and text.
-      return (
-        text.startsWith(explorationTitle + '\n') ||
-        text === explorationTitle
-      );
-    });
+    return await allExplorationCards.filter( //eslint-disable-line
+      async function(tile) {
+        var text = await tile.getText();
+        // Tile text contains title, possibly followed by newline and text.
+        return (
+          text.startsWith(explorationTitle + '\n') ||
+          text === explorationTitle
+        );
+      });
   };
 
   this.get = async function() {

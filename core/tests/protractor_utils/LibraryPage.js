@@ -61,7 +61,7 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    return await allExplorationSummaryTile.filter(
+    return await allExplorationSummaryTile.filter( //eslint-disable-line
       async function(tile) {
         var tileTitle = await tile.element(
           expSummaryTileTitleLocator).getText();
