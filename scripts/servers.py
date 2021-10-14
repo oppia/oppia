@@ -516,10 +516,10 @@ def managed_webdriver_server(chrome_version=None):
             raise Exception(
                 'Failed to execute "%s --version" command. This is used to '
                 'determine the chromedriver version to use. Please set the '
-                'chromedriver version manually using --chrome_driver_version '
-                'flag. To determine the chromedriver version to be used, '
-                'please follow the instructions mentioned in the following '
-                'URL:\n'
+                'chromedriver version manually using the '
+                '--chrome_driver_version flag. To determine the '
+                'chromedriver version to be used, please follow the '
+                'instructions mentioned in the following URL:\n'
                 'https://chromedriver.chromium.org/downloads/version-selection'
                 % chrome_command.replace(' ', r'\ '))
 
