@@ -37,12 +37,12 @@ class BlogPost:
     """Domain object for an Oppia Blog Post."""
 
     def __init__(
-            self, 
-        blog_post_id: str, 
+        self,
+        blog_post_id: str,
         author_id: str,
         title: str,
-        content: str, 
-        url_fragment: str, 
+        content: str,
+        url_fragment: str,
         tags: List[str],
         thumbnail_filename: Optional[str] = None,
         last_updated: Optional[datetime.datetime] = None,
@@ -352,9 +352,9 @@ class BlogPostSummary:
     """Domain object for Blog Post Summary."""
 
     def __init__(
-            self, 
+        self,
         blog_post_id: str,
-        author_id: str, 
+        author_id: str,
         title: str,
         summary: str,
         url_fragment: str,
@@ -570,8 +570,8 @@ class BlogPostRights:
     """Domain object for Blog Post rights."""
 
     def __init__(
-        self, 
-        blog_post_id: str, 
+        self,
+        blog_post_id: str,
         editor_ids: List[str],
         blog_post_is_published: bool = False
     ) -> None:

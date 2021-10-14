@@ -566,6 +566,7 @@ def _get_auth_claims_from_session_cookie(
     else:
         return _create_auth_claims(claims)
 
+
 # TODO(#13523): Change 'firebase_claims' to
 # TypedDict/Domain Object to remove Any used below.
 def _create_auth_claims(
@@ -586,7 +587,7 @@ def _create_auth_claims(
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     if not isinstance(auth_id, str):
-        raise ValueError('Expected auth_id to be a string. Recieved %s',
-                         auth_id)
+        raise ValueError(
+            'Expected auth_id to be a string. Recieved %s' % auth_id)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)
