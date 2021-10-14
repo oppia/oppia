@@ -173,18 +173,20 @@ class PreferencesHandler(base.BaseHandler):
                 }
             },
             'data': {
-                'type': 'list',
+                'schema': {
+                    'type': 'list',
                     'items': {
                         'type': 'unicode',
                         'validators': [{
-                            'id': 'has_length_at_most',
-                            'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
+                        'id': 'has_length_at_most',
+                        'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
                         }]
+                    }
                 },
                 'default_value': None
             }
         }
-    }
+    }            
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
