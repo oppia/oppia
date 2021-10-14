@@ -666,7 +666,7 @@ class Exploration(python_utils.OBJECT):
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
-        exp_android_proto = cls.to_exploration_proto(
+        exp_android_proto = cls.to_proto(
             exploration_id, title, 0, init_state_name, exploration.states)
         exp_android_proto_size = cls.calculate_size_of_proto(
             exp_android_proto)
@@ -2521,7 +2521,7 @@ class Exploration(python_utils.OBJECT):
         return html_list
 
     @classmethod
-    def to_exploration_proto(
+    def to_proto(
             cls, exploration_id, title, version, init_state_name, states):
         """Calculate the exploration size by setting exploration proto.
 

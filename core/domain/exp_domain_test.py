@@ -3290,7 +3290,7 @@ title: Title
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
-    def test_validate_exploration_proto_size_in_bytes(self):
+    def test_validation_of_proto_size_in_bytes(self):
         """Test validating proto_size_in_bytes of explorations."""
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -3302,11 +3302,11 @@ title: Title
             Exception, 'Expected proto size to be a int, received 1'):
             exploration.validate()
 
-    def test_proto_calculation_is_correct(self):
+    def test_proto_size_calculation_is_correct(self):
         """Test proto size calculation function."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp_id', self.sample_yaml_content_for_proto)
-        exploration_proto = exp_domain.Exploration.to_exploration_proto(
+        exploration_proto = exp_domain.Exploration.to_proto(
             exploration.id, exploration.title, exploration.version,
             exploration.init_state_name, exploration.states)
 
@@ -3317,7 +3317,7 @@ title: Title
     def test_exploration_proto_is_correct(self):
         exploration = exp_domain.Exploration.from_yaml(
             'exp_id', self.sample_yaml_content_for_proto)
-        exploration_proto = exp_domain.Exploration.to_exploration_proto(
+        exploration_proto = exp_domain.Exploration.to_proto(
             exploration.id, exploration.title, exploration.version,
             exploration.init_state_name, exploration.states)
 
