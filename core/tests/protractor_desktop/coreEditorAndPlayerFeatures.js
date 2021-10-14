@@ -254,10 +254,10 @@ describe('Enable correctness feedback and set correctness', function() {
       'First', false, 'Equals', 'Wrong!');
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Not correct'),
-      'First', false, 'Equals', 'Wrong!');
+      'First', false, 'Equals', 'Not correct');
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Wrong again'),
-      'First', false, 'Equals', 'Wrong!');
+      'First', false, 'Equals', 'Wrong again');
 
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
