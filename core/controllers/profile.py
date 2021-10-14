@@ -186,7 +186,7 @@ class PreferencesHandler(base.BaseHandler):
                 'default_value': None
             }
         }
-    }            
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

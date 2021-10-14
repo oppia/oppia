@@ -324,8 +324,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             feconf.PREFERENCES_DATA_URL,
             payload=None,
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('Missing key in handler args: update_type.', response_dict['error'])
+        self.assertIn('Missing key in handler args: update_type.',
+        response_dict['error'])
         self.logout()
+
 
 class LongUserBioHandlerTests(test_utils.GenericTestBase):
     USERNAME_A = 'a'
@@ -709,9 +711,9 @@ class SignupTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {'username': '', 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
-        validator_name = 'is_valid_username_string ({})'
+        validator_name = 'Validation failed: is_valid_username_string ({})'
         self.assertIn(
-            'Schema validation for \'username\' failed: Validation failed: %s for object'
+            'Schema validation for \'username\' failed: %s for object'
             % validator_name,
             response_dict['error'])
 
@@ -720,8 +722,8 @@ class SignupTests(test_utils.GenericTestBase):
             {'username': '!a!', 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'Schema validation for \'username\' failed: Validation failed: %s for object !a!'
-            % validator_name, 
+            'Schema validation for \'username\' failed: %s for object !a!'
+            % validator_name,
             response_dict['error'])
 
         response_dict = self.post_json(
@@ -729,8 +731,8 @@ class SignupTests(test_utils.GenericTestBase):
             {'username': self.UNICODE_TEST_STRING, 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'Schema validation for \'username\' failed: Validation failed: %s for object %s'
-            % (validator_name, self.UNICODE_TEST_STRING), 
+            'Schema validation for \'username\' failed: %s for object %s'
+            % (validator_name, self.UNICODE_TEST_STRING),
             response_dict['error'])
 
         response_dict = self.post_json(
