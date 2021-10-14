@@ -101,7 +101,7 @@ class QuestionChange(change_domain.BaseChange):
         'allowed_values': {'property_name': QUESTION_PROPERTIES}
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-        'required_attribute_names': ['question_dict', 'skill_id'],
+        'required_attribute_names': ['question_dict', 'skill_id','skill_difficulty'],
         'optional_attribute_names': ['topic_name'],
         'user_id_attribute_names': []
     }, {
