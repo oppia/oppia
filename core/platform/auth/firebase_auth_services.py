@@ -586,8 +586,6 @@ def _create_auth_claims(
     role_is_super_admin = (
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
-    if not isinstance(auth_id, str):
-        raise ValueError(
-            'Expected auth_id to be a string. Recieved %s' % auth_id)
+    assert auth_id is not None
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)
