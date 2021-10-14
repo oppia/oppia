@@ -536,7 +536,7 @@
 /mypy_imports.py @hardikkat24 @vojtechjelinek
 /mypy_requirements.txt @hardikkat24 @vojtechjelinek
 /stubs/ @hardikkat24 @vojtechjelinek
-/scripts/run_mypy_checks*.py @hardikkat24 @vojtechjelinek
+/scripts/run_mypy_checks*.py @hardikkat24 @vojtechjelinek @sajalasati
 
 
 # Restricted pages.
@@ -732,7 +732,7 @@
 /core/domain/user*.py @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
-/manifest.json @vojtechjelinek
+/dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @DubeySandeep

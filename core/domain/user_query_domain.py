@@ -31,12 +31,7 @@ attribute_names = [ # pylint: disable=invalid-name
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
 UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
-    'UserQueryParams', attribute_names)
-
-# TODO(#12275): In python 2, the default values in collection has to be assigned
-# to None. Once migrated to python 3, this has to be removed.
-UserQueryParams.__new__.__defaults__ = (None,) * len(
-    UserQueryParams._fields)
+    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names))
 
 
 class UserQuery:
