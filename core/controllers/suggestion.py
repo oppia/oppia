@@ -40,8 +40,9 @@ from core.domain import suggestion_services
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
+
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = { 
+    HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'suggestion_type': {
                 'schema': {
@@ -85,7 +86,7 @@ class SuggestionHandler(base.BaseHandler):
             }
         }
     }
-    
+
     @acl_decorators.can_suggest_changes
     def post(self):
         """Handles POST requests."""
@@ -97,7 +98,8 @@ class SuggestionHandler(base.BaseHandler):
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.normalized_payload.get('suggestion_type'),
-                self.normalized_payload.get('target_type'), self.normalized_payload.get('target_id'),
+                self.normalized_payload.get('target_type'), 
+                self.normalized_payload.get('target_id'),
                 self.normalized_payload.get('target_version_at_submission'),
                 self.user_id, self.normalized_payload.get('change'),
                 self.normalized_payload.get('description'))
