@@ -39,7 +39,7 @@ require(
   'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.component.ts');
 require(
-  'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
+  'pages/exploration-player-page/learner-experience/tutor-card.component.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('domain/collection/guest-collection-progress.service.ts');
