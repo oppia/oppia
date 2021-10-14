@@ -23,7 +23,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import mimetypes
 
 from core import feconf
-from core import python_utils
 
 import redis
 
@@ -38,7 +37,7 @@ REDIS_CLIENT = redis.StrictRedis(
 )
 
 
-class EmulatorBlob(python_utils.OBJECT):
+class EmulatorBlob:
     """Object for storing the file data."""
 
     def __init__(
@@ -176,7 +175,7 @@ class EmulatorBlob(python_utils.OBJECT):
                 self.name, self.content_type))
 
 
-class CloudStorageEmulator(python_utils.OBJECT):
+class CloudStorageEmulator:
     """Emulator for the storage client."""
 
     def __init__(self) -> None:

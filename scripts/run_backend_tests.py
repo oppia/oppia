@@ -50,6 +50,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import contextlib
 import importlib
 import inspect
 import json
@@ -61,7 +62,6 @@ import sys
 import threading
 import time
 import unittest
-
 
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
@@ -161,7 +161,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TestingTaskSpec(python_utils.OBJECT):
+class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):
@@ -345,7 +345,7 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_cloud_datastore_emulator())
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:

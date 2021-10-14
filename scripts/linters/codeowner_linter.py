@@ -23,7 +23,6 @@ import glob
 import os
 import subprocess
 
-from core import python_utils
 from .. import concurrent_task_utils
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
@@ -41,7 +40,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
     '/core/storage/',
-    '/manifest.json',
+    '/dependencies.json',
     '/package.json',
     '/requirements.txt',
     '/requirements.in',
@@ -55,7 +54,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/extensions/interactions/rule_templates.json']
 
 
-class CodeownerLintChecksManager(python_utils.OBJECT):
+class CodeownerLintChecksManager:
     """Manages codeowner checks."""
 
     def __init__(self, file_cache):

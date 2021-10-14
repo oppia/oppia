@@ -360,7 +360,7 @@ class ExplorationChange(change_domain.BaseChange):
         'delete_gadget', 'rename_gadget']
 
 
-class ExplorationCommitLogEntry(python_utils.OBJECT):
+class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
     def __init__(
@@ -428,7 +428,7 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
         }
 
 
-class ExpVersionReference(python_utils.OBJECT):
+class ExpVersionReference:
     """Value object representing an exploration ID and a version number."""
 
     def __init__(self, exp_id, version):
@@ -469,7 +469,7 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected version to be an int, received %s' % self.version)
 
 
-class ExplorationVersionsDiff(python_utils.OBJECT):
+class ExplorationVersionsDiff:
     """Domain object for the difference between two versions of an Oppia
     exploration.
 
@@ -534,7 +534,7 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         }
 
 
-class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
+class VersionedExplorationInteractionIdsMapping:
     """Domain object representing the mapping of state names to interaction ids
     in an exploration.
     """
@@ -552,7 +552,7 @@ class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration(python_utils.OBJECT):
+class Exploration:
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -4634,7 +4634,7 @@ class Exploration(python_utils.OBJECT):
         return int(proto.ByteSize())
 
 
-class ExplorationSummary(python_utils.OBJECT):
+class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
@@ -4921,7 +4921,7 @@ class ExplorationSummary(python_utils.OBJECT):
         self.contributor_ids = list(self.contributors_summary.keys())
 
 
-class ExplorationChangeMergeVerifier(python_utils.OBJECT):
+class ExplorationChangeMergeVerifier:
     """Class to check for mergeability.
 
     Attributes:
