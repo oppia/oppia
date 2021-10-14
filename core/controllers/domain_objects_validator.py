@@ -52,7 +52,7 @@ def validate_new_config_property_values(new_config_property):
     """Validates new config property values.
 
     Args:
-        obj: dict. Data that needs to be validated.
+        new_config_property: dict. Data that needs to be validated.
 
     Returns:
         dict(str, *). Returns a dict for new config properties.
