@@ -474,8 +474,9 @@ class ElasticSearchStub:
                 for _, v in term.items():
                     values = v['query'].split(' ')
                     for doc in result_docs:
-                        strs = [val for val in doc.values() if isinstance(
-                            val, str)]
+                        strs = [
+                            val for val in doc.values() if isinstance(val, str)
+                        ]
                         words = []
                         for s in strs:
                             words += s.split(' ')

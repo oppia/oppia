@@ -132,9 +132,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(all(hasattr(ca_spec, attr) for attr in [
                 'name', 'description', 'schema', 'default_value']))
 
-            self.assertTrue(isinstance(ca_spec.name, str))
+            self.assertIsInstance(ca_spec.name, str)
             self.assertTrue(self._is_alphanumeric_string(ca_spec.name))
-            self.assertTrue(isinstance(ca_spec.description, str))
+            self.assertIsInstance(ca_spec.description, str)
             self.assertGreater(len(ca_spec.description), 0)
 
             schema_utils_test.validate_schema(ca_spec.schema)
@@ -169,7 +169,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for spec in answer_visualization_specs:
             self.assertItemsEqual(list(spec.keys()), _answer_visualization_keys)
             for key, item_type in _answer_visualizations_specs_schema:
-                self.assertTrue(isinstance(spec[key], item_type))
+                self.assertIsInstance(spec[key], item_type)
                 if item_type == str:
                     self.assertTrue(spec[key])
 
@@ -634,8 +634,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
-                self.assertTrue(isinstance(
-                    getattr(interaction, item), item_type))
+                self.assertIsInstance(getattr(interaction, item), item_type)
                 if item_type == str:
                     self.assertTrue(getattr(interaction, item))
 
@@ -677,7 +676,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIsNone(interaction.instructions)
                 self.assertIsNone(interaction.narrow_instructions)
             else:
-                self.assertTrue(isinstance(interaction.instructions, str))
+                self.assertIsInstance(interaction.instructions, str)
                 self.assertIsNotNone(interaction.instructions)
                 self.assertIsNotNone(interaction.narrow_instructions)
 

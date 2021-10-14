@@ -459,7 +459,7 @@ def base64_from_int(value: int) -> str:
     Returns:
         str. Returns the base64 representation of the number passed.
     """
-    byte_value = (b'[' + str(value).encode('utf-8') + b']')
+    byte_value = b'[' + str(value).encode('utf-8') + b']'
     return base64.b64encode(byte_value).decode('utf-8')
 
 

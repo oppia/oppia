@@ -382,8 +382,7 @@ def validate_schema(schema: Dict[str, Any]) -> None:
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION])
             assert isinstance(prop[SCHEMA_KEY_NAME], str), (
-                'Expected %s, got %s' % (
-                    str, prop[SCHEMA_KEY_NAME]))
+                'Expected %s, got %s' % (str, prop[SCHEMA_KEY_NAME]))
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
                 assert isinstance(

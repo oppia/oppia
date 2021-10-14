@@ -46,7 +46,6 @@ import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-impor
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
-INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
