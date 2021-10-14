@@ -1204,7 +1204,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-
     def test_notification_user_ids_list_validator(self) -> None:
         schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
         valid_user_id_list = [
@@ -1325,12 +1324,12 @@ class ValidateArgumentHavingSpecificClass(test_utils.GenericTestBase):
             'object_class': ValidateClassForTesting
         }
 
-        DATA_FOR_TESTING = {
+        sample_dict = {
             'arg_a': 'arbitary_argument_a',
             'arg_b': 'arbitary_argument_b'
         }
-        arg1 = schema_utils.normalize_against_schema(DATA_FOR_TESTING, schema)
-        arg2 = ValidateClassForTesting.from_dict(DATA_FOR_TESTING)
+        arg1 = schema_utils.normalize_against_schema(sample_dict, schema)
+        arg2 = ValidateClassForTesting.from_dict(sample_dict)
         self.assertEqual(arg1.arg_a, arg2.arg_a)
 
 
