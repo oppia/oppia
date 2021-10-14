@@ -98,7 +98,7 @@ class SuggestionHandler(base.BaseHandler):
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.normalized_payload.get('suggestion_type'),
-                self.normalized_payload.get('target_type'), 
+                self.normalized_payload.get('target_type'),
                 self.normalized_payload.get('target_id'),
                 self.normalized_payload.get('target_version_at_submission'),
                 self.user_id, self.normalized_payload.get('change'),
