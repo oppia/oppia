@@ -76,14 +76,10 @@ class AuthClaims:
         self.email = email
         self.role_is_super_admin = role_is_super_admin
 
-    # NOTE: Needs to return Any because of:
-    # https://github.com/python/mypy/issues/363#issue-39383094
     def __repr__(self) -> str:
         return 'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
             self.auth_id, self.email, self.role_is_super_admin)
-    
-    # NOTE: Needs to return Any because of:
-    # https://github.com/python/mypy/issues/363#issue-39383094
+
     def __hash__(self) -> int:
         return hash((self.auth_id, self.email, self.role_is_super_admin))
 
@@ -204,7 +200,7 @@ class UserAuthDetails:
         """Returns whether self refers to a full user account."""
         return self.auth_id is not None
 
-    def to_dict(self) -> Dict[str, Union[str,bool]]:
+    def to_dict(self) -> Dict[str, Union[str, bool]]:
         """Returns values corresponding to UserAuthDetailsModel's properties.
 
         This method is a utility for assigning values to UserAuthDetailsModel:

@@ -27,7 +27,8 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models,user_models
+    from mypy_imports import auth_models
+    from mypy_imports import user_models
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
