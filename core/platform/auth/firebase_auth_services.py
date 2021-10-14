@@ -65,7 +65,7 @@ from core.platform import models
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 import webapp2
 
 MYPY = False
@@ -566,9 +566,10 @@ def _get_auth_claims_from_session_cookie(
     else:
         return _create_auth_claims(claims)
 
-
+# TODO(#13523): Change 'firebase_claims' to
+# TypedDict/Domain Object to remove Any used below.
 def _create_auth_claims(
-        firebase_claims: Dict[str, Optional[Union[str, bool]]]
+        firebase_claims: Dict[str, Any]
 ) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from Firebase claims.
 
@@ -584,8 +585,8 @@ def _create_auth_claims(
     role_is_super_admin = (
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
-    # Mypy is wrong here. We know both auth_id is a str
-    # and email is a optional str.
-    # But Mypy shows they are Union[str, bool, None]
+    if not isinstance(auth_id, str):
+        raise ValueError('Expected auth_id to be a string. Recieved %s',
+                         auth_id)
     return auth_domain.AuthClaims(
-        auth_id, email, role_is_super_admin=role_is_super_admin) # type: ignore[arg-type]
+        auth_id, email, role_is_super_admin=role_is_super_admin)
