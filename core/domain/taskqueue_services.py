@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import datetime
 import json
 
+from core import feconf
 from core.platform import models
-import feconf
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 

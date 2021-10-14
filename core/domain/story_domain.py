@@ -22,16 +22,16 @@ import functools
 import json
 import re
 
-import android_validation_constants
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
-import feconf
-import python_utils
-import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -172,7 +172,7 @@ class StoryChange(change_domain.BaseChange):
     }]
 
 
-class StoryNode(python_utils.OBJECT):
+class StoryNode:
     """Domain object describing a node in the exploration graph of a
     story.
     """
@@ -468,7 +468,7 @@ class StoryNode(python_utils.OBJECT):
                     'The story node with ID %s points to itself.' % node_id)
 
 
-class StoryContents(python_utils.OBJECT):
+class StoryContents:
     """Domain object representing the story_contents dict."""
 
     def __init__(self, story_nodes, initial_node_id, next_node_id):
@@ -511,7 +511,7 @@ class StoryContents(python_utils.OBJECT):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if python_utils.NEXT((
+                if next((
                         node for node in self.nodes
                         if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
@@ -637,7 +637,7 @@ class StoryContents(python_utils.OBJECT):
         return story_contents
 
 
-class Story(python_utils.OBJECT):
+class Story:
     """Domain object for an Oppia Story."""
 
     def __init__(
@@ -793,7 +793,7 @@ class Story(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
-        if len(story_id) != 12:
+        if len(story_id) != constants.STORY_ID_LENGTH:
             raise utils.ValidationError('Invalid story id.')
 
     @classmethod
@@ -1020,7 +1020,7 @@ class Story(python_utils.OBJECT):
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+        for index in range(len(story_contents_dict['nodes'])):
             story_contents_dict['nodes'][index]['thumbnail_filename'] = None
             story_contents_dict['nodes'][index]['thumbnail_bg_color'] = None
         return story_contents_dict
@@ -1076,7 +1076,7 @@ class Story(python_utils.OBJECT):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_STORY, story_id))
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+        for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
                 constants.ASSET_TYPE_THUMBNAIL,
                 story_contents_dict['nodes'][index]['thumbnail_filename'])
@@ -1524,7 +1524,7 @@ class Story(python_utils.OBJECT):
         self.story_contents.initial_node_id = new_initial_node_id
 
 
-class StorySummary(python_utils.OBJECT):
+class StorySummary:
     """Domain object for Story Summary."""
 
     def __init__(

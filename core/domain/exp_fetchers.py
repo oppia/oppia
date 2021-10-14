@@ -28,12 +28,12 @@ from __future__ import unicode_literals
 import copy
 import logging
 
+from core import feconf
+from core import python_utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
-import feconf
-import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 datastore_services = models.Registry.import_datastore_services()

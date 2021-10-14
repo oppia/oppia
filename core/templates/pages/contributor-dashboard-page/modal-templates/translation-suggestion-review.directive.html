@@ -28,6 +28,19 @@
         <angular-html-bind ng-if="!isSetOfStringsContent"
                            html-data="contentHtml">
         </angular-html-bind>
+        <div ng-if="hasExplorationContentChanged()">
+          <p class="oppia-suggestion-review-panel-exploration-change-note">
+            <strong>NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The current content is:</strong>
+          </p>
+          <ul ng-if="isSetOfStringsContent">
+            <li ng-repeat="item in explorationContentHtml track by $index">
+              <[item]>
+            </li>
+          </ul>
+          <angular-html-bind ng-if="!isSetOfStringsContent"
+                             html-data="explorationContentHtml">
+          </angular-html-bind>
+        </div>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
@@ -97,6 +110,7 @@
   .oppia-suggestion-review-panel {
     border: 1px solid #ccc;
     height: 88%;
+    padding-left: 10px;
     padding-top: 10px;
   }
   .oppia-suggestion-review-message {
@@ -108,6 +122,9 @@
   }
   .oppia-suggestion-review-panel-header-container {
     height: 12%;
+  }
+  .oppia-suggestion-review-panel-exploration-change-note {
+    margin-top: 18px;
   }
   .oppia-translation-review-edit-buttons {
     margin-left: 10px;

@@ -19,14 +19,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import html_validation_service
 from core.domain import state_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -71,7 +71,7 @@ class SubtopicPageChange(change_domain.BaseChange):
     }]
 
 
-class SubtopicPageContents(python_utils.OBJECT):
+class SubtopicPageContents:
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
@@ -150,7 +150,7 @@ class SubtopicPageContents(python_utils.OBJECT):
                 'written_translations']))
 
 
-class SubtopicPage(python_utils.OBJECT):
+class SubtopicPage:
     """Domain object for a Subtopic page."""
 
     def __init__(

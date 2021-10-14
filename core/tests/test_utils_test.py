@@ -24,12 +24,12 @@ import os
 import re
 from unittest import mock
 
-from constants import constants
+from core import python_utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 import webapp2
 
@@ -97,7 +97,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -116,7 +116,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             str_attr = 'foo'
 
             @classmethod
@@ -134,7 +134,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num
@@ -313,7 +313,7 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         self.assertEqual(wrapped_function.times_called, 0)
 
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             self.assertEqual(wrapped_function(i), i ** 2)
             self.assertEqual(wrapped_function.times_called, i + 1)
 
@@ -330,7 +330,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             function, MockError('Dummy Exception'),
             test_utils.FailingFunction.INFINITY)
 
-        for i in python_utils.RANGE(20):
+        for i in range(20):
             with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
@@ -663,7 +663,7 @@ class EmailMockTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
-class SwapWithCheckTestClass(python_utils.OBJECT):
+class SwapWithCheckTestClass:
     """Dummy class for testing check_with_swap. This class stores a few dummy
     functions.
     """

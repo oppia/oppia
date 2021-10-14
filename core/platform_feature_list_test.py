@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import os
 import re
+
 from core import platform_feature_list
+from core import python_utils
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
-import python_utils
-
 
 FRONTEND_FEATURE_NAMES_PATH = os.path.join(
     os.getcwd(),

@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -39,7 +39,7 @@ ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
     feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
 
 
-class FileStream(python_utils.OBJECT):
+class FileStream:
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
@@ -65,7 +65,7 @@ class FileStream(python_utils.OBJECT):
         return content
 
 
-class GeneralFileSystem(python_utils.OBJECT):
+class GeneralFileSystem:
     """The parent class which is inherited by GcsFileSystem.
 
     Attributes:
@@ -244,7 +244,7 @@ class GcsFileSystem(GeneralFileSystem):
             blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
-class AbstractFileSystem(python_utils.OBJECT):
+class AbstractFileSystem:
     """Interface for a file system."""
 
     def __init__(self, impl):

@@ -25,7 +25,7 @@ from __future__ import unicode_literals
 import tempfile
 import unittest
 
-import python_utils
+from core import python_utils
 
 from . import pylint_extensions
 
@@ -1482,7 +1482,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_yield_type_func_node,
             missing_yield_type_yield_node) = astroid.extract_node(
                 """
-        class Test(python_utils.OBJECT):
+        class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -1523,7 +1523,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_return_type_func_node,
             missing_return_type_return_node) = astroid.extract_node(
                 """
-        class Test(python_utils.OBJECT):
+        class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -1602,7 +1602,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         valid_raise_node = astroid.extract_node(
             """
-        class Test(python_utils.OBJECT):
+        class Test:
             raise Exception #@
         """)
         with self.checker_test_object.assertNoMessages():
@@ -3387,75 +3387,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
-
-
-class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
-
-    def test_wrong_metaclass_usage_raises_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class FakeClass(python_utils.OBJECT):
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-                def fake_method(self, name):
-                    yield (name, name)
-            class MyObject: #@
-                __metaclass__ = FakeClass
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-dunder-metaclass',
-                node=metaclass_node,
-                confidence=interfaces.UNDEFINED
-            )
-        ):
-            checker_test_object.checker.visit_classdef(metaclass_node)
-
-    def test_no_metaclass_usage_raises_no_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class MyObject: #@
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(metaclass_node)
-
-    def test_correct_metaclass_usage_raises_no_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class FakeClass(python_utils.OBJECT):
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-                def fake_method(self, name):
-                    yield (name, name)
-            class MyObject: #@
-                python_utils.with_metaclass(FakeClass)
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(metaclass_node)
 
 
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):

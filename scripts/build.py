@@ -28,7 +28,7 @@ import shutil
 import subprocess
 import threading
 
-import python_utils
+from core import python_utils
 from scripts import common
 from scripts import servers
 
@@ -72,7 +72,7 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
 # interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
-MANIFEST_FILE_PATH = os.path.join('manifest.json')
+DEPENDENCIES_FILE_PATH = os.path.join('dependencies.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
@@ -85,7 +85,6 @@ WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
-WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
@@ -155,12 +154,6 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--minify_third_party_libs_only', action='store_true', default=False,
     dest='minify_third_party_libs_only')
-_PARSER.add_argument(
-    '--deparallelize_terser',
-    action='store_true',
-    default=False,
-    dest='deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env.')
 _PARSER.add_argument(
     '--maintenance_mode',
     action='store_true',
@@ -474,7 +467,7 @@ def get_dependency_directory(dependency):
 
     Args:
         dependency: dict(str, str). Dictionary representing single dependency
-            from manifest.json.
+            from dependencies.json.
 
     Returns:
         str. Dependency directory.
@@ -540,7 +533,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
         list(str). List of paths to font files that need to be copied.
     """
     if 'fontsPath' not in dependency_bundle:
-        # Skip dependency bundles in manifest.json that do not have
+        # Skip dependency bundles in dependencies.json that do not have
         # fontsPath property.
         return []
     fonts_path = dependency_bundle['fontsPath']
@@ -556,7 +549,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
 
 def get_dependencies_filepaths():
-    """Extracts dependencies filepaths from manifest.json file into
+    """Extracts dependencies filepaths from dependencies.json file into
     a dictionary.
 
     Returns:
@@ -570,10 +563,10 @@ def get_dependencies_filepaths():
         'css': [],
         'fonts': []
     }
-    with python_utils.open_file(MANIFEST_FILE_PATH, 'r') as json_file:
-        manifest = json.loads(
+    with python_utils.open_file(DEPENDENCIES_FILE_PATH, 'r') as json_file:
+        dependencies_json = json.loads(
             json_file.read(), object_pairs_hook=collections.OrderedDict)
-    frontend_dependencies = manifest['dependencies']['frontend']
+    frontend_dependencies = dependencies_json['dependencies']['frontend']
     for dependency in frontend_dependencies.values():
         if 'bundle' in dependency:
             dependency_dir = get_dependency_directory(dependency)
@@ -1324,6 +1317,13 @@ def generate_build_directory(hashes):
     python_utils.PRINT('Build completed.')
 
 
+def generate_python_package():
+    """Generates Python package using setup.py."""
+    python_utils.PRINT('Building Oppia package...')
+    subprocess.check_call('python setup.py sdist -d build', shell=True)
+    python_utils.PRINT('Oppia package build completed.')
+
+
 def main(args=None):
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
@@ -1354,13 +1354,8 @@ def main(args=None):
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        if options.deparallelize_terser:
-            if options.source_maps:
-                raise Exception(
-                    'source_maps flag shouldn\'t be used with '
-                    'deparallelize_terser flag.')
-            build_using_webpack(WEBPACK_TERSER_CONFIG)
-        elif options.source_maps:
+        generate_python_package()
+        if options.source_maps:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)

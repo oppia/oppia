@@ -22,12 +22,12 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
-import feconf
-import python_utils
-import utils
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -656,7 +656,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = python_utils.NEXT(
+            user_id_attribute_names = next(
                 cmd['user_id_attribute_names']
                 for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
                 if cmd['name'] == commit_cmd['cmd']
