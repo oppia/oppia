@@ -24,7 +24,7 @@ import collections
 from core import python_utils
 from core import utils
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -65,21 +65,30 @@ class AuthClaims:
     """
 
     def __init__(
-        self, auth_id: str, email: Optional[str],
-        role_is_super_admin: bool) -> None:
+        self,
+        auth_id: str,
+        email: Optional[str],
+        role_is_super_admin: bool
+    ) -> None:
         if not auth_id:
             raise Exception('auth_id must not be empty')
         self.auth_id = auth_id
         self.email = email
         self.role_is_super_admin = role_is_super_admin
 
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
     def __repr__(self) -> str:
         return 'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
             self.auth_id, self.email, self.role_is_super_admin)
-
+    
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
     def __hash__(self) -> int:
         return hash((self.auth_id, self.email, self.role_is_super_admin))
 
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         # https://docs.python.org/2/library/constants.html#NotImplemented.
         return NotImplemented if not isinstance(other, AuthClaims) else (
@@ -106,8 +115,13 @@ class UserAuthDetails:
     """
 
     def __init__(
-            self, user_id: str, gae_id: str, firebase_auth_id: str,
-            parent_user_id: str, deleted: bool = False) -> None:
+            self,
+            user_id: str,
+            gae_id: str,
+            firebase_auth_id: str,
+            parent_user_id: str,
+            deleted: bool = False
+    ) -> None:
         self.user_id = user_id
         self.gae_id = gae_id
         self.firebase_auth_id = firebase_auth_id
@@ -190,7 +204,7 @@ class UserAuthDetails:
         """Returns whether self refers to a full user account."""
         return self.auth_id is not None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Union[str,bool]]:
         """Returns values corresponding to UserAuthDetailsModel's properties.
 
         This method is a utility for assigning values to UserAuthDetailsModel:
