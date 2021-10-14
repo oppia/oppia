@@ -3331,6 +3331,7 @@ title: Title
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is a solution.</p>',
+                'image_sizes_in_bytes': {}
             },
         }
         hints_list = [
