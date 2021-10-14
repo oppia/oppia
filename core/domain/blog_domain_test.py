@@ -40,7 +40,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
     def _assert_strict_validation_error(
         self,
-        expected_error_substring: str) -> None:
+        expected_error_substring: str
+    ) -> None:
         """Checks that the blog post passes strict validation."""
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
