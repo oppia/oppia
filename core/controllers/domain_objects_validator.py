@@ -29,8 +29,8 @@ from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
-from core.domain import state_domain
 from core.domain import question_domain
+from core.domain import state_domain
 
 from typing import Dict, Optional, Union
 
@@ -47,7 +47,7 @@ def validate_change(obj):
         question_domain.QuestionChange(obj)
     else:
         raise base.BaseHandler.InvalidInputException(
-            '%s cmd is' 'not allowed.'% obj['cmd']
+            '%s cmd is' 'not allowed.' % obj['cmd']
         )
 
 
