@@ -25,6 +25,10 @@ from core.domain import auth_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import auth_models,user_models
+
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
@@ -92,7 +96,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.user_auth_details_model = (
-            auth_models.UserAuthDetailsModel.get(self.owner_id)) # type: ignore[attr-defined]
+            auth_models.UserAuthDetailsModel.get(self.owner_id))
         self.user_auth_details = auth_services.get_user_auth_details_from_model( # type: ignore[no-untyped-call]
             self.user_auth_details_model)
         self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
@@ -182,7 +186,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
 
     def test_parent_user_id_and_gae_id_together_raises_error(self) -> None:
         self.user_auth_details.parent_user_id = (
-            user_models.UserSettingsModel.get_new_id('')) # type: ignore[attr-defined]
+            user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = self.auth_id
         self.user_auth_details.firebase_auth_id = None
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -193,7 +197,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
     def test_parent_user_id_and_firebase_auth_id_together_raises_error(
         self) -> None:
         self.user_auth_details.parent_user_id = (
-            user_models.UserSettingsModel.get_new_id('')) # type: ignore[attr-defined]
+            user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = None
         self.user_auth_details.firebase_auth_id = self.auth_id
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
