@@ -31,11 +31,14 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   templateUrl: './exploration-footer.component.html'
 })
 export class ExplorationFooterComponent {
-  explorationId: string;
-  iframed: boolean;
-  windowIsNarrow: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
+  iframed!: boolean;
+  windowIsNarrow!: boolean;
+  resizeSubscription!: Subscription;
   contributorNames: string[] = [];
-  resizeSubscription: Subscription;
 
   constructor(
     private contextService: ContextService,
