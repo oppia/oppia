@@ -264,7 +264,28 @@ describe('Search bar component', () => {
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   });
 
-  it('should handle search query change', () => {
+  it('should handle search query change with language param in URL', () => {
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (
+          searchQuery: string, categorySelections: object,
+          languageCodeSelections: object, callb: () => void) => {
+        callb();
+      });
+    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
+      'search_query');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    windowRef.nativeWindow.location = new URL('http://localhost/search/find?lang=en');
+
+    component.onSearchQueryChangeExec();
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
+    windowRef.nativeWindow.location = new URL('http://localhost/not/search/find?lang=en');
+    component.onSearchQueryChangeExec();
+    expect(windowRef.nativeWindow.location.href).toEqual(
+      'http://localhost/search/find?q=search_query&lang=en');
+  });
+
+  it('should handle search query change without language param in URL', () => {
     spyOn(searchService, 'executeSearchQuery').and.callFake(
       (
           searchQuery: string, categorySelections: object,

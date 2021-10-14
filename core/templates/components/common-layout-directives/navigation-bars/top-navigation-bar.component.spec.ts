@@ -40,13 +40,19 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {}
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
-    gtag: () => {}
+    gtag: () => {},
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
   };
 }
 
@@ -401,6 +407,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.currentLanguageCode = 'en';
     component.currentLanguageText = 'English';
+    component.url = new URL('http://localhost:8181/');
 
     component.changeLanguage('hi', 'अंग्रेज़ी');
     tick();
@@ -469,4 +476,57 @@ describe('TopNavigationBarComponent', () => {
     expect(component.username).toBe('username1');
     expect(component.profilePageUrl).toBe('/profile/username1');
   }));
+
+  it('should remove language parameter from URL if user has a preferred' +
+  ' site language', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
+    spyOn(mockWindowRef.nativeWindow.history, 'pushState');
+
+    component.ngOnInit();
+    // Window location.toString() will return URL with language param 'es'.
+    expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
+
+    tick();
+
+    expect(i18nLanguageCodeService.setI18nLanguageCode)
+      .toHaveBeenCalledWith('en');
+    expect(component.url.toString()).toBe('http://localhost:8181/');
+    expect(mockWindowRef.nativeWindow.history.pushState)
+      .toHaveBeenCalledWith({}, '', 'http://localhost:8181/');
+  }));
+
+  it('should not remove URL lang param when preferred site language is' +
+  ' not set for the user', fakeAsync (() => {
+    // Preferred language code in userInfo has been set to null.
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      null, 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    spyOn(component, 'removeUrlLangParam');
+
+    component.ngOnInit();
+
+    expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
+
+    tick();
+
+    expect(component.removeUrlLangParam).not.toHaveBeenCalled();
+    expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
+  }));
+
+  it('should remove URL language param when user initiates site' +
+  ' language change', () => {
+    component.ngOnInit();
+    expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
+
+    component.changeLanguage('en', 'English');
+
+    expect(component.url.toString()).toBe('http://localhost:8181/');
+  });
 });
