@@ -82,12 +82,6 @@ class AuthClaims:
             (self.auth_id, self.email, self.role_is_super_admin) ==
             (other.auth_id, other.email, other.role_is_super_admin))
 
-    def __ne__(self, other):
-        # TODO(#11474): Delete this method once we've moved to Python 3 and rely
-        # on auto-generated method. In Python 2, we need to write this method
-        # ourselves: https://stackoverflow.com/a/30676267/4859885.
-        return not self == other
-
 
 class UserAuthDetails:
     """Domain object representing a user's authentication details.
