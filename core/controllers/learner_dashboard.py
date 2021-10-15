@@ -250,6 +250,7 @@ class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+
 class LearnerDashboardIdsHandler(base.BaseHandler):
     """Gets the progress of the learner.
 
