@@ -2563,7 +2563,9 @@ class Exploration:
         state_protos = {}
         for (state_name, state) in states.items():
             state_proto = state_pb2.State(
-                content=cls._to_subtitled_html_proto(state.content),
+                content=cls._to_subtitled_text_proto(
+                    state.content.content_id,
+                    state.content.html),
                 recorded_voiceovers=cls._to_recorded_voiceover_proto(
                     state.recorded_voiceovers),
                 written_translations=cls._to_written_translations_proto(
@@ -2575,22 +2577,22 @@ class Exploration:
         return state_protos
 
     @classmethod
-    def _to_subtitled_html_proto(cls, content):
-        """Creates a SubtitledHtml proto object.
+    def _to_subtitled_text_proto(cls, content_id, text):
+        """Creates a SubtitledText proto object.
 
         Args:
-            content: SubtitledHtml. The domain object
-                SubtitledHtml.
+            content: SubtitledHtml | SubtitleUnicode. The domain object
+                SubtitledHtml or SubtitleUnicode.
 
         Returns:
-            Proto object. The subtitled html proto object.
+            Proto object. The subtitled text proto object.
         """
-        subtitled_html_proto = languages_pb2.SubtitledHtml(
-            content_id=content.content_id,
-            html=content.html
+        subtitled_text_proto = languages_pb2.SubtitledText(
+            content_id=content_id,
+            text=text
         )
 
-        return subtitled_html_proto
+        return subtitled_text_proto
 
     @classmethod
     def _to_recorded_voiceover_proto(cls, recorded_voiceovers):
@@ -2603,17 +2605,17 @@ class Exploration:
         Returns:
             Proto Object. The recorded voiceovers proto object.
         """
-        voiceover_language_mapping_protos = (
-            cls._to_voiceovers_language_mapping_protos(
+        voiceover_content_mapping_protos = (
+            cls._to_voiceovers_content_mapping_protos(
                 recorded_voiceovers.voiceovers_mapping))
 
         recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
-            voiceover_language_mapping=voiceover_language_mapping_protos)
+            voiceover_langauge_mapping=voiceover_content_mapping_protos)
 
         return recorded_voiceover_proto
 
     @classmethod
-    def _to_voiceovers_language_mapping_protos(cls, voiceovers_mapping):
+    def _to_voiceovers_content_mapping_protos(cls, voiceovers_mapping):
         """Creates a VoiceoverContentMapping proto object.
 
         Args:
@@ -2624,27 +2626,32 @@ class Exploration:
         Returns:
             Proto Object. The recorded voiceovers proto object.
         """
-        voiceover_language_mapping_protos = {}
         voiceover_content_mapping_protos = {}
+        voiceover_content_mapping_list_proto = []
+        voiceover_langauge_mapping_list = []
 
         for (content_id, language_code_to_voiceover) in (
             voiceovers_mapping.items()):
             for (language_code, voiceover) in (
                 language_code_to_voiceover.items()):
+                if language_code == 'en':
+                    voiceover_content_mapping_proto = (
+                        languages_pb2.VoiceoverContentMapping(
+                            language_code=languages_pb2.LanguageType.ENGLISH,
+                            voiceover_content_mapping=(
+                                voiceover_content_mapping_protos)))
+                
                 voiceover_proto = cls._to_voiceover_proto(
                     voiceover.filename,
                     voiceover.file_size_bytes,
                     voiceover.duration_secs)
                 voiceover_content_mapping_protos[language_code] = (
                     voiceover_proto)
-            voiceover_content_mapping_proto = (
-                languages_pb2.VoiceoverContentMapping(
-                    voiceover_content_mapping=(
-                        voiceover_content_mapping_protos)))
-            voiceover_language_mapping_protos[content_id] = (
+
+            voiceover_content_mapping_list_proto.append(
                 voiceover_content_mapping_proto)
 
-        return voiceover_language_mapping_protos
+        return voiceover_content_mapping_list_proto
 
     @classmethod
     def _to_voiceover_proto(cls, filename, file_size_bytes, duration_secs):
@@ -2661,7 +2668,7 @@ class Exploration:
         Returns:
             Proto Object. The voiceover proto object.
         """
-        voiceover_proto = languages_pb2.Voiceover(
+        voiceover_proto = languages_pb2.VoiceoverFile(
             filename=filename,
             file_size_bytes=file_size_bytes,
             duration_secs=duration_secs
@@ -2702,8 +2709,8 @@ class Exploration:
         Returns:
             Proto Object. The written translations proto object.
         """
-        translation_language_mapping_protos = {}
         translation_content_mapping_protos = {}
+        translation_content_mapping_list_proto = []
 
         for (content_id, language_code_to_translation) in (
             translations_mapping.items()):
@@ -2719,10 +2726,10 @@ class Exploration:
                 languages_pb2.WrittenTranslationContentMapping(
                     translation_content_mapping=(
                         translation_content_mapping_protos)))
-            translation_language_mapping_protos[content_id] = (
+            translation_content_mapping_list_proto.append(
                 translation_content_mapping_proto)
 
-        return translation_language_mapping_protos
+        return translation_content_mapping_list_proto
 
     @classmethod
     def _to_written_translation_proto(cls, data_format, translation):
@@ -2832,7 +2839,7 @@ class Exploration:
         interaction_proto = None
         if interaction.id == 'Continue':
             interaction_proto = state_pb2.InteractionInstance(
-                continue_=cls._to_continue_proto(interaction))
+                continue_instance=cls._to_continue_proto(interaction))
 
         if interaction.id == 'FractionInput':
             interaction_proto = state_pb2.InteractionInstance(
@@ -2900,10 +2907,36 @@ class Exploration:
             interaction.default_outcome.dest,
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
+        customization_args_proto = (
+            cls._to_continue_customization_args_proto(
+                interaction.customization_args))
         continue_proto = state_pb2.ContinueInstance(
+            customization_args=customization_args_proto,
             default_outcome=outcome_proto)
 
         return continue_proto
+
+    @classmethod
+    def _to_continue_customization_args_proto(cls, customization_args):
+        """Creates a CustomizationArgs proto object
+            for ContinueInstance.
+
+        Args:
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+
+        Returns:
+            Proto Object. The CustomizationArgs proto object.
+        """
+        customization_arg_proto = (
+            state_pb2.ContinueInstance.CustomizationArgs(
+                button_text=cls._to_subtitled_text_proto(
+                    customization_args['buttonText'].value.content_id,
+                    customization_args['buttonText'].value.unicode_str)))
+
+        return customization_arg_proto
 
     @classmethod
     def _to_outcome_proto(
@@ -2920,7 +2953,9 @@ class Exploration:
         Returns:
             Proto Object. The Outcome proto object.
         """
-        feedback_proto = cls._to_subtitled_html_proto(feedback)
+        feedback_proto = cls._to_subtitled_text_proto(
+            feedback.content_id,
+            feedback.html)
         outcome_proto = state_pb2.Outcome(
             destination_state=destination_state,
             feedback=feedback_proto,
@@ -3324,7 +3359,9 @@ class Exploration:
             Proto Object. The BaseSolution proto object.
         """
         base_solution_proto = state_pb2.BaseSolution(
-            explanation=cls._to_subtitled_html_proto(explanation))
+            explanation=cls._to_subtitled_text_proto(
+                explanation.content_id,
+                explanation.html))
 
         return base_solution_proto
 
@@ -3423,7 +3460,8 @@ class Exploration:
         """
         choices_list_proto = []
         for value in customization_args['choices'].value:
-            value_proto = cls._to_subtitled_html_proto(value)
+            value_proto = cls._to_subtitled_text_proto(
+                value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
         customization_arg_proto = (
@@ -3450,7 +3488,9 @@ class Exploration:
 
         for hint in hints:
             hint_content_proto = (
-                cls._to_subtitled_html_proto(hint.hint_content))
+                cls._to_subtitled_text_proto(
+                    hint.hint_content.content_id,
+                    hint.hint_content.html))
             hint_proto = state_pb2.Hint(
                 hint_content=hint_content_proto
             )
@@ -3535,7 +3575,8 @@ class Exploration:
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = cls._to_subtitled_html_proto(value)
+            value_proto = cls._to_subtitled_text_proto(
+                value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
         customization_arg_proto = (
@@ -4352,8 +4393,8 @@ class Exploration:
         """
         normalized_rectangle_2d_proto = (
             objects_pb2.ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
-                upper_left=cls._to_point2d_proto(area[0]),
-                lower_right=cls._to_point2d_proto(area[1]),
+                top_left=cls._to_point2d_proto(area[0]),
+                bottom_right=cls._to_point2d_proto(area[1]),
             ))
 
         return normalized_rectangle_2d_proto
@@ -4369,7 +4410,7 @@ class Exploration:
         Returns:
             Proto Object. The Point2d proto object.
         """
-        points_proto = objects_pb2.Point2d(
+        points_proto = objects_pb2.NormalizedPoint2d(
             x=area[0],
             y=area[1]
         )
@@ -4562,7 +4603,8 @@ class Exploration:
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = cls._to_subtitled_html_proto(value)
+            value_proto = cls._to_subtitled_text_proto(
+                value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
         customization_arg_proto = (
