@@ -21,7 +21,10 @@ import io
 import logging
 import random
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -56,9 +59,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
-import python_utils
-import utils
 
 
 class AdminPage(base.BaseHandler):
@@ -290,7 +290,7 @@ class AdminHandler(base.BaseHandler):
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+            raise e
 
     def _reload_exploration(self, exploration_id):
         """Reloads the exploration in dev_mode corresponding to the given
@@ -584,7 +584,7 @@ class AdminHandler(base.BaseHandler):
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
-            for i in python_utils.RANGE(15):
+            for i in range(15):
                 question_id = question_services.get_new_question_id()
                 question_name = 'Question number %s %s' % (
                     python_utils.UNICODE(i), skill_name)
@@ -642,7 +642,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in python_utils.RANGE(num_dummy_exps_to_generate):
+            for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()

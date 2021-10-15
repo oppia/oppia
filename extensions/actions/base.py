@@ -20,10 +20,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from extensions import domain
-import python_utils
 
 
-class BaseLearnerActionSpec(python_utils.OBJECT):
+class BaseLearnerActionSpec:
     """Base action definition class.
 
     This class is not meant to be user-editable. The only methods in it should

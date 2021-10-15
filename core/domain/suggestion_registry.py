@@ -21,7 +21,10 @@ from __future__ import unicode_literals
 
 import copy
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -35,14 +38,11 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(python_utils.OBJECT):
+class BaseSuggestion:
     """Base class for a suggestion.
 
     Attributes:
@@ -638,12 +638,6 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
-        content_html = exploration.get_content_html(
-            self.change.state_name, self.change.content_id)
-        if content_html != self.change.content_html:
-            raise utils.ValidationError(
-                'The Exploration content has changed since this translation '
-                'was submitted.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -987,12 +981,12 @@ class SuggestionAddQuestion(BaseSuggestion):
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 43)
+                        'question_state_data_schema_version'] < 45)
             )
         )
 
 
-class BaseVoiceoverApplication(python_utils.OBJECT):
+class BaseVoiceoverApplication:
     """Base class for a voiceover application."""
 
     def __init__(self):
@@ -1205,7 +1199,7 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
 }
 
 
-class CommunityContributionStats(python_utils.OBJECT):
+class CommunityContributionStats:
     """Domain object for the CommunityContributionStatsModel.
 
     Attributes:
@@ -1406,7 +1400,7 @@ class CommunityContributionStats(python_utils.OBJECT):
                     self.question_reviewer_count)))
 
 
-class TranslationContributionStats(python_utils.OBJECT):
+class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
     def __init__(
@@ -1480,7 +1474,7 @@ class TranslationContributionStats(python_utils.OBJECT):
         }
 
 
-class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
+class ReviewableSuggestionEmailInfo:
     """Stores key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.

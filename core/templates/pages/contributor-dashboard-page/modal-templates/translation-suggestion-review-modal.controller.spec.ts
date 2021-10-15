@@ -60,7 +60,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         content_html: 'Translation',
         translation_html: 'Tradução',
         state_name: 'StateName'
-      }
+      },
+      exploration_content_html: 'Translation'
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -71,7 +72,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         content_html: 'Translation',
         translation_html: 'Tradução',
         state_name: 'StateName'
-      }
+      },
+      exploration_content_html: 'Translation CHANGED'
     };
 
     const contribution1 = {
@@ -122,7 +124,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       $scope.init();
     }));
 
-    it('should user service at initialization.',
+    it('should call user service at initialization.',
       function() {
         $scope.$apply();
         expect(userInfoSpy).toHaveBeenCalled();
@@ -169,6 +171,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect($scope.activeSuggestion).toEqual(suggestion1);
       expect($scope.reviewable).toBe(reviewable);
       expect($scope.reviewMessage).toBe('');
+      // Suggestion 1's exploration_content_html matches its content_html.
+      expect($scope.hasExplorationContentChanged()).toBe(false);
 
       spyOn(
         SiteAnalyticsService,
@@ -188,6 +192,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect($scope.activeSuggestion).toEqual(suggestion2);
       expect($scope.reviewable).toBe(reviewable);
       expect($scope.reviewMessage).toBe('');
+      // Suggestion 2's exploration_content_html does not match its
+      // content_html.
+      expect($scope.hasExplorationContentChanged()).toBe(true);
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -361,10 +368,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
+      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected'
     };
     const suggestion2 = {
@@ -376,7 +384,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         content_html: 'Translation',
         translation_html: 'Tradução',
         state_name: 'StateName'
-      }
+      },
+      exploration_content_html: 'Translation'
     };
 
     const contribution1 = {
@@ -421,6 +430,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.subheading).toBe('subheading_title');
+        // Suggestion 1's exploration_content_html does not match its
+        // content_html.
+        expect($scope.hasExplorationContentChanged()).toBe(true);
 
         var messages = [{
           author_username: '',

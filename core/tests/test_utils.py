@@ -32,7 +32,11 @@ import os
 import re
 import unittest
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.controllers import base
 from core.domain import auth_domain
 from core.domain import caching_domain
@@ -60,12 +64,8 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
-import feconf
 import main
 from proto_files import text_classifier_pb2
-import python_utils
-import schema_utils
-import utils
 
 import elasticsearch
 import requests_mock
@@ -199,7 +199,7 @@ def get_storage_model_classes():
                     yield clazz
 
 
-class ElasticSearchStub(python_utils.OBJECT):
+class ElasticSearchStub:
     """This stub class mocks the functionality of ES in
     elastic_search_services.py.
 
@@ -514,7 +514,7 @@ class ElasticSearchStub(python_utils.OBJECT):
         }
 
 
-class AuthServicesStub(python_utils.OBJECT):
+class AuthServicesStub:
     """Test-only implementation of the public API in core.platform.auth."""
 
     def __init__(self):
@@ -532,7 +532,7 @@ class AuthServicesStub(python_utils.OBJECT):
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -676,7 +676,7 @@ class AuthServicesStub(python_utils.OBJECT):
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return python_utils.NEXT(
+        return next(
             (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
             None)
 
@@ -765,7 +765,7 @@ class AuthServicesStub(python_utils.OBJECT):
         self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
-class TaskqueueServicesStub(python_utils.OBJECT):
+class TaskqueueServicesStub:
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.taskqueue taskqueue services API.
     """
@@ -866,7 +866,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         return self._client.get_tasks(queue_name=queue_name)
 
 
-class MemoryCacheServicesStub(python_utils.OBJECT):
+class MemoryCacheServicesStub:
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.cache cache services API.
     """
@@ -1046,7 +1046,7 @@ class TestBase(unittest.TestCase):
         """
         captured_logs = []
 
-        class ListStream(python_utils.OBJECT):
+        class ListStream:
             """Stream-like object that appends writes to the captured logs."""
 
             def write(self, msg):
@@ -1222,13 +1222,13 @@ class TestBase(unittest.TestCase):
             self.longMessage = True
 
             if expected_args:
-                next_args = python_utils.NEXT(expected_args_iter, None)
+                next_args = next(expected_args_iter, None)
                 self.assertEqual(
                     args, next_args, msg='*args to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))
 
             if expected_kwargs:
-                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                next_kwargs = next(expected_kwargs_iter, None)
                 self.assertEqual(
                     kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))
@@ -1378,7 +1378,7 @@ class AppEngineTestBase(TestBase):
     SERVER_PORT = '8080'
     DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AppEngineTestBase, self).__init__(*args, **kwargs)
         # Defined outside of setUp() because we access it from methods, but can
         # only install it during the run() method. Defining it in __init__
@@ -1392,7 +1392,7 @@ class AppEngineTestBase(TestBase):
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         storage_services.CLIENT.reset()
@@ -1820,7 +1820,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
@@ -1858,7 +1858,7 @@ title: Title
 
             super(GenericTestBase, self).run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
@@ -2296,13 +2296,15 @@ title: Title
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, data, csrf_token=None, expected_status_int=200,
-            upload_files=None, use_payload=True, source=None):
+            self, url, data, headers=None, csrf_token=None,
+            expected_status_int=200, upload_files=None, use_payload=True,
+            source=None):
         """Post an object to the server by JSON; return the received object.
 
         Args:
             url: str. The URL to send the POST request to.
             data: dict. The dictionary that acts as the body of the request.
+            headers: dict. The headers set in the request.
             csrf_token: str. The csrf token to identify the user.
             expected_status_int: int. Expected return status of the POST
                 request.
@@ -2332,7 +2334,8 @@ title: Title
 
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors,
-            expected_status_int=expected_status_int, upload_files=upload_files)
+            expected_status_int=expected_status_int, upload_files=upload_files,
+            headers=headers)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -2618,7 +2621,7 @@ title: Title
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
-                from_state, python_utils.NEXT(interaction_ids))
+                from_state, next(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
             if correctness_feedback_enabled:
                 from_state.interaction.default_outcome.labelled_as_correct = (
@@ -3400,7 +3403,7 @@ class LinterTestBase(GenericTestBase):
         self.assertEqual(failed_count, expected_failed_count)
 
 
-class EmailMessageMock(python_utils.OBJECT):
+class EmailMessageMock:
     """Mock for core.platform.models email services messages."""
 
     def __init__(
@@ -3618,7 +3621,7 @@ class ClassifierTestBase(GenericEmailTestBase):
         return classifier_data_proto
 
 
-class FunctionWrapper(python_utils.OBJECT):
+class FunctionWrapper:
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
     methods for more info.

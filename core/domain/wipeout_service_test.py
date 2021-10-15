@@ -20,7 +20,8 @@ from __future__ import unicode_literals
 import datetime
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -44,8 +45,6 @@ from core.domain import wipeout_domain
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     app_feedback_report_models, auth_models, blog_models,
@@ -186,6 +185,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.add_user_role(
             self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -434,6 +435,26 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'exp_id',
             self.user_2_id,
             feconf.ROLE_EDITOR)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertFalse(exp_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertTrue(exp_summary_model.community_owned)
+
+    def test_pre_delete_user_exploration_ownership_is_released_with_voice_art(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            self.user_1_actions,
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST)
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertFalse(exp_summary_model.community_owned)
@@ -708,7 +729,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
@@ -729,6 +750,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -750,6 +772,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -771,6 +794,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -906,7 +930,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
@@ -928,6 +952,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -949,6 +974,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -983,6 +1009,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -2127,7 +2154,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_feedbacks_are_pseudonymized(self):
         feedback_thread_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_thread_models.append(
                 feedback_models.GeneralFeedbackThreadModel(
                     id='feedback-%s' % i,
@@ -2142,7 +2169,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
                 feedback_thread_models)
         feedback_message_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
                 feedback_models.GeneralFeedbackMessageModel(
                     id='message-%s' % i,
@@ -3797,6 +3824,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
     VOICEOVER_1_ID = 'voiceover_1_id'
     VOICEOVER_2_ID = 'voiceover_2_id'
+    TRANSLATION_STATS_1_ID = 'translation_1_id'
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
 
@@ -3828,6 +3856,20 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             author_id=self.user_2_id,
             final_reviewer_id=self.user_1_id,
         ).put()
+        suggestion_models.TranslationContributionStatsModel(
+            id=self.TRANSLATION_STATS_1_ID,
+            language_code='cs',
+            contributor_user_id=self.user_1_id,
+            topic_id='topic',
+            submitted_translations_count=1,
+            submitted_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=2,
+            accepted_translation_word_count=3,
+            rejected_translations_count=4,
+            rejected_translation_word_count=6,
+            contribution_dates=[]
+        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -3857,6 +3899,14 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             voiceover_application_model_2.final_reviewer_id,
             suggestion_mappings[self.VOICEOVER_2_ID]
         )
+
+    def test_translation_contribution_stats_are_deleted(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.TranslationContributionStatsModel.get_by_id(
+                self.TRANSLATION_STATS_1_ID))
 
 
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(
@@ -4862,7 +4912,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_blog_post_models_are_pseudonymized(self):
         blog_post_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_models_list.append(
                 blog_models.BlogPostModel(
                     id='blogmodel-%s' % i,
@@ -4878,7 +4928,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             blog_models.BlogPostModel.update_timestamps_multi(
                 blog_post_models_list)
         blog_post_summary_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_summary_models_list.append(
                 blog_models.BlogPostSummaryModel(
                     id='blogmodel-%s' % i,
@@ -4895,7 +4945,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_models_list)
 
         blog_post_rights_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_rights_models_list.append(
                 blog_models.BlogPostRightsModel(
                     id='blogmodel-%s' % i,

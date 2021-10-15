@@ -94,7 +94,7 @@ angular.module('oppia').component('contributorDashboardPage', {
 
       ctrl.showLanguageSelector = function() {
         var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-        return (activeTabDetail.customizationOptions.includes('language'));
+        return activeTabDetail.customizationOptions.includes('language');
       };
 
       ctrl.onChangeTopic = function(topicName: string) {
@@ -107,7 +107,7 @@ angular.module('oppia').component('contributorDashboardPage', {
 
       ctrl.showTopicSelector = function() {
         var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-        return (activeTabDetail.customizationOptions.includes('topic'));
+        return activeTabDetail.customizationOptions.includes('topic');
       };
 
       ctrl.onTabClick = function(activeTabName) {

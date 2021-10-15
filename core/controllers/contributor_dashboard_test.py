@@ -17,7 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -32,8 +34,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -75,7 +75,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -116,7 +116,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -149,7 +149,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 0',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
 
         self.expected_opportunity_dict_2 = {
@@ -158,7 +159,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 1',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
@@ -486,7 +488,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -510,7 +512,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'

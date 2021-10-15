@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import base64
 
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
 
 from typing import Dict, List, Optional, Union
 
@@ -89,7 +89,7 @@ def send_email_to_recipients(
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_lists = [
         recipient_emails[i:i + 1000]
-        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
+        for i in range(0, len(recipient_emails), 1000)]
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,

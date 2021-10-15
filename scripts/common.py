@@ -30,8 +30,8 @@ import subprocess
 import sys
 import time
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -143,7 +143,7 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
-FECONF_PATH = os.path.join('feconf.py')
+FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
@@ -277,12 +277,12 @@ def open_new_tab_in_browser_if_possible(url):
         python_utils.PRINT(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
-        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+        USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
         python_utils.PRINT(
             'Please open the following link in browser: %s' % url)
         return
-    browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
+    browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
@@ -300,7 +300,7 @@ def open_new_tab_in_browser_if_possible(url):
     python_utils.PRINT(
         'the function open_new_tab_in_browser_if_possible() to work on your')
     python_utils.PRINT('system.')
-    python_utils.INPUT()
+    input()
 
 
 def get_remote_alias(remote_url):
@@ -501,7 +501,7 @@ def ask_user_to_confirm(message):
             '******************************************************')
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
+        answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
@@ -749,7 +749,7 @@ def fix_third_party_imports() -> None:
     sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
-class CD(python_utils.OBJECT):
+class CD:
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

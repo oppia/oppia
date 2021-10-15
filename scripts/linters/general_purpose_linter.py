@@ -22,8 +22,6 @@ from __future__ import unicode_literals
 import os
 import re
 
-import python_utils
-
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
 
@@ -214,43 +212,31 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'urllib\..*quote\('),
         'message': 'Please use python_utils.url_quote().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*unquote_plus\('),
-        'message': 'Please use python_utils.url_unquote_plus().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
+        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urllib\..*urlencode\('),
         'message': 'Please use python_utils.url_encode().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
+        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urllib\..*urlretrieve\('),
         'message': 'Please use python_utils.url_retrieve().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
+        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urllib(2)?\..*urlopen\('),
         'message': 'Please use python_utils.url_open().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
+        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'object\):'),
-        'message': 'Please use python_utils.OBJECT.',
-        'excluded_files': (),
+        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
 ]
@@ -352,7 +338,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
     return failed, total_error_count, error_messages
 
 
-class GeneralPurposeLinter(python_utils.OBJECT):
+class GeneralPurposeLinter:
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
     """

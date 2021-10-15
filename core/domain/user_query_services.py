@@ -19,7 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core.constants import constants
 from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models

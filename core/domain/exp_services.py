@@ -34,8 +34,11 @@ import os
 import pprint
 import zipfile
 
-import android_validation_constants
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
@@ -59,9 +62,6 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -162,7 +162,7 @@ def get_exploration_ids_matching_query(
     returned_exploration_ids = []
     search_offset = offset
 
-    for _ in python_utils.RANGE(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -377,8 +377,7 @@ def apply_change_list(exploration_id, change_list):
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(
-                        list(python_utils.MAP(
+                    state.update_param_changes(list(map(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     content = (
@@ -537,7 +536,7 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(list(
-                        python_utils.MAP(to_param_domain, change.new_value)))
+                        map(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -571,7 +570,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -946,7 +945,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = list(python_utils.RANGE(1, current_version + 1))
+    version_nums = list(range(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)
@@ -1742,7 +1741,7 @@ def get_composite_change_list(exp_id, from_version, to_version):
             'of exploration to version %s.'
             % (from_version, to_version))
 
-    version_nums = list(python_utils.RANGE(from_version + 1, to_version + 1))
+    version_nums = list(range(from_version + 1, to_version + 1))
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
         exp_id, version_nums, allow_deleted=False)
 

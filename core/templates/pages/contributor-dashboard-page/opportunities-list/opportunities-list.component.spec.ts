@@ -42,13 +42,19 @@ describe('Opportunities List Component', () => {
     id: 'id1',
     labelText: 'text',
     labelColor: 'red',
-    progressPercentage: 50
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
   },
   {
     id: 'id2',
     labelText: 'text',
     labelColor: 'blue',
-    progressPercentage: 30
+    progressPercentage: 30,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 30
   }];
 
   beforeEach(() => {
@@ -126,7 +132,10 @@ describe('Opportunities List Component', () => {
         id: 'id1',
         labelText: 'text',
         labelColor: 'red',
-        progressPercentage: 50
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
       }
     ]);
   }));

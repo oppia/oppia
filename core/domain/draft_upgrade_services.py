@@ -21,13 +21,13 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import python_utils
+from core import utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
-import python_utils
-import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -72,8 +72,7 @@ def try_upgrading_draft_to_exp_version(
     if current_draft_version == to_exp_version:
         return None
 
-    exp_versions = list(
-        python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
+    exp_versions = list(range(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
         exp_models.ExplorationCommitLogEntryModel.get_multi(
             exp_id, exp_versions))
@@ -100,7 +99,7 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-class DraftUpgradeUtil(python_utils.OBJECT):
+class DraftUpgradeUtil:
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
@@ -209,6 +208,21 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'state_name': change.state_name,
                     'new_value': new_value
                 })
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
+        """Converts draft change list from state version 48 to 49. State
+        version 49 adds requireNonnegativeInput customization_arg to
+        NumericInput interaction.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
         return draft_change_list
 
     @classmethod
