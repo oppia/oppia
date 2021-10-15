@@ -42,8 +42,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/',
     'core/domain/action_registry.py',
     'core/domain/action_registry_test.py',
-    'core/domain/activity_domain.py',
-    'core/domain/activity_domain_test.py',
     'core/domain/activity_jobs_one_off.py',
     'core/domain/activity_jobs_one_off_test.py',
     'core/domain/activity_services.py',
