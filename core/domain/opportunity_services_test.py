@@ -542,7 +542,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.owner_id, '0', translation_needs_update_change_list,
             'commit message')
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
+            opportunity_services.get_translation_opportunities(
+                'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
