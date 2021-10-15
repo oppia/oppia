@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import builtins
+import contextlib
 import getpass
 import os
 import re
@@ -566,9 +567,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.LIST_OF_FILEPATHS_TO_MODIFY
         )
 
-    def test_update_version_in_config_files_updates_version_in_package_json(
-            self
-    ):
+    def test_update_version_in_config_files_updates_version(self):
         package_json_swap = self.swap(
             update_changelog_and_credits,
             'PACKAGE_JSON_FILEPATH',
@@ -576,20 +575,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         )
         package_json_content = python_utils.open_file(
             MOCK_PACKAGE_JSON_PATH, 'r').read()
-        regex = re.compile('"version": ".*"')
-        expected_package_json_content = regex.sub(
+        package_json_regex = re.compile('"version": ".*"')
+        expected_package_json_content = package_json_regex.sub(
             '"version": "1.2.3"', package_json_content)
-        try:
-            with self.branch_name_swap, package_json_swap:
-                update_changelog_and_credits.update_version_in_config_files()
-            updated_package_json_content = python_utils.open_file(
-                MOCK_PACKAGE_JSON_PATH, 'r').read()
-            self.assertEqual(
-                updated_package_json_content, expected_package_json_content)
-        finally:
-            write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
 
-    def test_update_version_in_config_files_updates_version_in_setup_py(self):
         setup_py_swap = self.swap(
             update_changelog_and_credits,
             'SETUP_PY_FILEPATH',
@@ -597,33 +586,38 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         )
         setup_py_content = python_utils.open_file(
             MOCK_SETUP_PY_PATH, 'r').read()
-        regex = re.compile('version=\'.*\'')
-        expected_setup_py_content = regex.sub(
+        setup_py_regex = re.compile(r'version=\'.*\'')
+        expected_setup_py_content = setup_py_regex.sub(
             'version=\'1.2.3\'', setup_py_content)
-        try:
-            with self.branch_name_swap, setup_py_swap:
-                update_changelog_and_credits.update_version_in_config_files()
-            updated_setup_py_content = python_utils.open_file(
-                MOCK_SETUP_PY_PATH, 'r').read()
-            self.assertEqual(
-                updated_setup_py_content, expected_setup_py_content)
-        finally:
-            write_to_file(MOCK_SETUP_PY_PATH, setup_py_content)
 
-    def test_update_version_in_config_files_updates_version_in_feconf(self):
         feconf_swap = self.swap(common, 'FECONF_PATH', MOCK_FECONF_PATH)
         feconf_content = python_utils.open_file(MOCK_FECONF_PATH, 'r').read()
-        regex = re.compile('OPPIA_VERSION = \'.*\'')
-        expected_feconf_content = regex.sub(
+        feconf_regex = re.compile('OPPIA_VERSION = \'.*\'')
+        expected_feconf_content = feconf_regex.sub(
             'OPPIA_VERSION = \'1.2.3\'', feconf_content)
+
         try:
-            with self.branch_name_swap, feconf_swap:
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(self.branch_name_swap)
+                stack.enter_context(feconf_swap)
+                stack.enter_context(setup_py_swap)
+                stack.enter_context(package_json_swap)
                 update_changelog_and_credits.update_version_in_config_files()
-            updated_feconf_content = python_utils.open_file(
+            updated_package_json_content = python_utils.open_file(
                 MOCK_PACKAGE_JSON_PATH, 'r').read()
+            updated_setup_py_content = python_utils.open_file(
+                MOCK_SETUP_PY_PATH, 'r').read()
+            updated_feconf_content = python_utils.open_file(
+                MOCK_FECONF_PATH, 'r').read()
+            self.assertEqual(
+                updated_package_json_content, expected_package_json_content)
+            self.assertEqual(
+                updated_setup_py_content, expected_setup_py_content)
             self.assertEqual(updated_feconf_content, expected_feconf_content)
         finally:
-            write_to_file(MOCK_PACKAGE_JSON_PATH, feconf_content)
+            write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
+            write_to_file(MOCK_SETUP_PY_PATH, setup_py_content)
+            write_to_file(MOCK_FECONF_PATH, feconf_content)
 
     def test_function_calls(self):
         check_function_calls = {
@@ -688,7 +682,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
-        def mock_update_package_json():
+        def mock_update_version_in_config_files():
             check_function_calls['update_package_json_gets_called'] = True
 
         get_org_swap = self.swap(
@@ -726,8 +720,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         update_swap = self.swap(
-            update_changelog_and_credits, 'update_package_json',
-            mock_update_package_json)
+            update_changelog_and_credits, 'update_version_in_config_files',
+            mock_update_version_in_config_files)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
             with self.getpass_swap, input_swap, check_prs_swap:
