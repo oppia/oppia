@@ -644,7 +644,6 @@ def inplace_replace_file(
         with python_utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
-        os.remove(backup_filename)
 
         if (
                 expected_number_of_replacements is not None and
@@ -656,6 +655,8 @@ def inplace_replace_file(
                     total_number_of_replacements
                 )
             )
+
+        os.remove(backup_filename)
 
     except Exception:
         # Restore the content if there was en error.
