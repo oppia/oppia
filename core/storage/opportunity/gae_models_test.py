@@ -162,7 +162,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
 
         results, third_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, second_cursor, 'hi'))
+            .get_all_translation_opportunities(1, second_cursor, 'hi', ''))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
