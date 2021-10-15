@@ -152,7 +152,7 @@ for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
 
-class FileCache(python_utils.OBJECT):
+class FileCache:
     """Provides thread-safe access to cached file content."""
 
     def __init__(self):
