@@ -28,6 +28,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
@@ -42,11 +43,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
-        'UndoRedoService',
+        'UndoRedoService', 'UrlService',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
             SkillEditorRoutingService, SkillEditorStateService,
-            UndoRedoService) {
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var ACTIVE_TAB_EDITOR = 'Editor';
@@ -70,17 +71,18 @@ angular.module('oppia').directive('skillEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
-            SkillEditorStateService.loadSkill(ctrl.skill.getId());
+            SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
           };
 
           $scope.getWarningsCount = function() {
-            return ctrl.skill.getValidationIssues().length;
+            return SkillEditorStateService.getSkillValidationIssues().length;
           };
 
           $scope.isSkillSaveable = function() {
             return (
               $scope.getChangeListCount() > 0 &&
-              ctrl.skill.getValidationIssues().length === 0);
+              $scope.getWarningsCount() === 0
+            );
           };
 
           $scope.saveChanges = function() {
@@ -142,7 +144,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
 
           ctrl.$onInit = function() {
             $scope.activeTab = ACTIVE_TAB_EDITOR;
-            ctrl.skill = SkillEditorStateService.getSkill();
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(
                 () => $rootScope.$applyAsync()));

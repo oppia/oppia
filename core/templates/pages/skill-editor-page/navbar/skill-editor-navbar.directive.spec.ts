@@ -25,6 +25,7 @@ import { SkillEditorStateService } from '../services/skill-editor-state.service'
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { EventEmitter } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { UrlService } from 'services/contextual/url.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -40,6 +41,7 @@ describe('Skill Editor Navbar Directive', function() {
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
+  let urlService: UrlService = null;
 
   let sampleSkill: Skill = null;
   let mockEventEmitter = new EventEmitter();
@@ -64,6 +66,7 @@ describe('Skill Editor Navbar Directive', function() {
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     undoRedoService = $injector.get('UndoRedoService');
+    urlService = $injector.get('UrlService');
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
@@ -90,13 +93,11 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should set properties when initialized', function() {
     expect($scope.activeTab).toBe(undefined);
-    expect(ctrl.skill).toEqual(undefined);
 
     ctrl.$onInit();
     mockEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
-    expect(ctrl.skill).toEqual(sampleSkill);
   });
 
   it('should get current active tab name when ' +
@@ -143,19 +144,32 @@ describe('Skill Editor Navbar Directive', function() {
     '\'discardChanges\'', function() {
     let discardSpy = spyOn(undoRedoService, 'clearChanges')
       .and.returnValue(null);
+    let loadSkillSpy = spyOn(skillEditorStateService, 'loadSkill')
+      .and.returnValue(null);
+    let urlSpy = spyOn(urlService, 'getSkillIdFromUrl')
+      .and.returnValue('');
 
     ctrl.$onInit();
     $scope.discardChanges();
 
     expect(discardSpy).toHaveBeenCalled();
+    expect(loadSkillSpy).toHaveBeenCalled();
+    expect(urlSpy).toHaveBeenCalled();
   });
 
   it('should get change list count when calling ' +
     '\'getChangeListCount\'', function() {
-    ctrl.$onInit();
-    let result = $scope.getWarningsCount();
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(3);
 
-    expect(result).toBe(1);
+    expect($scope.getChangeListCount()).toBe(3);
+  });
+
+  it('should get number of warnings when calling ' +
+    '\'getWarningsCount\'', function() {
+    spyOn(skillEditorStateService, 'getSkillValidationIssues')
+      .and.returnValue(['issue 1', 'issue 2', 'issue 3']);
+
+    expect($scope.getWarningsCount()).toBe(3);
   });
 
   it('should check whether the skill is saveable when ' +
