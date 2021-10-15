@@ -44,7 +44,7 @@ def validate_change(obj):
     if obj['cmd'] in feconf.LIST_CMD_EXPLORATION_CHANGE:
         exp_domain.ExplorationChange(obj)
     elif obj['cmd'] in feconf.LIST_CMD_QUESTION_CHANGE:
-        question_domain.QuestionChange(obj)
+        question_domain.QuestionSuggestionChange(obj)
     else:
         raise base.BaseHandler.InvalidInputException(
             '%s cmd is not allowed.' % obj['cmd']
