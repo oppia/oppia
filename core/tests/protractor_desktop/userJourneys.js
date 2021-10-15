@@ -259,17 +259,17 @@ describe('Site language', function() {
       // Checking collection player page.
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-share-collection-footer')).getText())
-        .toEqual('COMPARTIR ESTA COLECCIÓN');
+      var testCollectionFooter = element(by.css('.protractor-test-share-collection-footer'));
+      var footerText = await action.getText('Share Collection Footer', testCollectionFooter);
+      expect(footerText).toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-author-profile-text')).getText())
-        .toEqual('PERFILES DE AUTORES');
+      var testProfileText = element(by.css('.protractor-test-author-profile-text'));
+      var authorProfileText = await action.getText('Share Profile Text', testProfileText);
+      expect(authorProfileText).toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }
   );

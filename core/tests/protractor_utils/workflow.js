@@ -59,15 +59,18 @@ var checkForAddTitleWarning = async function() {
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  await element(by.css('.protractor-test-exploration-title-input')).click();
-  await element(by.css('.protractor-test-exploration-objective-input')).click();
+  var testExplorationTitleInput = element(by.css('.protractor-test-exploration-title-input'));
+  await action.click('Test Exploration Title Input', testExplorationTitleInput);
+  var testExplorationObjectiveInput = element(by.css('.protractor-test-exploration-objective-input'));
+  await action.click('Test Exploration Objective Input', testExplorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys(
-    'Chuck Norris');
+  var testEditRoles = element(by.css('.protractor-test-edit-roles'));
+  await action.click('Test Edit Roles', testEditRoles);
+  var testEditRoleUsername = element(by.css('.protractor-test-role-username'));
+  await action.sendKeys('Test Role Username', testEditRoleUsername, 'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
@@ -128,7 +131,8 @@ var publishExploration = async function() {
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
-  await element(by.css('.protractor-test-publish-exploration')).click();
+  var testPublishExploration = element(by.css('.protractor-test-publish-exploration'));
+  await action.click('Test Publish Exploration', testPublishExploration);
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
@@ -139,7 +143,8 @@ var publishExploration = async function() {
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  await element(by.css('.protractor-test-confirm-publish')).click();
+  var testConfirmPublish = element(by.css('.protractor-test-confirm-publish'));
+  await action.click('Test Confirm Publish', testConfirmPublish);
 
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
