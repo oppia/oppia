@@ -44,7 +44,7 @@ def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> Any:
     """This method extracts the new key for an argument from its schema.
 
     Args:
-        arg_schema: str. Schema for an argument.
+        arg_schema: dict(str, *). Schema for an argument.
 
     Returns:
         str. Returns the new argument name as mentioned in the schema.
