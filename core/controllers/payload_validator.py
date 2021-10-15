@@ -27,7 +27,7 @@ from core import schema_utils
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
-def get_schema_type(arg_schema):
+def get_schema_type(arg_schema: Dict[str, Any]) -> Any:
     """This method returns the schema type for an argument by accepting the
     schema for the corresponding argument.
 
@@ -38,6 +38,18 @@ def get_schema_type(arg_schema):
         str. Returns schema type by extracting it from schema.
     """
     return arg_schema['schema']['type']
+
+
+def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> Any:
+    """This method extracts the new key for an argument from its schema.
+
+    Args:
+        arg_schema: str. Schema for an argument.
+
+    Returns:
+        str. Returns the new argument name as mentioned in the schema.
+    """
+    return arg_schema['schema']['new_key_for_argument']
 
 
 # This function recursively uses the schema dictionary and handler_args, and
@@ -97,6 +109,11 @@ def validate_arguments_against_schema(
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
+
+        # Modification of argument name if new_key_for_argument field is present
+        # in the schema.
+        if 'new_key_for_argument' in arg_schema['schema']:
+            arg_key = get_corresponding_key_for_object(arg_schema)
 
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(

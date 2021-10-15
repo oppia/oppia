@@ -150,3 +150,35 @@ class CheckConversionOfStringToBool(test_utils.GenericTestBase):
             payload_validator.convert_string_to_bool('any_other_value'),
             'any_other_value'
         )
+
+
+class CheckGetCorrespondingKeyForObjectMethod(test_utils.GenericTestBase):
+    """Test class to check behaviour of get_corresponding_key_for_object
+    method."""
+
+    def test_check_new_arg_key(self) -> None:
+        """Test case to check behaviour of new arg key name."""
+        sample_arg_schema = {
+            'schema': {
+                'new_key_for_argument': 'sample_new_arg_name'
+            }
+        }
+        new_key_name = payload_validator.get_corresponding_key_for_object(
+            sample_arg_schema)
+
+        self.assertEqual(new_key_name, 'sample_new_arg_name')
+
+
+class CheckGetSchemaTypeMethod(test_utils.GenericTestBase):
+    """Test class to check behaviour of get_schema_type method."""
+
+    def test_check_new_arg_key(self) -> None:
+        """Test case to check behaviour of get_schema_type method."""
+        sample_arg_schema = {
+            'schema': {
+                'type': 'bool'
+            }
+        }
+        schema_type = payload_validator.get_schema_type(sample_arg_schema)
+
+        self.assertEqual(schema_type, 'bool')
