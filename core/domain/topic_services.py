@@ -27,6 +27,7 @@ from core import python_utils
 from core import utils
 from core.domain import caching_services
 from core.domain import feedback_services
+from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -196,7 +197,6 @@ def apply_change_list(topic_id, change_list):
             topic_id, existing_subtopic_page_ids_to_be_modified))
     for subtopic_page in modified_subtopic_pages_list:
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
-
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
@@ -298,6 +298,11 @@ def apply_change_list(topic_id, change_list):
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
                     page_contents = state_domain.SubtitledHtml.from_dict(
                         change.new_value)
+                    page_contents.image_sizes_in_bytes = (
+                        html_cleaner.get_image_sizes_in_bytes_from_html(
+                            page_contents.html,
+                            feconf.ENTITY_TYPE_TOPIC,
+                            topic_id))
                     page_contents.validate()
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
