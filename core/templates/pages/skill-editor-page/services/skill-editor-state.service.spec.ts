@@ -434,7 +434,9 @@ describe('Skill editor state service', () => {
 
   it('should get validation issues for the skill', fakeAsync(() => {
     skillEditorStateService.loadSkill('skill_id_1');
+
     tick(1000);
+
     expect(skillEditorStateService.getSkillValidationIssues()).toEqual([]);
   }));
 

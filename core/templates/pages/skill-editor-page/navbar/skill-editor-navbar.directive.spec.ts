@@ -160,6 +160,7 @@ describe('Skill Editor Navbar Directive', function() {
   it('should get change list count when calling ' +
     '\'getChangeListCount\'', function() {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(3);
+
     expect($scope.getChangeListCount()).toBe(3);
   });
 
@@ -167,6 +168,7 @@ describe('Skill Editor Navbar Directive', function() {
     '\'getWarningsCount\'', function() {
     spyOn(skillEditorStateService, 'getSkillValidationIssues')
       .and.returnValue(['issue 1', 'issue 2', 'issue 3']);
+
     expect($scope.getWarningsCount()).toBe(3);
   });
 
