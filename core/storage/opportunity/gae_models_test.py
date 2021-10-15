@@ -173,9 +173,10 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_translation_opportunities_by_topic(self) -> None:
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(5, None, 'hi', 'A topic'))
-        self.assertEqual(len(results), 1)
+            .get_all_translation_opportunities(5, None, 'hi', 'a_topic name'))
+        self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertEqual(results[1].id, 'opportunity_id3')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
