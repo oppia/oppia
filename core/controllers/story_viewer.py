@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import skill_fetchers
+from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
@@ -39,6 +40,14 @@ class StoryPageDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
@@ -85,6 +94,24 @@ class StoryProgressHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+        'node_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': ('%s[0-9]+' % story_domain.NODE_ID_PREFIX)
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {}
+    }
 
     def _record_node_completion(
             self, story_id, node_id, completed_node_ids, ordered_nodes):
