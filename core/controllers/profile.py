@@ -420,7 +420,6 @@ class ExportAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
-        
         # Retrieve user data.
         user_takeout_object = takeout_service.export_data_for_user(
             self.user_id)
