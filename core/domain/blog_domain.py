@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 from core.domain import html_cleaner
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
@@ -233,7 +233,9 @@ class BlogPost:
                 'Only lowercase words, numbers separated by hyphens are'
                 ' allowed. Received %s.' % (url_fragment))
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(
+        self
+    ) -> Dict[str, Union[str, List[str], Optional[datetime.datetime]]]:
         """Returns a dict representing this blog post domain object.
 
         Returns:
@@ -256,7 +258,13 @@ class BlogPost:
         }
 
     @classmethod
-    def from_dict(cls, blog_post_dict: Dict[str, Any]) -> 'BlogPost':
+    def from_dict(
+        cls,
+        blog_post_dict: Dict[
+            str,
+            Union[str, List[str]]
+        ]
+    ) -> 'BlogPost':
         """Returns a blog post domain object from a dictionary.
 
         Args:
@@ -266,7 +274,20 @@ class BlogPost:
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
-
+        assert isinstance(blog_post_dict['last_updated'], str)
+        assert isinstance(
+            blog_post_dict['published_on'],
+            str
+        ) or blog_post_dict['published_on'] is None
+        assert isinstance(blog_post_dict['id'], str)
+        assert isinstance(blog_post_dict['author_id'], str)
+        assert isinstance(blog_post_dict['title'], str)
+        assert isinstance(blog_post_dict['content'], str)
+        assert isinstance(blog_post_dict['url_fragment'], str)
+        assert isinstance(blog_post_dict['tags'], list)
+        assert isinstance(
+            blog_post_dict['thumbnail_filename'], str
+            ) or blog_post_dict['thumbnail_filename'] is None
         last_updated = (
             utils.convert_string_to_naive_datetime_object(
                 blog_post_dict['last_updated'])
@@ -543,7 +564,9 @@ class BlogPostSummary:
         if len(set(tags)) != len(tags):
             raise utils.ValidationError('Some tags duplicate each other')
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(
+        self
+    ) -> Dict[str, Union[str, List[str], Optional[datetime.datetime]]]:
         """Returns a dict representing this blog post summary domain object.
 
         Returns:
@@ -587,7 +610,9 @@ class BlogPostRights:
         self.editor_ids = editor_ids
         self.blog_post_is_published = blog_post_is_published
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(
+        self
+    ) -> Dict[str, Union[str, List[str], bool]]:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
