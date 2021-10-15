@@ -250,7 +250,10 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         all_event_handlers = []
 
         for file_name in all_python_files:
-            if file_name.endswith('_test'):
+            if (
+                    file_name.endswith('_test') or
+                    file_name.startswith('core.tests')
+            ):
                 continue
 
             python_module = importlib.import_module(file_name)
