@@ -351,7 +351,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'dest': 'abc',
                     'feedback': {
                         'content_id': 'feedback_1',
-                        'html': '<p>Feedback</p>'
+                        'html': '<p>Feedback</p>',
+                        'image_sizes_in_bytes': {}
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
