@@ -1,7 +1,7 @@
 <div class="progress-nav-bar row space-between center">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
-  <div class="row-item">
+  <div class="row-item" [ngClass]="{'align-right': isLanguageRTL()}">
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
     <div *ngIf="hasPrevious && !helpCardHasContinueButton">
       <button mat-raised-button
@@ -12,7 +12,7 @@
       </button>
     </div>
   </div>
-  <div *ngIf="hasNext" class="row-item align-right">
+  <div *ngIf="hasNext" [ngClass]="{'align-right': !isLanguageRTL()}" class="row-item">
     <button mat-raised-button
             (click)="changeCard(displayedCardIndex+1)"
             aria-label="Next Card"

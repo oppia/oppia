@@ -1308,6 +1308,10 @@ angular.module('oppia').directive('conversationSkin', [
               });
           };
 
+          $scope.isLanguageRTL = function() {
+            return I18nLanguageCodeService.isCurrentLanguageRTL();
+          };
+
           ctrl.$onInit = function() {
             questionPlayerConfig = $scope.getQuestionPlayerConfig();
             ctrl.directiveSubscriptions.add(

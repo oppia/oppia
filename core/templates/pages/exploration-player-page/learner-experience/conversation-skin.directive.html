@@ -85,6 +85,7 @@
         <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                      ng-click="submitAnswerFromProgressNav()"
+                     ng-style="isLanguageRTL() ? {'left': '8px', 'right': 'auto'} : {'right': '8px', 'left': 'auto'}"
                      ng-disabled="isSubmitButtonDisabled()"
                      translate="I18N_INTERACTIONS_SUBMIT">
           </md-button>
