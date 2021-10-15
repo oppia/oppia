@@ -2581,8 +2581,8 @@ class Exploration:
         """Creates a SubtitledText proto object.
 
         Args:
-            content: SubtitledHtml | SubtitleUnicode. The domain object
-                SubtitledHtml or SubtitleUnicode.
+            content_id: str. The id of the content.
+            text: str. The text of the content.
 
         Returns:
             Proto object. The subtitled text proto object.
@@ -2628,9 +2628,8 @@ class Exploration:
         """
         voiceover_content_mapping_protos = {}
         voiceover_content_mapping_list_proto = []
-        voiceover_langauge_mapping_list = []
 
-        for (content_id, language_code_to_voiceover) in (
+        for (_, language_code_to_voiceover) in (
             voiceovers_mapping.items()):
             for (language_code, voiceover) in (
                 language_code_to_voiceover.items()):
@@ -2640,7 +2639,6 @@ class Exploration:
                             language_code=languages_pb2.LanguageType.ENGLISH,
                             voiceover_content_mapping=(
                                 voiceover_content_mapping_protos)))
-                
                 voiceover_proto = cls._to_voiceover_proto(
                     voiceover.filename,
                     voiceover.file_size_bytes,
@@ -2712,7 +2710,7 @@ class Exploration:
         translation_content_mapping_protos = {}
         translation_content_mapping_list_proto = []
 
-        for (content_id, language_code_to_translation) in (
+        for (_, language_code_to_translation) in (
             translations_mapping.items()):
             for (language_code, written_transaltion) in (
                 language_code_to_translation.items()):
