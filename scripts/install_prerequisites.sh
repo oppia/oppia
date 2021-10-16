@@ -37,6 +37,7 @@ sudo apt-get install python3-yaml
 sudo apt-get install python-matplotlib
 sudo apt-get install python3-matplotlib
 pip install --upgrade pip==21.2.3
+
 # Prerequirements for pyenv.
 sudo apt-get install make
 sudo apt-get install build-essential
@@ -54,3 +55,11 @@ sudo apt-get install libxml2-dev
 sudo apt-get install libxmlsec1-dev
 sudo apt-get install libffi-dev
 sudo apt-get install liblzma-dev
+
+# Check if the Python 2 is available and if so install it. This is needed
+# because the dev_appserver requires Python 2 to work.
+NUMBER_OF_LINES=$(sudo apt list python2 | wc -l)
+if [ $NUMBER_OF_LINES -eq 2 ];
+then
+  sudo apt-get install python2
+fi

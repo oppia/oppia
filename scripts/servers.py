@@ -164,9 +164,22 @@ def managed_dev_appserver(
     with contextlib.ExitStack() as stack:
         proc = stack.enter_context(managed_process(
             dev_appserver_args, human_readable_name='GAE Development Server',
-            shell=True, env=env))
+            shell=True, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ))
         common.wait_for_port_to_be_in_use(port)
-        yield proc
+        try:
+            yield proc
+        finally:
+            if (
+                    'python2: command not found' in proc.stderr.read() or
+                    'python2: command not found' in proc.stdout.read()
+            ):
+                print(
+                    '\033[93mYou do not have Python 2 installed, please follow '
+                    'instructions at https://github.com/oppia/oppia/wiki/'
+                    'Troubleshooting#python-2-is-not-available to fix this.'
+                    '\033[0m'
+                )
 
 
 @contextlib.contextmanager
