@@ -29,7 +29,6 @@
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
-                  <div class="oppia-navbar-profile-picture-container float-left">
                     <span *ngIf="profilePictureDataUrl">
                       <!--
                         Lighthouse flags <img> elements that don't have alt attributes:
@@ -43,7 +42,6 @@
                     <div *ngIf="!profilePictureDataUrl" class="dropdown-toggle">
                       <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
                     </div>
-                  </div>
                 </a>
                 <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
                     role="menu"
