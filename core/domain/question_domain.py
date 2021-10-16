@@ -1178,6 +1178,28 @@ class Question:
         return question_state_dict
 
     @classmethod
+    def _convert_state_v49_dict_to_v50_dict(
+            cls, question_id, question_state_dict):
+        """Converts from version 49 to 50. Version 50 contains the attribute
+        image_sizes_in_bytes for SubtitledHtml and WrittenTranslations.
+
+        Args:
+            question_id: str. The ID of the question.
+            question_state_dict: dict. A dict where ecah key-value pair
+            represents, respectively, a state name and a dict used to
+            initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in question_state_dict.values():
+            state_domain.State.update_image_sizes_in_bytes_in_state(
+                state_dict,
+                feconf.ENTITY_TYPE_QUESTION,
+                question_id)
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
