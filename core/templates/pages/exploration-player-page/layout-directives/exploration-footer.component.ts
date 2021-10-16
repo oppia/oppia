@@ -106,7 +106,6 @@ export class ExplorationFooterComponent {
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
-
 }
 
 angular.module('oppia').directive('oppiaExplorationFooter',
