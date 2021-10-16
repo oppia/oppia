@@ -23,6 +23,13 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { InteractiveGraphInput } from './oppia-interactive-graph-input.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('InteractiveGraphInput', () => {
   let component: InteractiveGraphInput;
@@ -90,6 +97,10 @@ describe('InteractiveGraphInput', () => {
         {
           provide: CurrentInteractionService,
           useValue: mockCurrentInteractionService
+        },
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -251,6 +262,10 @@ describe('InteractiveGraphInput', () => {
     expect(component.canAddEdge).toBe(false);
     expect(component.canDeleteEdge).toBe(false);
     expect(component.canEditEdgeWeight).toBe(false);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should set the last answer given by the user as the graph when the' +

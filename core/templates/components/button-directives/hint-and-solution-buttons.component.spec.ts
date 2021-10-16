@@ -33,6 +33,13 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
@@ -52,7 +59,11 @@ describe('HintAndSolutionButtonsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe]
+      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe],
+      providers: [{
+        provide: I18nLanguageCodeService,
+        useClass: MockI18nLanguageCodeService
+      }]
     }).compileComponents();
   }));
 
@@ -176,6 +187,10 @@ describe('HintAndSolutionButtonsComponent', () => {
 
     expect(component.displayedCard).toEqual(newCard);
   }));
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 
   it('should reset local hints array if active card is' +
     ' changed to the last one', fakeAsync(() => {

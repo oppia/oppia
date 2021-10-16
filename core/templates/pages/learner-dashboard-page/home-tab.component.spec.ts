@@ -26,6 +26,13 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HomeTabComponent } from './home-tab.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -44,6 +51,10 @@ describe('Home tab Component', () => {
         HomeTabComponent
       ],
       providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
         UrlInterpolationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -136,6 +147,10 @@ describe('Home tab Component', () => {
     jasmine.clock().mockDate(baseTime);
 
     expect(component.getTimeOfDay()).toEqual('morning');
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should get time of day as afternoon', () => {

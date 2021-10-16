@@ -31,6 +31,13 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -62,6 +69,10 @@ describe('Progress nav component', () => {
         ExplorationEngineService,
         ExplorationPlayerStateService,
         FocusManagerService,
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
         PlayerPositionService,
         PlayerTranscriptService,
         UrlService,
@@ -163,6 +174,10 @@ describe('Progress nav component', () => {
         .toBeFalse();
       expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
     });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
+  });
 
   it('should not resolve special case for interaction if in desktop mode',
     () => {

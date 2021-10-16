@@ -30,6 +30,13 @@ import { AudioTranslationManagerService } from '../services/audio-translation-ma
 import { CurrentInteractionService } from '../services/current-interaction.service';
 import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
 import { SupplementalCardComponent } from './supplemental-card.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('Supplemental card component', () => {
   let fixture: ComponentFixture<SupplementalCardComponent>;
@@ -66,6 +73,10 @@ describe('Supplemental card component', () => {
           useClass: MockChangeDetectorRef
         },
         CurrentInteractionService,
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
         PlayerPositionService,
         UrlInterpolationService,
         WindowRef
@@ -149,6 +160,10 @@ describe('Supplemental card component', () => {
     expect(componentInstance.helpCardHtml).toBeNull();
     expect(componentInstance.helpCardHasContinueButton).toBeFalse();
     expect(componentInstance.maxHelpCardHeightSeen).toEqual(0);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 
   it('should tell if help card is tall', () => {

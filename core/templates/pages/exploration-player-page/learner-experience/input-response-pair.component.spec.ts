@@ -34,6 +34,13 @@ import { AudioTranslationManagerService } from '../services/audio-translation-ma
 import { AppConstants } from 'app.constants';
 import { AudioPlayerService } from 'services/audio-player.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('InputResponsePairComponent', () => {
   let component: InputResponsePairComponent;
@@ -53,7 +60,13 @@ describe('InputResponsePairComponent', () => {
         InputResponsePairComponent,
         MockTranslatePipe
       ],
-      providers: [BackgroundMaskService],
+      providers: [
+        BackgroundMaskService,
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -149,6 +162,10 @@ describe('InputResponsePairComponent', () => {
     };
 
     expect(component.isVideoRteElementPresentInResponse()).toBe(true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should get answer html for the displayed card', () => {
