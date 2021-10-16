@@ -29,7 +29,7 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-def _migrate_page_contents_to_latest_schema(versioned_page_contents):
+def _migrate_page_contents_to_latest_schema(versioned_page_contents, topic_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the page contents structure based on the schema version of the input
     page contents dictionary. If the current page_contents schema changes, a
@@ -55,7 +55,7 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents):
     while (page_contents_schema_version <
            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
         subtopic_page_domain.SubtopicPage.update_page_contents_from_model(
-            versioned_page_contents, page_contents_schema_version)
+            versioned_page_contents, page_contents_schema_version, topic_id)
         page_contents_schema_version += 1
 
 
@@ -75,7 +75,8 @@ def get_subtopic_page_from_model(subtopic_page_model):
     }
     if (subtopic_page_model.page_contents_schema_version !=
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
-        _migrate_page_contents_to_latest_schema(versioned_page_contents)
+        _migrate_page_contents_to_latest_schema(
+            versioned_page_contents, subtopic_page_model.topic_id)
     return subtopic_page_domain.SubtopicPage(
         subtopic_page_model.id,
         subtopic_page_model.topic_id,

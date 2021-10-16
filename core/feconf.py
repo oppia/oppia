@@ -285,7 +285,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 5
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.

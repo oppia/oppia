@@ -24,6 +24,7 @@ from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
+from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
 from core.platform import models
@@ -250,6 +251,48 @@ class SubtopicPage:
         return subtopic_page_contents_dict
 
     @classmethod
+    def update_image_sizes_in_bytes_in_subtopic_page_contents(
+            cls, subtopic_page_contents_dict, topic_id):
+        """Updates the image_sizes_in_bytes dict for the SubtitledHtml and
+        WrittenTranslation contents in SubtopicPageContents.
+
+        Args:
+            subtopic_page_contents_dict: dict. The dict representation of
+                the SubtopicPage contents.
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            dict. The updated page_contents dict, which includes the mapping of
+            all rich text images to its size in bytes.
+        """
+
+        # Update image_sizes_in_bytes for content.
+        subtopic_page_contents_dict['subtitled_html'][
+            'image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                subtopic_page_contents_dict['subtitled_html']['html'],
+                feconf.ENTITY_TYPE_TOPIC,
+                topic_id))
+
+        # Update image_sizes_in_bytes for written translations.
+        for language_code, translation_dict in subtopic_page_contents_dict[
+            'written_translations']['translations_mapping']['content']:
+            if subtopic_page_contents_dict['written_translations'][
+                'translations_mapping']['content'][language_code][
+                'data_format'] == "html":
+                subtopic_page_contents_dict['written_translations'][
+                    'translations_mapping']['content'][language_code][
+                    'image_sizes_in_bytes'] = (
+                    html_cleaner.get_image_sizes_in_bytes_from_html(
+                        subtopic_page_contents_dict['written_translations'][
+                            'translations_mapping']['content'][language_code][
+                            'translation'],
+                        feconf.ENTITY_TYPE_TOPIC,
+                        topic_id))
+
+        return subtopic_page_contents_dict
+
+    @classmethod
     def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
         """Converts v1 SubtopicPage Contents schema to the v2 schema.
         v2 schema introduces the new schema for Math components.
@@ -299,8 +342,30 @@ class SubtopicPage:
             html_validation_service.fix_incorrectly_encoded_chars)
 
     @classmethod
+    def _convert_page_contents_v4_dict_to_v5_dict(
+            cls, page_contents_dict, topic_id):
+        """Converts v4 SubtopicPage Contents schema to v5 schema. v5 schema
+        adds a new attribute image_sizes_in_bytes, which contains mapping
+        of all the rich text images in the SubtitledHtml to their sizes in
+        bytes.
+
+        Args:
+            page_contents_dict: dict. A dict used to intialize a SubtopicPage
+                domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+        page_contents_dict = (
+            cls.update_image_sizes_in_bytes_in_subtopic_page_contents(
+                page_contents_dict,
+                topic_id))
+
+        return page_contents_dict
+
+    @classmethod
     def update_page_contents_from_model(
-            cls, versioned_page_contents, current_version):
+            cls, versioned_page_contents, current_version, topic_id):
         """Converts the page_contents blob contained in the given
         versioned_page_contents dict from current_version to
         current_version + 1. Note that the versioned_page_contents being
@@ -315,12 +380,16 @@ class SubtopicPage:
             current_version: int. The current schema version of page_contents.
         """
         versioned_page_contents['schema_version'] = current_version + 1
-
         conversion_fn = getattr(
             cls, '_convert_page_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
-        versioned_page_contents['page_contents'] = conversion_fn(
-            versioned_page_contents['page_contents'])
+        if current_version == 4:
+            versioned_page_contents['page_contents'] = conversion_fn(
+                versioned_page_contents['page_contents'], topic_id)
+        else:
+            versioned_page_contents['page_contents'] = conversion_fn(
+                versioned_page_contents['page_contents'])
+
 
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the id from the subtopic page id of the object.
