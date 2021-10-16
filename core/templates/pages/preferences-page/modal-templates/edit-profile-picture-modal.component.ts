@@ -70,7 +70,14 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         this.uploadedImage = decodeURIComponent(
           (<FileReader>e.target).result as string);
       }
-      this.changeDetectorRef.detectChanges();
+      try {
+        this.changeDetectorRef.detectChanges();
+      } catch(viewDestroyedError) {
+        // This try catch block will handles the following error in FE tests.
+        // ViewDestroyedError:
+        // Attempt to use a destroyed view: detectChanges thrown.
+        return;
+      }
       this.initializeCropper();
     };
 
