@@ -52,7 +52,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-player-page.directive.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
-    'conversation-skin.directive.ts',
+    'conversation-skin.component.ts',
     'current-interaction.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',

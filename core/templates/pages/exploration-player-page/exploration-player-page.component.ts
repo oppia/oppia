@@ -27,7 +27,7 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'conversation-skin.directive.ts');
+  'conversation-skin.component.ts');
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');

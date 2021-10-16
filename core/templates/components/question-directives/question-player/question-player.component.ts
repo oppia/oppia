@@ -104,7 +104,7 @@ require('components/concept-card/concept-card.directive.ts');
 require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'conversation-skin.directive.ts');
+  'conversation-skin.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.component.ts');
