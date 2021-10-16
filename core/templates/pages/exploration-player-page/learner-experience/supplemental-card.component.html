@@ -1,5 +1,6 @@
 <div class="conversation-skin-supplemental-card">
   <div *ngIf="helpCardHtml"
+       [ngClass]="{'left-align-card': isLanguageRTL()}"
        class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
        [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
@@ -43,6 +44,16 @@
 </div>
 
 <style>
+  /* The important tags are required since this is a conditional class for only
+     RTL languages. These styles are meant to override the corresponding styles
+     in the other non conditional classes for the same div.
+  */
+  .left-align-card {
+    left: 0;
+    right: auto !important;
+    text-align: right !important;
+  }
+
   .conversation-skin-help-card {
     background: #fff;
     border-radius: 2px;

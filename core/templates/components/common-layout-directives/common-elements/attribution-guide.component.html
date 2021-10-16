@@ -1,5 +1,5 @@
 <div class="oppia-attribution-guide">
-  <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
+  <div [ngStyle]="isLanguageRTL() ? {'left': '25px'} : {'right': '25px'}" class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
     <div class="oppia-neutral-element protractor-test-neutral-element"></div>
 
     <a class="oppia-attribution-image-link" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
@@ -105,7 +105,6 @@
   .oppia-attribution-guide .oppia-cc-icon {
     bottom: 50px;
     position: fixed;
-    right: 25px;
   }
 
   .oppia-attribution-guide .oppia-cc-icon:hover {
