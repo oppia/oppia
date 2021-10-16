@@ -76,7 +76,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         // This try catch block will handles the following error in FE tests.
         // ViewDestroyedError:
         // Attempt to use a destroyed view: detectChanges thrown.
-        return;
+        // No further actions is required.
       }
       this.initializeCropper();
     };
