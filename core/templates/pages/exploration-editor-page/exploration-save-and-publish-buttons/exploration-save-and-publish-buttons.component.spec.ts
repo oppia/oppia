@@ -125,9 +125,9 @@ describe('Exploration save and publish buttons component', function() {
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

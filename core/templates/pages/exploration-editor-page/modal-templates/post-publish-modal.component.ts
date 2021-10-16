@@ -74,4 +74,3 @@ angular.module('oppia').factory('oppiaPostPublishModal',
   downgradeComponent({
     component: PostPublishModalComponent
   }) as angular.IDirectiveFactory);
- 

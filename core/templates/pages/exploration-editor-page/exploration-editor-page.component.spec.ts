@@ -246,15 +246,15 @@ describe('Exploration editor page component', function() {
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
   });
-  
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

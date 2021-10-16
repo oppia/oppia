@@ -84,15 +84,15 @@ describe('Editor Navigation Component', function() {
     userService = TestBed.get(UserService);
     changeListService = TestBed.inject(ChangeListService);
   });
-  
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
 
   describe('when screen is large', function() {

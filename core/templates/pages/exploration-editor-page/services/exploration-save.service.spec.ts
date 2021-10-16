@@ -77,9 +77,9 @@ describe('Exploration save service ' +
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -208,9 +208,9 @@ describe('Exploration save service ' +
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -394,9 +394,9 @@ describe('Exploration save service ' +
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
@@ -631,15 +631,15 @@ describe('Exploration save service ' +
       ]
     });
   });
-  
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
       open: () => {
         return {
           result: Promise.resolve()
-        }
+        };
       }
-    })
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
