@@ -245,9 +245,9 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
       [
-        await forms.toRichText('Correct'), 
+        await forms.toRichText('Correct'),
         await forms.toRichText('Incorrect'),
-        await forms.toRichText('Wrong'), 
+        await forms.toRichText('Wrong'),
         await forms.toRichText('Not correct')
       ]);
     await explorationEditorMainTab.addResponse(
@@ -277,9 +277,9 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
       [
-        await forms.toRichText('Correct'), 
+        await forms.toRichText('Correct'),
         await forms.toRichText('Incorrect'),
-        await forms.toRichText('Wrong'), 
+        await forms.toRichText('Wrong'),
         await forms.toRichText('Not correct')
       ]);
     await explorationEditorMainTab.addResponse(
