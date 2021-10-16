@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for exploration saving & publication functionality.
- */
-
+* @fileoverview Service for exploration saving & publication functionality.
+*/
 import { EventEmitter } from '@angular/core';
-
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -36,10 +34,6 @@ require(
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'exploration-save-modal.controller');
-require(
-  'pages/exploration-editor-page/modal-templates/' +
-  'post-publish-modal.controller.ts');
-
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -70,6 +64,8 @@ require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
 require('services/editability.service.ts');
+require('services/ngb-modal.service.ts');
+import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 
 angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
@@ -81,7 +77,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
   'ExplorationWarningsService', 'ExternalSaveService',
-  'FocusManagerService', 'RouterService',
+  'FocusManagerService', 'NgbModal', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory',
   'DEFAULT_LANGUAGE_CODE',
   function(
@@ -94,7 +90,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationRightsService, ExplorationStatesService,
       ExplorationTagsService, ExplorationTitleService,
       ExplorationWarningsService, ExternalSaveService,
-      FocusManagerService, RouterService,
+      FocusManagerService, NgbModal, RouterService,
       SiteAnalyticsService, StatesObjectFactory,
       DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
@@ -118,14 +114,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
           DEFAULT_LANGUAGE_CODE ||
         ExplorationTagsService.savedMemento.length === 0);
     };
-
     var showCongratulatorySharingModal = function() {
-      return $uibModal.open({
-        template: require(
-          'pages/exploration-editor-page/modal-templates/' +
-          'post-publish-modal.template.html'),
-        backdrop: true,
-        controller: 'PostPublishModalController'
+      return NgbModal.open(PostPublishModalComponent, {
+        backdrop: true
       }).result.then(function() {}, function() {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
@@ -148,7 +139,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
         if (onStartSaveCallback) {
           onStartSaveCallback();
         }
-
         ExplorationRightsService.publish().then(
           function() {
             if (onSaveDoneCallback) {

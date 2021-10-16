@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the exploration editor page.
- */
-
+* @fileoverview Module for the exploration editor page.
+*/
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -39,7 +38,7 @@ import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
-
+import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 @NgModule({
   imports: [
     BrowserModule,
@@ -60,6 +59,7 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
     StateDiffModalComponent,
+    PostPublishModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -71,6 +71,7 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
     StateDiffModalComponent,
+    PostPublishModalComponent,
   ],
   providers: [
     {
