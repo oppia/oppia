@@ -21,6 +21,9 @@ from core import python_utils
 from core import utils
 from core.domain import user_services
 
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 
 class FeedbackThread:
     """Domain object for a feedback thread.
@@ -52,10 +55,10 @@ class FeedbackThread:
     """
 
     def __init__(
-            self, thread_id, entity_type, entity_id, state_name,
-            original_author_id, status, subject, summary, has_suggestion,
-            message_count, created_on, last_updated, last_nonempty_message_text,
-            last_nonempty_message_author_id):
+            self, thread_id: str, entity_type: str, entity_id: str, state_name: str,
+            original_author_id: str, status: str, subject: str, summary: str, has_suggestion: bool,
+            message_count: int, created_on: datetime, last_updated: datetime, last_nonempty_message_text: Optional[str],
+            last_nonempty_message_author_id: Optional[str]):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -74,7 +77,7 @@ class FeedbackThread:
         self.last_nonempty_message_text = last_nonempty_message_text
         self.last_nonempty_message_author_id = last_nonempty_message_author_id
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Optional[Any]]:
         """Returns a dict representation of this FeedbackThread object.
 
         Returns:
@@ -98,7 +101,7 @@ class FeedbackThread:
                 if self.last_nonempty_message_author_id else None),
         }
 
-    def _get_full_message_id(self, message_id):
+    def _get_full_message_id(self, message_id: int) -> str:
         """Returns the full id of the message.
 
         Args:
@@ -110,7 +113,7 @@ class FeedbackThread:
         """
         return '.'.join([self.id, python_utils.UNICODE(message_id)])
 
-    def get_last_two_message_ids(self):
+    def get_last_two_message_ids(self) -> List[Optional[str]]:
         """Returns the full message ids of the last two messages of the thread.
         If the thread has only one message, the id of the second last message is
         None.
@@ -145,9 +148,9 @@ class FeedbackMessage:
     """
 
     def __init__(
-            self, full_message_id, thread_id, message_id, author_id,
-            updated_status, updated_subject, text, created_on,
-            last_updated, received_via_email):
+            self, full_message_id: str, thread_id: str, message_id: str, author_id: str,
+            updated_status: str, updated_subject: str, text: str, created_on: datetime,
+            last_updated: datetime, received_via_email: bool):
         self.id = full_message_id
         self.thread_id = thread_id
         self.message_id = message_id
@@ -160,7 +163,7 @@ class FeedbackMessage:
         self.received_via_email = received_via_email
 
     @property
-    def entity_id(self):
+    def entity_id(self) -> str:
         """Returns the entity ID corresponding to this FeedbackMessage instance.
 
         Returns:
@@ -169,7 +172,7 @@ class FeedbackMessage:
         return self.id.split('.')[1]
 
     @property
-    def entity_type(self):
+    def entity_type(self) -> str:
         """Returns the entity type corresponding to this FeedbackMessage
         instance.
 
@@ -178,7 +181,7 @@ class FeedbackMessage:
         """
         return self.id.split('.')[0]
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Optional[Any]]:
         """Returns a dict representation of this FeedbackMessage object.
 
         Returns:
@@ -207,7 +210,7 @@ class FullyQualifiedMessageIdentifier:
         message_id: str. The ID of a message beloning to the thread.
     """
 
-    def __init__(self, thread_id, message_id):
+    def __init__(self, thread_id: str, message_id: str):
         self.thread_id = thread_id
         self.message_id = message_id
 
@@ -225,7 +228,7 @@ class FeedbackAnalytics:
     """
 
     def __init__(
-            self, entity_type, entity_id, num_open_threads, num_total_threads):
+            self, entity_type: str, entity_id: str, num_open_threads: int, num_total_threads: int):
         """Initializes a FeedbackAnalytics object."""
 
         self.id = entity_id
@@ -233,7 +236,7 @@ class FeedbackAnalytics:
         self.num_open_threads = num_open_threads
         self.num_total_threads = num_total_threads
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Returns the numbers of threads in the FeedbackAnalytics object.
 
         Attributes:
@@ -256,14 +259,14 @@ class FeedbackMessageReference:
         message_id: str. The ID of the feedback thread message.
     """
 
-    def __init__(self, entity_type, entity_id, thread_id, message_id):
+    def __init__(self, entity_type: str, entity_id: str, thread_id: str, message_id: str):
         """Initializes FeedbackMessageReference object."""
         self.entity_type = entity_type
         self.entity_id = entity_id
         self.thread_id = thread_id
         self.message_id = message_id
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Returns dict representation of the FeedbackMessageReference object.
 
         Returns:
@@ -300,11 +303,11 @@ class FeedbackThreadSummary:
     """
 
     def __init__(
-            self, status, original_author_id, last_updated, last_message_text,
-            total_message_count, last_message_is_read,
-            second_last_message_is_read, author_last_message,
-            author_second_last_message, exploration_title, exploration_id,
-            thread_id):
+            self, status: str, original_author_id: str, last_updated: datetime, last_message_text: str,
+            total_message_count: int, last_message_is_read: bool,
+            second_last_message_is_read: bool, author_last_message: str,
+            author_second_last_message: str, exploration_title: str, exploration_id: str,
+            thread_id: str):
         self.status = status
         self.original_author_id = original_author_id
         self.last_updated = last_updated
@@ -318,7 +321,7 @@ class FeedbackThreadSummary:
         self.exploration_id = exploration_id
         self.thread_id = thread_id
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Returns dict representation of the FeedbackThreadSummary object.
 
         Returns:

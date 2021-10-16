@@ -23,6 +23,9 @@ from core import utils
 from core.domain import user_services
 from core.platform import models
 
+from datetime import datetime
+from typing import Any, Dict
+
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 
@@ -51,9 +54,9 @@ class TaskEntry:
     """
 
     def __init__(
-            self, entity_type, entity_id, entity_version, task_type,
-            target_type, target_id, issue_description, status, resolver_id,
-            resolved_on):
+            self, entity_type: str, entity_id: str, entity_version: str, task_type: str,
+            target_type: str, target_id: str, issue_description: str, status: str, resolver_id: str,
+            resolved_on: datetime):
         """Initializes a new TaskEntry domain object from the given values.
 
         Args:
@@ -91,7 +94,7 @@ class TaskEntry:
         self.resolved_on = resolved_on
 
     @property
-    def task_id(self):
+    def task_id(self) -> str:
         """Returns the unique identifier of this task.
 
         Value has the form: "[entity_type].[entity_id].[entity_version].
@@ -105,7 +108,7 @@ class TaskEntry:
             self.task_type, self.target_type, self.target_id)
 
     @property
-    def composite_entity_id(self):
+    def composite_entity_id(self) -> str:
         """Utility field which results in a 20% speedup compared to querying by
         each of the invididual fields used to compose it.
 
@@ -117,7 +120,7 @@ class TaskEntry:
         return improvements_models.TaskEntryModel.generate_composite_entity_id(
             self.entity_type, self.entity_id, self.entity_version)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict-representation of the task.
 
         Returns:

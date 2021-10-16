@@ -17,12 +17,15 @@
 """Domain objects representing a file system and a file stream."""
 
 from __future__ import absolute_import
+from __future__ import annotations
 from __future__ import unicode_literals
 
 from core import feconf
 from core import python_utils
 from core import utils
 from core.platform import models
+
+from typing import List, Optional
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -46,7 +49,7 @@ class FileStream:
         content: str. The content of the file snapshot.
     """
 
-    def __init__(self, content):
+    def __init__(self, content: str):
         """Constructs a FileStream object.
 
         Args:
@@ -54,7 +57,7 @@ class FileStream:
         """
         self._content = content
 
-    def read(self):
+    def read(self) -> str:
         """Emulates stream.read(). Returns all bytes and emulates EOF.
 
         Returns:
@@ -73,7 +76,7 @@ class GeneralFileSystem:
         entity_id: str. The ID of the corresponding entity.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(self, entity_name: str, entity_id: str):
         """Constructs a GeneralFileSystem object.
 
         Args:
@@ -84,7 +87,7 @@ class GeneralFileSystem:
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
-    def _validate_entity_parameters(self, entity_name, entity_id):
+    def _validate_entity_parameters(self, entity_name: str, entity_id: str) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
@@ -106,7 +109,7 @@ class GeneralFileSystem:
             raise utils.ValidationError('Entity id cannot be empty')
 
     @property
-    def assets_path(self):
+    def assets_path(self) -> str:
         """Returns the path of the parent folder of assets.
 
         Returns:
@@ -121,11 +124,11 @@ class GcsFileSystem(GeneralFileSystem):
     This implementation ignores versioning.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(self, entity_name: str, entity_id: str):
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         super(GcsFileSystem, self).__init__(entity_name, entity_id)
 
-    def _get_gcs_file_url(self, filepath):
+    def _get_gcs_file_url(self, filepath: str) -> str:
         """Returns the constructed GCS file URL.
 
         Args:
@@ -140,7 +143,7 @@ class GcsFileSystem(GeneralFileSystem):
         gcs_file_url = '%s/%s' % (self._assets_path, filepath)
         return gcs_file_url
 
-    def isfile(self, filepath):
+    def isfile(self, filepath: str) -> bool:
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
@@ -153,7 +156,7 @@ class GcsFileSystem(GeneralFileSystem):
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-    def get(self, filepath):
+    def get(self, filepath: str) -> Optional[FileStream]:
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
@@ -170,7 +173,7 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             return None
 
-    def commit(self, filepath, raw_bytes, mimetype):
+    def commit(self, filepath: str, raw_bytes: str, mimetype: str) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
@@ -186,7 +189,7 @@ class GcsFileSystem(GeneralFileSystem):
             mimetype
         )
 
-    def delete(self, filepath):
+    def delete(self, filepath: str) -> None:
         """Deletes a file and the metadata associated with it.
 
         Args:
@@ -199,7 +202,7 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             raise IOError('File does not exist: %s' % filepath)
 
-    def copy(self, source_assets_path, filepath):
+    def copy(self, source_assets_path: str, filepath: str) -> None:
         """Copy images from source_path.
 
         Args:
@@ -215,7 +218,7 @@ class GcsFileSystem(GeneralFileSystem):
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-    def listdir(self, dir_name):
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all files in a directory.
 
         Args:
@@ -247,12 +250,12 @@ class GcsFileSystem(GeneralFileSystem):
 class AbstractFileSystem:
     """Interface for a file system."""
 
-    def __init__(self, impl):
+    def __init__(self, impl: AbstractFileSystem):
         """Constructs a AbstractFileSystem object."""
         self._impl = impl
 
     @property
-    def impl(self):
+    def impl(self) -> AbstractFileSystem:
         """Returns a AbstractFileSystem object.
 
         Returns:
@@ -260,7 +263,7 @@ class AbstractFileSystem:
         """
         return self._impl
 
-    def _check_filepath(self, filepath):
+    def _check_filepath(self, filepath: str) -> None:
         """Raises an error if a filepath is invalid.
 
         Args:
@@ -279,7 +282,7 @@ class AbstractFileSystem:
         if not normalized_path.startswith(base_dir):
             raise IOError('Invalid filepath: %s' % filepath)
 
-    def isfile(self, filepath):
+    def isfile(self, filepath: str) -> bool:
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
@@ -292,7 +295,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
-    def open(self, filepath):
+    def open(self, filepath: str) -> str:
         """Returns a stream with the file content. Similar to open(...).
 
         Args:
@@ -305,7 +308,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         return self._impl.get(filepath)
 
-    def get(self, filepath):
+    def get(self, filepath: str) -> str:
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
@@ -323,7 +326,7 @@ class AbstractFileSystem:
             raise IOError('File %s not found.' % (filepath))
         return file_stream.read()
 
-    def commit(self, filepath, raw_bytes, mimetype=None):
+    def commit(self, filepath: str, raw_bytes: str, mimetype=None) -> None:
         """Replaces the contents of the file with the given by test string.
 
         Args:
@@ -355,7 +358,7 @@ class AbstractFileSystem:
         self._check_filepath(filepath)
         self._impl.delete(filepath)
 
-    def listdir(self, dir_name):
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all the files in a directory. Similar to os.listdir(...).
 
         Args:
@@ -369,7 +372,7 @@ class AbstractFileSystem:
         self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)
 
-    def copy(self, source_assets_path, filepath):
+    def copy(self, source_assets_path: str, filepath: str) -> None:
         """Copy images from source.
 
         Args:
