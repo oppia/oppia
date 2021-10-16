@@ -40,6 +40,7 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents, topic_id):
         versioned_page_contents: dict. A dict with two keys:
           - schema_version: int. The schema version for the page_contents dict.
           - page_contents: dict. The dict comprising the page contents.
+        topic_id: str. The ID of the topic.
 
     Raises:
         Exception. The schema version of the page_contents is outside of what

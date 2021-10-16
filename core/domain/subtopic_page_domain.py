@@ -275,11 +275,11 @@ class SubtopicPage:
                 topic_id))
 
         # Update image_sizes_in_bytes for written translations.
-        for language_code, translation_dict in subtopic_page_contents_dict[
+        for language_code in subtopic_page_contents_dict[
             'written_translations']['translations_mapping']['content']:
             if subtopic_page_contents_dict['written_translations'][
                 'translations_mapping']['content'][language_code][
-                'data_format'] == "html":
+                'data_format'] == 'html':
                 subtopic_page_contents_dict['written_translations'][
                     'translations_mapping']['content'][language_code][
                     'image_sizes_in_bytes'] = (
@@ -352,6 +352,7 @@ class SubtopicPage:
         Args:
             page_contents_dict: dict. A dict used to intialize a SubtopicPage
                 domain object.
+            topic_id: str. The ID of the topic.
 
         Returns:
             dict. The converted page_contents_dict.
@@ -378,6 +379,7 @@ class SubtopicPage:
                 - page_contents: dict. The dict comprising the subtopic page
                     contents.
             current_version: int. The current schema version of page_contents.
+            topic_id: str. The ID of the topic.
         """
         versioned_page_contents['schema_version'] = current_version + 1
         conversion_fn = getattr(
@@ -389,7 +391,6 @@ class SubtopicPage:
         else:
             versioned_page_contents['page_contents'] = conversion_fn(
                 versioned_page_contents['page_contents'])
-
 
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the id from the subtopic page id of the object.
