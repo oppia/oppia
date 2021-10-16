@@ -19,7 +19,7 @@
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -56,11 +56,16 @@ import { AutosaveInfoModalsService } from './services/autosave-info-modals.servi
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
+
+class MockNgbModalRef {
+  componentInstance = {};
+}
 
 describe('Exploration editor page component', function() {
   importAllAngularServices();
@@ -100,6 +105,8 @@ describe('Exploration editor page component', function() {
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
   var focusManagerService = null;
+
+  let ngbModal: NgbModal;
 
   var refreshGraphEmitter = new EventEmitter();
 
@@ -199,7 +206,8 @@ describe('Exploration editor page component', function() {
         NgbModule
       ],
       declarations: [
-        LostChangesModalComponent
+        LostChangesModalComponent,
+        WelcomeModalComponent
       ],
       providers: [
         AlertsService,
@@ -238,13 +246,14 @@ describe('Exploration editor page component', function() {
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [LostChangesModalComponent]
+        entryComponents: [LostChangesModalComponent, WelcomeModalComponent]
       }
     });
 
     aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -276,7 +285,10 @@ describe('Exploration editor page component', function() {
     focusManagerService = $injector.get('FocusManagerService');
 
     $scope = $rootScope.$new();
-    ctrl = $componentController('explorationEditorPage');
+    ctrl = $componentController('explorationEditorPage', {
+      NgbModal: ngbModal,
+      $scope: $scope,
+    });
   }));
 
   afterEach(() => {
@@ -678,9 +690,12 @@ describe('Exploration editor page component', function() {
     it('should start editor tutorial when closing welcome exploration' +
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve(explorationId)
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve(explorationId)
+        }
+      );
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
@@ -693,9 +708,12 @@ describe('Exploration editor page component', function() {
     it('should dismiss tutorial when dismissing welcome exploration' +
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject(explorationId)
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          componentInstance: new MockNgbModalRef(),
+          result: $q.reject(explorationId)
+        }
+      );
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
