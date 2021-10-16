@@ -22,7 +22,7 @@ require(
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require(
-  'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
+  'pages/exploration-player-page/learner-experience/tutor-card.component.ts');
 require(
   'components/question-directives/question-player/' +
     'question-player.component.ts');
