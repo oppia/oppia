@@ -359,8 +359,10 @@ describe('Core exploration functionality', function() {
         await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
       });
       await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-        await forms.toRichText('option A'), await forms.toRichText('option B'),
-        await forms.toRichText('option C'), await forms.toRichText('option D')
+        await forms.toRichText('option A'), 
+        await forms.toRichText('option B'),
+        await forms.toRichText('option C'), 
+        await forms.toRichText('option D')
       ]);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(
         'default');
@@ -374,8 +376,9 @@ describe('Core exploration functionality', function() {
       await general.moveToPlayer();
       await explorationPlayerPage.expectExplorationToNotBeOver();
       await explorationPlayerPage.expectInteractionToMatch(
-        'MultipleChoiceInput', ['option A', 'option B', 'option C', 'option D'
-        ]);
+        'MultipleChoiceInput', 
+        ['option A', 'option B', 'option C', 'option D']
+      );
       await explorationPlayerPage.submitAnswer(
         'MultipleChoiceInput', 'option B');
       await explorationPlayerPage.expectExplorationToBeOver();
