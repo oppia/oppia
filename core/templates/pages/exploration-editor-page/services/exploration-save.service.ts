@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
-* @fileoverview Service for exploration saving & publication functionality.
-*/
+ * @fileoverview Unit tests for the Exploration save service.
+ */
+
 import { EventEmitter } from '@angular/core';
 require(
   'components/common-layout-directives/common-elements/' +
