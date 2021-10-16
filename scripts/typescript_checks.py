@@ -74,17 +74,18 @@ def compile_and_check_typescript(config_path):
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
         config_path]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, encoding='utf-8')
     error_messages = []
-    for line in iter(process.stdout.readline, b''):
-        if not line.startswith(b'node_modules'):
+    for line in iter(process.stdout.readline, ''):
+        if not line.startswith('node_modules'):
             error_messages.append(line)
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
     if error_messages:
         python_utils.PRINT('Errors found during compilation\n')
         for message in error_messages:
-            python_utils.PRINT(message)
+            python_utils.PRINT(message, end='')
         sys.exit(1)
     else:
         python_utils.PRINT('Compilation successful!')

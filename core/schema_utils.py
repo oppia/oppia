@@ -418,6 +418,21 @@ class _Validators:
         return len(obj) <= max_value
 
     @staticmethod
+    def has_length(obj: List[str], value: int) -> bool:
+        """Returns True iff the given object (a list) has exact
+        `value` elements.
+
+        Args:
+            obj: list(str). A list of strings.
+            value: int. The number of elements that `obj` should
+                contain.
+
+        Returns:
+            bool. Whether the given object has exact `value` elements.
+        """
+        return len(obj) == value
+
+    @staticmethod
     def is_nonempty(obj: str) -> bool:
         """Returns True iff the given object (a string) is nonempty.
 

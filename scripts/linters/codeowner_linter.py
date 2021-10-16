@@ -40,7 +40,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
     '/core/storage/',
-    '/manifest.json',
+    '/dependencies.json',
     '/package.json',
     '/requirements.txt',
     '/requirements.in',

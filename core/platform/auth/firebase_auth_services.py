@@ -255,14 +255,8 @@ def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
     if auth_id is None:
         return True
     try:
-        # TODO(#11474): Replace with `get_users()` (plural) because `get_user()`
-        # (singular) does not distinguish between disabled and deleted users. We
-        # can't do it right now because firebase-admin==3.2.1 does not offer the
-        # get_users() API. We will need to fix this when we've moved to a more
-        # recent version (after the Python 3 migration).
-        firebase_auth.get_user(auth_id)
-    except firebase_auth.UserNotFoundError:
-        return True
+        result = firebase_auth.get_users([firebase_auth.UidIdentifier(auth_id)])
+        return len(result.users) == 0
     except (firebase_exceptions.FirebaseError, ValueError):
         # NOTE: logging.exception appends the stack trace automatically. The
         # errors are not re-raised because wipeout_services, the user of this
