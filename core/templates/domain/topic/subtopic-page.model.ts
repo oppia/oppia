@@ -32,14 +32,14 @@ export interface SubtopicPageBackendDict {
 
 export class SubtopicPage {
   constructor(
-    private id: string,
-    private topicId: string,
-    private pageContents: SubtopicPageContents,
+    private id: string | null,
+    private topicId: string | null,
+    private pageContents: SubtopicPageContents | null,
     private languageCode: string,
   ) {}
 
   // Returns the id of the subtopic page.
-  getId(): string {
+  getId(): string | null {
     return this.id;
   }
 
@@ -48,12 +48,12 @@ export class SubtopicPage {
   }
 
   // Returns the topic id that the subtopic page is linked to.
-  getTopicId(): string {
+  getTopicId(): string | null {
     return this.topicId;
   }
 
   // Returns the page data for the subtopic page.
-  getPageContents(): SubtopicPageContents {
+  getPageContents(): SubtopicPageContents | null {
     return this.pageContents;
   }
 

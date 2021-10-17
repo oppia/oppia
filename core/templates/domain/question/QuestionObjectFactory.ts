@@ -25,7 +25,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 
 export interface QuestionBackendDict {
-  'id': string;
+  'id': string | null;
   'question_state_data': StateBackendDict,
   'question_state_data_schema_version': number;
   'language_code': string;
@@ -35,7 +35,7 @@ export interface QuestionBackendDict {
 }
 
 export class Question {
-  _id: string;
+  _id: string | null;
   _stateData: State;
   _languageCode: string;
   _version: number;
@@ -43,7 +43,7 @@ export class Question {
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
-      id: string, stateData: State, languageCode: string,
+      id: string | null, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
     this._id = id;
@@ -55,7 +55,7 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -97,8 +97,10 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getValidationErrorMessage(): string {
+  getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
+    type InteractionId = keyof typeof INTERACTION_SPECS;
+    var interactionId = <InteractionId> interaction.id;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
       return 'Please enter a question.';
@@ -106,9 +108,10 @@ export class Question {
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
-
-    if (interaction.defaultOutcome.feedback._html.length === 0) {
-      return 'Please enter a feedback for the default outcome.';
+    if (interaction.defaultOutcome !== null) {
+      if (interaction.defaultOutcome.feedback._html.length === 0) {
+        return 'Please enter a feedback for the default outcome.';
+      }
     }
 
     if (interaction.hints.length === 0) {
@@ -116,7 +119,7 @@ export class Question {
     }
     if (
       !interaction.solution &&
-      INTERACTION_SPECS[interaction.id].can_have_solution) {
+      INTERACTION_SPECS[interactionId].can_have_solution) {
       return 'A solution must be specified';
     }
     var answerGroups = this._stateData.interaction.answerGroups;
@@ -133,19 +136,31 @@ export class Question {
     return null;
   }
 
-  getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
+  getUnaddressedMisconceptionNames(
+      misconceptionsBySkill: Record<string, {
+        getId(): string,
+        isMandatory(): boolean,
+        getName(): string,
+      }[]>): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
-    var taggedSkillMisconceptionIds = {};
+    var taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
-        taggedSkillMisconceptionIds[
-          answerGroups[i].taggedSkillMisconceptionId] = true;
+        answerGroups[i].taggedSkillMisconceptionId !== null) {
+          type InteractionhId = keyof typeof taggedSkillMisconceptionIds;
+          var interactionhId =
+           <InteractionhId> answerGroups[i].taggedSkillMisconceptionId;
+          taggedSkillMisconceptionIds[interactionhId] = true;
       }
     }
-    var unaddressedMisconceptionNames = [];
+    var unaddressedMisconceptionNames: string[] = [];
     var self = this;
-    Object.keys(misconceptionsBySkill).forEach(function(skillId) {
+    type MisconceptionsBySkillKeys = (
+      keyof typeof misconceptionsBySkill)[ ];
+    var misconceptionsBySkillKeys = (
+       <MisconceptionsBySkillKeys> Object.keys(misconceptionsBySkill));
+
+    misconceptionsBySkillKeys.forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
         var skillMisconceptionIdIsNotApplicable = (
           self._inapplicableSkillMisconceptionIds.includes(
@@ -167,7 +182,7 @@ export class Question {
   }
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
-    var questionBackendDict = {
+    var questionBackendDict: QuestionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
