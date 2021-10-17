@@ -83,6 +83,12 @@ class SuggestionHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 }
+            },
+            'image': {
+                'schema':{
+                    'type':'basestring'
+                },
+                'default_value':None
             }
         }
     }
@@ -94,7 +100,6 @@ class SuggestionHandler(base.BaseHandler):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
-
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.normalized_payload.get('suggestion_type'),
