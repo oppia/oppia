@@ -252,9 +252,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
           ExternalSaveService.onExternalSave.emit();
           
           NgbModal.open(EditorReloadingModalComponent,{
-            backdrop: true,
+            backdrop: 'static',
             keyboard: false,
-            windowClass: 'oppia-editor-reloading-modal'
+            windowClass: 'oppia-loading-modal'
           }).result.then(() => {}, () => {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.

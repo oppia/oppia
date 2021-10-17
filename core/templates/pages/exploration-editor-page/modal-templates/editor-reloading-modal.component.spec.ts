@@ -12,36 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { EditorReloadingModalComponent } from "pages/exploration-editor-page/modal-templates/editor-reloading-modal.component";
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 /**
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
 
-describe('Editor Reloading Modal Controller', function() {
-  var $flushPendingTasks = null;
-  var $scope = null;
-  var $uibModalInstance = null;
-  var $verifyNoPendingTasks = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    $flushPendingTasks = $injector.get('$flushPendingTasks');
-    var $rootScope = $injector.get('$rootScope');
-    $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
+  dismiss(): void {
+    return;
+  }
+}
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+describe('Editor Reloading Modal Controller',() => {
+  let component: EditorReloadingModalComponent;
+  let fixture: ComponentFixture<EditorReloadingModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
 
-    $scope = $rootScope.$new();
-    $controller('EditorReloadingModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        EditorReloadingModalComponent,
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should dismiss modal after waiting timeout to finish', function() {
-    $flushPendingTasks();
-    $verifyNoPendingTasks('$timeout');
-
-    expect($uibModalInstance.dismiss).toHaveBeenCalled();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(EditorReloadingModalComponent);
+    component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    spyOn(component,'cancel');
+    fixture.detectChanges();
   });
+
+  it('should dismiss modal after waiting timeout to finish', () => {
+    jasmine.createSpy('cancel');
+    component.ngOnInit();
+    setTimeout(() => {
+      expect(component.cancel()).toHaveBeenCalled();
+    },2501);
+  })
 });

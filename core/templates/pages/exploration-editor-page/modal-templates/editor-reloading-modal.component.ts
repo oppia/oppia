@@ -43,7 +43,7 @@ export class EditorReloadingModalComponent
     }
 }
 
-// angular.module('oppia').factory('oppiaEditorReloadingModal',
-//   downgradeComponent({
-//     component: EditorReloadingModalComponent
-//   }) as angular.IDirectiveFactory);
+angular.module('oppia').factory('oppiaEditorReloadingModal',
+  downgradeComponent({
+    component: EditorReloadingModalComponent
+  }) as angular.IDirectiveFactory);

@@ -77,6 +77,16 @@ describe('Editor Navigation Component', function() {
 
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     userService = TestBed.get(UserService);
@@ -144,7 +154,7 @@ describe('Editor Navigation Component', function() {
       ctrl.$onInit();
       $scope.$apply();
     }));
-
+    
     beforeEach(() => {
       testSubscriptions = new Subscription();
       testSubscriptions.add(
