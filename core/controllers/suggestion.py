@@ -61,8 +61,7 @@ class SuggestionHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'target_version_at_submission':
-            {
+            'target_version_at_submission': {
                 'schema': {
                     'type': 'int',
                     'validators': [{
