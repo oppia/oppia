@@ -667,12 +667,12 @@ class StateYamlHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests."""
-        state_dict = self.normalized_payload.get('state_dict')
+        state_object = self.normalized_payload.get('state_dict')
         width = self.normalized_payload.get('width')
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
-                state_dict, width),
+                state_object, width),
         })
 
 
@@ -892,7 +892,7 @@ class ResolveIssueHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
-        exp_issue_dict = self.normalized_payload.get('exp_issue_dict')
+        exp_issue_object = self.normalized_payload.get('exp_issue_dict')
         exp_version = self.normalized_payload.get('exp_version')
 
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
@@ -904,7 +904,7 @@ class ResolveIssueHandler(EditorHandler):
         # issues instance.
         issue_to_remove = None
         for issue in exp_issues.unresolved_issues:
-            if issue.to_dict() == exp_issue_dict:
+            if issue.to_dict() == exp_issue_object.to_dict():
                 issue_to_remove = issue
                 break
 

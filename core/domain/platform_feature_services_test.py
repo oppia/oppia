@@ -59,7 +59,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
-                {
+                platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -69,14 +69,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': True
-                }
+                })
             ]
         )
 
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
-                {
+                platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -88,7 +88,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': True
-                }
+                })
             ]
         )
 
@@ -186,7 +186,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
-                {
+                platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -202,7 +202,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': True
-                }
+                })
             ]
         )
         with self.swap(constants, 'DEV_MODE', False):
@@ -218,7 +218,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.update_feature_flag_rules(
             self.dev_feature.name, self.user_id, 'test update',
             [
-                {
+                platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -228,7 +228,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': False
-                },
+                })
             ]
         )
 
@@ -253,7 +253,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.update_feature_flag_rules(
                 self.dev_feature.name, self.user_id, 'test update',
                 [
-                    {
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'app_version',
@@ -261,9 +261,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    },
-                    {
+                    }),
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [], 'value_when_matched': False
-                    }
+                    })
                 ]
             )

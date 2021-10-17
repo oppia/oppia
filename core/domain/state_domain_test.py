@@ -3951,23 +3951,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Found a duplicate content id solution'):
             exploration.init_state.validate(None, True)
 
-    def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-
-        with contextlib.ExitStack() as stack:
-            captured_logs = stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
-            stack.enter_context(
-                self.assertRaisesRegexp(
-                    Exception, 'string indices must be integers')
-            )
-
-            exploration.init_state.convert_state_dict_to_yaml(
-                'invalid_state_dict', 10)
-
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
-
     def test_cannot_update_hints_with_content_id_not_in_written_translations(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
