@@ -35,8 +35,8 @@ from core.domain import state_domain
 from typing import Dict, Optional, Union
 
 
-def validate_change(obj):
-    """Validates Exploration and Question domain change.
+def validate_exploration_or_question_change(obj):
+    """Validates Exploration or Question change.
 
     Args:
         obj: dict. Data that needs to be validated.
