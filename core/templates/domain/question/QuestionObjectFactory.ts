@@ -23,6 +23,8 @@ import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+
 
 export interface QuestionBackendDict {
   'id': string | null;
@@ -137,11 +139,7 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(
-      misconceptionsBySkill: Record<string, {
-        getId(): string,
-        isMandatory(): boolean,
-        getName(): string,
-      }[]>): string[] {
+      misconceptionsBySkill: Record<string, Misconception[]>): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (var i = 0; i < answerGroups.length; i++) {
