@@ -464,7 +464,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             # Group 4: Matches the string 'BackendDict' (optional).
             used_match = (
                 re.search(
-                    r'(as )([a-zA-Z]+)(CustomizationArgs)(BackendDict)?',
+                    r'(as )([a-zA-Z]+)(CustomizationArgs)(BackendDict)',
                     line
                 ))
             if used_match:
