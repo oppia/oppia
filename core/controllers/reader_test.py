@@ -374,7 +374,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url)
         self.assertEqual(
             len(json_response['question_dicts']),
-            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+            feconf.QUESTION_BATCH_SIZE)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.

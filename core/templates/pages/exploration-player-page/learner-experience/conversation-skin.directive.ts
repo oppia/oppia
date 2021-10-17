@@ -1158,7 +1158,6 @@ angular.module('oppia').directive('conversationSkin', [
 
             $timeout(function() {
               FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
-              scrollToTop();
             },
             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
               0.5 * TIME_FADEIN_MSEC);
@@ -1174,6 +1173,7 @@ angular.module('oppia').directive('conversationSkin', [
 
           $scope.showUpcomingCard = function() {
             var currentIndex = PlayerPositionService.getDisplayedCardIndex();
+            scrollToTop();
             var conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInQuestionMode());

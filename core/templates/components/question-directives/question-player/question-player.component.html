@@ -64,7 +64,7 @@
     <div class="oppia-question-player-card question-player-results-footer"
          ng-if="$ctrl.showActionButtonsFooter()">
       <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
-            ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn)">
+            ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
           <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
             <div ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></div>
@@ -112,14 +112,13 @@
   .oppia-question-player-container .action-button-text {
     font-size: 12px;
     margin: 0 auto;
-    width: 60px;
   }
 
-  .oppia-question-player-container .boost-score-outer {
+  .oppia-question-player-container .review-lowest-scored-skill-outer {
     background-color: #D95C0C;
   }
 
-  .oppia-question-player-container .boost-score-inner {
+  .oppia-question-player-container .review-lowest-scored-skill-inner {
     background-color: #F3EAE6;
   }
 

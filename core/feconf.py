@@ -1130,6 +1130,7 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 USER_FILTER_CRITERION_ROLE = 'role'
 USER_FILTER_CRITERION_USERNAME = 'username'
 
+# Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2

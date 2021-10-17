@@ -875,10 +875,11 @@ class QuestionPlayerHandler(base.BaseHandler):
             question_services.get_questions_by_skill_ids(
                 int(question_count), skill_ids, fetch_by_difficulty)
         )
+        random.shuffle(questions)
 
         question_dicts = [question.to_dict() for question in questions]
         self.values.update({
-            'question_dicts': question_dicts
+            'question_dicts': question_dicts[:feconf.QUESTION_BATCH_SIZE]
         })
         self.render_json(self.values)
 
