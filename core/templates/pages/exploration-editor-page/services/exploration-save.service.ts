@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { EditorReloadingModalComponent } from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -27,9 +28,6 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.component.ts');
-require(
-  'pages/exploration-editor-page/modal-templates/' +
-  'editor-reloading-modal.controller.ts');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'exploration-metadata-modal.controller');
@@ -70,6 +68,7 @@ require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
 require('services/editability.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
@@ -80,7 +79,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationWarningsService', 'ExternalSaveService',
+  'ExplorationWarningsService', 'ExternalSaveService','NgbModal',
   'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory',
   'DEFAULT_LANGUAGE_CODE',
@@ -93,7 +92,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationLanguageCodeService, ExplorationObjectiveService,
       ExplorationRightsService, ExplorationStatesService,
       ExplorationTagsService, ExplorationTitleService,
-      ExplorationWarningsService, ExternalSaveService,
+      ExplorationWarningsService, ExternalSaveService, NgbModal,
       FocusManagerService, RouterService,
       SiteAnalyticsService, StatesObjectFactory,
       DEFAULT_LANGUAGE_CODE) {
@@ -251,15 +250,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
         }).result.then(function() {
           AlertsService.clearWarnings();
           ExternalSaveService.onExternalSave.emit();
-
-          $uibModal.open({
-            template: require(
-              'pages/exploration-editor-page/modal-templates/' +
-              'editor-reloading-modal.template.html'),
-            backdrop: 'static',
+          
+          NgbModal.open(EditorReloadingModalComponent,{
+            backdrop: true,
             keyboard: false,
-            controller: 'EditorReloadingModalController',
-            windowClass: 'oppia-loading-modal'
+            windowClass: 'oppia-editor-reloading-modal'
           }).result.then(() => {}, () => {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
