@@ -74,7 +74,7 @@ class SuggestionHandler(base.BaseHandler):
                'schema': {
                    'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_change
+                        domain_objects_validator.validate_exploration_or_question_change
                     )
                }
             },
