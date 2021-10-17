@@ -99,16 +99,14 @@ class SuggestionHandler(base.BaseHandler):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
-        try:
-            suggestion = suggestion_services.create_suggestion(
-                self.normalized_payload.get('suggestion_type'),
-                self.normalized_payload.get('target_type'),
-                self.normalized_payload.get('target_id'),
-                self.normalized_payload.get('target_version_at_submission'),
-                self.user_id, self.normalized_payload.get('change'),
-                self.normalized_payload.get('description'))
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+
+        suggestion = suggestion_services.create_suggestion(
+            self.normalized_payload.get('suggestion_type'),
+            self.normalized_payload.get('target_type'),
+            self.normalized_payload.get('target_id'),
+            self.normalized_payload.get('target_version_at_submission'),
+            self.user_id, self.normalized_payload.get('change'),
+            self.normalized_payload.get('description'))
 
         suggestion_change = suggestion.change
         if (
