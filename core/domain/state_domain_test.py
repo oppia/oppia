@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import contextlib
 import copy
 import logging
 import os
