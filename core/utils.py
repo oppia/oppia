@@ -328,8 +328,7 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
-            PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
+            PNG_DATA_URL_PREFIX, urllib.parse.quote(base64.b64encode(content))
         )
     else:
         raise Exception('The given string does not represent a PNG image.')

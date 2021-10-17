@@ -60,10 +60,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
-    def test_url_quote(self):
-        self.assertEqual(
-            python_utils.url_quote('/~connolly/'), '/~connolly/')
-
     def test_url_retrieve(self):
         tmp_file = tempfile.NamedTemporaryFile()
         tmp_file.name = 'temp_file.txt'
