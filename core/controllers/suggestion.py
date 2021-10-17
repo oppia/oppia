@@ -85,10 +85,10 @@ class SuggestionHandler(base.BaseHandler):
                 }
             },
             'image': {
-                'schema':{
-                    'type':'basestring'
+                'schema': {
+                    'type': 'basestring'
                 },
-                'default_value':None
+                'default_value': None
             }
         }
     }
