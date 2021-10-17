@@ -388,7 +388,9 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectTopicNameToBe = async function(topicName, index) {
     await this.waitForTopicsToLoad();
-    expect(await topicNames.get(index).getText()).toEqual(topicName);
+    var topicNamesElement = topicNames.get(index);
+    var text = await action.getText('Topic Names Element', topicNamesElement);
+    expect(text).toEqual(topicName);
   };
 
   this.getTopicsCount = async function() {
@@ -404,8 +406,10 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectSkillDescriptionToBe = async function(description, index) {
     await this.waitForSkillsToLoad();
-    var elems = await skillDescriptions;
-    expect(await elems[index].getText()).toEqual(description);
+    var skillDescriptionsElement = await skillDescriptions;
+    var text = await action.getText(
+      'Skill Description Element', skillDescriptionsElement[index]);
+    expect(text).toEqual(description);
   };
 
   this.expectNumberOfSkillsToBe = async function(number) {
