@@ -2330,7 +2330,8 @@ class Exploration(python_utils.OBJECT):
         # YAML representation.
         del exp_dict['id']
 
-        return yaml.dump(exp_dict, allow_unicode=True,
+        return yaml.dump(
+                         exp_dict, allow_unicode=True,
                          default_flow_style=False)
 
     def to_dict(self):

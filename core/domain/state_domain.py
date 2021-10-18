@@ -2697,7 +2697,8 @@ class State(python_utils.OBJECT):
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             python_utils.reraise_exception()
 
-        return yaml.dump(state.to_dict(), allow_unicode=True,
+        return yaml.dump(
+                         state.to_dict(), allow_unicode=True,
                          default_flow_style=False, width=width)
 
     def get_translation_counts(self):
