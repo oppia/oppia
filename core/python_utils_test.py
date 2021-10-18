@@ -60,10 +60,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
-    def test_url_quote(self):
-        self.assertEqual(
-            python_utils.url_quote('/~connolly/'), '/~connolly/')
-
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}
         self.assertEqual(
