@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the Post Publish Modal.
+ * @fileoverview Component for the Post Publish Modal.
  */
 
 import { Component, OnInit } from '@angular/core';
