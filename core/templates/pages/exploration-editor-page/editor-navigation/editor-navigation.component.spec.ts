@@ -154,7 +154,7 @@ describe('Editor Navigation Component', function() {
       ctrl.$onInit();
       $scope.$apply();
     }));
-    
+
     beforeEach(() => {
       testSubscriptions = new Subscription();
       testSubscriptions.add(

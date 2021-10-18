@@ -79,7 +79,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationWarningsService', 'ExternalSaveService','NgbModal',
+  'ExplorationWarningsService', 'ExternalSaveService', 'NgbModal',
   'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory',
   'DEFAULT_LANGUAGE_CODE',
@@ -250,8 +250,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
         }).result.then(function() {
           AlertsService.clearWarnings();
           ExternalSaveService.onExternalSave.emit();
-          
-          NgbModal.open(EditorReloadingModalComponent,{
+
+          NgbModal.open(EditorReloadingModalComponent, {
             backdrop: 'static',
             keyboard: false,
             windowClass: 'oppia-loading-modal'

@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { EditorReloadingModalComponent } from "pages/exploration-editor-page/modal-templates/editor-reloading-modal.component";
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 /**
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
+
+ import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+ import { EditorReloadingModalComponent } from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockActiveModal {
   close(): void {
@@ -30,11 +31,12 @@ class MockActiveModal {
   }
 }
 
-describe('Editor Reloading Modal Controller',() => {
+describe('Editor Reloading Modal Controller', () => {
   let component: EditorReloadingModalComponent;
   let fixture: ComponentFixture<EditorReloadingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let check: boolean = false;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
@@ -56,16 +58,18 @@ describe('Editor Reloading Modal Controller',() => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture.detectChanges();
   });
+
   afterAll(() => {
     check = true;
-  })
+  });
+
   it('should dismiss modal after waiting timeout to finish', () => {
     spyOn(ngbActiveModal,'dismiss').and.callFake(() => {
       check = true;
-    })
+    });
     component.ngOnInit();
     setTimeout(() => {
       expect(check).toBe(true);
-    },2501);
-  })
+    }, 2501);
+  });
 });
