@@ -1,1 +1,0 @@
-spyOn(speechSynthesisChunkerService, 'cancel');
