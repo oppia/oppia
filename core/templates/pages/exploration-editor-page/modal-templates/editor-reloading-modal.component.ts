@@ -36,7 +36,7 @@ export class EditorReloadingModalComponent
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }
-  ngOnInit():void {
+  ngOnInit(): void {
     setTimeout(() => {
       this.cancel();
     }, 2500);

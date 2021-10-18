@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
 
- import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
- import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
- import { EditorReloadingModalComponent } from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
- import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from
+ '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditorReloadingModalComponent } from
+ 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockActiveModal {
   close(): void {
@@ -31,7 +33,7 @@ class MockActiveModal {
   }
 }
 
-describe('Editor Reloading Modal Controller', () => {
+fdescribe('Editor Reloading Modal Controller', () => {
   let component: EditorReloadingModalComponent;
   let fixture: ComponentFixture<EditorReloadingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -64,7 +66,7 @@ describe('Editor Reloading Modal Controller', () => {
   });
 
   it('should dismiss modal after waiting timeout to finish', () => {
-    spyOn(ngbActiveModal,'dismiss').and.callFake(() => {
+    spyOn(ngbActiveModal, 'dismiss').and.callFake(() => {
       check = true;
     });
     component.ngOnInit();
