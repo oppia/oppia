@@ -51,7 +51,7 @@ class MockWindowRef {
     },
     gtag: () => {},
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState(data: object, title: string, url?: string | null) {}
     }
   };
 }

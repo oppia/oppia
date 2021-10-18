@@ -67,6 +67,8 @@
     "core/templates/components/common-layout-directives/common-elements/sharing-links.component.spec.ts",
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.ts",
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.spec.ts",
+    "core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.ts",
+    "core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.spec.ts",
     "core/templates/components/entity-creation-services/collection-creation-backend-api.service.ts",
     "core/templates/components/entity-creation-services/collection-creation-backend-api.service.spec.ts",
     "core/templates/components/entity-creation-services/collection-creation.service.ts",

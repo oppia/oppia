@@ -48,28 +48,28 @@ interface LanguageInfo {
   templateUrl: './top-navigation-bar.component.html',
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
-  @Input() headerText: string;
-  @Input() subheaderText: string;
+  @Input() headerText!: string;
+  @Input() subheaderText!: string;
 
-  url: URL;
-  currentLanguageCode: string;
-  currentLanguageText: string;
-  isModerator: boolean;
-  isCurriculumAdmin: boolean;
-  isTopicManager: boolean;
-  isSuperAdmin: boolean;
-  isBlogAdmin: boolean;
-  isBlogPostEditor: boolean;
-  userIsLoggedIn: boolean;
-  username: string;
-  currentUrl: string;
-  userMenuIsShown: boolean;
-  inClassroomPage: boolean;
-  showLanguageSelector: boolean;
-  standardNavIsShown: boolean;
-  supportedSiteLanguages: LanguageInfo[];
-  ACTION_OPEN: string;
-  ACTION_CLOSE: string;
+  url!: URL;
+  currentLanguageCode!: string;
+  currentLanguageText: string | undefined;
+  isModerator: boolean | undefined;
+  isCurriculumAdmin: boolean | undefined;
+  isTopicManager: boolean | undefined;
+  isSuperAdmin: boolean | undefined;
+  isBlogAdmin: boolean | undefined;
+  isBlogPostEditor: boolean | undefined;
+  userIsLoggedIn: boolean | undefined;
+  username: string | undefined;
+  currentUrl: string | undefined;
+  userMenuIsShown: boolean | undefined;
+  inClassroomPage: boolean | undefined;
+  showLanguageSelector: boolean | undefined;
+  standardNavIsShown: boolean | undefined;
+  supportedSiteLanguages!: LanguageInfo[];
+  ACTION_OPEN: string | undefined;
+  ACTION_CLOSE: string | undefined;
   KEYBOARD_EVENT_TO_KEY_CODES: {
     enter: {
         shiftKeyIsPressed: boolean;
@@ -83,13 +83,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       shiftKeyIsPressed: boolean;
       keyCode: number;
       };
-    };
+    } | undefined;
   windowIsNarrow: boolean = false;
-  activeMenuName: string;
-  profilePageUrl: string;
-  labelForClearingFocus: string;
-  profilePictureDataUrl: string;
-  sidebarIsShown: boolean;
+  activeMenuName: string | undefined;
+  profilePageUrl: string | undefined;
+  labelForClearingFocus: string | undefined;
+  profilePictureDataUrl: string | undefined;
+  sidebarIsShown: boolean | undefined;
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -106,7 +106,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
-  navElementsVisibilityStatus ={};
+  navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -173,11 +173,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
 
     this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.getPreferredSiteLanguageCode()) {
+      let preferredSiteLanguageCode = userInfo.getPreferredSiteLanguageCode();
+      if (preferredSiteLanguageCode) {
         // TODO(#14052): Find a better way to structure and encapsulate language
         // translations related code.
         this.i18nLanguageCodeService.setI18nLanguageCode(
-          userInfo.getPreferredSiteLanguageCode());
+          preferredSiteLanguageCode);
 
         // This removes the language parameter from the URL if it is present,
         // since, when the user is logged in and has a preferred site language,
@@ -199,8 +200,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isBlogAdmin = userInfo.isBlogAdmin();
       this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.username = userInfo.getUsername();
-      if (this.username) {
+      let usernameFromUserInfo = userInfo.getUsername();
+      if (usernameFromUserInfo) {
+        this.username = usernameFromUserInfo;
         this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
           '/profile/<username>', {
             username: this.username
