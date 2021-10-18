@@ -105,6 +105,11 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
+import { OffScreenPreviewComponent } from 'pages/exploration-player-page/learner-experience/off-screen-preview.component';
+import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
+import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
+import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
 
 @NgModule({
   imports: [
@@ -145,6 +150,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ConversationSkinComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -153,6 +159,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
+    FeedbackPopupComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
@@ -160,16 +167,19 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    LearnerAnswerInfoCard,
     LazyLoadingComponent,
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeFeedbackEditorComponent,
+    OffScreenPreviewComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     ProgressNavComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
+    RatingsAndRecommendationsComponent,
     RubricsEditorComponent,
     SelectSkillModalComponent,
     SearchBarComponent,
@@ -205,11 +215,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ConversationSkinComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
+    FeedbackPopupComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
@@ -228,7 +240,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
+    LearnerAnswerInfoCard,
     OutcomeFeedbackEditorComponent,
+    OffScreenPreviewComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
@@ -236,6 +250,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
+    RatingsAndRecommendationsComponent,
     RubricsEditorComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
@@ -274,6 +289,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ConversationSkinComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -281,8 +297,11 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard,
     MultiSelectionFieldComponent,
     FilteredChoicesFieldComponent,
+    OffScreenPreviewComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
@@ -292,6 +311,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
+    RatingsAndRecommendationsComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,

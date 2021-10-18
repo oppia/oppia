@@ -37,7 +37,6 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
@@ -45,8 +44,6 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { ToastrModule } from 'ngx-toastr';
-import { OffScreenPreviewComponent } from './learner-experience/off-screen-preview.component';
-import { RatingsAndRecommendationsComponent } from './learner-experience/ratings-and-recommendations.component';
 
 @NgModule({
   imports: [
@@ -64,15 +61,11 @@ import { RatingsAndRecommendationsComponent } from './learner-experience/ratings
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
-    LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
     LearnerViewInfoComponent,
-    OffScreenPreviewComponent,
-    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
@@ -81,11 +74,7 @@ import { RatingsAndRecommendationsComponent } from './learner-experience/ratings
     InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
-    LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
-    OffScreenPreviewComponent,
-    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [

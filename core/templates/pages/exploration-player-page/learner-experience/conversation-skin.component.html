@@ -2,89 +2,91 @@
   Off-screen preview of the next card in order to pre-determine the target
   height for the card content transition animation.
 -->
-<oppia-off-screen-preview [next-card-content-html]="nextCard.getContentHtml()"
-                          [upcoming-inline-interaction-html]="upcomingInlineInteractionHtml">
+<oppia-off-screen-preview [nextCardContentHtml]="nextCard.getContentHtml()"
+                          [upcomingInlineInteractionHtml]="upcomingInlineInteractionHtml">
 </oppia-off-screen-preview>
 
-<div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" ng-if="hasFullyLoaded">
+<div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" *ngIf="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
-       ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
+       [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
-         ng-class="{'conversation-skin-animate-tutor-card-on-narrow':
+         [ngClass]="{'conversation-skin-animate-tutor-card-on-narrow':
                       !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
-      <oppia-tutor-card [displayed-card]="displayedCard"
-                        [avatar-image-is-shown]="true"
-                        [start-card-change-animation]="startCardChangeAnimation">
+      <oppia-tutor-card [displayedCard]="displayedCard"
+                        [avatarImageIsShown]="true"
+                        [startCardChangeAnimation]="startCardChangeAnimation">
       </oppia-tutor-card>
-      <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-        <oppia-supplemental-card (click-continue-button)="showUpcomingCard()"
-                                 [displayed-card]="displayedCard"
-                                 [is-learn-again-button]="isLearnAgainButton()">
+      <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
+        <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
+                                 [displayedCard]="displayedCard"
+                                 [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
       </div>
-      <div ng-if="getCanAskLearnerForAnswerInfo()">
-        <oppia-learner-answer-info-card (submit-answer)="submitAnswer($event.currentAnswer, $event.rulesService)">
+      <div *ngIf="getCanAskLearnerForAnswerInfo()">
+        <oppia-learner-answer-info-card (submitAnswer)="submitAnswer($event.currentAnswer, $event.rulesService)">
         </oppia-learner-answer-info-card>
       </div>
-      <div ng-if="!getCanAskLearnerForAnswerInfo()">
+      <div *ngIf="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
-                            [is-learn-again-button]="isLearnAgainButton"
-                            [submit-button-is-disabled]="isSubmitButtonDisabled()"
-                            [displayed-card]="displayedCard"
-                            [submit-button-is-shown]="!answerIsBeingProcessed"
-                            (click-continue-button)="showUpcomingCard()">
+                            [isLearnAgainButton]="isLearnAgainButton"
+                            [submitButtonIsDisabled]="isSubmitButtonDisabled()"
+                            [displayedCard]="displayedCard"
+                            [submitButtonIsShown]="!answerIsBeingProcessed"
+                            (clickContinueButton)="showUpcomingCard()">
         </oppia-progress-nav>
       </div>
-      <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
+      <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
-          <span><[recommendedExplorationSummaries[0].title]></span>
+          <span>{{ recommendedExplorationSummaries[0].title }}</span>
         </div>
         <div>
-          <a href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-            <md-button class="md-raised oppia-button-raised">
+          <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+            <button #matButton class="md-raised oppia-button-raised">
               <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
-            </md-button>
+            </button>
           </a>
         </div>
       </div>
     </div>
 
-    <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
+    <div *ngIf="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <div class="supplemental-card-parent-container">
-        <oppia-supplemental-card (click-continue-button)="showUpcomingCard()"
-                                 [displayed-card]="displayedCard"
-                                 [is-learn-again-button]="isLearnAgainButton()">
+        <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
+                                 [displayedCard]="displayedCard"
+                                 [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
-        <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
-          <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
-                     ng-click="submitAnswerFromProgressNav()"
-                     ng-disabled="isSubmitButtonDisabled()"
-                     translate="I18N_INTERACTIONS_SUBMIT">
-          </md-button>
+        <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
+          <button #matButton
+                  type="submit"
+                  class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
+                  (click)="submitAnswerFromProgressNav()"
+                  [disabled]="isSubmitButtonDisabled()"
+                  translate="I18N_INTERACTIONS_SUBMIT">
+          </button>
         </div>
       </div>
     </div>
   </div>
-  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
+  <div class="conversation-skin-correctness-footer-container" *ngIf="isCorrectnessFooterEnabled()">
     <oppia-correctness-footer></oppia-correctness-footer>
   </div>
 </div>
 
-<oppia-ratings-and-recommendations ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-                                   [user-is-logged-in]="isLoggedIn"
-                                   [exploration-is-in-preview-mode]="isInPreviewMode"
-                                   [question-player-config]="questionPlayerConfig"
-                                   [in-story-mode]="inStoryMode"
-                                   [story-viewer-url]="storyViewerUrl"
-                                   [collection-summary]="collectionSummary"
-                                   [is-refresher-exploration]="isRefresherExploration"
-                                   [recommended-exploration-summaries]="recommendedExplorationSummaries"
-                                   [parent-exploration-ids]="parentExplorationIds">
+<oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                   [userIsLoggedIn]="isLoggedIn"
+                                   [explorationIsInPreviewMode]="isInPreviewMode"
+                                   [questionPlayerConfig]="questionPlayerConfig"
+                                   [inStoryMode]="inStoryMode"
+                                   [storyViewerUrl]="storyViewerUrl"
+                                   [collectionSummary]="collectionSummary"
+                                   [isRefresherExploration]="isRefresherExploration"
+                                   [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                   [parentExplorationIds]="parentExplorationIds">
 </oppia-ratings-and-recommendations>
 
 <!-- These styles must be embedded within the directive script tags, since
@@ -286,19 +288,19 @@ otherwise they will interfere with the iframed conversation skin directive.
     top: -10px;
   }
 
-  conversation-skin .oppia-conversation-skin-animate-cards-container {
+  .oppia-conversation-skin-animate-cards-container {
     margin: 0 auto;
   }
 
-  conversation-skin .oppia-conversation-skin-next-lession-text-container {
+  .oppia-conversation-skin-next-lession-text-container {
     cursor: default;
   }
 
-  conversation-skin .oppia-button-raised.md-raised {
+  .oppia-button-raised.md-raised {
     background-color: #0D48A1
   }
 
-  conversation-skin .oppia-button-icon {
+  .oppia-button-icon {
     color: #fff;
   }
 

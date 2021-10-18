@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ServicesConstants } from 'services/services.constants';
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AlertsService } from 'services/alerts.service';
@@ -59,13 +60,225 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { State } from 'domain/state/StateObjectFactory';
+import { InteractionRulesService } from '../services/answer-classification.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
+import { AppConstants } from 'app.constants';
+import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
+import { StoryViewerDomainConstants } from 'domain/story_viewer/story-viewer-domain.constants';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+
+// Note: This file should be assumed to be in an IIFE, and the constants below
+// should only be used within this file.
+const TIME_FADEOUT_MSEC = 100;
+const TIME_HEIGHT_CHANGE_MSEC = 500;
+const TIME_FADEIN_MSEC = 100;
+const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
 @Component({
-  selector: 'conversation-skin',
+  selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html'
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
+  directiveSubscriptions = new Subscription();
+  // The minimum width, in pixels, needed to be able to show two cards
+  // side-by-side.
+  TIME_PADDING_MSEC = 250;
+  TIME_SCROLL_MSEC = 600;
+  MIN_CARD_LOADING_DELAY_MSEC = 950;
+
+  hasInteractedAtLeastOnce: boolean = false;
+  _nextFocusLabel = null;
+  _editorPreviewMode;
+  explorationActuallyStarted: boolean = false;
+
+  CONTINUE_BUTTON_FOCUS_LABEL = (
+    ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+  isLoggedIn: boolean;
+  storyNodeIdToAdd: string;
+  inStoryMode: boolean = false;
+  collectionId: string;
+  collectionTitle: string;
+  answerIsBeingProcessed: boolean = false;
+  explorationId: string;
+  isInPreviewMode: boolean;
+  isIframed: boolean;
+  hasFullyLoaded = false;
+  recommendedExplorationSummaries = [];
+  answerIsCorrect = false;
+  nextCard;
+  pendingCardWasSeenBefore: boolean = false;
+  OPPIA_AVATAR_IMAGE_URL: string;
+  displayedCard: StateCard;
+  upcomingInlineInteractionHtml;
+  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+    AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+  // If the exploration is iframed, send data to its parent about
+  // its height so that the parent can be resized as necessary.
+  lastRequestedHeight: number = 0;
+  lastRequestedScroll: boolean = false;
+  startCardChangeAnimation: boolean;
+  collectionSummary;
+  redirectToRefresherExplorationConfirmed;
+  isAnimatingToTwoCards: boolean;
+  isAnimatingToOneCard: boolean;
+  isRefresherExploration: boolean;
+  parentExplorationIds: string[];
+  storyViewerUrl: string;
+  conceptCard: ConceptCard;
+  questionSessionCompleted: boolean;
+  moveToExploration: boolean;
+  upcomingInteractionInstructions;
+
+  ngOnInit(): void {
+    this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.isLoggedIn = userInfo.isLoggedIn();
+    });
+
+    this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+
+    if (this.collectionId) {
+      this.readOnlyCollectionBackendApiService.loadCollectionAsync(
+        this.collectionId).then((collection) => {
+        this.collectionTitle = collection.getTitle();
+      });
+    } else {
+      this.collectionTitle = null;
+    }
+
+    this.explorationId = this.explorationEngineService.getExplorationId();
+    this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
+    this.isIframed = this.urlService.isIframed();
+    this.loaderService.showLoadingScreen('Loading');
+
+    this.OPPIA_AVATAR_IMAGE_URL = (
+      this.urlInterpolationService.getStaticImageUrl(
+        '/avatar/oppia_avatar_100px.svg'));
+
+    if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+      this.directiveSubscriptions.add(
+        this.hintsAndSolutionManagerService.onHintConsumed.subscribe(
+          () => {
+            this.questionPlayerStateService.hintUsed(
+              this.questionPlayerEngineService.getCurrentQuestion());
+          }
+        )
+      );
+
+      this.directiveSubscriptions.add(
+        this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
+          .subscribe(() => {
+            this.questionPlayerStateService.solutionViewed(
+              this.questionPlayerEngineService.getCurrentQuestion()
+            );
+          })
+      );
+    }
+
+    this.directiveSubscriptions.add(
+      this.explorationPlayerStateService.onPlayerStateChange.subscribe(
+        (newStateName) => {
+          if (!newStateName) {
+            return;
+          }
+          // To restart the preloader for the new state if required.
+          if (!this._editorPreviewMode) {
+            this.imagePreloaderService.onStateChange(newStateName);
+          }
+          // Ensure the transition to a terminal state properly logs
+          // the end of the exploration.
+          if (
+            !this._editorPreviewMode && this.nextCard.isTerminal()) {
+            this.statsReportingService.recordExplorationCompleted(
+              newStateName, this.learnerParamsService.getAllParams());
+
+            // If the user is a guest, has completed this exploration
+            // within the context of a collection, and the collection is
+            // whitelisted, record their temporary progress.
+            let whiteListedCollectionIds = (
+              AppConstants.
+                WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
+            );
+            let collectionAllowsGuestProgress = (
+              (
+                whiteListedCollectionIds as unknown as string[]
+              ).
+                indexOf(this.collectionId) !== -1);
+            if (collectionAllowsGuestProgress && !this.isLoggedIn) {
+              this.guestCollectionProgressService.
+                recordExplorationCompletedInCollection(
+                  this.collectionId, this.explorationId);
+            }
+
+            // For single state explorations, when the exploration
+            // reachesthe terminal state and explorationActuallyStarted
+            // is false, record exploration actual start event.
+            if (!this.explorationActuallyStarted) {
+              this.statsReportingService.recordExplorationActuallyStarted(
+                newStateName);
+              this.explorationActuallyStarted = true;
+            }
+          }
+        }
+      )
+    );
+
+    this.windowRef.nativeWindow.addEventListener('beforeunload', (e) => {
+      if (this.redirectToRefresherExplorationConfirmed) {
+        return;
+      }
+      if (this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
+          !this.displayedCard.isTerminal() &&
+          !this.explorationPlayerStateService.isInQuestionMode()) {
+        this.statsReportingService.recordMaybeLeaveEvent(
+          this.playerTranscriptService.getLastStateName(),
+          this.learnerParamsService.getAllParams());
+        let confirmationMessage = (
+          'If you navigate away from this page, your progress on the ' +
+          'exploration will be lost.');
+        (e || this.windowRef.nativeWindow.event).returnValue = (
+          confirmationMessage);
+        return confirmationMessage;
+      }
+    });
+
+    this.windowRef.nativeWindow.onresize = () => {
+      this.adjustPageHeight(false, null);
+    };
+
+    this.windowRef.nativeWindow.addEventListener('scroll', () => {
+      this.fixSupplementOnScroll();
+    });
+
+    this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
+    this.startCardChangeAnimation = false;
+    this.initializePage();
+
+    this.collectionSummary = null;
+
+    if (this.collectionId) {
+      this.http.get<{ summaries: string[]}>(
+        '/collectionsummarieshandler/data', {
+          params: {
+            stringified_collection_ids: JSON.stringify(
+              [this.collectionId])
+          }
+        }).toPromise().then(
+        (response) => {
+          this.collectionSummary = response.summaries[0];
+        },
+        () => {
+          this.alertsService.addWarning(
+            'There was an error while fetching the collection ' +
+            'summary.');
+        }
+      );
+    }
+  }
 
   constructor(
     private http: HttpClient,
@@ -81,7 +294,7 @@ export class ConversationSkinComponent {
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationEngineService: ExplorationEngineService,
-    private ExplorationPlayerStateService: ExplorationPlayerStateService,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
     private explorationRecommendationsService:
     ExplorationRecommendationsService,
     private fatigueDetectionService: FatigueDetectionService,
@@ -108,1159 +321,873 @@ export class ConversationSkinComponent {
     private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  alwaysAskLearnerForAnswerDetails(): boolean {
+    return this.explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
+  }
+
+  getCanAskLearnerForAnswerInfo(): boolean {
+    return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
+  }
+
+  initLearnerAnswerInfoService(
+      entityId: string, state: State, answer: string,
+      interactionRulesService: InteractionRulesService,
+      alwaysAskLearnerForAnswerInfo: boolean): void {
+    this.learnerAnswerInfoService.initLearnerAnswerInfoService(
+      entityId, state, answer, interactionRulesService,
+      alwaysAskLearnerForAnswerInfo);
+  }
+
+  // This variable is used only when viewport is narrow.
+  // Indicates whether the tutor card is displayed.
+  isCorrectnessFeedbackEnabled(): boolean {
+    return this.playerCorrectnessFeedbackEnabledService.isEnabled();
+  }
+
+  isCorrectnessFooterEnabled(): boolean {
+    return (
+      this.answerIsCorrect && this.isCorrectnessFeedbackEnabled() &&
+      this.playerPositionService.hasLearnerJustSubmittedAnAnswer());
+  }
+
+  isLearnAgainButton(): boolean {
+    var conceptCardIsBeingShown = (
+      this.displayedCard.getStateName() === null &&
+      !this.explorationPlayerStateService.isInQuestionMode());
+    if (conceptCardIsBeingShown) {
+      return false;
+    }
+    var interaction = this.displayedCard.getInteraction();
+    if (INTERACTION_SPECS[interaction.id].is_linear) {
+      return false;
+    }
+    return (
+      this.pendingCardWasSeenBefore && !this.answerIsCorrect &&
+      this.isCorrectnessFeedbackEnabled());
+  }
+
+  private _getRandomSuffix(): string {
+    // This is a bit of a hack. When a refresh to a $scope variable
+    // happens,
+    // AngularJS compares the new value of the variable to its previous
+    // value. If they are the same, then the variable is not updated.
+    // Appending a random suffix makes the new value different from the
+    // previous one, and thus indirectly forces a refresh.
+    let randomSuffix = '';
+    let N = Math.round(Math.random() * 1000);
+    for (let i = 0; i < N; i++) {
+      randomSuffix += ' ';
+    }
+    return randomSuffix;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getContentFocusLabel(index: number): string {
+    return ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index;
+  }
+
+  adjustPageHeight(scroll: boolean, callback: () => void): void {
+    setTimeout(() => {
+      let newHeight = document.body.scrollHeight;
+      if (Math.abs(this.lastRequestedHeight - newHeight) > 50.5 ||
+          (scroll && !this.lastRequestedScroll)) {
+        // Sometimes setting iframe height to the exact content height
+        // still produces scrollbar, so adding 50 extra px.
+        newHeight += 50;
+        this.messengerService.sendMessage(
+          ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+            height: newHeight,
+            scroll: scroll
+          });
+        this.lastRequestedHeight = newHeight;
+        this.lastRequestedScroll = scroll;
+      }
+
+      if (callback) {
+        callback();
+      }
+    }, 100);
+  }
+
+  getExplorationLink(): string {
+    if (this.recommendedExplorationSummaries &&
+        this.recommendedExplorationSummaries[0]) {
+      if (!this.recommendedExplorationSummaries[0].id) {
+        return '#';
+      } else {
+        let result = '/explore/' +
+            this.recommendedExplorationSummaries[0].id;
+        let urlParams = this.urlService.getUrlParams();
+        let parentExplorationIds = (
+          this.recommendedExplorationSummaries[0]
+            .parentExplorationIds);
+
+        let collectionIdToAdd = this.collectionId;
+        let storyUrlFragmentToAdd = null;
+        let topicUrlFragment = null;
+        let classroomUrlFragment = null;
+        // Replace the collection ID with the one in the URL if it
+        // exists in urlParams.
+        if (parentExplorationIds &&
+            urlParams.hasOwnProperty('collection_id')) {
+          collectionIdToAdd = urlParams.collection_id;
+        } else if (
+          this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
+            this.recommendedExplorationSummaries[0].nextNodeId) {
+          storyUrlFragmentToAdd = (
+            this.urlService.getStoryUrlFragmentFromLearnerUrl());
+          topicUrlFragment = (
+            this.urlService.getTopicUrlFragmentFromLearnerUrl());
+          classroomUrlFragment = (
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+        } else if (
+          urlParams.hasOwnProperty('story_url_fragment') &&
+            urlParams.hasOwnProperty('node_id') &&
+            urlParams.hasOwnProperty('topic_url_fragment') &&
+            urlParams.hasOwnProperty('classroom_url_fragment')) {
+          topicUrlFragment = urlParams.topic_url_fragment;
+          classroomUrlFragment = urlParams.classroom_url_fragment;
+          storyUrlFragmentToAdd = urlParams.story_url_fragment;
+        }
+
+        if (collectionIdToAdd) {
+          result = this.urlService.addField(
+            result, 'collection_id', collectionIdToAdd);
+        }
+        if (parentExplorationIds) {
+          for (let i = 0; i < parentExplorationIds.length - 1; i++) {
+            result = this.urlService.addField(
+              result, 'parent', parentExplorationIds[i]);
+          }
+        }
+        if (storyUrlFragmentToAdd && this.storyNodeIdToAdd) {
+          result = this.urlService.addField(
+            result, 'topic_url_fragment', topicUrlFragment);
+          result = this.urlService.addField(
+            result, 'classroom_url_fragment', classroomUrlFragment);
+          result = this.urlService.addField(
+            result, 'story_url_fragment', storyUrlFragmentToAdd);
+          result = this.urlService.addField(
+            result, 'node_id', this.storyNodeIdToAdd);
+        }
+        return result;
+      }
+    }
+  }
+
+  reloadExploration(): void {
+    this.windowRef.nativeWindow.location.reload();
+  }
+
+  isOnTerminalCard(): boolean {
+    return (
+      this.displayedCard && this.displayedCard.isTerminal());
+  }
+
+  isSupplementalCardNonempty(card: StateCard): boolean {
+    return !card.isInteractionInline();
+  }
+
+  isCurrentSupplementalCardNonempty(): boolean {
+    return this.displayedCard && this.isSupplementalCardNonempty(
+      this.displayedCard);
+  }
+
+  isSupplementalNavShown(): boolean {
+    if (
+      this.displayedCard.getStateName() === null &&
+      !this.explorationPlayerStateService.isInQuestionMode()) {
+      return false;
+    }
+    var interaction = this.displayedCard.getInteraction();
+    return (
+      Boolean(interaction.id) &&
+      INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
+      this.isCurrentCardAtEndOfTranscript());
+  }
+
+
+  private _recordLeaveForRefresherExp(refresherExpId): void {
+    if (!this._editorPreviewMode) {
+      this.statsReportingService.recordLeaveForRefresherExp(
+        this.playerPositionService.getCurrentStateName(),
+        refresherExpId);
+    }
+  }
+
+  // Navigates to the currently-active card, and resets the
+  // 'show previous responses' setting.
+  private _navigateToDisplayedCard(): void {
+    var index = this.playerPositionService.getDisplayedCardIndex();
+    this.displayedCard = this.playerTranscriptService.getCard(index);
+
+    this.playerPositionService.onActiveCardChanged.emit();
+
+    this.audioPlayerService.onAutoplayAudio.emit();
+    /* A hash value is added to URL for scrolling to Oppia feedback
+        when answer is submitted by user in mobile view. This hash value
+        has to be reset each time a new card is loaded to prevent
+        unwanted scrolling in the new card. */
+
+    // $location.hash(null);
+
+    // We must cancel the autogenerated audio player here, or else a
+    // bug where the autogenerated audio player generates duplicate
+    // utterances occurs.
+    this.autogeneratedAudioPlayerService.cancel();
+    if (this._nextFocusLabel &&
+      this.playerTranscriptService.isLastCard(index)) {
+      this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+    } else {
+      this.focusManagerService.setFocusIfOnDesktop(
+        this.getContentFocusLabel(index));
+    }
+  }
+
+  returnToExplorationAfterConceptCard(): void {
+    this.playerTranscriptService.addPreviousCard();
+    let numCards = this.playerTranscriptService.getNumCards();
+    this.playerPositionService.setDisplayedCardIndex(numCards - 1);
+  }
+
+  animateToTwoCards(doneCallback: () => void): void {
+    this.isAnimatingToTwoCards = true;
+    setTimeout(() => {
+      this.isAnimatingToTwoCards = false;
+      if (doneCallback) {
+        doneCallback();
+      }
+    }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC +
+      this.TIME_PADDING_MSEC);
+  }
+
+  animateToOneCard(doneCallback: () => void): void {
+    this.isAnimatingToOneCard = true;
+    setTimeout(() => {
+      this.isAnimatingToOneCard = false;
+      if (doneCallback) {
+        doneCallback();
+      }
+    }, TIME_NUM_CARDS_CHANGE_MSEC);
+  }
+
+
+  isCurrentCardAtEndOfTranscript(): boolean {
+    return this.playerTranscriptService.isLastCard(
+      this.playerPositionService.getDisplayedCardIndex());
+  }
+
+  private _addNewCard(newCard): void {
+    this.playerTranscriptService.addNewCard(newCard);
+    const explorationLanguageCode = (
+      this.explorationPlayerStateService.getLanguageCode());
+    const selectedLanguageCode = (
+      this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+    );
+    if (explorationLanguageCode !== selectedLanguageCode) {
+      this.contentTranslationManagerService.displayTranslations(
+        selectedLanguageCode);
+    }
+
+    let totalNumCards = this.playerTranscriptService.getNumCards();
+
+    let previousSupplementalCardIsNonempty = (
+      totalNumCards > 1 &&
+      this.isSupplementalCardNonempty(
+        this.playerTranscriptService.getCard(totalNumCards - 2)));
+
+    let nextSupplementalCardIsNonempty = this.isSupplementalCardNonempty(
+      this.playerTranscriptService.getLastCard());
+    let previousDisplayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex());
+
+    if (
+      totalNumCards > 1 &&
+      this.canWindowShowTwoCards() &&
+      !previousSupplementalCardIsNonempty &&
+      nextSupplementalCardIsNonempty) {
+      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+      this.animateToTwoCards(function() {});
+    } else if (
+      totalNumCards > 1 &&
+      this.canWindowShowTwoCards() &&
+      previousSupplementalCardIsNonempty &&
+      !nextSupplementalCardIsNonempty) {
+      this.animateToOneCard(function() {
+        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+      });
+    } else {
+      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+    }
+    this.playerPositionService.changeCurrentQuestion(
+      this.playerPositionService.getDisplayedCardIndex());
+
+    // TODO(#7951): Remove the following try-catch block once #7951 has
+    // been fixed.
+    try {
+      this.displayedCard.isTerminal();
+    } catch (error) {
+      let additionalDebugInfo = (
+        `${error.message} \n` +
+        `state name: ${newCard && newCard.getStateName()} \n` +
+        `totalNumCards: ${totalNumCards} \n` +
+        'previous displayedCardIndex: ' +
+        `${previousDisplayedCardIndex} \n` +
+        'current displayedCardIndex: ' +
+        `${this.playerPositionService.getDisplayedCardIndex()} \n`);
+      throw new Error(additionalDebugInfo);
+    }
+
+    if (this.displayedCard.isTerminal()) {
+      this.isRefresherExploration = false;
+      this.parentExplorationIds =
+        this.urlService.getQueryFieldValuesAsList('parent');
+      let recommendedExplorationIds = [];
+      let includeAutogeneratedRecommendations = false;
+
+      if (this.parentExplorationIds.length > 0) {
+        this.isRefresherExploration = true;
+        var parentExplorationId = this.parentExplorationIds[
+          this.parentExplorationIds.length - 1];
+        recommendedExplorationIds.push(parentExplorationId);
+      } else {
+        recommendedExplorationIds =
+          this.explorationEngineService.getAuthorRecommendedExpIds();
+        includeAutogeneratedRecommendations = true;
+      }
+
+      if (this.explorationPlayerStateService.isInStoryChapterMode() &&
+        AppConstants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES) {
+        recommendedExplorationIds = [];
+        includeAutogeneratedRecommendations = false;
+        var topicUrlFragment = (
+          this.urlService.getUrlParams().topic_url_fragment);
+        var classroomUrlFragment = (
+          this.urlService.getUrlParams().classroom_url_fragment);
+        var storyUrlFragment = (
+          this.urlService.getUrlParams().story_url_fragment);
+        let nodeId = this.urlService.getUrlParams().node_id;
+        this.inStoryMode = true;
+        this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
+          TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+            topic_url_fragment: topicUrlFragment,
+            classroom_url_fragment: classroomUrlFragment,
+            story_url_fragment: storyUrlFragment
+          });
+        this.storyViewerBackendApiService.fetchStoryDataAsync(
+          topicUrlFragment, classroomUrlFragment,
+          storyUrlFragment).then(
+          (res) => {
+            let nextStoryNode = [];
+            for (let i = 0; i < res.nodes.length; i++) {
+              if (res.nodes[i].id === nodeId &&
+                  (i + 1) < res.nodes.length) {
+                this.storyNodeIdToAdd = (
+                  res.nodes[i].destinationNodeIds[0]);
+                nextStoryNode.push(
+                  res.nodes[i + 1].explorationSummary);
+                break;
+              }
+            }
+            this.recommendedExplorationSummaries = nextStoryNode;
+          });
+        if (this.isLoggedIn) {
+          this.storyViewerBackendApiService.recordChapterCompletionAsync(
+            topicUrlFragment, classroomUrlFragment,
+            storyUrlFragment, nodeId
+          ).then((returnObject) => {
+            if (returnObject.readyForReviewTest) {
+              this.windowRef.nativeWindow.location =
+                this.urlInterpolationService.interpolateUrl(
+                  TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE, {
+                    topic_url_fragment: topicUrlFragment,
+                    classroom_url_fragment: classroomUrlFragment,
+                    story_url_fragment: storyUrlFragment
+                  });
+            }
+          });
+        } else {
+          let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
+            StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
+              topic_url_fragment: topicUrlFragment,
+              classroom_url_fragment: classroomUrlFragment,
+              story_url_fragment: storyUrlFragment,
+              node_id: nodeId
+            });
+          this.userService.setReturnUrl(loginRedirectUrl);
+        }
+      } else {
+        this.explorationRecommendationsService.getRecommendedSummaryDicts(
+          recommendedExplorationIds,
+          includeAutogeneratedRecommendations,
+          (summaries) => {
+            this.recommendedExplorationSummaries = summaries;
+          });
+      }
+    }
+  }
+
+  showQuestionAreNotAvailable(): void {
+    this.loaderService.hideLoadingScreen();
+  }
+
+  private _initializeDirectiveComponents(initialCard, focusLabel): void {
+    this._addNewCard(initialCard);
+    this.nextCard = initialCard;
+    this.explorationPlayerStateService.onPlayerStateChange.emit(
+      this.nextCard.getStateName());
+    this.focusManagerService.setFocusIfOnDesktop(focusLabel);
+    this.loaderService.hideLoadingScreen();
+    this.hasFullyLoaded = true;
+
+    // If the exploration is embedded, use the exploration language
+    // as site language. If the exploration language is not supported
+    // as site language, English is used as default.
+    let langCodes = AppConstants.SUPPORTED_SITE_LANGUAGES.map((language) => {
+      return language.id;
+    }) as string[];
+    if (this.isIframed) {
+      let explorationLanguageCode = (
+        this.explorationPlayerStateService.getLanguageCode());
+      if (langCodes.indexOf(explorationLanguageCode) !== -1) {
+        this.i18nLanguageCodeService.setI18nLanguageCode(
+          explorationLanguageCode);
+      } else {
+        this.i18nLanguageCodeService.setI18nLanguageCode('en');
+      }
+    }
+    this.adjustPageHeight(false, null);
+    this.windowRef.nativeWindow.scrollTo(0, 0);
+
+    // The timeout is needed in order to give the recipient of the
+    // broadcast sufficient time to load.
+    setTimeout(() => {
+      this.playerPositionService.onNewCardOpened.emit(initialCard);
+    });
+  }
+
+  initializePage(): void {
+    this.hasInteractedAtLeastOnce = false;
+    this.recommendedExplorationSummaries = [];
+    this.playerPositionService.init(this._navigateToDisplayedCard);
+    if (this.questionPlayerConfig) {
+      this.explorationPlayerStateService.initializeQuestionPlayer(
+        this.questionPlayerConfig, this._initializeDirectiveComponents,
+        this.showQuestionAreNotAvailable);
+    } else {
+      this.explorationPlayerStateService.initializePlayer(
+        this._initializeDirectiveComponents);
+    }
+  }
+
+  submitAnswer(
+      answer: string, interactionRulesService: InteractionRulesService): void {
+    // Safety check to prevent double submissions from occurring.
+    if (this.answerIsBeingProcessed ||
+      !this.isCurrentCardAtEndOfTranscript() ||
+      this.displayedCard.isCompleted()) {
+      return;
+    }
+
+    if (!this.isInPreviewMode) {
+      this.fatigueDetectionService.recordSubmissionTimestamp();
+      if (this.fatigueDetectionService.isSubmittingTooFast()) {
+        this.fatigueDetectionService.displayTakeBreakMessage();
+        this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+        return;
+      }
+    }
+
+    if (!this.explorationPlayerStateService.isInQuestionMode() &&
+      !this.isInPreviewMode &&
+      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+      this.initLearnerAnswerInfoService(
+        this.explorationId, this.explorationEngineService.getState(),
+        answer, interactionRulesService,
+        this.alwaysAskLearnerForAnswerDetails());
+    }
+
+    this.numberAttemptsService.submitAttempt();
+
+    this.answerIsBeingProcessed = true;
+    this.hasInteractedAtLeastOnce = true;
+
+    this.playerTranscriptService.addNewInput(answer, false);
+
+    if (this.getCanAskLearnerForAnswerInfo()) {
+      setTimeout(() => {
+        this.playerTranscriptService.addNewResponse(
+          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
+        this.answerIsBeingProcessed = false;
+        this.playerPositionService.onHelpCardAvailable.emit({
+          helpCardHtml: (
+            this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
+          hasContinueButton: false
+        });
+      }, 100);
+      return;
+    }
+
+    let timeAtServerCall = new Date().getTime();
+    this.playerPositionService.recordAnswerSubmission();
+    let currentEngineService =
+      this.explorationPlayerStateService.getCurrentEngineService();
+    this.answerIsCorrect = currentEngineService.submitAnswer(
+      answer, interactionRulesService, (
+          nextCard, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations, refresherExplorationId,
+          missingPrerequisiteSkillId, remainOnCurrentCard,
+          taggedSkillMisconceptionId, wasOldStateInitial,
+          isFirstHit, isFinalQuestion, focusLabel) => {
+        this.nextCard = nextCard;
+        if (!this._editorPreviewMode &&
+            !this.explorationPlayerStateService.isInQuestionMode()) {
+          let oldStateName =
+            this.playerPositionService.getCurrentStateName();
+          if (!remainOnCurrentCard) {
+            this.statsReportingService.recordStateTransition(
+              oldStateName, nextCard.getStateName(), answer,
+              this.learnerParamsService.getAllParams(), isFirstHit);
+
+            this.statsReportingService.recordStateCompleted(
+              oldStateName);
+          }
+          if (nextCard.isTerminal()) {
+            this.statsReportingService.recordStateCompleted(
+              nextCard.getStateName());
+          }
+          if (wasOldStateInitial && !this.explorationActuallyStarted) {
+            this.statsReportingService.recordExplorationActuallyStarted(
+              oldStateName);
+            this.explorationActuallyStarted = true;
+          }
+        }
+        if (!this.explorationPlayerStateService.isInQuestionMode()) {
+          this.explorationPlayerStateService.onPlayerStateChange.emit(
+            nextCard.getStateName());
+        } else {
+          this.questionPlayerStateService.answerSubmitted(
+            this.questionPlayerEngineService.getCurrentQuestion(),
+            !remainOnCurrentCard,
+            taggedSkillMisconceptionId);
+        }
+        // Do not wait if the interaction is supplemental -- there's
+        // already a delay bringing in the help card.
+        var millisecsLeftToWait = (
+          !this.displayedCard.isInteractionInline() ? 1.0 :
+          Math.max(this.MIN_CARD_LOADING_DELAY_MSEC - (
+            new Date().getTime() - timeAtServerCall),
+          1.0));
+
+        setTimeout(() => {
+          this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+
+          this.audioPlayerService.onAutoplayAudio.emit({
+            audioTranslations: feedbackAudioTranslations,
+            html: feedbackHtml,
+            componentName: AppConstants.COMPONENT_NAME_FEEDBACK
+          });
+
+          if (remainOnCurrentCard) {
+            // Stay on the same card.
+            this.hintsAndSolutionManagerService.recordWrongAnswer();
+            this.playerTranscriptService.addNewResponse(feedbackHtml);
+            let helpCardAvailable = false;
+            if (feedbackHtml &&
+                !this.displayedCard.isInteractionInline()) {
+              helpCardAvailable = true;
+            }
+
+            if (helpCardAvailable) {
+              this.playerPositionService.onHelpCardAvailable.emit({
+                helpCardHtml: feedbackHtml,
+                hasContinueButton: false
+              });
+            }
+            if (missingPrerequisiteSkillId) {
+              this.displayedCard.markAsCompleted();
+              this.conceptCardBackendApiService.loadConceptCardsAsync(
+                [missingPrerequisiteSkillId]
+              ).then((conceptCardObject) => {
+                // This.conceptCard = conceptCardObject;
+                if (helpCardAvailable) {
+                  this.playerPositionService.onHelpCardAvailable.emit({
+                    helpCardHtml: feedbackHtml,
+                    hasContinueButton: true
+                  });
+                }
+              });
+            }
+            if (refreshInteraction) {
+              // Replace the previous interaction with another of the
+              // same type.
+              this._nextFocusLabel = (
+                this.focusManagerService.generateFocusLabel());
+              this.playerTranscriptService.updateLatestInteractionHtml(
+                this.displayedCard.getInteractionHtml() +
+                this._getRandomSuffix());
+            }
+
+            this.redirectToRefresherExplorationConfirmed = false;
+
+            if (refresherExplorationId) {
+              // TODO(bhenning): Add tests to verify the event is
+              // properly recorded.
+              let confirmRedirection = function() {
+                this.redirectToRefresherExplorationConfirmed = true;
+                this._recordLeaveForRefresherExp(refresherExplorationId);
+              };
+              this.http.get<{ summaries: string[] }>(
+                AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                  params: {
+                    stringified_exp_ids: JSON.stringify(
+                      [refresherExplorationId])
+                  }
+                }).toPromise().then((response) => {
+                if (response.summaries.length > 0) {
+                  this.refresherExplorationConfirmationModalService.
+                    displayRedirectConfirmationModal(
+                      refresherExplorationId, confirmRedirection);
+                }
+              });
+            }
+            this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+            this.scrollToBottom();
+          } else {
+            // There is a new card. If there is no feedback, move on
+            // immediately. Otherwise, give the learner a chance to read
+            // the feedback, and display a 'Continue' button.
+            this.pendingCardWasSeenBefore = false;
+            this.displayedCard.markAsCompleted();
+            if (isFinalQuestion) {
+              if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+                // We will redirect to the results page here.
+                this.questionSessionCompleted = true;
+              }
+              this.moveToExploration = true;
+              if (feedbackHtml) {
+                this.playerTranscriptService.addNewResponse(feedbackHtml);
+                if (
+                  !this.displayedCard.isInteractionInline()) {
+                  this.playerPositionService.onHelpCardAvailable.emit({
+                    helpCardHtml: feedbackHtml,
+                    hasContinueButton: true
+                  });
+                }
+              } else {
+                this.showUpcomingCard();
+              }
+              this.answerIsBeingProcessed = false;
+              return;
+            }
+            this.fatigueDetectionService.reset();
+            this.numberAttemptsService.reset();
+
+            var _isNextInteractionInline =
+              this.nextCard.isInteractionInline();
+            this.upcomingInlineInteractionHtml = (
+              _isNextInteractionInline ?
+                this.nextCard.getInteractionHtml() : '');
+            this.upcomingInteractionInstructions = (
+              this.nextCard.getInteractionInstructions());
+
+            if (feedbackHtml) {
+              if (
+                this.playerTranscriptService.hasEncounteredStateBefore(
+                  nextCard.getStateName())) {
+                this.pendingCardWasSeenBefore = true;
+              }
+              this.playerTranscriptService.addNewResponse(feedbackHtml);
+              if (!this.displayedCard.isInteractionInline()) {
+                this.playerPositionService.onHelpCardAvailable.emit({
+                  helpCardHtml: feedbackHtml,
+                  hasContinueButton: true
+                });
+              }
+              this.playerPositionService.onNewCardAvailable.emit();
+              this._nextFocusLabel = (
+                ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+              this.focusManagerService.setFocusIfOnDesktop(
+                this._nextFocusLabel);
+              this.scrollToBottom();
+            } else {
+              this.playerTranscriptService.addNewResponse(feedbackHtml);
+              // If there is no feedback, it immediately moves on
+              // to next card. Therefore $scope.answerIsCorrect needs
+              // to be set to false before it proceeds to next card.
+              this.answerIsCorrect = false;
+              this.showPendingCard();
+            }
+            this.currentInteractionService.clearPresubmitHooks();
+          }
+          this.answerIsBeingProcessed = false;
+        }, millisecsLeftToWait);
+      }
+    );
+  }
+
+  showPendingCard(): void {
+    this.startCardChangeAnimation = true;
+    this.explorationPlayerStateService.recordNewCardAdded();
+
+    setTimeout(() => {
+      this._addNewCard(this.nextCard);
+
+      this.upcomingInlineInteractionHtml = null;
+      this.upcomingInteractionInstructions = null;
+    }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
+
+    setTimeout(() => {
+      this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+      this.scrollToTop();
+    },
+    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
+      0.5 * TIME_FADEIN_MSEC);
+
+    setTimeout(() => {
+      this.startCardChangeAnimation = false;
+    },
+    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
+    this.TIME_PADDING_MSEC);
+
+    this.playerPositionService.onNewCardOpened.emit(this.nextCard);
+  }
+
+  showUpcomingCard(): void {
+    let currentIndex = this.playerPositionService.getDisplayedCardIndex();
+    let conceptCardIsBeingShown = (
+      this.displayedCard.getStateName() === null &&
+      !this.explorationPlayerStateService.isInQuestionMode());
+    if (conceptCardIsBeingShown &&
+        this.playerTranscriptService.isLastCard(currentIndex)) {
+      this.returnToExplorationAfterConceptCard();
+      return;
+    }
+    if (this.questionSessionCompleted) {
+      this.questionPlayerStateService.onQuestionSessionCompleted.emit(
+        this.questionPlayerStateService.getQuestionPlayerStateData());
+      return;
+    }
+    if (this.moveToExploration) {
+      this.moveToExploration = false;
+      this.explorationPlayerStateService.moveToExploration(
+        this._initializeDirectiveComponents);
+      return;
+    }
+    if (
+      this.displayedCard.isCompleted() &&
+      (this.nextCard.getStateName() ===
+      this.displayedCard.getStateName()) && this.conceptCard) {
+      this.explorationPlayerStateService.recordNewCardAdded();
+      this._addNewCard(
+        StateCard.createNewCard(
+          null, this.conceptCard.getExplanation().html, null, null, null,
+          null, null, this.audioTranslationLanguageService));
+      return;
+    }
+    /* This is for the following situation:
+        if A->B->C is the arrangement of cards and C redirected to A,
+        then after this, B and C are visited cards and hence
+        pendingCardWasSeenBefore would be true during both these
+        transitions and as answerIsCorrect is set to false below,
+        Continue would briefly change to Learn Again (after it is
+        clicked) during these transitions which is not required.
+        Also, if the 'if' check is not there, Learn Again button would
+        briefly switched to Continue before going to next card. */
+    if (this.answerIsCorrect) {
+      this.pendingCardWasSeenBefore = false;
+    }
+    this.answerIsCorrect = false;
+    this.showPendingCard();
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      let tutorCard = $('.conversation-skin-main-tutor-card');
+
+      if (tutorCard && tutorCard.length === 0) {
+        return;
+      }
+      let tutorCardBottom = (
+        tutorCard.offset().top + tutorCard.outerHeight());
+      if ($(window).scrollTop() +
+            $(window).height() < tutorCardBottom) {
+        $('html, body').animate({
+          scrollTop: tutorCardBottom - $(window).height() + 12
+        }, {
+          duration: this.TIME_SCROLL_MSEC,
+          easing: 'easeOutQuad'
+        });
+      }
+    }, 100);
+  }
+
+  scrollToTop(): void {
+    setTimeout(() => {
+      $('html, body').animate({
+        scrollTop: 0
+      }, 800, 'easeOutQuart');
+      return false;
+    });
+  }
+
+  // Returns whether the screen is wide enough to fit two
+  // cards (e.g., the tutor and supplemental cards) side-by-side.
+  canWindowShowTwoCards(): boolean {
+    return this.windowDimensionsService.getWidth() >
+    ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
+  }
+
+  fixSupplementOnScroll(): void {
+    let supplementCard = $('div.conversation-skin-supplemental-card');
+    let topMargin = $('.navbar-container').height() - 20;
+    if ($(window).scrollTop() > topMargin) {
+      supplementCard.addClass(
+        'conversation-skin-supplemental-card-fixed');
+    } else {
+      supplementCard.removeClass(
+        'conversation-skin-supplemental-card-fixed');
+    }
+  }
+
+  onNavigateFromIframe(): void {
+    this.siteAnalyticsService.registerVisitOppiaFromIframeEvent(
+      this.explorationId);
+  }
+
+  isSubmitButtonDisabled(): boolean {
+    let currentIndex = this.playerPositionService.getDisplayedCardIndex();
+    // This check is added because it was observed that when returning
+    // to current card after navigating through previous cards, using
+    // the arrows, the Submit button was sometimes falsely disabled.
+    // Also, since a learner's answers would always be in the current
+    // card, this additional check doesn't interfere with its normal
+    // working.
+    if (!this.playerTranscriptService.isLastCard(currentIndex)) {
+      return false;
+    }
+    return this.currentInteractionService.isSubmitButtonDisabled();
+  }
+
+  submitAnswerFromProgressNav(): void {
+    this.currentInteractionService.submitAnswer();
+  }
 }
 
-angular.module('oppia').directive('conversationSkin',
+angular.module('oppia').directive('oppiaConversationSkin',
   downgradeComponent({
     component: ConversationSkinComponent
   }) as angular.IDirectiveFactory);
-
-
-// // Note: This file should be assumed to be in an IIFE, and the constants below
-// // should only be used within this file.
-// var TIME_FADEOUT_MSEC = 100;
-// var TIME_HEIGHT_CHANGE_MSEC = 500;
-// var TIME_FADEIN_MSEC = 100;
-// var TIME_NUM_CARDS_CHANGE_MSEC = 500;
-
-// interface ConversationSkinCustomScope extends ng.IScope {
-//   directiveTemplate?: string;
-// }
-
-// angular.module('oppia').directive('conversationSkin', [
-//   'UrlInterpolationService', 'UrlService',
-//   function(UrlInterpolationService, UrlService) {
-//     return {
-//       restrict: 'E',
-//       scope: {
-//         getQuestionPlayerConfig: '&questionPlayerConfig',
-//       },
-//       link: function(scope: ConversationSkinCustomScope) {
-//         var isIframed = UrlService.isIframed();
-//         scope.directiveTemplate = isIframed ?
-//           UrlInterpolationService.getDirectiveTemplateUrl(
-//             '/pages/exploration-player-page/learner-experience/' +
-//             'conversation-skin-embed.directive.html') :
-//           UrlInterpolationService.getDirectiveTemplateUrl(
-//             '/pages/exploration-player-page/learner-experience/' +
-//             'conversation-skin.directive.html');
-//       },
-//       template: '<div ng-include="directiveTemplate"></div>',
-//       controller: [
-//         '$http', '$location', '$rootScope', '$scope', '$timeout', '$translate',
-//         '$window', 'AlertsService', 'AudioPlayerService',
-//         'AudioTranslationLanguageService', 'AutogeneratedAudioPlayerService',
-//         'ConceptCardBackendApiService', 'ContentTranslationLanguageService',
-//         'ContentTranslationManagerService',
-//         'ContextService', 'CurrentInteractionService',
-//         'ExplorationEngineService', 'ExplorationPlayerStateService',
-//         'ExplorationRecommendationsService', 'FatigueDetectionService',
-//         'FocusManagerService', 'GuestCollectionProgressService',
-//         'HintsAndSolutionManagerService', 'I18nLanguageCodeService',
-//         'ImagePreloaderService', 'LearnerAnswerInfoService',
-//         'LearnerParamsService', 'LoaderService',
-//         'MessengerService', 'NumberAttemptsService',
-//         'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
-//         'PlayerTranscriptService', 'QuestionPlayerEngineService',
-//         'QuestionPlayerStateService', 'ReadOnlyCollectionBackendApiService',
-//         'RefresherExplorationConfirmationModalService',
-//         'SiteAnalyticsService', 'StatsReportingService',
-//         'StoryViewerBackendApiService', 'UrlService',
-//         'UserService', 'WindowDimensionsService',
-//         'COMPONENT_NAME_FEEDBACK', 'CONTENT_FOCUS_LABEL_PREFIX',
-//         'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
-//         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
-//         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
-//         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-//         'INTERACTION_SPECS',
-//         'REVIEW_TESTS_URL_TEMPLATE',
-//         'STORY_PROGRESS_URL_TEMPLATE', 'STORY_VIEWER_URL_TEMPLATE',
-//         'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
-//         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-//         function(
-//             $http, $location, $rootScope, $scope, $timeout, $translate,
-//             $window, AlertsService, AudioPlayerService,
-//             AudioTranslationLanguageService, AutogeneratedAudioPlayerService,
-//             ConceptCardBackendApiService, ContentTranslationLanguageService,
-//             ContentTranslationManagerService,
-//             ContextService, CurrentInteractionService,
-//             ExplorationEngineService, ExplorationPlayerStateService,
-//             ExplorationRecommendationsService, FatigueDetectionService,
-//             FocusManagerService, GuestCollectionProgressService,
-//             HintsAndSolutionManagerService, I18nLanguageCodeService,
-//             ImagePreloaderService, LearnerAnswerInfoService,
-//             LearnerParamsService, LoaderService,
-//             MessengerService, NumberAttemptsService,
-//             PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
-//             PlayerTranscriptService, QuestionPlayerEngineService,
-//             QuestionPlayerStateService, ReadOnlyCollectionBackendApiService,
-//             RefresherExplorationConfirmationModalService,
-//             SiteAnalyticsService, StatsReportingService,
-//             StoryViewerBackendApiService, UrlService,
-//             UserService, WindowDimensionsService,
-//             COMPONENT_NAME_FEEDBACK, CONTENT_FOCUS_LABEL_PREFIX,
-//             CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
-//             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
-//             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
-//             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
-//             INTERACTION_SPECS,
-//             REVIEW_TESTS_URL_TEMPLATE,
-//             STORY_PROGRESS_URL_TEMPLATE, STORY_VIEWER_URL_TEMPLATE,
-//             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
-//             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
-//           var ctrl = this;
-//           ctrl.directiveSubscriptions = new Subscription();
-//           // The minimum width, in pixels, needed to be able to show two cards
-//           // side-by-side.
-//           var TIME_PADDING_MSEC = 250;
-//           var TIME_SCROLL_MSEC = 600;
-//           var MIN_CARD_LOADING_DELAY_MSEC = 950;
-
-//           var alwaysAskLearnerForAnswerDetails = function() {
-//             return ExplorationEngineService.getAlwaysAskLearnerForAnswerDetails(
-//             );
-//           };
-
-//           $scope.getCanAskLearnerForAnswerInfo = function() {
-//             return LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
-//           };
-
-//           var initLearnerAnswerInfoService = function(
-//               entityId, state, answer, interactionRulesService,
-//               alwaysAskLearnerForAnswerInfo) {
-//             LearnerAnswerInfoService.initLearnerAnswerInfoService(
-//               entityId, state, answer, interactionRulesService,
-//               alwaysAskLearnerForAnswerInfo);
-//           };
-
-//           var hasInteractedAtLeastOnce = false;
-//           var _nextFocusLabel = null;
-//           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-//           // This variable is used only when viewport is narrow.
-//           // Indicates whether the tutor card is displayed.
-//           $scope.isCorrectnessFeedbackEnabled = function() {
-//             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
-//           };
-
-//           $scope.isCorrectnessFooterEnabled = function() {
-//             return (
-//               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled() &&
-//               PlayerPositionService.hasLearnerJustSubmittedAnAnswer());
-//           };
-
-//           $scope.isLearnAgainButton = function() {
-//             var conceptCardIsBeingShown = (
-//               $scope.displayedCard.getStateName() === null &&
-//               !ExplorationPlayerStateService.isInQuestionMode());
-//             if (conceptCardIsBeingShown) {
-//               return false;
-//             }
-//             var interaction = $scope.displayedCard.getInteraction();
-//             if (INTERACTION_SPECS[interaction.id].is_linear) {
-//               return false;
-//             }
-//             return (
-//               $scope.pendingCardWasSeenBefore && !$scope.answerIsCorrect &&
-//               $scope.isCorrectnessFeedbackEnabled());
-//           };
-
-//           var _getRandomSuffix = function() {
-//             // This is a bit of a hack. When a refresh to a $scope variable
-//             // happens,
-//             // AngularJS compares the new value of the variable to its previous
-//             // value. If they are the same, then the variable is not updated.
-//             // Appending a random suffix makes the new value different from the
-//             // previous one, and thus indirectly forces a refresh.
-//             var randomSuffix = '';
-//             var N = Math.round(Math.random() * 1000);
-//             for (var i = 0; i < N; i++) {
-//               randomSuffix += ' ';
-//             }
-//             return randomSuffix;
-//           };
-
-//           $scope.getStaticImageUrl = function(imagePath) {
-//             return UrlInterpolationService.getStaticImageUrl(imagePath);
-//           };
-
-//           var explorationActuallyStarted = false;
-
-//           $scope.getContentFocusLabel = function(index) {
-//             return CONTENT_FOCUS_LABEL_PREFIX + index;
-//           };
-
-//           $scope.adjustPageHeight = function(scroll, callback) {
-//             $timeout(function() {
-//               var newHeight = document.body.scrollHeight;
-//               if (Math.abs($scope.lastRequestedHeight - newHeight) > 50.5 ||
-//                   (scroll && !$scope.lastRequestedScroll)) {
-//                 // Sometimes setting iframe height to the exact content height
-//                 // still produces scrollbar, so adding 50 extra px.
-//                 newHeight += 50;
-//                 MessengerService.sendMessage(
-//                   ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
-//                     height: newHeight,
-//                     scroll: scroll
-//                   });
-//                 $scope.lastRequestedHeight = newHeight;
-//                 $scope.lastRequestedScroll = scroll;
-//               }
-
-//               if (callback) {
-//                 callback();
-//               }
-//             }, 100);
-//           };
-
-//           $scope.getExplorationLink = function() {
-//             if ($scope.recommendedExplorationSummaries &&
-//                 $scope.recommendedExplorationSummaries[0]) {
-//               if (!$scope.recommendedExplorationSummaries[0].id) {
-//                 return '#';
-//               } else {
-//                 var result = '/explore/' +
-//                     $scope.recommendedExplorationSummaries[0].id;
-//                 var urlParams = UrlService.getUrlParams();
-//                 var parentExplorationIds = (
-//                   $scope.recommendedExplorationSummaries[0]
-//                     .parentExplorationIds);
-
-//                 var collectionIdToAdd = $scope.collectionId;
-//                 var storyUrlFragmentToAdd = null;
-//                 var topicUrlFragment = null;
-//                 var classroomUrlFragment = null;
-//                 // Replace the collection ID with the one in the URL if it
-//                 // exists in urlParams.
-//                 if (parentExplorationIds &&
-//                     urlParams.hasOwnProperty('collection_id')) {
-//                   collectionIdToAdd = urlParams.collection_id;
-//                 } else if (
-//                   UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-//                     $scope.recommendedExplorationSummaries[0].nextNodeId) {
-//                   storyUrlFragmentToAdd = (
-//                     UrlService.getStoryUrlFragmentFromLearnerUrl());
-//                   topicUrlFragment = (
-//                     UrlService.getTopicUrlFragmentFromLearnerUrl());
-//                   classroomUrlFragment = (
-//                     UrlService.getClassroomUrlFragmentFromLearnerUrl());
-//                 } else if (
-//                   urlParams.hasOwnProperty('story_url_fragment') &&
-//                     urlParams.hasOwnProperty('node_id') &&
-//                     urlParams.hasOwnProperty('topic_url_fragment') &&
-//                     urlParams.hasOwnProperty('classroom_url_fragment')) {
-//                   topicUrlFragment = urlParams.topic_url_fragment;
-//                   classroomUrlFragment = urlParams.classroom_url_fragment;
-//                   storyUrlFragmentToAdd = urlParams.story_url_fragment;
-//                 }
-
-//                 if (collectionIdToAdd) {
-//                   result = UrlService.addField(
-//                     result, 'collection_id', collectionIdToAdd);
-//                 }
-//                 if (parentExplorationIds) {
-//                   for (var i = 0; i < parentExplorationIds.length - 1; i++) {
-//                     result = UrlService.addField(
-//                       result, 'parent', parentExplorationIds[i]);
-//                   }
-//                 }
-//                 if (storyUrlFragmentToAdd && $scope.storyNodeIdToAdd) {
-//                   result = UrlService.addField(
-//                     result, 'topic_url_fragment', topicUrlFragment);
-//                   result = UrlService.addField(
-//                     result, 'classroom_url_fragment', classroomUrlFragment);
-//                   result = UrlService.addField(
-//                     result, 'story_url_fragment', storyUrlFragmentToAdd);
-//                   result = UrlService.addField(
-//                     result, 'node_id', $scope.storyNodeIdToAdd);
-//                 }
-//                 return result;
-//               }
-//             }
-//           };
-
-//           $scope.reloadExploration = function() {
-//             $window.location.reload();
-//           };
-
-//           $scope.isOnTerminalCard = function() {
-//             return (
-//               $scope.displayedCard && $scope.displayedCard.isTerminal());
-//           };
-
-//           var isSupplementalCardNonempty = function(card) {
-//             return !card.isInteractionInline();
-//           };
-
-//           $scope.isCurrentSupplementalCardNonempty = function() {
-//             return $scope.displayedCard && isSupplementalCardNonempty(
-//               $scope.displayedCard);
-//           };
-
-//           $scope.isSupplementalNavShown = function() {
-//             if (
-//               $scope.displayedCard.getStateName() === null &&
-//               !ExplorationPlayerStateService.isInQuestionMode()) {
-//               return false;
-//             }
-//             var interaction = $scope.displayedCard.getInteraction();
-//             return (
-//               Boolean(interaction.id) &&
-//               INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
-//               $scope.isCurrentCardAtEndOfTranscript());
-//           };
-
-//           var _recordLeaveForRefresherExp = function(refresherExpId) {
-//             if (!_editorPreviewMode) {
-//               StatsReportingService.recordLeaveForRefresherExp(
-//                 PlayerPositionService.getCurrentStateName(),
-//                 refresherExpId);
-//             }
-//           };
-
-//           // Navigates to the currently-active card, and resets the
-//           // 'show previous responses' setting.
-//           var _navigateToDisplayedCard = function() {
-//             var index = PlayerPositionService.getDisplayedCardIndex();
-//             $scope.displayedCard = PlayerTranscriptService.getCard(index);
-
-//             PlayerPositionService.onActiveCardChanged.emit();
-
-//             AudioPlayerService.onAutoplayAudio.emit();
-//             /* A hash value is added to URL for scrolling to Oppia feedback
-//                when answer is submitted by user in mobile view. This hash value
-//                has to be reset each time a new card is loaded to prevent
-//                unwanted scrolling in the new card. */
-//             $location.hash(null);
-//             // We must cancel the autogenerated audio player here, or else a
-//             // bug where the autogenerated audio player generates duplicate
-//             // utterances occurs.
-//             AutogeneratedAudioPlayerService.cancel();
-//             if (_nextFocusLabel && PlayerTranscriptService.isLastCard(index)) {
-//               FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
-//             } else {
-//               FocusManagerService.setFocusIfOnDesktop(
-//                 $scope.getContentFocusLabel(index));
-//             }
-//           };
-
-//           $scope.returnToExplorationAfterConceptCard = function() {
-//             PlayerTranscriptService.addPreviousCard();
-//             var numCards = PlayerTranscriptService.getNumCards();
-//             PlayerPositionService.setDisplayedCardIndex(numCards - 1);
-//           };
-
-//           var animateToTwoCards = function(doneCallback) {
-//             $scope.isAnimatingToTwoCards = true;
-//             $timeout(function() {
-//               $scope.isAnimatingToTwoCards = false;
-//               if (doneCallback) {
-//                 doneCallback();
-//               }
-//             }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC +
-//               TIME_PADDING_MSEC);
-//           };
-
-//           var animateToOneCard = function(doneCallback) {
-//             $scope.isAnimatingToOneCard = true;
-//             $timeout(function() {
-//               $scope.isAnimatingToOneCard = false;
-//               if (doneCallback) {
-//                 doneCallback();
-//               }
-//             }, TIME_NUM_CARDS_CHANGE_MSEC);
-//           };
-
-//           $scope.isCurrentCardAtEndOfTranscript = function() {
-//             return PlayerTranscriptService.isLastCard(
-//               PlayerPositionService.getDisplayedCardIndex());
-//           };
-//           var _addNewCard = function(newCard) {
-//             PlayerTranscriptService.addNewCard(newCard);
-//             const explorationLanguageCode = (
-//               ExplorationPlayerStateService.getLanguageCode());
-//             const selectedLanguageCode = (
-//               ContentTranslationLanguageService.getCurrentContentLanguageCode()
-//             );
-//             if (explorationLanguageCode !== selectedLanguageCode) {
-//               ContentTranslationManagerService.displayTranslations(
-//                 selectedLanguageCode);
-//             }
-
-//             var totalNumCards = PlayerTranscriptService.getNumCards();
-
-//             var previousSupplementalCardIsNonempty = (
-//               totalNumCards > 1 &&
-//               isSupplementalCardNonempty(
-//                 PlayerTranscriptService.getCard(totalNumCards - 2)));
-
-//             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
-//               PlayerTranscriptService.getLastCard());
-//             var previousDisplayedCardIndex = (
-//               PlayerPositionService.getDisplayedCardIndex());
-
-//             if (
-//               totalNumCards > 1 &&
-//               $scope.canWindowShowTwoCards() &&
-//               !previousSupplementalCardIsNonempty &&
-//               nextSupplementalCardIsNonempty) {
-//               PlayerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-//               animateToTwoCards(function() {});
-//             } else if (
-//               totalNumCards > 1 &&
-//               $scope.canWindowShowTwoCards() &&
-//               previousSupplementalCardIsNonempty &&
-//               !nextSupplementalCardIsNonempty) {
-//               animateToOneCard(function() {
-//                 PlayerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-//               });
-//             } else {
-//               PlayerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-//             }
-//             PlayerPositionService.changeCurrentQuestion(
-//               PlayerPositionService.getDisplayedCardIndex());
-
-//             // TODO(#7951): Remove the following try-catch block once #7951 has
-//             // been fixed.
-//             try {
-//               $scope.displayedCard.isTerminal();
-//             } catch (error) {
-//               let additionalDebugInfo = (
-//                 `${error.message} \n` +
-//                 `state name: ${newCard && newCard.getStateName()} \n` +
-//                 `totalNumCards: ${totalNumCards} \n` +
-//                 'previous displayedCardIndex: ' +
-//                 `${previousDisplayedCardIndex} \n` +
-//                 'current displayedCardIndex: ' +
-//                 `${PlayerPositionService.getDisplayedCardIndex()} \n`);
-//               throw new Error(additionalDebugInfo);
-//             }
-
-//             if ($scope.displayedCard.isTerminal()) {
-//               $scope.isRefresherExploration = false;
-//               $scope.parentExplorationIds =
-//                 UrlService.getQueryFieldValuesAsList('parent');
-//               var recommendedExplorationIds = [];
-//               var includeAutogeneratedRecommendations = false;
-
-//               if ($scope.parentExplorationIds.length > 0) {
-//                 $scope.isRefresherExploration = true;
-//                 var parentExplorationId = $scope.parentExplorationIds[
-//                   $scope.parentExplorationIds.length - 1];
-//                 recommendedExplorationIds.push(parentExplorationId);
-//               } else {
-//                 recommendedExplorationIds =
-//                   ExplorationEngineService.getAuthorRecommendedExpIds();
-//                 includeAutogeneratedRecommendations = true;
-//               }
-
-//               if (ExplorationPlayerStateService.isInStoryChapterMode() &&
-//                 ENABLE_NEW_STRUCTURE_VIEWER_UPDATES) {
-//                 recommendedExplorationIds = [];
-//                 includeAutogeneratedRecommendations = false;
-//                 var topicUrlFragment = (
-//                   UrlService.getUrlParams().topic_url_fragment);
-//                 var classroomUrlFragment = (
-//                   UrlService.getUrlParams().classroom_url_fragment);
-//                 var storyUrlFragment = (
-//                   UrlService.getUrlParams().story_url_fragment);
-//                 var nodeId = UrlService.getUrlParams().node_id;
-//                 $scope.inStoryMode = true;
-//                 $scope.storyViewerUrl = UrlInterpolationService.interpolateUrl(
-//                   STORY_VIEWER_URL_TEMPLATE, {
-//                     topic_url_fragment: topicUrlFragment,
-//                     classroom_url_fragment: classroomUrlFragment,
-//                     story_url_fragment: storyUrlFragment
-//                   });
-//                 StoryViewerBackendApiService.fetchStoryDataAsync(
-//                   topicUrlFragment, classroomUrlFragment,
-//                   storyUrlFragment).then(
-//                   function(res) {
-//                     var nextStoryNode = [];
-//                     for (var i = 0; i < res.nodes.length; i++) {
-//                       if (res.nodes[i].id === nodeId &&
-//                           (i + 1) < res.nodes.length) {
-//                         $scope.storyNodeIdToAdd = (
-//                           res.nodes[i].destinationNodeIds[0]);
-//                         nextStoryNode.push(
-//                           res.nodes[i + 1].explorationSummary);
-//                         break;
-//                       }
-//                     }
-//                     $scope.recommendedExplorationSummaries = nextStoryNode;
-//                     // TODO(#8521): Remove the use of $rootScope.$apply()
-//                     // once the directive is migrated to angular.
-//                     $rootScope.$apply();
-//                   });
-//                 if ($scope.isLoggedIn) {
-//                   StoryViewerBackendApiService.recordChapterCompletionAsync(
-//                     topicUrlFragment, classroomUrlFragment,
-//                     storyUrlFragment, nodeId
-//                   ).then(function(returnObject) {
-//                     if (returnObject.readyForReviewTest) {
-//                       $window.location =
-//                         UrlInterpolationService.interpolateUrl(
-//                           REVIEW_TESTS_URL_TEMPLATE, {
-//                             topic_url_fragment: topicUrlFragment,
-//                             classroom_url_fragment: classroomUrlFragment,
-//                             story_url_fragment: storyUrlFragment
-//                           });
-//                     }
-//                     // TODO(#8521): Remove the use of $rootScope.$apply()
-//                     // once the directive is migrated to angular.
-//                     $rootScope.$apply();
-//                   });
-//                 } else {
-//                   let loginRedirectUrl = UrlInterpolationService.interpolateUrl(
-//                     STORY_PROGRESS_URL_TEMPLATE, {
-//                       topic_url_fragment: topicUrlFragment,
-//                       classroom_url_fragment: classroomUrlFragment,
-//                       story_url_fragment: storyUrlFragment,
-//                       node_id: nodeId
-//                     });
-//                   UserService.setReturnUrl(loginRedirectUrl);
-//                 }
-//               } else {
-//                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
-//                   recommendedExplorationIds,
-//                   includeAutogeneratedRecommendations,
-//                   function(summaries) {
-//                     $scope.recommendedExplorationSummaries = summaries;
-//                     // TODO(#8521): Remove the use of $rootScope.$apply()
-//                     // once the directive is migrated to angular.
-//                     $rootScope.$apply();
-//                   });
-//               }
-//             }
-//           };
-
-//           var showQuestionAreNotAvailable = function() {
-//             LoaderService.hideLoadingScreen();
-//           };
-
-//           var _initializeDirectiveComponents = function(
-//               initialCard, focusLabel) {
-//             _addNewCard(initialCard);
-//             $scope.nextCard = initialCard;
-//             ExplorationPlayerStateService.onPlayerStateChange.emit(
-//               $scope.nextCard.getStateName());
-//             FocusManagerService.setFocusIfOnDesktop(focusLabel);
-//             LoaderService.hideLoadingScreen();
-//             $scope.hasFullyLoaded = true;
-
-//             // If the exploration is embedded, use the exploration language
-//             // as site language. If the exploration language is not supported
-//             // as site language, English is used as default.
-//             var langCodes = SUPPORTED_SITE_LANGUAGES.map(
-//               function(language) {
-//                 return language.id;
-//               });
-//             if ($scope.isIframed) {
-//               var explorationLanguageCode = (
-//                 ExplorationPlayerStateService.getLanguageCode());
-//               if (langCodes.indexOf(explorationLanguageCode) !== -1) {
-//                 $translate.use(explorationLanguageCode);
-//                 I18nLanguageCodeService.setI18nLanguageCode(
-//                   explorationLanguageCode);
-//               } else {
-//                 $translate.use('en');
-//                 I18nLanguageCodeService.setI18nLanguageCode('en');
-//               }
-//             }
-//             $scope.adjustPageHeight(false, null);
-//             $window.scrollTo(0, 0);
-
-//             // The timeout is needed in order to give the recipient of the
-//             // broadcast sufficient time to load.
-//             $timeout(function() {
-//               PlayerPositionService.onNewCardOpened.emit(initialCard);
-//             });
-//           };
-//           $scope.initializePage = function() {
-//             hasInteractedAtLeastOnce = false;
-//             $scope.recommendedExplorationSummaries = [];
-//             PlayerPositionService.init(_navigateToDisplayedCard);
-//             if ($scope.questionPlayerConfig) {
-//               ExplorationPlayerStateService.initializeQuestionPlayer(
-//                 $scope.questionPlayerConfig, _initializeDirectiveComponents,
-//                 showQuestionAreNotAvailable);
-//             } else {
-//               ExplorationPlayerStateService.initializePlayer(
-//                 _initializeDirectiveComponents);
-//             }
-//           };
-
-//           $scope.submitAnswer = function(answer, interactionRulesService) {
-//             // Safety check to prevent double submissions from occurring.
-//             if ($scope.answerIsBeingProcessed ||
-//               !$scope.isCurrentCardAtEndOfTranscript() ||
-//               $scope.displayedCard.isCompleted()) {
-//               return;
-//             }
-
-//             if (!$scope.isInPreviewMode) {
-//               FatigueDetectionService.recordSubmissionTimestamp();
-//               if (FatigueDetectionService.isSubmittingTooFast()) {
-//                 FatigueDetectionService.displayTakeBreakMessage();
-//                 ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
-//                 return;
-//               }
-//             }
-
-//             if (!ExplorationPlayerStateService.isInQuestionMode() &&
-//               !$scope.isInPreviewMode &&
-//               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
-//               initLearnerAnswerInfoService(
-//                 $scope.explorationId, ExplorationEngineService.getState(),
-//                 answer, interactionRulesService,
-//                 alwaysAskLearnerForAnswerDetails());
-//             }
-
-//             NumberAttemptsService.submitAttempt();
-
-//             $scope.answerIsBeingProcessed = true;
-//             hasInteractedAtLeastOnce = true;
-
-//             PlayerTranscriptService.addNewInput(answer, false);
-
-//             if ($scope.getCanAskLearnerForAnswerInfo()) {
-//               $timeout(function() {
-//                 PlayerTranscriptService.addNewResponse(
-//                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
-//                 $scope.answerIsBeingProcessed = false;
-//                 PlayerPositionService.onHelpCardAvailable.emit({
-//                   helpCardHtml: (
-//                     LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
-//                   hasContinueButton: false
-//                 });
-//               }, 100);
-//               return;
-//             }
-
-//             var timeAtServerCall = new Date().getTime();
-//             PlayerPositionService.recordAnswerSubmission();
-//             var currentEngineService =
-//               ExplorationPlayerStateService.getCurrentEngineService();
-//             $scope.answerIsCorrect = currentEngineService.submitAnswer(
-//               answer, interactionRulesService, function(
-//                   nextCard, refreshInteraction, feedbackHtml,
-//                   feedbackAudioTranslations, refresherExplorationId,
-//                   missingPrerequisiteSkillId, remainOnCurrentCard,
-//                   taggedSkillMisconceptionId, wasOldStateInitial,
-//                   isFirstHit, isFinalQuestion, focusLabel) {
-//                 $scope.nextCard = nextCard;
-//                 if (!_editorPreviewMode &&
-//                     !ExplorationPlayerStateService.isInQuestionMode()) {
-//                   var oldStateName =
-//                     PlayerPositionService.getCurrentStateName();
-//                   if (!remainOnCurrentCard) {
-//                     StatsReportingService.recordStateTransition(
-//                       oldStateName, nextCard.getStateName(), answer,
-//                       LearnerParamsService.getAllParams(), isFirstHit);
-
-//                     StatsReportingService.recordStateCompleted(
-//                       oldStateName);
-//                   }
-//                   if (nextCard.isTerminal()) {
-//                     StatsReportingService.recordStateCompleted(
-//                       nextCard.getStateName());
-//                   }
-//                   if (wasOldStateInitial && !explorationActuallyStarted) {
-//                     StatsReportingService.recordExplorationActuallyStarted(
-//                       oldStateName);
-//                     explorationActuallyStarted = true;
-//                   }
-//                 }
-//                 if (!ExplorationPlayerStateService.isInQuestionMode()) {
-//                   ExplorationPlayerStateService.onPlayerStateChange.emit(
-//                     nextCard.getStateName());
-//                 } else {
-//                   QuestionPlayerStateService.answerSubmitted(
-//                     QuestionPlayerEngineService.getCurrentQuestion(),
-//                     !remainOnCurrentCard,
-//                     taggedSkillMisconceptionId);
-//                 }
-//                 // Do not wait if the interaction is supplemental -- there's
-//                 // already a delay bringing in the help card.
-//                 var millisecsLeftToWait = (
-//                   !$scope.displayedCard.isInteractionInline() ? 1.0 :
-//                   Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
-//                     new Date().getTime() - timeAtServerCall),
-//                   1.0));
-
-//                 $timeout(function() {
-//                   ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
-
-//                   AudioPlayerService.onAutoplayAudio.emit({
-//                     audioTranslations: feedbackAudioTranslations,
-//                     html: feedbackHtml,
-//                     componentName: COMPONENT_NAME_FEEDBACK
-//                   });
-
-//                   if (remainOnCurrentCard) {
-//                     // Stay on the same card.
-//                     HintsAndSolutionManagerService.recordWrongAnswer();
-//                     PlayerTranscriptService.addNewResponse(feedbackHtml);
-//                     var helpCardAvailable = false;
-//                     if (feedbackHtml &&
-//                         !$scope.displayedCard.isInteractionInline()) {
-//                       helpCardAvailable = true;
-//                     }
-
-//                     if (helpCardAvailable) {
-//                       PlayerPositionService.onHelpCardAvailable.emit({
-//                         helpCardHtml: feedbackHtml,
-//                         hasContinueButton: false
-//                       });
-//                     }
-//                     if (missingPrerequisiteSkillId) {
-//                       $scope.displayedCard.markAsCompleted();
-//                       ConceptCardBackendApiService.loadConceptCardsAsync(
-//                         [missingPrerequisiteSkillId]
-//                       ).then(function(conceptCardObject) {
-//                         $scope.conceptCard = conceptCardObject;
-//                         if (helpCardAvailable) {
-//                           PlayerPositionService.onHelpCardAvailable.emit({
-//                             helpCardHtml: feedbackHtml,
-//                             hasContinueButton: true
-//                           });
-//                         }
-//                         // TODO(#8521): Remove when this directive is migrated
-//                         // to Angular.
-//                         $rootScope.$apply();
-//                       });
-//                     }
-//                     if (refreshInteraction) {
-//                       // Replace the previous interaction with another of the
-//                       // same type.
-//                       _nextFocusLabel =
-//                         FocusManagerService.generateFocusLabel();
-//                       PlayerTranscriptService.updateLatestInteractionHtml(
-//                         $scope.displayedCard.getInteractionHtml(
-//                           _nextFocusLabel) + _getRandomSuffix());
-//                     }
-
-//                     $scope.redirectToRefresherExplorationConfirmed = false;
-
-//                     if (refresherExplorationId) {
-//                       // TODO(bhenning): Add tests to verify the event is
-//                       // properly recorded.
-//                       var confirmRedirection = function() {
-//                         $scope.redirectToRefresherExplorationConfirmed = true;
-//                         _recordLeaveForRefresherExp(refresherExplorationId);
-//                       };
-//                       $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-//                         params: {
-//                           stringified_exp_ids: JSON.stringify(
-//                             [refresherExplorationId])
-//                         }
-//                       }).then(function(response) {
-//                         if (response.data.summaries.length > 0) {
-//                           RefresherExplorationConfirmationModalService.
-//                             displayRedirectConfirmationModal(
-//                               refresherExplorationId, confirmRedirection);
-//                         }
-//                       });
-//                     }
-//                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
-//                     scrollToBottom();
-//                   } else {
-//                     // There is a new card. If there is no feedback, move on
-//                     // immediately. Otherwise, give the learner a chance to read
-//                     // the feedback, and display a 'Continue' button.
-//                     $scope.pendingCardWasSeenBefore = false;
-//                     $scope.displayedCard.markAsCompleted();
-//                     if (isFinalQuestion) {
-//                       if (ExplorationPlayerStateService.
-//                         isInQuestionPlayerMode()) {
-//                         // We will redirect to the results page here.
-//                         $scope.questionSessionCompleted = true;
-//                       }
-//                       $scope.moveToExploration = true;
-//                       if (feedbackHtml) {
-//                         PlayerTranscriptService.addNewResponse(feedbackHtml);
-//                         if (
-//                           !$scope.displayedCard.isInteractionInline()) {
-//                           PlayerPositionService.onHelpCardAvailable.emit({
-//                             helpCardHtml: feedbackHtml,
-//                             hasContinueButton: true
-//                           });
-//                         }
-//                       } else {
-//                         $scope.showUpcomingCard();
-//                       }
-//                       $scope.answerIsBeingProcessed = false;
-//                       return;
-//                     }
-//                     FatigueDetectionService.reset();
-//                     NumberAttemptsService.reset();
-
-//                     var _isNextInteractionInline =
-//                       $scope.nextCard.isInteractionInline();
-//                     $scope.upcomingInlineInteractionHtml = (
-//                       _isNextInteractionInline ?
-//                         $scope.nextCard.getInteractionHtml() : '');
-//                     $scope.upcomingInteractionInstructions =
-//                       $scope.nextCard.getInteractionInstructions();
-
-//                     if (feedbackHtml) {
-//                       if (
-//                         PlayerTranscriptService.hasEncounteredStateBefore(
-//                           nextCard.getStateName())) {
-//                         $scope.pendingCardWasSeenBefore = true;
-//                       }
-//                       PlayerTranscriptService.addNewResponse(feedbackHtml);
-//                       if (!$scope.displayedCard.isInteractionInline()) {
-//                         PlayerPositionService.onHelpCardAvailable.emit({
-//                           helpCardHtml: feedbackHtml,
-//                           hasContinueButton: true
-//                         });
-//                       }
-//                       PlayerPositionService.onNewCardAvailable.emit();
-//                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
-//                       FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
-//                       scrollToBottom();
-//                     } else {
-//                       PlayerTranscriptService.addNewResponse(feedbackHtml);
-//                       // If there is no feedback, it immediately moves on
-//                       // to next card. Therefore $scope.answerIsCorrect needs
-//                       // to be set to false before it proceeds to next card.
-//                       $scope.answerIsCorrect = false;
-//                       $scope.showPendingCard();
-//                     }
-//                     CurrentInteractionService.clearPresubmitHooks();
-//                   }
-//                   $scope.answerIsBeingProcessed = false;
-//                 }, millisecsLeftToWait);
-//               }
-//             );
-//           };
-
-//           $scope.showPendingCard = function() {
-//             $scope.startCardChangeAnimation = true;
-//             ExplorationPlayerStateService.recordNewCardAdded();
-
-//             $timeout(function() {
-//               _addNewCard($scope.nextCard);
-
-//               $scope.upcomingInlineInteractionHtml = null;
-//               $scope.upcomingInteractionInstructions = null;
-//             }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
-
-//             $timeout(function() {
-//               FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
-//               scrollToTop();
-//             },
-//             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
-//               0.5 * TIME_FADEIN_MSEC);
-
-//             $timeout(function() {
-//               $scope.startCardChangeAnimation = false;
-//             },
-//             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
-//             TIME_PADDING_MSEC);
-
-//             PlayerPositionService.onNewCardOpened.emit($scope.nextCard);
-//           };
-
-//           $scope.showUpcomingCard = function() {
-//             var currentIndex = PlayerPositionService.getDisplayedCardIndex();
-//             var conceptCardIsBeingShown = (
-//               $scope.displayedCard.getStateName() === null &&
-//               !ExplorationPlayerStateService.isInQuestionMode());
-//             if (conceptCardIsBeingShown &&
-//                 PlayerTranscriptService.isLastCard(currentIndex)) {
-//               $scope.returnToExplorationAfterConceptCard();
-//               $rootScope.$applyAsync();
-//               return;
-//             }
-//             if ($scope.questionSessionCompleted) {
-//               QuestionPlayerStateService.onQuestionSessionCompleted.emit(
-//                 QuestionPlayerStateService.getQuestionPlayerStateData());
-//               $rootScope.$applyAsync();
-//               return;
-//             }
-//             if ($scope.moveToExploration) {
-//               $scope.moveToExploration = false;
-//               ExplorationPlayerStateService.moveToExploration(
-//                 _initializeDirectiveComponents);
-//               $rootScope.$applyAsync();
-//               return;
-//             }
-//             if (
-//               $scope.displayedCard.isCompleted() &&
-//               ($scope.nextCard.getStateName() ===
-//               $scope.displayedCard.getStateName()) && $scope.conceptCard) {
-//               ExplorationPlayerStateService.recordNewCardAdded();
-//               _addNewCard(
-//                 StateCard.createNewCard(
-//                   null, $scope.conceptCard.getExplanation(), null, null, null,
-//                   null, null, AudioTranslationLanguageService));
-//               $rootScope.$applyAsync();
-//               return;
-//             }
-//             /* This is for the following situation:
-//                if A->B->C is the arrangement of cards and C redirected to A,
-//                then after this, B and C are visited cards and hence
-//                pendingCardWasSeenBefore would be true during both these
-//                transitions and as answerIsCorrect is set to false below,
-//                Continue would briefly change to Learn Again (after it is
-//                clicked) during these transitions which is not required.
-//                Also, if the 'if' check is not there, Learn Again button would
-//                briefly switched to Continue before going to next card. */
-//             if ($scope.answerIsCorrect) {
-//               $scope.pendingCardWasSeenBefore = false;
-//             }
-//             $scope.answerIsCorrect = false;
-//             $scope.showPendingCard();
-//             $rootScope.$applyAsync();
-//           };
-
-//           var scrollToBottom = function() {
-//             $timeout(function() {
-//               var tutorCard = $('.conversation-skin-main-tutor-card');
-
-//               if (tutorCard && tutorCard.length === 0) {
-//                 return;
-//               }
-//               var tutorCardBottom = (
-//                 tutorCard.offset().top + tutorCard.outerHeight());
-//               if ($(window).scrollTop() +
-//                     $(window).height() < tutorCardBottom) {
-//                 $('html, body').animate({
-//                   scrollTop: tutorCardBottom - $(window).height() + 12
-//                 }, {
-//                   duration: TIME_SCROLL_MSEC,
-//                   easing: 'easeOutQuad'
-//                 });
-//               }
-//             }, 100);
-//           };
-
-//           var scrollToTop = function() {
-//             $timeout(function() {
-//               $('html, body').animate({
-//                 scrollTop: 0
-//               }, 800, 'easeOutQuart');
-//               return false;
-//             });
-//           };
-
-//           // Returns whether the screen is wide enough to fit two
-//           // cards (e.g., the tutor and supplemental cards) side-by-side.
-//           $scope.canWindowShowTwoCards = function() {
-//             return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
-//           };
-
-//           var fixSupplementOnScroll = function() {
-//             var supplementCard = $('div.conversation-skin-supplemental-card');
-//             var topMargin = $('.navbar-container').height() - 20;
-//             if ($(window).scrollTop() > topMargin) {
-//               supplementCard.addClass(
-//                 'conversation-skin-supplemental-card-fixed');
-//             } else {
-//               supplementCard.removeClass(
-//                 'conversation-skin-supplemental-card-fixed');
-//             }
-//           };
-
-//           $scope.onNavigateFromIframe = function() {
-//             SiteAnalyticsService.registerVisitOppiaFromIframeEvent(
-//               $scope.explorationId);
-//           };
-
-//           $scope.isSubmitButtonDisabled = function() {
-//             var currentIndex = PlayerPositionService.getDisplayedCardIndex();
-//             // This check is added because it was observed that when returning
-//             // to current card after navigating through previous cards, using
-//             // the arrows, the Submit button was sometimes falsely disabled.
-//             // Also, since a learner's answers would always be in the current
-//             // card, this additional check doesn't interfere with its normal
-//             // working.
-//             if (!PlayerTranscriptService.isLastCard(currentIndex)) {
-//               return false;
-//             }
-//             return CurrentInteractionService.isSubmitButtonDisabled();
-//           };
-
-//           $scope.submitAnswerFromProgressNav = function() {
-//             CurrentInteractionService.submitAnswer();
-//           };
-
-//           ctrl.$onInit = function() {
-//             $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
-//             ctrl.directiveSubscriptions.add(
-//               // TODO(#11996): Remove when migrating to Angular2+.
-//               CurrentInteractionService.onAnswerChanged$.subscribe(() => {
-//                 $rootScope.$applyAsync();
-//               })
-//             );
-//             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
-//             $scope.isLoggedIn = null;
-//             $scope.storyNodeIdToAdd = null;
-//             $scope.inStoryMode = false;
-//             UserService.getUserInfoAsync().then(function(userInfo) {
-//               $scope.isLoggedIn = userInfo.isLoggedIn();
-//             });
-
-//             $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl(
-//             );
-//             if ($scope.collectionId) {
-//               ReadOnlyCollectionBackendApiService
-//                 .loadCollectionAsync($scope.collectionId)
-//                 .then(function(collection) {
-//                   $scope.collectionTitle = collection.getTitle();
-//                 });
-//             } else {
-//               $scope.collectionTitle = null;
-//             }
-//             $scope.answerIsBeingProcessed = false;
-//             $scope.explorationId = ExplorationEngineService.getExplorationId();
-//             $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
-//             $scope.isIframed = UrlService.isIframed();
-//             LoaderService.showLoadingScreen('Loading');
-//             $scope.hasFullyLoaded = false;
-//             $scope.recommendedExplorationSummaries = [];
-//             $scope.answerIsCorrect = false;
-//             $scope.nextCard = null;
-//             $scope.pendingCardWasSeenBefore = false;
-//             $scope.OPPIA_AVATAR_IMAGE_URL = (
-//               UrlInterpolationService.getStaticImageUrl(
-//                 '/avatar/oppia_avatar_100px.svg'));
-//             $scope.displayedCard = null;
-//             $scope.upcomingInlineInteractionHtml = null;
-//             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
-//               DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
-//             // If the exploration is iframed, send data to its parent about
-//             // its height so that the parent can be resized as necessary.
-//             $scope.lastRequestedHeight = 0;
-//             $scope.lastRequestedScroll = false;
-//             if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
-//               ctrl.directiveSubscriptions.add(
-//                 HintsAndSolutionManagerService.onHintConsumed.subscribe(
-//                   () => {
-//                     QuestionPlayerStateService.hintUsed(
-//                       QuestionPlayerEngineService.getCurrentQuestion());
-//                   }
-//                 )
-//               );
-
-//               ctrl.directiveSubscriptions.add(
-//                 HintsAndSolutionManagerService.onSolutionViewedEventEmitter
-//                   .subscribe(() => {
-//                     QuestionPlayerStateService.solutionViewed(
-//                       QuestionPlayerEngineService.getCurrentQuestion());
-//                   })
-//               );
-//             }
-//             ctrl.directiveSubscriptions.add(
-//               ExplorationPlayerStateService.onPlayerStateChange.subscribe(
-//                 (newStateName) => {
-//                   if (!newStateName) {
-//                     return;
-//                   }
-//                   // To restart the preloader for the new state if required.
-//                   if (!_editorPreviewMode) {
-//                     ImagePreloaderService.onStateChange(newStateName);
-//                   }
-//                   // Ensure the transition to a terminal state properly logs
-//                   // the end of the exploration.
-//                   if (
-//                     !_editorPreviewMode && $scope.nextCard.isTerminal()) {
-//                     StatsReportingService.recordExplorationCompleted(
-//                       newStateName, LearnerParamsService.getAllParams());
-
-//                     // If the user is a guest, has completed this exploration
-//                     // within the context of a collection, and the collection is
-//                     // whitelisted, record their temporary progress.
-//                     var collectionAllowsGuestProgress = (
-//                       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.
-//                         indexOf($scope.collectionId) !== -1);
-//                     if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
-//                       GuestCollectionProgressService.
-//                         recordExplorationCompletedInCollection(
-//                           $scope.collectionId, $scope.explorationId);
-//                     }
-
-//                     // For single state explorations, when the exploration
-//                     // reachesthe terminal state and explorationActuallyStarted
-//                     // is false, record exploration actual start event.
-//                     if (!explorationActuallyStarted) {
-//                       StatsReportingService.recordExplorationActuallyStarted(
-//                         newStateName);
-//                       explorationActuallyStarted = true;
-//                     }
-//                   }
-//                 }
-//               )
-//             );
-//             ctrl.directiveSubscriptions.add(
-//               ContentTranslationManagerService
-//                 .onStateCardContentUpdate.subscribe(
-//                   () => $rootScope.$applyAsync())
-//             );
-//             ctrl.directiveSubscriptions.add(
-//               PlayerPositionService.displayedCardIndexChangedEventEmitter
-//                 .subscribe(
-//                   () => $rootScope.$applyAsync()
-//                 )
-//             );
-//             $window.addEventListener('beforeunload', function(e) {
-//               if ($scope.redirectToRefresherExplorationConfirmed) {
-//                 return;
-//               }
-//               if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
-//                   !$scope.displayedCard.isTerminal() &&
-//                   !ExplorationPlayerStateService.isInQuestionMode()) {
-//                 StatsReportingService.recordMaybeLeaveEvent(
-//                   PlayerTranscriptService.getLastStateName(),
-//                   LearnerParamsService.getAllParams());
-//                 var confirmationMessage = (
-//                   'If you navigate away from this page, your progress on the ' +
-//                   'exploration will be lost.');
-//                 (e || $window.event).returnValue = confirmationMessage;
-//                 return confirmationMessage;
-//               }
-//             });
-//             $window.onresize = function() {
-//               $scope.adjustPageHeight(false, null);
-//             };
-
-//             $window.addEventListener('scroll', function() {
-//               fixSupplementOnScroll();
-//             });
-//             CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
-//             $scope.startCardChangeAnimation = false;
-//             $scope.initializePage();
-
-//             $scope.collectionSummary = null;
-
-//             if ($scope.collectionId) {
-//               $http.get('/collectionsummarieshandler/data', {
-//                 params: {
-//                   stringified_collection_ids: JSON.stringify(
-//                     [$scope.collectionId])
-//                 }
-//               }).then(
-//                 function(response) {
-//                   $scope.collectionSummary = response.data.summaries[0];
-//                 },
-//                 function() {
-//                   AlertsService.addWarning(
-//                     'There was an error while fetching the collection ' +
-//                     'summary.');
-//                 }
-//               );
-//             }
-//           };
-
-//           ctrl.$onDestroy = function() {
-//             ctrl.directiveSubscriptions.unsubscribe();
-//           };
-//         }
-//       ]
-//     };
-//   }]);
