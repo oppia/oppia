@@ -269,9 +269,12 @@ describe('Learner dashboard page', () => {
       completed_explorations: 0,
       exploration_playlist: 0,
     },
+    exploration_playlist: [],
+  };
+
+  let learnerDashboardFeedbackUpdatesData = {
     thread_summaries: threadSummaryList,
     number_of_unread_threads: 10,
-    exploration_playlist: [],
   };
 
   let userInfo = {
@@ -464,59 +467,14 @@ describe('Learner dashboard page', () => {
 
       spyOn(
         learnerDashboardBackendApiService,
-        'fetchLearnerDashboardCollectionsDataAsync')
+        'fetchLearnerDashboardFeedbackUpdatesDataAsync')
         .and.returnValue(Promise.resolve({
-          completedCollectionsList: (
-            learnerDashboardCollectionsData.completed_collections_list.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          incompleteCollectionsList: (
-            learnerDashboardCollectionsData.incomplete_collections_list.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          collectionPlaylist: (
-            learnerDashboardCollectionsData.collection_playlist.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          completedToIncompleteCollections: (
-            learnerDashboardCollectionsData
-              .completed_to_incomplete_collections),
-          numberOfNonexistentCollections: (
-            NonExistentCollections.createFromBackendDict(
-              learnerDashboardCollectionsData
-                .number_of_nonexistent_collections)),
-        }));
-
-      spyOn(
-        learnerDashboardBackendApiService,
-        'fetchLearnerDashboardExplorationsDataAsync')
-        .and.returnValue(Promise.resolve({
-          completedExplorationsList: (
-            learnerDashboardExplorationsData.completed_explorations_list.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          incompleteExplorationsList: (
-            learnerDashboardExplorationsData.incomplete_explorations_list.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          explorationPlaylist: (
-            learnerDashboardExplorationsData.exploration_playlist.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          numberOfUnreadThreads: learnerDashboardExplorationsData.
+          numberOfUnreadThreads: learnerDashboardFeedbackUpdatesData.
             number_of_unread_threads,
           threadSummaries: (
-            learnerDashboardExplorationsData.thread_summaries.map(
+            learnerDashboardFeedbackUpdatesData.thread_summaries.map(
               threadSummary => FeedbackThreadSummary
-                .createFromBackendDict(threadSummary))),
-          numberOfNonexistentExplorations: (
-            NonExistentExplorations.createFromBackendDict(
-              learnerDashboardExplorationsData
-                .number_of_nonexistent_explorations)),
-          subscriptionList: (
-            learnerDashboardExplorationsData.subscription_list.map(
-              profileSummary => ProfileSummary
-                .createFromCreatorBackendDict(profileSummary)))
+                .createFromBackendDict(threadSummary)))
         }));
 
       component.ngOnInit();
@@ -529,12 +487,6 @@ describe('Learner dashboard page', () => {
     ' initialization and get data from backend', fakeAsync(() => {
       expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
       expect(component.username).toBe(userInfo.getUsername());
-
-      expect(component.incompleteExplorationsList.length).toBe(12);
-      expect(component.incompleteCollectionsList.length).toBe(8);
-
-      expect(component.explorationPlaylist.length).toBe(10);
-      expect(component.explorationPlaylist.length).toBe(10);
     }));
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
@@ -1056,7 +1008,9 @@ describe('Learner dashboard page', () => {
           .and.rejectWith(404);
         const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
 
-        component.ngOnInit();
+        let newActiveSectionName = (
+          'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+        component.setActiveSection(newActiveSectionName);
 
         tick();
         fixture.detectChanges();
@@ -1074,13 +1028,100 @@ describe('Learner dashboard page', () => {
           .and.rejectWith(404);
         const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
 
-        component.ngOnInit();
+        let newActiveSectionName = (
+          'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+        component.setActiveSection(newActiveSectionName);
 
         tick();
         fixture.detectChanges();
 
         expect(alertsSpy).toHaveBeenCalledWith(
           'Failed to get learner dashboard explorations data');
+        expect(fetchDataSpy).toHaveBeenCalled();
+      }));
+
+    it('should get explorations and collections data when user clicks ' +
+    'communtiy lessons tab',
+    fakeAsync(() => {
+      const fetchCollectionsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedCollectionsList: (
+            learnerDashboardCollectionsData.completed_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          incompleteCollectionsList: (
+            learnerDashboardCollectionsData.incomplete_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          collectionPlaylist: (
+            learnerDashboardCollectionsData.collection_playlist.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          completedToIncompleteCollections: (
+            learnerDashboardCollectionsData
+              .completed_to_incomplete_collections),
+          numberOfNonexistentCollections: (
+            NonExistentCollections.createFromBackendDict(
+              learnerDashboardCollectionsData
+                .number_of_nonexistent_collections)),
+        }));
+
+      const fetchExplorationsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedExplorationsList: (
+            learnerDashboardExplorationsData.completed_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          incompleteExplorationsList: (
+            learnerDashboardExplorationsData.incomplete_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          explorationPlaylist: (
+            learnerDashboardExplorationsData.exploration_playlist.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          numberOfNonexistentExplorations: (
+            NonExistentExplorations.createFromBackendDict(
+              learnerDashboardExplorationsData
+                .number_of_nonexistent_explorations)),
+          subscriptionList: (
+            learnerDashboardExplorationsData.subscription_list.map(
+              profileSummary => ProfileSummary
+                .createFromCreatorBackendDict(profileSummary)))
+        }));
+
+      let newActiveSectionName = (
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+      component.setActiveSection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(fetchCollectionsDataSpy).toHaveBeenCalled();
+      flush();
+      expect(fetchExplorationsDataSpy).toHaveBeenCalled();
+      expect(component.communtiyLessonsDataLoaded).toEqual(true);
+    }));
+
+    it('should show an alert warning when fails to get feedback updates data',
+      fakeAsync(() => {
+        const fetchDataSpy = spyOn(
+          learnerDashboardBackendApiService,
+          'fetchLearnerDashboardFeedbackUpdatesDataAsync')
+          .and.rejectWith(404);
+        const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+        component.ngOnInit();
+
+        tick();
+        fixture.detectChanges();
+
+        expect(alertsSpy).toHaveBeenCalledWith(
+          'Failed to get learner dashboard feedback updates data');
         expect(fetchDataSpy).toHaveBeenCalled();
       }));
   });

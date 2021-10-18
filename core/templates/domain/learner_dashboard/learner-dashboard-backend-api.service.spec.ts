@@ -335,6 +335,27 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
 
+  let sampleFeedbackUpdatesDataResults = {
+    number_of_unread_threads: 0,
+    thread_summaries: [
+      {
+        status: 'open',
+        author_second_last_message: null,
+        exploration_id: 'JctD1Xvtg1eC',
+        last_message_is_read: true,
+        thread_id:
+          'exploration.JctD1Xvtg1eC.WzE1OTIyMjMzMDM3ODMuMTldWzEyOTk3XQ==',
+        author_last_message: 'nishantwrp',
+        last_updated_msecs: 1592223304062.665,
+        last_message_text: '',
+        original_author_id: 'uid_oijrdjajpkgegqmqqttxsxbbiobexugg',
+        exploration_title: 'What is a negative number?',
+        second_last_message_is_read: false,
+        total_message_count: 1
+      }
+    ]
+  };
+
   let sampleExplorationDataResults = {
     incomplete_explorations_list: [{
       category: 'Arithmetic',
@@ -391,24 +412,6 @@ describe('Learner Dashboard Backend API Service', () => {
       id: '0',
       activity_type: 'exploration'
     }],
-    number_of_unread_threads: 0,
-    thread_summaries: [
-      {
-        status: 'open',
-        author_second_last_message: null,
-        exploration_id: 'JctD1Xvtg1eC',
-        last_message_is_read: true,
-        thread_id:
-          'exploration.JctD1Xvtg1eC.WzE1OTIyMjMzMDM3ODMuMTldWzEyOTk3XQ==',
-        author_last_message: 'nishantwrp',
-        last_updated_msecs: 1592223304062.665,
-        last_message_text: '',
-        original_author_id: 'uid_oijrdjajpkgegqmqqttxsxbbiobexugg',
-        exploration_title: 'What is a negative number?',
-        second_last_message_is_read: false,
-        total_message_count: 1
-      }
-    ],
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
       exploration_playlist: 0,
@@ -458,6 +461,8 @@ describe('Learner Dashboard Backend API Service', () => {
     '/learnerdashboardcollectionsprogresshandler/data');
   let LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data');
+  let LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
+    '/learnerdashboardfeedbackupdateshandler/data');
   let ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
@@ -530,6 +535,27 @@ describe('Learner Dashboard Backend API Service', () => {
       LEARNER_DASHBOARD_EXPLORATION_DATA_URL);
     expect(req.request.method).toEqual('GET');
     req.flush(sampleExplorationDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should successfully fetch learner dashboard feedback updates data ' +
+    'from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardFeedbackUpdatesDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleFeedbackUpdatesDataResults);
 
     flushMicrotasks();
 
@@ -645,6 +671,31 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_EXPLORATION_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error loading dashboard data.'
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it('should use rejection handler if learner dashboard feedback updates ' +
+    'data backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardFeedbackUpdatesDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 'Error loading dashboard data.'

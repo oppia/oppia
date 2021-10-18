@@ -88,10 +88,14 @@ interface LearnerDashboardExplorationsDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
   'incomplete_explorations_list': LearnerExplorationSummaryBackendDict[];
   'exploration_playlist': LearnerExplorationSummaryBackendDict[];
-  'number_of_unread_threads': number;
-  'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'number_of_nonexistent_explorations': NonExistentExplorationsBackendDict;
   'subscription_list': CreatorSummaryBackendDict[];
+}
+
+
+interface LearnerDashboardFeedbackUpdatesDataBackendDict {
+  'number_of_unread_threads': number;
+  'thread_summaries': FeedbackThreadSummaryBackendDict[];
 }
 
 
@@ -121,10 +125,13 @@ interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   explorationPlaylist: LearnerExplorationSummary[];
-  numberOfUnreadThreads: number;
-  threadSummaries: FeedbackThreadSummary[];
   numberOfNonexistentExplorations: NonExistentExplorations;
   subscriptionList: ProfileSummary[];
+}
+
+interface LearnerDashboardFeedbackUpdatesData {
+  numberOfUnreadThreads: number;
+  threadSummaries: FeedbackThreadSummary[];
 }
 
 
@@ -247,11 +254,6 @@ export class LearnerDashboardBackendApiService {
               dashboardData.exploration_playlist.map(
                 expSummary => LearnerExplorationSummary.createFromBackendDict(
                   expSummary))),
-            numberOfUnreadThreads: dashboardData.number_of_unread_threads,
-            threadSummaries: (
-              dashboardData.thread_summaries.map(
-                threadSummary => FeedbackThreadSummary
-                  .createFromBackendDict(threadSummary))),
             numberOfNonexistentExplorations: (
               NonExistentExplorations.createFromBackendDict(
                 dashboardData.number_of_nonexistent_explorations)),
@@ -259,6 +261,25 @@ export class LearnerDashboardBackendApiService {
               dashboardData.subscription_list.map(
                 profileSummary => ProfileSummary
                   .createFromCreatorBackendDict(profileSummary)))
+          });
+        }, errorResponse => {
+          reject(errorResponse.status);
+        });
+    });
+  }
+
+  async _fetchLearnerDashboardFeedbackUpdatesDataAsync():
+  Promise<LearnerDashboardFeedbackUpdatesData> {
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerDashboardFeedbackUpdatesDataBackendDict>(
+        '/learnerdashboardfeedbackupdateshandler/data').toPromise().then(
+        dashboardData => {
+          resolve({
+            numberOfUnreadThreads: dashboardData.number_of_unread_threads,
+            threadSummaries: (
+              dashboardData.thread_summaries.map(
+                threadSummary => FeedbackThreadSummary
+                  .createFromBackendDict(threadSummary))),
           });
         }, errorResponse => {
           reject(errorResponse.status);
@@ -292,6 +313,11 @@ export class LearnerDashboardBackendApiService {
   async fetchLearnerDashboardExplorationsDataAsync():
   Promise<LearnerDashboardExplorationsData> {
     return this._fetchLearnerDashboardExplorationsDataAsync();
+  }
+
+  async fetchLearnerDashboardFeedbackUpdatesDataAsync():
+  Promise<LearnerDashboardFeedbackUpdatesData> {
+    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync();
   }
 
   async addNewMessageAsync(
