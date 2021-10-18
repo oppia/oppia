@@ -465,7 +465,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
             used_match = (
                 re.search(
-                    r'(as)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?',
+                    r'(as )([a-zA-Z]+)(CustomizationArgs)(BackendDict)?',
                     line
                 ))
             if used_match:
