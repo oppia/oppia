@@ -21,7 +21,6 @@ import datetime
 import enum
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -1245,7 +1244,7 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
-    def get_version( # type: ignore[return]
+    def get_version(
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
@@ -1282,10 +1281,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError:
+        except cls.EntityNotFoundError as e:
             if not strict:
                 return None
-            python_utils.reraise_exception() # type: ignore[no-untyped-call]
+            raise e
 
     @classmethod
     def get_multi_versions(
