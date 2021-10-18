@@ -456,15 +456,16 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         for line in lines:
             # Checks that the customization args interfaces are being used
             # to typecast the customization args. Matches patterns
-            # as XCustomizationArgs or as XCustomizationArgsBackendDict
+            # 'as XCustomizationArgs' or 'as XCustomizationArgsBackendDict'
             # where X is an interaction id.
             # Group 1: Matches the string 'as'
             # Group 2: Matches an interaction id.
             # Group 3: Matches the string 'CustomizationArgs'.
             # Group 4: Matches the string 'BackendDict' (optional).
+
             used_match = (
                 re.search(
-                    r'(as )([a-zA-Z]+)(CustomizationArgs)(BackendDict)?',
+                    r'(as)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?',
                     line
                 ))
             if used_match:
