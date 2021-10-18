@@ -63,6 +63,7 @@
 	"I18N_ACTION_EXPLORE_LESSONS": "Dersleri keşfet",
 	"I18N_ACTION_GUIDE_FOR_TEACHERS": "Öğretmenler için rehber",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "Ebeveynler ve vasiler için ipuçları",
+	"I18N_ACTION_VISIT_CLASSROOM": "Sınıfı ziyaret edin",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Bu kart oldukça uzundur ve öğrenciler ilgilerini kaybedebilir. Kısaltmayı veya iki karta bölmeyi düşünün.",
 	"I18N_CLASSROOM_CALLOUT_BUTTON": "Keşfet",
 	"I18N_CLASSROOM_CALLOUT_HEADING_1": "Matematik Temelleri",
@@ -219,6 +220,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9": "Öğrenciler araştırmanızdan geçtiğinde, sizi sorunlara karşı uyarmak veya daha iyi hale getirmek için fikirlerinizi paylaşmak üzere size geri bildirim gönderebilirler.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Keşfinizi Geliştirin",
 	"I18N_GET_STARTED_PAGE_TITLE": "Başla",
+	"I18N_GOT_IT": "Anladım",
 	"I18N_HEADING_VOLUNTEER": "Gönüllü",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "\"x/y\" biçiminde bir kesir veya \"A x/y\" biçiminde bir karışık sayı girin.",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "x/y biçiminde bir kesir girin.",
@@ -412,6 +414,7 @@
 	"I18N_PLAYER_GIVE_UP": "Vazgeç?",
 	"I18N_PLAYER_GIVE_UP_TOOLTIP": "Yanıt için buraya tıklayın.",
 	"I18N_PLAYER_HINT": "İpucu",
+	"I18N_PLAYER_HINTS": "İpucu",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "Üzgünüm, ipucu yok!",
 	"I18N_PLAYER_HINT_IS_AVAILABLE": "Bir ipucu için buraya tıklayın!",
 	"I18N_PLAYER_HINT_NEED_A_HINT": "Bir ipucuna mı ihtiyacınız var?",
@@ -512,6 +515,7 @@
 	"I18N_QUESTION_PLAYER_TEST_PASSED": "Test tamamlandı. Aferin!",
 	"I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Kayıt Oturumu Sona Erdi",
 	"I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Üzgünüz, kayıt oturumunuzun süresi doldu. İşlemi yeniden başlatmak için lütfen \"Kaydı Devam Et\"i tıklayın.",
+	"I18N_SHOW_SOLUTION_BUTTON": "Çözümü Görüntüle",
 	"I18N_SIDEBAR_ABOUT_LINK": "Oppia Hakkında",
 	"I18N_SIDEBAR_BLOG": "Blog",
 	"I18N_SIDEBAR_CLASSROOM": "Sınıf",
@@ -667,5 +671,6 @@
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Konular ve Beceriler Gösterge Tablosu",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Toplam <[totalSubscribers]> aboneniz var.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abonelikten çık",
+	"I18N_WARNING_MODAL_TITLE": "Uyarı!",
 	"I18N_WORKED_EXAMPLE": "Çalıştığı Örnek"
 }

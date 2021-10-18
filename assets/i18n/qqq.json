@@ -82,7 +82,7 @@
 	"I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Text displayed in the blog post editor page. - Text of the button that allows the user to upload thumbnail image for the blog post.",
 	"I18N_BLOG_POST_EDITOR_BODY_HEADING": "Text displayed in the blog post editor page. -Heading Text before the input field to enter blog post content.",
 	"I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT": "Button displayed in the blog post editor page. - Text of the cancel button of the dialog shown to upload a thumbnail image or in RTE.\n{{Identical|Cancel}}",
-	"I18N_BLOG_POST_EDITOR_DELETE_BUTTON": "Button displayed in the blog post editor page. - Text of the delete button which deletes the blog post.",
+	"I18N_BLOG_POST_EDITOR_DELETE_BUTTON": "Button displayed in the blog post editor page. - Text of the delete button which deletes the blog post.\n\n{{Identical|Delete}}",
 	"I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT": "Text displayed in the blog post editor page. - Text of the button that allows the user to edit the thumbnail image for the blog post.",
 	"I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX": "Text displayed in the blog post editor page. - Text shown before the date and time when the blog post was last saved.",
 	"I18N_BLOG_POST_EDITOR_PUBLISH_BUTTON": "Button displayed in the blog post editor page. - Text of the publish button which publishes the blog post on the blog home page.",
@@ -778,6 +778,6 @@
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}",
 	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "Text displayed in the Volunteer page. - Text shown in the top left corner of the nav bar.",
 	"I18N_WARNING_MODAL_DESCRIPTION": "Text shown in the warning modal before the solution is displayed",
-	"I18N_WARNING_MODAL_TITLE": "Title of the modal shown before the modal that displays the solution, to warn the user",
+	"I18N_WARNING_MODAL_TITLE": "Title of the modal shown before the modal that displays the solution, to warn the user\n\n{{Identical|Warning}}",
 	"I18N_WORKED_EXAMPLE": "The text that is displayed on the button to view another worked example when a skill concept card is displayed in the exploration player."
 }
