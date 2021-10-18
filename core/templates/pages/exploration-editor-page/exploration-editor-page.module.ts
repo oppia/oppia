@@ -39,8 +39,8 @@ import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
-
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
+
 @NgModule({
   imports: [
     BrowserModule,
