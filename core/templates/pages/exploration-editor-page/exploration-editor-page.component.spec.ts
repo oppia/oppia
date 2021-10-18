@@ -58,6 +58,7 @@ import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
+
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -207,7 +208,7 @@ describe('Exploration editor page component', function() {
       ],
       declarations: [
         LostChangesModalComponent,
-        WelcomeModalComponent
+        WelcomeModalComponent,
       ],
       providers: [
         AlertsService,
@@ -255,6 +256,16 @@ describe('Exploration editor page component', function() {
     as = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');

@@ -34,7 +34,7 @@ describe('Editor Reloading Modal Controller',() => {
   let component: EditorReloadingModalComponent;
   let fixture: ComponentFixture<EditorReloadingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-
+  let check: boolean = false;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
@@ -54,15 +54,18 @@ describe('Editor Reloading Modal Controller',() => {
     fixture = TestBed.createComponent(EditorReloadingModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    spyOn(component,'cancel');
     fixture.detectChanges();
   });
-
+  afterAll(() => {
+    check = true;
+  })
   it('should dismiss modal after waiting timeout to finish', () => {
-    jasmine.createSpy('cancel');
+    spyOn(ngbActiveModal,'dismiss').and.callFake(() => {
+      check = true;
+    })
     component.ngOnInit();
     setTimeout(() => {
-      expect(component.cancel()).toHaveBeenCalled();
+      expect(check).toBe(true);
     },2501);
   })
 });
