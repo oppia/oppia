@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 from core import feconf
 from core.domain import skill_domain
 from core.domain import skill_fetchers
+from core.domain import skill_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -64,52 +65,92 @@ class MigrateSkillJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(skill_models.SkillModel.get_all()))
+            | 'Add keys' >> beam.GroupBy(lambda skill_model: skill_model.id)
         )
-
 
         migrated_skill_results = (
-            skill_models
+            unmigrated_skill_models
             | 'Transform and migrate model' >> beam.Map(self._migrate_skill)
         )
+        skill_migration_errors = (
+            migrated_skill_results
+            | 'Filter errors' >> beam.Filter(result.is_err)
+        )
+        migrated_skills = (
+            migrated_skill_results
+            | 'Filter oks' >> beam.Filter(result.is_ok)
+            | 'Unwrap ok' >> beam.Map(result.unwrap)
+        )
+
+        skill_changes = (
+            unmigrated_skill_models
+            | 'Transform and migrate model' >> beam.Map(
+                lambda skill_id, skill_model: (
+                    skill_id, self._generate_skill_changes))
+        )
+
+        skill_models_to_put = (
+
+        )
+
 
 
     @staticmethod
     def _migrate_skill(
-        skill_model
+        skill_id: str, skill_model: skill_models.SkillModel
     ) -> result.Result[skill_domain.Skill, Exception]:
         try:
             skill = skill_fetchers.get_skill_from_model(skill_model)
             skill.validate()
         except Exception as e:
-            return result.Err(e)
+            return result.Err((skill_id, e))
 
-        return result.Ok(skill_model)
+        return result.Ok((skill_id, skill))
 
     @staticmethod
-    def _generate_skill_changes(skill_model):
-
-        skill_contents_version = skill_model.skill_contents_schema_version
-        if skill_contents_version <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
-            yield skill_domain.SkillChange({
+    def _generate_skill_changes(
+        skill_model: skill_models.SkillModel
+    ) -> Tuple[str, skill_domain.SkillChange]:
+        contents_version = skill_model.skill_contents_schema_version
+        if contents_version <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
+            skill_change = skill_domain.SkillChange({
                 'cmd': (
                     skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION),
                 'from_version': skill_model.skill_contents_schema_version,
                 'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             })
+            yield skill_change
 
         misconceptions_version = skill_model.misconceptions_schema_version
         if misconceptions_version <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:
-             yield skill_domain.SkillChange({
+            skill_change = skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
                 'from_version': skill_model.misconceptions_schema_version,
                 'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             })
+            yield skill_change
 
         rubric_schema_version = skill_model.rubric_schema_version
         if rubric_schema_version <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
-            yield skill_domain.SkillChange({
+            skill_change = skill_domain.SkillChange({
                 'cmd': (
                     skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
                 'from_version': skill_model.rubric_schema_version,
                 'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
             })
+            yield skill_change
+
+    @staticmethod
+    def _update_skill(skill, commit_cmds):
+        commit_message = (
+            'Update skill content schema version to %d and '
+            'skill misconceptions schema version to %d and '
+            'skill rubrics schema version to %d.'
+        ) % (
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+        )
+        skill_services._save_skill(
+            feconf.MIGRATION_BOT_USERNAME, skill, commit_message, commit_cmds)
+        skill_services.create_skill_summary(skill.id)
