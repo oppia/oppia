@@ -19,8 +19,7 @@
 import { ComponentFixture, waitForAsync, TestBed } from
  '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditorReloadingModalComponent } from
- 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+import { EditorReloadingModalComponent } from './editor-reloading-modal.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockActiveModal {
@@ -33,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-fdescribe('Editor Reloading Modal Controller', () => {
+describe('Editor Reloading Modal Controller', () => {
   let component: EditorReloadingModalComponent;
   let fixture: ComponentFixture<EditorReloadingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
