@@ -1490,4 +1490,4 @@ ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'
 # Currently, we use language codes that consist of these
 # types 'en', 'kab', and 'hi-en'. We are also keeping our
 # language codes ISO 639 compatible.
-LANGUAGE_CODE_REGEX = '^[a-z]{2,4}([-]([a-z]{2,}))?$'
+LANGUAGE_CODE_REGEX = '^[a-z]{2,4}([-]([a-z]{2,4}))?$'
