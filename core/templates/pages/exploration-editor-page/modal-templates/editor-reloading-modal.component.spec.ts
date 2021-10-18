@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, waitForAsync, TestBed } from
- '@angular/core/testing';
+  '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditorReloadingModalComponent } from './editor-reloading-modal.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
