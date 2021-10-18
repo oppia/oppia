@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the Exploration save service.
+ * @fileoverview Unit tests for the Post Publish Modal.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -24,7 +24,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-
 
 @Component({
   selector: 'oppia-post-publish-modal',

@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
- * @fileoverview Unit tests for the Exploration save service.
+ * @fileoverview Service for exploration saving & publication functionality.
  */
 
 import { EventEmitter } from '@angular/core';
+import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -67,7 +68,6 @@ require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
 require('services/editability.service.ts');
 require('services/ngb-modal.service.ts');
-import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 
 angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
@@ -116,9 +116,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
           DEFAULT_LANGUAGE_CODE ||
         ExplorationTagsService.savedMemento.length === 0);
     };
+
     var showCongratulatorySharingModal = function() {
       return NgbModal.open(PostPublishModalComponent, {
-        backdrop: true
+        backdrop: true 
       }).result.then(function() {}, function() {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.

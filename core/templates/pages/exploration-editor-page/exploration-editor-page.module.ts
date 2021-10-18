@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
- * @fileoverview Unit tests for the Exploration save service.
+ * @fileoverview Module for the exploration editor page.
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
@@ -40,6 +39,7 @@ import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
+
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 @NgModule({
   imports: [
