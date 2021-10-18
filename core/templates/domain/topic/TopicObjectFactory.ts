@@ -58,7 +58,7 @@ export interface TopicBackendDict {
 import constants from 'assets/constants';
 
 export class Topic {
-  _id: string;
+  _id: string | null;
   _name: string;
   _abbreviatedName: string;
   _description: string;
@@ -69,7 +69,7 @@ export class Topic {
   _nextSubtopicId: number;
   _version: number;
   _subtopics: Subtopic[];
-  _thumbnailFilename: string;
+  _thumbnailFilename: string | null;
   _thumbnailBgColor: string;
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
@@ -77,13 +77,13 @@ export class Topic {
   _pageTitleFragmentForWeb: string;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string, name: string, abbreviatedName: string,
+      id: string | null, name: string, abbreviatedName: string,
       urlFragment: string, description: string, languageCode: string,
       canonicalStoryReferences: StoryReference[],
       additionalStoryReferences: StoryReference[],
       uncategorizedSkillIds: string[],
       nextSubtopicId: number, version: number, subtopics: Subtopic[],
-      thumbnailFilename: string,
+      thumbnailFilename: string | null,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
@@ -114,7 +114,7 @@ export class Topic {
   }
 
   // ---- Instance methods ----
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -166,11 +166,11 @@ export class Topic {
     this._urlFragment = urlFragment;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
