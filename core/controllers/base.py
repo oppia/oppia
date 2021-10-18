@@ -91,7 +91,7 @@ class SessionEndHandler(webapp2.RequestHandler):
         auth_services.destroy_auth_session(self.response)
 
 
-class UserFacingExceptions(python_utils.OBJECT):
+class UserFacingExceptions:
     """This class contains all the exception class definitions used."""
 
     class NotLoggedInException(Exception):
@@ -713,7 +713,7 @@ class Error404Handler(BaseHandler):
     pass
 
 
-class CsrfTokenManager(python_utils.OBJECT):
+class CsrfTokenManager:
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (48 hours).

@@ -52,7 +52,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.print_arr = []
         def mock_check_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -62,7 +62,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     return '', ''
             return Ret()
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object that gives user-prefix error."""
 
                 def __init__(self):
