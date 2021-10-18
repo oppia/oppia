@@ -171,8 +171,8 @@ def managed_dev_appserver(
             yield proc
         finally:
             if (
-                    'python2: command not found' in proc.stderr.read() or
-                    'python2: command not found' in proc.stdout.read()
+                    b'python2: command not found' in proc.stderr.read() or
+                    b'python2: command not found' in proc.stdout.read()
             ):
                 print(
                     '\033[93mYou do not have Python 2 installed, please follow '
