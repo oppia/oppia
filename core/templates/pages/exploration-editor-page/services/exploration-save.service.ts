@@ -119,7 +119,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
     var showCongratulatorySharingModal = function() {
       return NgbModal.open(PostPublishModalComponent, {
-        backdrop: true 
+        backdrop: true
       }).result.then(function() {}, function() {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
