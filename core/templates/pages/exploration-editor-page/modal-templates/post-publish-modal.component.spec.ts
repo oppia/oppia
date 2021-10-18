@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the Exploration save service.
+ * @fileoverview Unit tests for the Post Publish Modal.
  */
 
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
