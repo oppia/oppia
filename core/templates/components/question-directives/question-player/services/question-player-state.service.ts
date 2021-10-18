@@ -46,7 +46,7 @@ interface QuestionPlayerState {
   providedIn: 'root'
 })
 export class QuestionPlayerStateService {
-  private _questionPlayerState: QuestionPlayerState = {};
+  questionPlayerState: QuestionPlayerState = {};
   private _questionSessionCompletedEventEmitter = new EventEmitter<void>();
 
   private _getCurrentTime(): number {
@@ -57,7 +57,7 @@ export class QuestionPlayerStateService {
       questionId: string,
       linkedSkillIds: string[]
   ): void {
-    this._questionPlayerState[questionId] = {
+    this.questionPlayerState[questionId] = {
       linkedSkillIds: linkedSkillIds,
       answers: [],
       usedHints: [],
@@ -67,22 +67,22 @@ export class QuestionPlayerStateService {
 
   hintUsed(question: Question): void {
     let questionId = question.getId();
-    if (!this._questionPlayerState[questionId]) {
+    if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
     }
-    this._questionPlayerState[questionId].usedHints.push(
+    this.questionPlayerState[questionId].usedHints.push(
       {timestamp: this._getCurrentTime()}
     );
   }
 
   solutionViewed(question: Question): void {
     let questionId = question.getId();
-    if (!this._questionPlayerState[questionId]) {
+    if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
     }
-    this._questionPlayerState[questionId].viewedSolution = {
+    this.questionPlayerState[questionId].viewedSolution = {
       timestamp: this._getCurrentTime()
     };
   }
@@ -92,16 +92,16 @@ export class QuestionPlayerStateService {
       isCorrect: boolean,
       taggedSkillMisconceptionId: string): void {
     let questionId = question.getId();
-    if (!this._questionPlayerState[questionId]) {
+    if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
     }
     // Don't store a correct answer in the case where
     // the learner viewed the solution for this question.
-    if (isCorrect && this._questionPlayerState[questionId].viewedSolution) {
+    if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
       return;
     }
-    this._questionPlayerState[questionId].answers.push(
+    this.questionPlayerState[questionId].answers.push(
       {
         isCorrect: isCorrect,
         timestamp: this._getCurrentTime(),
@@ -111,7 +111,7 @@ export class QuestionPlayerStateService {
   }
 
   getQuestionPlayerStateData(): object {
-    return this._questionPlayerState;
+    return this.questionPlayerState;
   }
 
   get onQuestionSessionCompleted(): EventEmitter<void> {
