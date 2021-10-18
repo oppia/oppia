@@ -39,7 +39,6 @@ sys.path.insert(0, _CERTIFI_PATH)
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
@@ -48,7 +47,6 @@ import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-or
 
 
 BASESTRING = past.builtins.basestring
-INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
@@ -113,20 +111,6 @@ def redirect_stdout(new_target):
     except ImportError:
         from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
     return impl(new_target)
-
-
-def ExitStack(): # pylint: disable=invalid-name
-    """Returns ExitStack from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Returns:
-        contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
-    """
-    try:
-        from contextlib import ExitStack as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import ExitStack as impl  # pylint: disable=import-only-modules
-    return impl()
 
 
 def string_io(buffer_value=''):
@@ -407,35 +391,6 @@ def divide(number1, number2):
         int. The quotent.
     """
     return past.utils.old_div(number1, number2)
-
-
-def with_metaclass(meta, *bases):
-    """Python 2 & 3 helper for installing metaclasses.
-
-    Example:
-
-        class BaseForm:
-            pass
-
-        class FormType(type):
-            pass
-
-        class Form(with_metaclass(FormType, BaseForm)):
-            pass
-
-    Args:
-        meta: type. The metaclass to install on the derived class.
-        *bases: tuple(class). The base classes to install on the derived class.
-            When empty, `object` will be the sole base class.
-
-    Returns:
-        class. A proxy class that mutates the classes which inherit from it to
-        install the input meta class and inherit from the input base classes.
-        The proxy class itself does not actually become one of the base classes.
-    """
-    if not bases:
-        bases = (OBJECT,)
-    return future.utils.with_metaclass(meta, *bases)
 
 
 def convert_to_bytes(string_to_convert) -> bytes:
