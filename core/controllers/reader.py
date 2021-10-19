@@ -26,7 +26,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator as objects_validator
+from core.controllers import domain_objects_validator
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
@@ -393,7 +393,7 @@ class StatsEventsHandler(base.BaseHandler):
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        objects_validator.validate_aggregated_stats),
+                        domain_objects_validator.validate_aggregated_stats),
                 }
             },
             'exp_version': {
