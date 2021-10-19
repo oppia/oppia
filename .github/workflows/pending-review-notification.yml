@@ -1,7 +1,11 @@
 name: Send pending review notifications to reviewer on github-discussion
+# on:
+#   schedule:
+#     - cron: '0 0 * * 2,5'
 on:
-  schedule:
-    - cron: '0 0 * * 2,5'
+  pull_request:
+    branches:
+      - develop
 permissions:
   pull-requests: read
   issues: read
@@ -20,7 +24,7 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
-      - uses: DubeySandeep/pending-review-notification
+      - uses: DubeySandeep/pending-review-notification@init
         with:
           team-slur: oppia-codeowners
           repo-token: ${{secrets.GITHUB_TOKEN}}
