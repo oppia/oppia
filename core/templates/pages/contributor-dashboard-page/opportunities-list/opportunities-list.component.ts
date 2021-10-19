@@ -43,6 +43,7 @@ export class OpportunitiesListComponent {
   @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
+  opportunityRemainder: number = 0
   lastPageNumber: number = 1000;
   opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities = [];
@@ -95,6 +96,8 @@ export class OpportunitiesListComponent {
         this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
           this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
         this.loadingOpportunityData = false;
+        this.opportunityRemainder =
+          (this.OPPORTUNITIES_PAGE_SIZE - this.opportunities.length % this.OPPORTUNITIES_PAGE_SIZE)
       });
     });
   }
@@ -108,8 +111,11 @@ export class OpportunitiesListComponent {
       this.loadMoreOpportunities().then(
         ({opportunitiesDicts, more}) => {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
+          this.opportunityRemainder = 
+            (this.OPPORTUNITIES_PAGE_SIZE - this.opportunities.length % this.OPPORTUNITIES_PAGE_SIZE)
           this.visibleOpportunities = this.opportunities.slice(
-            startIndex, endIndex);
+            startIndex - this.opportunityRemainder,
+            endIndex - this.opportunityRemainder);
           this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
             this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
           this.loadingOpportunityData = false;
