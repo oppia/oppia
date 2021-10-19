@@ -951,7 +951,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             if isinstance(model, rights_snapshot_metadata_model_class)]
         for rights_snapshot_metadata_model in rights_snapshot_metadata_models:
             for commit_cmd in rights_snapshot_metadata_model.commit_cmds:
-                user_id_attribute_names = python_utils.NEXT(
+                user_id_attribute_names = next(
                     cmd['user_id_attribute_names']
                     for cmd in allowed_commands
                     if cmd['name'] == commit_cmd['cmd']
@@ -1279,6 +1279,11 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             request object to be saved in the datastore.
     """
     user_id = pending_deletion_request.user_id
+
+    suggestion_models.TranslationContributionStatsModel.apply_deletion_policy(
+        user_id
+    )
+
     voiceover_application_class = (
         suggestion_models.GeneralVoiceoverApplicationModel)
 
