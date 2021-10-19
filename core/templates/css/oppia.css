@@ -836,6 +836,12 @@ textarea {
   outline: 1px dotted #FFF;
   outline: auto 5px -webkit-focus-ring-color;
 }
+
+.oppia-topic-selector:focus {
+  outline: 1px dotted #FFF;
+  outline: auto 5px -webkit-focus-ring-color;
+}
+
 .oppia-footer-padding {
   height: 198px;
 }
