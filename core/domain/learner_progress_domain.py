@@ -18,10 +18,12 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import story_domain
 from core.domain import topic_domain
+
 from typing import Dict, List
 
 
