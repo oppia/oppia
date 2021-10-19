@@ -409,7 +409,7 @@ describe('TopNavigationBarComponent', () => {
     component.currentLanguageText = 'English';
     component.url = new URL('http://localhost:8181/');
 
-    component.changeLanguage('hi', 'अंग्रेज़ी');
+    component.changeLanguage('hi');
     tick();
 
     expect(component.currentLanguageCode).toBe('hi');
@@ -508,7 +508,6 @@ describe('TopNavigationBarComponent', () => {
       null, 'username1', 'tester@example.com', true
     );
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-    spyOn(component, 'removeUrlLangParam');
 
     component.ngOnInit();
 
@@ -516,7 +515,6 @@ describe('TopNavigationBarComponent', () => {
 
     tick();
 
-    expect(component.removeUrlLangParam).not.toHaveBeenCalled();
     expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
   }));
 
@@ -525,7 +523,7 @@ describe('TopNavigationBarComponent', () => {
     component.ngOnInit();
     expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
 
-    component.changeLanguage('en', 'English');
+    component.changeLanguage('en');
 
     expect(component.url.toString()).toBe('http://localhost:8181/');
   });

@@ -143,7 +143,6 @@ describe('OppiaAngularRootComponent', function() {
     component.ngAfterViewInit();
 
     expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('es');
-    expect(component.url.toString()).toBe('http://localhost:8181/?lang=es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
@@ -160,7 +159,6 @@ describe('OppiaAngularRootComponent', function() {
     // is invalid.
     expect(cookieService.put).not.toHaveBeenCalledWith();
     expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
-    expect(component.url.toString()).toBe('http://localhost:8181/');
   });
 
   it('should not update translation cache if no language param is present in' +
@@ -174,7 +172,6 @@ describe('OppiaAngularRootComponent', function() {
     component.ngAfterViewInit();
 
     expect(cookieService.put).not.toHaveBeenCalledWith();
-    expect(component.url.toString()).toBe('http://localhost:8181/');
     expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
   });
 });
