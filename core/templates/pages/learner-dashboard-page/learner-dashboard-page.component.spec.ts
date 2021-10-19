@@ -562,13 +562,6 @@ describe('Learner dashboard page', () => {
         expect(component.activeSubsection).toBe(newActiveSubsection2);
       });
 
-    it('should detect when application is being used on a mobile', () => {
-      expect(component.checkMobileView()).toBe(false);
-
-      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-      expect(component.checkMobileView()).toBe(true);
-    });
-
     it('should show username popover based on its length', () => {
       expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(component.showUsernamePopover('abc')).toBe('none');

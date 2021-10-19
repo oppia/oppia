@@ -1,4 +1,4 @@
-<div class="oppia-goals-box protractor-test-current-goals-section" [ngStyle]="{'margin-top': checkMobileView()? '35px': '64px'}">
+<div class="oppia-goals-box protractor-test-current-goals-section" [ngStyle]="{'margin-top': this.windowIsNarrow? '35px': '64px'}">
   <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
   </p>
   <div *ngIf="currentGoals.length > 0">
@@ -332,9 +332,7 @@
       width: 300px;
     }
     .oppia-checkbox {
-      left: 267px;
-      text-align: start;
-      width: 100px;
+      margin-left: 50px;
     }
     .oppia-new-story-content {
       font-size: 13px;
@@ -400,6 +398,32 @@
     }
     .oppia-current-goals-topic-name {
       width: 365px;
+    }
+  }
+
+  @media(max-width: 768px) {
+    .oppia-goals-topic-name {
+      width: 230px
+    }
+
+    .oppia-checkbox {
+      left: unset;
+      margin-left: 0;
+    }
+  }
+
+  @media(max-width: 400px) {
+    .oppia-goals-box {
+      width: 355px;
+    }
+
+    .oppia-goals-topic-name {
+      width: 220px
+    }
+
+    .oppia-checkbox {
+      left: unset;
+      margin-left: 0;
     }
   }
 </style>

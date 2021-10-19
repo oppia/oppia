@@ -151,13 +151,6 @@ describe('Progress tab Component', () => {
     expect(component.width).toEqual(233);
   });
 
-  it('should detect when application is being used on a mobile', () => {
-    expect(component.checkMobileView()).toBe(false);
-
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-    expect(component.checkMobileView()).toBe(true);
-  });
-
   it('should get static image url', () => {
     const urlSpy = spyOn(
       urlInterpolationService, 'getStaticImageUrl')
