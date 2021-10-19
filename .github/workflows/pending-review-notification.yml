@@ -1,0 +1,28 @@
+name: Send pending review notifications to reviewer on github-discussion
+on:
+  schedule:
+    - cron: '0 0 * * 2,5'
+permissions:
+  pull-requests: read
+  issues: read
+  discussions: write
+
+jobs:
+  send_notifications:
+    name: Send pending review notifications
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - uses: DubeySandeep/pending-review-notification
+        with:
+          team-slur: oppia-codeowners
+          repo-token: ${{secrets.GITHUB_TOKEN}}
+          review-turnaround-hours: 48
+
