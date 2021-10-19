@@ -76,6 +76,12 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -94,11 +100,12 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+            topic_name = self.request.get('topic_name', None)
             if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
-                    language_code, search_cursor))
+                    language_code, topic_name, search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
             if language_code is None:
@@ -177,12 +184,16 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
         return opportunities, cursor, more
 
-    def _get_translation_opportunity_dicts(self, language_code, search_cursor):
+    def _get_translation_opportunity_dicts(
+            self, language_code, topic_name, search_cursor):
         """Returns a list of translation opportunity dicts.
 
         Args:
             language_code: str. The language for which translation opportunities
                 should be fetched.
+            topic_name: str or None. The topic for which translation
+                opportunities should be fetched. If topic_name is None or empty,
+                fetch translation opportunities from all topics.
             search_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise, the
                 returned entities start from the beginning of the full list of
@@ -199,7 +210,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         """
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities(
-                language_code, search_cursor))
+                language_code, topic_name, search_cursor))
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
 
@@ -494,3 +505,22 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
             'featured_translation_languages':
                 config_domain.FEATURED_TRANSLATION_LANGUAGES.value
         })
+
+
+class AllTopicNamesHandler(base.BaseHandler):
+    """Provides names of all existing topics in the datastore."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        topic_names = [summary.name for summary in topic_summaries]
+        self.values = {
+            'topic_names': topic_names
+        }
+        self.render_json(self.values)
