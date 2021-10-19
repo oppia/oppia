@@ -16,7 +16,7 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import { async, TestBed } from '@angular/core/testing';
+import { async, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeListService } from './change-list.service';
 import { LoaderService } from 'services/loader.service';
@@ -162,7 +162,7 @@ describe('Change List Service when changes are mergable', () => {
   });
 
   it('should save changes after deleting a state ' +
-    'when calling \'deleteState\'', () => {
+    'when calling \'deleteState\'', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = 10;
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
@@ -170,9 +170,68 @@ describe('Change List Service when changes are mergable', () => {
       .and.callThrough();
 
     changeListService.deleteState('state');
+    flush();
 
     expect(saveSpy).toHaveBeenCalled();
-  });
+  }));
+
+  it('should save changes after adding a state ' +
+    'when calling \'addState\'', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.addState('state');
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should save changes after renaming a state ' +
+    'when calling \'renameState\'', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.renameState('oldState', 'newState');
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should save changes after editing exploration property ' +
+    'when calling \'editExplorationProperty\'', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.editExplorationProperty(
+      'language_code', 'oldValue', 'newValue');
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should save changes after editing state property ' +
+    'when calling \'editExplorationProperty\'', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.editStateProperty(
+      'state', 'solution', 'oldValue', 'newValue');
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+  }));
 
   it('should not save changes after deleting a state ' +
     'if loading message is being shown', () => {
