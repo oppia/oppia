@@ -6,10 +6,6 @@ on:
   pull_request:
     branches:
       - develop
-permissions:
-  pull-requests: read
-  issues: read
-  discussions: write
 
 jobs:
   send_notifications:
