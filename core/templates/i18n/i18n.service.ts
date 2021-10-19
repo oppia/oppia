@@ -19,7 +19,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
-import { CookieService } from 'ngx-cookie';        
+import { CookieService } from 'ngx-cookie';
 import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
