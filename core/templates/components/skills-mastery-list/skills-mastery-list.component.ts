@@ -20,7 +20,7 @@ require(
   'components/skills-mastery-list/' +
   'skills-mastery-list-concept-card-modal.controller.ts');
 
-require('components/concept-card/concept-card.directive.ts');
+require('components/concept-card/concept-card.component.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/user.service.ts');
