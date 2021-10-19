@@ -341,7 +341,7 @@ describe('TopNavigationBarComponent', () => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
     spyOn(document, 'querySelector').and.stub();
 
-    component.checkIfI18NCompleted = null;
+    component.I18nCompleteTest = true;
 
     component.truncateNavbar();
     tick(101);

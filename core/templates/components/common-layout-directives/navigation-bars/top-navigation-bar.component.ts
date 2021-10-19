@@ -85,6 +85,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       };
     } | undefined;
   windowIsNarrow: boolean = false;
+  I18nCompleteTest: boolean = false;
   activeMenuName: string | undefined;
   profilePageUrl: string | undefined;
   labelForClearingFocus: string | undefined;
@@ -400,7 +401,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
 
     // If i18n hasn't completed, retry after 100ms.
-    if (!this.checkIfI18NCompleted) {
+    if (this.I18nCompleteTest || !this.checkIfI18NCompleted) {
       setTimeout(this.truncateNavbar, 100);
       return;
     }
@@ -409,8 +410,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     // height of the navbar (56px) in Chrome's inspector and rounding
     // up. If the height of the navbar is changed in the future this
     // will need to be updated.
-    if (document.querySelector('div.collapse.navbar-collapse')
-      .clientHeight > 60) {
+    let navbar = document.querySelector('div.collapse.navbar-collapse');
+    if (navbar && navbar.clientHeight > 60) {
       for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
         if (
           this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
