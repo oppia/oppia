@@ -38,7 +38,7 @@ export const ContributorDashboardConstants = {
       tabName: 'Translate Text',
       description: 'Translate the lesson text to help non-English speakers ' +
         'follow the lessons.',
-      customizationOptions: ['language', 'sort'],
+      customizationOptions: ['language', 'topic', 'sort'],
       enabled: true
     }
   },
@@ -48,5 +48,6 @@ export const ContributorDashboardConstants = {
   CORRESPONDING_DELETED_OPPORTUNITY_TEXT: '[The corresponding opportunity ' +
     'has been deleted.]',
 
-  DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi'
+  DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi',
+  DEFAULT_OPPORTUNITY_TOPIC_NAME: 'All'
 } as const;

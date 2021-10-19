@@ -51,6 +51,8 @@ export class LocalStorageService {
 
   LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = ('last_selected_translation_lang');
 
+  LAST_SELECTED_TRANSLATION_TOPIC_NAME = ('last_selected_translation_topic');
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -153,6 +155,37 @@ export class LocalStorageService {
         // by calling 'isStorageAvailable()' so the typecast is safe.
         (<Storage> this.storage).getItem(
           this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+    }
+    return null;
+  }
+
+  /**
+   * Save the given active topic name to localStorage.
+   * @param topicName
+   */
+  updateLastSelectedTranslationTopicName(topicName: string): void {
+    if (this.isStorageAvailable()) {
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (<Storage> this.storage).setItem(
+        this.LAST_SELECTED_TRANSLATION_TOPIC_NAME, topicName);
+    }
+  }
+
+  /**
+   * Retrieve the local save of the last selected topic for translation.
+   * @returns {String} The local save of the last selected topic for
+   *   translation if it exists, else null.
+   */
+  getLastSelectedTranslationTopicName(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (<Storage> this.storage).getItem(
+          this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
     }
     return null;
   }

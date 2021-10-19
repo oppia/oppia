@@ -76,6 +76,10 @@ interface FeaturedTranslationLanguagesBackendDict {
   'featured_translation_languages': FeaturedTranslationLanguageBackendDict[];
 }
 
+interface TopicNamesBackendDict {
+  'topic_names': string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -129,10 +133,13 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchTranslationOpportunitiesAsync(
-      languageCode: string, cursor: string):
+      languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
+    topicName = (topicName === 'All') ? '' : topicName;
+
     const params = {
       language_code: languageCode,
+      topic_name: topicName,
       cursor: cursor
     };
 
@@ -191,6 +198,19 @@ export class ContributionOpportunitiesBackendApiService {
       return response.featured_translation_languages.map(
         backendDict => FeaturedTranslationLanguage
           .createFromBackendDict(backendDict));
+    } catch {
+      return [];
+    }
+  }
+
+  async fetchAllTopicNamesAsync():
+  Promise<string[]> {
+    try {
+      const response = await this.http
+        .get<TopicNamesBackendDict>('/getalltopicnames').toPromise();
+      response.topic_names.unshift('All');
+
+      return response.topic_names;
     } catch {
       return [];
     }

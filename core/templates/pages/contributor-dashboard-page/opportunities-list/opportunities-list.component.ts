@@ -20,6 +20,7 @@ import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import constants from 'assets/constants';
@@ -54,13 +55,18 @@ export class OpportunitiesListComponent {
     private zone: NgZone,
     private readonly contributionOpportunitiesService:
       ContributionOpportunitiesService,
-    private readonly translationLanguageService: TranslationLanguageService) {
+    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly translationTopicService: TranslationTopicService) {
     this.init();
   }
 
   init(): void {
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(
+        () => this.ngOnInit()));
+
+    this.directiveSubscriptions.add(
+      this.translationTopicService.onActiveTopicChanged.subscribe(
         () => this.ngOnInit()));
 
     this.directiveSubscriptions.add(
