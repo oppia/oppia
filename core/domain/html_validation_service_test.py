@@ -1058,11 +1058,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 test_case['expected_output'])
 
     def test_parsable_as_xml(self):
-        invalid_xml = 'aDRjSzNS'
+        invalid_xml = b'aDRjSzNS'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
-        invalid_xml = '123'
+        invalid_xml = b'123'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
@@ -1070,7 +1070,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
-        valid_xml = '<svg><path d="0" /></svg>'
+        valid_xml = b'<svg><path d="0" /></svg>'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(valid_xml),
             True)
