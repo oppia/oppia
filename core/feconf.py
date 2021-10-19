@@ -1482,22 +1482,6 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
-# Constants defining various domain commands.
-CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
-CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
-CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION = 'create_new_fully_specified_question'
-
-# Possible allowed commands for exploration change.
-LIST_CMD_EXPLORATION_CHANGE = [
-    CMD_ADD_WRITTEN_TRANSLATION,
-    CMD_EDIT_STATE_PROPERTY
-]
-
-# Possible allowed commands for question change.
-LIST_CMD_QUESTION_CHANGE = [
-    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION
-]
-
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'

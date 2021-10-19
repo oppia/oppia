@@ -21,7 +21,6 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import feconf
 from core import python_utils
 from core.constants import constants
 from core.controllers import base
@@ -41,9 +40,9 @@ def validate_exploration_or_question_change(obj):
     Args:
         obj: dict. Data that needs to be validated.
     """
-    if obj['cmd'] in feconf.LIST_CMD_EXPLORATION_CHANGE:
+    if obj['cmd'] in exp_domain.LIST_CMD_EXPLORATION_CHANGE:
         exp_domain.ExplorationChange(obj)
-    elif obj['cmd'] in feconf.LIST_CMD_QUESTION_CHANGE:
+    elif obj['cmd'] in question_domain.LIST_CMD_QUESTION_CHANGE:
         question_domain.QuestionSuggestionChange(obj)
     else:
         raise base.BaseHandler.InvalidInputException(
