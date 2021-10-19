@@ -121,7 +121,7 @@ export class TranslationOpportunitiesComponent {
     });
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
       () => this.languageSelected = true);
-    if(this.translationLanguageService.getActiveLanguageCode()) {
+    if (this.translationLanguageService.getActiveLanguageCode()) {
       this.languageSelected = true;
     } else {
       this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;

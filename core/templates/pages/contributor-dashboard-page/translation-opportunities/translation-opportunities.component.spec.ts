@@ -97,7 +97,6 @@ describe('Translation opportunities component', () => {
   });
 
   beforeEach(() => {
-
     opportunitiesArray = [
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '1',
@@ -195,8 +194,9 @@ describe('Translation opportunities component', () => {
 
   it('should not open translation modal when user is not logged', fakeAsync(
     () => {
-      spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        'en');
+      spyOn(
+        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+          'en');
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
       spyOn(
         contributionOpportunitiesService,
@@ -215,20 +215,20 @@ describe('Translation opportunities component', () => {
       expect(modalService.open).not.toHaveBeenCalled();
     }));
 
-    it('should not show tranlsation opportunities when language is not ' +
-      'selected', fakeAsync(() => {
-      spyOn(
-        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-          null);
-      component.ngOnInit();
-      expect(component.languageSelected).toBe(false);
-    }));
+  it('should not show tranlsation opportunities when language is not ' +
+    'selected', fakeAsync(() => {
+    spyOn(
+      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+        null);
+    component.ngOnInit();
+    expect(component.languageSelected).toBe(false);
+  }));
 
-    it('should show tranlsation opportunities when language is changed ',
-      fakeAsync(() => {
+  it('should show tranlsation opportunities when language is changed',
+    fakeAsync(() => {
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-          null);
+        null);
       component.ngOnInit();
       expect(component.languageSelected).toBe(false);
 

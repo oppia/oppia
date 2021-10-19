@@ -158,10 +158,10 @@ describe('Translation language selector', () => {
 
   it('should ask user to select a language when the language is not selected'
     , () => {
-    component.activeLanguageCode = null;
+      component.activeLanguageCode = null;
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.initialCaption).toBe('Select a language...');
-  });
+      expect(component.initialCaption).toBe('Select a language...');
+    });
 });

@@ -55,19 +55,15 @@ angular.module('oppia').component('contributorDashboardPage', {
     'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
-    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
+    'OPPIA_AVATAR_LINK_URL',
     function(
         $rootScope, $timeout, FocusManagerService,
         LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
-        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
+        OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
-      var prevSelectedLanguageCode = (
-        LocalStorageService.getLastSelectedTranslationLanguageCode());
-      var allAudioLanguageCodes = (
-        LanguageUtilService.getAllVoiceoverLanguageCodes());
 
       var getLanguageDescriptions = function(languageCodes) {
         var languageDescriptions = [];
@@ -182,13 +178,6 @@ angular.module('oppia').component('contributorDashboardPage', {
           // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
-
-        // ctrl.languageCode = (
-        //   allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
-        //   prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
-        // console.log(ctrl.languageCode);
-        // TranslationLanguageService.setActiveLanguageCode(
-        //   ctrl.languageCode);
 
         ctrl.activeTabName = 'myContributionTab';
         ctrl.tabsDetails = CONTRIBUTOR_DASHBOARD_TABS_DETAILS;

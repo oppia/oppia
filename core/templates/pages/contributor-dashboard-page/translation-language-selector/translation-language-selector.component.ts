@@ -68,8 +68,9 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.featuredLanguages = featuredLanguages;
       });
 
-    if(this.activeLanguageCode) {
-      this.initialCaption = this.languageIdToDescription[this.activeLanguageCode];
+    if (this.activeLanguageCode) {
+      this.initialCaption = this.languageIdToDescription[
+        this.activeLanguageCode];
     } else {
       this.initialCaption = 'Select a language...';
     }
