@@ -121,7 +121,7 @@ export class OpportunitiesListComponent {
           this.loadingOpportunityData = false;
         });
     } else {
-      if (pageNumber == 1) {
+      if (pageNumber === 1) {
         this.visibleOpportunities =
           this.opportunities.slice(startIndex, endIndex);
       } else {
