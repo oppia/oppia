@@ -79,6 +79,8 @@ angular.module('oppia').component('contributorDashboardPage', {
         return languageDescriptions;
       };
 
+      ctrl.languageCode = TranslationLanguageService.getActiveLanguageCode();
+
       ctrl.onChangeLanguage = function(languageCode: string) {
         ctrl.languageCode = languageCode;
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
@@ -181,12 +183,12 @@ angular.module('oppia').component('contributorDashboardPage', {
           $rootScope.$applyAsync();
         });
 
-        ctrl.languageCode = (
-          allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
-          prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
-
-        TranslationLanguageService.setActiveLanguageCode(
-          ctrl.languageCode);
+        // ctrl.languageCode = (
+        //   allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
+        //   prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
+        // console.log(ctrl.languageCode);
+        // TranslationLanguageService.setActiveLanguageCode(
+        //   ctrl.languageCode);
 
         ctrl.activeTabName = 'myContributionTab';
         ctrl.tabsDetails = CONTRIBUTOR_DASHBOARD_TABS_DETAILS;

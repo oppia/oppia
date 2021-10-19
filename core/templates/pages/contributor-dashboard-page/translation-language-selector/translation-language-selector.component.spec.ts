@@ -155,4 +155,13 @@ describe('Translation language selector', () => {
       expect(component.explanationPopupShown).toBe(false);
     });
   }));
+
+  it('should ask user to select a language when the language is not selected'
+    , () => {
+    component.activeLanguageCode = null;
+
+    component.ngOnInit();
+
+    expect(component.initialCaption).toBe('Select a language...');
+  });
 });

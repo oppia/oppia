@@ -94,9 +94,6 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should set specific properties after $onInit is called', function() {
-      expect(ctrl.languageCode).toBe('hi');
-      expect(TranslationLanguageService.setActiveLanguageCode)
-        .toHaveBeenCalledWith('hi');
       expect(ctrl.activeTabName).toBe('myContributionTab');
       expect(ctrl.OPPIA_AVATAR_IMAGE_URL).toBe(
         '/assets/images/avatar/oppia_avatar_100px.svg');
