@@ -72,7 +72,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
       }
       try {
         this.changeDetectorRef.detectChanges();
-      } catch(viewDestroyedError) {
+      } catch (viewDestroyedError) {
         // This try catch block will handles the following error in FE tests.
         // ViewDestroyedError:
         // Attempt to use a destroyed view: detectChanges thrown.
