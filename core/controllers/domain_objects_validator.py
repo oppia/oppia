@@ -40,6 +40,9 @@ def validate_exploration_or_question_change(obj):
     Args:
         obj: dict. Data that needs to be validated.
     """
+    # No explicit call to validate_dict is required, because
+    # ExplorationChange or QuestionSuggestionChange calls
+    # validate method while initialization.
     if obj['cmd'] in exp_domain.LIST_CMD_EXPLORATION_CHANGE:
         exp_domain.ExplorationChange(obj)
     elif obj['cmd'] in question_domain.LIST_CMD_QUESTION_CHANGE:
