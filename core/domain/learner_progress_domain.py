@@ -152,8 +152,10 @@ class ActivityIdsInLearnerDashboard:
         incomplete_exploration_ids: List[str],
         incomplete_collection_ids: List[str],
         partially_learnt_topic_ids: List[str],
-        topic_ids_to_learn: List[str], all_topic_ids: List[str],
-        untracked_topic_ids: List[str], exploration_playlist_ids: List[str],
+        topic_ids_to_learn: List[str],
+        all_topic_ids: List[str],
+        untracked_topic_ids: List[str],
+        exploration_playlist_ids: List[str],
         collection_playlist_ids: List[str]
     ) -> None:
         """Constructs a ActivityIdsInLearnerDashboard domain object.
