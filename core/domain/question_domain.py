@@ -71,6 +71,7 @@ LIST_CMD_QUESTION_CHANGE = [
     CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION
 ]
 
+
 class QuestionChange(change_domain.BaseChange):
     """Domain object for changes made to question object.
 
