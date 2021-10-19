@@ -177,7 +177,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id3')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_all_voiceover_opportunities(self) -> None:
         results, cursor, more = (
