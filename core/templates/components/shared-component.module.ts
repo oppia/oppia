@@ -134,7 +134,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig
-    },
+    }
   ],
 
   declarations: [
