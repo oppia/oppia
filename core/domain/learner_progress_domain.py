@@ -31,18 +31,18 @@ class LearnerProgressInTopicsAndStories:
     """Domain object for the progress of the learner in topics and stories."""
 
     def __init__(
-            self,
-            partially_learnt_topic_summaries: List[topic_domain.TopicSummary],
-            completed_story_summaries: List[story_domain.StorySummary],
-            learnt_topic_summaries: List[topic_domain.TopicSummary],
-            topics_to_learn_summaries: List[topic_domain.TopicSummary],
-            all_topic_summaries: List[topic_domain.TopicSummary],
-            untracked_topic_summaries: List[topic_domain.TopicSummary],
-            completed_to_incomplete_story_titles: List[
-                story_domain.StorySummary],
-            learnt_to_partially_learnt_topic_titles: List[
-                story_domain.StorySummary]
-        ) -> None:
+        self,
+        partially_learnt_topic_summaries: List[topic_domain.TopicSummary],
+        completed_story_summaries: List[story_domain.StorySummary],
+        learnt_topic_summaries: List[topic_domain.TopicSummary],
+        topics_to_learn_summaries: List[topic_domain.TopicSummary],
+        all_topic_summaries: List[topic_domain.TopicSummary],
+        untracked_topic_summaries: List[topic_domain.TopicSummary],
+        completed_to_incomplete_story_titles: List[
+            story_domain.StorySummary],
+        learnt_to_partially_learnt_topic_titles: List[
+            story_domain.StorySummary]
+    ) -> None:
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -84,16 +84,16 @@ class LearnerProgressInCollections:
     """Domain object for the progress of the learner in collections."""
 
     def __init__(
-            self,
-            incomplete_collection_summaries: List[
-                collection_domain.CollectionSummary],
-            completed_collection_summaries: List[
-                collection_domain.CollectionSummary],
-            collection_playlist: List[
-                collection_domain.CollectionSummary],
-            completed_to_incomplete_collection_titles: List[
-                collection_domain.CollectionSummary],
-        ) -> None:
+        self,
+        incomplete_collection_summaries: List[
+            collection_domain.CollectionSummary],
+        completed_collection_summaries: List[
+            collection_domain.CollectionSummary],
+        collection_playlist: List[
+            collection_domain.CollectionSummary],
+        completed_to_incomplete_collection_titles: List[
+            collection_domain.CollectionSummary],
+    ) -> None:
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -120,13 +120,14 @@ class LearnerProgressInExplorations:
     """Domain object for the progress of the learner in explorations."""
 
     def __init__(
-            self,
-            incomplete_exp_summaries: List[
-                exp_domain.ExplorationSummary],
-            completed_exp_summaries: List[
-                exp_domain.ExplorationSummary],
-            exploration_playlist: List[
-                exp_domain.ExplorationSummary]) -> None:
+        self,
+        incomplete_exp_summaries: List[
+            exp_domain.ExplorationSummary],
+        completed_exp_summaries: List[
+            exp_domain.ExplorationSummary],
+        exploration_playlist: List[
+            exp_domain.ExplorationSummary]
+    ) -> None:
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -148,17 +149,18 @@ class ActivityIdsInLearnerDashboard:
     """
 
     def __init__(
-            self,
-            completed_exploration_ids: List[str],
-            completed_collection_ids: List[str],
-            completed_story_ids: List[str],
-            learnt_topic_ids: List[str],
-            incomplete_exploration_ids: List[str],
-            incomplete_collection_ids: List[str],
-            partially_learnt_topic_ids: List[str],
-            topic_ids_to_learn: List[str], all_topic_ids: List[str],
-            untracked_topic_ids: List[str], exploration_playlist_ids: List[str],
-            collection_playlist_ids: List[str]) -> None:
+        self,
+        completed_exploration_ids: List[str],
+        completed_collection_ids: List[str],
+        completed_story_ids: List[str],
+        learnt_topic_ids: List[str],
+        incomplete_exploration_ids: List[str],
+        incomplete_collection_ids: List[str],
+        partially_learnt_topic_ids: List[str],
+        topic_ids_to_learn: List[str], all_topic_ids: List[str],
+        untracked_topic_ids: List[str], exploration_playlist_ids: List[str],
+        collection_playlist_ids: List[str]
+    ) -> None:
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
         Args:
