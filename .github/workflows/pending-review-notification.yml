@@ -27,6 +27,6 @@ jobs:
       - uses: DubeySandeep/pending-review-notification@init
         with:
           team-slur: oppia-codeowners
-          repo-token: ${{secrets.GITHUB_TOKEN}}
+          repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
 
