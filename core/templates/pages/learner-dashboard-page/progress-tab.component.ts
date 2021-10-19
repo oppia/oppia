@@ -17,7 +17,7 @@
  */
 
 import { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { StorySummary } from 'domain/story/story-summary.model';
@@ -31,6 +31,7 @@ import { LearnerDashboardBackendApiService, SubtopicMasterySummaryBackendDict } 
    templateUrl: './progress-tab.component.html'
  })
 export class ProgressTabComponent implements OnInit {
+  @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   @Input() completedStoriesList: StorySummary[];
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[] = [];
   @Input() activeSubsection?: string;
@@ -135,5 +136,10 @@ export class ProgressTabComponent implements OnInit {
         `linear-gradient(${degree}deg, #00645C 50%, #CCCCCC 50%)`);
     }
     return cssStyle;
+  }
+
+  changeActiveSection(): void {
+    this.setActiveSection.emit(
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS);
   }
 }

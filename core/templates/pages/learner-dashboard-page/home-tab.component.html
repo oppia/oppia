@@ -38,7 +38,7 @@
     <div class="suggested-for-you-section">
       <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
         <div *ngIf="item.value.length !== 0" class="classroom-name">
-          {{item.key}}
+          Basic {{item.key}}
         </div>
         <div class="topic-summary-tile-scroll">
           <div class="topic-summary-tile-section"
@@ -121,7 +121,7 @@
     background-color: #EEE ;
     border-radius: 4px;
     float: right;
-    height: 184px;
+    height: 210px;
     margin: 0 2px 30px 6px;
     padding: 0;
     position: relative;
@@ -136,7 +136,7 @@
     position: relative;
     text-align: center;
     text-transform: capitalize;
-    top: 70px;
+    top: 85px;
   }
   .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
     display: inline-block;
@@ -182,15 +182,18 @@
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
       overflow: scroll;
     }
-    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar {
+    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
+    .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
     -webkit-appearance: none;
     }
-    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb {
+    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
+    .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
       background-color: #EEE;
       border: 1px solid #fff;
       border-radius: 8px;
     }
-    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal {
+    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
+    .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
       height: 5px;
     }
   }

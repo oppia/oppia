@@ -260,7 +260,7 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "Näyttää siltä, ettet ole vielä suorittanut yhtään kokoelmaa. Mene kirjastoon aloittaaksesi jännittävän uuden kokoelman!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "Näyttää siltä, ettet ole suorittanut yhtään tutkimusta vielä. Mene kirjastoon aloittaaksesi uuden jännittävän tutkimuksen!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST": "Näyttää siltä ettei 'Suorita myöhemmin' listallasi ole yhtään tutkimuksia. Mene kirjastoon ja luo oma kuratoitu soittolistasi!",
-	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Näyttää siltä, ettei sinulla ole yhtään aktiivista palautelankaa. Palautteesi auttaa meitä parantamaan opetustemme laatua. Mene kirjastoon oppiaksesi jotain jännittävää ja lähetä arvokas palautteesi!",
+	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Sinulla ei ole vielä aktiivisia palauteketjuja. Palautteesi auttaa parantamaan oppituntiemme laatua. Voit tehdä sen aloittamalla oppitunnimme ja lähettämällä arvokasta palautettasi!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS": "Näyttää siltä, että sinulla ei ole osittain suoritettuja kokoelmia tällä hetkellä. Mene kirjastoon aloittaaksesi jännittävän uuden kokoelman!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "Näyttää siltä, että sinulla ei ole osittain täydellisiä tutkimuksia tällä hetkellä. Mene kirjastoon aloittaaksesi jännittävän uuden tutkimuksen!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS": "Näyttää siltä, ettet ole tilannut yhtään tekijää vielä. Mene kirjastoon löytääksesi uusia luojia ja heidän uskomattomia tutkimuksia!",

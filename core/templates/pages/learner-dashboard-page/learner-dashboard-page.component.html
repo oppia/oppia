@@ -114,7 +114,8 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !checkMobileView()">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
-                              [learntTopicsList]="learntTopicsList">
+                              [learntTopicsList]="learntTopicsList"
+                              (setActiveSection)="setActiveSection($event)">
           </oppia-progress-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && checkMobileView()">
@@ -141,12 +142,12 @@
           <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
                    *ngIf="threadSummaries.length === 0">
             <div>
-              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate"></p>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate" class="empty-feedback-threads"></p>
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 href="/community-library"
-                 [routerLink]="communityLibraryUrl">
+                 href="/learn/math"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE">
               </a>
             </div>
           </mat-card>
@@ -417,6 +418,12 @@
     text-align: center;
   }
 
+  .empty-feedback-threads {
+    color: #333;
+    font-size: 18px;
+    font-family: "Roboto", Arial, sans-serif;
+  }
+
   .oppia-buttons {
     cursor: pointer;
     display: inline-block;
@@ -442,11 +449,9 @@
   }
 
   .oppia-learner-dashboard-menu {
-    color: black;
     cursor: pointer;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 1em;
-    font-weight: normal;
+    font-family: 'Roboto';
+    font-size: 18px;
     margin: 0;
     padding: 17px 20px 17px 20px;
   }
@@ -592,7 +597,7 @@
     color: #076962;
     display: inline-block;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 1.3em;
+    font-size: 24px;
     margin: 64px 0 0 0;
     padding: 16px;
     padding-bottom: 8px;
