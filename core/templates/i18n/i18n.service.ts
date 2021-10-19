@@ -37,10 +37,9 @@ interface LanguageInfo {
   providedIn: 'root'
 })
 export class I18nService {
-  private _direction: string;
   private _directionChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
-  url: URL;
+  url!: URL;
 
   constructor(
     private cookieService: CookieService,
@@ -83,7 +82,7 @@ export class I18nService {
           }
         )
       );
-      let siteLanguageCode = searchParams.get('lang');
+      let siteLanguageCode = searchParams.get('lang') || '';
       if (supportedSiteLanguageCodes.includes(siteLanguageCode)) {
         // When translation cache is initialized, language code stored in cookie
         // is used to set the site language. To have a single source of truth,
@@ -142,9 +141,10 @@ export class I18nService {
 
   updateViewToUserPreferredSiteLanguage(): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.getPreferredSiteLanguageCode()) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(
-          userInfo.getPreferredSiteLanguageCode());
+      let preferredLangCode = userInfo.getPreferredSiteLanguageCode() || '';
+
+      if (preferredLangCode) {
+        this.i18nLanguageCodeService.setI18nLanguageCode(preferredLangCode);
 
         // This removes the language parameter from the URL if it is present,
         // since, when the user is logged in and has a preferred site language,
@@ -156,7 +156,6 @@ export class I18nService {
   }
 
   private _updateDirection(newDirection: string): void {
-    this._direction = newDirection;
     this._directionChangeEventEmitter.emit(newDirection);
   }
 
