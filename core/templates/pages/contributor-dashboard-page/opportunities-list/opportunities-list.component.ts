@@ -121,8 +121,15 @@ export class OpportunitiesListComponent {
           this.loadingOpportunityData = false;
         });
     } else {
-      this.visibleOpportunities =
-        this.opportunities.slice(startIndex, endIndex);
+      if (pageNumber == 1) {
+        this.visibleOpportunities =
+          this.opportunities.slice(startIndex, endIndex);
+      } else {
+        this.visibleOpportunities =
+          this.opportunities.slice(
+            startIndex - this.opportunityRemainder,
+            endIndex - this.opportunityRemainder);
+      }
     }
     this.activePageNumber = pageNumber;
   }
