@@ -47,7 +47,6 @@ MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
 MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH = 'about_temp_file.ts'
 MOCK_PACKAGE_JSON_PATH = os.path.join(RELEASE_TEST_DIR, 'mock_package.json')
 MOCK_FECONF_PATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
-MOCK_SETUP_PY_PATH = os.path.join(RELEASE_TEST_DIR, 'mock_setup.py')
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
@@ -579,17 +578,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         expected_package_json_content = package_json_regex.sub(
             '"version": "1.2.3"', package_json_content)
 
-        setup_py_swap = self.swap(
-            update_changelog_and_credits,
-            'SETUP_PY_FILEPATH',
-            MOCK_SETUP_PY_PATH
-        )
-        setup_py_content = python_utils.open_file(
-            MOCK_SETUP_PY_PATH, 'r').read()
-        setup_py_regex = re.compile(r'version=\'.*\'')
-        expected_setup_py_content = setup_py_regex.sub(
-            'version=\'1.2.3\'', setup_py_content)
-
         feconf_swap = self.swap(common, 'FECONF_PATH', MOCK_FECONF_PATH)
         feconf_content = python_utils.open_file(MOCK_FECONF_PATH, 'r').read()
         feconf_regex = re.compile('OPPIA_VERSION = \'.*\'')
@@ -600,23 +588,17 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             with contextlib.ExitStack() as stack:
                 stack.enter_context(self.branch_name_swap)
                 stack.enter_context(feconf_swap)
-                stack.enter_context(setup_py_swap)
                 stack.enter_context(package_json_swap)
                 update_changelog_and_credits.update_version_in_config_files()
             updated_package_json_content = python_utils.open_file(
                 MOCK_PACKAGE_JSON_PATH, 'r').read()
-            updated_setup_py_content = python_utils.open_file(
-                MOCK_SETUP_PY_PATH, 'r').read()
             updated_feconf_content = python_utils.open_file(
                 MOCK_FECONF_PATH, 'r').read()
             self.assertEqual(
                 updated_package_json_content, expected_package_json_content)
-            self.assertEqual(
-                updated_setup_py_content, expected_setup_py_content)
             self.assertEqual(updated_feconf_content, expected_feconf_content)
         finally:
             write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
-            write_to_file(MOCK_SETUP_PY_PATH, setup_py_content)
             write_to_file(MOCK_FECONF_PATH, feconf_content)
 
     def test_function_calls(self):

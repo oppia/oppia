@@ -496,12 +496,6 @@ def update_version_in_config_files():
         expected_number_of_replacements=1
     )
     common.inplace_replace_file(
-        SETUP_PY_FILEPATH,
-        'version=\'.*\'',
-        'version=\'%s\'' % release_version,
-        expected_number_of_replacements=1
-    )
-    common.inplace_replace_file(
         common.FECONF_PATH,
         'OPPIA_VERSION = \'.*\'',
         'OPPIA_VERSION = \'%s\'' % release_version,
