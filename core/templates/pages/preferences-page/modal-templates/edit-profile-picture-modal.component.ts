@@ -16,7 +16,7 @@
  * @fileoverview Component for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild, ViewRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
