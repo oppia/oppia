@@ -196,7 +196,7 @@ describe('Translation opportunities component', () => {
     () => {
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-          'en');
+        'en');
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
       spyOn(
         contributionOpportunitiesService,
@@ -219,7 +219,7 @@ describe('Translation opportunities component', () => {
     'selected', fakeAsync(() => {
     spyOn(
       translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        null);
+      null);
     component.ngOnInit();
     expect(component.languageSelected).toBe(false);
   }));
