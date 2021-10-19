@@ -470,7 +470,7 @@ def delete_exp_opportunities_corresponding_to_story(story_id):
     exp_opprtunity_model_class.delete_multi(exp_opportunity_models)
 
 
-def get_translation_opportunities(language_code, cursor):
+def get_translation_opportunities(language_code, topic_name, cursor):
     """Returns a list of opportunities available for translation in a specific
     language.
 
@@ -480,6 +480,9 @@ def get_translation_opportunities(language_code, cursor):
             entities start from the beginning of the full list of entities.
         language_code: str. The language for which translation opportunities
             should be fetched.
+        topic_name: str or None. The topic for which translation opportunities
+            should be fetched. If topic_name is None or empty, fetch
+            translation opportunities from all topics.
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
@@ -494,7 +497,7 @@ def get_translation_opportunities(language_code, cursor):
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
-            page_size, cursor, language_code))
+            page_size, cursor, language_code, topic_name))
     opportunities = []
     suggestion_ids = []
     opportunity_ids = []
