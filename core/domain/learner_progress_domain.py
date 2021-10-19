@@ -38,10 +38,8 @@ class LearnerProgressInTopicsAndStories:
         topics_to_learn_summaries: List[topic_domain.TopicSummary],
         all_topic_summaries: List[topic_domain.TopicSummary],
         untracked_topic_summaries: List[topic_domain.TopicSummary],
-        completed_to_incomplete_story_titles: List[
-            story_domain.StorySummary],
-        learnt_to_partially_learnt_topic_titles: List[
-            story_domain.StorySummary]
+        completed_to_incomplete_story_titles: List[story_domain.StorySummary],
+        learnt_to_partially_learnt_topic_titles: List[story_domain.StorySummary]
     ) -> None:
         """Constructs a LearnerProgress domain object.
 
@@ -121,12 +119,9 @@ class LearnerProgressInExplorations:
 
     def __init__(
         self,
-        incomplete_exp_summaries: List[
-            exp_domain.ExplorationSummary],
-        completed_exp_summaries: List[
-            exp_domain.ExplorationSummary],
-        exploration_playlist: List[
-            exp_domain.ExplorationSummary]
+        incomplete_exp_summaries: List[exp_domain.ExplorationSummary],
+        completed_exp_summaries: List[exp_domain.ExplorationSummary],
+        exploration_playlist: List[exp_domain.ExplorationSummary]
     ) -> None:
         """Constructs a LearnerProgress domain object.
 
