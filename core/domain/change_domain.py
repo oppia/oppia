@@ -223,3 +223,6 @@ class BaseChange:
                     self, attribute_name)
 
         return base_change_dict
+
+    def __getattr__(self, name: str) -> str:
+        return self.name
