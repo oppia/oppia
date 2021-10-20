@@ -51,8 +51,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
+  // See here for an explanation for the use of the (!) operator.
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   url!: URL;
   currentLanguageCode!: string;
+  supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText: string | undefined;
   isModerator: boolean | undefined;
   isCurriculumAdmin: boolean | undefined;
@@ -67,7 +70,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   inClassroomPage: boolean | undefined;
   showLanguageSelector: boolean | undefined;
   standardNavIsShown: boolean | undefined;
-  supportedSiteLanguages!: LanguageInfo[];
   ACTION_OPEN: string | undefined;
   ACTION_CLOSE: string | undefined;
   KEYBOARD_EVENT_TO_KEY_CODES: {
