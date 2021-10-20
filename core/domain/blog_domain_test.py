@@ -47,7 +47,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             self.blog_post.validate(strict=True)
 
     def _assert_validation_error( # type: ignore[override]
-    self, expected_error_substring: str) -> None:
+        self, expected_error_substring: str
+    ) -> None:
         """Checks that the blog post passes validation."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -56,7 +57,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     def _assert_valid_tags_for_blog_post(
         self,
         expected_error_substring: str,
-        tags: List[str]) -> None:
+        tags: List[str]
+    ) -> None:
         """Checks that the blog post tags passes validation."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -65,7 +67,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     def _assert_valid_thumbnail_filename_for_blog_post(
             self,
             expected_error_substring: str,
-            thumbnail_filename: str) -> None:
+            thumbnail_filename: str
+    ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -75,7 +78,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
             self,
             expected_error_substring: str,
-            thumbnail_filename: str) -> None:
+            thumbnail_filename: str
+    ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -293,7 +297,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
     def _assert_valid_thumbnail_filename_for_blog_post(
             self,
             expected_error_substring: str,
-            thumbnail_filename: str) -> None:
+            thumbnail_filename: str
+    ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -303,7 +308,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
             self,
             expected_error_substring: str,
-            thumbnail_filename: str) -> None:
+            thumbnail_filename: str
+    ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):

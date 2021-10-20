@@ -46,11 +46,12 @@ class AuthClaimsTests(test_utils.TestBase):
 
     def test_rejects_empty_auth_id(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'auth_id must not be empty'):
-            # Since auth_id (first argument) is str type, we cannot use None.
-            auth_domain.AuthClaims(None, None, False) # type: ignore[arg-type]
+            Exception, 'auth_id must not be empty'
+        ):
+            auth_domain.AuthClaims('', None, False)
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'auth_id must not be empty'):
+            Exception, 'auth_id must not be empty'
+        ):
             auth_domain.AuthClaims('', None, True)
 
     def test_attributes(self) -> None:
@@ -196,7 +197,8 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             self.user_auth_details.validate)
 
     def test_parent_user_id_and_firebase_auth_id_together_raises_error(
-        self) -> None:
+        self
+    ) -> None:
         self.user_auth_details.parent_user_id = (
             user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = None
