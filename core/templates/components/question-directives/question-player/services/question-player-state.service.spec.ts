@@ -20,7 +20,7 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { QuestionPlayerStateService } from './question-player-state.service';
 
-describe('Question player state service', () => {
+fdescribe('Question player state service', () => {
   let qpss: QuestionPlayerStateService;
   let questionId = 'question_id';
   let question = new Question(questionId, null, '', 7, [], []);
@@ -53,8 +53,11 @@ describe('Question player state service', () => {
     expect(qpss.questionPlayerState[questionId].answers.length).toEqual(1);
   });
 
-  it('should test getters', () => {
+  it('should get question player state data', () => {
     expect(qpss.getQuestionPlayerStateData()).toBeDefined();
+  });
+
+  it('should access on question session completed', () => {
     expect(qpss.onQuestionSessionCompleted).toBeDefined();
   });
 });
