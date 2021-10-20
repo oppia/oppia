@@ -23,12 +23,13 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { CookieModule } from 'ngx-cookie';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nService } from 'i18n/i18n.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -47,7 +48,13 @@ class MockWindowRef {
   };
 }
 
+class MockI18nService {
+  directionChangeEventEmitter = new EventEmitter<string>();
+  initialize(): void {}
+}
+
 describe('OppiaAngularRootComponent', function() {
+  let i18nService: I18nService;
   let emitSpy: jasmine.Spy;
 
   beforeEach(async(() => {
@@ -71,6 +78,10 @@ describe('OppiaAngularRootComponent', function() {
           useValue: {
             addAttribute: (attr, code) => {}
           }
+        },
+        {
+          provide: I18nService,
+          useClass: MockI18nService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -83,6 +94,7 @@ describe('OppiaAngularRootComponent', function() {
     emitSpy = spyOn(component.initialized, 'emit');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags')
       .and.returnValue();
+    i18nService = TestBed.inject(I18nService);
   }));
 
   it('should only intialize rteElements once', () => {
@@ -98,5 +110,14 @@ describe('OppiaAngularRootComponent', function() {
     TestBed.inject(I18nLanguageCodeService).setI18nLanguageCode('en');
 
     expect(emitSpy).toHaveBeenCalled();
+  });
+
+  it('should detect change in direction', () => {
+    let newDirection = 'rtl';
+
+    component.ngAfterViewInit();
+    i18nService.directionChangeEventEmitter.emit(newDirection);
+    fixture.detectChanges();
+    expect(component.direction).toEqual(newDirection);
   });
 });
