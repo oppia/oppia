@@ -89,10 +89,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   sidebarIsShown!: boolean;
   windowIsNarrow: boolean = false;
   I18nCompleteTest: boolean = false;
-  username: string | undefined;
-  activeMenuName: string | undefined;
-  profilePageUrl: string | undefined;
-  profilePictureDataUrl: string | undefined;
+  username: string | null = null;
+  activeMenuName: string | null = null;
+  profilePageUrl: string | null = null;
+  profilePictureDataUrl: string | null = null;
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
