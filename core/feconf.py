@@ -879,6 +879,8 @@ LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data')
+LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
+    '/learnerdashboardfeedbackupdateshandler/data')
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
@@ -1128,6 +1130,7 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 USER_FILTER_CRITERION_ROLE = 'role'
 USER_FILTER_CRITERION_USERNAME = 'username'
 
+# Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2

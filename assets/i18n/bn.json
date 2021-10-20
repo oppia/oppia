@@ -25,6 +25,8 @@
 	"I18N_ACTION_BROWSE_LESSONS": "আমাদের পাঠ ব্রাউজ করুন",
 	"I18N_ACTION_CREATE_EXPLORATION": "একটি অন্বেষণ তৈরি করুন",
 	"I18N_ACTION_CREATE_LESSON": "আপনার নিজস্ব পাঠ তৈরি করুন",
+	"I18N_BLOG_POST_EDITOR_BODY_HEADING": "মূলাংশ",
+	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "শিরোনাম",
 	"I18N_CONTACT_PAGE_HEADING": "জড়িত হোন!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Oppia প্রকল্পে সাহায্য করার জন্য আপনার আগ্রহের জন্য ধন্যবাদ!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10_HEADING": "উন্নতি ও রক্ষণাবেক্ষণ বজায় রাখা",
