@@ -2612,6 +2612,8 @@ class Exploration:
         recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
             voiceover_langauge_mapping=voiceover_content_mapping_protos)
 
+        print(recorded_voiceover_proto)
+
         return recorded_voiceover_proto
 
     @classmethod
@@ -2626,30 +2628,52 @@ class Exploration:
         Returns:
             Proto Object. The recorded voiceovers proto object.
         """
+        voiceover_language_mapping_dict = {}
         voiceover_content_mapping_protos = {}
-        voiceover_content_mapping_list_proto = []
 
-        for (_, language_code_to_voiceover) in (
+        for (content_id, language_code_to_voiceover) in (
             voiceovers_mapping.items()):
             for (language_code, voiceover) in (
                 language_code_to_voiceover.items()):
-                if language_code == 'en':
+                    voiceover_proto = cls._to_voiceover_proto(
+                        voiceover.filename,
+                        voiceover.file_size_bytes,
+                        voiceover.duration_secs)
+                    voiceover_content_mapping_protos[content_id] = (
+                        voiceover_proto)
                     voiceover_content_mapping_proto = (
-                        languages_pb2.VoiceoverContentMapping(
-                            language_code=languages_pb2.LanguageType.ENGLISH,
+                        languages_pb2.VoiceoverFileMap(
                             voiceover_content_mapping=(
                                 voiceover_content_mapping_protos)))
-                voiceover_proto = cls._to_voiceover_proto(
-                    voiceover.filename,
-                    voiceover.file_size_bytes,
-                    voiceover.duration_secs)
-                voiceover_content_mapping_protos[language_code] = (
-                    voiceover_proto)
+                    if language_code not in voiceover_language_mapping_dict:
+                        voiceover_language_mapping_dict[language_code] = [voiceover_content_mapping_proto]
+                    else:
+                        tempList = voiceover_language_mapping_dict[language_code]
+                        tempList += [voiceover_content_mapping_proto]
+                        voiceover_language_mapping_dict[language_code] = tempList
+                        tempList = []
+                    voiceover_content_mapping_protos = {}
 
-            voiceover_content_mapping_list_proto.append(
-                voiceover_content_mapping_proto)
+        voiceover_langauge_mapping_protos_list = []
 
-        return voiceover_content_mapping_list_proto
+        for (language_code, list) in voiceover_language_mapping_dict.items():
+            if language_code == 'en':
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=languages_pb2.LanguageType.ENGLISH,
+                    voiceover_file_map=list)
+                voiceover_langauge_mapping_protos_list.append(proto)
+            if language_code == 'hi-en':
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=languages_pb2.LanguageType.HINGLISH,
+                    voiceover_file_map=list)
+                voiceover_langauge_mapping_protos_list.append(proto)
+            if language_code == 'ar':
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=languages_pb2.LanguageType.ARABIC,
+                    voiceover_file_map=list)
+                voiceover_langauge_mapping_protos_list.append(proto)
+
+        return voiceover_langauge_mapping_protos_list
 
     @classmethod
     def _to_voiceover_proto(cls, filename, file_size_bytes, duration_secs):
