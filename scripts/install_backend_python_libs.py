@@ -671,7 +671,12 @@ def main():
     # Therefore, in order to allow continued execution after the requirements
     # file is generated, we must call it as a separate process.
     subprocess.check_call(
-        ['python', '-m', 'scripts.regenerate_requirements', '--no-emit-index-url'],
+        [
+            'python',
+            '-m',
+            'scripts.regenerate_requirements',
+            '--no-emit-index-url',
+        ],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     # Adds a note to the beginning of the 'requirements.txt' file to make sure
