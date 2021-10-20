@@ -117,7 +117,6 @@ RERUN_POLICIES = {
     'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
     'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'emaildashboard': RERUN_POLICY_ALWAYS,
     'embedding': RERUN_POLICY_KNOWN_FLAKES,
     'explorationfeedbacktab': RERUN_POLICY_NEVER,
     'explorationhistorytab': RERUN_POLICY_KNOWN_FLAKES,
