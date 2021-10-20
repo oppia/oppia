@@ -1,0 +1,107 @@
+<div #dropdown class="oppia-translation-topic-selector-container protractor-test-topic-selector">
+  <div class="oppia-translation-topic-selector-inner-container protractor-test-topic-selector-selected" (click)="toggleDropdown()">
+    {{activeTopicName}}
+    <span class="material-icons oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+      arrow_drop_down
+    </span>
+  </div>
+
+  <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container protractor-test-topic-selector-dropdown">
+    <div class="oppia-translation-topic-selector-dropdown-label">All Topics</div>
+    <div class="oppia-translation-topic-selector-dropdown-option protractor-test-topic-selector-option"
+         *ngFor="let option of options"
+         (click)="selectOption(option)"
+         [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
+      {{option}}
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-translation-topic-selector-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    position: relative;
+  }
+
+  .oppia-translation-topic-selector-inner-container {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .oppia-translation-topic-selector-inner-container-arrow {
+    color: #009688;
+  }
+
+  .oppia-translation-topic-selector-dropdown-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    height: 40vh;
+    left: 0;
+    overflow-y: scroll;
+    padding: 8px 12px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 1;
+  }
+
+  .oppia-translation-topic-selector-dropdown-container::-webkit-scrollbar {
+    width: 7px;
+  }
+  .oppia-translation-topic-selector-dropdown-container::-webkit-scrollbar-track {
+    border-radius: 5px;
+    box-shadow: inset 0 0 3px #808080;
+  }
+  .oppia-translation-topic-selector-dropdown-container::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    transition: background 0.5s ease;
+  }
+  .oppia-translation-topic-selector-dropdown-container::-webkit-scrollbar-thumb:hover {
+    background: black;
+  }
+
+  .oppia-translation-topic-selector-info-icon {
+    color: rgb(183, 183, 183);
+    margin-right: 4px;
+  }
+
+  .oppia-translation-topic-selector-dropdown-label {
+    color: #009688;
+    font-weight: 500;
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-top: 8px;
+  }
+
+  .oppia-translation-topic-selector-dropdown-option {
+    color: rgb(104, 104, 104);
+    display: flex;
+    flex: 1;
+    margin-left: 16px;
+    padding: 8px;
+  }
+
+  .oppia-translation-topic-selector-dropdown-option-selected {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+  }
+
+  .oppia-translation-topic-selector-featured-tooltip .oppia-translation-topic-selector-featured-tooltip-content {
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    padding: 8px;
+    position: absolute;
+    right: 0;
+    width: 250px;
+    z-index: 1;
+  }
+</style>
