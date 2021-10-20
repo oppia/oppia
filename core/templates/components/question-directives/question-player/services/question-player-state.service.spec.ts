@@ -20,7 +20,7 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { QuestionPlayerStateService } from './question-player-state.service';
 
-fdescribe('Question player state service', () => {
+describe('Question player state service', () => {
   let qpss: QuestionPlayerStateService;
   let questionId = 'question_id';
   let question = new Question(questionId, null, '', 7, [], []);
