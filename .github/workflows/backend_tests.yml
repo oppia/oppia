@@ -46,10 +46,10 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
       - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "A backend test failed on the upstream develop branch."
+          message: "[No action required it's a test message] A backend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -164,9 +164,9 @@ jobs:
         shell: bash
         run: coverage report --fail-under 100 -m
       - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "A backend test coverage check failed on the upstream develop branch."
+          message: "[No action required it's a test message] A backend test coverage check failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
 

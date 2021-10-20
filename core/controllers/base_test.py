@@ -203,7 +203,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Tests request without csrf_token results in 401 error."""
 
         self.post_json(
-            '/community-library/any', data={}, expected_status_int=401)
+            '/community-library/any', data={}, expected_status_int=402)
 
         self.put_json(
             '/community-library/any', payload={}, expected_status_int=401)
