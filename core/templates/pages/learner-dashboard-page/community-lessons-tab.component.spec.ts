@@ -27,8 +27,9 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
@@ -52,8 +53,11 @@ describe('Community lessons tab Component', () => {
   let learnerDashboardActivityBackendApiService:
     LearnerDashboardActivityBackendApiService;
   let ngbModal: NgbModal;
+  let windowDimensionsService: WindowDimensionsService;
+  let mockResizeEmitter: EventEmitter<void>;
 
   beforeEach(async(() => {
+    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
@@ -68,6 +72,13 @@ describe('Community lessons tab Component', () => {
       ],
       providers: [
         LearnerDashboardActivityBackendApiService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => mockResizeEmitter,
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -79,6 +90,7 @@ describe('Community lessons tab Component', () => {
     learnerDashboardActivityBackendApiService =
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
@@ -92,6 +104,8 @@ describe('Community lessons tab Component', () => {
   });
 
   it ('should initilize values on init for web view', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
     component.ngOnInit();
 
     expect(component.noCommunityLessonActivity).toEqual(true);
@@ -106,6 +120,9 @@ describe('Community lessons tab Component', () => {
     expect(component.displayInCommunityLessons).toEqual([]);
     expect(component.selectedSection).toEqual('All');
     expect(component.dropdownEnabled).toEqual(false);
+
+    mockResizeEmitter.emit();
+    expect(component.windowIsNarrow).toBeFalse();
   });
 
   it ('should initilize values on init for mobile view', () => {
