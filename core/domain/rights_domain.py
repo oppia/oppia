@@ -24,7 +24,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import user_services
 
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -59,9 +59,15 @@ class ActivityRights:
     """
 
     def __init__(
-            self, exploration_id: str, owner_ids: List[str], editor_ids: List[str], voice_artist_ids: List[str],
-            viewer_ids: List[str], community_owned: Optional[bool]=False, cloned_from: Optional[str]=None,
-            status: Optional[str]=ACTIVITY_STATUS_PRIVATE, viewable_if_private: Optional[bool]=False,
+            self, exploration_id: str,
+            owner_ids: List[str],
+            editor_ids: List[str],
+            voice_artist_ids: List[str],
+            viewer_ids: List[str],
+            community_owned: Optional[bool]=False,
+            cloned_from: Optional[str]=None,
+            status: Optional[str]=ACTIVITY_STATUS_PRIVATE,
+            viewable_if_private: Optional[bool]=False,
             first_published_msec: Optional[str]=None) -> None:
         self.id = exploration_id
         self.owner_ids = owner_ids
@@ -132,7 +138,8 @@ class ActivityRights:
             raise utils.ValidationError(
                 'Activity should have atleast one owner.')
 
-    def to_dict(self) -> Dict[str, Union[Optional[str], Optional[bool], Optional[List[str]]]]:
+    def to_dict(self) -> Dict[str, Union[Optional[str],
+    Optional[bool], Optional[List[str]]]]:
         """Returns a dict suitable for use by the frontend.
 
         Returns:

@@ -26,7 +26,6 @@ from core.constants import constants
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
-from core.domain import change_domain
 from core.tests import test_utils
 
 from typing import Sequence
@@ -134,7 +133,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_edit_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
-    def test_check_cannot_voiceover_activity_with_no_activity_rights(self) -> None:
+    def test_check_cannot_voiceover_activity_with_no_activity_rights(
+        self) -> None:
         self.assertFalse(rights_manager.check_can_voiceover_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
@@ -146,15 +146,18 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_delete_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
-    def test_check_cannot_modify_activity_roles_with_no_activity_rights(self) -> None:
+    def test_check_cannot_modify_activity_roles_with_no_activity_rights(
+        self) -> None:
         self.assertFalse(rights_manager.check_can_modify_core_activity_roles( # type: ignore[no-untyped-call]
             self.owner, None))
 
-    def test_check_cannot_release_ownership_with_no_activity_rights(self) -> None:
+    def test_check_cannot_release_ownership_with_no_activity_rights(
+        self) -> None:
         self.assertFalse(rights_manager.check_can_release_ownership( # type: ignore[no-untyped-call]
             self.owner, None))
 
-    def test_check_cannnot_publish_activity_with_no_activity_rights(self) -> None:
+    def test_check_cannnot_publish_activity_with_no_activity_rights(
+        self) -> None:
         self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
@@ -163,7 +166,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
             self.owner, self.activity_rights))
 
-    def test_check_cannot_unpublish_activity_with_no_activity_rights(self) -> None:
+    def test_check_cannot_unpublish_activity_with_no_activity_rights(
+        self) -> None:
         self.assertFalse(rights_manager.check_can_unpublish_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
@@ -270,7 +274,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
                 'assignee_id': 'assignee_id',
             })
 
-    def test_exploration_rights_change_object_with_extra_attribute_in_cmd(self) -> None:
+    def test_exploration_rights_change_object_with_extra_attribute_in_cmd(
+        self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -279,7 +284,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
                 'old_viewable_if_private': 'old_viewable_if_private',
                 'new_viewable_if_private': 'new_viewable_if_private',
                 'invalid': 'invalid'
-            }) 
+            })
 
     def test_exploration_rights_change_object_with_invalid_role(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -332,7 +337,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             rights_domain.ROLE_VIEWER
         )
 
-    def test_exploration_rights_change_object_with_release_ownership(self) -> None:
+    def test_exploration_rights_change_object_with_release_ownership(
+        self) -> None:
         exploration_rights_change_object = (
             rights_domain.ExplorationRightsChange( # type: ignore[no-untyped-call]
                 {'cmd': 'release_ownership'}
@@ -436,7 +442,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
                 'assignee_id': 'assignee_id',
             })
 
-    def test_collection_rights_change_object_with_extra_attribute_in_cmd(self) -> None:
+    def test_collection_rights_change_object_with_extra_attribute_in_cmd(
+        self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -493,10 +500,11 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection_rights_change_object.new_role, rights_domain.ROLE_VIEWER)
 
-    def test_collection_rights_change_object_with_release_ownership(self) -> None:
+    def test_collection_rights_change_object_with_release_ownership(
+        self) -> None:
         collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
             'cmd': 'release_ownership'
-        }) 
+        })
 
         self.assertEqual(
             collection_rights_change_object.cmd, 'release_ownership')
@@ -561,7 +569,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             'new_viewable_if_private': 'new_viewable_if_private'
         }
         collection_rights_change_object = rights_domain.CollectionRightsChange( # type: ignore[no-untyped-call]
-            collection_rights_change_dict) 
+            collection_rights_change_dict)
         self.assertEqual(
             collection_rights_change_object.to_dict(), # type: ignore[no-untyped-call]
             collection_rights_change_dict)
