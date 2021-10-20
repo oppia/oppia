@@ -49,7 +49,7 @@ jobs:
         if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "[No action required it's a test message] A backend test failed on the upstream develop branch."
+          message: "[No action required it is a test message] A backend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -167,6 +167,6 @@ jobs:
         if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "[No action required it's a test message] A backend test coverage check failed on the upstream develop branch."
+          message: "[No action required it is a test message] A backend test coverage check failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
 
