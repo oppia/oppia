@@ -35,7 +35,6 @@ import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
 
@@ -127,7 +126,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService,
     private focusManagerService: FocusManagerService
   ) {}
 
