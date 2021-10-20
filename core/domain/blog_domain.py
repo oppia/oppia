@@ -75,25 +75,17 @@ class BlogPost:
 
     @classmethod
     def require_valid_thumbnail_filename(
-        cls, thumbnail_filename: str, strict: bool = False
+        cls, thumbnail_filename: str
     ) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
-            strict: bool. Enable strict checks on the blog post when the
-                blog post is published or is going to be published.
 
         Raises:
             ValidationError. Provided thumbnail filename is invalid.
         """
-        if strict:
-            if not isinstance(thumbnail_filename, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected thumbnail filename to be a string, received: %s.'
-                    % thumbnail_filename)
-
         if thumbnail_filename == '':
             raise utils.ValidationError(
                 'Thumbnail filename should not be empty.')
@@ -114,7 +106,7 @@ class BlogPost:
         self.require_valid_tags(self.tags, strict)
         if isinstance(self.thumbnail_filename, str):
             self.require_valid_thumbnail_filename(
-                self.thumbnail_filename, strict=strict)
+                self.thumbnail_filename)
 
         if not isinstance(self.content, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -137,10 +129,6 @@ class BlogPost:
         Raises:
             ValidationErrors. One or more tags provided are invalid.
         """
-        if not isinstance(tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received: %s' % tags)
-
         for tag in tags:
             if not isinstance(tag, python_utils.BASESTRING):
                 raise utils.ValidationError(
@@ -214,10 +202,6 @@ class BlogPost:
         Raises:
             ValidationErrors. URL fragment provided is invalid.
         """
-        if not isinstance(url_fragment, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
         if not url_fragment:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
@@ -361,10 +345,6 @@ class BlogPost:
         Args:
             blog_id: str. The blog post id to validate.
         """
-        if not isinstance(blog_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Blog Post ID should be a string, received: %s' % blog_id)
-
         if len(blog_id) != BLOG_POST_ID_LENGTH:
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
@@ -412,25 +392,17 @@ class BlogPostSummary:
 
     @classmethod
     def require_valid_thumbnail_filename(
-        cls, thumbnail_filename: str, strict: bool = False
+        cls, thumbnail_filename: str
     ) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
-            strict: bool. Enable strict checks on the blog post summary when the
-                blog post is published or is going to be published.
 
         Raises:
             ValidationErrors. Thumbnail filename provided is invalid.
         """
-        if strict:
-            if not isinstance(thumbnail_filename, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected thumbnail filename to be a string, received: %s.'
-                    % thumbnail_filename)
-
         if thumbnail_filename == '':
             raise utils.ValidationError(
                 'Thumbnail filename should not be empty')
@@ -451,7 +423,7 @@ class BlogPostSummary:
         self.require_valid_tags(self.tags, strict)
         if isinstance(self.thumbnail_filename, str):
             self.require_valid_thumbnail_filename(
-                self.thumbnail_filename, strict=strict)
+                self.thumbnail_filename)
 
         if not isinstance(self.summary, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -472,11 +444,6 @@ class BlogPostSummary:
         Raises:
             ValidationErrors. URL fragment provided is invalid.
         """
-        if not isinstance(url_fragment, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
-
         if not url_fragment:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
@@ -504,9 +471,6 @@ class BlogPostSummary:
         Raises:
             ValidationErrors. Title provided is invalid.
         """
-        if not isinstance(title, python_utils.BASESTRING):
-            raise utils.ValidationError('Title should be a string.')
-
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
                 'blog post title should at most have %d chars, received: %s'
@@ -528,15 +492,7 @@ class BlogPostSummary:
         Raises:
             ValidationErrors.One or more tags provided are invalid.
         """
-        if not isinstance(tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received: %s' % tags)
         for tag in tags:
-            if not isinstance(tag, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each tag in \'tags\' to be a string, received: '
-                    '\'%s\'' % tag)
-
             if not tag:
                 raise utils.ValidationError(
                     'Tag should not be empty.')
