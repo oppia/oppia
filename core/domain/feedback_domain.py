@@ -240,7 +240,12 @@ class FeedbackAnalytics:
     """
 
     def __init__(
-            self, entity_type: str, entity_id: str, num_open_threads: int, num_total_threads: int):
+        self, 
+        entity_type: str, 
+        entity_id: str, 
+        num_open_threads: int, 
+        num_total_threads: int
+    ):
         """Initializes a FeedbackAnalytics object."""
 
         self.id = entity_id
