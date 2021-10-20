@@ -399,7 +399,7 @@ def set_url_query_parameter(
     query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
+    new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
     return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
         (scheme, netloc, path, new_query_string, fragment))
