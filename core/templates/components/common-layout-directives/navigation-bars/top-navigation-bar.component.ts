@@ -56,43 +56,43 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
-  currentLanguageText: string | undefined;
-  isModerator: boolean | undefined;
-  isCurriculumAdmin: boolean | undefined;
-  isTopicManager: boolean | undefined;
-  isSuperAdmin: boolean | undefined;
-  isBlogAdmin: boolean | undefined;
-  isBlogPostEditor: boolean | undefined;
-  userIsLoggedIn: boolean | undefined;
-  username: string | undefined;
-  currentUrl: string | undefined;
-  userMenuIsShown: boolean | undefined;
-  inClassroomPage: boolean | undefined;
-  showLanguageSelector: boolean | undefined;
-  standardNavIsShown: boolean | undefined;
-  ACTION_OPEN: string | undefined;
-  ACTION_CLOSE: string | undefined;
-  KEYBOARD_EVENT_TO_KEY_CODES: {
+  currentLanguageText!: string;
+  isModerator!: boolean;
+  isCurriculumAdmin!: boolean;
+  isTopicManager!: boolean;
+  isSuperAdmin!: boolean;
+  isBlogAdmin!: boolean;
+  isBlogPostEditor!: boolean;
+  userIsLoggedIn!: boolean;
+  currentUrl!: string;
+  userMenuIsShown!: boolean;
+  inClassroomPage!: boolean;
+  showLanguageSelector!: boolean;
+  standardNavIsShown!: boolean;
+  ACTION_OPEN!: string;
+  ACTION_CLOSE!: string;
+  KEYBOARD_EVENT_TO_KEY_CODES!: {
     enter: {
-        shiftKeyIsPressed: boolean;
-        keyCode: number;
-        };
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
+    };
     tab: {
-        shiftKeyIsPressed: boolean;
-        keyCode: number;
-        };
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
+    };
     shiftTab: {
       shiftKeyIsPressed: boolean;
       keyCode: number;
-      };
-    } | undefined;
+    };
+  };
+  labelForClearingFocus!: string;
+  sidebarIsShown!: boolean;
   windowIsNarrow: boolean = false;
   I18nCompleteTest: boolean = false;
+  username: string | undefined;
   activeMenuName: string | undefined;
   profilePageUrl: string | undefined;
-  labelForClearingFocus: string | undefined;
   profilePictureDataUrl: string | undefined;
-  sidebarIsShown: boolean | undefined;
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
