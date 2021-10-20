@@ -435,7 +435,8 @@ def update_topic_and_subtopic_pages(
     Raises:
         ValueError. Current user does not have enough rights to edit a topic.
     """
-    if not commit_message:
+    topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
+    if topic_rights.topic_is_published and not commit_message:
         raise ValueError(
             'Expected a commit message, received none.')
 
