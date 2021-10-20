@@ -65,8 +65,6 @@ INVALID_NO_NEWLINE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_no_newline.py')
 INVALID_URLOPEN_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlopen.py')
-INVALID_URLRETRIEVE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_urlretrieve.py')
 INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
 INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
@@ -165,16 +163,6 @@ class PythonLintTests(test_utils.LinterTestBase):
             'The id-to-message list can be seen '
             'here->http://pylint-messages.wikidot.com/all-codes'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_urlretrieve(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_URLRETRIEVE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 44: Please use python_utils.url_retrieve().'],
-            lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import os
 import tarfile
+import urllib.request as urlrequest
 
 from core import python_utils
 from core.tests import test_utils
@@ -70,7 +71,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
         self.makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
 
     def test_main_with_no_installs_required(self):
         check_file_removals = {
