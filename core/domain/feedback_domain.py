@@ -55,10 +55,22 @@ class FeedbackThread:
     """
 
     def __init__(
-            self, thread_id: str, entity_type: str, entity_id: str, state_name: str,
-            original_author_id: str, status: str, subject: str, summary: str, has_suggestion: bool,
-            message_count: int, created_on: datetime, last_updated: datetime, last_nonempty_message_text: Optional[str],
-            last_nonempty_message_author_id: Optional[str]):
+        self, 
+        thread_id: str, 
+        entity_type: str, 
+        entity_id: str, 
+        state_name: str,
+        original_author_id: str, 
+        status: str, 
+        subject: str, 
+        summary: str, 
+        has_suggestion: bool,
+        message_count: int, 
+        created_on: datetime, 
+        last_updated: datetime, 
+        last_nonempty_message_text: Optional[str],
+        last_nonempty_message_author_id: Optional[str]
+    ):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
