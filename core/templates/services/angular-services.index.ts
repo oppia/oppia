@@ -240,6 +240,7 @@ import { UserExplorationPermissionsService } from 'pages/exploration-editor-page
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
@@ -758,6 +759,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TranslationTabActiveContentIdService',
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
+  ['TranslationTopicService', TranslationTopicService],
   ['TruncatePipe', TruncatePipe],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
