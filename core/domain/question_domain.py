@@ -1186,8 +1186,8 @@ class Question:
         Args:
             question_id: str. The ID of the question.
             question_state_dict: dict. A dict where ecah key-value pair
-            represents, respectively, a state name and a dict used to
-            initialize a State domain object.
+                represents, respectively, a state name and a dict used to
+                initialize a State domain object.
 
         Returns:
             dict. The converted states_dict.
@@ -1201,7 +1201,8 @@ class Question:
 
     @classmethod
     def update_state_from_model(
-            cls, versioned_question_state, current_state_schema_version):
+            cls, versioned_question_state, current_state_schema_version,
+            question_id):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -1216,6 +1217,7 @@ class Question:
                     state data.
             current_state_schema_version: int. The current state
                 schema version.
+            question_id: str. The ID of the question.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
@@ -1223,6 +1225,9 @@ class Question:
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
 
+        if current_state_schema_version == 49:
+            versioned_question_state['state'] = conversion_fn(
+                question_id, versioned_question_state['state'])
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
 

@@ -113,7 +113,7 @@ def get_question_from_model(question_model):
     # Migrate the question if it is not using the latest schema version.
     if (question_model.question_state_data_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_state_schema(versioned_question_state)
+        _migrate_state_schema(versioned_question_state, question_model.id)
 
     return question_domain.Question(
         question_model.id,
@@ -125,7 +125,7 @@ def get_question_from_model(question_model):
         question_model.created_on, question_model.last_updated)
 
 
-def _migrate_state_schema(versioned_question_state):
+def _migrate_state_schema(versioned_question_state, question_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
     state dictionary. If the current State schema changes, a new
@@ -138,6 +138,7 @@ def _migrate_state_schema(versioned_question_state):
                 question.
             state: The State domain object representing the question
                 state data.
+        question_id: str. The ID of the question.
 
     Raises:
         Exception. The given state_schema_version is invalid.
@@ -155,5 +156,5 @@ def _migrate_state_schema(versioned_question_state):
 
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
         question_domain.Question.update_state_from_model(
-            versioned_question_state, state_schema_version)
+            versioned_question_state, state_schema_version, question_id)
         state_schema_version += 1
