@@ -202,7 +202,9 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-' + difficulty));
     var explanationCount = await rubricExplanationsForDifficulty.count();
     for (var i = 0; i < explanationCount; i++) {
-      var text = await rubricExplanationsForDifficulty.get(i).getText();
+      var text = await action.getText(
+        `Rubric explanations for difficulty ${i}`,
+        rubricExplanationsForDifficulty.get(i));
       expect(text).toMatch(explanations[i]);
     }
   };
@@ -277,7 +279,9 @@ var SkillEditorPage = function() {
   };
 
   this.expectConceptCardExplanationToMatch = async function(explanation) {
-    var text = await conceptCardExplanationText.getText();
+    var text = await action.getText(
+      'Concept card explanation text',
+      conceptCardExplanationText);
     expect(text).toMatch(explanation);
   };
 
@@ -327,16 +331,14 @@ var SkillEditorPage = function() {
     for (var index in questions) {
       await action.click(
         'Worked Example Summary', workedExampleSummary(index));
-      await waitFor.visibilityOf(
-        workedExampleQuestionField,
-        'Worked example question field takes too long to appear.');
-      var text = await workedExampleQuestionField.getText();
+      var text = await action.getText(
+        'Worked example question field',
+        workedExampleQuestionField);
       expect(text).toMatch(questions[questionIndexToCheck]);
       questionIndexToCheck++;
-      await waitFor.visibilityOf(
-        workedExampleExplanationField,
-        'Worked example explanation field takes too long to appear.');
-      var text = await workedExampleExplanationField.getText();
+      var text = await action.getText(
+        'Worked example explanation field',
+        workedExampleExplanationField);
       expect(text).toMatch(explanations[explanationIndexToCheck]);
       explanationIndexToCheck++;
       await action.click(
