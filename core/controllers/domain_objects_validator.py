@@ -125,7 +125,8 @@ def validate_collection_change(collection_change_dict):
     # planning to remove collections from our codebase hence modification is
     # not done here.
 
-    return collection_domain.CollectionChange(collection_change_dict)
+    collection_domain.CollectionChange(collection_change_dict)
+    return collection_change_dict
 
 
 def validate_state_dict(state_dict):
