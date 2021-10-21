@@ -2,7 +2,8 @@
   Off-screen preview of the next card in order to pre-determine the target
   height for the card content transition animation.
 -->
-<oppia-off-screen-preview [nextCardContentHtml]="nextCard.getContentHtml()"
+<oppia-off-screen-preview *ngIf="nextCard"
+                          [nextCardContentHtml]="nextCard.getContentHtml()"
                           [upcomingInlineInteractionHtml]="upcomingInlineInteractionHtml">
 </oppia-off-screen-preview>
 

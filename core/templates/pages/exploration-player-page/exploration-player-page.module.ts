@@ -35,7 +35,6 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
-import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { InformationCardModalComponent } from './templates/information-card-modal.component';
@@ -61,6 +60,7 @@ import { ToastrModule } from 'ngx-toastr';
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
@@ -70,6 +70,7 @@ import { ToastrModule } from 'ngx-toastr';
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
@@ -102,6 +103,7 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

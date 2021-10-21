@@ -254,7 +254,7 @@ export class ConversationSkinComponent {
       this.fixSupplementOnScroll();
     });
 
-    this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
+    this.currentInteractionService.setOnSubmitFn(this.submitAnswer.bind(this));
     this.startCardChangeAnimation = false;
     this.initializePage();
 
@@ -782,14 +782,15 @@ export class ConversationSkinComponent {
   initializePage(): void {
     this.hasInteractedAtLeastOnce = false;
     this.recommendedExplorationSummaries = [];
-    this.playerPositionService.init(this._navigateToDisplayedCard);
+    this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
     if (this.questionPlayerConfig) {
       this.explorationPlayerStateService.initializeQuestionPlayer(
-        this.questionPlayerConfig, this._initializeDirectiveComponents,
+        this.questionPlayerConfig,
+        this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
     } else {
       this.explorationPlayerStateService.initializePlayer(
-        this._initializeDirectiveComponents);
+        this._initializeDirectiveComponents.bind(this));
     }
   }
 
@@ -1084,7 +1085,7 @@ export class ConversationSkinComponent {
     if (this.moveToExploration) {
       this.moveToExploration = false;
       this.explorationPlayerStateService.moveToExploration(
-        this._initializeDirectiveComponents);
+        this._initializeDirectiveComponents.bind(this));
       return;
     }
     if (
