@@ -670,6 +670,9 @@ def main():
     # callstack to exit.
     # Therefore, in order to allow continued execution after the requirements
     # file is generated, we must call it as a separate process.
+    # The option --no-emit-index-url is specified to prevent pip compile from
+    # generating an index configuration line(s) in requirements.txt when the
+    # local pip configuration uses one or more custom index servers.
     subprocess.check_call(
         [
             'python',
