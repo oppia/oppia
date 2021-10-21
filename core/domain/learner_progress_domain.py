@@ -19,18 +19,28 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.domain import collection_domain
+from core.domain import exp_domain
+from core.domain import story_domain
+from core.domain import topic_domain
+
+from typing import Dict, List
+
 
 class LearnerProgressInTopicsAndStories:
     """Domain object for the progress of the learner in topics and stories."""
 
     def __init__(
-            self,
-            partially_learnt_topic_summaries,
-            completed_story_summaries,
-            learnt_topic_summaries, topics_to_learn_summaries,
-            all_topic_summaries, untracked_topic_summaries,
-            completed_to_incomplete_story_titles,
-            learnt_to_partially_learnt_topic_titles):
+        self,
+        partially_learnt_topic_summaries: List[topic_domain.TopicSummary],
+        completed_story_summaries: List[story_domain.StorySummary],
+        learnt_topic_summaries: List[topic_domain.TopicSummary],
+        topics_to_learn_summaries: List[topic_domain.TopicSummary],
+        all_topic_summaries: List[topic_domain.TopicSummary],
+        untracked_topic_summaries: List[topic_domain.TopicSummary],
+        completed_to_incomplete_story_titles: List[story_domain.StorySummary],
+        learnt_to_partially_learnt_topic_titles: List[story_domain.StorySummary]
+    ) -> None:
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -72,11 +82,16 @@ class LearnerProgressInCollections:
     """Domain object for the progress of the learner in collections."""
 
     def __init__(
-            self,
-            incomplete_collection_summaries,
-            completed_collection_summaries,
-            collection_playlist,
-            completed_to_incomplete_collection_titles,):
+        self,
+        incomplete_collection_summaries: List[
+            collection_domain.CollectionSummary],
+        completed_collection_summaries: List[
+            collection_domain.CollectionSummary],
+        collection_playlist: List[
+            collection_domain.CollectionSummary],
+        completed_to_incomplete_collection_titles: List[
+            collection_domain.CollectionSummary],
+    ) -> None:
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -103,8 +118,11 @@ class LearnerProgressInExplorations:
     """Domain object for the progress of the learner in explorations."""
 
     def __init__(
-            self, incomplete_exp_summaries, completed_exp_summaries,
-            exploration_playlist):
+        self,
+        incomplete_exp_summaries: List[exp_domain.ExplorationSummary],
+        completed_exp_summaries: List[exp_domain.ExplorationSummary],
+        exploration_playlist: List[exp_domain.ExplorationSummary]
+    ) -> None:
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -126,12 +144,20 @@ class ActivityIdsInLearnerDashboard:
     """
 
     def __init__(
-            self, completed_exploration_ids, completed_collection_ids,
-            completed_story_ids, learnt_topic_ids,
-            incomplete_exploration_ids, incomplete_collection_ids,
-            partially_learnt_topic_ids, topic_ids_to_learn, all_topic_ids,
-            untracked_topic_ids, exploration_playlist_ids,
-            collection_playlist_ids):
+        self,
+        completed_exploration_ids: List[str],
+        completed_collection_ids: List[str],
+        completed_story_ids: List[str],
+        learnt_topic_ids: List[str],
+        incomplete_exploration_ids: List[str],
+        incomplete_collection_ids: List[str],
+        partially_learnt_topic_ids: List[str],
+        topic_ids_to_learn: List[str],
+        all_topic_ids: List[str],
+        untracked_topic_ids: List[str],
+        exploration_playlist_ids: List[str],
+        collection_playlist_ids: List[str]
+    ) -> None:
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
         Args:
@@ -170,7 +196,7 @@ class ActivityIdsInLearnerDashboard:
         self.exploration_playlist_ids = exploration_playlist_ids
         self.collection_playlist_ids = collection_playlist_ids
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, List[str]]:
         """Return dictionary representation of ActivityIdsInLearnerDashboard.
 
         Returns:
