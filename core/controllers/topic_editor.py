@@ -69,26 +69,31 @@ class TopicEditorStoryHandler(base.BaseHandler):
             'description': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default': None
             },
             'filename': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default': None
             },
             'thumbnailBgColor': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default': None
             },
             'image': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default': None
             },
             'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
         }
     }
+
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
@@ -275,7 +280,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'is_nonempty'                    
+                        'id': 'is_nonempty'
                     }]
                 }
             },
@@ -303,16 +308,13 @@ class EditableTopicDataHandler(base.BaseHandler):
                 }
             }
         },
-        "DELETE": {}
+        'DELETE': {}
     }
 
     def _require_valid_version(self, version_from_payload, topic_version):
         """Check that the payload version matches the given topic
         version.
         """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
 
         if version_from_payload != topic_version:
             raise base.BaseHandler.InvalidInputException(
@@ -518,7 +520,8 @@ class TopicPublishSendMailHandler(base.BaseHandler):
             'topic_name': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default': 'UNKNOWN'
             },
         }
     }
@@ -532,7 +535,12 @@ class TopicPublishSendMailHandler(base.BaseHandler):
                 'Request to review and publish a topic',
                 '%s wants to publish topic: %s at URL %s, please review'
                 ' and publish if it looks good.'
-                % (self.username, self.normalized_payload.get('topic_name'), topic_url))
+                % (
+                    self.username, 
+                    self.normalized_payload.get('topic_name'), 
+                    topic_url
+                  )
+                )
 
         self.render_json(self.values)
 
@@ -552,10 +560,12 @@ class TopicPublishHandler(base.BaseHandler):
             'publish_status': {
                 'schema': {
                     'type': 'bool'
-                }
+                },
+                'default': False
             },
         }
     }
+
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic."""
