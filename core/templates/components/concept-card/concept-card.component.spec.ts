@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -93,31 +93,5 @@ describe('ConceptCardComponent', () => {
     component.numberOfWorkedExamplesShown = 2;
 
     expect(component.isLastWorkedExample()).toBe(false);
-  });
-
-  it('should update concept cards when index value' +
-  ' changes', () => {
-    component.index = 1;
-    let changes: SimpleChanges = {
-      index: {
-        currentValue: 0,
-        previousValue: 1,
-        firstChange: false,
-        isFirstChange: () => false
-      }
-    };
-    component.ngOnInit();
-
-    component.conceptCards = [{
-      getWorkedExamples: () => {
-        return ['1'];
-      }
-    }] as unknown as ConceptCard[];
-
-    expect(component.index).toEqual(1);
-
-    component.ngOnChanges(changes);
-
-    expect(component.numberOfWorkedExamplesShown).toEqual(1);
   });
 });
