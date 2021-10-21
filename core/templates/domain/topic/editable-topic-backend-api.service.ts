@@ -109,7 +109,8 @@ export class EditableTopicBackendApiService {
 
   private _fetchTopic(
       topicId: string,
-      successCallback: (value?: FetchTopicResponse) => void,
+      successCallback: (
+        value: FetchTopicResponse | PromiseLike<FetchTopicResponse>) => void,
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -143,7 +144,9 @@ export class EditableTopicBackendApiService {
 
   private _fetchStories(
       topicId: string,
-      successCallback: (value?: StorySummaryBackendDict[]) => void,
+      successCallback: (
+        value: StorySummaryBackendDict[] |
+         PromiseLike<StorySummaryBackendDict[]>) => void,
       errorCallback: (reason?: string) => void): void {
     let storiesDataUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
@@ -164,7 +167,9 @@ export class EditableTopicBackendApiService {
   private _fetchSubtopicPage(
       topicId: string,
       subtopicId: number,
-      successCallback: (value?: SubtopicPageBackendDict) => void,
+      successCallback: (
+        value: SubtopicPageBackendDict |
+         PromiseLike<SubtopicPageBackendDict>) => void,
       errorCallback: (reason?: string) => void): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
@@ -185,7 +190,7 @@ export class EditableTopicBackendApiService {
 
   private _deleteTopic(
       topicId: string,
-      successCallback: (value?: number) => void,
+      successCallback: (value: number | PromiseLike<number>) => void,
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -206,7 +211,8 @@ export class EditableTopicBackendApiService {
       topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[],
-      successCallback: (value?: UpdateTopicResponse) => void,
+      successCallback: (
+        value: UpdateTopicResponse | PromiseLike<UpdateTopicResponse>) => void,
       errorCallback: (reason?: string) => void): void {
     let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -236,7 +242,7 @@ export class EditableTopicBackendApiService {
 
   private _doesTopicWithUrlFragmentExist(
       topicUrlFragment: string,
-      successCallback: (value?: boolean) => void,
+      successCallback: (value: boolean | PromiseLike<boolean>) => void,
       errorCallback: (reason?: string) => void): void {
     let topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
@@ -254,7 +260,7 @@ export class EditableTopicBackendApiService {
 
   private _doesTopicWithNameExist(
       topicName: string,
-      successCallback: (value?: boolean) => void,
+      successCallback: (value: boolean | PromiseLike<boolean>) => void,
       errorCallback: (reason?: string) => void): void {
     let topicNameUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE, {

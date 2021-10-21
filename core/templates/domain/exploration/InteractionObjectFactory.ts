@@ -25,7 +25,7 @@ import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { HintBackendDict, Hint, HintObjectFactory } from
   'domain/exploration/HintObjectFactory';
-import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+import { OutcomeBackendDict, Outcome, OutcomeObjectFactory} from
   'domain/exploration/OutcomeObjectFactory';
 import { SolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
@@ -68,8 +68,6 @@ import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-
-
 export interface InteractionBackendDict {
   // A null 'default_outcome' indicates that this interaction is
   // an EndExploration interaction.
@@ -98,7 +96,7 @@ export class Interaction {
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
-      defaultOutcome: Outcome | null,
+      defaultOutcome: Outcome,
       hints: Hint[], id: string | null, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
@@ -465,7 +463,9 @@ export class InteractionObjectFactory {
       this.convertFromCustomizationArgsBackendDict(
         interactionDict.id, interactionDict.customization_args),
       interactionDict.default_outcome ? this.createOutcomeFromBackendDict(
-        interactionDict.default_outcome) : null,
+        interactionDict.default_outcome) :
+        new Outcome('', new SubtitledHtml(
+          '', ''), false, [], '', ''),
       this.createHintsFromBackendDict(interactionDict.hints),
       interactionDict.id,
       interactionDict.solution ? this.createSolutionFromBackendDict(

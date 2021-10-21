@@ -107,7 +107,8 @@ export class Question {
       return 'An interaction must be specified';
     }
 
-    if (interaction.defaultOutcome.feedback._html.length === 0) {
+    if (interaction.defaultOutcome &&
+      interaction.defaultOutcome.feedback._html.length === 0) {
       return 'Please enter a feedback for the default outcome.';
     }
 
@@ -130,7 +131,7 @@ export class Question {
     if (!atLeastOneAnswerCorrect) {
       return 'At least one answer should be marked correct';
     }
-    return null;
+    return '';
   }
 
   getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
@@ -138,12 +139,12 @@ export class Question {
     var taggedSkillMisconceptionIds = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
+        answerGroups[i].taggedSkillMisconceptionId !== null) {
         taggedSkillMisconceptionIds[
           answerGroups[i].taggedSkillMisconceptionId] = true;
       }
     }
-    var unaddressedMisconceptionNames = [];
+    var unaddressedMisconceptionNames!: string[];
     var self = this;
     Object.keys(misconceptionsBySkill).forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
@@ -168,7 +169,7 @@ export class Question {
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict = {
-      id: null,
+      id: '',
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
       language_code: this._languageCode,
@@ -177,7 +178,7 @@ export class Question {
         this._inapplicableSkillMisconceptionIds),
       version: 0,
     };
-    if (!isNewQuestion) {
+    if (!isNewQuestion && this._id !== null) {
       questionBackendDict.id = this._id;
       questionBackendDict.version = this._version;
     }
@@ -194,7 +195,7 @@ export class QuestionObjectFactory {
 
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      null, this.stateObject.createDefaultState(null),
+      '', this.stateObject.createDefaultState(''),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 

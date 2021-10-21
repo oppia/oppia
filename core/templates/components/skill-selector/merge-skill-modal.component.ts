@@ -28,12 +28,12 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
   templateUrl: './merge-skill-modal.component.html'
 })
 export class MergeSkillModalComponent extends ConfirmOrCancelModal {
-  categorizedSkills: SkillsCategorizedByTopics;
-  skill: AugmentedSkillSummary;
-  skillSummaries: AugmentedSkillSummary[];
-  untriagedSkillSummaries: SkillSummary[];
+  categorizedSkills!: SkillsCategorizedByTopics;
+  skill!: AugmentedSkillSummary;
+  skillSummaries!: AugmentedSkillSummary[];
+  untriagedSkillSummaries!: SkillSummary[];
   allowSkillsFromOtherTopics: boolean = true;
-  selectedSkillId: string;
+  selectedSkillId!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

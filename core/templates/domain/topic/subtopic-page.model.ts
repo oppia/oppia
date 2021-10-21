@@ -22,6 +22,8 @@ import {
   SubtopicPageContentsBackendDict,
   SubtopicPageContents
 } from 'domain/topic/subtopic-page-contents.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 export interface SubtopicPageBackendDict {
   'id': string;
@@ -98,6 +100,10 @@ export class SubtopicPage {
   // Create an interstitial subtopic page that would be displayed in the
   // editor until the actual subtopic page is fetched from the backend.
   static createInterstitialSubtopicPage(): SubtopicPage {
-    return new SubtopicPage(null, null, null, 'en');
+    return new SubtopicPage(
+      '', '',
+      new SubtopicPageContents(new SubtitledHtml(
+        '', '')
+      , new RecordedVoiceovers({})), 'en');
   }
 }

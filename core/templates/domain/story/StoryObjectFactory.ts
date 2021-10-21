@@ -242,8 +242,9 @@ export class StoryObjectFactory {
   // the actual story is fetched from the backend.
   createInterstitialStory(): Story {
     return new Story(
-      null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null, null, null, '');
+      '', 'Story title loading', 'Story description loading',
+      'Story notes loading',
+      new StoryContents('', [], ''), 'en', 1, '', '', '', '', '');
   }
 }
 

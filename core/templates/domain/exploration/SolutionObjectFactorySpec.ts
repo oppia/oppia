@@ -26,15 +26,18 @@ import {
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { Outcome} from
+  'domain/exploration/OutcomeObjectFactory';
 import { Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
-import { Interaction } from './InteractionObjectFactory';
+import { Interaction} from './InteractionObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
     let sof: SolutionObjectFactory, solution: Solution;
+    let defaultOutcome: Outcome;
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
@@ -44,6 +47,12 @@ describe('Solution object factory', () => {
           FormatRtePreviewPipe
         ]
       });
+      defaultOutcome = new Outcome(
+        'dest_default',
+        new SubtitledHtml('', ''),
+        false, [],
+        null, null
+      );
       sof = TestBed.inject(SolutionObjectFactory);
       solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
@@ -142,7 +151,7 @@ describe('Solution object factory', () => {
         choices: {
           value: [new SubtitledHtml('This is a choice', '')]
         }
-      }, null, [], '0', null);
+      }, defaultOutcome, [], '0', null);
       const expectedShortAnswerHtml = {
         prefix: 'One',
         answer: '<oppia-short-response-0 ' +
@@ -160,7 +169,7 @@ describe('Solution object factory', () => {
         choices: {
           value: [new SubtitledHtml('This is a choice', '')]
         }
-      }, null, [], null, null);
+      }, defaultOutcome, [], null, null);
 
       expect(() => {
         solution.getOppiaShortAnswerResponseHtml(interaction);

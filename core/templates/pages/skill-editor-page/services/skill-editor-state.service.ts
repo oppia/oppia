@@ -87,7 +87,7 @@ export class SkillEditorStateService {
   };
 
   private _updateGroupedSkillSummaries = (groupedSkillSummaries) => {
-    let topicName = null;
+    let topicName = '';
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
