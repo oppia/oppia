@@ -39,22 +39,18 @@ sys.path.insert(0, _CERTIFI_PATH)
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 BASESTRING = past.builtins.basestring
-INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
 
@@ -115,38 +111,6 @@ def redirect_stdout(new_target):
     except ImportError:
         from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
     return impl(new_target)
-
-
-def nullcontext(enter_result=None):
-    """Returns nullcontext from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Args:
-        enter_result: *. The object returned by the nullcontext when entered.
-
-    Returns:
-        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
-        object.
-    """
-    try:
-        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
-    return impl(enter_result=enter_result)
-
-
-def ExitStack(): # pylint: disable=invalid-name
-    """Returns ExitStack from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Returns:
-        contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
-    """
-    try:
-        from contextlib import ExitStack as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import ExitStack as impl  # pylint: disable=import-only-modules
-    return impl()
 
 
 def string_io(buffer_value=''):
@@ -348,32 +312,6 @@ def url_encode(query, doseq=False):
     return urlparse.urlencode(query, doseq=doseq)
 
 
-def url_retrieve(source_url, filename=None):
-    """Copy a network object denoted by a URL to a local file using
-    urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-        filename: str. The file location to copy to.
-
-    Returns:
-        urlretrieve. The 'urlretrieve' object.
-    """
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib as urlrequest
-
-    # Change the User-Agent to prevent servers from blocking requests.
-    # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
-    urlrequest.URLopener.version = (
-        'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-        'Gecko/20100101 Firefox/47.0'
-    )
-    return urlrequest.urlretrieve(source_url, filename=filename)
-
-
 def url_open(source_url):
     """Open a network object denoted by a URL for reading using
     urllib2.urlopen if run under Python 2 and urllib.request.urlopen if
@@ -427,35 +365,6 @@ def divide(number1, number2):
         int. The quotent.
     """
     return past.utils.old_div(number1, number2)
-
-
-def with_metaclass(meta, *bases):
-    """Python 2 & 3 helper for installing metaclasses.
-
-    Example:
-
-        class BaseForm(python_utils.OBJECT):
-            pass
-
-        class FormType(type):
-            pass
-
-        class Form(with_metaclass(FormType, BaseForm)):
-            pass
-
-    Args:
-        meta: type. The metaclass to install on the derived class.
-        *bases: tuple(class). The base classes to install on the derived class.
-            When empty, `object` will be the sole base class.
-
-    Returns:
-        class. A proxy class that mutates the classes which inherit from it to
-        install the input meta class and inherit from the input base classes.
-        The proxy class itself does not actually become one of the base classes.
-    """
-    if not bases:
-        bases = (OBJECT,)
-    return future.utils.with_metaclass(meta, *bases)
 
 
 def convert_to_bytes(string_to_convert) -> bytes:
@@ -523,16 +432,6 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def reraise_exception():
-    """Reraise exception with complete stacktrace."""
-    # TODO(#11547): This method can be replace by 'raise e' after we migrate
-    # to Python 3.
-    # This code is needed in order to reraise the error properly with
-    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-    exec_info = sys.exc_info()
-    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def create_enum(*sequential):
