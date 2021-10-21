@@ -243,7 +243,10 @@ var SkillEditorPage = function() {
 
   this.expectSkillDescriptionToBe = async function(description) {
     await waitFor.visibilityOf(skillDescriptionField, 'Skill description');
-    var description = await skillDescriptionField.getAttribute('value');
+    var description = await action.getAttribute(
+      'Skill description field',
+      skillDescriptionField,
+      'value');
     expect(description).toEqual(description);
   };
 
