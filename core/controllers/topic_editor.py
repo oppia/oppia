@@ -536,8 +536,8 @@ class TopicPublishSendMailHandler(base.BaseHandler):
                 '%s wants to publish topic: %s at URL %s, please review'
                 ' and publish if it looks good.'
                 % (
-                    self.username, 
-                    self.normalized_payload.get('topic_name'), 
+                    self.username,
+                    self.normalized_payload.get('topic_name'),
                     topic_url
                   )
                 )
