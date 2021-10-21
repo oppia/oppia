@@ -97,6 +97,33 @@ describe('ContinueValidationService', () => {
         'Expected customization arguments to have property: buttonText');
     });
 
+  it('should expect a button text having at most 20 characters',
+    () => {
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+
+      customizationArguments.buttonText.value = (
+        new SubtitledUnicode('123456789012345678901', 'ca_buttonText'));
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The button text should be at most 20 characters.'
+      }]);
+
+      expect(() => {
+        validatorService.getAllWarnings(
+          // This throws "Argument of type '{}'. We need to suppress this error
+          // because is not assignable to parameter of type
+          // 'ContinueCustomizationArgs'." We are purposely assigning the wrong
+          // type of customization args in order to test validations.
+          // @ts-expect-error
+          currentState, {}, [], goodDefaultOutcome);
+      }).toThrowError(
+        'Expected customization arguments to have property: buttonText');
+    });
+
   it('should expect no answer groups', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

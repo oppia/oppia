@@ -744,7 +744,7 @@
               "id": "is_at_least"
             },
             {
-              "max_value": 200,
+              "max_value": 10,
               "id": "is_at_most"
             }
           ]

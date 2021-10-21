@@ -236,7 +236,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     'validators': [{
                         'id': 'is_at_least', 'min_value': 1
                     }, {
-                        'id': 'is_at_most', 'max_value': 200
+                        'id': 'is_at_most', 'max_value': 10
                     }]
                 },
                 'default_value': 1,
