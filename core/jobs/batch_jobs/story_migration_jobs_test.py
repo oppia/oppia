@@ -24,22 +24,32 @@ import datetime
 from core.constants import constants
 from core.domain import recommendations_services
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import skill_migration_jobs
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union # isort:skip
 
 MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import skill_models
+if MYPY:
+    from mypy_imports import exp_models
+    from mypy_imports import recommendations_models
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(exp_models, recommendations_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.recommendations])
+
+StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
-class MigrateSkillJobTests(job_test_utils.JobTestBase):
+class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = skill_migration_jobs.MigrateSkillJob
+    JOB_CLASS = (
+        exp_recommendation_computation_jobs
+        .ComputeExplorationRecommendationsJob)
+
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+    EXP_3_ID = 'exp_3_id'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()

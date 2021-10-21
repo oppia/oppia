@@ -27,23 +27,22 @@ from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 import result
 
-from typing import Sequence, Tuple
+from typing import Dict, Iterable, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import skill_models
+    from mypy_imports import story_models
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-class MigrateSkillJob(base_jobs.JobBase):
+class MigrateStoryJob(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -58,15 +57,15 @@ class MigrateSkillJob(base_jobs.JobBase):
         unmigrated_skill_models = (
             self.pipeline
             | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(skill_models.SkillModel.get_all()))
-            | 'Add skill model ID' >> beam.GroupBy(
+                ndb_io.GetModels(story_models.StoryModel.get_all()))
+            | 'Add skill keys' >> beam.GroupBy(
                 lambda skill_model: skill_model.id)
         )
         skill_summary_models = (
             self.pipeline
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(skill_models.SkillSummaryModel.get_all()))
-            | 'Add skill summary ID' >> beam.GroupBy(
+            | 'Add skill summary keys' >> beam.GroupBy(
                 lambda skill_summary_model: skill_summary_model.id)
         )
 
@@ -74,14 +73,14 @@ class MigrateSkillJob(base_jobs.JobBase):
             unmigrated_skill_models
             | 'Transform and migrate model' >> beam.Map(self._migrate_skill)
         )
+        skill_migration_errors = (
+            migrated_skill_results
+            | 'Filter errors' >> beam.Filter(result.is_err)
+        )
         migrated_skills = (
             migrated_skill_results
-            | 'Filter oks' >> beam.Filter(lambda result: result.result.is_ok())
-            | 'Unwrap ok' >> beam.Map(lambda result: result.result.unwrap())
-        )
-        migrated_skill_job_run_results = (
-            migrated_skill_results
-            | job_result_transforms.ResultsToJobRunResults('SKILL MIGRATION')
+            | 'Filter oks' >> beam.Filter(result.is_ok)
+            | 'Unwrap ok' >> beam.Map(result.unwrap)
         )
 
         skill_changes = (
@@ -91,56 +90,8 @@ class MigrateSkillJob(base_jobs.JobBase):
                     skill_id, self._generate_skill_changes))
         )
 
-        cache_deletion_job_run_results = (
-            migrated_skills
-            | 'Keep IDs only' >> beam.Keys()
-            | 'Delete skills from cache' >> beam.Map(
-                self._delete_skill_from_cache)
-            | job_result_transforms.ResultsToJobRunResults('CACHE DELETION')
-        )
-
-        skill_objects = (
-            {
-                'skill_model': unmigrated_skill_models,
-                'skill_summary_model': skill_summary_models,
-                'skill': migrated_skills,
-                'skill_changes': skill_changes
-            }
-            | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Reorganize the skill objects' >> beam.Map(lambda x: {
-                    'skill_model': x['skill_model'][0][0],
-                    'skill_summary_model': x['skill_summary_model'][0][0],
-                    'skill': x['skill'][0][0],
-                    'skill_changes': x['skill_changes'][0][0]
-                })
-        )
-
         skill_models_to_put = (
-            skill_objects
-            | 'Generate skill models to put' >> beam.FlatMap(
-                lambda x: self._update_skill(
-                    x['skill_model'], x['skill'], x['skill_changes'],
-                ))
-        )
 
-        skill_summary_models_to_put = (
-            skill_objects
-            | 'Generate skill summary models to put' >> beam.Map(
-                lambda x: self._update_skill_summary(
-                    x['skill'], x['skill_summary_model']
-                ))
-        )
-
-        unused_put_results = (
-            (skill_models_to_put, skill_summary_models_to_put)
-            | 'Merge models' >> beam.Flatten()
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
-
-        return (
-            (cache_deletion_job_run_results, migrated_skill_job_run_results)
-            | beam.Flatten()
         )
 
     @staticmethod
@@ -189,24 +140,21 @@ class MigrateSkillJob(base_jobs.JobBase):
             yield skill_change
 
     @staticmethod
-    def _delete_skill_from_cache(
-        skill_id: str
-    ) -> result.Result[str, Exception]:
-        try:
-            caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id])
-            return result.Ok(skill_id)
-        except Exception as e:
-            return result.Err(e)
+    def _update_skill(skill_model, skill, skill_summary_model, commit_cmds):
+        skill_summary = skill_services.compute_summary_of_skill(skill)
 
-    @staticmethod
-    def _update_skill(
-        skill_model: skill_models.SkillModel,
-        skill: skill_domain.Skill,
-        skill_changes: Sequence[skill_domain.SkillChange]
-    ):
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
+
+
         updated_skill_model = (
             skill_services.populate_skill_model_with_skill(skill_model, skill))
+        updated_skill_summary_model = (
+            skill_services.populate_skill_summary_model_with_skill_summary(
+                skill_summary_model, skill_summary
+            )
+        )
+
         commit_message = (
             'Update skill content schema version to %d and '
             'skill misconceptions schema version to %d and '
@@ -216,18 +164,6 @@ class MigrateSkillJob(base_jobs.JobBase):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION
         )
-        change_dicts = [change.to_dict() for change in skill_changes]
-        return [updated_skill_model]
-
-    @staticmethod
-    def _update_skill_summary(
-        skill: skill_domain.Skill,
-        skill_summary_model: skill_models.SkillSummaryModel
-    ):
-        skill_summary = skill_services.compute_summary_of_skill(skill)
-        updated_skill_summary_model = (
-            skill_services.populate_skill_summary_model_with_skill_summary(
-                skill_summary_model, skill_summary
-            )
-        )
-        return updated_skill_summary_model
+        change_dicts = [change.to_dict() for change in commit_cmds]
+        updated_skill_model.commit(
+            feconf.MIGRATION_BOT_USERNAME, commit_message, change_dicts)

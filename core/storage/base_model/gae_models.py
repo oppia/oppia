@@ -1168,13 +1168,11 @@ class VersionedModel(BaseModel):
         """
         self._require_not_marked_deleted()
 
-        for item in commit_cmds:
-            if not isinstance(item, dict):
+        for commit_cmd in commit_cmds:
+            if not isinstance(commit_cmd, dict):
                 raise Exception(
                     'Expected commit_cmds to be a list of dicts, received %s'
                     % commit_cmds)
-
-        for commit_cmd in commit_cmds:
             if 'cmd' not in commit_cmd:
                 raise Exception(
                     'Invalid commit_cmd: %s. Expected a \'cmd\' key.'
