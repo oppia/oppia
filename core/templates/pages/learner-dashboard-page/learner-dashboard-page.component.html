@@ -894,8 +894,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: unset;
   }
+  .oppia-learner-dashboard-buttons.headroom--top {
+    margin-bottom: 70px;
+  }
+
   .oppia-learner-dashboard-buttons.headroom--unfixed {
     position: relative;
     transform: translateY(0);
@@ -904,12 +907,11 @@
     transition: transform 200ms ease-in-out;
   }
   .oppia-learner-dashboard-buttons.headroom--unpinned {
-    bottom: 70px;
-    position: fixed;
-    transform: translateY(0%);
+    bottom: -30px;
   }
   .oppia-learner-dashboard-buttons.headroom--pinned {
     position: fixed;
-    transform: translateY(100%);
+    margin-bottom: 50px;
+    transform: translateY(-100%);
   }
 </style>

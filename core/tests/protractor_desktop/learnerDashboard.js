@@ -216,7 +216,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display correct topics in edit goals, Learn Something New ' +
+  it('should display correct topics in edit goals, learn something new ' +
     'section, current goals and continue where you left off section',
   async function() {
     var TOPIC_NAME = 'Learner Dashboard Topic 1';
