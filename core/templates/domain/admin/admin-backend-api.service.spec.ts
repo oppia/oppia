@@ -88,7 +88,7 @@ describe('Admin backend api service', () => {
       rules: [{
         filters: [{
           type: PlatformParameterFilterType.ServerMode,
-          conditions: [<[string, string]>['=', 'dev']]
+          conditions: [['=', 'dev'] as [string, string]]
         }],
         value_when_matched: true
       }],

@@ -121,20 +121,20 @@ export class RatioExpressionInputValidationService {
     for (let i = 0; i < answerGroups.length; i++) {
       let rules = answerGroups[i].rules;
       for (let j = 0; j < rules.length; j++) {
-        let currentRuleType = <string> rules[j].type;
+        let currentRuleType = rules[j].type as string;
         let currentInput: number[] | number;
         var ratio: Ratio;
         if (currentRuleType === 'HasNumberOfTermsEqualTo') {
-          currentInput = <number> rules[j].inputs.y;
+          currentInput = rules[j].inputs.y as number;
         } else if (currentRuleType === 'HasSpecificTermEqualTo') {
           currentInput = [
             // The x-th term.
-            <number> rules[j].inputs.x,
+            rules[j].inputs.x as number,
             // Should have value y.
-            <number> rules[j].inputs.y,
+            rules[j].inputs.y as number,
           ];
         } else {
-          currentInput = <number[]> rules[j].inputs.x;
+          currentInput = rules[j].inputs.x as number[];
         }
 
         if (expectedNumberOfTerms >= 2) {
@@ -150,7 +150,7 @@ export class RatioExpressionInputValidationService {
               });
             }
           } else if (currentRuleType === 'HasSpecificTermEqualTo') {
-            const _currentInput = <number[]> currentInput;
+            const _currentInput = currentInput as number[];
             // Note: termIndex is 1-indexed, not 0-indexed. In other words,
             // we don't want the lesson implementor to have a rule like
             // "make sure the 0-th term of the ratio equals..." since the
@@ -167,7 +167,7 @@ export class RatioExpressionInputValidationService {
               });
             }
           } else {
-            ratio = Ratio.fromList(<number[]> currentInput);
+            ratio = Ratio.fromList(currentInput as number[]);
             if (ratio.getNumberOfTerms() !== expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
@@ -181,19 +181,19 @@ export class RatioExpressionInputValidationService {
           }
         }
         for (let seenRule of seenRules) {
-          let seenRuleType = <string> seenRule.type;
+          let seenRuleType = seenRule.type as string;
           let seenInput = null;
           if (seenRuleType === 'HasNumberOfTermsEqualTo') {
-            seenInput = <number> seenRule.inputs.y;
+            seenInput = seenRule.inputs.y as number;
           } else if (seenRuleType === 'HasSpecificTermEqualTo') {
             seenInput = [
               // The x-th term.
-              <number> seenRule.inputs.x,
+              seenRule.inputs.x as number,
               // Should have value y.
-              <number> seenRule.inputs.y,
+              seenRule.inputs.y as number,
             ];
           } else {
-            seenInput = <number[]> seenRule.inputs.x;
+            seenInput = seenRule.inputs.x as number[];
           }
 
           if (
@@ -201,7 +201,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType !== 'IsEquivalent' &&
             currentRuleType !== 'HasNumberOfTermsEqualTo' && (
               ratioRulesService.Equals(
-                <RatioInputAnswer> seenInput, {x: <number[]> currentInput}))) {
+              seenInput as RatioInputAnswer, {x: currentInput as number[]}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -215,8 +215,8 @@ export class RatioExpressionInputValidationService {
             seenRuleType === 'HasSpecificTermEqualTo' &&
             currentRuleType === 'Equals' && (
               ratioRulesService.HasSpecificTermEqualTo(
-                <RatioInputAnswer> currentInput,
-                <{x: number, y: number}> seenRule.inputs))) {
+                currentInput as RatioInputAnswer,
+                seenRule.inputs as {x: number, y: number}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -231,7 +231,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType !== 'HasNumberOfTermsEqualTo' &&
             currentRuleType !== 'HasSpecificTermEqualTo' && (
               ratioRulesService.IsEquivalent(
-                <RatioInputAnswer> seenInput, {x: <number[]> currentInput}))) {
+              seenInput as RatioInputAnswer, {x: currentInput as number[]}))) {
             // This rule will make the following inputs with
             // IsEquivalent rule obsolete.
             warningsList.push({
@@ -245,7 +245,7 @@ export class RatioExpressionInputValidationService {
             seenRuleType === 'HasNumberOfTermsEqualTo' &&
             hasLessNumberOfTerms(
               currentRuleType, seenRuleType,
-              <number[]> currentInput, <number> seenInput
+              currentInput as number[], seenInput as number
             )
           ) {
             // This rule will make the following inputs with

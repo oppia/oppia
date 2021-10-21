@@ -73,10 +73,10 @@ describe('Exploration stats back-end API service', () => {
     const req = (
       httpTestingController.expectOne('/improvements/exploration/eid'));
     expect(req.request.method).toEqual('GET');
-    req.flush(<ExplorationImprovementsResponseBackendDict>{
+    req.flush({
       open_tasks: [taskDict],
       resolved_task_types_by_state_name: {Introduction: ['high_bounce_rate']},
-    });
+    } as ExplorationImprovementsResponseBackendDict);
     flushMicrotasks();
 
     expect(await response).toEqual(
@@ -107,11 +107,11 @@ describe('Exploration stats back-end API service', () => {
       const req = httpTestingController.expectOne(
         '/improvements/history/exploration/eid');
       expect(req.request.method).toEqual('GET');
-      req.flush(<ExplorationImprovementsHistoryResponseBackendDict>{
+      req.flush({
         results: [taskDict],
         cursor: 'cursor123',
         more: true,
-      });
+      } as ExplorationImprovementsHistoryResponseBackendDict);
       flushMicrotasks();
 
       expect(await response).toEqual(
@@ -144,11 +144,11 @@ describe('Exploration stats back-end API service', () => {
     const req = httpTestingController.expectOne(
       '/improvements/history/exploration/eid?cursor=cursor123');
     expect(req.request.method).toEqual('GET');
-    req.flush(<ExplorationImprovementsHistoryResponseBackendDict>{
+    req.flush({
       results: [taskDict],
       cursor: 'cursor456',
       more: false,
-    });
+    } as ExplorationImprovementsHistoryResponseBackendDict);
     flushMicrotasks();
 
     expect(await response).toEqual(
@@ -211,14 +211,14 @@ describe('Exploration stats back-end API service', () => {
     const req = (
       httpTestingController.expectOne('/improvements/config/exploration/eid'));
     expect(req.request.method).toEqual('GET');
-    req.flush(<ExplorationImprovementsConfigBackendDict> {
+    req.flush({
       exploration_id: 'eid',
       exploration_version: 1,
       is_improvements_tab_enabled: true,
       high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.25,
       high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.20,
       high_bounce_rate_task_minimum_exploration_starts: 100,
-    });
+    } as ExplorationImprovementsConfigBackendDict);
     flushMicrotasks();
 
     expect(await response).toEqual(

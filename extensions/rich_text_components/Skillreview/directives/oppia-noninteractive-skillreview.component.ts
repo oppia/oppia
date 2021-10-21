@@ -87,8 +87,8 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   // RTE is inside a CKEditor instance, check if the offsetParent
   // element contains the data attribute ckeWidgetId.
   private _shouldOpenRTEModal(event: Event): boolean {
-    const target = <HTMLElement> event.currentTarget;
-    const offsetParent = <HTMLElement> target.offsetParent;
+    const target = event.currentTarget as HTMLElement;
+    const offsetParent = target.offsetParent as HTMLElement;
     return (
       Boolean(offsetParent.dataset.ckeWidgetId) ||
       this.ckEditorCopyContentService.copyModeActive

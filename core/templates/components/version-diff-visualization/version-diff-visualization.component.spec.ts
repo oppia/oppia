@@ -185,10 +185,10 @@ describe('VersionDiffVisualizationComponent', () => {
     }
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: MockComponentInstance,
         result: Promise.resolve()
-      });
+      }) as NgbModalRef;
     });
 
     ctrl.$onInit();
@@ -234,10 +234,10 @@ describe('VersionDiffVisualizationComponent', () => {
     }
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: MockComponentInstance,
         result: Promise.resolve()
-      });
+      }) as NgbModalRef;
     });
 
     ctrl.$onInit();
@@ -249,10 +249,10 @@ describe('VersionDiffVisualizationComponent', () => {
 
   it('should close state diff modal when user clicks cancel', () => {
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: {},
         result: Promise.reject()
-      });
+      }) as NgbModalRef;
     });
 
     ctrl.$onInit();

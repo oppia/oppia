@@ -131,9 +131,9 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   it('should open modal to save changes when user clicks topic name' +
   ' with unsaved changes', () => {
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
+      {
         result: Promise.resolve()
-      }
+      } as NgbModalRef
     );
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
@@ -145,9 +145,9 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
 
   it('should close save pending changes modal when user clicks cancel', () => {
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
+      {
         result: Promise.reject()
-      }
+      } as NgbModalRef
     );
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 

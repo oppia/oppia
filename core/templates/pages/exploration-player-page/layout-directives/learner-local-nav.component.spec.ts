@@ -144,10 +144,10 @@ describe('Learner Local Nav Component ', () => {
     'clicking on flag button', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: {},
           result: Promise.resolve()
-        });
+        }) as NgbModalRef;
     });
 
     component.showFlagExplorationModal();

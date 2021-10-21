@@ -62,10 +62,10 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
       if (opt?.beforeDismiss !== undefined) {
         setTimeout(opt.beforeDismiss);
       }
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
     });
 
     let suggestionType = 'edit_exploration_state_content';
@@ -87,10 +87,10 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
       if (opt?.beforeDismiss !== undefined) {
         setTimeout(opt.beforeDismiss);
       }
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
     });
 
     let suggestionType = 'invalidType';
@@ -112,10 +112,10 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
       if (opt?.beforeDismiss !== undefined) {
         setTimeout(opt.beforeDismiss);
       }
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.reject('cancel')
-        });
+        }) as NgbModalRef;
     });
 
     let suggestionType = 'edit_exploration_state_content';

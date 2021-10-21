@@ -78,13 +78,13 @@ export class StateInteractionStatsService {
   private getReadableAnswerString(
       state: State, answer: InteractionAnswer): InteractionAnswer {
     if (state.interaction.id === 'FractionInput') {
-      return Fraction.fromDict(<FractionAnswer> answer).toString();
+      return Fraction.fromDict(answer as FractionAnswer).toString();
     } else if (state.interaction.id === 'MultipleChoiceInput') {
       const customizationArgs = (
-        <MultipleChoiceInputCustomizationArgs>
-        state.interaction.customizationArgs);
+        state.interaction.customizationArgs
+      ) as MultipleChoiceInputCustomizationArgs;
       return customizationArgs.choices.value[
-        <MultipleChoiceAnswer> answer].html;
+        answer as MultipleChoiceAnswer].html;
     }
     return answer;
   }
@@ -104,12 +104,12 @@ export class StateInteractionStatsService {
     const statsPromise = (
       this.stateInteractionStatsBackendApiService.getStatsAsync(
         expId,
-        state.name)).then(vizInfo => <StateInteractionStats> {
+        state.name)).then(vizInfo => ({
           explorationId: expId,
           stateName: state.name,
-          visualizationsInfo: vizInfo.map(info => <VisualizationInfo> ({
+          visualizationsInfo: vizInfo.map(info => ({
             addressedInfoIsSupported: info.addressedInfoIsSupported,
-            data: info.data.map(datum => <AnswerData>{
+            data: info.data.map(datum => ({
               answer: this.getReadableAnswerString(state, datum.answer),
               frequency: datum.frequency,
               isAddressed: (
@@ -118,16 +118,15 @@ export class StateInteractionStatsService {
                   .isClassifiedExplicitlyOrGoesToNewState(
                     state.name, state, datum.answer, interactionRulesService) :
                 undefined)
-            }),
+            }) as AnswerData),
             id: info.id,
             options: info.options
-          })),
-        });
+          }) as VisualizationInfo),
+        }) as StateInteractionStats);
     this.statsCache.set(state.name, statsPromise);
     return statsPromise;
   }
 }
-
 angular.module('oppia').factory(
   'StateInteractionStatsService',
   downgradeInjectable(StateInteractionStatsService));

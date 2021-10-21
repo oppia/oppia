@@ -544,10 +544,10 @@ describe('Community lessons tab Component', () => {
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
-          });
+          }) as NgbModalRef;
       });
       const exp1 = {
         last_updated_msec: 1591296737470.528,
@@ -595,10 +595,10 @@ describe('Community lessons tab Component', () => {
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
-          });
+          }) as NgbModalRef;
       });
 
       const collection = {
@@ -638,10 +638,10 @@ describe('Community lessons tab Component', () => {
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
-          });
+          }) as NgbModalRef;
       });
       const exp1 = {
         last_updated_msec: 1591296737470.528,
@@ -689,10 +689,10 @@ describe('Community lessons tab Component', () => {
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
-          });
+          }) as NgbModalRef;
       });
 
       const collection = {

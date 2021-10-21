@@ -114,7 +114,7 @@ export class EditThumbnailModalComponent implements OnInit {
           img.naturalHeight || 150,
           img.naturalWidth || 300);
       };
-      this.imgSrc = <string>reader.result;
+      this.imgSrc = reader.result as string;
       this.updateBackgroundColor(this.tempBgColor);
       img.src = this.imgSrc;
       this.uploadedImage = this.imgSrc;

@@ -319,9 +319,9 @@ describe('Story editor navbar component', () => {
       .and.returnValue(mockStoryInitializedEventEmitter);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>({
+      return ({
         result: Promise.resolve('success')
-      });
+      } as NgbModalRef);
     });
 
     component.ngOnInit();
@@ -425,10 +425,10 @@ describe('Story editor navbar component', () => {
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve(commitMessage)
-          });
+          } as NgbModalRef);
       });
 
       component.ngOnInit();
@@ -470,10 +470,10 @@ describe('Story editor navbar component', () => {
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve(commitMessage)
-          });
+          } as NgbModalRef);
       });
 
       component.ngOnInit();
@@ -514,10 +514,10 @@ describe('Story editor navbar component', () => {
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject()
-          });
+          } as NgbModalRef);
       });
 
       component.ngOnInit();

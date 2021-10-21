@@ -48,31 +48,34 @@ describe('Exploration task model', () => {
   it('should return a high bounce rate task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        <ExplorationTaskBackendDict>newTaskEntryBackendDict('high_bounce_rate'))
+        newTaskEntryBackendDict(
+          'high_bounce_rate'
+        ) as ExplorationTaskBackendDict
+      )
     ).toBeInstanceOf(HighBounceRateTask);
   });
 
   it('should return a ineffective feedback loop task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        <ExplorationTaskBackendDict>newTaskEntryBackendDict(
-          'ineffective_feedback_loop'))
+        newTaskEntryBackendDict(
+          'ineffective_feedback_loop') as ExplorationTaskBackendDict)
     ).toBeInstanceOf(IneffectiveFeedbackLoopTask);
   });
 
   it('should return a needs guiding responses task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        <ExplorationTaskBackendDict>newTaskEntryBackendDict(
-          'needs_guiding_responses'))
+        newTaskEntryBackendDict(
+          'needs_guiding_responses') as ExplorationTaskBackendDict)
     ).toBeInstanceOf(NeedsGuidingResponsesTask);
   });
 
   it('should return a successive incorrect answers task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        <ExplorationTaskBackendDict>newTaskEntryBackendDict(
-          'successive_incorrect_answers'))
+        newTaskEntryBackendDict(
+          'successive_incorrect_answers') as ExplorationTaskBackendDict)
     ).toBeInstanceOf(SuccessiveIncorrectAnswersTask);
   });
 
@@ -99,8 +102,8 @@ describe('Exploration task model', () => {
   it('should throw an error if task type is unknown', () => {
     expect(
       () => ExplorationTaskModel.createFromBackendDict(
-        <ExplorationTaskBackendDict>newTaskEntryBackendDict(
-          'unknown_task_type'))
+        newTaskEntryBackendDict(
+          'unknown_task_type') as ExplorationTaskBackendDict)
     ).toThrowError(new RegExp(
       'Unsupported task type "unknown_task_type" for backend dict: ' +
       '{.*"task_type":"unknown_task_type".*}'));

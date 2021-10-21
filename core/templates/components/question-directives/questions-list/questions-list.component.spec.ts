@@ -869,10 +869,10 @@ describe('QuestionsListComponent', () => {
       others: [skillSummaryDict]
     });
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
+      {
         componentInstance: new MockNgbModalRef(),
         result: $q.resolve(skillSummaryDict)
-      }
+      } as NgbModalRef
     );
     spyOn(AlertsService, 'addInfoMessage');
 
@@ -910,10 +910,10 @@ describe('QuestionsListComponent', () => {
       others: [skillSummaryDict]
     });
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
+      {
         componentInstance: new MockNgbModalRef(),
         result: $q.resolve(skillSummaryDict)
-      }
+      } as NgbModalRef
     );
 
     ctrl.addSkill();
@@ -968,10 +968,10 @@ describe('QuestionsListComponent', () => {
       others: [skillSummaryDict]
     });
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
+      {
         componentInstance: new MockNgbModalRef(),
         result: $q.reject(skillSummaryDict)
-      }
+      } as NgbModalRef
     );
     spyOn(AlertsService, 'addInfoMessage');
 

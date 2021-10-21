@@ -51,8 +51,8 @@ angular.module('oppia').component('scoreRing', {
         }
       };
       ctrl.$onInit = function() {
-        circle = <SVGCircleElement>(
-          document.querySelector('.score-ring-circle'));
+        circle = (
+          document.querySelector('.score-ring-circle')) as SVGCircleElement;
         radius = circle.r.baseVal.value;
         circumference = (radius * 2 * Math.PI);
         circle.style.strokeDasharray = `${circumference} ${circumference}`;

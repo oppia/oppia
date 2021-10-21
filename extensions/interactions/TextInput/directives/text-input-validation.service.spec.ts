@@ -54,7 +54,7 @@ describe('TextInputValidationService', () => {
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
     let rowsSpecs = customizationArgSpecs[1];
-    const validators = <Validators[]>rowsSpecs.schema.validators;
+    const validators = rowsSpecs.schema.validators as Validators[];
     minRows = validators[0].min_value;
     maxRows = validators[1].max_value;
 

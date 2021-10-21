@@ -153,7 +153,7 @@ export class FractionInputValidationService {
         switch (rule.type) {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
-              var fractionDict = <FractionAnswer> rule.inputs.f;
+              var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm = Fraction.fromDict(
                 fractionDict).convertToSimplestForm();
               if (!angular.equals(fractionDict, fractionInSimplestForm)) {
@@ -169,7 +169,7 @@ export class FractionInputValidationService {
             }
             if (!allowImproperFraction) {
               var fraction: Fraction = Fraction.fromDict(
-                <FractionAnswer> rule.inputs.f);
+                rule.inputs.f as FractionAnswer);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -183,7 +183,7 @@ export class FractionInputValidationService {
             }
             if (!allowNonzeroIntegerPart) {
               var fraction: Fraction = Fraction.fromDict(
-                <FractionAnswer> rule.inputs.f);
+                rule.inputs.f as FractionAnswer);
               if (fraction.hasNonzeroIntegerPart()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -195,20 +195,20 @@ export class FractionInputValidationService {
                 });
               }
             }
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
           case 'IsEquivalentTo': // fall-through.
           case 'IsEquivalentToAndInSimplestForm':
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
           case 'IsGreaterThan':
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, Infinity, false, false);
             break;
           case 'IsLessThan':
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, -Infinity, f, false, false);
             break;
           case 'HasNumeratorEqualTo':
@@ -244,10 +244,10 @@ export class FractionInputValidationService {
                   'should be greater than zero.')
               });
             }
-            matchedDenominator.denominator = <number> rule.inputs.x;
+            matchedDenominator.denominator = rule.inputs.x as number;
             break;
           case 'HasFractionalPartExactlyEqualTo':
-            if ((<FractionAnswer> rule.inputs.f).wholeNumber !== 0) {
+            if ((rule.inputs.f as FractionAnswer).wholeNumber !== 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -256,7 +256,7 @@ export class FractionInputValidationService {
                   ' is invalid as integer part should be zero')
               });
             }
-            if ((<FractionAnswer> rule.inputs.f).isNegative !== false) {
+            if ((rule.inputs.f as FractionAnswer).isNegative) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -267,7 +267,7 @@ export class FractionInputValidationService {
             }
             if (!allowImproperFraction) {
               var fraction: Fraction = Fraction.fromDict(
-                <FractionAnswer> rule.inputs.f);
+                rule.inputs.f as FractionAnswer);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -304,7 +304,7 @@ export class FractionInputValidationService {
           if (matchedDenominators[k].denominator !== null &&
             rule.type === 'HasFractionalPartExactlyEqualTo') {
             if (matchedDenominators[k].denominator ===
-              (<FractionAnswer> rule.inputs.f).denominator) {
+              (rule.inputs.f as FractionAnswer).denominator) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (

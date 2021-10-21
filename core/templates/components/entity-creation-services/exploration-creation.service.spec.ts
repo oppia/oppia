@@ -154,11 +154,11 @@ describe('ExplorationCreationService', () => {
   describe('on calling showUploadExplorationModal', () => {
     it('should show upload exploration modal', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.resolve({
             yamlFile: ''
           })
-        }
+        } as NgbModalRef
       );
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.resolveTo('sample-csrf-token');
@@ -182,11 +182,11 @@ describe('ExplorationCreationService', () => {
     it('should show upload exploration modal and display alert if post' +
       ' request fails', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.resolve({
             yamlFile: ''
           })
-        }
+        } as NgbModalRef
       );
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.resolveTo('sample-csrf-token');

@@ -318,10 +318,10 @@ describe('Admin roles tab component ', function() {
       ngbModal = TestBed.inject(NgbModal);
       component.topicSummaries = [sampleTopicSummary];
       modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-        return <NgbModalRef>({
+        return ({
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(['topic_id_1'])
-        });
+        }) as NgbModalRef;
       });
     });
 

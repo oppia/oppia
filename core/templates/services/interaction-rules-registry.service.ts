@@ -139,8 +139,10 @@ export class InteractionRulesRegistryService {
       throw new Error('Unknown interaction ID: ' + interactionId);
     }
     return (
-      <InteractionRulesService> this.rulesServiceRegistry.get(
-        rulesServiceName));
+      this.rulesServiceRegistry.get(
+        rulesServiceName
+      ) as InteractionRulesService
+    );
   }
 }
 

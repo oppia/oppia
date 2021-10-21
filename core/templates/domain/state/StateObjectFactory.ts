@@ -136,8 +136,8 @@ export class State {
     // checking status of a state.
     if (
       !interactionId ||
-      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear ||
-      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear ||
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
     ) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {

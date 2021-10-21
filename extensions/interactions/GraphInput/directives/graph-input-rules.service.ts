@@ -152,13 +152,13 @@ export class GraphInputRulesService {
   }
 
   private _getDegreesOfMatrix(adj: AdjacencyMatrix): number[] {
-    return <number[]> adj.map((value) => {
+    return adj.map((value) => {
       return value.reduce((prev, cur) => {
         prev = (prev === null) ? 0 : prev;
         cur = (cur === null) ? 0 : cur;
         return prev + cur;
       });
-    }).sort();
+    }).sort() as number[];
   }
 
   private isIsomorphic(graph1: GraphAnswer, graph2: GraphAnswer): boolean {
@@ -189,7 +189,7 @@ export class GraphInputRulesService {
     while (permutation !== null) {
       var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
         graph2.vertices.every((vertex, index) => {
-          const _permutation = <number[]> permutation;
+          const _permutation = permutation as number[];
           return vertex.label === graph1.vertices[_permutation[index]].label;
         });
       if (doLabelsMatch &&

@@ -300,10 +300,10 @@ describe('Goals tab Component', () => {
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
     });
 
     component.removeFromLearnerGoals(

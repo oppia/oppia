@@ -208,7 +208,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                  * If form submission happens on existing element remove focus
                  * from it
                  */
-                (<HTMLElement>document.activeElement).blur();
+                (document.activeElement as HTMLElement).blur();
               }
             };
             ctrl.directiveSubscriptions.add(

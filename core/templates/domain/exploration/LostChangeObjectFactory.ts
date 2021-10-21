@@ -134,8 +134,8 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual(): boolean {
-    let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
-    let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
+    let newValueOutcome = (this.newValue as LostChangeValues).outcome;
+    let oldValueOutcome = (this.oldValue as LostChangeValues).outcome;
     if (
       newValueOutcome && newValueOutcome?.feedback &&
       oldValueOutcome && oldValueOutcome?.feedback
@@ -146,8 +146,8 @@ export class LostChange {
   }
 
   isOutcomeDestEqual(): boolean {
-    let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
-    let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
+    let newValueOutcome = (this.newValue as LostChangeValues).outcome;
+    let oldValueOutcome = (this.oldValue as LostChangeValues).outcome;
     if (newValueOutcome && oldValueOutcome) {
       return newValueOutcome?.dest === oldValueOutcome?.dest;
     }
@@ -155,13 +155,14 @@ export class LostChange {
   }
 
   isDestEqual(): boolean {
-    return (<LostChangeValues> this.oldValue).dest ===
-      (<LostChangeValues> this.newValue).dest;
+    let newValueDest = (this.newValue as LostChangeValues).dest;
+    let oldValueDest = (this.oldValue as LostChangeValues).dest;
+    return newValueDest === oldValueDest;
   }
 
   isFeedbackEqual(): boolean {
-    let newValueFeedback = (<LostChangeValues> this.newValue).feedback;
-    let oldValueFeedback = (<LostChangeValues> this.oldValue).feedback;
+    let newValueFeedback = (this.newValue as LostChangeValues).feedback;
+    let oldValueFeedback = (this.oldValue as LostChangeValues).feedback;
     if (newValueFeedback && oldValueFeedback) {
       return newValueFeedback?.html === oldValueFeedback?.html;
     }
@@ -170,8 +171,8 @@ export class LostChange {
 
   isRulesEqual(): boolean {
     return isEqual(
-      (<LostChangeValues> this.newValue).rules,
-      (<LostChangeValues> this.oldValue).rules);
+      (this.newValue as LostChangeValues).rules,
+      (this.oldValue as LostChangeValues).rules);
   }
 
   // Detects whether an object of the type 'answer_group' or

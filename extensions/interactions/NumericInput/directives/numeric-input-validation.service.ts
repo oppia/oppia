@@ -124,13 +124,13 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = (<number>rule.inputs.x);
+            var x = rule.inputs.x as number;
             setLowerAndUpperBounds(range, x, x, true, true);
             raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsInclusivelyBetween':
-            var a = <number> rule.inputs.a;
-            var b = <number> rule.inputs.b;
+            var a = rule.inputs.a as number;
+            var b = rule.inputs.b as number;
             if (a > b) {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
@@ -148,26 +148,26 @@ export class NumericInputValidationService {
             }
             break;
           case 'IsGreaterThan':
-            var x = (<number>rule.inputs.x);
+            var x = rule.inputs.x as number;
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = (<number>rule.inputs.x);
+            var x = rule.inputs.x as number;
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = (<number>rule.inputs.x);
+            var x = rule.inputs.x as number;
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = (<number>rule.inputs.x);
+            var x = rule.inputs.x as number;
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsWithinTolerance':
-            var x = (<number>rule.inputs.x);
-            var tol = (<number>rule.inputs.tol);
+            var x = rule.inputs.x as number;
+            var tol = rule.inputs.tol as number;
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             if (
               (x + tol) < 0 &&

@@ -287,9 +287,9 @@ describe('HintAndSolutionButtonsComponent', () => {
   it('should display hint modal when user clicks on hints icon',
     fakeAsync(() => {
       spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.resolve('success')
-        }
+        } as NgbModalRef
       );
 
       expect(component.activeHintIndex).toBe(undefined);
@@ -304,9 +304,9 @@ describe('HintAndSolutionButtonsComponent', () => {
   it('should close display hint modal and reset active hint index when modal' +
     ' is closed', fakeAsync(() => {
     spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue(
-      <NgbModalRef>{
+      {
         result: Promise.reject('failure')
-      }
+      } as NgbModalRef
     );
 
     expect(component.activeHintIndex).toBe(undefined);
@@ -329,9 +329,9 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('state1');
     spyOn(hintAndSolutionModalService, 'displaySolutionModal').and.returnValue(
-      <NgbModalRef>{
+      {
         result: Promise.resolve('success')
-      }
+      } as NgbModalRef
     );
 
     expect(component.solutionModalIsActive).toBe(false);
@@ -351,9 +351,9 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('state1');
     spyOn(hintAndSolutionModalService, 'displaySolutionModal').and.returnValue(
-      <NgbModalRef>{
+      {
         result: Promise.reject()
-      }
+      } as NgbModalRef
     );
 
     component.onClickSolutionButton();
@@ -369,9 +369,9 @@ describe('HintAndSolutionButtonsComponent', () => {
       false);
     spyOn(hintAndSolutionModalService, 'displaySolutionInterstitialModal')
       .and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.resolve('success')
-        }
+        } as NgbModalRef
       );
     spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 
@@ -387,9 +387,9 @@ describe('HintAndSolutionButtonsComponent', () => {
       false);
     spyOn(hintAndSolutionModalService, 'displaySolutionInterstitialModal')
       .and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.reject('failure')
-        }
+        } as NgbModalRef
       );
     spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 

@@ -32,7 +32,7 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
   controller: ['$scope', '$uibModal', 'UtilsService',
     function($scope, $uibModal, UtilsService) {
       this.$onInit = () => {
-        const data = <AnswerStats[]> $scope.data;
+        const data = $scope.data as AnswerStats[];
         const totalFrequency = (
           $scope.totalFrequency || sum(data, a => a.frequency));
 

@@ -379,7 +379,7 @@ describe('retrieving threads service', () => {
     expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
     threadDataBackendApiService.createNewThreadAsync(subject, 'Text').then(
       threadData => {
-        const data = <SuggestionAndFeedbackThreads>threadData;
+        const data = threadData as SuggestionAndFeedbackThreads;
         expect(data.feedbackThreads.length).toEqual(1);
         expect(data.feedbackThreads[0].threadId)
           .toEqual('exploration.exp1.jkl1');

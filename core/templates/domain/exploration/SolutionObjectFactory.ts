@@ -94,20 +94,20 @@ export class Solution {
       correctAnswer = '[Graph]';
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
-      correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;
+      correctAnswer = (this.correctAnswer as PencilCodeEditorAnswer).code;
     } else if (interactionId === 'MusicNotesInput') {
       correctAnswer = '[Music Notes]';
     } else if (interactionId === 'FractionInput') {
       correctAnswer = Fraction.fromDict(
-        <FractionAnswer> this.correctAnswer).toString();
+        this.correctAnswer as FractionAnswer).toString();
     } else if (interactionId === 'NumberWithUnits') {
       correctAnswer = (new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory())).fromDict(
-          <NumberWithUnitsAnswer> this.correctAnswer).toString();
+          this.correctAnswer as NumberWithUnitsAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       const formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];
-      for (const arr of <DragAndDropAnswer> this.correctAnswer) {
+      for (const arr of this.correctAnswer as DragAndDropAnswer) {
         const transformedArray = [];
         for (const elem of arr) {
           transformedArray.push(formatRtePreview.transform(elem));

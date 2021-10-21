@@ -71,12 +71,12 @@ export class NumericExpressionInputValidationService {
     for (let i = 0; i < answerGroups.length; i++) {
       let rules = answerGroups[i].rules;
       for (let j = 0; j < rules.length; j++) {
-        let currentInput = <string> rules[j].inputs.x;
-        let currentRuleType = <string> rules[j].type;
+        let currentInput = rules[j].inputs.x as string;
+        let currentRuleType = rules[j].type as string;
 
         for (let seenRule of seenRules) {
-          let seenInput = <string> seenRule.inputs.x;
-          let seenRuleType = <string> seenRule.type;
+          let seenInput = seenRule.inputs.x as string;
+          let seenRuleType = seenRule.type as string;
 
           if (seenRuleType === 'IsEquivalentTo' && (
             algebraicRulesService.IsEquivalentTo(

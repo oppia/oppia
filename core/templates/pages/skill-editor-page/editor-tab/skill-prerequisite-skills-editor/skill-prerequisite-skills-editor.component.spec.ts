@@ -283,12 +283,12 @@ describe('Skill editor main tab directive', function() {
     it('should show info message if we try ' +
       'to add a prerequisite skill to itself', fakeAsync(function() {
       spyOn(ngbModal, 'open').and.callFake(() => {
-        return <NgbModalRef>({
+        return ({
           componentInstance: {},
           result: Promise.resolve({
             id: 'skill1'
           })
-        });
+        }) as NgbModalRef;
       });
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
         .and.returnValue(null);
@@ -304,12 +304,12 @@ describe('Skill editor main tab directive', function() {
     it('should show info message if we try to add a prerequisite ' +
       'skill which has already been added', fakeAsync(function() {
       spyOn(ngbModal, 'open').and.callFake(() => {
-        return <NgbModalRef>({
+        return ({
           componentInstance: {},
           result: Promise.resolve({
             id: 'skill_1'
           })
-        });
+        }) as NgbModalRef;
       });
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
         .and.returnValue(null);
@@ -325,12 +325,12 @@ describe('Skill editor main tab directive', function() {
     it('should add skill sucessfully when calling ' +
       '\'addSkill\'', fakeAsync(function() {
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-        return <NgbModalRef>({
+        return ({
           componentInstance: {},
           result: Promise.resolve({
             id: 'skillId'
           })
-        });
+        }) as NgbModalRef;
       });
       $scope.skill = sampleSkill;
       $scope.addSkill();

@@ -84,8 +84,8 @@ export class SetInputValidationService {
   private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
       this.areSameSet(
-        (<TranslatableSetOfUnicodeString>ruleA.inputs.x).unicodeStrSet,
-        (<TranslatableSetOfUnicodeString>ruleB.inputs.x).unicodeStrSet);
+        (ruleA.inputs.x as TranslatableSetOfUnicodeString).unicodeStrSet,
+        (ruleB.inputs.x as TranslatableSetOfUnicodeString).unicodeStrSet);
   }
 
   getCustomizationArgsWarnings(
@@ -142,9 +142,9 @@ export class SetInputValidationService {
                 depending on their rule types.
             */
             let isRuleCoveredByAnyPrevRule = false;
-            let ruleInput = <TranslatableSetOfUnicodeString>rule.inputs.x;
+            let ruleInput = rule.inputs.x as TranslatableSetOfUnicodeString;
             let prevRuleInput = (
-              <TranslatableSetOfUnicodeString>prevRule.rule.inputs.x);
+              prevRule.rule.inputs.x as TranslatableSetOfUnicodeString);
             switch (rule.type) {
               case 'Equals':
                 // An 'Equals' rule is made redundant by another only when

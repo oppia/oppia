@@ -110,17 +110,18 @@ export class ExpressionEvaluatorService {
       }
 
       if (parsed[0] === '#') {
-        const varName = <string> parsed[1];
+        const varName = parsed[1] as string;
         return (
-          <Expr> this.expressionSyntaxTreeService.lookupEnvs(varName, envs));
+          this.expressionSyntaxTreeService.lookupEnvs(varName, envs) as Expr);
       }
 
       // Otherwise, this must be a function/operator expression.
-      const funcName = <string> parsed[0];
+      const funcName = parsed[0] as string;
       const funcArgs = parsed.slice(1).map(item => this.evaluate(item, envs));
-      const funcEnvs = <SystemEnv> this.expressionSyntaxTreeService.lookupEnvs(
-        funcName, envs);
-      return funcEnvs.eval(<string[]> funcArgs);
+      const funcEnvs = this.expressionSyntaxTreeService.lookupEnvs(
+        funcName, envs
+      ) as SystemEnv;
+      return funcEnvs.eval(funcArgs as string[]);
     }
 
     // This should be a terminal node with an actual value.

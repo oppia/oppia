@@ -245,10 +245,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       });
     };
     for (let i of Object.keys(editable)) {
-      (<HTMLElement>editable[i]).onchange = () => {
+      (editable[i] as HTMLElement).onchange = () => {
         resize();
       };
-      (<HTMLElement>editable[i]).onclick = () => {
+      (editable[i] as HTMLElement).onclick = () => {
         resize();
       };
     }
@@ -301,7 +301,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     const sharedSpaces = {
       top: (
-          <HTMLElement> this.elementRef.nativeElement.children[0].children[0])
+        this.elementRef.nativeElement.children[0].children[0] as HTMLElement)
     };
 
     const ckConfig = this._createCKEditorConfig(
@@ -310,10 +310,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     // Initialize CKEditor.
     var ck = CKEDITOR.inline(
-            <HTMLElement>(
-              this.elementRef.nativeElement.children[0].children[1]
-              ),
-            ckConfig
+      (
+        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
+      ),
+      ckConfig
     );
 
     // Hide the editor until it is fully loaded after `instanceReady`
@@ -328,11 +328,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
       (
-        <HTMLElement> this.elementRef.nativeElement
+        this.elementRef.nativeElement as HTMLElement
       ).setAttribute('style', 'display: block');
       // Focus on the CK editor text box.
       (
-        <HTMLElement> this.elementRef.nativeElement.children[0].children[1]
+        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
       ).focus();
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);

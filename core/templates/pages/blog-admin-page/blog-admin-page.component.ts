@@ -112,7 +112,7 @@ export class BlogAdminPageComponent implements OnInit {
       // Update role button will not be enabled if 'newRole' is 'null'.
       // hence whenever this method is called 'newRole' will exist and
       // we can safely typecast it to a 'string'.
-      <string>formResponse.newRole, formResponse.username,
+      formResponse.newRole as string, formResponse.username,
     ).then(() => {
       this.statusMessage = (
         'Role of ' + formResponse.username + ' successfully updated to ' +
@@ -181,7 +181,7 @@ export class BlogAdminPageComponent implements OnInit {
     this.statusMessage = 'Saving...';
 
     this.adminTaskManagerService.startTask();
-    let newConfigPropertyValues = <ConfigPropertyValuesRecord> {};
+    let newConfigPropertyValues = {} as ConfigPropertyValuesRecord;
     for (let property in this.configProperties) {
       const prop = property as keyof ConfigPropertyValues;
       newConfigPropertyValues[prop] = this.configProperties[prop].value;

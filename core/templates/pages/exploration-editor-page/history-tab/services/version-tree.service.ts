@@ -65,7 +65,7 @@ export class VersionTreeService {
           if (this._snapshots[versionNum].commit_cmds[i].cmd ===
               'AUTO_revert_version_number') {
             this._treeParents[versionNum] =
-              (<RevertChangeList> this._snapshots[versionNum].commit_cmds[i])
+              (this._snapshots[versionNum].commit_cmds[i] as RevertChangeList)
                 .version_number;
           }
         }

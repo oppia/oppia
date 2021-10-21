@@ -208,7 +208,8 @@ export class StoryEditorStateService {
     this._storyIsBeingSaved = true;
     this.editableStoryBackendApiService.updateStoryAsync(
       this._story.getId(), this._story.getVersion(), commitMessage,
-      <StoryChange[]> this.undoRedoService.getCommittableChangeList()).then(
+      this.undoRedoService.getCommittableChangeList() as StoryChange[]
+    ).then(
       (storyBackendObject) => {
         this._updateStory(storyBackendObject);
         this.undoRedoService.clearChanges();

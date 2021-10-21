@@ -101,8 +101,8 @@ export class DragAndDropSortInputValidationService {
 
     var checkRedundancy = (earlierRule: Rule, laterRule: Rule) => {
       var noOfMismatches = 0;
-      var inputs = <string[][]> earlierRule.inputs.x;
-      var answer = <string[][]> laterRule.inputs.x;
+      var inputs = earlierRule.inputs.x as string[][];
+      var answer = laterRule.inputs.x as string[][];
       for (var i = 0; i < Math.min(inputs.length, answer.length); i++) {
         for (var j = 0; j < Math.max(answer[i].length, inputs[i].length);
           j++) {
@@ -126,7 +126,7 @@ export class DragAndDropSortInputValidationService {
         var inputs = rules[j].inputs;
         var rule = rules[j];
         if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
-          var xInputs = <string[][]>inputs.x;
+          var xInputs = inputs.x as string[][];
           for (var k = 0; k < xInputs.length; k++) {
             if (xInputs[k].length > 1) {
               warningsList.push({
@@ -159,7 +159,7 @@ export class DragAndDropSortInputValidationService {
 
         switch (rule.type) {
           case 'HasElementXAtPositionY':
-            if (!choiceContentIdToHtml.hasOwnProperty(<string>inputs.x)) {
+            if (!choiceContentIdToHtml.hasOwnProperty(inputs.x as string)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -188,8 +188,9 @@ export class DragAndDropSortInputValidationService {
               });
             }
             if (
-              !choiceContentIdToHtml.hasOwnProperty(<string>inputs.x) ||
-              !choiceContentIdToHtml.hasOwnProperty(<string>inputs.y)) {
+              !choiceContentIdToHtml.hasOwnProperty(inputs.x as string) ||
+              !choiceContentIdToHtml.hasOwnProperty(inputs.y as string)
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -201,7 +202,7 @@ export class DragAndDropSortInputValidationService {
             break;
           case 'IsEqualToOrdering':
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
-            var xInputs = <string[][]>inputs.x;
+            var xInputs = inputs.x as string[][];
             for (var k = 0; k < xInputs.length; k++) {
               if (xInputs[k].length === 0) {
                 areAnyItemsEmpty = true;
