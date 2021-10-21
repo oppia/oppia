@@ -29,6 +29,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   @Input() currentGoals: LearnerTopicSummary[];
+  @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
   @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
   @Input() username: string;
   CLASSROOM_LINK_URL_TEMPLATE = '/learn/<classroom_url_fragment>';
@@ -36,6 +37,7 @@ export class HomeTabComponent {
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   width: number;
+  continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
 
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -44,6 +46,18 @@ export class HomeTabComponent {
 
   ngOnInit(): void {
     this.width = this.widthConst * (this.currentGoals.length);
+    var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
+    if (allGoals.length !== 0) {
+      var allGoalIds = [];
+      for (var goal of allGoals) {
+        allGoalIds.push(goal.id);
+      }
+      var uniqueGoalIds = Array.from(new Set(allGoalIds));
+      for (var uniqueGoalId of uniqueGoalIds) {
+        var index = allGoalIds.indexOf(uniqueGoalId);
+        this.continueWhereYouLeftOffList.push(allGoals[index]);
+      }
+    }
   }
 
   getTimeOfDay(): string {

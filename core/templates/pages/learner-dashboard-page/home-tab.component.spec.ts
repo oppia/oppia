@@ -113,6 +113,7 @@ describe('Home tab Component', () => {
     };
     component.currentGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1)];
+    component.partiallyLearntTopicsList = [];
     component.untrackedTopics = {};
     component.username = 'username';
     fixture.detectChanges();
