@@ -1,0 +1,29 @@
+<div class="modal-body oppia-welcome-modal-container oppia-long-text protractor-test-welcome-modal">
+  <div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+      <h1 class="oppia-welcome-modal-h1">Welcome!</h1>
+      <p class="oppia-welcome-modal-p">
+        It looks like you're new to creating explorations.
+      </p>
+      <p class="oppia-welcome-modal-p">
+        Would you like an introduction to creating in Oppia?
+      </p>
+
+      <button type="button"
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-start-tutorial oppia-autofocus oppia-welcome-modal-left-button"
+              (click)="confirm(explorationId)" autofocus>
+        Yes, please!
+      </button>
+
+      <button type="button"
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-dismiss-welcome-modal"
+              (click)="cancel(explorationId)">
+        Nope, take me to the editor
+      </button>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
+      <img class="oppia-welcome-modal-img" [src]="editorWelcomeImgUrl">
+    </div>
+  </div>
+</div>

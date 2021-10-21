@@ -31,6 +31,7 @@ import string
 import sys
 import time
 import unicodedata
+import urllib
 import zlib
 
 from core import feconf
@@ -327,8 +328,7 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
-            PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
+            PNG_DATA_URL_PREFIX, urllib.parse.quote(base64.b64encode(content))
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -395,11 +395,11 @@ def set_url_query_parameter(
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = python_utils.url_split(url) # type: ignore[no-untyped-call]
+    scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
     query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
+    new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
     return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
         (scheme, netloc, path, new_query_string, fragment))

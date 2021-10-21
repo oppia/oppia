@@ -23,6 +23,7 @@ import base64
 import copy
 import datetime
 import os
+import urllib
 
 from core import feconf
 from core import python_utils
@@ -41,7 +42,7 @@ class UtilsTests(test_utils.GenericTestBase):
         alist = ['a', 'b', 'c', 'd']
         results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
 
-        for i in python_utils.RANGE(len(alist) + 1):
+        for i in range(len(alist) + 1):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
 
@@ -703,7 +704,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_grouper(self) -> None:
         self.assertEqual(
-            [list(g) for g in utils.grouper(python_utils.RANGE(7), 3)],
+            [list(g) for g in utils.grouper(range(7), 3)],
             [[0, 1, 2], [3, 4, 5], [6, None, None]])
         # Returns an iterable of iterables, so we need to combine them into
         # strings for easier comparison.
@@ -733,7 +734,8 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary(self) -> None:
         image_data_url = '%s%s' % (
             utils.PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(b'test123'))) # type: ignore[no-untyped-call]
+            urllib.parse.quote(base64.b64encode(b'test123'))
+        )
 
         self.assertEqual(
             utils.convert_png_data_url_to_binary(image_data_url), b'test123')
@@ -741,7 +743,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
             self
     ) -> None:
-        image_data_url = python_utils.url_quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
+        image_data_url = urllib.parse.quote(base64.b64encode(b'test123'))
 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG data URL.',

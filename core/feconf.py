@@ -881,6 +881,8 @@ LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data')
+LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
+    '/learnerdashboardfeedbackupdateshandler/data')
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
@@ -1130,6 +1132,7 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 USER_FILTER_CRITERION_ROLE = 'role'
 USER_FILTER_CRITERION_USERNAME = 'username'
 
+# Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
@@ -1249,10 +1252,6 @@ CLOUD_DATASTORE_EMULATOR_PORT = 8089
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 FIREBASE_EMULATOR_PORT = 9099
 
-# The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live on in the
-# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
-FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
 # duration expires, a new cookie will need to be generated. Generating a new
 # cookie requires the user to sign-in _explicitly_.

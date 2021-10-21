@@ -29,6 +29,7 @@ from __future__ import unicode_literals
 
 import numbers
 import re
+import urllib
 
 from core import feconf
 from core import python_utils
@@ -274,7 +275,7 @@ def get_validator(validator_id: str) -> Callable[..., bool]:
     return _Validators.get(validator_id)
 
 
-class Normalizers(python_utils.OBJECT):
+class Normalizers:
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -329,9 +330,9 @@ class Normalizers(python_utils.OBJECT):
         """
         if obj == '':
             return obj
-        url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
+        url_components = urllib.parse.urlsplit(obj)
         quoted_url_components = (
-            python_utils.url_quote(component) for component in url_components) # type: ignore[no-untyped-call]
+            urllib.parse.quote(component) for component in url_components)
         raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
 
         acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
@@ -356,7 +357,7 @@ class Normalizers(python_utils.OBJECT):
         return ' '.join(obj.split())
 
 
-class _Validators(python_utils.OBJECT):
+class _Validators:
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is
@@ -415,6 +416,21 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object has at most `max_value` elements.
         """
         return len(obj) <= max_value
+
+    @staticmethod
+    def has_length(obj: List[str], value: int) -> bool:
+        """Returns True iff the given object (a list) has exact
+        `value` elements.
+
+        Args:
+            obj: list(str). A list of strings.
+            value: int. The number of elements that `obj` should
+                contain.
+
+        Returns:
+            bool. Whether the given object has exact `value` elements.
+        """
+        return len(obj) == value
 
     @staticmethod
     def is_nonempty(obj: str) -> bool:

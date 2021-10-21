@@ -42,7 +42,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def setUp(self):
         super(CustomLintChecksManagerTests, self).setUp()
         self.verbose_mode_enabled = False
-        self.manifest_file = python_utils.string_io(
+        self.dependencies_file = python_utils.string_io(
             buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":'
             '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
             ',\"midiJs\":{\"version\": \"0.4\"}}}}')
@@ -55,8 +55,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts'
         ]
         def mock_open_file(path, unused_permissions):
-            if path == other_files_linter.MANIFEST_JSON_FILE_PATH:
-                return self.manifest_file
+            if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
+                return self.dependencies_file
             elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
                 return self.package_file
         def mock_listdir(unused_path):

@@ -55,11 +55,10 @@
       <div class="skill-question-container">
         <div><span class="headings">Preview</span></div>
         <div class="preview-box" ng-if="$ctrl.displayCardIsInitialized">
-          <tutor-card displayed-card="$ctrl.displayedCard"
-                      avatar-image-is-shown="false"
-                      is-learn-again-button="$ctrl.isLearnAgainButton()"
-                      start-card-change-animation="false">
-          </tutor-card>
+          <oppia-tutor-card [displayed-card]="$ctrl.displayedCard"
+                            [avatar-image-is-shown]="false"
+                            [start-card-change-animation]="false">
+          </oppia-tutor-card>
         </div>
       </div>
     </div>
