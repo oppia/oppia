@@ -53,8 +53,11 @@ describe('Question player state service', () => {
     expect(qpss.questionPlayerState[questionId].answers.length).toEqual(1);
   });
 
-  it('should test getters', () => {
+  it('should get question player state data', () => {
     expect(qpss.getQuestionPlayerStateData()).toBeDefined();
+  });
+
+  it('should access on question session completed', () => {
     expect(qpss.onQuestionSessionCompleted).toBeDefined();
   });
 });
