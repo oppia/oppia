@@ -3181,7 +3181,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 
         (
             call1, call2,
-            call4, call5
+            call3, call4
             ) = astroid.extract_node(
                 """
         datetime.datetime.now() #@
@@ -3206,7 +3206,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 
         message_replace_disallowed_next = testutils.Message(
             msg_id='replace-disallowed-function-calls',
-            node=call4,
+            node=call3,
             args=('b.next', 'python_utils.NEXT'),
             confidence=interfaces.UNDEFINED
         )
@@ -3218,8 +3218,10 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)
+
+        with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_call(call4)
-            self.checker_test_object.checker.visit_call(call5)
 
     def test_disallowed_removals_regex(self):
         (
