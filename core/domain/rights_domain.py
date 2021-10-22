@@ -64,10 +64,10 @@ class ActivityRights:
             editor_ids: List[str],
             voice_artist_ids: List[str],
             viewer_ids: List[str],
-            community_owned: Optional[bool]=False,
+            community_owned: bool=False,
             cloned_from: Optional[str]=None,
-            status: Optional[str]=ACTIVITY_STATUS_PRIVATE,
-            viewable_if_private: Optional[bool]=False,
+            status: str=ACTIVITY_STATUS_PRIVATE,
+            viewable_if_private: bool=False,
             first_published_msec: Optional[str]=None) -> None:
         self.id = exploration_id
         self.owner_ids = owner_ids
