@@ -18,8 +18,6 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-require('directives/angular-html-bind.directive');
-
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
 angular.module('oppia').directive('angularHtmlBind', [
