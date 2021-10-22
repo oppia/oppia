@@ -36,12 +36,12 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('practiceSessionPage', {
   template: require('./practice-session-page.component.html'),
   controller: [
-    '$http', 'PageTitleService', 'UrlInterpolationService', 'UrlService',
-    'PRACTICE_SESSIONS_DATA_URL', '$window', 'PRACTICE_SESSIONS_URL',
+    '$http', '$window', 'PageTitleService', 'UrlInterpolationService',
+    'UrlService', 'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
     'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
     function(
-        $http, PageTitleService, UrlInterpolationService, UrlService,
-        PRACTICE_SESSIONS_DATA_URL, $window, PRACTICE_SESSIONS_URL,
+        $http, $window, PageTitleService, UrlInterpolationService,
+        UrlService, PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
         TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
       var ctrl = this;
       var _fetchSkillDetails = function() {
@@ -104,7 +104,7 @@ angular.module('oppia').component('practiceSessionPage', {
             'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
-      $window.addEventListener('beforeunload', function (e) {
+      $window.addEventListener('beforeunload', function(e) {
         e.preventDefault();
         e.returnValue = '';
       });
