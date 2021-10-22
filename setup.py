@@ -21,8 +21,11 @@ The package is built by running 'python setup.py sdist' in the build.py.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+
 import pkg_resources
 import setuptools
+
 
 # Configure the required packages and scripts to install.
 with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
@@ -35,7 +38,7 @@ with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: d
 
 setuptools.setup(
     name='oppia-beam-job',
-    version='0.0.1',
+    version=feconf.OPPIA_VERSION,
     description='Oppia Apache Beam package',
     install_requires=REQUIRED_PACKAGES,
     packages=setuptools.find_packages(),

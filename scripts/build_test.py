@@ -764,9 +764,10 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": true,\n')
-            tmp.write(u'};')
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": true,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
@@ -781,6 +782,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -793,6 +795,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -811,9 +814,10 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": false,\n')
-            tmp.write(u'};')
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": false,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
@@ -828,6 +832,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
