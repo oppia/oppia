@@ -32,7 +32,7 @@ import { DisplaySolutionModalComponent } from './display-solution-modal.componen
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { AudioTranslationLanguageService } from 'services/audio-translation-language.service';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 let MockAngularHtmlBindWrapperDirective = function(
     options: Component): Directive {
