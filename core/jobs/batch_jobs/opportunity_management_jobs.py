@@ -38,7 +38,7 @@ from core.platform import models
 import apache_beam as beam
 
 import result
-from typing import Dict, List, Union
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -82,11 +82,8 @@ class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
 
         return (
             exp_opportunity_summary_model
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda n: n > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda n: job_run_result.JobRunResult(stdout='SUCCESS: %s' % n))
+            | 'Create job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
         )
 
 

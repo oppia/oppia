@@ -19,55 +19,66 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import feconf
-from core.jobs import job_utils
 from core.jobs.types import job_run_result
-from core.platform import models
 
 import apache_beam as beam
-from apache_beam import pvalue
-from apache_beam.io.gcp.datastore.v1new import datastoreio
-
 import result
-from typing import Optional, Tuple
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-
-datastore_services = models.Registry.import_datastore_services()
+from typing import Any, Optional, Tuple
 
 
-class ResultsToJobRunResults(beam.PTransform): # type: ignore[misc]
+class ResultsToJobRunResults(beam.PTransform):
     """Transforms result.Result into job_run_result.JobRunResult."""
 
     def __init__(
         self, prefix: Optional[str] = None, label: Optional[str] = None
     ) -> None:
-        """Initializes the GetModels PTransform.
+        """Initializes the ResultsToJobRunResults PTransform.
 
         Args:
-            prefix: str. The prefix for the result string.
+            prefix: str|None. The prefix for the result string.
             label: str|None. The label of the PTransform.
         """
         super().__init__(label=label)
         self.prefix = '%s ' % prefix if prefix else ''
 
+    # This is needed because the Beam annotations validator doesn't properly
+    # work with result.Result.
+    @beam.typehints.no_annotations
     def _transform_result_to_job_run_result(
-        self, result: result.Result
+        self, result_item: result.Result[Any, Any]
     ) -> job_run_result.JobRunResult:
-        if result.is_ok():
+        """Transforms Result objects into JobRunResult objects. When the result
+        is Ok then transform it into stdout, if the result is Err transform it
+        into stderr.
+
+        Args:
+            result_item: Result. The result object.
+
+        Returns:
+            JobRunResult. The JobRunResult object.
+        """
+        if isinstance(result_item, result.Ok):
             return job_run_result.JobRunResult.as_stdout(
                 '%sSUCCESS:' % self.prefix
             )
         else:
             return job_run_result.JobRunResult.as_stderr(
-                '%sERROR: "%s":' % (self.prefix, result.value)
+                '%sERROR: "%s":' % (self.prefix, result_item.value)
             )
 
+    @staticmethod
     def _add_count_to_job_run_result(
-         self, job_result_and_count: Tuple[job_run_result.JobRunResult, int]
+        job_result_and_count: Tuple[job_run_result.JobRunResult, int]
     ) -> job_run_result.JobRunResult:
+        """Adds count to the stdout or stderr of the JobRunResult.
+
+        Args:
+            job_result_and_count: tuple(JobRunResult, int). Tuple containing
+                unique JobRunResult and their counts.
+
+        Returns:
+            JobRunResult. JobRunResult objects with counts added.
+        """
         job_result, count = job_result_and_count
         if job_result.stdout:
             job_result.stdout += ' %s' % str(count)
@@ -75,15 +86,64 @@ class ResultsToJobRunResults(beam.PTransform): # type: ignore[misc]
             job_result.stderr += ' %s' % str(count)
         return job_result
 
+    # This is needed because the Beam annotations validator doesn't properly
+    # work with result.Result.
+    @beam.typehints.no_annotations
     def expand(
-        self, results: beam.PCollection[result.Result]
+        self, results: beam.PCollection[result.Result[Any, Any]]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
-        """"""
+        """Transforms Result objects into unique JobRunResult objects and
+        adds counts to them.
+
+        Args:
+            results: PCollection. Sequence of Result objects.
+
+        Returns:
+            PCollection. Sequence of unique JobRunResult objects with count.
+        """
         return (
             results
             | 'Transform result to job run result' >> beam.Map(
                 self._transform_result_to_job_run_result)
-            | 'Count all new models' >> beam.combiners.Count.PerElement()
+            | 'Count all elements' >> beam.combiners.Count.PerElement()
             | 'Add count to job run result' >> beam.Map(
                 self._add_count_to_job_run_result)
+        )
+
+
+class CountObjectsToJobRunResult(beam.PTransform):
+    """Count sequence of any object into job_run_result.JobRunResult."""
+
+    def __init__(
+        self, prefix: Optional[str] = None, label: Optional[str] = None
+    ) -> None:
+        """Initializes the ResultsToJobRunResults PTransform.
+
+        Args:
+            prefix: str|None. The prefix for the result string.
+            label: str|None. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self.prefix = '%s ' % prefix if prefix else ''
+
+    def expand(
+        self, objects: beam.PCollection[Any]
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Counts items in collection into a job run result.
+
+        Args:
+            objects: PCollection. Sequence of any objects.
+
+        Returns:
+            PCollection. Sequence of one JobRunResult with count.
+        """
+        return (
+            objects
+            | 'Count all new models' >> beam.combiners.Count.Globally()
+            | 'Only create result for non-zero number of objects' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Add count to job run result' >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    '%sSUCCESS: %s' % (self.prefix, object_count)
+                ))
         )
