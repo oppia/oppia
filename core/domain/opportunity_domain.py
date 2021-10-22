@@ -24,10 +24,15 @@ from core import utils
 from core.constants import constants
 
 from typing import Dict, List
-from typing_extensions import TypedDict
+import typing_extensions
 
 
-class ExplorationOpportunitySummaryDict(TypedDict, total=False):
+class ExplorationOpportunitySummaryDict(
+    typing_extensions.TypedDict, total=False
+):
+    """A dictionary representing ExplorationOpportunitySummary object.
+    """
+
     id: str
     topic_id: str
     topic_name: str
@@ -42,7 +47,10 @@ class ExplorationOpportunitySummaryDict(TypedDict, total=False):
     translation_in_review_counts: Dict[str, int]
 
 
-class SkillOpportunityDict(TypedDict):
+class SkillOpportunityDict(typing_extensions.TypedDict):
+    """A dictionary representing SkillOpportunity object.
+    """
+
     id: str
     skill_description: str
     question_count: int
