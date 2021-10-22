@@ -248,10 +248,10 @@ describe('Question Editor Modal Controller', function() {
     it('should open add skill modal when adding a new skill', function() {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve('success')
-          });
+          }) as NgbModalRef;
       });
       $scope.addSkill();
       $scope.$apply();
@@ -263,10 +263,10 @@ describe('Question Editor Modal Controller', function() {
         const summary = {id: '1', description: 'Description 1'};
         const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
           setTimeout(opt.beforeDismiss);
-          return <NgbModalRef>(
+          return (
             { componentInstance: MockNgbModalRef,
               result: Promise.resolve(summary)
-            });
+            } as NgbModalRef);
         });
         $scope.addSkill();
         $scope.$apply();
@@ -276,10 +276,10 @@ describe('Question Editor Modal Controller', function() {
     it('should close add skill modal on clicking cancel', () => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject()
-          });
+          } as NgbModalRef);
       });
       $scope.addSkill();
       $scope.$apply();
