@@ -313,7 +313,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install',
                     '%s#egg=git-dep1' % (
