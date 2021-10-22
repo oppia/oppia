@@ -51,8 +51,8 @@
         <p *ngIf="editGoalsTopicBelongToLearntToPartiallyLearntTopic[i]" class="oppia-new-story-content" [innerHTML]="'I18N_LEARNER_DASHBOARD_NEW_STORY_CONTENT' | translate">
         </p>
       </a>
-      <img [src]="bookImageUrl" alt="book image" class="oppia-svg-book-image" *ngIf="editGoalsTopicClassification[i] == 1" ngbTooltip="You have completed this topic.">
-      <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 2" class="oppia-checkbox protractor-test-add-topic-to-current-goals-button" (click)="addToLearnerGoals(topic, topic.id, i)" [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH"></mat-checkbox>
+      <img [src]="bookImageUrl" alt="book image" class="oppia-svg-book-image ml-4" *ngIf="editGoalsTopicClassification[i] == 1" ngbTooltip="You have completed this topic.">
+      <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 2" class="oppia-checkbox protractor-test-add-topic-to-current-goals-button pl-4" (click)="addToLearnerGoals(topic, topic.id, i)" [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH"></mat-checkbox>
       <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 0" checked disabled class="oppia-checkbox"></mat-checkbox>
     </div>
   </div>
@@ -379,7 +379,7 @@
       width: 430px;
     }
     .oppia-checkbox {
-      left: 215px;
+      left: 230px;
       text-align: end;
       width: 144px;
     }
@@ -403,9 +403,10 @@
 
   @media(max-width: 768px) {
     .oppia-goals-topic-name {
-      width: 230px
+      width: 200px
     }
 
+    .oppia-svg-book-image,
     .oppia-checkbox {
       left: unset;
       margin-left: 0;
@@ -418,9 +419,10 @@
     }
 
     .oppia-goals-topic-name {
-      width: 220px
+      width: 200px
     }
 
+    .oppia-svg-book-image,
     .oppia-checkbox {
       left: unset;
       margin-left: 0;
