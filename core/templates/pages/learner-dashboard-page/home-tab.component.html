@@ -1,6 +1,6 @@
 <div class="home-tab">
   <div class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
-    {{getTimeOfDay() | translate}}, {{username}}!
+    {{ getTimeOfDay() | translate }}, {{ username }}!
   </div>
   <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
     <p class="continue-where-you-left-off-heading"

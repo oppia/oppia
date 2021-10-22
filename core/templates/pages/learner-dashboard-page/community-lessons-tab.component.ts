@@ -112,19 +112,25 @@ export class CommunityLessonsTabComponent {
       0, 3);
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.setDisplayLessonsInPlaylist();
+
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+        this.setDisplayLessonsInPlaylist();
       }));
 
+    this.displayInCommunityLessons = this.allCommunityLessons;
+    this.selectedSection = this.all;
+    this.dropdownEnabled = false;
+  }
+
+  setDisplayLessonsInPlaylist(): void {
     if (this.windowIsNarrow) {
       this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
     } else {
       this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(0, 3);
     }
-    this.displayInCommunityLessons = this.allCommunityLessons;
-    this.selectedSection = this.all;
-    this.dropdownEnabled = false;
   }
 
   decodePngURIData(base64ImageData: string): string {

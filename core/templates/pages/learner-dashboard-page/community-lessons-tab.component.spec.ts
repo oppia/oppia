@@ -90,7 +90,7 @@ describe('Community lessons tab Component', () => {
     learnerDashboardActivityBackendApiService =
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
@@ -125,11 +125,13 @@ describe('Community lessons tab Component', () => {
 
   it('should check whether window is narrow on resizing the screen', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.displayLessonsInPlaylist).toEqual([]);
     expect(component.windowIsNarrow).toBeTrue();
 
     mockResizeEmitter.emit();
 
     expect(component.windowIsNarrow).toBeFalse();
+    expect(component.displayLessonsInPlaylist).toEqual([]);
   });
 
   it ('should initilize values on init for mobile view', () => {
