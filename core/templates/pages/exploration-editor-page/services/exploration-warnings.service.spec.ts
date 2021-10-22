@@ -1459,7 +1459,7 @@ describe('Exploration Warnings Service', function() {
     }));
 
     it('should update warning to an empty array', function() {
-      ExplorationStatesService.init(<StateObjectsBackendDict> {
+      ExplorationStatesService.init({
         Hola: {
           content: {
             content_id: 'content',
@@ -1581,7 +1581,7 @@ describe('Exploration Warnings Service', function() {
           linked_skill_id: null,
           next_content_id_index: null
         }
-      });
+      } as StateObjectsBackendDict);
       ExplorationWarningsService.updateWarnings();
 
       expect(ExplorationWarningsService.getWarnings()).toEqual([]);

@@ -1534,8 +1534,8 @@ describe('Conversation skin directive', function() {
     $scope.getQuestionPlayerConfig = function() {
       return {
         resultActionButtons: [{
-          type: 'BOOST_SCORE',
-          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+          type: 'REVIEW_LOWEST_SCORED_SKILL',
+          i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
         }, {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
@@ -1866,8 +1866,8 @@ describe('Conversation skin directive', function() {
     $scope.getQuestionPlayerConfig = function() {
       return {
         resultActionButtons: [{
-          type: 'BOOST_SCORE',
-          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+          type: 'REVIEW_LOWEST_SCORED_SKILL',
+          i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
         }, {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',

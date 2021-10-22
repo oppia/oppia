@@ -238,7 +238,7 @@ describe('Exploration improvements task registrar service', () => {
 
   const makeTask = (
     <T extends ExplorationTask = ExplorationTask>(dict = taskBackendDict) => {
-      return <T> ExplorationTaskModel.createFromBackendDict(dict);
+      return ExplorationTaskModel.createFromBackendDict(dict) as T;
     });
   const makeStates = (map = statesBackendDict) => {
     return statesObjectFactory.createFromBackendDict(map);
@@ -250,16 +250,19 @@ describe('Exploration improvements task registrar service', () => {
     return AnswerStats.createFromBackendDict(dict);
   };
   const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
-    return <CyclicStateTransitionsPlaythroughIssue> (
-      playthroughIssueObjectFactory.createFromBackendDict(dict));
+    return (
+      playthroughIssueObjectFactory.createFromBackendDict(dict)
+    ) as CyclicStateTransitionsPlaythroughIssue;
   };
   const makeEqPlaythroughIssue = (dict = eqPlaythroughIssueBackendDict) => {
-    return <EarlyQuitPlaythroughIssue> (
-      playthroughIssueObjectFactory.createFromBackendDict(dict));
+    return (
+      playthroughIssueObjectFactory.createFromBackendDict(dict)
+    ) as EarlyQuitPlaythroughIssue;
   };
   const makeMisPlaythroughIssue = (dict = misPlaythroughIssueBackendDict) => {
-    return <MultipleIncorrectSubmissionsPlaythroughIssue> (
-      playthroughIssueObjectFactory.createFromBackendDict(dict));
+    return (
+      playthroughIssueObjectFactory.createFromBackendDict(dict)) as
+       MultipleIncorrectSubmissionsPlaythroughIssue;
   };
 
   it('should initialize successfully using default test values', () => {
@@ -313,7 +316,7 @@ describe('Exploration improvements task registrar service', () => {
     it('should throw if a resolved task type targets an unknown state', () => {
       delete statesBackendDict.End;
       const resolvedTaskTypesByStateName = new Map([
-        ['End', <ExplorationTaskType[]> ['high_bounce_rate']]
+        ['End', ['high_bounce_rate'] as ExplorationTaskType[]]
       ]);
       expect(
         () => taskRegistryService.initialize(
@@ -410,7 +413,7 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.target_id = 'Introduction';
       taskBackendDict.task_type = 'high_bounce_rate';
       const resolvedTaskTypesByStateName = new Map([
-        ['Introduction', <ExplorationTaskType[]> ['high_bounce_rate']]
+        ['Introduction', ['high_bounce_rate'] as ExplorationTaskType[]]
       ]);
       expect(
         () => taskRegistryService.initialize(
@@ -425,7 +428,8 @@ describe('Exploration improvements task registrar service', () => {
       'same state', () => {
       const resolvedTaskTypesByStateName = new Map([
         ['Introduction',
-          <ExplorationTaskType[]> ['high_bounce_rate', 'high_bounce_rate']],
+          ['high_bounce_rate', 'high_bounce_rate'] as ExplorationTaskType[]
+        ],
       ]);
       expect(
         () => taskRegistryService.initialize(

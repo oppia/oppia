@@ -149,7 +149,7 @@ export class TextInputValidationService {
 
 
         let currentStrings = (
-          <TranslatableSetOfNormalizedString>rule.inputs.x).normalizedStrSet;
+          rule.inputs.x as TranslatableSetOfNormalizedString).normalizedStrSet;
         if (rule.type === 'Contains') {
           // Check if any of the current strings contain any of the previously
           // seen strings as a substring.

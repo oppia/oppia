@@ -27,7 +27,7 @@ describe('Missing Translations Custom Handler', () => {
     () => {
       expect(mth.handle({
         key: 'I18N_SIGNUP_PAGE_SUBTITLE',
-        translateService: <TranslateService> {},
+        translateService: {} as TranslateService,
       })).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
     });
 
@@ -35,8 +35,7 @@ describe('Missing Translations Custom Handler', () => {
     () => {
       let key = 'KEY_NOT_AVAILABLE_IN_APP_CONSTANTS';
       expect(mth.handle({
-        key,
-        translateService: <TranslateService> {}
+        key, translateService: {} as TranslateService
       })).toEqual(key);
     });
 });

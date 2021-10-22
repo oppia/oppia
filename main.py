@@ -79,7 +79,7 @@ from core.controllers import voice_artist
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
 
@@ -291,6 +291,9 @@ URLS = [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
+        r'/getalltopicnames',
+        contributor_dashboard.AllTopicNamesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -388,6 +391,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
         learner_dashboard.LearnerDashboardExplorationsProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
@@ -990,11 +996,14 @@ class NdbWsgiMiddleware:
             self,
             environ: Dict[str, str],
             start_response: webapp2.Response
-    ) -> Any:
+    ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            return self.wsgi_app(environ, start_response)
+            # Cast is needed since webapp2.WSGIApplication is not
+            # correctly typed.
+            return cast(
+                webapp2.Response, self.wsgi_app(environ, start_response))
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)

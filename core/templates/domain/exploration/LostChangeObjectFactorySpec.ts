@@ -74,13 +74,8 @@ describe('Lost Change Object Factory', () => {
 
     expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
     expect(lostChange.getStatePropertyValue(
-      <string[] | Object>lostChange.newValue)).toEqual({
-      html: 'newValue',
-      content_id: '',
-      image_sizes_in_bytes: {}
-    });
-    expect(lostChange.getStatePropertyValue(
-      <string[] | Object>lostChange.oldValue)).toEqual({
+      lostChange.oldValue as string[] | Object)
+    ).toEqual({
       html: 'oldValue',
       content_id: '',
       image_sizes_in_bytes: {}
@@ -103,10 +98,10 @@ describe('Lost Change Object Factory', () => {
       expect(lostChange.isOldValueEmpty()).toBeFalse();
       expect(lostChange.isNewValueEmpty()).toBeFalse();
       expect(lostChange.getStatePropertyValue(
-        <string[] | Object>lostChange.newValue)).toEqual(
+        lostChange.newValue as string[] | Object)).toEqual(
         'value 2');
       expect(lostChange.getStatePropertyValue(
-        <string[] | Object>lostChange.oldValue)).toEqual(
+        lostChange.oldValue as string[] | Object)).toEqual(
         'value 1');
     });
 
