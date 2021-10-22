@@ -288,9 +288,9 @@ class SkillDescriptionHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
       'skill_description': {
-        'schema': {
-          'type': 'basestring'
-        }
+          'schema': {
+              'type': 'basestring'
+          }
       }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
