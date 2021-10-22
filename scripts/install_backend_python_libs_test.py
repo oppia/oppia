@@ -271,7 +271,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -380,7 +380,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -543,7 +543,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
