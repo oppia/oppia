@@ -131,12 +131,17 @@ describe('Home tab Component', () => {
   });
 
   it('should get the correct width in mobile view', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
     component.ngOnInit();
     expect(component.width).toEqual(233);
+    expect(component.windowIsNarrow).toBeTrue();
+  });
+
+  it('should check whether window is narrow on resizing the screen', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.windowIsNarrow).toBeTrue();
 
     mockResizeEmitter.emit();
+
     expect(component.windowIsNarrow).toBeFalse();
   });
 

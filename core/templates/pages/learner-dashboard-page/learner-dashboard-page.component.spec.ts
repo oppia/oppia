@@ -497,14 +497,19 @@ describe('Learner dashboard page', () => {
 
     it('should initialize correctly component properties after its' +
     ' initialization and get data from backend', fakeAsync(() => {
-      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
       expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
       expect(component.username).toBe(userInfo.getUsername());
+      expect(component.windowIsNarrow).toBeTrue();
+    }));
+
+    it('should check whether window is narrow on resizing the screen', () => {
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+      expect(component.windowIsNarrow).toBeTrue();
 
       mockResizeEmitter.emit();
+
       expect(component.windowIsNarrow).toBeFalse();
-    }));
+    });
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');

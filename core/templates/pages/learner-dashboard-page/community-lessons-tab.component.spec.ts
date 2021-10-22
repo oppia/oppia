@@ -108,6 +108,7 @@ describe('Community lessons tab Component', () => {
 
     component.ngOnInit();
 
+    expect(component.windowIsNarrow).toBeFalse();
     expect(component.noCommunityLessonActivity).toEqual(true);
     expect(component.noPlaylistActivity).toEqual(true);
     expect(component.totalIncompleteLessonsList).toEqual([]);
@@ -120,13 +121,18 @@ describe('Community lessons tab Component', () => {
     expect(component.displayInCommunityLessons).toEqual([]);
     expect(component.selectedSection).toEqual('All');
     expect(component.dropdownEnabled).toEqual(false);
+  });
+
+  it('should check whether window is narrow on resizing the screen', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.windowIsNarrow).toBeTrue();
 
     mockResizeEmitter.emit();
+
     expect(component.windowIsNarrow).toBeFalse();
   });
 
   it ('should initilize values on init for mobile view', () => {
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
     component.ngOnInit();
 
     expect(component.displayLessonsInPlaylist).toEqual([]);

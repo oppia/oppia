@@ -241,17 +241,21 @@ describe('Goals tab Component', () => {
   });
 
   it('should intialize the component and set values', fakeAsync(() => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    expect(component.windowIsNarrow).toBeTrue();
-
     component.ngOnInit();
     fixture.detectChanges();
 
     expect(component.MAX_CURRENT_GOALS_LENGTH).toEqual(5);
+    expect(component.windowIsNarrow).toBeTrue();
+  }));
+
+  it('should check whether window is narrow on resizing the screen', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.windowIsNarrow).toBeTrue();
 
     mockResizeEmitter.emit();
+
     expect(component.windowIsNarrow).toBeFalse();
-  }));
+  });
 
   it('should check where the topicId belongs to current goal', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];

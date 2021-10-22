@@ -1,10 +1,10 @@
-<background-banner *ngIf="!this.windowIsNarrow || (this.windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div class="oppia-learner-dashboard-container position-relative overflow-auto" [ngStyle]="this.windowIsNarrow && {'min-height': '85.5vh'}">
+<background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
+<div class="oppia-learner-dashboard-container position-relative overflow-auto" [ngStyle]="windowIsNarrow && {'min-height': '85.5vh'}">
   <div class="row oppia-row"
-       [ngStyle]="this.windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': this.windowIsNarrow}">
+       [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
     <div class="col-md-3 oppia-learner-dashboard-side-content"
-         *ngIf="!this.windowIsNarrow">
+         *ngIf="!windowIsNarrow">
       <mat-card class="oppia-learner-dashboard-main-menu">
         <h4 class="oppia-learner-dashboard-menu protractor-test-home-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
@@ -34,7 +34,7 @@
         </h4>
       </mat-card>
     </div>
-    <footer class="oppia-learner-dashboard-buttons" *ngIf="this.windowIsNarrow" headroom>
+    <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow" headroom>
       <mat-card class="oppia-learner-dashboard-button-menu d-flex justify-content-around">
         <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
           <img [src]="homeImageUrl" alt="home image" class="oppia-svg-image">
@@ -51,7 +51,7 @@
       </mat-card>
     </footer>
 
-    <div *ngIf="this.windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS">
+    <div *ngIf="windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS">
       <mat-card class="oppia-learner-dashboard-progress-button-menu d-flex justify-content-around">
         <div class="oppia-learner-dashboard-progress-button-menu-options" [ngStyle]="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY && {'border-bottom': '2px solid #00645C'}" (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
           <p [innerHTML]="'I18N_DASHBOARD_SKILL_PROFICIENCY' | translate">
@@ -69,7 +69,7 @@
     </div>
 
     <div class="col-md-8 oppia-learner-dashboard-main-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': this.windowIsNarrow}">
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
       <div>
         <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
           <span [innerHTML]="activeSection | translate">
@@ -78,7 +78,7 @@
 
         <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-sort-options"
               *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
-              [ngClass]="{'oppia-learner-dashboard-sort-mobile': this.windowIsNarrow}">
+              [ngClass]="{'oppia-learner-dashboard-sort-mobile': windowIsNarrow}">
           <p class="sort-by-text mt-0">Sort By</p>
           <select [(ngModel)]="currentFeedbackThreadsSortType"
                   class="sort-options oppia-sort-options"
@@ -94,8 +94,8 @@
           </span>
         </span>
       </div>
-      <div class="oppia-learner-dashboard-main-content-container d-flex justify-content-center"
-           [ngClass]="{'pl-5': !windowIsNarrow}">
+      <div class="oppia-learner-dashboard-main-content-container d-flex"
+           [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [untrackedTopics]="untrackedTopics"
@@ -112,20 +112,20 @@
                            [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
           </oppia-goals-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !this.windowIsNarrow">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList">
           </oppia-progress-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && this.windowIsNarrow">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && windowIsNarrow">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
                               [activeSubsection]="activeSubsection">
           </oppia-progress-tab>
         </div>
-        <div *ngIf="((!this.windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (this.windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
+        <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
           <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
                                        [incompleteCollectionsList]="incompleteCollectionsList"
                                        [completedExplorationsList]="completedExplorationsList"
@@ -331,7 +331,7 @@
     </div>
 
     <div class="col-md-2 oppia-learner-dashboard-side-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': this.windowIsNarrow}">
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
     </div>
   </div>
 </div>
@@ -792,6 +792,10 @@
       padding: 0 0 6px 7.5px;
       width: 100%;
     }
+
+    .oppia-learner-dashboard-main-content-container {
+      margin-bottom: 10vh;
+    }
   }
 
   @media (max-width: 500px) {
@@ -910,8 +914,8 @@
     bottom: -30px;
   }
   .oppia-learner-dashboard-buttons.headroom--pinned {
-    position: fixed;
     margin-bottom: 50px;
+    position: fixed;
     transform: translateY(-100%);
   }
 </style>
