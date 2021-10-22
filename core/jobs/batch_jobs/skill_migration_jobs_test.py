@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
 from core.constants import constants
 from core.domain import recommendations_services
 from core.jobs import job_test_utils
@@ -41,240 +42,28 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = skill_migration_jobs.MigrateSkillJob
 
+    SKILL_1_ID = 'skill_1'
+
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_does_nothing_when_only_one_exploration_exists(self) -> None:
-        exp_summary = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_1_ID,
-            deleted=False,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='lang',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
+    def test_one_unmigrated_skill(self) -> None:
+        skill_model = self.create_model(
+            skill_models.SkillModel,
+            id=self.SKILL_1_ID,
+            description='description',
+            misconceptions_schema_version=(
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            language_code='cs',
+            skill_contents_schema_version=(
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+            next_misconception_id='misconception_id',
+            all_questions_merged=True
         )
-        exp_summary.update_timestamps()
-        exp_summary.put()
-
-        self.assert_job_output_is_empty()
-
-        exp_recommendations_model = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_1_ID, strict=False))
-        self.assertIsNone(exp_recommendations_model)
-
-    def test_creates_recommendations_for_similar_explorations(self) -> None:
-        recommendations_services.create_default_topic_similarities() # type: ignore[no-untyped-call]
-        exp_summary_1 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_1_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_1.update_timestamps()
-        exp_summary_2 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_2_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_2.update_timestamps()
-        self.put_multi([exp_summary_1, exp_summary_2])
+        skill_model.update_timestamps()
+        skill_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 2')
+            job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
         ])
-
-        exp_recommendations_model_1 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_1_ID))
-        # Ruling out the possibility of None for mypy type checking.
-        assert exp_recommendations_model_1 is not None
-        self.assertEqual(
-            exp_recommendations_model_1.recommended_exploration_ids,
-            [self.EXP_2_ID]
-        )
-        exp_recommendations_model_2 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_2_ID))
-        # Ruling out the possibility of None for mypy type checking.
-        assert exp_recommendations_model_2 is not None
-        self.assertEqual(
-            exp_recommendations_model_2.recommended_exploration_ids,
-            [self.EXP_1_ID]
-        )
-
-    def test_skips_private_explorations(self) -> None:
-        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
-        exp_summary_1 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_1_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_1.update_timestamps()
-        exp_summary_2 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_2_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_2.update_timestamps()
-        self.put_multi([exp_summary_1, exp_summary_2])
-
-        self.assert_job_output_is_empty()
-
-        exp_recommendations_model_1 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_1_ID, strict=False))
-        self.assertIsNone(exp_recommendations_model_1)
-        exp_recommendations_model_2 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_2_ID, strict=False))
-        self.assertIsNone(exp_recommendations_model_2)
-
-    def test_does_not_create_recommendations_for_different_explorations(
-            self
-    ) -> None:
-        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
-        exp_summary_1 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_1_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang1',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_1.update_timestamps()
-        exp_summary_2 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_2_ID,
-            deleted=False,
-            title='title',
-            category='Sport',
-            objective='objective',
-            language_code='lang2',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_2.update_timestamps()
-        self.put_multi([exp_summary_1, exp_summary_2])
-
-        self.assert_job_output_is_empty()
-
-        exp_recommendations_model_1 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_1_ID, strict=False))
-        self.assertIsNone(exp_recommendations_model_1)
-        exp_recommendations_model_2 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_2_ID, strict=False))
-        self.assertIsNone(exp_recommendations_model_2)
-
-    def test_creates_recommendations_for_three_explorations(self) -> None:
-        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
-        exp_summary_1 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_1_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang1',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_1.update_timestamps()
-        exp_summary_2 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_2_ID,
-            deleted=False,
-            title='title',
-            category='Sport',
-            objective='objective',
-            language_code='lang1',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_2.update_timestamps()
-        exp_summary_3 = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_3_ID,
-            deleted=False,
-            title='title',
-            category='Architecture',
-            objective='objective',
-            language_code='lang1',
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
-        )
-        exp_summary_3.update_timestamps()
-        self.put_multi([exp_summary_1, exp_summary_2, exp_summary_3])
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 3')
-        ])
-
-        exp_recommendations_model_1 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_1_ID))
-        # Ruling out the possibility of None for mypy type checking.
-        assert exp_recommendations_model_1 is not None
-        self.assertEqual(
-            exp_recommendations_model_1.recommended_exploration_ids,
-            [self.EXP_3_ID, self.EXP_2_ID]
-        )
-        exp_recommendations_model_2 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_2_ID))
-        # Ruling out the possibility of None for mypy type checking.
-        assert exp_recommendations_model_2 is not None
-        self.assertEqual(
-            exp_recommendations_model_2.recommended_exploration_ids,
-            [self.EXP_1_ID, self.EXP_3_ID]
-        )
-        exp_recommendations_model_3 = (
-            recommendations_models.ExplorationRecommendationsModel.get(
-                self.EXP_3_ID))
-        # Ruling out the possibility of None for mypy type checking.
-        assert exp_recommendations_model_3 is not None
-        self.assertEqual(
-            exp_recommendations_model_3.recommended_exploration_ids,
-            [self.EXP_1_ID, self.EXP_2_ID]
-        )

@@ -44,109 +44,13 @@ if MYPY: # pragma: no cover
 
 
 class MigrateSkillJob(base_jobs.JobBase):
-    """Job that indexes the explorations in Elastic Search."""
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        the Elastic Search.
-
-        Returns:
-            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            the Elastic Search.
-        """
-
-        unmigrated_skill_models = (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(skill_models.SkillModel.get_all()))
-            | 'Add skill model ID' >> beam.GroupBy(
-                lambda skill_model: skill_model.id)
-        )
-        skill_summary_models = (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(skill_models.SkillSummaryModel.get_all()))
-            | 'Add skill summary ID' >> beam.GroupBy(
-                lambda skill_summary_model: skill_summary_model.id)
-        )
-
-        migrated_skill_results = (
-            unmigrated_skill_models
-            | 'Transform and migrate model' >> beam.Map(self._migrate_skill)
-        )
-        migrated_skills = (
-            migrated_skill_results
-            | 'Filter oks' >> beam.Filter(lambda result: result.result.is_ok())
-            | 'Unwrap ok' >> beam.Map(lambda result: result.result.unwrap())
-        )
-        migrated_skill_job_run_results = (
-            migrated_skill_results
-            | job_result_transforms.ResultsToJobRunResults('SKILL MIGRATION')
-        )
-
-        skill_changes = (
-            unmigrated_skill_models
-            | 'Transform and migrate model' >> beam.Map(
-                lambda skill_id, skill_model: (
-                    skill_id, self._generate_skill_changes))
-        )
-
-        cache_deletion_job_run_results = (
-            migrated_skills
-            | 'Keep IDs only' >> beam.Keys()
-            | 'Delete skills from cache' >> beam.Map(
-                self._delete_skill_from_cache)
-            | job_result_transforms.ResultsToJobRunResults('CACHE DELETION')
-        )
-
-        skill_objects = (
-            {
-                'skill_model': unmigrated_skill_models,
-                'skill_summary_model': skill_summary_models,
-                'skill': migrated_skills,
-                'skill_changes': skill_changes
-            }
-            | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Reorganize the skill objects' >> beam.Map(lambda x: {
-                    'skill_model': x['skill_model'][0][0],
-                    'skill_summary_model': x['skill_summary_model'][0][0],
-                    'skill': x['skill'][0][0],
-                    'skill_changes': x['skill_changes'][0][0]
-                })
-        )
-
-        skill_models_to_put = (
-            skill_objects
-            | 'Generate skill models to put' >> beam.FlatMap(
-                lambda x: self._update_skill(
-                    x['skill_model'], x['skill'], x['skill_changes'],
-                ))
-        )
-
-        skill_summary_models_to_put = (
-            skill_objects
-            | 'Generate skill summary models to put' >> beam.Map(
-                lambda x: self._update_skill_summary(
-                    x['skill'], x['skill_summary_model']
-                ))
-        )
-
-        unused_put_results = (
-            (skill_models_to_put, skill_summary_models_to_put)
-            | 'Merge models' >> beam.Flatten()
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
-
-        return (
-            (cache_deletion_job_run_results, migrated_skill_job_run_results)
-            | beam.Flatten()
-        )
+    """"""
 
     @staticmethod
     def _migrate_skill(
-        skill_id: str, skill_model: skill_models.SkillModel
+            skill_id_and_skill_model: Tuple[str, skill_models.SkillModel]
     ) -> result.Result[skill_domain.Skill, Exception]:
+        skill_id, skill_model = skill_id_and_skill_model
         try:
             skill = skill_fetchers.get_skill_from_model(skill_model)
             skill.validate()
@@ -157,7 +61,7 @@ class MigrateSkillJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_skill_changes(
-        skill_model: skill_models.SkillModel
+            skill_model: skill_models.SkillModel
     ) -> Tuple[str, skill_domain.SkillChange]:
         contents_version = skill_model.skill_contents_schema_version
         if contents_version <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
@@ -170,9 +74,10 @@ class MigrateSkillJob(base_jobs.JobBase):
             yield skill_change
 
         misconceptions_version = skill_model.misconceptions_schema_version
-        if misconceptions_version <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION: # pylint: disable=line-too-long
+        if misconceptions_version <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
             skill_change = skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
+                # pylint: disable=line-too-long
                 'from_version': skill_model.misconceptions_schema_version,
                 'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             })
@@ -190,12 +95,12 @@ class MigrateSkillJob(base_jobs.JobBase):
 
     @staticmethod
     def _delete_skill_from_cache(
-        skill_id: str
+        skill: skill_domain.Skill
     ) -> result.Result[str, Exception]:
         try:
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id])
-            return result.Ok(skill_id)
+                caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
+            return result.Ok(skill.id)
         except Exception as e:
             return result.Err(e)
 
@@ -231,3 +136,100 @@ class MigrateSkillJob(base_jobs.JobBase):
             )
         )
         return updated_skill_summary_model
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """"""
+
+        unmigrated_skill_models = (
+            self.pipeline
+            | 'Get all non-deleted skill models' >> (
+                ndb_io.GetModels(skill_models.SkillModel.get_all()))
+            | 'Add skill model ID' >> beam.GroupBy(
+                lambda skill_model: skill_model.id)
+        )
+        skill_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted skill summary models' >> (
+                ndb_io.GetModels(skill_models.SkillSummaryModel.get_all()))
+            | 'Add skill summary ID' >> beam.GroupBy(
+                lambda skill_summary_model: skill_summary_model.id)
+        )
+
+        migrated_skill_results = (
+            unmigrated_skill_models
+            | 'Transform and migrate model' >> beam.Map(self._migrate_skill)
+        )
+        migrated_skills = (
+            migrated_skill_results
+            | 'Filter oks' >> beam.Filter(lambda result: result.is_ok())
+            | 'Unwrap ok' >> beam.Map(lambda result: result.unwrap())
+        )
+        migrated_skill_job_run_results = (
+            migrated_skill_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('SKILL MIGRATION'))
+        )
+
+        skill_changes = (
+            unmigrated_skill_models
+            | 'Generate skill changes' >> beam.Map(
+                lambda skill_id, skill_model: (
+                    skill_id, self._generate_skill_changes(skill_model)))
+        )
+
+        skill_objects_list = (
+            {
+                'skill_model': unmigrated_skill_models,
+                'skill_summary_model': skill_summary_models,
+                'skill': migrated_skills,
+                'skill_changes': skill_changes
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Reorganize the skill objects' >> beam.Map(lambda x: {
+                    'skill_model': x['skill_model'][0][0],
+                    'skill_summary_model': x['skill_summary_model'][0][0],
+                    'skill': x['skill'][0][0],
+                    'skill_changes': x['skill_changes'][0][0]
+                })
+            | 'Remove unmigrated skills' >> beam.Filter(
+                lambda x: len(x['skill_changes']) > 0)
+        )
+
+        cache_deletion_job_run_results = (
+            skill_objects_list
+            | 'Delete skills from cache' >> beam.Map(lambda skill_object:
+                self._delete_skill_from_cache(skill_object['skill']))
+            | 'Generate results for cache deletion' >> (
+                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
+        )
+
+        skill_models_to_put = (
+            skill_objects_list
+            | 'Generate skill models to put' >> beam.FlatMap(
+                lambda skill_objects: self._update_skill(
+                    skill_objects['skill_model'],
+                    skill_objects['skill'],
+                    skill_objects['skill_changes'],
+                ))
+        )
+
+        skill_summary_models_to_put = (
+            skill_objects_list
+            | 'Generate skill summary models to put' >> beam.Map(
+                lambda skill_objects: self._update_skill_summary(
+                    skill_objects['skill'],
+                    skill_objects['skill_summary_model']
+                ))
+        )
+
+        unused_put_results = (
+            (skill_models_to_put, skill_summary_models_to_put)
+            | 'Merge models' >> beam.Flatten()
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            (cache_deletion_job_run_results, migrated_skill_job_run_results)
+            | beam.Flatten()
+        )
