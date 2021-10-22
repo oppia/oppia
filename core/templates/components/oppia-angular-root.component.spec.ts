@@ -30,6 +30,7 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nService } from 'i18n/i18n.service';
+import { MockI18nService } from 'tests/unit-test-utils';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -46,11 +47,6 @@ class MockWindowRef {
       pushState(data, title: string, url?: string | null) {}
     }
   };
-}
-
-class MockI18nService {
-  directionChangeEventEmitter = new EventEmitter<string>();
-  initialize(): void {}
 }
 
 describe('OppiaAngularRootComponent', function() {

@@ -26,7 +26,7 @@ import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
@@ -74,13 +74,6 @@ describe('TopNavigationBarComponent', () => {
   let i18nService: I18nService;
 
   let mockResizeEmitter: EventEmitter<void>;
-
-  class MockI18nService {
-    initialize(): void {}
-    updateViewToUserPreferredSiteLanguage(): void {}
-    removeUrlLangParam(): void {}
-    updateUserPreferredLanguage(newLangCode: string): void {}
-  }
 
   beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();

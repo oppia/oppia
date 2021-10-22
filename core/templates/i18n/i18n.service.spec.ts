@@ -38,7 +38,6 @@ describe('I18n service', () => {
   let userBackendApiService: UserBackendApiService;
   const CACHE_KEY_FOR_TESTS: string = 'CACHED_LANG_KEY';
 
-
   class MockWindowRef {
     nativeWindow = {
       document: {
@@ -143,8 +142,10 @@ describe('I18n service', () => {
     cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
     // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
-      .and.returnValue('http://localhost:8181');
+      .and.returnValue('http://localhost:8181/');
     spyOn(cookieService, 'put');
+
+    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
 
     i18nService.initialize();
 
@@ -173,6 +174,8 @@ describe('I18n service', () => {
 
     let newLangCode = 'en';
 
+    expect(userInfo.getPreferredSiteLanguageCode()).toBe('es');
+
     i18nService.updateUserPreferredLanguage(newLangCode);
     tick();
 
@@ -199,6 +202,25 @@ describe('I18n service', () => {
     expect(i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
       preferredLanguage);
     expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
+  }));
+
+  it('should not update site language if user doesnot have' +
+    ' a preferred language', fakeAsync(() => {
+    let preferredLanguage = null;
+    let userInfo = new UserInfo(
+      [], true, true, true, true, true, preferredLanguage, '', '', false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
+    spyOn(i18nService, 'removeUrlLangParam');
+
+    i18nService.updateViewToUserPreferredSiteLanguage();
+    tick();
+
+    expect(userService.getUserInfoAsync).toHaveBeenCalled();
+    expect(i18nLanguageCodeService.setI18nLanguageCode).not.
+      toHaveBeenCalledWith(preferredLanguage);
+    expect(i18nService.removeUrlLangParam).not.toHaveBeenCalled();
   }));
 
   it('should update site language', fakeAsync(() => {
