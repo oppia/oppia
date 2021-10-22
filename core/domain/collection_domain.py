@@ -430,8 +430,8 @@ class Collection(python_utils.OBJECT):
         del collection_dict['id']
 
         collection_yaml = yaml.dump(
-                         collection_dict, allow_unicode=True,
-                         default_flow_style=False)
+              collection_dict, allow_unicode=True,
+              default_flow_style=False)
 
         return collection_yaml
 

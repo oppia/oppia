@@ -2698,8 +2698,8 @@ class State(python_utils.OBJECT):
             python_utils.reraise_exception()
 
         return yaml.dump(
-                         state.to_dict(), allow_unicode=True,
-                         default_flow_style=False, width=width)
+            state.to_dict(), allow_unicode=True,
+            default_flow_style=False, width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a
