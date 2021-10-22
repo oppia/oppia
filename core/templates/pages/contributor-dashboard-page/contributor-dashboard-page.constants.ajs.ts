@@ -33,3 +33,7 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
   ContributorDashboardConstants.DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
+
+angular.module('oppia').constant(
+  'DEFAULT_OPPORTUNITY_TOPIC_NAME',
+  ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);

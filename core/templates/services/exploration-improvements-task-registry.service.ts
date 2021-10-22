@@ -117,14 +117,14 @@ export class StateTasks implements Iterable<ExplorationTask> {
       tasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask>,
       supportingStats: SupportingStateStats) {
     this.stateName = stateName;
-    this.hbrTask = <HbrTask> tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
-    this.iflTask = <IflTask> tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
-    this.ngrTask = <NgrTask> tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
-    this.siaTask = <SiaTask> tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+    this.hbrTask = tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) as HbrTask;
+    this.iflTask = tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP) as IflTask;
+    this.ngrTask = tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES) as NgrTask;
+    this.siaTask = tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS) as SiaTask;
     this.supportingStats = supportingStats;
   }
 
@@ -197,12 +197,14 @@ export class ExplorationImprovementsTaskRegistryService {
     for (const stateName of states.getStateNames()) {
       const playthroughIssuesByType = group(
         playthroughIssuesByStateName.get(stateName) || [], p => p.issueType);
-      const cstPlaythroughIssues = <CstPlaythroughIssue[]> (
-        playthroughIssuesByType.get('CyclicStateTransitions'));
-      const eqPlaythroughIssues = <EqPlaythroughIssue[]> (
-        playthroughIssuesByType.get('EarlyQuit'));
-      const misPlaythroughIssues = <MisPlaythroughIssue[]> (
-        playthroughIssuesByType.get('MultipleIncorrectSubmissions'));
+      const cstPlaythroughIssues = (
+        playthroughIssuesByType.get('CyclicStateTransitions')
+      ) as CstPlaythroughIssue[];
+      const eqPlaythroughIssues = (
+        playthroughIssuesByType.get('EarlyQuit') as EqPlaythroughIssue[]);
+      const misPlaythroughIssues = (
+        playthroughIssuesByType.get('MultipleIncorrectSubmissions')
+      ) as MisPlaythroughIssue[];
 
       this.registerNewStateTasks(
         stateName,
@@ -289,23 +291,24 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   getOpenHighBounceRateTasks(): HbrTask[] {
-    return <HbrTask[]> this.openTasksByType.get(
-      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
+    return this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) as HbrTask[];
   }
 
   getOpenIneffectiveFeedbackLoopTasks(): IflTask[] {
-    return <IflTask[]> this.openTasksByType.get(
-      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+    return this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP) as IflTask[];
   }
 
   getOpenNeedsGuidingResponsesTasks(): NgrTask[] {
-    return <NgrTask[]> this.openTasksByType.get(
-      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+    return this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES) as NgrTask[];
   }
 
   getOpenSuccessiveIncorrectAnswersTasks(): SiaTask[] {
-    return <SiaTask[]> this.openTasksByType.get(
-      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+    return this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS
+    ) as SiaTask[];
   }
 
   getStateTasks(stateName: string): StateTasks {
@@ -413,7 +416,7 @@ export class ExplorationImprovementsTaskRegistryService {
       // Not an error to be missing stats.
       this.expStats = this.expStats.createNewWithStateAdded(stateName);
     }
-    const tasksByType = new Map(<[ExplorationTaskType, ExplorationTask][]> [
+    const tasksByType = new Map([
       // NOTE TO DEVELOPERS: The last repeated key wins. For example:
       //    let map = new Map([['a', 1], ['b', 3], ['a', 9]]);
       //    map.get('a'); // Returns 9.
@@ -430,7 +433,7 @@ export class ExplorationImprovementsTaskRegistryService {
           this.config.explorationId, this.config.explorationVersion, taskType,
           stateName)
       ]),
-    ]);
+    ] as [ExplorationTaskType, ExplorationTask][]);
     const supportingStats = new SupportingStateStats(
       this.expStats.getStateStats(stateName), answerStats, cstPlaythroughIssues,
       eqPlaythroughIssues, misPlaythroughIssues);
