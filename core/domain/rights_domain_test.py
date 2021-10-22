@@ -526,8 +526,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             collection_rights_change_object.cmd, 'release_ownership')
 
     def test_collection_rights_change_object_with_change_private_viewability(
-            self
-        ) -> None:
+        self
+    ) -> None:
         collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
             'cmd': 'change_private_viewability',
             'old_viewable_if_private': 'old_viewable_if_private',
