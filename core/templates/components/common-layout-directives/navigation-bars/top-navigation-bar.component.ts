@@ -75,16 +75,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     enter: {
         shiftKeyIsPressed: boolean;
         keyCode: number;
-    };
+        };
     tab: {
         shiftKeyIsPressed: boolean;
         keyCode: number;
-    };
+        };
     shiftTab: {
-        shiftKeyIsPressed: boolean;
-        keyCode: number;
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
+      };
     };
-  };
   labelForClearingFocus!: string;
   sidebarIsShown!: boolean;
   windowIsNarrow: boolean = false;
