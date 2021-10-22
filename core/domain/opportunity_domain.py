@@ -23,6 +23,30 @@ from core import python_utils
 from core import utils
 from core.constants import constants
 
+from typing import Dict, List
+from typing_extensions import TypedDict
+
+
+class ExplorationOpportunitySummaryDict(TypedDict, total=False):
+    id: str
+    topic_id: str
+    topic_name: str
+    story_id: str
+    story_title: str
+    chapter_title: str
+    content_count: int
+    incomplete_translation_language_codes: List[str]
+    translation_counts: Dict[str, int]
+    language_codes_needing_voice_artists: List[str]
+    language_codes_with_assigned_voice_artists: List[str]
+    translation_in_review_counts: Dict[str, int]
+
+
+class SkillOpportunityDict(TypedDict):
+    id: str
+    skill_description: str
+    question_count: int
+
 
 class ExplorationOpportunitySummary:
     """The domain object for the translation and voiceover opportunities summary
@@ -30,11 +54,20 @@ class ExplorationOpportunitySummary:
     """
 
     def __init__(
-            self, exp_id, topic_id, topic_name, story_id, story_title,
-            chapter_title, content_count, incomplete_translation_language_codes,
-            translation_counts, language_codes_needing_voice_artists,
-            language_codes_with_assigned_voice_artists,
-            translation_in_review_counts):
+        self,
+        exp_id: str,
+        topic_id: str,
+        topic_name: str,
+        story_id: str,
+        story_title: str,
+        chapter_title: str,
+        content_count: int,
+        incomplete_translation_language_codes: List[str],
+        translation_counts: Dict[str, int],
+        language_codes_needing_voice_artists: List[str],
+        language_codes_with_assigned_voice_artists: List[str],
+        translation_in_review_counts: Dict[str, int]
+    ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -77,7 +110,10 @@ class ExplorationOpportunitySummary:
         self.validate()
 
     @classmethod
-    def from_dict(cls, exploration_opportunity_summary_dict):
+    def from_dict(
+        cls,
+        exploration_opportunity_summary_dict: ExplorationOpportunitySummaryDict,
+    ) -> 'ExplorationOpportunitySummary':
         """Return a ExplorationOpportunitySummary domain object from a dict.
 
         Args:
@@ -106,7 +142,7 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict[
                 'translation_in_review_counts'])
 
-    def to_dict(self):
+    def to_dict(self) -> ExplorationOpportunitySummaryDict:
         """Return a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 
@@ -128,7 +164,7 @@ class ExplorationOpportunitySummary:
             'translation_in_review_counts': self.translation_in_review_counts
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the object.
 
         Raises:
@@ -193,7 +229,10 @@ class ExplorationOpportunitySummary:
                 ' to be the same as the supported audio languages, '
                 'received %s' % list(sorted(expected_set_of_all_languages)))
 
-    def _validate_translation_counts(self, translation_counts):
+    def _validate_translation_counts(
+        self,
+        translation_counts: Dict[str, int]
+    ) -> None:
         """Validates per-language counts of translations.
 
         Args:
@@ -228,7 +267,11 @@ class SkillOpportunity:
     """The domain object for skill opportunities."""
 
     def __init__(
-            self, skill_id, skill_description, question_count):
+        self,
+        skill_id: str,
+        skill_description: str,
+        question_count: int
+    ) -> None:
         """Constructs a SkillOpportunity domain object.
 
         Args:
@@ -241,7 +284,7 @@ class SkillOpportunity:
         self.question_count = question_count
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the object.
 
         Raises:
@@ -262,7 +305,9 @@ class SkillOpportunity:
                 'received %s' % self.question_count)
 
     @classmethod
-    def from_dict(cls, skill_opportunity_dict):
+    def from_dict(
+        cls, skill_opportunity_dict: SkillOpportunityDict
+    ) -> 'SkillOpportunity':
         """Return a SkillOpportunity domain object from a dict.
 
         Args:
@@ -277,7 +322,7 @@ class SkillOpportunity:
             skill_opportunity_dict['skill_description'],
             skill_opportunity_dict['question_count'])
 
-    def to_dict(self):
+    def to_dict(self) -> SkillOpportunityDict:
         """Returns a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 
