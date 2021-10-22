@@ -18,80 +18,76 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ConceptCardComponent } from './concept-card.component';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { ConceptCardComponent } from './concept-card.component';
 
-describe('ConceptCardComponent', () => {
+describe('Concept card component', () => {
   let fixture: ComponentFixture<ConceptCardComponent>;
-  let component: ConceptCardComponent;
-  let conceptBackendApiService: ConceptCardBackendApiService;
+  let componentInstance: ConceptCardComponent;
+  let conceptCardBackendApiService: ConceptCardBackendApiService;
+  let conceptCard = new ConceptCard(
+    null, [new WorkedExample(null, null)], null);
+  let conceptCardObjects = [conceptCard];
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
       ],
-      declarations: [
-        ConceptCardComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        ConceptCardBackendApiService,
-      ],
+      declarations: [ConceptCardComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConceptCardComponent);
-    component = fixture.componentInstance;
-    conceptBackendApiService = TestBed.inject(ConceptCardBackendApiService);
+    componentInstance = fixture.componentInstance;
+    conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
   });
 
-  it('should load concept cards', () => {
-    spyOn(conceptBackendApiService, 'loadConceptCardsAsync').and.resolveTo([{
-      getWorkedExamples: () => {
-        return ['1'];
-      }
-    }] as unknown as ConceptCard[]);
-    component.index = 0;
+  it('should initialize and load concept cards successfully', fakeAsync(() => {
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.returnValue(Promise.resolve(conceptCardObjects));
+    componentInstance.index = 0;
 
-    component.conceptCards = [{
-      getWorkedExamples: () => {
-        return ['1'];
-      }
-    }] as unknown as ConceptCard[];
-    component.ngOnInit();
+    componentInstance.ngOnInit();
+    tick();
 
-    expect(component.numberOfWorkedExamplesShown).toBe(0);
+    expect(componentInstance.loadingMessage).toEqual('');
+    expect(componentInstance.currentConceptCard).toEqual(conceptCard);
+  }));
+
+  it('should initialize and handle error if fails to load concept cards',
+    fakeAsync(() => {
+      spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+        .and.returnValue(Promise.reject({}));
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.loadingMessage).toEqual('');
+      expect(componentInstance.skillDeletedMessage).toEqual(
+        'Oops, it looks like this skill has been deleted.');
+    }));
+
+  it('should tell if work example is last', () => {
+    componentInstance.numberOfWorkedExamplesShown = 1;
+    componentInstance.currentConceptCard = conceptCard;
+
+    expect(componentInstance.isLastWorkedExample()).toBeTrue();
   });
 
-  it('should show more worked examples when user clicks on \'+ Worked ' +
-    'Examples\'', () => {
-    component.explanationIsShown = true;
-    component.numberOfWorkedExamplesShown = 2;
+  it('should show more worked examples', () => {
+    let numberOfWorkedExamplesShown = 1;
 
-    component.showMoreWorkedExamples();
+    componentInstance.numberOfWorkedExamplesShown = numberOfWorkedExamplesShown;
+    componentInstance.showMoreWorkedExamples();
 
-    expect(component.explanationIsShown).toBe(false);
-    expect(component.numberOfWorkedExamplesShown).toBe(3);
-  });
-
-  it('should check if worked example is the last one', () => {
-    component.currentConceptCard = {
-      getWorkedExamples: () => {
-        return ['1'];
-      }
-    } as unknown as ConceptCard;
-    component.numberOfWorkedExamplesShown = 1;
-
-    expect(component.isLastWorkedExample()).toBe(true);
-
-    component.numberOfWorkedExamplesShown = 2;
-
-    expect(component.isLastWorkedExample()).toBe(false);
+    expect(componentInstance.explanationIsShown).toBeFalse();
+    expect(componentInstance.numberOfWorkedExamplesShown).toEqual(
+      numberOfWorkedExamplesShown + 1);
   });
 });

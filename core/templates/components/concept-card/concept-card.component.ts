@@ -23,67 +23,51 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
 @Component({
   selector: 'oppia-concept-card',
-  templateUrl: './concept-card.component.html',
+  templateUrl: './concept-card.component.html'
 })
 export class ConceptCardComponent implements OnInit {
-  @Input() skillIds: string[];
-  @Input() index: string | number;
-  numberOfWorkedExamplesShown: number;
+  @Input() skillIds!: string[];
+  @Input() index!: number;
+  conceptsCards: ConceptCard[] = [];
   currentConceptCard: ConceptCard;
-  explanationIsShown: boolean;
-  conceptCards: ConceptCard[];
+  numberOfWorkedExamplesShown: number = 0;
   loadingMessage: string;
   skillDeletedMessage: string;
+  explanationIsShown: boolean;
+
 
   constructor(
     private conceptCardBackendApiService: ConceptCardBackendApiService
   ) {}
 
+  ngOnInit(): void {
+    this.loadingMessage = 'Loading';
+    this.conceptCardBackendApiService.loadConceptCardsAsync(this.skillIds)
+      .then((conceptCardObjects) => {
+        conceptCardObjects.forEach((conceptCardObject) => {
+          this.conceptsCards.push(conceptCardObject);
+        });
+        this.loadingMessage = '';
+        this.currentConceptCard = this.conceptsCards[this.index];
+        this.numberOfWorkedExamplesShown = 0;
+        if (this.currentConceptCard.getWorkedExamples().length > 0) {
+          this.numberOfWorkedExamplesShown = 1;
+        }
+      }, (errorResponse) => {
+        this.loadingMessage = '';
+        this.skillDeletedMessage = 'Oops, it looks like this skill has' +
+           ' been deleted.';
+      });
+  }
+
   isLastWorkedExample(): boolean {
     return this.numberOfWorkedExamplesShown ===
-        this.currentConceptCard.getWorkedExamples().length;
+       this.currentConceptCard.getWorkedExamples().length;
   }
 
   showMoreWorkedExamples(): void {
     this.explanationIsShown = false;
     this.numberOfWorkedExamplesShown++;
-  }
-
-  updatePreview(index: string | number): void {
-    if (index) {
-      this.currentConceptCard = this.conceptCards[index];
-      if (this.currentConceptCard) {
-        this.numberOfWorkedExamplesShown = 0;
-        if (this.currentConceptCard.getWorkedExamples().length > 0) {
-          this.numberOfWorkedExamplesShown = 1;
-        }
-      }
-    }
-  }
-
-  ngOnInit(): void {
-    this.conceptCards = [];
-    this.currentConceptCard = null;
-    this.numberOfWorkedExamplesShown = 0;
-    this.loadingMessage = 'Loading';
-    this.conceptCardBackendApiService.loadConceptCardsAsync(
-      this.skillIds
-    ).then((conceptCardObjects) => {
-      this.updatePreview(this.index);
-      conceptCardObjects.forEach((conceptCardObject) => {
-        this.conceptCards.push(conceptCardObject);
-      });
-      this.loadingMessage = '';
-      this.currentConceptCard = this.conceptCards[this.index];
-      this.numberOfWorkedExamplesShown = 0;
-      if (this.currentConceptCard.getWorkedExamples().length > 0) {
-        this.numberOfWorkedExamplesShown = 1;
-      }
-    }, () => {
-      this.loadingMessage = '';
-      this.skillDeletedMessage = 'Oops, it looks like this skill has' +
-        ' been deleted.';
-    });
   }
 }
 
