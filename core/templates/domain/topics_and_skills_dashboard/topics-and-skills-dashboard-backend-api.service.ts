@@ -47,7 +47,7 @@ import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface CategorizedSkillsBackendDict {
+export interface CategorizedSkillsBackendDict {
   [topicName: string]: {
     uncategorized: ShortSkillSummaryBackendDict[];
     [subtopicName: string]: ShortSkillSummaryBackendDict[];
