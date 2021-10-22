@@ -247,15 +247,52 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 class NewTopicHandler(base.BaseHandler):
     """Creates a new topic."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'thumbnailBgColor': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        name = self.payload.get('name')
-        url_fragment = self.payload.get('url_fragment')
-        description = self.payload.get('description')
-        thumbnail_filename = self.payload.get('filename')
-        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
-        raw_image = self.request.get('image')
+        name = self.normalized_payload.get('name')
+        url_fragment = self.normalized_payload.get('url_fragment')
+        description = self.normalized_payload.get('description')
+        thumbnail_filename = self.normalized_payload.get('filename')
+        thumbnail_bg_color = self.normalized_payload.get('thumbnailBgColor')
+        raw_image = self.normalized_request.get('image')
 
         try:
             topic_domain.Topic.require_valid_name(name)
@@ -303,12 +340,47 @@ class NewTopicHandler(base.BaseHandler):
 class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'linked_topic_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'str'
+                    }
+                }
+            },
+            'explanation_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': state_domain.SubtitledHtml
+                }
+            },
+            'rubrics': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.Rubric
+                    }
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_create_skill
     def post(self):
-        description = self.payload.get('description')
-        linked_topic_ids = self.payload.get('linked_topic_ids')
-        explanation_dict = self.payload.get('explanation_dict')
-        rubrics = self.payload.get('rubrics')
+        description = self.normalized_payload.get('description')
+        linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
+        explanation_dict = self.normalized_payload.get('explanation_dict')
+        rubrics = self.normalized_payload.get('rubrics')
 
         if not isinstance(rubrics, list):
             raise self.InvalidInputException('Rubrics should be a list.')
