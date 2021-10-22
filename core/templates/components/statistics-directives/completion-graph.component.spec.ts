@@ -17,28 +17,43 @@
  * the improvements tab.
  */
 
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 
-require('components/statistics-directives/completion-graph.component.ts');
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CompletionGraphComponent } from './completion-graph.component';
 
-describe('Completion graph', function() {
-  let $componentController;
+describe('Completion Graph Component', () => {
+  let fixture: ComponentFixture<CompletionGraphComponent>;
+  let component: CompletionGraphComponent;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(_$componentController_ => {
-    $componentController = _$componentController_;
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        CompletionGraphComponent,
+      ],
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(CompletionGraphComponent);
+    component = fixture.componentInstance;
+  });
 
   it('should derive style values from the completion rate', () => {
-    const completionRate = 0.65;
-    const ctrl = (
-      $componentController('completionGraph', null, {completionRate}));
-    ctrl.$onInit();
+    component.completionRate = 0.65;
+    component.ngOnInit();
 
-    expect(ctrl.completionBarStyle['stroke-dasharray']).toBeCloseTo(
+    expect(component.completionBarStyle['stroke-dasharray']).toBeCloseTo(
       ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH);
-    expect(ctrl.completionBarStyle['stroke-dashoffset']).toBeCloseTo(
-      ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH * (1 - completionRate));
+    expect(component.completionBarStyle['stroke-dashoffset']).toBeCloseTo(
+      ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH *
+       (1 - component.completionRate));
   });
 });

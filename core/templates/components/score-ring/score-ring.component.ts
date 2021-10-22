@@ -16,55 +16,68 @@
  * @fileoverview Component for the animated score ring.
  */
 
-angular.module('oppia').component('scoreRing', {
-  bindings: {
-    getScore: '&score',
-    testIsPassed: '&testIsPassed'
-  },
-  template: require('./score-ring.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['$scope', 'COLORS_FOR_PASS_FAIL_MODE',
-    function($scope, COLORS_FOR_PASS_FAIL_MODE) {
-      var ctrl = this;
-      let circle, radius, circumference;
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { QuestionPlayerConstants } from '../question-directives/question-player/question-player.constants';
 
-      var setScore = function(percent) {
-        const offset = circumference - percent / 100 * circumference;
-        circle.style.strokeDashoffset = offset.toString();
-      };
+@Component({
+  selector: 'oppia-score-ring',
+  templateUrl: './score-ring.component.html'
+})
+export class ScoreRingComponent implements OnInit, OnChanges {
+  constructor() {}
+  @Input() score;
+  @Input() testIsPassed: boolean;
+  circle: SVGCircleElement;
+  radius: number;
+  circumference: number;
+  COLORS_FOR_PASS_FAIL_MODE = QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE;
 
-      ctrl.getScoreRingColor = function() {
-        if (ctrl.testIsPassed()) {
-          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
-        } else {
-          return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
-        }
-      };
+  setScore(percent: number): void {
+    const offset = this.circumference - percent / 100 * this.circumference;
+    this.circle.style.strokeDashoffset = offset.toString();
+  }
 
-      ctrl.getScoreOuterRingColor = function() {
-        if (ctrl.testIsPassed()) {
-          // Return color green when passed.
-          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
-        } else {
-          // Return color orange when failed.
-          return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
-        }
-      };
-      ctrl.$onInit = function() {
-        circle = (
-          document.querySelector('.score-ring-circle')) as SVGCircleElement;
-        radius = circle.r.baseVal.value;
-        circumference = (radius * 2 * Math.PI);
-        circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = circumference.toString();
-        $scope.$watch(function() {
-          return ctrl.getScore();
-        }, function(newScore) {
-          if (newScore && newScore > 0) {
-            setScore(newScore);
-          }
-        });
-      };
+  getScoreRingColor(): string {
+    if (this.testIsPassed) {
+      return this.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+    } else {
+      return this.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
     }
-  ]
-});
+  }
+
+  getScoreOuterRingColor(): string {
+    if (this.testIsPassed) {
+      // Return color green when passed.
+      return this.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+    } else {
+      // Return color orange when failed.
+      return this.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.score &&
+      changes.score.currentValue !== changes.score.previousValue &&
+      changes.score.currentValue > 0
+    ) {
+      this.setScore(changes.score.currentValue);
+    }
+  }
+
+  ngOnInit(): void {
+    this.circle = (
+      document.querySelector('.score-ring-circle') as SVGCircleElement);
+    this.radius = this.circle.r.baseVal.value;
+    this.circumference = (this.radius * 2 * Math.PI);
+    this.circle.style.strokeDasharray = (
+      `${this.circumference} ${this.circumference}`);
+    this.circle.style.strokeDashoffset = this.circumference.toString();
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaScoreRing', downgradeComponent({
+    component: ScoreRingComponent
+  }) as angular.IDirectiveFactory);

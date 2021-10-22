@@ -160,7 +160,7 @@ var BlogDashboardPage = function() {
     await action.sendKeys(
       'New blog post title field', blogPostTitleFieldElement, blogPostTitle);
     await this.setContent(richTextInstructions);
-    await waitFor.visibilityOf(
+    await waitFor.presenceOf(
       blogPostContentDisplay, 'Blog Post content not showing up');
     await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
@@ -172,7 +172,7 @@ var BlogDashboardPage = function() {
       'New blog post title field', blogPostTitleFieldElement, blogPostTitle);
     await this.selectTags(tags);
     await this.setContent(richTextInstructions);
-    await waitFor.visibilityOf(
+    await waitFor.presenceOf(
       blogPostContentDisplay, 'Blog Post content not showing up');
     await this.setThumbnailImage();
     await action.click('Publish Blog Post Button', publishBlogPostButton);
