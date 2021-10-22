@@ -178,28 +178,6 @@ class ExplorationOpportunitySummary:
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected topic_name to be a string, received %s' %
-                self.topic_name)
-        if not isinstance(self.story_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected story_id to be a string, received %s' % self.story_id)
-        if not isinstance(self.story_title, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected story_title to be a string, received %s' %
-                self.story_title)
-        if not isinstance(self.chapter_title, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected chapter_title to be a string, received %s' %
-                self.chapter_title)
-        if not isinstance(self.content_count, int):
-            raise utils.ValidationError(
-                'Expected content_count to be an integer, received %s' %
-                self.content_count)
 
         if self.content_count < 0:
             raise utils.ValidationError(
@@ -255,10 +233,7 @@ class ExplorationOpportunitySummary:
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
-            if not isinstance(count, int):
-                raise utils.ValidationError(
-                    'Expected count for language_code %s to be an integer, '
-                    'received %s' % (language_code, count))
+
             if count < 0:
                 raise utils.ValidationError(
                     'Expected count for language_code %s to be a non-negative '
@@ -298,14 +273,6 @@ class SkillOpportunity:
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.skill_description, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected skill_description to be a string, received %s' %
-                self.skill_description)
-        if not isinstance(self.question_count, int):
-            raise utils.ValidationError(
-                'Expected question_count to be an integer, received %s' %
-                self.question_count)
 
         if self.question_count < 0:
             raise utils.ValidationError(
