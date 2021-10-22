@@ -654,12 +654,40 @@ class CommonTests(test_utils.GenericTestBase):
         )
         with remove_swap:
             common.inplace_replace_file(
-                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+                origin_file,
+                '"DEV_MODE": .*',
+                '"DEV_MODE": true,',
+                expected_number_of_replacements=1
+            )
         with python_utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         os.remove(origin_file)
         shutil.move(backup_file, origin_file)
+
+    def test_inplace_replace_file_with_expected_number_of_replacements_raises(
+            self
+    ):
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        with python_utils.open_file(origin_file, 'r') as f:
+            origin_content = f.readlines()
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
+        ):
+            common.inplace_replace_file(
+                origin_file,
+                '"DEV_MODEa": .*',
+                '"DEV_MODE": true,',
+                expected_number_of_replacements=1
+            )
+        self.assertFalse(os.path.isfile(backup_file))
+        with python_utils.open_file(origin_file, 'r') as f:
+            new_content = f.readlines()
+        self.assertEqual(origin_content, new_content)
 
     def test_inplace_replace_file_with_exception_raised(self):
         origin_file = os.path.join(
