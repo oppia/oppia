@@ -18,6 +18,8 @@
  * should not be used in migrated files unless strictly necessary.
  */
 
+require('directives/angular-html-bind.directive');
+
 angular.module('oppia').directive('angularHtmlBindWrapper', [
   function() {
     return {
@@ -42,6 +44,7 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
                 $scope[key] = ctrl.parentScope[key];
               }
             }
+            console.log(ctrl.htmlData);
             $rootScope.$applyAsync();
           };
           // Manually implementing the OnChanges lifecycle hook to trigger the
