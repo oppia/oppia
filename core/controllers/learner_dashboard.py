@@ -195,15 +195,6 @@ class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.exploration_playlist_summaries))
 
-        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-        if len(full_thread_ids) > 0:
-            thread_summaries, number_of_unread_threads = (
-                feedback_services.get_exp_thread_summaries(
-                    self.user_id, full_thread_ids))
-        else:
-            thread_summaries, number_of_unread_threads = [], 0
-
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
         creators_settings = user_services.get_users_settings(
@@ -228,9 +219,34 @@ class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
             'exploration_playlist': exploration_playlist_summary_dicts,
             'number_of_nonexistent_explorations': (
                 number_of_nonexistent_explorations),
+            'subscription_list': subscription_list
+        })
+        self.render_json(self.values)
+
+
+class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
+    """Provides data for the user's learner dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
+            self.user_id)
+        if len(full_thread_ids) > 0:
+            thread_summaries, number_of_unread_threads = (
+                feedback_services.get_exp_thread_summaries(
+                    self.user_id, full_thread_ids))
+        else:
+            thread_summaries, number_of_unread_threads = [], 0
+
+        self.values.update({
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
-            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 

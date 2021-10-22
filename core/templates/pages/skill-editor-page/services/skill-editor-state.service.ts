@@ -235,6 +235,13 @@ export class SkillEditorStateService {
     return true;
   }
   /**
+   * Returns any validation issues associated with the current
+   * skill.
+   */
+  getSkillValidationIssues(): string[] {
+    return this._skill.getValidationIssues();
+  }
+  /**
    * Checks if the skill description exists and updates class
    * variable. `create-new-skill-modal.controller` will search
    * for that variable.

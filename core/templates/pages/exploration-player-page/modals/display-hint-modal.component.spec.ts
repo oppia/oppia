@@ -40,7 +40,7 @@ let MockAngularHtmlBindWrapperDirective = function(
     inputs: options.inputs,
     outputs: options.outputs
   };
-  return <undefined>Directive(metadata)(class _ { });
+  return Directive(metadata)(class _ { }) as undefined;
 };
 
 describe('Display hint modal', () => {
