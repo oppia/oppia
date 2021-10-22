@@ -119,7 +119,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.assertEqual(activity_rights.first_published_msec, 0.0)
 
     def test_cannot_update_activity_first_published_msec_for_invalid_activity(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Cannot get activity rights for unknown activity type'):
             rights_manager.update_activity_first_published_msec( # type: ignore[no-untyped-call]
@@ -134,7 +135,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, None))
 
     def test_check_cannot_voiceover_activity_with_no_activity_rights(
-        self) -> None:
+        self
+    ) -> None:
         self.assertFalse(rights_manager.check_can_voiceover_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
@@ -147,17 +149,20 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, None))
 
     def test_check_cannot_modify_activity_roles_with_no_activity_rights(
-        self) -> None:
+        self
+    ) -> None:
         self.assertFalse(rights_manager.check_can_modify_core_activity_roles( # type: ignore[no-untyped-call]
             self.owner, None))
 
     def test_check_cannot_release_ownership_with_no_activity_rights(
-        self) -> None:
+        self
+    ) -> None:
         self.assertFalse(rights_manager.check_can_release_ownership( # type: ignore[no-untyped-call]
             self.owner, None))
 
     def test_check_cannnot_publish_activity_with_no_activity_rights(
-        self) -> None:
+        self
+    ) -> None:
         self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
@@ -167,12 +172,14 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, self.activity_rights))
 
     def test_check_cannot_unpublish_activity_with_no_activity_rights(
-        self) -> None:
+        self
+    ) -> None:
         self.assertFalse(rights_manager.check_can_unpublish_activity( # type: ignore[no-untyped-call]
             self.owner, None))
 
     def test_cannot_release_ownership_of_exploration_with_insufficient_rights(
-            self) -> None:
+        self
+    ) -> None:
         observed_log_messages = []
 
         def _mock_logging_function(msg: str, *args: Sequence[str]) -> None:
@@ -264,7 +271,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             rights_domain.ExplorationRightsChange({'cmd': 'invalid'}) # type: ignore[no-untyped-call]
 
     def test_exploration_rights_change_object_with_missing_attribute_in_cmd(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
@@ -275,7 +283,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exploration_rights_change_object_with_extra_attribute_in_cmd(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -338,7 +347,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         )
 
     def test_exploration_rights_change_object_with_release_ownership(
-        self) -> None:
+        self
+    ) -> None:
         exploration_rights_change_object = (
             rights_domain.ExplorationRightsChange( # type: ignore[no-untyped-call]
                 {'cmd': 'release_ownership'}
@@ -349,7 +359,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             exploration_rights_change_object.cmd, 'release_ownership')
 
     def test_exploration_rights_change_object_with_change_private_viewability(
-            self) -> None:
+        self
+    ) -> None:
         exploration_rights_change_object = (
             rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
                 'cmd': 'change_private_viewability',
@@ -368,7 +379,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             'new_viewable_if_private')
 
     def test_exploration_rights_change_object_with_update_first_published_msec(
-            self) -> None:
+        self
+    ) -> None:
         exploration_rights_change_object = (
             rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
                 'cmd': 'update_first_published_msec',
@@ -387,7 +399,8 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             'new_first_published_msec')
 
     def test_exploration_rights_change_object_with_change_exploration_status(
-            self) -> None:
+        self
+    ) -> None:
         exploration_rights_change_object = (
             rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
                 'cmd': 'change_exploration_status',
@@ -432,7 +445,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             rights_domain.CollectionRightsChange({'cmd': 'invalid'}) # type: ignore[no-untyped-call]
 
     def test_collection_rights_change_object_with_missing_attribute_in_cmd(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
@@ -443,7 +457,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_rights_change_object_with_extra_attribute_in_cmd(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -501,7 +516,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             collection_rights_change_object.new_role, rights_domain.ROLE_VIEWER)
 
     def test_collection_rights_change_object_with_release_ownership(
-        self) -> None:
+        self
+    ) -> None:
         collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
             'cmd': 'release_ownership'
         })
@@ -510,7 +526,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             collection_rights_change_object.cmd, 'release_ownership')
 
     def test_collection_rights_change_object_with_change_private_viewability(
-            self) -> None:
+            self
+        ) -> None:
         collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
             'cmd': 'change_private_viewability',
             'old_viewable_if_private': 'old_viewable_if_private',
@@ -527,7 +544,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             'new_viewable_if_private')
 
     def test_collection_rights_change_object_with_update_first_published_msec(
-            self) -> None:
+        self
+    ) -> None:
         collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
             'cmd': 'update_first_published_msec',
             'old_first_published_msec': 'old_first_published_msec',
@@ -544,7 +562,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             'new_first_published_msec')
 
     def test_collection_rights_change_object_with_change_collection_status(
-            self) -> None:
+        self
+    ) -> None:
         collection_rights_change_object = (
             rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
                 'cmd': 'change_collection_status',

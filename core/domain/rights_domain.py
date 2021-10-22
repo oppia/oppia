@@ -59,16 +59,18 @@ class ActivityRights:
     """
 
     def __init__(
-            self, exploration_id: str,
-            owner_ids: List[str],
-            editor_ids: List[str],
-            voice_artist_ids: List[str],
-            viewer_ids: List[str],
-            community_owned: bool=False,
-            cloned_from: Optional[str]=None,
-            status: str=ACTIVITY_STATUS_PRIVATE,
-            viewable_if_private: bool=False,
-            first_published_msec: Optional[str]=None) -> None:
+        self,
+        exploration_id: str,
+        owner_ids: List[str],
+        editor_ids: List[str],
+        voice_artist_ids: List[str],
+        viewer_ids: List[str],
+        community_owned: Optional[bool] = False,
+        cloned_from: Optional[str] = None,
+        status: Optional[str] = ACTIVITY_STATUS_PRIVATE,
+        viewable_if_private: Optional[bool] = False,
+        first_published_msec: Optional[str] = None
+    ) -> None:
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
