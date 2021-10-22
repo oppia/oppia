@@ -96,82 +96,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'translation_in_review_counts': {}
         })
 
-    def test_invalid_topic_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_id, python_utils.BASESTRING))
-        with self.mock_supported_audio_languages_context:
-            # Object with topic_id as string passes the validation check.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.topic_id = 5
-            # Object with topic_id as int fails the validation check.
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected topic_id to be a string, received 5')
-
-    def test_invalid_topic_name_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_name, python_utils.BASESTRING))
-
-        with self.mock_supported_audio_languages_context:
-            # Object with topic_name as string passes the validation check.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.topic_name = True
-            # Object with topic_id as bool fails the validation check.
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected topic_name to be a string, received True')
-
-    def test_invalid_story_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_id, python_utils.BASESTRING))
-        with self.mock_supported_audio_languages_context:
-            # Object with story_id as string passes the validation check.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.story_id = 5
-            # Object with story_id as int fails the validation check.
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected story_id to be a string, received 5')
-
-    def test_invalid_story_title_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_title, python_utils.BASESTRING))
-
-        with self.mock_supported_audio_languages_context:
-            # Object with story_title as string passes the validation check.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.story_title = True
-            # Object with story_id as bool fails the validation check.
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected story_title to be a string, received True')
-
-    def test_invalid_chapter_title_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.chapter_title, python_utils.BASESTRING))
-
-        with self.mock_supported_audio_languages_context:
-            # Object with chapter_title as string passes the validation check.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.chapter_title = True
-            # Object with chapter_id as bool fails the validation check.
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected chapter_title to be a string, received True')
-
-    def test_invalid_content_count_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.content_count, int))
-
-        with self.mock_supported_audio_languages_context:
-            # Object with content_count as int passes the validation check.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.content_count = '123abc'
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected content_count to be an integer, received 123abc')
-
-    def test_negative_content_count_fails_validation_check(self):
+    def test_negative_content_count_fails_validation_check(self) -> None:
         self.assertTrue(isinstance(
             self.valid_exp_opp_summary.content_count, int))
 
@@ -254,26 +179,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected count for language_code hi to be a non-negative '
-                'integer, received -5')
-
-    def test_translation_counts_with_invalid_count_type_fails_validation(
-            self):
-        self.valid_exp_opp_summary.translation_counts = {
-            'hi': 4
-        }
-        with self.mock_supported_audio_languages_context:
-            # Object with valid count in translation_counts passes the
-            # validation.
-            self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.translation_counts = {
-                'hi': '12ab'
-            }
-            # Object with invalid count in translation_counts fails the
-            # validation.
-            self._assert_validation_error(
-                self.valid_exp_opp_summary,
-                'Expected count for language_code hi to be an integer, '
-                'received 12ab')
+                'integer, received -5'
+            )
 
     def test_translation_counts_with_invalid_count_value_fails_validation(
             self):
@@ -398,31 +305,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
             'question_count': 5,
         })
 
-    def test_invalid_skill_description_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.skill_description,
-            python_utils.BASESTRING))
-
-        # Object with skill_description as string passes the validation check.
-        self.valid_skill_opportunity.validate()
-        self.valid_skill_opportunity.skill_description = True
-        # Object with skill_id as bool fails the validation check.
-        self._assert_validation_error(
-            self.valid_skill_opportunity,
-            'Expected skill_description to be a string, received True')
-
-    def test_invalid_question_count_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.question_count, int))
-
-        # Object with question_count as int passes the validation check.
-        self.valid_skill_opportunity.validate()
-        self.valid_skill_opportunity.question_count = '123abc'
-        self._assert_validation_error(
-            self.valid_skill_opportunity,
-            'Expected question_count to be an integer, received 123abc')
-
-    def test_negative_question_count_fails_validation_check(self):
+    def test_negative_question_count_fails_validation_check(self) -> None:
         self.assertTrue(isinstance(
             self.valid_skill_opportunity.question_count, int))
 
