@@ -65,7 +65,7 @@ class TextInput(base.BaseInteraction):
                 'min_value': 1,
             }, {
                 'id': 'is_at_most',
-                'max_value': 200,
+                'max_value': 10,
             }]
         },
         'default_value': 1,

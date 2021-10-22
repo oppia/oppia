@@ -64,11 +64,11 @@ export class CkEditorCopyContentService {
   private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
     let containedWidgetTagName;
     let currentElement = target;
-    let descendants = <ChildNode[]> Array.from(target.childNodes);
+    let descendants = Array.from(target.childNodes) as ChildNode[];
 
     while (true) {
       const currentTagName = currentElement.tagName.toLowerCase();
-      const parentElement = <HTMLElement> currentElement.parentElement;
+      const parentElement = currentElement.parentElement as HTMLElement;
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
         containedWidgetTagName = currentTagName;
         break;
@@ -83,7 +83,7 @@ export class CkEditorCopyContentService {
     while (descendants.length !== 0) {
       // 'shift()' returns 'undefined' only when 'descendants' array is empty,
       // the while loop terminates before that condition is reached.
-      let currentDescendant = <ChildNode> descendants.shift();
+      let currentDescendant = descendants.shift() as ChildNode;
 
       const currentTagName = currentDescendant.nodeName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
