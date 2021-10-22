@@ -59,15 +59,22 @@ var checkForAddTitleWarning = async function() {
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  await element(by.css('.protractor-test-exploration-title-input')).click();
-  await element(by.css('.protractor-test-exploration-objective-input')).click();
+  //await element(by.css('.protractor-test-exploration-title-input')).click();
+  // await element(by.css('.protractor-test-exploration-objective-input')).click();
+  var explorationTitleInput = element(by.css('.protractor-test-exploration-title-input'));
+  await action.click('Exploration Title Input', explorationTitleInput);
+  var explorationObjectiveInput = element(by.css('.protractor-test-exploration-objective-input'));
+  await action.click('Exploration Objective Input', explorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys(
-    'Chuck Norris');
+  // await element(by.css('.protractor-test-edit-roles')).click();
+  var testEditRoles = element(by.css('.protractor-test-edit-roles'));
+  await action.click('Test edit roles', testEditRoles);
+  // await element(by.css('.protractor-test-role-username')).sendKeys(
+  //   'Chuck Norris');
+  await action.sendKeys('Test Role Username', element(by.css('.protractor-test-role-username')), 'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
@@ -128,18 +135,23 @@ var publishExploration = async function() {
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
-  await element(by.css('.protractor-test-publish-exploration')).click();
+  // await element(by.css('.protractor-test-publish-exploration')).click();
+  var testPublishExploration = element(by.css('.protractor-test-publish-exploration'));
+  await action.click('Test Publish Exploration', testPublishExploration);
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
-  await prePublicationButtonElem.click();
+  // await prePublicationButtonElem.click();
+  await action.click('Pre Publication Button Element', prePublicationButtonElem);
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  await element(by.css('.protractor-test-confirm-publish')).click();
+  // await element(by.css('.protractor-test-confirm-publish')).click();
+  var testConfirmPublish = element(by.css('.protractor-test-confirm-publish'));
+  await action.click('Test Confirm Publish', testConfirmPublish);
 
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
@@ -149,7 +161,8 @@ var publishExploration = async function() {
     sharePublishModal, 'Share Publish Modal takes too long to appear');
   await waitFor.elementToBeClickable(
     closePublishModalButton, 'Close Publish Modal button is not clickable');
-  await closePublishModalButton.click();
+  // await closePublishModalButton.click();
+  await action.click('Close Publish Modal Button', closePublishModalButton);
 };
 
 // Creates and publishes a minimal exploration.
@@ -319,7 +332,8 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  return await imageUploadInput.sendKeys(absPath);
+  // return await imageUploadInput.sendKeys(absPath);
+  return await action.sendKeys('Image Upload Input', imageUploadInput, absPath);
 };
 
 var submitImage = async function(
