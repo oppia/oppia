@@ -67,8 +67,8 @@ export class ScoreRingComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.circle = <SVGCircleElement>(
-      document.querySelector('.score-ring-circle'));
+    this.circle = (
+      document.querySelector('.score-ring-circle') as SVGCircleElement);
     this.radius = this.circle.r.baseVal.value;
     this.circumference = (this.radius * 2 * Math.PI);
     this.circle.style.strokeDasharray = (
