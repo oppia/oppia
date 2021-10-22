@@ -370,6 +370,8 @@
     "core/templates/pages/exploration-player-page/learner-experience/continue-button.component.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-interstitial-modal.component.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-interstitial-modal.component.spec.ts",
+    "core/templates/pages/exploration-player-page/modals/display-solution-modal.component.ts",
+    "core/templates/pages/exploration-player-page/modals/display-solution-modal.component.spec.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-language.service.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-language.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-manager.service.ts",

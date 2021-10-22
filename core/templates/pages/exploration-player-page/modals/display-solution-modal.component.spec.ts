@@ -30,6 +30,9 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplaySolutionModalComponent } from './display-solution-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 let MockAngularHtmlBindWrapperDirective = function(
     options: Component): Directive {
@@ -38,7 +41,7 @@ let MockAngularHtmlBindWrapperDirective = function(
     inputs: options.inputs,
     outputs: options.outputs
   };
-  return Directive(metadata)(class _ { }) as undefined;
+  return Directive(metadata)(class _ { }) as Directive;
 };
 
 describe('Display Solution Modal', () => {
@@ -119,10 +122,13 @@ describe('Display Solution Modal', () => {
 
   it('should intialize', () => {
     let contentId: string = 'content_id';
+    let interaction = {} as Interaction;
+    let writtenTranslations = {} as WrittenTranslations;
     let recordedVoiceovers = new RecordedVoiceovers({});
+    let audioTranslation = {} as AudioTranslationLanguageService;
     let displayedCard = new StateCard(
-      'test_name', 'content', 'interaction', null, [],
-      recordedVoiceovers, null, contentId, null);
+      'test_name', 'content', 'interaction', interaction, [],
+      recordedVoiceovers, writtenTranslations, contentId, audioTranslation);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
     spyOn(audioTranslationManagerService, 'setSecondaryAudioTranslations');
     spyOn(audioPlayerService.onAutoplayAudio, 'emit');
