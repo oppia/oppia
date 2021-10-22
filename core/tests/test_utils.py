@@ -2127,10 +2127,9 @@ title: Title
                 filepath = os.path.relpath(
                     os.path.join(_dir, file_name), start=current_dir)
                 if (
-                        filepath.endswith('.py') and (
-                            filepath.startswith('core/') or
-                            filepath.startswith('extensions/')
-                        )
+                        filepath.endswith('.py') and
+                        filepath.startswith(('core/', 'extensions/')) and
+                        not filepath.startswith('core/tests')
                 ):
                     module = filepath[:-3].replace('/', '.')
                     files_in_directory.append(module)
