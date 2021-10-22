@@ -40,12 +40,10 @@ var SkillEditorPage = function() {
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
-  var workedExampleQuestion = element(
-    by.css('.protractor-test-worked-example-question')
-  ).all(by.tagName('p')).last();
-  var workedExampleExplanation = element(
-    by.css('.protractor-test-worked-example-explanation')
-  ).all(by.tagName('p')).last();
+  var workedExampleQuestionInput = element(
+    by.css('.protractor-test-worked-example-question .protractor-test-rte'));
+  var workedExampleExplanationInput = element(
+    by.css('.protractor-test-worked-example-explanation .protractor-test-rte'));
   var workedExampleQuestionField = element(
     by.css('.protractor-test-worked-example-question-field'));
   var workedExampleExplanationField = element(
@@ -62,11 +60,9 @@ var SkillEditorPage = function() {
   var misconceptionNameField = element(
     by.css('.protractor-test-misconception-name-field'));
   var misconceptionNotesField = element(
-    by.css('.protractor-test-notes-textarea'))
-    .all(by.tagName('p')).last();
+    by.css('.protractor-test-notes-textarea .protractor-test-rte'));
   var misconceptionFeedbackField = element(
-    by.css('.protractor-test-feedback-textarea'))
-    .all(by.tagName('p')).last();
+    by.css('.protractor-test-feedback-textarea .protractor-test-rte'));
   var confirmAddMisconception = element(
     by.css('.protractor-test-confirm-add-misconception-button'));
   var misconceptionListItems = element.all(
@@ -110,6 +106,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-select-rubric-difficulty'));
   var rubricExplanationEditorElement = element(
     by.css('.protractor-test-rubric-explanation-text'));
+  var rubricExplanationEditorInput = element(
+    by.css('.protractor-test-rubric-explanation-text .protractor-test-rte'));
   var addWorkedExampleModal = element(
     by.css('.protractor-test-add-worked-example-modal'));
   var deleteWorkedExampleModal = element(
@@ -120,6 +118,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-delete-misconception-modal'));
   var conceptCardTextElement = element(
     by.css('.protractor-test-concept-card-text'));
+  var conceptCardExplanationEditorInput = element(
+    by.css('.protractor-test-concept-card-text .protractor-test-rte'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -143,10 +143,9 @@ var SkillEditorPage = function() {
     await action.click(
       'Add rubric explanation button',
       addRubricExplanationButton);
-    await waitFor.visibilityOf(
-      rubricExplanationEditorElement,
-      'Rubric explanation editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    await action.sendKeys(
+      'Rubric explanation editor input',
+      rubricExplanationEditorInput, explanation, true);
     await action.click(
       'Save rubric explanation button',
       saveRubricExplanationButton);
@@ -186,10 +185,9 @@ var SkillEditorPage = function() {
     await action.click(
       `Edit rubric explanation button ${explIndex}`,
       editRubricExplanationButtons.get(explIndex));
-    await waitFor.visibilityOf(
-      rubricExplanationEditorElement,
-      'Rubric explanation editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    await action.sendKeys(
+      'Rubric explanation editor input',
+      rubricExplanationEditorInput, explanation, true);
     await action.click(
       'Save rubric explanation button',
       saveRubricExplanationButton);
@@ -267,11 +265,9 @@ var SkillEditorPage = function() {
     await action.click(
       'Edit concept card explanation', editConceptCardExplanationButton);
 
-    await waitFor.visibilityOf(
-      conceptCardTextElement,
-      'Concept card text Editor takes too long to appear');
-
-    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    await action.sendKeys(
+      'Concept card explanation editor input',
+      conceptCardExplanationEditorInput, explanation, true);
 
     await action.click(
       'Save Concept Card Explanation Button',
@@ -295,11 +291,13 @@ var SkillEditorPage = function() {
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    await action.click('Worked example question', workedExampleQuestion);
-    await browser.switchTo().activeElement().sendKeys(question);
+    await action.sendKeys(
+      'Worked example question',
+      workedExampleQuestionInput, question, true);
 
-    await action.click('Worked example explanation', workedExampleExplanation);
-    await browser.switchTo().activeElement().sendKeys(explanation);
+    await action.sendKeys(
+      'Worked example question',
+      workedExampleExplanationInput, explanation, true);
 
     await action.click(
       'Save worked example', saveWorkedExampleButton);
@@ -355,18 +353,20 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       addMisconceptionModal,
       'Add Misconception Modal takes too long to appear');
+    await action.sendKeys(
+      'Misconception name field',
+      misconceptionNameField,
+      name, true);
 
-    await action.click('Misconception name field', misconceptionNameField);
-    await browser.switchTo().activeElement().sendKeys(name);
+    await action.sendKeys(
+      'Misconception notes field',
+      misconceptionNotesField,
+      notes, true);
 
-    await action.click('Misconception notes field', misconceptionNotesField);
-    await browser.switchTo().activeElement().sendKeys(notes);
-
-    await action.click(
-      'Misconception feedback field',
-      misconceptionFeedbackField);
-
-    await browser.switchTo().activeElement().sendKeys(feedback);
+    await action.sendKeys(
+      'Misconception notes field',
+      misconceptionFeedbackField,
+      feedback, true);
 
     await action.click('Confirm add misconception', confirmAddMisconception);
 
