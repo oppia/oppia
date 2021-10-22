@@ -131,12 +131,12 @@ export class TopicRightsBackendApiService {
       topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(topicId)) {
-        resolve(<TopicRightsBackendResponse> this.topicRightsCache[topicId]);
+        resolve(this.topicRightsCache[topicId] as TopicRightsBackendResponse);
       } else {
         this._fetchTopicRights(topicId, (topicRights) => {
           // Save the fetched topic rights to avoid future fetches.
           this.topicRightsCache[topicId] = topicRights;
-          resolve(<TopicRightsBackendResponse> this.topicRightsCache[topicId]);
+          resolve(this.topicRightsCache[topicId] as TopicRightsBackendResponse);
         }, reject);
       }
     });
