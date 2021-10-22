@@ -219,13 +219,15 @@ export class StateEditorService {
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
-      return <AnswerChoice[]>(
-        <MultipleChoiceInputCustomizationArgs> customizationArgs
-      ).choices.value.map((val, ind) => ({ val: ind, label: val.html }));
+      return (
+        customizationArgs as MultipleChoiceInputCustomizationArgs
+      ).choices.value.map((val, ind) => (
+        { val: ind, label: val.html }
+      )) as AnswerChoice[];
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
-        <ImageClickInputCustomizationArgs> customizationArgs)
+        customizationArgs as ImageClickInputCustomizationArgs)
         .imageAndRegions.value;
       for (
         var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
@@ -239,13 +241,13 @@ export class StateEditorService {
       interactionId === 'ItemSelectionInput' ||
       interactionId === 'DragAndDropSortInput'
     ) {
-      return <AnswerChoice[]>(
-        <CustomizationArgs>customizationArgs
+      return (
+        customizationArgs as CustomizationArgs
       ).choices.value.map(
         val => ({
           val: val.contentId, label: val.html}
         )
-      );
+      ) as AnswerChoice[];
     } else {
       return null;
     }
