@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for unit testing in Angular.
  */
 
-import { Directive, ElementRef, EventEmitter, Injectable, Input, NgModule, Pipe } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, NgModule, Pipe } from '@angular/core';
 
 @Pipe({name: 'translate'})
 export class MockTranslatePipe {

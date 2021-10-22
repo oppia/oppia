@@ -23,7 +23,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { CookieModule } from 'ngx-cookie';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
