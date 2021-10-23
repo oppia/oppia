@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import android_validation_constants
 from core import feconf
 from core import python_utils
 from core import utils
@@ -253,7 +254,15 @@ class NewTopicHandler(base.BaseHandler):
         'POST': {
             'name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }, {
+                        'id': 'has_length_below',
+                        'max_value': (
+                          android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
+                        )
+                    }]
                 }
             },
             'url_fragment': {
@@ -294,11 +303,6 @@ class NewTopicHandler(base.BaseHandler):
         thumbnail_bg_color = self.normalized_payload.get('thumbnailBgColor')
         raw_image = self.normalized_request.get('image')
 
-        try:
-            topic_domain.Topic.require_valid_name(name)
-        except:
-            raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name)
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
@@ -381,21 +385,6 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
         explanation_dict = self.normalized_payload.get('explanation_dict')
         rubrics = self.normalized_payload.get('rubrics')
-
-        if not isinstance(rubrics, list):
-            raise self.InvalidInputException('Rubrics should be a list.')
-
-        if not isinstance(explanation_dict, dict):
-            raise self.InvalidInputException(
-                'Explanation should be a dict.')
-
-        try:
-            subtitled_html = (
-                state_domain.SubtitledHtml.from_dict(explanation_dict))
-            subtitled_html.validate()
-        except:
-            raise self.InvalidInputException(
-                'Explanation should be a valid SubtitledHtml dict.')
 
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()

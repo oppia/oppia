@@ -445,6 +445,22 @@ class _Validators:
         return bool(obj)
 
     @staticmethod
+    def has_length_below(obj: str, max_value: int) -> bool:
+        """Returns True iff the given object (a string) has length below
+        `max_value` characters.
+
+        Args:
+            obj: str. A string.
+            max_value: int. The maximum number of characters that `obj`
+                should contain.
+
+        Returns:
+            bool. Whether the given object has length below
+            `max_value` characters.
+        """
+        return len(obj) <= max_value
+
+    @staticmethod
     def is_uniquified(obj: List[str]) -> bool:
         """Returns True iff the given object (a list) has no duplicates.
 
