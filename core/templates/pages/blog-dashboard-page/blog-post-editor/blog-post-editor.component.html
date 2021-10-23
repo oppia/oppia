@@ -100,7 +100,7 @@
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="protractor-test-content-button blog-post-content-button">
           <div class="oppia-editable-section-mask">
             <angular-html-bind-wrapper [htmlData]="this.blogPostData.content"
-                                       class="protractor-test-content-display">
+                                       classStr="protractor-test-content-display">
             </angular-html-bind-wrapper>
           </div>
         </div>
