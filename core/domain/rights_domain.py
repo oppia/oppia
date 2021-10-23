@@ -25,7 +25,6 @@ from core.domain import change_domain
 from core.domain import user_services
 
 from typing import List, Optional
-
 from typing_extensions import TypedDict
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
@@ -56,9 +55,7 @@ DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
 
 
 class ActivityRightsDict(TypedDict):
-    """A dict version of ActivityRights suitable for use by the frontend.
-    """
-
+    """A dict version of ActivityRights suitable for use by the frontend."""
     cloned_from: Optional[str]
     status: str
     community_owned: bool
