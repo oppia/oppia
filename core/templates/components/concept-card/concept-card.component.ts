@@ -41,7 +41,6 @@ export class ConceptCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingMessage = 'Loading';
-
     this.conceptCardBackendApiService.loadConceptCardsAsync(this.skillIds)
       .then((conceptCardObjects) => {
         conceptCardObjects.forEach((conceptCardObject) => {
@@ -56,13 +55,13 @@ export class ConceptCardComponent implements OnInit {
       }, (errorResponse) => {
         this.loadingMessage = '';
         this.skillDeletedMessage = 'Oops, it looks like this skill has' +
-          ' been deleted.';
+           ' been deleted.';
       });
   }
 
   isLastWorkedExample(): boolean {
     return this.numberOfWorkedExamplesShown ===
-      this.currentConceptCard.getWorkedExamples().length;
+       this.currentConceptCard.getWorkedExamples().length;
   }
 
   showMoreWorkedExamples(): void {
@@ -71,7 +70,7 @@ export class ConceptCardComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaConceptCard',
-  downgradeComponent({
+angular.module('oppia').directive(
+  'oppiaConceptCard', downgradeComponent({
     component: ConceptCardComponent
   }) as angular.IDirectiveFactory);

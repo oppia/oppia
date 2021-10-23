@@ -36,9 +36,9 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.compo
 import { PortalModule } from '@angular/cdk/portal';
 import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
 
-
 @NgModule({
   imports: [
+    CommonElementsModule,
     CommonModule,
     CommonElementsModule,
     DynamicContentModule,

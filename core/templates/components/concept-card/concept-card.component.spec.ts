@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for concept card component.
+ * @fileoverview Unit test for Concept Card Component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
