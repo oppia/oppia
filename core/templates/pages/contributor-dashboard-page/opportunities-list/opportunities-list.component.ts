@@ -44,13 +44,13 @@ export class OpportunitiesListComponent {
   @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
-  opportunityRemainder: number = 0;
   lastPageNumber: number = 1000;
   opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
+  more: boolean = true
 
   constructor(
     private zone: NgZone,
@@ -102,8 +102,6 @@ export class OpportunitiesListComponent {
         this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
           this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
         this.loadingOpportunityData = false;
-        this.opportunityRemainder = this.OPPORTUNITIES_PAGE_SIZE -
-            this.opportunities.length % this.OPPORTUNITIES_PAGE_SIZE;
       });
     });
   }
@@ -111,31 +109,20 @@ export class OpportunitiesListComponent {
   gotoPage(pageNumber: number): void {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
-    if (startIndex >= this.opportunities.length) {
+    if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
       this.loadMoreOpportunities().then(
         ({opportunitiesDicts, more}) => {
+          this.more = more
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
-          this.opportunityRemainder = this.OPPORTUNITIES_PAGE_SIZE -
-            this.opportunities.length % this.OPPORTUNITIES_PAGE_SIZE;
-          this.visibleOpportunities = this.opportunities.slice(
-            startIndex - this.opportunityRemainder,
-            endIndex - this.opportunityRemainder);
+          this.visibleOpportunities = this.opportunities.slice(startIndex, endIndex);
           this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
             this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
           this.loadingOpportunityData = false;
         });
     } else {
-      if (pageNumber === 1) {
-        this.visibleOpportunities =
-          this.opportunities.slice(startIndex, endIndex);
-      } else {
-        this.visibleOpportunities =
-          this.opportunities.slice(
-            startIndex - this.opportunityRemainder,
-            endIndex - this.opportunityRemainder);
-      }
+      this.visibleOpportunities = this.opportunities.slice(startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
   }

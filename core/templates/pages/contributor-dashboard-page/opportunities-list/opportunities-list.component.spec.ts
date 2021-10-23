@@ -21,7 +21,6 @@ import { EventEmitter } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from './opportunities-list.component';
@@ -31,10 +30,8 @@ describe('Opportunities List Component', () => {
   let fixture: ComponentFixture<OpportunitiesListComponent>;
 
   let translationLanguageService: TranslationLanguageService;
-  let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
   const mockActiveLanguageEventEmitter = new EventEmitter();
-  const mockActiveTopicEventEmitter = new EventEmitter();
   const mockReloadOpportunitiesEventEmitter = new EventEmitter();
   const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
 
@@ -50,141 +47,6 @@ describe('Opportunities List Component', () => {
   {
     id: 'id2',
     labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id3',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id4',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id5',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id6',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id7',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id8',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id9',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id10',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id11',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id12',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id13',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id5',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id14',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id15',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
-    id: 'id16',
-    labelText: 'text',
     labelColor: 'blue',
     progressPercentage: 30,
     inReviewCount: 20,
@@ -198,8 +60,7 @@ describe('Opportunities List Component', () => {
       declarations: [OpportunitiesListComponent],
       providers: [
         ContributionOpportunitiesService,
-        TranslationLanguageService,
-        TranslationTopicService
+        TranslationLanguageService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -209,7 +70,6 @@ describe('Opportunities List Component', () => {
     fixture = TestBed.createComponent(OpportunitiesListComponent);
     component = fixture.componentInstance;
     translationLanguageService = TestBed.inject(TranslationLanguageService);
-    translationTopicService = TestBed.inject(TranslationTopicService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);
 
@@ -224,8 +84,6 @@ describe('Opportunities List Component', () => {
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
       .and.returnValue(mockActiveLanguageEventEmitter);
-    spyOnProperty(translationTopicService, 'onActiveTopicChanged')
-      .and.returnValue(mockActiveTopicEventEmitter);
     spyOnProperty(
       contributionOpportunitiesService, 'reloadOpportunitiesEventEmitter')
       .and.returnValue(mockReloadOpportunitiesEventEmitter);
@@ -250,18 +108,27 @@ describe('Opportunities List Component', () => {
     // Added two opportunities with id's as 'id1' and 'id2'.
     mockActiveLanguageEventEmitter.emit();
     tick();
-    mockActiveTopicEventEmitter.emit();
-    tick();
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
     expect(component.opportunities).toEqual(ExplorationOpportunityDict);
-    expect(component.opportunities.length).toEqual(17);
+    expect(component.opportunities.length).toEqual(2);
 
     // Removed opportunity with id as 'id2'.
     mockRemoveOpportunitiesEventEmitter.emit(['id2']);
     tick();
 
-    expect(component.opportunities.length).toEqual(16);
+    expect(component.opportunities.length).toEqual(1);
+    expect(component.opportunities).toEqual([
+      {
+        id: 'id1',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      }
+    ]);
   }));
 
   describe('when clicking on page number ', () => {
@@ -273,14 +140,10 @@ describe('Opportunities List Component', () => {
       tick();
       mockReloadOpportunitiesEventEmitter.emit();
       tick();
-      component.gotoPage(1);
-      tick();
       component.gotoPage(2);
       tick();
-      component.gotoPage(3);
-      tick();
 
-      expect(component.activePageNumber).toBe(3);
+      expect(component.activePageNumber).toBe(2);
     }));
 
     it('should not go to the new page when opportunities ' +
