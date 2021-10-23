@@ -47,6 +47,141 @@ describe('Opportunities List Component', () => {
   {
     id: 'id2',
     labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id3',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id4',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id5',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id6',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id7',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id8',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id9',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id10',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id11',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id12',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id13',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id5',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id14',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id15',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id16',
+    labelText: 'text',
     labelColor: 'blue',
     progressPercentage: 30,
     inReviewCount: 20,
@@ -111,24 +246,13 @@ describe('Opportunities List Component', () => {
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
     expect(component.opportunities).toEqual(ExplorationOpportunityDict);
-    expect(component.opportunities.length).toEqual(2);
+    expect(component.opportunities.length).toEqual(17);
 
     // Removed opportunity with id as 'id2'.
     mockRemoveOpportunitiesEventEmitter.emit(['id2']);
     tick();
 
-    expect(component.opportunities.length).toEqual(1);
-    expect(component.opportunities).toEqual([
-      {
-        id: 'id1',
-        labelText: 'text',
-        labelColor: 'red',
-        progressPercentage: 50,
-        inReviewCount: 20,
-        totalCount: 100,
-        translationsCount: 50
-      }
-    ]);
+    expect(component.opportunities.length).toEqual(16);
   }));
 
   describe('when clicking on page number ', () => {
@@ -142,8 +266,12 @@ describe('Opportunities List Component', () => {
       tick();
       component.gotoPage(2);
       tick();
+      component.gotoPage(1);
+      tick();
+      component.gotoPage(3);
+      tick();
 
-      expect(component.activePageNumber).toBe(2);
+      expect(component.activePageNumber).toBe(3);
     }));
 
     it('should not go to the new page when opportunities ' +
