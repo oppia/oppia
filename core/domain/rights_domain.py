@@ -24,7 +24,9 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
+
+from typing_extensions import TypedDict
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -51,6 +53,20 @@ ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Changed role of %s from %s to %s'
 ASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Changed role of (.*) from (.*) to (.*)$'
 DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
 DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
+
+
+class ActivityRightsDict(TypedDict):
+    """A dict version of ActivityRights suitable for use by the frontend.
+    """
+
+    cloned_from: Optional[str]
+    status: str
+    community_owned: bool
+    owner_names: List[str]
+    editor_names: List[str]
+    voice_artist_names: List[str]
+    viewer_names: List[str]
+    viewable_if_private: bool
 
 
 class ActivityRights:
@@ -140,8 +156,7 @@ class ActivityRights:
             raise utils.ValidationError(
                 'Activity should have atleast one owner.')
 
-    def to_dict(self) -> Dict[str, Union[Optional[str],
-    Optional[bool], Optional[List[str]]]]:
+    def to_dict(self) -> ActivityRightsDict:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
