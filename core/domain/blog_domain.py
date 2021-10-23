@@ -271,7 +271,6 @@ class BlogPost:
             BlogPost. The corresponding blog post domain object.
         """
         assert isinstance(blog_post_dict['last_updated'], str)
-        assert isinstance(blog_post_dict['published_on'], str)
         assert isinstance(blog_post_dict['id'], str)
         assert isinstance(blog_post_dict['author_id'], str)
         assert isinstance(blog_post_dict['title'], str)
@@ -285,10 +284,15 @@ class BlogPost:
             utils.convert_string_to_naive_datetime_object(
                 blog_post_dict['last_updated'])
             if blog_post_dict['last_updated'] else None)
-        published_on = (
-            utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['published_on'])
-            if blog_post_dict['published_on'] else None)
+        published_on: Optional[datetime.datetime] = None
+        if blog_post_dict['published_on']:
+            assert isinstance(blog_post_dict['published_on'], str)
+            published_on = (
+                utils.convert_string_to_naive_datetime_object(
+                    blog_post_dict['published_on'])
+                )
+        else:
+            published_on = None
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
