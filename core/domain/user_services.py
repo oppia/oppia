@@ -24,16 +24,17 @@ import hashlib
 import imghdr
 import logging
 import re
+import urllib
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 import requests
 
@@ -2218,7 +2219,7 @@ def create_login_url(return_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    return '/login?%s' % python_utils.url_encode({'return_url': return_url})
+    return '/login?%s' % urllib.parse.urlencode({'return_url': return_url})
 
 
 def mark_user_banned(user_id):

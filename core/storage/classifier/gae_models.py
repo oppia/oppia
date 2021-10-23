@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -124,7 +124,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 producing too many collisions.
         """
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(

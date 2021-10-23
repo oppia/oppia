@@ -176,6 +176,7 @@ why they need to be overriden.  */
 }
 
 .md-button.oppia-learner-confirm-button,
+.mat-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
 .md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;
@@ -835,6 +836,12 @@ textarea {
   outline: 1px dotted #FFF;
   outline: auto 5px -webkit-focus-ring-color;
 }
+
+.oppia-topic-selector:focus {
+  outline: 1px dotted #FFF;
+  outline: auto 5px -webkit-focus-ring-color;
+}
+
 .oppia-footer-padding {
   height: 198px;
 }
@@ -2552,6 +2559,12 @@ oppia-parameter {
   max-width: 1200px;
   width: 90%;
 }
+
+.oppia-welcome-modal .modal-dialog {
+  height: 70%;
+  width: 70%;
+}
+
 .modal.in .modal-dialog {
   -webkit-transform: translate(0,0);
   -ms-transform: translate(0,0);
@@ -3091,12 +3104,19 @@ md-card.preview-conversation-skin-supplemental-card {
   align-items: center;
   flex-direction: column;
 }
+
+.oppia-welcome-modal .modal-content {
+  border-radius: 0;
+  height: 100%;
+  min-height: 450px;
+}
+
 .oppia-modal-information-card .modal-dialog .modal-content {
   border-radius: 0;
   min-width: 200px;
 }
 
-.oppia-modal-information-card .modal-dialog .modal-content md-card {
+.oppia-modal-information-card .modal-dialog .modal-content .mat-card {
   border-radius: 0;
   margin: 0;
   padding: 0;
@@ -4731,4 +4751,81 @@ div.oppia-issues-learner-action {
 .oppia-navigation-button[disabled] {
   color: #bdc3c7;
   cursor: default;
+}
+.conversation-skin-help-card-content {
+  max-height: 235px;
+  overflow-y: auto;
+  width: 270px;
+}
+
+.oppia-welcome-modal .modal-body {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  height: 100%;
+  margin: 0 auto;
+  top: 10%;
+  width: 95%;
+}
+
+.oppia-welcome-modal .oppia-welcome-modal-h1 {
+  color: #015c53;
+}
+
+.oppia-welcome-modal .oppia-welcome-modal-p {
+  font-size: 0.9em;
+  margin-bottom: 6px;
+  margin-top: 0;
+}
+
+.oppia-welcome-modal .oppia-welcome-modal-button {
+  background-color: #015c53;
+  border-radius: 4px;
+  color: #fff;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  margin-top: 10px;
+  text-transform: uppercase;
+  width: 260px;
+}
+
+.oppia-welcome-modal .oppia-welcome-modal-left-button {
+  margin-right: 10px;
+}
+.oppia-welcome-modal .oppia-welcome-modal-button:hover,
+.oppia-welcome-modal .oppia-welcome-modal-button:focus,
+.oppia-welcome-modal .oppia-welcome-modal-button:active {
+  background-color: rgba(5, 190, 178, 1);
+  color: #fff;
+}
+
+.oppia-welcome-modal .oppia-welcome-modal-img {
+  min-width: 100px;
+}
+
+@media (max-width: 770px) {
+  .oppia-welcome-modal .modal-body {
+    top: 5%;
+  }
+
+  .oppia-welcome-modal .modal-dialog {
+    margin: 10% auto;
+    width: 95%;
+  }
+}
+@media (min-width: 576px) {
+  .oppia-welcome-modal .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 900px;
+  }
+}
+
+.oppia-typeahead-form .dropdown-item.active {
+  color: #212529;
+}
+
+/*
+ * This ensures that when mat select is invoked from a modal, the mat options
+ * are not covered by the it.
+ */
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 10000 !important;
 }

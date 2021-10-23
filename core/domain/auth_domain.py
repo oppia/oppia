@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import collections
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -48,7 +48,7 @@ class StaleAuthSessionError(Exception):
     pass
 
 
-class AuthClaims(python_utils.OBJECT):
+class AuthClaims:
     """Domain object for holding onto essential Claims about an authorized user.
 
     A Claim is a piece of information about a user (e.g. name, mailing address,
@@ -82,14 +82,8 @@ class AuthClaims(python_utils.OBJECT):
             (self.auth_id, self.email, self.role_is_super_admin) ==
             (other.auth_id, other.email, other.role_is_super_admin))
 
-    def __ne__(self, other):
-        # TODO(#11474): Delete this method once we've moved to Python 3 and rely
-        # on auto-generated method. In Python 2, we need to write this method
-        # ourselves: https://stackoverflow.com/a/30676267/4859885.
-        return not self == other
 
-
-class UserAuthDetails(python_utils.OBJECT):
+class UserAuthDetails:
     """Domain object representing a user's authentication details.
 
     There are two distinct types of user accounts: "full" and "profile".

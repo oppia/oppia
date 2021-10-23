@@ -19,7 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -30,8 +32,6 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
-import python_utils
-import utils
 
 _LIBRARY_INDEX_GROUPS = [{
     'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
@@ -91,7 +91,7 @@ def get_human_readable_contributors_summary(contributors_summary):
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in python_utils.RANGE(len(contributor_ids))
+        for ind in range(len(contributor_ids))
     }
 
 

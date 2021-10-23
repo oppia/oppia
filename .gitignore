@@ -3,6 +3,7 @@
 *.swp
 *.swo
 *.bak
+*.egg-info
 __pycache__/
 gae_runtime/*
 # Ignore the auto-generated protobuf python code.
@@ -62,3 +63,4 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
+.python-version

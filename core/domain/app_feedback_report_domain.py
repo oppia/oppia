@@ -22,24 +22,26 @@ from __future__ import unicode_literals
 import datetime
 import re
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-import feconf
-from mypy_imports import app_feedback_report_models
-import python_utils
-import utils
-
 from typing import Dict, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
 
 
-class AppFeedbackReport(python_utils.OBJECT):
+class AppFeedbackReport:
     """Domain object for a single feedback report."""
 
     def __init__(
@@ -406,7 +408,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             'The given Android network type %s is invalid.' % network_type_name)
 
 
-class UserSuppliedFeedback(python_utils.OBJECT):
+class UserSuppliedFeedback:
     """Domain object for the user-supplied information in feedback reports."""
 
     def __init__(
@@ -565,7 +567,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                     'Invalid option %s selected by user.' % item)
 
 
-class DeviceSystemContext(python_utils.OBJECT):
+class DeviceSystemContext:
     """Domain object for the device and system information from the device used
     to submit the report.
     """
@@ -833,7 +835,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 'Invalid network type, received: %s.' % network_type)
 
 
-class AppContext(python_utils.OBJECT):
+class AppContext:
     """Domain object for the Oppia app information of the user's Oppia instance
     at the time they submitted the report.
     """
@@ -1057,7 +1059,7 @@ class AndroidAppContext(AppContext):
                     text_size))
 
 
-class EntryPoint(python_utils.OBJECT):
+class EntryPoint:
     """Domain object for the entry point used to initiate the feedback
     report.
     """
@@ -1329,7 +1331,7 @@ class CrashEntryPoint(EntryPoint):
             constants.ENTRY_POINT.crash)
 
 
-class AppFeedbackReportTicket(python_utils.OBJECT):
+class AppFeedbackReportTicket:
     """Domain object for a single ticket created for feedback reports."""
 
     def __init__(
@@ -1503,7 +1505,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                     constants.GITHUB_REPO_CHOICES))
 
 
-class AppFeedbackReportDailyStats(python_utils.OBJECT):
+class AppFeedbackReportDailyStats:
     """Domain object for report statistics on a single day for a specific
     ticket.
     """
@@ -1625,7 +1627,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             param_count_obj.validate()
 
 
-class ReportStatsParameterValueCounts(python_utils.OBJECT):
+class ReportStatsParameterValueCounts:
     """Domain object for the number of reports that satisfy a specific parameter
     value.
     """
@@ -1668,7 +1670,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
                     'received: %r' % param_count)
 
 
-class AppFeedbackReportFilter(python_utils.OBJECT):
+class AppFeedbackReportFilter:
     """Domain object for a filter that can be applied to the collection of
     feedback reports.
     """

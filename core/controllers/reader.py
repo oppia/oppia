@@ -21,7 +21,9 @@ import json
 import logging
 import random
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
@@ -43,8 +45,6 @@ from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
-import feconf
-import utils
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -875,10 +875,11 @@ class QuestionPlayerHandler(base.BaseHandler):
             question_services.get_questions_by_skill_ids(
                 int(question_count), skill_ids, fetch_by_difficulty)
         )
+        random.shuffle(questions)
 
         question_dicts = [question.to_dict() for question in questions]
         self.values.update({
-            'question_dicts': question_dicts
+            'question_dicts': question_dicts[:feconf.QUESTION_BATCH_SIZE]
         })
         self.render_json(self.values)
 
