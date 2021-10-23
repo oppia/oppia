@@ -702,10 +702,10 @@ describe('Exploration editor page component', function() {
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           componentInstance: new MockNgbModalRef(),
           result: $q.resolve(explorationId)
-        }
+        } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
@@ -720,10 +720,10 @@ describe('Exploration editor page component', function() {
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           componentInstance: new MockNgbModalRef(),
           result: $q.reject(explorationId)
-        }
+        } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
