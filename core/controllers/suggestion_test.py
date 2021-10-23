@@ -741,7 +741,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '</oppia-noninteractive-image>'),
                     'data_format': 'html'
                 },
-                'description':'test',
+                'description': 'test',
             }, csrf_token=csrf_token,
             upload_files=(
                 ('image', 'translation_image.png', raw_image), )
