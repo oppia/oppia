@@ -105,8 +105,9 @@ export class Exploration {
     }
 
     const customizationArgs = (
-      <EndExplorationCustomizationArgs> this.getInteractionCustomizationArgs(
-        stateName));
+      this.getInteractionCustomizationArgs(
+        stateName
+      ) as EndExplorationCustomizationArgs);
     return customizationArgs && customizationArgs.recommendedExplorationIds ?
       customizationArgs.recommendedExplorationIds.value : null;
   }
