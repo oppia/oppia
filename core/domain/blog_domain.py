@@ -28,9 +28,24 @@ from core.constants import constants
 from core.domain import html_cleaner
 
 from typing import Dict, List, Optional, Union
+import typing_extensions
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
+
+
+class BlogPostDict(typing_extensions.TypedDict):
+    """Dict type for blog post dict."""
+
+    id: str
+    title: str
+    author_id: str
+    content: str
+    url_fragment: str
+    tags: List[str]
+    thumbnail_filename: Optional[str]
+    last_updated: Optional[str]
+    published_on: Optional[str]
 
 
 class BlogPost:
@@ -219,7 +234,7 @@ class BlogPost:
 
     def to_dict(
         self
-    ) -> Dict[str, Union[str, List[str], Optional[datetime.datetime]]]:
+    ) -> BlogPostDict:
         """Returns a dict representing this blog post domain object.
 
         Returns:
@@ -244,10 +259,7 @@ class BlogPost:
     @classmethod
     def from_dict(
         cls,
-        blog_post_dict: Dict[
-            str,
-            Union[str, List[str]]
-        ]
+        blog_post_dict: BlogPostDict
     ) -> 'BlogPost':
         """Returns a blog post domain object from a dictionary.
 
@@ -259,10 +271,7 @@ class BlogPost:
             BlogPost. The corresponding blog post domain object.
         """
         assert isinstance(blog_post_dict['last_updated'], str)
-        assert isinstance(
-            blog_post_dict['published_on'],
-            str
-        ) or blog_post_dict['published_on'] is None
+        assert isinstance(blog_post_dict['published_on'], str)
         assert isinstance(blog_post_dict['id'], str)
         assert isinstance(blog_post_dict['author_id'], str)
         assert isinstance(blog_post_dict['title'], str)

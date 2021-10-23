@@ -65,7 +65,8 @@ from core.platform import models
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
+import typing_extensions
 import webapp2
 
 MYPY = False
@@ -76,6 +77,14 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 transaction_services = models.Registry.import_transaction_services()
+
+
+class FireBaseClaims(typing_extensions.TypedDict):
+    """Dict type for Firebase Claim Dict."""
+
+    sub: str
+    email: str
+    role: str
 
 
 def establish_firebase_connection() -> None:
@@ -564,13 +573,11 @@ def _get_auth_claims_from_session_cookie(
     except (firebase_exceptions.FirebaseError, ValueError) as error:
         raise auth_domain.InvalidAuthSessionError('session invalid: %s' % error)
     else:
-        return _create_auth_claims(claims)
+        return _create_auth_claims(claims) # type: ignore[arg-type]
 
 
-# TODO(#13523): Change 'firebase_claims' to
-# TypedDict/Domain Object to remove Any used below.
 def _create_auth_claims(
-        firebase_claims: Dict[str, Any]
+        firebase_claims: FireBaseClaims
 ) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from Firebase claims.
 
