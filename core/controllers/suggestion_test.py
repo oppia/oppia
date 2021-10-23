@@ -741,9 +741,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '</oppia-noninteractive-image>'),
                     'data_format': 'html'
                 },
+                'description':'test',
             }, csrf_token=csrf_token,
             upload_files=(
-                ('translation_image.png', 'translation_image.png', raw_image), )
+                ('image', 'translation_image.png', raw_image), )
             )
 
         fs = fs_domain.AbstractFileSystem(
@@ -1058,7 +1059,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
             }, csrf_token=csrf_token, expected_status_int=400, upload_files=(
-                ('file.svg', 'file.svg', large_image),),)
+                ('image', 'file.svg', large_image),),)
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -1592,7 +1593,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token, upload_files=(
-                ('file.svg', 'file.svg', raw_image), ))
+                ('image', 'file.svg', raw_image), ))
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_provided(self):
@@ -1687,7 +1688,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token,
             upload_files=(
-                ('file.svg', 'file.svg', large_image),),
+                ('image', 'file.svg', large_image),),
             expected_status_int=400)
 
         self.assertIn(
