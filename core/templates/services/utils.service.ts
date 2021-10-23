@@ -96,8 +96,8 @@ export class UtilsService {
       const getKeyValue = (key: string) =>
         (obj: Record<string, Object>) => obj[key];
       if (!this.isEquivalent(
-        getKeyValue(propName)(<Record<string, object>>a),
-        getKeyValue(propName)(<Record<string, object>>b))
+        getKeyValue(propName)(a as Record<string, object>),
+        getKeyValue(propName)(b as Record<string, object>))
       ) {
         return false;
       }
