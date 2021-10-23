@@ -136,11 +136,8 @@ var publishExploration = async function() {
   var testPublishExploration = element(
     by.css('.protractor-test-publish-exploration'));
   await action.click('Test Publish Exploration', testPublishExploration);
-  await waitFor.elementToBeClickable(element(by.css(
-    '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
-  await prePublicationButtonElem.isPresent();
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);
 
@@ -156,8 +153,6 @@ var publishExploration = async function() {
     by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  await waitFor.elementToBeClickable(
-    closePublishModalButton, 'Close Publish Modal button is not clickable');
   await action.click('Close Publish Modal Button', closePublishModalButton);
 };
 
@@ -328,6 +323,7 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
+  clickInputElement = false;
   return await action.sendKeys('Image Upload Input', imageUploadInput, absPath);
 };
 
