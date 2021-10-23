@@ -50,7 +50,7 @@ export class OpportunitiesListComponent {
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
-  more: boolean = true
+  more: boolean = true;
 
   constructor(
     private zone: NgZone,
@@ -114,15 +114,17 @@ export class OpportunitiesListComponent {
       this.loadingOpportunityData = true;
       this.loadMoreOpportunities().then(
         ({opportunitiesDicts, more}) => {
-          this.more = more
+          this.more = more;
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
-          this.visibleOpportunities = this.opportunities.slice(startIndex, endIndex);
+          this.visibleOpportunities = this.opportunities.slice(
+            startIndex, endIndex);
           this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
             this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
           this.loadingOpportunityData = false;
         });
     } else {
-      this.visibleOpportunities = this.opportunities.slice(startIndex, endIndex);
+      this.visibleOpportunities = this.opportunities.slice(
+        startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
   }
