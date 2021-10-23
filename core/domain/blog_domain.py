@@ -284,14 +284,10 @@ class BlogPost:
             utils.convert_string_to_naive_datetime_object(
                 blog_post_dict['last_updated'])
             if blog_post_dict['last_updated'] else None)
-        published_on: Optional[datetime.datetime] = None
-        if blog_post_dict['published_on']:
-            published_on = (
+        published_on = (
                 utils.convert_string_to_naive_datetime_object(
                     blog_post_dict['published_on']) # type: ignore[arg-type]
-                )
-        else:
-            published_on = None
+        ) if blog_post_dict['published_on'] else None
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
