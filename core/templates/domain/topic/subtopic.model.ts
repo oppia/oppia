@@ -39,8 +39,11 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
+  // 'null' to indicate the lack of thumbnail file.
   _thumbnailFilename: string | null;
+  // 'null' to indicate the lack of thumbnail background color.
   _thumbnailBgColor: string | null;
+  // 'null' to indicate the lack of url fragment.
   _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
@@ -164,6 +167,7 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
+  // Returns 'null' if there is no thumbnail file.
   getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
@@ -172,6 +176,7 @@ export class Subtopic {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
+  // Returns 'null' if there is no thumbnail background color.
   getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
