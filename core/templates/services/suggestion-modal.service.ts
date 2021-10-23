@@ -44,17 +44,29 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
+  /**
+   * @param {object} $uibModalInstance - A IModalServiceInstance object.
+   * @param {object} paramDict - A ParamDict object.
+   */
   acceptSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
       paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
+  /**
+   * @param {object} $uibModalInstance - A IModalServiceInstance object.
+   * @param {object} paramDict - A ParamDict object.
+   */
   rejectSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
       paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
+
+  /**
+   * @param {object} $uibModalInstance - A IModalServiceInstance object.
+   */
   cancelSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
     $uibModalInstance.dismiss('cancel');
