@@ -61,8 +61,8 @@ export class PostPublishModalComponent
   selectText(event: MouseEvent): void {
     let codeDiv = event.currentTarget;
     let range = document.createRange();
-    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild as Node);
-    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild as Node);
+    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
+    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     let selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(range);
