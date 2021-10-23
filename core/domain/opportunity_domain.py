@@ -29,8 +29,7 @@ import typing_extensions
 class ExplorationOpportunitySummaryDict(
     typing_extensions.TypedDict, total=False
 ):
-    """A dictionary representing ExplorationOpportunitySummary object.
-    """
+    """A dictionary representing ExplorationOpportunitySummary object."""
 
     id: str
     topic_id: str
@@ -47,8 +46,7 @@ class ExplorationOpportunitySummaryDict(
 
 
 class SkillOpportunityDict(typing_extensions.TypedDict):
-    """A dictionary representing SkillOpportunity object.
-    """
+    """A dictionary representing SkillOpportunity object."""
 
     id: str
     skill_description: str
@@ -215,8 +213,7 @@ class ExplorationOpportunitySummary:
                 'received %s' % list(sorted(expected_set_of_all_languages)))
 
     def _validate_translation_counts(
-        self,
-        translation_counts: Dict[str, int]
+        self, translation_counts: Dict[str, int]
     ) -> None:
         """Validates per-language counts of translations.
 

@@ -64,21 +64,22 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self.mock_supported_audio_languages)
 
     def test_to_and_from_dict_works_correctly(self) -> None:
-        exploration_opportunity_summary_dict = (
-            opportunity_domain.ExplorationOpportunitySummaryDict(
-                id='exp_1',
-                topic_id='topic_1',
-                topic_name='A topic',
-                story_id='story_1',
-                story_title='A new story',
-                chapter_title='A new chapter',
-                content_count=5,
-                incomplete_translation_language_codes=['hi-en', 'hi'],
-                translation_counts={},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[],
-                translation_in_review_counts={}
-        ))
+        exploration_opportunity_summary_dict: (
+            opportunity_domain.ExplorationOpportunitySummaryDict
+        ) = {
+        'id': 'exp_1',
+        'topic_id': 'topic_1',
+        'topic_name': 'A topic',
+        'story_id': 'story_1',
+        'story_title': 'A new story',
+        'chapter_title': 'A new chapter',
+        'content_count': 5,
+        'incomplete_translation_language_codes': ['hi-en', 'hi'],
+        'translation_counts': {},
+        'language_codes_needing_voice_artists': ['en'],
+        'language_codes_with_assigned_voice_artists': [],
+        'translation_in_review_counts': {}
+        }
 
         with self.mock_supported_audio_languages_context:
             obj = opportunity_domain.ExplorationOpportunitySummary.from_dict(
@@ -293,13 +294,17 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(SkillOpportunityDomainTest, self).setUp()
+        valid_skill_opportunity_dict: (
+            opportunity_domain.SkillOpportunityDict
+        ) = {
+            'id': 'skill_1',
+            'skill_description': 'A new skill',
+            'question_count': 5,
+        }
         self.valid_skill_opportunity = (
             opportunity_domain.SkillOpportunity.from_dict(
-                opportunity_domain.SkillOpportunityDict(
-                    id='skill_1',
-                    skill_description='A new skill',
-                    question_count=10
-        )))
+                valid_skill_opportunity_dict
+        ))
 
     def test_to_and_from_dict_works_correctly(self) -> None:
         skill_opportunity_dict: opportunity_domain.SkillOpportunityDict = {
