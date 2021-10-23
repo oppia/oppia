@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for editor reloading modal.
+ * @fileoverview Component for editor reloading modal.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -33,9 +33,7 @@ export class EditorReloadingModalComponent
   ) {
     super(ngbActiveModal);
   }
-  cancel(): void {
-    this.ngbActiveModal.dismiss();
-  }
+
   ngOnInit(): void {
     setTimeout(() => {
       this.cancel();
