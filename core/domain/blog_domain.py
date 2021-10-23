@@ -286,10 +286,9 @@ class BlogPost:
             if blog_post_dict['last_updated'] else None)
         published_on: Optional[datetime.datetime] = None
         if blog_post_dict['published_on']:
-            assert isinstance(blog_post_dict['published_on'], str)
             published_on = (
                 utils.convert_string_to_naive_datetime_object(
-                    blog_post_dict['published_on'])
+                    blog_post_dict['published_on']) # type: ignore[arg-type]
                 )
         else:
             published_on = None
@@ -299,7 +298,8 @@ class BlogPost:
             blog_post_dict['url_fragment'], blog_post_dict['tags'],
             blog_post_dict['thumbnail_filename'],
             last_updated,
-            published_on)
+            published_on
+        )
 
         return blog_post
 
