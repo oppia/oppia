@@ -48,11 +48,12 @@ interface LanguageInfo {
   templateUrl: './top-navigation-bar.component.html',
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
+  // The properties below are initialized in Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  // See here for an explanation for the use of the (!) operator.
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
