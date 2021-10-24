@@ -24,15 +24,19 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HomeTabComponent } from './home-tab.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
+  let windowDimensionsService: WindowDimensionsService;
+  let mockResizeEmitter: EventEmitter<void>;
 
   beforeEach(async(() => {
+    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [
         MaterialModule,
@@ -44,7 +48,14 @@ describe('Home tab Component', () => {
         HomeTabComponent
       ],
       providers: [
-        UrlInterpolationService
+        UrlInterpolationService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => mockResizeEmitter,
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -54,6 +65,7 @@ describe('Home tab Component', () => {
     fixture = TestBed.createComponent(HomeTabComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -121,13 +133,16 @@ describe('Home tab Component', () => {
   it('should get the correct width in mobile view', () => {
     component.ngOnInit();
     expect(component.width).toEqual(233);
+    expect(component.windowIsNarrow).toBeTrue();
   });
 
-  it('should detect when application is being used on a mobile', () => {
-    expect(component.checkMobileView()).toBe(false);
+  it('should check whether window is narrow on resizing the screen', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.windowIsNarrow).toBeTrue();
 
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-    expect(component.checkMobileView()).toBe(true);
+    mockResizeEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
   });
 
   it('should get time of day as morning', () => {
@@ -135,7 +150,8 @@ describe('Home tab Component', () => {
     baseTime.setHours(11);
     jasmine.clock().mockDate(baseTime);
 
-    expect(component.getTimeOfDay()).toEqual('morning');
+    expect(component.getTimeOfDay())
+      .toEqual('I18N_LEARNER_DASHBOARD_MORNING_GREETING');
   });
 
   it('should get time of day as afternoon', () => {
@@ -143,7 +159,8 @@ describe('Home tab Component', () => {
     baseTime.setHours(15);
     jasmine.clock().mockDate(baseTime);
 
-    expect(component.getTimeOfDay()).toEqual('afternoon');
+    expect(component.getTimeOfDay())
+      .toEqual('I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING');
   });
 
   it('should get time of day as evening', () => {
@@ -151,7 +168,8 @@ describe('Home tab Component', () => {
     baseTime.setHours(20);
     jasmine.clock().mockDate(baseTime);
 
-    expect(component.getTimeOfDay()).toEqual('evening');
+    expect(component.getTimeOfDay())
+      .toEqual('I18N_LEARNER_DASHBOARD_EVENING_GREETING');
   });
 
   it('should switch the tab to Goals', () => {
