@@ -27,8 +27,9 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
@@ -52,8 +53,11 @@ describe('Community lessons tab Component', () => {
   let learnerDashboardActivityBackendApiService:
     LearnerDashboardActivityBackendApiService;
   let ngbModal: NgbModal;
+  let windowDimensionsService: WindowDimensionsService;
+  let mockResizeEmitter: EventEmitter<void>;
 
   beforeEach(async(() => {
+    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
@@ -68,6 +72,13 @@ describe('Community lessons tab Component', () => {
       ],
       providers: [
         LearnerDashboardActivityBackendApiService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => mockResizeEmitter,
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -79,6 +90,7 @@ describe('Community lessons tab Component', () => {
     learnerDashboardActivityBackendApiService =
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
@@ -92,8 +104,11 @@ describe('Community lessons tab Component', () => {
   });
 
   it ('should initilize values on init for web view', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
     component.ngOnInit();
 
+    expect(component.windowIsNarrow).toBeFalse();
     expect(component.noCommunityLessonActivity).toEqual(true);
     expect(component.noPlaylistActivity).toEqual(true);
     expect(component.totalIncompleteLessonsList).toEqual([]);
@@ -108,8 +123,18 @@ describe('Community lessons tab Component', () => {
     expect(component.dropdownEnabled).toEqual(false);
   });
 
+  it('should check whether window is narrow on resizing the screen', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.displayLessonsInPlaylist).toEqual([]);
+    expect(component.windowIsNarrow).toBeTrue();
+
+    mockResizeEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.displayLessonsInPlaylist).toEqual([]);
+  });
+
   it ('should initilize values on init for mobile view', () => {
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
     component.ngOnInit();
 
     expect(component.displayLessonsInPlaylist).toEqual([]);
