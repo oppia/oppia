@@ -90,10 +90,22 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   sidebarIsShown!: boolean;
   windowIsNarrow: boolean = false;
   I18nCompleteTest: boolean = false;
+
+  // The username, profilePageUrl and profilePictureDataUrl properties
+  // are set using the asynchronous method getUserInfoAsync()
+  // which sends an http request to the backend.
+  // Until the response object is received and the method returns,
+  // these properties remain undefined.
   username: string | undefined;
-  activeMenuName: string | undefined;
   profilePageUrl: string | undefined;
   profilePictureDataUrl: string | undefined;
+
+  // The activeMenuName property is not initialized in the constructor
+  // or in a lifecycle hook, and is set based on certain
+  // optional user input (see the onMenuKeypress() method further below).
+  // Until that input is received the property remains undefined.
+  activeMenuName: string | undefined;
+
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
