@@ -76,23 +76,23 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationWarningsService', 'ExternalSaveService', 'NgbModal',
-  'FocusManagerService', 'RouterService',
+  'ExplorationWarningsService', 'ExternalSaveService',
+  'FocusManagerService', 'NgbModal', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, AutosaveInfoModalsService, ChangeListService,
-      EditabilityService,
-      ExplorationCategoryService, ExplorationDataService,
-      ExplorationDiffService, ExplorationInitStateNameService,
-      ExplorationLanguageCodeService, ExplorationObjectiveService,
-      ExplorationRightsService, ExplorationStatesService,
-      ExplorationTagsService, ExplorationTitleService,
-      ExplorationWarningsService, ExternalSaveService, NgbModal,
-      FocusManagerService, RouterService,
-      SiteAnalyticsService, StatesObjectFactory,
-      DEFAULT_LANGUAGE_CODE) {
+    $log, $q, $rootScope, $timeout, $uibModal, $window,
+    AlertsService, AutosaveInfoModalsService, ChangeListService,
+    EditabilityService,
+    ExplorationCategoryService, ExplorationDataService,
+    ExplorationDiffService, ExplorationInitStateNameService,
+    ExplorationLanguageCodeService, ExplorationObjectiveService,
+    ExplorationRightsService, ExplorationStatesService,
+    ExplorationTagsService, ExplorationTitleService,
+    ExplorationWarningsService, ExternalSaveService,
+    FocusManagerService, NgbModal, RouterService,
+    SiteAnalyticsService, StatesObjectFactory,
+    DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet).
     var saveIsInProgress = false;
