@@ -72,7 +72,10 @@ describe('Exploration save service ' +
         reload() {}
       }
     });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3a4b5f7b51847296cf71d10a066b2b4d7e7f9040
     $provide.value('NgbModal', {
       open: () => {
         return {
@@ -740,7 +743,6 @@ describe('Exploration save service ' +
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
-        nodes: 'nodes',
         links: ['links'],
         finalStateIds: ['finalStaeIds'],
         originalStateIds: ['Hola'],
