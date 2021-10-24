@@ -155,9 +155,9 @@ describe('GraphInputValidationService', () => {
 
   it('should validate the maximum number of vertices in the graph for an ' +
     'isomorphism check', () => {
-    (<GraphAnswer> answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
-    (<GraphAnswer> answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
-    (<GraphAnswer> answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
+    (answerGroups[0].rules[0].inputs.g as GraphAnswer).vertices = new Array(11);
+    (answerGroups[0].rules[1].inputs.g as GraphAnswer).vertices = new Array(11);
+    (answerGroups[1].rules[0].inputs.g as GraphAnswer).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
