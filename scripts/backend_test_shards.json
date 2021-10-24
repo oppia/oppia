@@ -1,5 +1,6 @@
 {
     "1": [
+        "scripts.linters.pre_commit_linter_test",
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
@@ -300,7 +301,6 @@
         "core.storage.statistics.gae_models_test",
         "core.storage.exploration.gae_models_test",
         "scripts.release_scripts.repo_specific_changes_fetcher_test",
-        "scripts.docstrings_checker_test",
-        "scripts.linters.pre_commit_linter_test"
+        "scripts.docstrings_checker_test"
     ]
 }
