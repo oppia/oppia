@@ -23,11 +23,11 @@ from core import utils
 from core.constants import constants
 
 from typing import Dict, List
-import typing_extensions
+from typing_extensions import TypedDict
 
 
 class ExplorationOpportunitySummaryDict(
-    typing_extensions.TypedDict, total=False
+    TypedDict, total=False
 ):
     """A dictionary representing ExplorationOpportunitySummary object."""
 
@@ -45,7 +45,7 @@ class ExplorationOpportunitySummaryDict(
     translation_in_review_counts: Dict[str, int]
 
 
-class SkillOpportunityDict(typing_extensions.TypedDict):
+class SkillOpportunityDict(TypedDict):
     """A dictionary representing SkillOpportunity object."""
 
     id: str
