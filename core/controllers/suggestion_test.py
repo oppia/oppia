@@ -1540,8 +1540,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, '
-            'received <class \'str\'>'
+            'Schema validation for \'target_version_at_submission\' failed: '
+            'Could not convert str to int: invalid_target_version'
         )
         self.assertEqual(len(suggestions), 1)
         self.logout()
