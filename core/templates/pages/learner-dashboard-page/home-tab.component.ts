@@ -20,8 +20,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
  @Component({
    selector: 'oppia-home-tab',
    templateUrl: './home-tab.component.html'
@@ -36,25 +36,32 @@ export class HomeTabComponent {
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   width: number;
+  windowIsNarrow: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   constructor(
-    private deviceInfoService: DeviceInfoService,
+    private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   ngOnInit(): void {
     this.width = this.widthConst * (this.currentGoals.length);
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+      }));
   }
 
   getTimeOfDay(): string {
     let time = new Date().getHours();
 
     if (time <= 12) {
-      return 'morning';
+      return 'I18N_LEARNER_DASHBOARD_MORNING_GREETING';
     } else if (time <= 18) {
-      return 'afternoon';
+      return 'I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING';
     }
-    return 'evening';
+    return 'I18N_LEARNER_DASHBOARD_EVENING_GREETING';
   }
 
   isNonemptyObject(object: Object): boolean {
@@ -68,10 +75,6 @@ export class HomeTabComponent {
         classroom_url_fragment: this.classroomUrlFragment
       }
     );
-  }
-
-  checkMobileView(): boolean {
-    return this.deviceInfoService.isMobileDevice();
   }
 
   getWidth(length: number): number {

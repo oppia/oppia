@@ -25,6 +25,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
  @Component({
    selector: 'oppia-goals-tab',
@@ -32,6 +34,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
  })
 export class GoalsTabComponent implements OnInit {
   constructor(
+    private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
@@ -64,6 +67,8 @@ export class GoalsTabComponent implements OnInit {
   completedGoalsTopicPageUrl: string[] = [];
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
+  windowIsNarrow: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
     this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
@@ -93,10 +98,11 @@ export class GoalsTabComponent implements OnInit {
     for (topic of this.partiallyLearntTopicsList) {
       this.topicIdsInPartiallyLearntTopics.push(topic.id);
     }
-  }
-
-  checkMobileView(): boolean {
-    return this.deviceInfoService.isMobileDevice();
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+      }));
   }
 
   getTopicPageUrl(

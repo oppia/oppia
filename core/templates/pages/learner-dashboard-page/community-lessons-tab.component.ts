@@ -23,8 +23,9 @@ import { LearnerDashboardPageConstants } from './learner-dashboard-page.constant
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { AppConstants } from 'app.constants';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { Subscription } from 'rxjs';
 
  @Component({
    selector: 'oppia-community-lessons-tab',
@@ -34,7 +35,7 @@ export class CommunityLessonsTabComponent {
   constructor(
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
-    private deviceInfoService: DeviceInfoService) {
+    private windowDimensionService: WindowDimensionsService) {
   }
   @Input() incompleteExplorationsList: LearnerExplorationSummary[];
   @Input() incompleteCollectionsList: CollectionSummary[];
@@ -84,6 +85,8 @@ export class CommunityLessonsTabComponent {
   endIndexInPlaylist: number = 3;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+  windowIsNarrow: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
     this.noCommunityLessonActivity = (
@@ -107,22 +110,31 @@ export class CommunityLessonsTabComponent {
       0, 3);
     this.displayCompletedLessonsList = this.totalCompletedLessonsList.slice(
       0, 3);
-    if (this.checkMobileView()) {
-      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-    } else {
-      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(0, 3);
-    }
+
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.setDisplayLessonsInPlaylist();
+
+    this.directiveSubscriptions.add(
+      this.windowDimensionService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+        this.setDisplayLessonsInPlaylist();
+      }));
+
     this.displayInCommunityLessons = this.allCommunityLessons;
     this.selectedSection = this.all;
     this.dropdownEnabled = false;
   }
 
-  decodePngURIData(base64ImageData: string): string {
-    return decodeURIComponent(base64ImageData);
+  setDisplayLessonsInPlaylist(): void {
+    if (this.windowIsNarrow) {
+      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
+    } else {
+      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(0, 3);
+    }
   }
 
-  checkMobileView(): boolean {
-    return this.deviceInfoService.isMobileDevice();
+  decodePngURIData(base64ImageData: string): string {
+    return decodeURIComponent(base64ImageData);
   }
 
   toggleDropdown(): void {
@@ -308,7 +320,7 @@ export class CommunityLessonsTabComponent {
           } else if (this.showMoreInSection.playlist === false) {
             this.displayLessonsInPlaylist = (
               this.totalLessonsInPlaylist.slice(0, 3));
-          } if (this.checkMobileView()) {
+          } if (this.windowIsNarrow) {
             this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
           } if (this.displayLessonsInPlaylist.slice(
             this.startIndexInPlaylist,
