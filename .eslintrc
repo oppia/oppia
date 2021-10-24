@@ -217,15 +217,6 @@
         "ignoreConsecutiveComments": true
       }
     ],
-    // The following must be off so that we can enable
-    // "@typescript-eslint/comma-spacing".
-    "comma-spacing": [
-      "off",
-      {
-        "before": false,
-        "after": true
-      }
-    ],
     "curly": [
       "error",
       "all"
@@ -266,15 +257,6 @@
       }
     ],
     "key-spacing": "error",
-    // The following must be off so that we can enable
-    // "@typescript-eslint/keyword-spacing".
-    "keyword-spacing": [
-      "off",
-      {
-        "before": true,
-        "after": true
-      }
-    ],
     "max-len": [
       "error",
       {
@@ -372,16 +354,6 @@
     "space-before-blocks": [
       "error",
       "always"
-    ],
-    // The following must be off so that we can enable
-    // "@typescript-eslint/space-before-function-paren".
-    "space-before-function-paren": [
-      "off",
-      {
-        "anonymous": "never",
-        "asyncArrow": "never",
-        "named": "never"
-      }
     ],
     "spaced-comment": [
       "error",
