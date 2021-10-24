@@ -26,23 +26,30 @@ from typing import Dict, List
 from typing_extensions import TypedDict
 
 
-class ExplorationOpportunitySummaryDict(
-    TypedDict, total=False
-):
-    """A dictionary representing ExplorationOpportunitySummary object."""
+class PartialExplorationOpportunitySummaryDict(TypedDict):
+    """A dictionary representing partial fields of
+    ExplorationOpportunitySummary object.
+    """
 
     id: str
-    topic_id: str
     topic_name: str
-    story_id: str
     story_title: str
     chapter_title: str
     content_count: int
-    incomplete_translation_language_codes: List[str]
     translation_counts: Dict[str, int]
+    translation_in_review_counts: Dict[str, int]
+
+
+class ExplorationOpportunitySummaryDict(
+    PartialExplorationOpportunitySummaryDict
+):
+    """A dictionary representing ExplorationOpportunitySummary object."""
+
+    topic_id: str
+    story_id: str
+    incomplete_translation_language_codes: List[str]
     language_codes_needing_voice_artists: List[str]
     language_codes_with_assigned_voice_artists: List[str]
-    translation_in_review_counts: Dict[str, int]
 
 
 class SkillOpportunityDict(TypedDict):
@@ -147,7 +154,7 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict[
                 'translation_in_review_counts'])
 
-    def to_dict(self) -> ExplorationOpportunitySummaryDict:
+    def to_dict(self) -> PartialExplorationOpportunitySummaryDict:
         """Return a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 
