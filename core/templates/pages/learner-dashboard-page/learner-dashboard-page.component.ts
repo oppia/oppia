@@ -35,13 +35,14 @@ import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedba
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { AlertsService } from 'services/alerts.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
@@ -136,10 +137,12 @@ export class LearnerDashboardPageComponent implements OnInit {
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
+  windowIsNarrow: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private alertsService: AlertsService,
-    private deviceInfoService: DeviceInfoService,
+    private windowDimensionService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
     private focusManagerService: FocusManagerService,
     private learnerDashboardBackendApiService:
@@ -249,6 +252,12 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.newMessage = {
       text: ''
     };
+
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+      }));
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -327,10 +336,6 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   setActiveSubsection(newActiveSubsectionName: string): void {
     this.activeSubsection = newActiveSubsectionName;
-  }
-
-  checkMobileView(): boolean {
-    return this.deviceInfoService.isMobileDevice();
   }
 
   showUsernamePopover(subscriberUsername: string): string {
