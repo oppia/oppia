@@ -21,8 +21,8 @@ import { TestBed } from '@angular/core/testing';
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Story object factory', () => {
-  let storyObjectFactory: StoryObjectFactory = null;
-  let _sampleStory: Story = null;
+  let storyObjectFactory: StoryObjectFactory;
+  let _sampleStory: Story;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
