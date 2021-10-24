@@ -145,7 +145,10 @@ angular.module('oppia').directive('skillEditorNavbar', [
             ctrl.skill = SkillEditorStateService.getSkill();
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(
-                () => $rootScope.$applyAsync()));
+                () => {
+                  ctrl.skill = SkillEditorStateService.getSkill();
+                  $rootScope.$applyAsync()
+                }));
           };
         }]
     };
