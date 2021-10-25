@@ -84,7 +84,7 @@ class BlogPost:
             raise utils.ValidationError(
                 'Thumbnail filename should not be empty.')
 
-        utils.require_valid_image_filename(thumbnail_filename)
+        utils.require_valid_filename(thumbnail_filename)
 
     def validate(self, strict=False):
         """Validates various properties of the blog post object.
@@ -385,7 +385,7 @@ class BlogPostSummary:
             raise utils.ValidationError(
                 'Thumbnail filename should not be empty')
 
-        utils.require_valid_image_filename(thumbnail_filename)
+        utils.require_valid_filename(thumbnail_filename)
 
     def validate(self, strict=False):
         """Validates various properties of the blog post summary object.

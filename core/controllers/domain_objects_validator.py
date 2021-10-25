@@ -29,6 +29,7 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
+from core.domain import topic_domain
 
 from typing import Dict, Optional, Union
 
@@ -145,3 +146,15 @@ def validate_task_entries(task_entries):
     status = task_entries.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
+
+
+def validate_topic_and_sub_topic_change(obj):
+    """Validates Topic or Sub topic change.
+    Args:
+        obj: dict. Data that needs to be validated.
+    """
+    allowed_commands = [command['name'] for command in topic_domain.ALLOWED_COMMANDS]
+    if obj['cmd'] not in allowed_commands:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % obj['cmd']
+        )

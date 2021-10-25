@@ -24,19 +24,17 @@ from core import utils
 from core.domain import html_validation_service
 
 
-def validate_image_and_filename(raw_image, filename):
-    """Validates the image data and its filename.
+def validate_raw_image(raw_image):
+    """Validate the raw image
 
     Args:
         raw_image: str. The image content.
-        filename: str. The filename for the image.
 
     Returns:
-        str. The file format of the image.
+        None
 
     Raises:
-        ValidationError. Image or filename supplied fails one of the
-            validation checks.
+        ValidationError. Raw image failed size or name validation
     """
     hundred_kb_in_bytes = 100 * 1024
 
@@ -45,8 +43,20 @@ def validate_image_and_filename(raw_image, filename):
     if len(raw_image) > hundred_kb_in_bytes:
         raise utils.ValidationError(
             'Image exceeds file size limit of 100 KB.')
-    allowed_formats = ', '.join(
-        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
+
+
+def detect_and_validate_format_of_raw_image(raw_image):
+    """Determines the image type and validate.
+
+    Args:
+        raw_image: str. The image content.
+
+    Returns:
+        str. File type of the given raw image
+
+    Raises:
+        ValidationError. File format of the given raw image cannot be determined
+    """
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
         invalid_tags, invalid_attrs = (
@@ -69,19 +79,23 @@ def validate_image_and_filename(raw_image, filename):
         if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
             raise utils.ValidationError('Image not recognized')
 
-    # Verify that the file type matches the supplied extension.
-    if not filename:
-        raise utils.ValidationError('No filename supplied')
-    if filename.rfind('.') == 0:
-        raise utils.ValidationError('Invalid filename')
-    if '/' in filename or '..' in filename:
-        raise utils.ValidationError(
-            'Filenames should not include slashes (/) or consecutive '
-            'dot characters.')
-    if '.' not in filename:
-        raise utils.ValidationError(
-            'Image filename with no extension: it should have '
-            'one of the following extensions: %s.' % allowed_formats)
+    return file_format
+
+
+def verify_image_type_and_extension(file_format, filename):
+    """Verify whether the image type matches its file extension.
+
+    Args:
+        file_format: str. The image format.
+        filename: str. The filename for the image.
+
+    Returns:
+        None
+
+    Raises:
+        ValidationError. File format or name supplied fails one of the
+            validation checks.
+    """
 
     dot_index = filename.rfind('.')
     extension = filename[dot_index + 1:].lower()
@@ -90,5 +104,29 @@ def validate_image_and_filename(raw_image, filename):
         raise utils.ValidationError(
             'Expected a filename ending in .%s, received %s' %
             (file_format, filename))
+
+
+def validate_image_and_filename(raw_image, filename):
+    """Validates the image data and its filename.
+
+    Args:
+        raw_image: str. The image content.
+        filename: str. The filename for the image.
+
+    Returns:
+        str. The file format of the image.
+
+    Raises:
+        ValidationError. Image or filename supplied fails one of the
+            validation checks.
+    """
+
+    #Validate file name and raw_image
+    validate_raw_image(raw_image)
+    utils.require_valid_filename(filename)
+
+    # Verify that the file type matches the supplied extension.
+    file_format = detect_and_validate_format_of_raw_image(raw_image)
+    verify_image_type_and_extension(file_format, filename)
 
     return file_format

@@ -26,6 +26,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import fs_services
@@ -50,11 +51,14 @@ class TopicEditorStoryHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -63,7 +67,10 @@ class TopicEditorStoryHandler(base.BaseHandler):
         'POST': {
             'title': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_story_title'
+                    }]
                 }
             },
             'description': {
@@ -74,7 +81,10 @@ class TopicEditorStoryHandler(base.BaseHandler):
             },
             'filename': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_file_name'
+                    }]
                 },
                 'default': None
             },
@@ -86,7 +96,10 @@ class TopicEditorStoryHandler(base.BaseHandler):
             },
             'image': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_image'
+                    }]
                 },
                 'default': None
             },
@@ -146,7 +159,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         raw_image = self.normalized_request.get('image')
         story_url_fragment = self.normalized_payload.get('story_url_fragment')
 
-        story_domain.Story.require_valid_title(title)
         if story_services.does_story_exist_with_url_fragment(
                 story_url_fragment):
             raise self.InvalidInputException(
@@ -165,8 +177,8 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story_services.save_new_story(self.user_id, story)
 
         try:
-            file_format = image_validation_services.validate_image_and_filename(
-                raw_image, thumbnail_filename)
+            file_format = image_validation_services.detect_and_validate_format_of_raw_image(raw_image)
+            image_validation_services.verify_image_type_and_extension(file_format, thumbnail_filename)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -203,7 +215,11 @@ class TopicEditorPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -231,12 +247,20 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         },
         'subtopic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -268,7 +292,11 @@ class EditableTopicDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -301,7 +329,11 @@ class EditableTopicDataHandler(base.BaseHandler):
                         {
                             'name': 'cmd',
                             'schema': {
-                                'type': 'basestring'
+                                'type': 'basestring',
+                                'validation_method': (
+                                    domain_objects_validator.
+                                    validate_topic_and_sub_topic_change
+                                )
                             }
                         }
                     ]
@@ -471,7 +503,11 @@ class TopicRightsHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -511,7 +547,11 @@ class TopicPublishSendMailHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -519,7 +559,11 @@ class TopicPublishSendMailHandler(base.BaseHandler):
         'PUT': {
             'topic_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                    }]
                 },
                 'default': 'UNKNOWN'
             },
@@ -551,7 +595,11 @@ class TopicPublishHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -619,7 +667,11 @@ class TopicNameHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_name': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                    }]
             }
         }
     }

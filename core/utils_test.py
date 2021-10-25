@@ -666,7 +666,7 @@ class UtilsTests(test_utils.GenericTestBase):
         """Helper method for test_require_valid_image_filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
-            utils.require_valid_image_filename(
+            utils.require_valid_filename(
                 image_filename)
 
     def test_require_valid_image_filename(self) -> None:
@@ -684,7 +684,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self._assert_valid_image_filename(
             'Image filename should include an extension.', 'name')
         filename = 'filename.svg'
-        utils.require_valid_image_filename(filename)
+        utils.require_valid_filename(filename)
 
     def test_get_time_in_millisecs(self) -> None:
         dt = datetime.datetime(2020, 6, 15)

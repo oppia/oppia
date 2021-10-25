@@ -35,9 +35,9 @@ from core import feconf
 from core import python_utils
 from core import utils
 from core.constants import constants
-from core.domain import expression_parser
+from core.domain import expression_parser, image_validation_services
 from core.domain import html_cleaner
-from core.domain import user_domain
+from core.domain import story_domain, user_domain
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -676,6 +676,54 @@ class _Validators:
 
         try:
             user_domain.UserSettings.require_valid_username(obj)
+            return True
+        except utils.ValidationError:
+            return False
+
+    @staticmethod
+    def is_valid_story_title(obj: str) -> bool:
+        """Checks if the given obj (a string) represents a valid title.
+
+        Args:
+            obj: str. The title to verify.
+
+        Returns:
+            bool. Whether the given object is a valid title.
+        """
+        try:
+            story_domain.Story.require_valid_title(obj)
+            return True
+        except utils.ValidationError:
+            return False
+
+    @staticmethod
+    def is_valid_file_name(obj: str) -> bool:
+        """Checks if the given obj (a string) represents a valid file name.
+
+        Args:
+            obj: str. The file name to verify.
+
+        Returns:
+            bool. Whether the given object is a valid file name.
+        """
+        try:
+            utils.require_valid_filename(obj)
+            return True
+        except utils.ValidationError:
+            return False
+
+    @staticmethod
+    def is_valid_image(obj: str) -> bool:
+        """Checks if the given obj (a string) represents a valid raw image.
+
+        Args:
+            obj: str. The raw image content to verify.
+
+        Returns:
+            bool. Whether the given object is a valid image.
+        """
+        try:
+            image_validation_services.validate_raw_image(obj)
             return True
         except utils.ValidationError:
             return False
