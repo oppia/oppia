@@ -399,7 +399,7 @@ def set_url_query_parameter(
     query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
-    new_query_string = urllib.parse.urlencode(query_params, doseq=True)
+    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
 
     return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
         (scheme, netloc, path, new_query_string, fragment))
@@ -764,34 +764,34 @@ def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
                 thumbnail_filename)
 
 
-def require_valid_image_filename(image_filename: str) -> None:
-    """Generic image filename validation.
+def require_valid_filename(filename: str) -> None:
+    """Generic file name validation.
 
         Args:
-            image_filename: str. The image filename to validate.
+            filename: str. The file name to validate.
 
         Raises:
-            ValidationError. Image filename is not a string.
-            ValidationError. Image filename does start with a dot.
-            ValidationError. Image filename includes slashes
+            ValidationError. File name is not a string.
+            ValidationError. File name does start with a dot.
+            ValidationError. File name includes slashes
                 or consecutive dots.
-            ValidationError. Image filename does not include an extension.
+            ValidationError. File name does not include an extension.
         """
-    if image_filename is not None:
-        if not isinstance(image_filename, python_utils.BASESTRING):
+    if filename is not None:
+        if not isinstance(filename, python_utils.BASESTRING):
             raise ValidationError(
-                'Expected image filename to be a string, received %s'
-                % image_filename)
-        if image_filename.rfind('.') == 0:
+                'Expected file name to be a string, received %s'
+                % filename)
+        if filename.rfind('.') == 0:
             raise ValidationError(
-                'Image filename should not start with a dot.')
-        if '/' in image_filename or '..' in image_filename:
+                'File name should not start with a dot.')
+        if '/' in filename or '..' in filename:
             raise ValidationError(
-                'Image filename should not include slashes or '
+                'File name should not include slashes or '
                 'consecutive dot characters.')
-        if '.' not in image_filename:
+        if '.' not in filename:
             raise ValidationError(
-                'Image filename should include an extension.')
+                'File name should include an extension.')
 
 
 def require_valid_meta_tag_content(meta_tag_content: str) -> None:
