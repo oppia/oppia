@@ -14,8 +14,7 @@
 
 """Tests for various errors raised by validate method of payload validator."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.controllers import payload_validator
 from core.tests import test_utils

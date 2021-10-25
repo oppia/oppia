@@ -14,8 +14,7 @@
 
 """Functions to perform actions related to voiceover application."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core.domain import email_manager

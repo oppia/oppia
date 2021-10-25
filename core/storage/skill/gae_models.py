@@ -14,8 +14,7 @@
 
 """Models for storing the skill data models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.constants import constants
 from core.platform import models
@@ -149,7 +148,7 @@ class SkillModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_merged_skills(cls) -> List['SkillModel']:
+    def get_merged_skills(cls) -> List[SkillModel]:
         """Returns the skill models which have been merged.
 
         Returns:
@@ -223,7 +222,7 @@ class SkillModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_by_description(cls, description: str) -> Optional['SkillModel']:
+    def get_by_description(cls, description: str) -> Optional[SkillModel]:
         """Gets SkillModel by description. Returns None if the skill with
         description doesn't exist.
 
@@ -302,11 +301,11 @@ class SkillSummaryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def fetch_page(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            sort_by: Optional[str]
-    ) -> Tuple[Sequence['SkillSummaryModel'], Optional[str], bool]:
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        sort_by: Optional[str]
+    ) -> Tuple[Sequence[SkillSummaryModel], Optional[str], bool]:
         """Returns the models according to values specified.
 
         Args:

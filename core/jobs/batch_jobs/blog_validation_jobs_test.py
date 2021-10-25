@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.blog_validation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_validation_jobs

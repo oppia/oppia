@@ -16,8 +16,7 @@
 
 """Tests for the email services API wrapper in DEV_MODE."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import textwrap

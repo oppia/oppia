@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.job_options."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs import job_options
 from core.tests import test_utils

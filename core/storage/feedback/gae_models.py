@@ -16,8 +16,7 @@
 
 """Models for Oppia feedback threads and messages."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core import python_utils
@@ -233,7 +232,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             'New thread id generator is producing too many collisions.')
 
     @classmethod
-    def create(cls, thread_id: str) -> 'GeneralFeedbackThreadModel':
+    def create(cls, thread_id: str) -> GeneralFeedbackThreadModel:
         """Creates a new FeedbackThreadModel entry.
 
         Args:
@@ -252,11 +251,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def get_threads(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            limit: int = feconf.DEFAULT_QUERY_LIMIT
-    ) -> Sequence['GeneralFeedbackThreadModel']:
+        cls,
+        entity_type: str,
+        entity_id: str,
+        limit: int = feconf.DEFAULT_QUERY_LIMIT
+    ) -> Sequence[GeneralFeedbackThreadModel]:
         """Returns a list of threads associated with the entity, ordered
         by their "last updated" field. The number of entities fetched is
         limited by the `limit` argument to this method, whose default
@@ -417,9 +416,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            message_identifier: feedback_domain.FullyQualifiedMessageIdentifier
-    ) -> 'GeneralFeedbackMessageModel':
+        cls, message_identifier: feedback_domain.FullyQualifiedMessageIdentifier
+    ) -> GeneralFeedbackMessageModel:
         """Creates a new GeneralFeedbackMessageModel entry.
 
         Args:
@@ -440,10 +438,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(
-            cls,
-            message_identifiers: List[
-                feedback_domain.FullyQualifiedMessageIdentifier]
-    ) -> List['GeneralFeedbackMessageModel']:
+        cls,
+        message_identifiers: List[
+            feedback_domain.FullyQualifiedMessageIdentifier]
+    ) -> List[GeneralFeedbackMessageModel]:
         """Creates a new GeneralFeedbackMessageModel entry for each
         (thread_id, message_id) pair.
 
@@ -493,11 +491,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            thread_id: str,
-            message_id: int,
-            strict: bool = True
-    ) -> Optional['GeneralFeedbackMessageModel']:
+        cls, thread_id: str, message_id: int, strict: bool = True
+    ) -> Optional[GeneralFeedbackMessageModel]:
         """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
         an error if no undeleted message with the given ID is found and
         strict == True.
@@ -527,9 +522,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_messages(
-            cls,
-            thread_id: str
-    ) -> Sequence['GeneralFeedbackMessageModel']:
+        cls, thread_id: str
+    ) -> Sequence[GeneralFeedbackMessageModel]:
         """Returns a list of messages in the given thread. The number of
         messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
@@ -547,9 +541,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_most_recent_message(
-            cls,
-            thread_id: str
-    ) -> 'GeneralFeedbackMessageModel':
+        cls, thread_id: str
+    ) -> GeneralFeedbackMessageModel:
         """Returns the last message in the thread.
 
         Args:
@@ -601,10 +594,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_messages(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[Sequence['GeneralFeedbackMessageModel'], Optional[str], bool]:
+        cls, page_size: int, urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[Sequence[GeneralFeedbackMessageModel], Optional[str], bool]:
         """Fetches a list of all the messages sorted by their last updated
         attribute.
 
@@ -707,10 +698,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            user_id: str,
-            thread_id: str
-    ) -> Optional['GeneralFeedbackThreadUserModel']:
+        cls, user_id: str, thread_id: str
+    ) -> Optional[GeneralFeedbackThreadUserModel]:
         """Gets the FeedbackThreadUserModel corresponding to the given user and
         the thread.
 
@@ -728,10 +717,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            user_id: str,
-            thread_id: str
-    ) -> 'GeneralFeedbackThreadUserModel':
+        cls, user_id: str, thread_id: str
+    ) -> GeneralFeedbackThreadUserModel:
         """Creates a new FeedbackThreadUserModel instance and returns it.
 
         Args:
@@ -747,10 +734,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(
-            cls,
-            user_id: str,
-            thread_ids: List[str]
-    ) -> List['GeneralFeedbackThreadUserModel']:
+        cls, user_id: str, thread_ids: List[str]
+    ) -> List[GeneralFeedbackThreadUserModel]:
         """Creates new FeedbackThreadUserModel instances for user_id for each
         of the thread_ids.
 
@@ -777,10 +762,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-            cls,
-            user_id: str,
-            thread_ids: List[str]
-    ) -> List[Optional['GeneralFeedbackThreadUserModel']]:
+        cls, user_id: str, thread_ids: List[str]
+    ) -> List[Optional[GeneralFeedbackThreadUserModel]]:
         """Gets the ExplorationUserDataModel corresponding to the given user and
         the thread ids.
 

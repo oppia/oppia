@@ -14,8 +14,7 @@
 
 """Unit tests for scripts/check_e2e_tests_are_captured_in_ci.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re

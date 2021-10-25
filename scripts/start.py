@@ -17,8 +17,7 @@ missing third-party dependencies and starts up a local GAE development
 server.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import contextlib

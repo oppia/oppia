@@ -14,8 +14,7 @@
 
 """Unit tests for scripts/check_frontend_test_coverage.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import subprocess

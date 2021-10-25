@@ -46,8 +46,7 @@ imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import contextlib

@@ -16,8 +16,7 @@
 
 """Domain objects for app feedback reports."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import re
@@ -45,17 +44,17 @@ class AppFeedbackReport:
     """Domain object for a single feedback report."""
 
     def __init__(
-            self,
-            report_id: str,
-            schema_version: int,
-            platform: str,
-            submitted_on_timestamp: datetime.datetime,
-            local_timezone_offset_hrs: int,
-            ticket_id: Optional[str],
-            scrubbed_by: Optional[str],
-            user_supplied_feedback: 'UserSuppliedFeedback',
-            device_system_context: 'DeviceSystemContext',
-            app_context: 'AppContext'
+        self,
+        report_id: str,
+        schema_version: int,
+        platform: str,
+        submitted_on_timestamp: datetime.datetime,
+        local_timezone_offset_hrs: int,
+        ticket_id: Optional[str],
+        scrubbed_by: Optional[str],
+        user_supplied_feedback: UserSuppliedFeedback,
+        device_system_context: DeviceSystemContext,
+        app_context: AppContext
     ) -> None:
         """Constructs an AppFeedbackReport domain object.
 
@@ -178,7 +177,8 @@ class AppFeedbackReport:
 
     @classmethod
     def require_valid_schema_version(
-            cls, platform: str, schema_version: int) -> None:
+        cls, platform: str, schema_version: int
+    ) -> None:
         """Checks whether the report schema version is valid for the given
         platform.
 
@@ -225,7 +225,7 @@ class AppFeedbackReport:
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
     @classmethod
-    def from_dict(cls, report_dict: Dict[str, Any]) -> 'AppFeedbackReport':
+    def from_dict(cls, report_dict: Dict[str, Any]) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict of the report sent in
         an incoming feedback report request.
 
@@ -245,7 +245,8 @@ class AppFeedbackReport:
 
     @classmethod
     def get_android_report_from_dict(
-            cls, report_dict: Dict[str, Any]) -> 'AppFeedbackReport':
+        cls, report_dict: Dict[str, Any]
+    ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict for an Android
         report.
 
@@ -309,7 +310,8 @@ class AppFeedbackReport:
 
     @classmethod
     def get_report_type_from_string(
-            cls, report_type_name: str) -> constants.REPORT_TYPE:
+        cls, report_type_name: str
+    ) -> constants.REPORT_TYPE:
         """Determines the report type based on the JSON value.
 
         Args:
@@ -342,7 +344,8 @@ class AppFeedbackReport:
 
     @classmethod
     def get_android_text_size_from_string(
-            cls, text_size_name: str) -> constants.ANDROID_TEXT_SIZE:
+        cls, text_size_name: str
+    ) -> constants.ANDROID_TEXT_SIZE:
         """Determines the app text size based on the JSON value.
 
         Args:
@@ -359,7 +362,8 @@ class AppFeedbackReport:
 
     @classmethod
     def get_entry_point_from_json(
-            cls, entry_point_json: Dict[str, Any]) -> 'EntryPoint':
+        cls, entry_point_json: Dict[str, Any]
+    ) -> EntryPoint:
         """Determines the entry point type based on the rececived JSON.
 
         Args:
@@ -392,7 +396,8 @@ class AppFeedbackReport:
 
     @classmethod
     def get_android_network_type_from_string(
-            cls, network_type_name: str) -> constants.ANDROID_NETWORK_TYPE:
+        cls, network_type_name: str
+    ) -> constants.ANDROID_NETWORK_TYPE:
         """Determines the network type based on the JSON value.
 
         Args:
@@ -412,11 +417,11 @@ class UserSuppliedFeedback:
     """Domain object for the user-supplied information in feedback reports."""
 
     def __init__(
-            self,
-            report_type: constants.REPORT_TYPE,
-            category: constants.CATEGORY,
-            user_feedback_selected_items: List[str],
-            user_feedback_other_text_input: str
+        self,
+        report_type: constants.REPORT_TYPE,
+        category: constants.CATEGORY,
+        user_feedback_selected_items: List[str],
+        user_feedback_other_text_input: str
     ) -> None:
         """Constructs a UserSuppliedFeedback domain object.
 
@@ -473,7 +478,8 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_report_type(
-            cls, report_type: constants.REPORT_TYPE) -> None:
+        cls, report_type: constants.REPORT_TYPE
+    ) -> None:
         """Checks whether the report_type is valid.
 
         Args:
@@ -511,10 +517,10 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
-            cls,
-            category: str,
-            selected_items: List[str],
-            other_text_input: str
+        cls,
+        category: str,
+        selected_items: List[str],
+        other_text_input: str
     ) -> None:
         """Checks whether the user_feedback_selected_items and
         user_feedback_selected_items are valid for the given cateory and
@@ -551,7 +557,8 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_selected_items_for_category(
-        cls, selected_items: List[str]) -> None:
+        cls, selected_items: List[str]
+    ) -> None:
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
@@ -573,7 +580,8 @@ class DeviceSystemContext:
     """
 
     def __init__(
-            self, version_name: str, device_country_locale_code: str) -> None:
+        self, version_name: str, device_country_locale_code: str
+    ) -> None:
         """Constructs a DeviceSystemContext domain object.
 
         Args:
@@ -616,15 +624,15 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
     """
 
     def __init__(
-            self,
-            version_name: str,
-            package_version_code: int,
-            device_country_locale_code: str,
-            device_language_locale_code: str,
-            device_model: str,
-            sdk_version: int,
-            build_fingerprint: str,
-            network_type: constants.ANDROID_NETWORK_TYPE
+        self,
+        version_name: str,
+        package_version_code: int,
+        device_country_locale_code: str,
+        device_language_locale_code: str,
+        device_model: str,
+        sdk_version: int,
+        build_fingerprint: str,
+        network_type: constants.ANDROID_NETWORK_TYPE
     ) -> None:
         """Constructs an AndroidDeviceSystemContext domain object.
 
@@ -729,7 +737,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_package_version_code(
-            cls, package_version_code: int) -> None:
+        cls, package_version_code: int
+    ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
@@ -754,7 +763,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_locale_code(
-            cls, locale_type: str, locale_code: str) -> None:
+        cls, locale_type: str, locale_code: str
+    ) -> None:
         """Checks whether the device's locale code is a valid  code.
 
         Args:
@@ -814,8 +824,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_network_type(
-            cls,
-            network_type: Type[constants.ANDROID_NETWORK_TYPE]
+        cls, network_type: Type[constants.ANDROID_NETWORK_TYPE]
     ) -> None:
         """Checks that the Android device's network type is valid.
 
@@ -841,10 +850,10 @@ class AppContext:
     """
 
     def __init__(
-            self,
-            entry_point: 'EntryPoint',
-            text_language_code: str,
-            audio_language_code: str
+        self,
+        entry_point: EntryPoint,
+        text_language_code: str,
+        audio_language_code: str
     ) -> None:
         """Constructs an AppContext domain object.
 
@@ -891,16 +900,16 @@ class AndroidAppContext(AppContext):
     """
 
     def __init__(
-            self,
-            entry_point: 'EntryPoint',
-            text_language_code: str,
-            audio_language_code: str,
-            text_size: Type[constants.ANDROID_TEXT_SIZE],
-            only_allows_wifi_download_and_update: bool,
-            automatically_update_topics: bool,
-            account_is_profile_admin: bool,
-            event_logs: List[str],
-            logcat_logs: List[str]
+        self,
+        entry_point: EntryPoint,
+        text_language_code: str,
+        audio_language_code: str,
+        text_size: Type[constants.ANDROID_TEXT_SIZE],
+        only_allows_wifi_download_and_update: bool,
+        automatically_update_topics: bool,
+        account_is_profile_admin: bool,
+        event_logs: List[str],
+        logcat_logs: List[str]
     ) -> None:
         """Constructs a AndroidAppContext domain object.
 
@@ -996,9 +1005,9 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def require_valid_language_code(
-            cls,
-            language_type: str,
-            language_code: str
+        cls,
+        language_type: str,
+        language_code: str
     ) -> None:
         """Checks that the language code is valid.
 
@@ -1039,7 +1048,8 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def require_valid_text_size(
-            cls, text_size: constants.ANDROID_TEXT_SIZE) -> None:
+        cls, text_size: constants.ANDROID_TEXT_SIZE
+    ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
@@ -1065,12 +1075,12 @@ class EntryPoint:
     """
 
     def __init__(
-            self,
-            entry_point: Type[constants.ENTRY_POINT],
-            topic_id: Optional[str]=None,
-            story_id: Optional[str]=None,
-            exploration_id: Optional[str]=None,
-            subtopic_id: Optional[str]=None
+        self,
+        entry_point: Type[constants.ENTRY_POINT],
+        topic_id: Optional[str] = None,
+        story_id: Optional[str] = None,
+        exploration_id: Optional[str] = None,
+        subtopic_id: Optional[str] = None
     ) -> None:
         """Constructs an EntryPoint domain object.
 
@@ -1116,9 +1126,9 @@ class EntryPoint:
 
     @classmethod
     def require_valid_entry_point_name(
-            cls,
-            actual_name: str,
-            expected_entry_point: Type[constants.ENTRY_POINT]
+        cls,
+        actual_name: str,
+        expected_entry_point: Type[constants.ENTRY_POINT]
     ) -> None:
         """Validates this EntryPoint name.
 
@@ -1144,9 +1154,9 @@ class EntryPoint:
 
     @classmethod
     def require_valid_entry_point_exploration(
-            cls,
-            exploration_id: Optional[str],
-            story_id: Optional[str]
+        cls,
+        exploration_id: Optional[str],
+        story_id: Optional[str]
     ) -> None:
         """Checks whether the exploration id is a valid one.
 
@@ -1207,7 +1217,8 @@ class LessonPlayerEntryPoint(EntryPoint):
     """Domain object for the lesson player entry point."""
 
     def __init__(
-            self, topic_id: str, story_id: str, exploration_id: str) -> None:
+        self, topic_id: str, story_id: str, exploration_id: str
+    ) -> None:
         """Constructs an LessonPlayerEntryPoint domain object.
 
         Args:
@@ -1335,15 +1346,15 @@ class AppFeedbackReportTicket:
     """Domain object for a single ticket created for feedback reports."""
 
     def __init__(
-            self,
-            ticket_id: str,
-            ticket_name: str,
-            platform: str,
-            github_issue_repo_name: Optional[str],
-            github_issue_number: Optional[int],
-            archived: bool,
-            newest_report_creation_timestamp: datetime.datetime,
-            reports: List[str]
+        self,
+        ticket_id: str,
+        ticket_name: str,
+        platform: str,
+        github_issue_repo_name: Optional[str],
+        github_issue_number: Optional[int],
+        archived: bool,
+        newest_report_creation_timestamp: datetime.datetime,
+        reports: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportTicket domain object.
 
@@ -1511,13 +1522,13 @@ class AppFeedbackReportDailyStats:
     """
 
     def __init__(
-            self,
-            stats_id: str,
-            ticket: 'AppFeedbackReportTicket',
-            platform: str,
-            stats_tracking_date: datetime.date,
-            total_reports_submitted: int,
-            daily_param_stats: Dict[str, 'ReportStatsParameterValueCounts']
+        self,
+        stats_id: str,
+        ticket: AppFeedbackReportTicket,
+        platform: str,
+        stats_tracking_date: datetime.date,
+        total_reports_submitted: int,
+        daily_param_stats: Dict[str, ReportStatsParameterValueCounts]
     ) -> None:
         """Constructs a AppFeedbackReportDailyStats domain object.
 
@@ -1600,8 +1611,7 @@ class AppFeedbackReportDailyStats:
 
     @classmethod
     def require_valid_daily_param_stats(
-            cls,
-            param_stats: Dict[str, 'ReportStatsParameterValueCounts']
+        cls, param_stats: Dict[str, ReportStatsParameterValueCounts]
     ) -> None:
         """Checks whether the statistics in this domain object are valid.
 
@@ -1676,9 +1686,9 @@ class AppFeedbackReportFilter:
     """
 
     def __init__(
-            self,
-            filter_field: Type[constants.FILTER_FIELD_NAMES],
-            filter_options: List[str]
+        self,
+        filter_field: Type[constants.FILTER_FIELD_NAMES],
+        filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
 

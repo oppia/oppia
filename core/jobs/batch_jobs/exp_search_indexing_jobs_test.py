@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.batch_jobs.exp_search_indexing_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.constants import constants
 from core.domain import search_services

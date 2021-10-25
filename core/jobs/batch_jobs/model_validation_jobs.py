@@ -16,8 +16,7 @@
 
 """Audit jobs that validate all of the storage models in the datastore."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 

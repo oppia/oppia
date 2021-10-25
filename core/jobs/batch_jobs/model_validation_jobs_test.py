@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.batch_jobs.model_validation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core.jobs import job_test_utils

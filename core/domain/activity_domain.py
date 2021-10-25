@@ -16,8 +16,7 @@
 
 """Domain object for a reference to an activity."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import python_utils
 from core.constants import constants
@@ -84,7 +83,7 @@ class ActivityReference:
     @classmethod
     def from_dict(
         cls, activity_reference_dict: Dict[str, str]
-    ) -> 'ActivityReference':
+    ) -> ActivityReference:
         """Return the ActivityReference object from a dict.
 
         Args:

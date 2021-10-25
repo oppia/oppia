@@ -16,9 +16,7 @@
 
 """Jobs that are run by CRON scheduler."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
 from core import python_utils
 from core.domain import recommendations_services

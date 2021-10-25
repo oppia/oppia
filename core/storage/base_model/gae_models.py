@@ -14,8 +14,7 @@
 
 """Base model class."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import enum
@@ -776,10 +775,10 @@ class VersionedModel(BaseModel):
 
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
-    SNAPSHOT_METADATA_CLASS: Optional[Type['BaseSnapshotMetadataModel']] = None
+    SNAPSHOT_METADATA_CLASS: Optional[Type[BaseSnapshotMetadataModel]] = None
     # The class designated as the snapshot content model. This should be a
     # subclass of BaseSnapshotContentModel.
-    SNAPSHOT_CONTENT_CLASS: Optional[Type['BaseSnapshotContentModel']] = None
+    SNAPSHOT_CONTENT_CLASS: Optional[Type[BaseSnapshotContentModel]] = None
     # The class designated as the commit log entry model. This should be
     # a subclass of BaseCommitLogEntryModel. In cases where we do not need
     # to log the commits it can be None.

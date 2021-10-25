@@ -18,8 +18,7 @@
 python_linter_test. This file is using tabs instead of spaces.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 
 class FakeClass:

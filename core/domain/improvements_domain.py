@@ -16,8 +16,7 @@
 
 """Domain objects related to Oppia improvement tasks."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import utils
 from core.domain import user_services

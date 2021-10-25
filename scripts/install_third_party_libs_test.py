@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/install_third_party_libs.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import shutil

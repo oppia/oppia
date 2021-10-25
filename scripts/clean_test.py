@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/clean_test.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import shutil

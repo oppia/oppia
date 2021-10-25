@@ -47,8 +47,7 @@ $ export PORTSERVER_ADDRESS=portserver.sock
 $ # ... launch a bunch of tests that use portpicker ...
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import collections

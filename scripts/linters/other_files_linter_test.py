@@ -16,8 +16,7 @@
 
 """Unit tests for app_dev_linter.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import multiprocessing
 import os

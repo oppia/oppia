@@ -16,9 +16,7 @@
 
 """Objects for holding onto the results produced by Apache Beam jobs."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
 import heapq
 

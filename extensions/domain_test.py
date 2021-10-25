@@ -16,8 +16,7 @@
 
 """Tests for extensions domain."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.tests import test_utils
 from extensions import domain

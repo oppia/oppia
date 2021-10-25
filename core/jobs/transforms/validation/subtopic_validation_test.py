@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.transforms.subtopic_validation."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.transforms.validation import subtopic_validation

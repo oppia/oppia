@@ -21,8 +21,7 @@ Usage: Run this script from your oppia root folder:
     python -m scripts.release_scripts.update_configs
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import getpass

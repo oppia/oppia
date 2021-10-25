@@ -16,8 +16,7 @@
 
 """Provides PTransforms for writing job results to the datastore."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import beam_job_services
 from core.jobs.io import ndb_io
