@@ -445,22 +445,6 @@ class _Validators:
         return bool(obj)
 
     @staticmethod
-    def has_length_below(obj: str, max_value: int) -> bool:
-        """Returns True iff the given object (a string) has length below
-        `max_value` characters.
-
-        Args:
-            obj: str. A string.
-            max_value: int. The maximum number of characters that `obj`
-                should contain.
-
-        Returns:
-            bool. Whether the given object has length below
-            `max_value` characters.
-        """
-        return len(obj) <= max_value
-
-    @staticmethod
     def is_uniquified(obj: List[str]) -> bool:
         """Returns True iff the given object (a list) has no duplicates.
 
@@ -676,6 +660,27 @@ class _Validators:
             bool. Whether the given object is a gae search query string.
         """
         if obj and (not obj.startswith('("') or not obj.endswith('")')):
+            return False
+        return True
+
+    @staticmethod
+    def is_valid_filename(obj: str) -> bool:
+        """Checks if the given obj (a string) is a valid username string.
+
+        Args:
+            obj: str. The filename to verify.
+
+        Returns:
+            bool. Whether the given object is a valid filename.
+        """
+
+        if not obj:
+            return False
+        if obj.rfind('.') == 0:
+            return False
+        if '/' in obj or '..' in obj:
+            return False
+        if '.' not in obj:
             return False
         return True
 

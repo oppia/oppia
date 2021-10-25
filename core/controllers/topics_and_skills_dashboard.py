@@ -25,6 +25,7 @@ from core import android_validation_constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -258,26 +259,32 @@ class NewTopicHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_nonempty'
                     }, {
-                        'id': 'has_length_below',
+                        'id': 'has_length_at_most',
                         'max_value': (
                           android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
                         )
                     }]
                 }
             },
-            'url_fragment': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
             'description': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                          android_validation_constants
+                            .MAX_CHARS_IN_TOPIC_DESCRIPTION
+                        )
+                    }]
                 }
             },
             'filename': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_filename'
+                    }]
                 }
             },
             'thumbnailBgColor': {
@@ -350,14 +357,27 @@ class NewSkillHandler(base.BaseHandler):
         'POST': {
             'description': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }, {
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                          android_validation_constants
+                            .MAX_CHARS_IN_SKILL_DESCRIPTION
+                        )
+                    }]
                 }
             },
             'linked_topic_ids': {
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'str'
+                        'type': 'str',
+                        'validators': [{
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX
+                        }]
                     }
                 }
             },

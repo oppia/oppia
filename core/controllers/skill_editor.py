@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -293,7 +294,16 @@ class SkillDescriptionHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'skill_description': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_nonempty'
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': (
+                      android_validation_constants
+                        .MAX_CHARS_IN_SKILL_DESCRIPTION
+                    )
+                }]
             }
         }
     }
