@@ -702,6 +702,7 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
     """Handles operations related to the activities in the incomplete list of
     the user.
     """
+
     URL_PATH_ARGS_SCHEMAS = {
         'activity_type': {
             'schema': {
@@ -756,6 +757,7 @@ class RatingHandler(base.BaseHandler):
     Note that this represents ratings submitted on completion of the
     exploration.
     """
+
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
@@ -866,6 +868,7 @@ class RecommendationsHandler(base.BaseHandler):
 
 class FlagExplorationHandler(base.BaseHandler):
     """Handles operations relating to learner flagging of explorations."""
+
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
