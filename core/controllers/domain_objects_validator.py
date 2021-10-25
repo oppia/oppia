@@ -150,7 +150,7 @@ def validate_task_entries(task_entries):
 
 def validate_topic_and_sub_topic_change(obj):
     """Validates Topic or Sub topic change.
-    
+
     Args:
         obj: dict. Data that needs to be validated.
     """

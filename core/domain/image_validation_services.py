@@ -52,7 +52,8 @@ def detect_and_validate_format_of_raw_image(raw_image):
         str. File type of the given raw image.
 
     Raises:
-        ValidationError. File format of the given raw image cannot be determined.
+        ValidationError. File format of the given raw image
+            cannot be determined.
     """
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
