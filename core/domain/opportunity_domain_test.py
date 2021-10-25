@@ -67,18 +67,18 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         exploration_opportunity_summary_dict: (
             opportunity_domain.ExplorationOpportunitySummaryDict
         ) = {
-        'id': 'exp_1',
-        'topic_id': 'topic_1',
-        'topic_name': 'A topic',
-        'story_id': 'story_1',
-        'story_title': 'A new story',
-        'chapter_title': 'A new chapter',
-        'content_count': 5,
-        'incomplete_translation_language_codes': ['hi-en', 'hi'],
-        'translation_counts': {},
-        'language_codes_needing_voice_artists': ['en'],
-        'language_codes_with_assigned_voice_artists': [],
-        'translation_in_review_counts': {}
+            'id': 'exp_1',
+            'topic_id': 'topic_1',
+            'topic_name': 'A topic',
+            'story_id': 'story_1',
+            'story_title': 'A new story',
+            'chapter_title': 'A new chapter',
+            'content_count': 5,
+            'incomplete_translation_language_codes': ['hi-en', 'hi'],
+            'translation_counts': {},
+            'language_codes_needing_voice_artists': ['en'],
+            'language_codes_with_assigned_voice_artists': [],
+            'translation_in_review_counts': {}
         }
 
         with self.mock_supported_audio_languages_context:
