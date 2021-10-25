@@ -21,10 +21,8 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
 from core import utils
-from core.platform import models
-
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
@@ -120,7 +118,7 @@ class BaseChange:
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
-        'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
+        'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
