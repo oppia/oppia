@@ -37,8 +37,10 @@ import { SaveVersionMismatchModalComponent } from './modal-templates/save-versio
 import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
+import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 
 @NgModule({
   imports: [
@@ -59,7 +61,9 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
+    WelcomeModalComponent,
     StateDiffModalComponent,
+    PostPublishModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -70,7 +74,9 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
+    WelcomeModalComponent,
     StateDiffModalComponent,
+    PostPublishModalComponent,
   ],
   providers: [
     {
