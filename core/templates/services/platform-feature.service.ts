@@ -252,6 +252,7 @@ export class PlatformFeatureService {
     const storedFeatures: string[] = (
       Array.from(item.featureStatusSummary.featureNameToFlag.keys()));
     const featureNamesKeys = (
+
       Object.keys(FeatureNames) as FeatureNamesKeys);
     const requiredFeatures: string[] = (
       featureNamesKeys.map(name => FeatureNames[name]));

@@ -166,7 +166,7 @@ describe('SharingLinksComponent', () => {
     component.serverName = 'https://www.oppia.org';
     component.explorationId = 'exp1';
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>ngbModalRef);
+      ngbModalRef as NgbModalRef);
 
     component.showEmbedExplorationModal();
 

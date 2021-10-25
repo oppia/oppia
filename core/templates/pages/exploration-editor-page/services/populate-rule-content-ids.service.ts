@@ -51,7 +51,7 @@ export class PopulateRuleContentIdsService {
       if (!hasContentId) {
         return;
       }
-      const inputValue = <BaseTranslatableObject>inputs[inputName];
+      const inputValue = inputs[inputName] as BaseTranslatableObject;
       const needsContentId = inputValue.contentId === null;
 
       if (needsContentId) {

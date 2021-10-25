@@ -61,7 +61,7 @@ describe('Browser Checker Service', function() {
   });
 
   it('should not support speech synthesis', () => {
-    spyOn(<Object>wrs.nativeWindow, 'hasOwnProperty')
+    spyOn(wrs.nativeWindow as Object, 'hasOwnProperty')
       .withArgs('speechSynthesis').and.returnValue(false);
     expect(bcs.supportsSpeechSynthesis()).toBe(false);
   });

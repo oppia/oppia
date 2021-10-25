@@ -1,7 +1,7 @@
-<div class="community-lessons-section" [ngStyle]="!checkMobileView() && {'margin-top': '64px'}">
+<div class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
   </p>
-  <div class="dropdown" *ngIf="checkMobileView() && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
+  <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
     <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
       View
     </span>
@@ -33,7 +33,7 @@
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!checkMobileView()">
+  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
       <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
       </p>
@@ -44,7 +44,7 @@
              (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
           <div *ngIf="getTileType(summaryTile) === 'exploration'">
             <i class="remove-icon fa fa-times"
-               *ngIf="summaryTile.toggle || checkMobileView()"
+               *ngIf="summaryTile.toggle || windowIsNarrow"
                aria-hidden="true"
                (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
                ngbTooltip="Remove"
@@ -64,7 +64,7 @@
           </div>
           <div *ngIf="getTileType(summaryTile) === 'collection'">
             <i class="remove-icon fa fa-times"
-               *ngIf="summaryTile.toggle || checkMobileView()"
+               *ngIf="summaryTile.toggle || windowIsNarrow"
                aria-hidden="true"
                (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
                ngbTooltip="Remove"
@@ -97,7 +97,7 @@
       </div>
     </div>
   </div>
-  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!checkMobileView()">
+  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
       <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
       </p>
@@ -167,7 +167,7 @@
       </div>
     </div>
   </div>
-  <div class="community-lessons-mobile-view" *ngIf="checkMobileView()">
+  <div class="community-lessons-mobile-view" *ngIf="windowIsNarrow">
     <span class="oppia-learner-dashboard-nonexistent-exploration"
           *ngIf="completedToIncompleteCollections.length !== 0">
       <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
@@ -234,7 +234,7 @@
         </oppia-collection-summary-tile>
       </div>
     </div>
-    <div class="pagination-bottom" *ngIf="displayInCommunityLessons.length !== 0 && checkMobileView()">
+    <div class="pagination-bottom" *ngIf="displayInCommunityLessons.length !== 0 && windowIsNarrow">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
          (click)="changePageByOne(moveToPrevPage, 'communityLessons')">
       </i>
@@ -260,7 +260,7 @@
        [routerLink]="communityLibraryUrl">
     </a>
   </div>
-  <div *ngIf="checkMobileView() && displayLessonsInPlaylist.length !== 0">
+  <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
     <div class="pagination">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
          (click)="changePageByOne(moveToPrevPage, 'playlist')">
@@ -283,7 +283,7 @@
            (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
         <div *ngIf="getTileType(summaryTile) === 'exploration'">
           <i class="remove-icon fa fa-times"
-             *ngIf="summaryTile.toggle || checkMobileView()"
+             *ngIf="summaryTile.toggle || windowIsNarrow"
              aria-hidden="true"
              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
              ngbTooltip="Remove"
@@ -303,7 +303,7 @@
         </div>
         <div *ngIf="getTileType(summaryTile) === 'collection'">
           <i class="remove-icon fa fa-times"
-             *ngIf="summaryTile.toggle || checkMobileView()"
+             *ngIf="summaryTile.toggle || windowIsNarrow"
              aria-hidden="true"
              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
              ngbTooltip="Remove"
@@ -321,7 +321,7 @@
           </oppia-collection-summary-tile>
         </div>
       </div>
-      <div *ngIf="checkMobileView() && displayLessonsInPlaylist.length !== 0">
+      <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
         <div class="pagination-bottom">
           <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
              (click)="changePageByOne(moveToPrevPage, 'playlist')">
@@ -336,7 +336,7 @@
           </i>
         </div>
       </div>
-      <div class="oppia-toggle-button-section" *ngIf="totalLessonsInPlaylist.length > 3 && !checkMobileView()">
+      <div class="oppia-toggle-button-section" *ngIf="totalLessonsInPlaylist.length > 3 && !windowIsNarrow">
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="!showMoreInSection['playlist']">
@@ -385,12 +385,12 @@
     <div class="oppia-toggle-button-section" *ngIf="subscriptionsList.length > 3">
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
-              *ngIf="!showMoreInSection['subscription'] && !checkMobileView()">
+              *ngIf="!showMoreInSection['subscription'] && !windowIsNarrow">
               Show More
       </button>
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
-              *ngIf="showMoreInSection['subscription'] && !checkMobileView()">
+              *ngIf="showMoreInSection['subscription'] && !windowIsNarrow">
               Show Less
       </button>
     </div>
