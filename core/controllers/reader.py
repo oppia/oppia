@@ -761,7 +761,11 @@ class RatingHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -770,7 +774,8 @@ class RatingHandler(base.BaseHandler):
         'PUT': {
             'user_rating': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'choices': [1, 2, 3, 4, 5]
                 }
             }
         }
@@ -872,7 +877,11 @@ class FlagExplorationHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
