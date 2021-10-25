@@ -2630,7 +2630,6 @@ class Exploration:
         """
         voiceover_language_mapping_dict = {}
         voiceover_content_mapping_protos = {}
-
         for (content_id, language_code_to_voiceover) in (
             voiceovers_mapping.items()):
             for (language_code, voiceover) in (
@@ -2642,7 +2641,7 @@ class Exploration:
                     voiceover_content_mapping_protos[content_id] = (
                         voiceover_proto)
                     voiceover_content_mapping_proto = (
-                        languages_pb2.VoiceoverFileMap(
+                        languages_pb2.VoiceoverContentMapping(
                             voiceover_content_mapping=(
                                 voiceover_content_mapping_protos)))
                     if language_code not in voiceover_language_mapping_dict:
@@ -2660,7 +2659,7 @@ class Exploration:
             if language_code == 'en':
                 proto = languages_pb2.VoiceoverContentMapping(
                     language=languages_pb2.LanguageType.ENGLISH,
-                    voiceover_file_map=list)
+                    voiceover_content_mapping=list)
                 voiceover_langauge_mapping_protos_list.append(proto)
             if language_code == 'hi-en':
                 proto = languages_pb2.VoiceoverContentMapping(
