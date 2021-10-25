@@ -680,6 +680,9 @@
 # Data stability.
 /core/controllers/domain_objects_validator*.py @vojtechjelinek
 /core/controllers/payload_validator*.py @vojtechjelinek
+/core/controllers/noschema.py @vojtechjelinek
+/mock_app_dev.yaml @vojtechjelinek
+/mock_app.yaml @vojtechjelinek
 
 
 # QA team.
