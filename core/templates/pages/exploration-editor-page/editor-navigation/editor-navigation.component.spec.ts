@@ -29,6 +29,8 @@ import { WindowDimensionsService } from
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 
+require('services/ngb-modal.service.ts');
+
 describe('Editor Navigation Component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
@@ -82,6 +84,16 @@ describe('Editor Navigation Component', function() {
     userService = TestBed.get(UserService);
     changeListService = TestBed.inject(ChangeListService);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   describe('when screen is large', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {

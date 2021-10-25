@@ -146,7 +146,7 @@ export class ExtractImageFilenamesFromModelService {
           this.contentTranslationLanguageService.getCurrentContentLanguageCode()
         );
         const self = this;
-        (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
+        (state.interaction.customizationArgs as CustomizationArgsWithChoices)
           .choices.value.forEach(function(value) {
             customizationArgsHtml = (
               customizationArgsHtml.concat(
@@ -267,8 +267,8 @@ export class ExtractImageFilenamesFromModelService {
       // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         let filename = ((
-          <ImageClickInputCustomizationArgs> state.interaction
-            .customizationArgs).imageAndRegions.value.imagePath);
+        state.interaction.customizationArgs as ImageClickInputCustomizationArgs
+        ).imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);
