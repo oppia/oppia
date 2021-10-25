@@ -107,8 +107,7 @@
 /core/domain/blog*.py @iamprayush @aks681
 /core/controllers/blog_dashboard*.py @aks681
 /core/controllers/blog_homepage*.py @aks681
-# TODO(#13846): Add @kevintab95 after 2021-10-11 (1 line below).
-/core/templates/domain/blog/ @iamprayush
+/core/templates/domain/blog/ @iamprayush @kevintab95
 /core/templates/pages/blog-dashboard-page/ @aks681 @iamprayush
 
 # Collection project.
