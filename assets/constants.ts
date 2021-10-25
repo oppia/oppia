@@ -20,94 +20,146 @@
 export default {
   // Whether to allow custom event reporting to Google Analytics.
   // Mock gtag function is used when disabled.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
+  CAN_SEND_ANALYTICS_EVENTS: false,
 
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
-  "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
+  CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS: "staging",
 
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
-  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
+  DEFAULT_CLASSROOM_URL_FRAGMENT: "math",
 
-  "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
-    "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
-    "Combinatorics", "Computing", "Economics", "Education", "Engineering",
-    "English", "Environment", "Gaulish", "Geography", "Geometry", "Government",
-    "Graph Theory", "History", "Languages", "Latin", "Law", "Logic",
-    "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
-    "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
-    "Statistics", "Trigonometry", "Welcome"],
-  "ACTIVITY_TYPE_EXPLORATION": "exploration",
-  "ACTIVITY_TYPE_COLLECTION": "collection",
-  "ACTIVITY_TYPE_STORY": "story",
-  "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
-  "DISABLED_EXPLORATION_IDS": ["5"],
-  "TESTING_CONSTANT": "test",
-  "LIBRARY_TILE_WIDTH_PX": 208,
-  "DASHBOARD_TYPE_CREATOR": "creator",
-  "DASHBOARD_TYPE_LEARNER": "learner",
-  "DEFAULT_COLOR": "#a33f40",
-  "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
-  "DEFAULT_CATEGORY_ICON": "Lightbulb",
+  ALL_CATEGORIES: [
+    "Algebra",
+    "Algorithms",
+    "Architecture",
+    "Arithmetic",
+    "Art",
+    "Astronomy",
+    "Biology",
+    "Business",
+    "Calculus",
+    "Chemistry",
+    "Combinatorics",
+    "Computing",
+    "Economics",
+    "Education",
+    "Engineering",
+    "English",
+    "Environment",
+    "Gaulish",
+    "Geography",
+    "Geometry",
+    "Government",
+    "Graph Theory",
+    "History",
+    "Languages",
+    "Latin",
+    "Law",
+    "Logic",
+    "Mathematics",
+    "Medicine",
+    "Music",
+    "Philosophy",
+    "Physics",
+    "Poetry",
+    "Probability",
+    "Programming",
+    "Puzzles",
+    "Reading",
+    "Spanish",
+    "Sport",
+    "Statistics",
+    "Trigonometry",
+    "Welcome",
+  ],
+  ACTIVITY_TYPE_EXPLORATION: "exploration",
+  ACTIVITY_TYPE_COLLECTION: "collection",
+  ACTIVITY_TYPE_STORY: "story",
+  ACTIVITY_TYPE_LEARN_TOPIC: "learntopic",
+  DISABLED_EXPLORATION_IDS: ["5"],
+  TESTING_CONSTANT: "test",
+  LIBRARY_TILE_WIDTH_PX: 208,
+  DASHBOARD_TYPE_CREATOR: "creator",
+  DASHBOARD_TYPE_LEARNER: "learner",
+  DEFAULT_COLOR: "#a33f40",
+  DEFAULT_THUMBNAIL_ICON: "Lightbulb",
+  DEFAULT_CATEGORY_ICON: "Lightbulb",
 
-  "ACTION_ACCEPT_SUGGESTION": "accept",
-  "ACTION_REJECT_SUGGESTION": "reject",
+  ACTION_ACCEPT_SUGGESTION: "accept",
+  ACTION_REJECT_SUGGESTION: "reject",
 
-  "SKILL_STATUS_OPTIONS": {
-    "ALL": "All",
-    "ASSIGNED": "Assigned",
-    "UNASSIGNED": "Unassigned"
+  SKILL_STATUS_OPTIONS: {
+    ALL: "All",
+    ASSIGNED: "Assigned",
+    UNASSIGNED: "Unassigned",
   },
-  "TOPIC_SKILL_DASHBOARD_SORT_OPTIONS": {
-    "IncreasingCreatedOn": "Newly Created",
-    "DecreasingCreatedOn": "Oldest Created",
-    "IncreasingUpdatedOn": "Most Recently Updated",
-    "DecreasingUpdatedOn": "Least Recently Updated"
+  TOPIC_SKILL_DASHBOARD_SORT_OPTIONS: {
+    IncreasingCreatedOn: "Newly Created",
+    DecreasingCreatedOn: "Oldest Created",
+    IncreasingUpdatedOn: "Most Recently Updated",
+    DecreasingUpdatedOn: "Least Recently Updated",
   },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
-  "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
-    "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
-    "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
-    "Reading", "Statistics"],
+  SEARCH_DROPDOWN_CATEGORIES: [
+    "Algorithms",
+    "Architecture",
+    "Art",
+    "Biology",
+    "Business",
+    "Chemistry",
+    "Economics",
+    "English",
+    "Geography",
+    "History",
+    "Mathematics",
+    "Medicine",
+    "Music",
+    "Physics",
+    "Programming",
+    "Reading",
+    "Statistics",
+  ],
 
   // The default language code for an exploration.
-  "DEFAULT_LANGUAGE_CODE": "en",
+  DEFAULT_LANGUAGE_CODE: "en",
 
-  "ALLOWED_THUMBNAIL_BG_COLORS": {
-    "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
-    "topic": ["#C6DCDA"],
-    "subtopic": ["#FFFFFF"],
-    "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
+  ALLOWED_THUMBNAIL_BG_COLORS: {
+    chapter: ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
+    topic: ["#C6DCDA"],
+    subtopic: ["#FFFFFF"],
+    story: ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
   },
 
-  "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+  ALLOWED_IMAGE_FORMATS: ["svg", "png", "jpeg", "jpg", "gif"],
 
-  "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
-  "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
-  "TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS": "successive_incorrect_answers",
-  "TASK_TYPE_NEEDS_GUIDING_RESPONSES": "needs_guiding_responses",
+  TASK_TYPE_HIGH_BOUNCE_RATE: "high_bounce_rate",
+  TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP: "ineffective_feedback_loop",
+  TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS: "successive_incorrect_answers",
+  TASK_TYPE_NEEDS_GUIDING_RESPONSES: "needs_guiding_responses",
 
-  "TASK_STATUS_OPEN": "open",
-  "TASK_STATUS_OBSOLETE": "obsolete",
-  "TASK_STATUS_RESOLVED": "resolved",
+  TASK_STATUS_OPEN: "open",
+  TASK_STATUS_OBSOLETE: "obsolete",
+  TASK_STATUS_RESOLVED: "resolved",
 
-  "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
+  TASK_ENTITY_TYPE_EXPLORATION: "exploration",
 
-  "TASK_TARGET_TYPE_STATE": "state",
+  TASK_TARGET_TYPE_STATE: "state",
 
   // Roles in exploration.
-  "ROLE_OWNER": "owner",
-  "ROLE_EDITOR": "editor",
-  "ROLE_VOICE_ARTIST": "voice artist",
-  "ROLE_VIEWER": "viewer",
+  ROLE_OWNER: "owner",
+  ROLE_EDITOR: "editor",
+  ROLE_VOICE_ARTIST: "voice artist",
+  ROLE_VIEWER: "viewer",
 
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.
   // eslint-disable-next-line max-len
-  "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
+  MATH_SVG_FILENAME_REGEX:
+    "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
 
   // The SVG tag-specific attribute allowlist is based on the list of tags and
   // and attributes specified in this project:
@@ -116,8 +168,8 @@ export default {
   // https://github.com/wooorm/svg-element-attributes/blob/master/index.json
   // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute
   // https://www.w3schools.com/graphics/svg_reference.asp
-  "SVG_ATTRS_ALLOWLIST": {
-    "a": [
+  SVG_ATTRS_ALLOWLIST: {
+    a: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -215,9 +267,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "altglyph": [
+    altglyph: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -300,9 +352,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "altglyphdef": [
+    altglyphdef: [
       "about",
       "class",
       "content",
@@ -315,9 +367,9 @@ export default {
       "rev",
       "style",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "altglyphitem": [
+    altglyphitem: [
       "about",
       "class",
       "content",
@@ -330,9 +382,9 @@ export default {
       "rev",
       "style",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "animatecolor": [
+    animatecolor: [
       "about",
       "accumulate",
       "additive",
@@ -429,9 +481,9 @@ export default {
       "values",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "animatemotion": [
+    animatemotion: [
       "about",
       "accumulate",
       "additive",
@@ -473,9 +525,9 @@ export default {
       "tabindex",
       "to",
       "typeof",
-      "values"
+      "values",
     ],
-    "animatetransform": [
+    animatetransform: [
       "about",
       "accumulate",
       "additive",
@@ -516,9 +568,9 @@ export default {
       "to",
       "type",
       "typeof",
-      "values"
+      "values",
     ],
-    "audio": [
+    audio: [
       "about",
       "begin",
       "class",
@@ -550,9 +602,9 @@ export default {
       "systemlanguage",
       "tabindex",
       "type",
-      "typeof"
+      "typeof",
     ],
-    "canvas": [
+    canvas: [
       "about",
       "class",
       "content",
@@ -568,9 +620,9 @@ export default {
       "style",
       "systemlanguage",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "circle": [
+    circle: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -665,9 +717,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "clippath": [
+    clippath: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -745,9 +797,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "defs": [
+    defs: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -824,9 +876,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "desc": [
+    desc: [
       "about",
       "class",
       "content",
@@ -844,9 +896,9 @@ export default {
       "style",
       "systemlanguage",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "ellipse": [
+    ellipse: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -942,9 +994,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "feblend": [
+    feblend: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1024,9 +1076,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fecolormatrix": [
+    fecolormatrix: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1106,9 +1158,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fecomponenttransfer": [
+    fecomponenttransfer: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1186,9 +1238,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fecomposite": [
+    fecomposite: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1272,9 +1324,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "feconvolvematrix": [
+    feconvolvematrix: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1361,9 +1413,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fediffuselighting": [
+    fediffuselighting: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1444,9 +1496,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fedisplacementmap": [
+    fedisplacementmap: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1528,9 +1580,9 @@ export default {
       "x",
       "xchannelselector",
       "y",
-      "ychannelselector"
+      "ychannelselector",
     ],
-    "fedistantlight": [
+    fedistantlight: [
       "about",
       "azimuth",
       "class",
@@ -1545,9 +1597,9 @@ export default {
       "rev",
       "style",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "feflood": [
+    feflood: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1624,9 +1676,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fefunca": [
+    fefunca: [
       "about",
       "amplitude",
       "class",
@@ -1646,9 +1698,9 @@ export default {
       "tabindex",
       "tablevalues",
       "type",
-      "typeof"
+      "typeof",
     ],
-    "fefuncb": [
+    fefuncb: [
       "about",
       "amplitude",
       "class",
@@ -1668,9 +1720,9 @@ export default {
       "tabindex",
       "tablevalues",
       "type",
-      "typeof"
+      "typeof",
     ],
-    "fefuncg": [
+    fefuncg: [
       "about",
       "amplitude",
       "class",
@@ -1690,9 +1742,9 @@ export default {
       "tabindex",
       "tablevalues",
       "type",
-      "typeof"
+      "typeof",
     ],
-    "fefuncr": [
+    fefuncr: [
       "about",
       "amplitude",
       "class",
@@ -1712,9 +1764,9 @@ export default {
       "tabindex",
       "tablevalues",
       "type",
-      "typeof"
+      "typeof",
     ],
-    "fegaussianblur": [
+    fegaussianblur: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1794,9 +1846,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "femerge": [
+    femerge: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1873,9 +1925,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "femergenode": [
+    femergenode: [
       "about",
       "class",
       "content",
@@ -1889,9 +1941,9 @@ export default {
       "rev",
       "style",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "femorphology": [
+    femorphology: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -1971,9 +2023,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "feoffset": [
+    feoffset: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2053,9 +2105,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fepointlight": [
+    fepointlight: [
       "about",
       "class",
       "content",
@@ -2071,9 +2123,9 @@ export default {
       "typeof",
       "x",
       "y",
-      "z"
+      "z",
     ],
-    "fespecularlighting": [
+    fespecularlighting: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2155,9 +2207,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "fespotlight": [
+    fespotlight: [
       "about",
       "class",
       "content",
@@ -2178,9 +2230,9 @@ export default {
       "typeof",
       "x",
       "y",
-      "z"
+      "z",
     ],
-    "fetile": [
+    fetile: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2258,9 +2310,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "feturbulence": [
+    feturbulence: [
       "about",
       "alignment-baseline",
       "basefrequency",
@@ -2342,9 +2394,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "filter": [
+    filter: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2424,9 +2476,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "font": [
+    font: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2505,9 +2557,9 @@ export default {
       "vert-origin-y",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "g": [
+    g: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2598,9 +2650,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "glyph": [
+    glyph: [
       "about",
       "alignment-baseline",
       "arabic-form",
@@ -2681,9 +2733,9 @@ export default {
       "vert-origin-y",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "glyphref": [
+    glyphref: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2761,9 +2813,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "hkern": [
+    hkern: [
       "about",
       "class",
       "content",
@@ -2781,9 +2833,9 @@ export default {
       "tabindex",
       "typeof",
       "u1",
-      "u2"
+      "u2",
     ],
-    "image": [
+    image: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2882,9 +2934,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "line": [
+    line: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -2980,9 +3032,9 @@ export default {
       "x1",
       "x2",
       "y1",
-      "y2"
+      "y2",
     ],
-    "lineargradient": [
+    lineargradient: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3063,9 +3115,9 @@ export default {
       "x1",
       "x2",
       "y1",
-      "y2"
+      "y2",
     ],
-    "marker": [
+    marker: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3146,9 +3198,9 @@ export default {
       "viewbox",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "mask": [
+    mask: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3230,9 +3282,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "metadata": [
+    metadata: [
       "about",
       "class",
       "content",
@@ -3250,9 +3302,9 @@ export default {
       "style",
       "systemlanguage",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "mpath": [
+    mpath: [
       "about",
       "class",
       "content",
@@ -3267,9 +3319,9 @@ export default {
       "rev",
       "style",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "path": [
+    path: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3362,9 +3414,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "pattern": [
+    pattern: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3450,9 +3502,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "polygon": [
+    polygon: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3545,9 +3597,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "polyline": [
+    polyline: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3640,9 +3692,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "radialgradient": [
+    radialgradient: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3725,9 +3777,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "rect": [
+    rect: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3825,9 +3877,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "stop": [
+    stop: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -3900,9 +3952,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "style": [
+    style: [
       "about",
       "class",
       "content",
@@ -3918,9 +3970,9 @@ export default {
       "tabindex",
       "title",
       "type",
-      "typeof"
+      "typeof",
     ],
-    "svg": [
+    svg: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4029,9 +4081,9 @@ export default {
       "xmlns",
       "xmlns:xlink",
       "y",
-      "zoomandpan"
+      "zoomandpan",
     ],
-    "switch": [
+    switch: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4122,9 +4174,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "symbol": [
+    symbol: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4201,9 +4253,9 @@ export default {
       "viewbox",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "text": [
+    text: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4302,9 +4354,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "textpath": [
+    textpath: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4388,9 +4440,9 @@ export default {
       "unicode-bidi",
       "visibility",
       "word-spacing",
-      "writing-mode"
+      "writing-mode",
     ],
-    "title": [
+    title: [
       "about",
       "class",
       "content",
@@ -4408,9 +4460,9 @@ export default {
       "style",
       "systemlanguage",
       "tabindex",
-      "typeof"
+      "typeof",
     ],
-    "tref": [
+    tref: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4493,9 +4545,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "tspan": [
+    tspan: [
       "about",
       "alignment-baseline",
       "baseline-shift",
@@ -4592,9 +4644,9 @@ export default {
       "word-spacing",
       "writing-mode",
       "x",
-      "y"
+      "y",
     ],
-    "video": [
+    video: [
       "about",
       "begin",
       "class",
@@ -4647,9 +4699,9 @@ export default {
       "typeof",
       "width",
       "x",
-      "y"
+      "y",
     ],
-    "view": [
+    view: [
       "about",
       "class",
       "content",
@@ -4667,9 +4719,9 @@ export default {
       "typeof",
       "viewbox",
       "viewtarget",
-      "zoomandpan"
+      "zoomandpan",
     ],
-    "vkern": [
+    vkern: [
       "about",
       "class",
       "content",
@@ -4687,623 +4739,747 @@ export default {
       "tabindex",
       "typeof",
       "u1",
-      "u2"
-    ]
+      "u2",
+    ],
   },
 
   // List of supported default categories. For now, each category has a specific
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.
-  "CATEGORIES_TO_COLORS": {
-    "Mathematics": "#cd672b",
-    "Algebra": "#cd672b",
-    "Arithmetic": "#d68453",
-    "Calculus": "#b86330",
-    "Logic": "#d68453",
-    "Combinatorics": "#cf5935",
+  CATEGORIES_TO_COLORS: {
+    Mathematics: "#cd672b",
+    Algebra: "#cd672b",
+    Arithmetic: "#d68453",
+    Calculus: "#b86330",
+    Logic: "#d68453",
+    Combinatorics: "#cf5935",
     "Graph Theory": "#cf5935",
-    "Probability": "#cf5935",
-    "Statistics": "#cd672b",
-    "Geometry": "#d46949",
-    "Trigonometry": "#d46949",
+    Probability: "#cf5935",
+    Statistics: "#cd672b",
+    Geometry: "#d46949",
+    Trigonometry: "#d46949",
 
-    "Algorithms": "#d0982a",
-    "Computing": "#bb8b2f",
-    "Programming": "#d9aa53",
+    Algorithms: "#d0982a",
+    Computing: "#bb8b2f",
+    Programming: "#d9aa53",
 
-    "Astronomy": "#879d6c",
-    "Biology": "#97a766",
-    "Chemistry": "#aab883",
-    "Engineering": "#8b9862",
-    "Environment": "#aba86d",
-    "Medicine": "#97a766",
-    "Physics": "#879d6c",
+    Astronomy: "#879d6c",
+    Biology: "#97a766",
+    Chemistry: "#aab883",
+    Engineering: "#8b9862",
+    Environment: "#aba86d",
+    Medicine: "#97a766",
+    Physics: "#879d6c",
 
-    "Architecture": "#6e3466",
-    "Art": "#895a83",
-    "Music": "#6a3862",
-    "Philosophy": "#613968",
-    "Poetry": "#7f507f",
+    Architecture: "#6e3466",
+    Art: "#895a83",
+    Music: "#6a3862",
+    Philosophy: "#613968",
+    Poetry: "#7f507f",
 
-    "English": "#193a69",
-    "Languages": "#1b4174",
-    "Latin": "#3d5a89",
-    "Reading": "#193a69",
-    "Spanish": "#405185",
-    "Gaulish": "#1b4174",
+    English: "#193a69",
+    Languages: "#1b4174",
+    Latin: "#3d5a89",
+    Reading: "#193a69",
+    Spanish: "#405185",
+    Gaulish: "#1b4174",
 
-    "Business": "#387163",
-    "Economics": "#5d8b7f",
-    "Geography": "#3c6d62",
-    "Government": "#538270",
-    "History": "#3d6b52",
-    "Law": "#538270",
+    Business: "#387163",
+    Economics: "#5d8b7f",
+    Geography: "#3c6d62",
+    Government: "#538270",
+    History: "#3d6b52",
+    Law: "#538270",
 
-    "Education": "#942e20",
-    "Puzzles": "#a8554a",
-    "Sport": "#893327",
-    "Welcome": "#992a2b"
+    Education: "#942e20",
+    Puzzles: "#a8554a",
+    Sport: "#893327",
+    Welcome: "#992a2b",
   },
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
-  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "link", "math", "skillreview"],
+  VALID_RTE_COMPONENTS_FOR_ANDROID: ["image", "link", "math", "skillreview"],
 
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
-  "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
-    "code": "en",
-    "description": "English"
-  }],
+  SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID: [
+    {
+      code: "en",
+      description: "English",
+    },
+  ],
 
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
-  "SUPPORTED_CONTENT_LANGUAGES": [{
-    "code": "en",
-    "description": "English",
-    "direction": "ltr"
-  }, {
-    "code": "ar",
-    "description": "العربية (Arabic)",
-    "direction": "rtl"
-  }, {
-    "code": "sq",
-    "description": "shqip (Albanian)",
-    "direction": "ltr"
-  }, {
-    "code": "bg",
-    "description": "български (Bulgarian)",
-    "direction": "ltr"
-  }, {
-    "code": "bn",
-    "description": "বাংলা (Bangla)",
-    "direction": "ltr"
-  }, {
-    "code": "ca",
-    "description": "català (Catalan)",
-    "direction": "ltr"
-  }, {
-    "code": "zh",
-    "description": "中文 (Chinese)",
-    "direction": "ltr"
-  }, {
-    "code": "hr",
-    "description": "hrvatski (Croatian)",
-    "direction": "ltr"
-  }, {
-    "code": "cs",
-    "description": "čeština (Czech)",
-    "direction": "ltr"
-  }, {
-    "code": "da",
-    "description": "dansk (Danish)",
-    "direction": "ltr"
-  }, {
-    "code": "nl",
-    "description": "Nederlands (Dutch)",
-    "direction": "ltr"
-  }, {
-    "code": "fat",
-    "description": "Fanti",
-    "direction": "ltr"
-  }, {
-    "code": "tl",
-    "description": "Filipino (Filipino)",
-    "direction": "ltr"
-  }, {
-    "code": "fi",
-    "description": "suomi (Finnish)",
-    "direction": "ltr"
-  }, {
-    "code": "fr",
-    "description": "français (French)",
-    "direction": "ltr"
-  }, {
-    "code": "lg",
-    "description": "Luganda (Ganda)",
-    "direction": "ltr"
-  }, {
-    "code": "de",
-    "description": "Deutsch (German)",
-    "direction": "ltr"
-  }, {
-    "code": "el",
-    "description": "ελληνικά (Greek)",
-    "direction": "ltr"
-  }, {
-    "code": "he",
-    "description": "עברית (Hebrew)",
-    "direction": "rtl"
-  }, {
-    "code": "hi",
-    "description": "हिन्दी (Hindi)",
-    "direction": "ltr"
-  }, {
-    "code": "hi-en",
-    "description": "Hinglish",
-    "direction": "ltr"
-  }, {
-    "code": "hu",
-    "description": "magyar (Hungarian)",
-    "direction": "ltr"
-  }, {
-    "code": "id",
-    "description": "Bahasa Indonesia (Indonesian)",
-    "direction": "ltr"
-  }, {
-    "code": "it",
-    "description": "italiano (Italian)",
-    "direction": "ltr"
-  }, {
-    "code": "ja",
-    "description": "日本語 (Japanese)",
-    "direction": "ltr"
-  }, {
-    "code": "kab",
-    "description": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
-  }, {
-    "code": "ko",
-    "description": "한국어 (Korean)",
-    "direction": "ltr"
-  }, {
-    "code": "lv",
-    "description": "latviešu (Latvian)",
-    "direction": "ltr"
-  }, {
-    "code": "lt",
-    "description": "lietuvių (Lithuanian)",
-    "direction": "ltr"
-  }, {
-    "code": "mr",
-    "description": "मराठी (Marathi)",
-    "direction": "ltr"
-  }, {
-    "code": "no",
-    "description": "Norsk (Norwegian)",
-    "direction": "ltr"
-  }, {
-    "code": "fa",
-    "description": "فارسی (Persian)",
-    "direction": "rtl"
-  }, {
-    "code": "pl",
-    "description": "polszczyzna (Polish)",
-    "direction": "ltr"
-  }, {
-    "code": "prs",
-    "description": "دری (Dari)",
-    "direction": "rtl"
-  }, {
-    "code": "pt",
-    "description": "português (Portuguese)",
-    "direction": "ltr"
-  }, {
-    "code": "ro",
-    "description": "română (Romanian)",
-    "direction": "ltr"
-  }, {
-    "code": "ru",
-    "description": "pусский (Russian)",
-    "direction": "ltr"
-  }, {
-    "code": "sr",
-    "description": "cрпски (Serbian)",
-    "direction": "ltr"
-  }, {
-    "code": "sk",
-    "description": "slovenčina (Slovak)",
-    "direction": "ltr"
-  }, {
-    "code": "sl",
-    "description": "slovenščina (Slovenian)",
-    "direction": "ltr"
-  }, {
-    "code": "es",
-    "description": "español (Spanish)",
-    "direction": "ltr"
-  }, {
-    "code": "sw",
-    "description": "kiswahili (Swahili)",
-    "direction": "ltr"
-  }, {
-    "code": "sv",
-    "description": "svenska (Swedish)",
-    "direction": "ltr"
-  }, {
-    "code": "ta",
-    "description": "தமிழ் (Tamil)",
-    "direction": "ltr"
-  }, {
-    "code": "th",
-    "description": "ภาษาไทย (Thai)",
-    "direction": "ltr"
-  }, {
-    "code": "tr",
-    "description": "Türkçe (Turkish)",
-    "direction": "ltr"
-  }, {
-    "code": "uk",
-    "description": "yкраїнська (Ukrainian)",
-    "direction": "ltr"
-  }, {
-    "code": "ur",
-    "description": "اُردُو (Urdu)",
-    "direction": "rtl"
-  }, {
-    "code": "vi",
-    "description": "Tiếng Việt (Vietnamese)",
-    "direction": "ltr"
-  }],
+  SUPPORTED_CONTENT_LANGUAGES: [
+    {
+      code: "en",
+      description: "English",
+      direction: "ltr",
+    },
+    {
+      code: "ar",
+      description: "العربية (Arabic)",
+      direction: "rtl",
+    },
+    {
+      code: "sq",
+      description: "shqip (Albanian)",
+      direction: "ltr",
+    },
+    {
+      code: "bg",
+      description: "български (Bulgarian)",
+      direction: "ltr",
+    },
+    {
+      code: "bn",
+      description: "বাংলা (Bangla)",
+      direction: "ltr",
+    },
+    {
+      code: "ca",
+      description: "català (Catalan)",
+      direction: "ltr",
+    },
+    {
+      code: "zh",
+      description: "中文 (Chinese)",
+      direction: "ltr",
+    },
+    {
+      code: "hr",
+      description: "hrvatski (Croatian)",
+      direction: "ltr",
+    },
+    {
+      code: "cs",
+      description: "čeština (Czech)",
+      direction: "ltr",
+    },
+    {
+      code: "da",
+      description: "dansk (Danish)",
+      direction: "ltr",
+    },
+    {
+      code: "nl",
+      description: "Nederlands (Dutch)",
+      direction: "ltr",
+    },
+    {
+      code: "fat",
+      description: "Fanti",
+      direction: "ltr",
+    },
+    {
+      code: "tl",
+      description: "Filipino (Filipino)",
+      direction: "ltr",
+    },
+    {
+      code: "fi",
+      description: "suomi (Finnish)",
+      direction: "ltr",
+    },
+    {
+      code: "fr",
+      description: "français (French)",
+      direction: "ltr",
+    },
+    {
+      code: "lg",
+      description: "Luganda (Ganda)",
+      direction: "ltr",
+    },
+    {
+      code: "de",
+      description: "Deutsch (German)",
+      direction: "ltr",
+    },
+    {
+      code: "el",
+      description: "ελληνικά (Greek)",
+      direction: "ltr",
+    },
+    {
+      code: "he",
+      description: "עברית (Hebrew)",
+      direction: "rtl",
+    },
+    {
+      code: "hi",
+      description: "हिन्दी (Hindi)",
+      direction: "ltr",
+    },
+    {
+      code: "hi-en",
+      description: "Hinglish",
+      direction: "ltr",
+    },
+    {
+      code: "hu",
+      description: "magyar (Hungarian)",
+      direction: "ltr",
+    },
+    {
+      code: "id",
+      description: "Bahasa Indonesia (Indonesian)",
+      direction: "ltr",
+    },
+    {
+      code: "it",
+      description: "italiano (Italian)",
+      direction: "ltr",
+    },
+    {
+      code: "ja",
+      description: "日本語 (Japanese)",
+      direction: "ltr",
+    },
+    {
+      code: "kab",
+      description: "Taqbaylit (Kabyle)",
+      direction: "ltr",
+    },
+    {
+      code: "ko",
+      description: "한국어 (Korean)",
+      direction: "ltr",
+    },
+    {
+      code: "lv",
+      description: "latviešu (Latvian)",
+      direction: "ltr",
+    },
+    {
+      code: "lt",
+      description: "lietuvių (Lithuanian)",
+      direction: "ltr",
+    },
+    {
+      code: "mr",
+      description: "मराठी (Marathi)",
+      direction: "ltr",
+    },
+    {
+      code: "no",
+      description: "Norsk (Norwegian)",
+      direction: "ltr",
+    },
+    {
+      code: "fa",
+      description: "فارسی (Persian)",
+      direction: "rtl",
+    },
+    {
+      code: "pl",
+      description: "polszczyzna (Polish)",
+      direction: "ltr",
+    },
+    {
+      code: "prs",
+      description: "دری (Dari)",
+      direction: "rtl",
+    },
+    {
+      code: "pt",
+      description: "português (Portuguese)",
+      direction: "ltr",
+    },
+    {
+      code: "ro",
+      description: "română (Romanian)",
+      direction: "ltr",
+    },
+    {
+      code: "ru",
+      description: "pусский (Russian)",
+      direction: "ltr",
+    },
+    {
+      code: "sr",
+      description: "cрпски (Serbian)",
+      direction: "ltr",
+    },
+    {
+      code: "sk",
+      description: "slovenčina (Slovak)",
+      direction: "ltr",
+    },
+    {
+      code: "sl",
+      description: "slovenščina (Slovenian)",
+      direction: "ltr",
+    },
+    {
+      code: "es",
+      description: "español (Spanish)",
+      direction: "ltr",
+    },
+    {
+      code: "sw",
+      description: "kiswahili (Swahili)",
+      direction: "ltr",
+    },
+    {
+      code: "sv",
+      description: "svenska (Swedish)",
+      direction: "ltr",
+    },
+    {
+      code: "ta",
+      description: "தமிழ் (Tamil)",
+      direction: "ltr",
+    },
+    {
+      code: "th",
+      description: "ภาษาไทย (Thai)",
+      direction: "ltr",
+    },
+    {
+      code: "tr",
+      description: "Türkçe (Turkish)",
+      direction: "ltr",
+    },
+    {
+      code: "uk",
+      description: "yкраїнська (Ukrainian)",
+      direction: "ltr",
+    },
+    {
+      code: "ur",
+      description: "اُردُو (Urdu)",
+      direction: "rtl",
+    },
+    {
+      code: "vi",
+      description: "Tiếng Việt (Vietnamese)",
+      direction: "ltr",
+    },
+  ],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
   // languages are in alphabetical order.
   // List of supported site languages in which the platform is offered.
-  "SUPPORTED_SITE_LANGUAGES": [{
-    "id": "id",
-    "text": "Bahasa Indonesia",
-    "direction": "ltr"
-  }, {
-    "id": "en",
-    "text": "English",
-    "direction": "ltr"
-  }, {
-    "id": "es",
-    "text": "Español",
-    "direction": "ltr"
-  }, {
-    "id": "fr",
-    "text": "français (French)",
-    "direction": "ltr"
-  }, {
-    "id": "pt-br",
-    "text": "Português (Brasil)",
-    "direction": "ltr"
-  }, {
-    "id": "ar",
-    "text": "العربية",
-    "direction": "rtl"
-  }, {
-    "id": "kab",
-    "text": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
-  }, {
-    "id": "vi",
-    "text": "Tiếng Việt",
-    "direction": "ltr"
-  }, {
-    "id": "tr",
-    "text": "Türkçe (Turkish)",
-    "direction": "ltr"
-  }, {
-    "id": "hi",
-    "text": "हिन्दी",
-    "direction": "ltr"
-  }, {
-    "id": "bn",
-    "text": "বাংলা",
-    "direction": "ltr"
-  }, {
-    "id": "zh-hans",
-    "text": "中文(简体)",
-    "direction": "ltr"
-  }, {
-    "id": "zh-hant",
-    "text": "中文(繁體)",
-    "direction": "ltr"
-  }],
+  SUPPORTED_SITE_LANGUAGES: [
+    {
+      id: "id",
+      text: "Bahasa Indonesia",
+      direction: "ltr",
+    },
+    {
+      id: "en",
+      text: "English",
+      direction: "ltr",
+    },
+    {
+      id: "es",
+      text: "Español",
+      direction: "ltr",
+    },
+    {
+      id: "fr",
+      text: "français (French)",
+      direction: "ltr",
+    },
+    {
+      id: "pt-br",
+      text: "Português (Brasil)",
+      direction: "ltr",
+    },
+    {
+      id: "ar",
+      text: "العربية",
+      direction: "rtl",
+    },
+    {
+      id: "kab",
+      text: "Taqbaylit (Kabyle)",
+      direction: "ltr",
+    },
+    {
+      id: "vi",
+      text: "Tiếng Việt",
+      direction: "ltr",
+    },
+    {
+      id: "tr",
+      text: "Türkçe (Turkish)",
+      direction: "ltr",
+    },
+    {
+      id: "hi",
+      text: "हिन्दी",
+      direction: "ltr",
+    },
+    {
+      id: "bn",
+      text: "বাংলা",
+      direction: "ltr",
+    },
+    {
+      id: "zh-hans",
+      text: "中文(简体)",
+      direction: "ltr",
+    },
+    {
+      id: "zh-hant",
+      text: "中文(繁體)",
+      direction: "ltr",
+    },
+  ],
 
   // List of supported audio languages in which we have audio and translations
   // for explorations or other entities.
   // Related languages are used to prioritize an exploration's language when
   // setting the default audio language.
-  "SUPPORTED_AUDIO_LANGUAGES": [{
-    "id": "en",
-    "description": "English",
-    "relatedLanguages": ["en"],
-    "direction": "ltr"
-  }, {
-    "id": "ak",
-    "description": "Akan",
-    "relatedLanguages": ["ak"],
-    "direction": "ltr"
-  }, {
-    "id": "sq",
-    "description": "Albanian",
-    "relatedLanguages": ["sq"],
-    "direction": "ltr"
-  }, {
-    "id": "ar",
-    "description": "Arabic",
-    "relatedLanguages": ["ar"],
-    "direction": "rtl"
-  }, {
-    "id": "bg",
-    "description": "Bulgarian",
-    "relatedLanguages": ["bg"],
-    "direction": "ltr"
-  }, {
-    "id": "bn",
-    "description": "Bangla",
-    "relatedLanguages": ["bn"],
-    "direction": "ltr"
-  }, {
-    "id": "ms",
-    "description": "Bahasa Melayu",
-    "relatedLanguages": ["ms"],
-    "direction": "ltr"
-  }, {
-    "id": "ca",
-    "description": "Catalan",
-    "relatedLanguages": ["ca"],
-    "direction": "ltr"
-  }, {
-    "id": "zh",
-    "description": "Chinese",
-    "relatedLanguages": ["zh"],
-    "direction": "ltr"
-  }, {
-    "id": "hr",
-    "description": "Croatian",
-    "relatedLanguages": ["hr"],
-    "direction": "ltr"
-  }, {
-    "id": "cs",
-    "description": "Czech",
-    "relatedLanguages": ["cs"],
-    "direction": "ltr"
-  }, {
-    "id": "da",
-    "description": "Danish",
-    "relatedLanguages": ["da"],
-    "direction": "ltr"
-  }, {
-    "id": "prs",
-    "description": "Dari",
-    "relatedLanguages": ["prs"],
-    "direction": "rtl"
-  }, {
-    "id": "nl",
-    "description": "Dutch",
-    "relatedLanguages": ["nl"],
-    "direction": "ltr"
-  }, {
-    "id": "ee",
-    "description": "Ewe",
-    "relatedLanguages": ["ee"],
-    "direction": "ltr"
-  }, {
-    "id": "fat",
-    "description": "Fanti",
-    "relatedLanguages": ["ak", "fat"],
-    "direction": "ltr"
-  }, {
-    "id": "tl",
-    "description": "Filipino",
-    "relatedLanguages": ["tl"],
-    "direction": "ltr"
-  }, {
-    "id": "fi",
-    "description": "Finnish",
-    "relatedLanguages": ["fi"],
-    "direction": "ltr"
-  }, {
-    "id": "fr",
-    "description": "French",
-    "relatedLanguages": ["fr"],
-    "direction": "ltr"
-  }, {
-    "id": "lg",
-    "description": "Ganda",
-    "relatedLanguages": ["lg"],
-    "direction": "ltr"
-  }, {
-    "id": "de",
-    "description": "German",
-    "relatedLanguages": ["de"],
-    "direction": "ltr"
-  }, {
-    "id": "el",
-    "description": "Greek",
-    "relatedLanguages": ["el"],
-    "direction": "ltr"
-  }, {
-    "id": "gaa",
-    "description": "Ga",
-    "relatedLanguages": ["gaa"],
-    "direction": "ltr"
-  }, {
-    "id": "he",
-    "description": "Hebrew",
-    "relatedLanguages": ["he"],
-    "direction": "rtl"
-  }, {
-    "id": "hi",
-    "description": "Hindi",
-    "relatedLanguages": ["hi"],
-    "direction": "ltr"
-  }, {
-    "id": "hi-en",
-    "description": "Hinglish",
-    "relatedLanguages": ["hi", "en"],
-    "direction": "ltr"
-  }, {
-    "id": "hu",
-    "description": "Hungarian",
-    "relatedLanguages": ["hu"],
-    "direction": "ltr"
-  }, {
-    "id": "id",
-    "description": "Indonesian",
-    "relatedLanguages": ["id"],
-    "direction": "ltr"
-  }, {
-    "id": "it",
-    "description": "Italian",
-    "relatedLanguages": ["it"],
-    "direction": "ltr"
-  }, {
-    "id": "ja",
-    "description": "Japanese",
-    "relatedLanguages": ["ja"],
-    "direction": "ltr"
-  }, {
-    "id": "kab",
-    "description": "Kabyle",
-    "relatedLanguages": ["kab"],
-    "direction": "ltr"
-  }, {
-    "id": "ko",
-    "description": "Korean",
-    "relatedLanguages": ["ko"],
-    "direction": "ltr"
-  }, {
-    "id": "lv",
-    "description": "Latvian",
-    "relatedLanguages": ["lv"],
-    "direction": "ltr"
-  }, {
-    "id": "lt",
-    "description": "Lithuanian",
-    "relatedLanguages": ["lt"],
-    "direction": "ltr"
-  }, {
-    "id": "mr",
-    "description": "Marathi",
-    "relatedLanguages": ["mr"],
-    "direction": "ltr"
-  }, {
-    "id": "no",
-    "description": "Norwegian",
-    "relatedLanguages": ["no"],
-    "direction": "ltr"
-  }, {
-    "id": "fa",
-    "description": "Persian",
-    "relatedLanguages": ["fa"],
-    "direction": "rtl"
-  }, {
-    "id": "pl",
-    "description": "Polish",
-    "relatedLanguages": ["pl"],
-    "direction": "ltr"
-  }, {
-    "id": "pt",
-    "description": "Portuguese",
-    "relatedLanguages": ["pt"],
-    "direction": "ltr"
-  }, {
-    "id": "ps",
-    "description": "Pashto",
-    "relatedLanguages": ["ps"],
-    "direction": "rtl"
-  }, {
-    "id": "ro",
-    "description": "Romanian",
-    "relatedLanguages": ["ro"],
-    "direction": "ltr"
-  }, {
-    "id": "ru",
-    "description": "Russian",
-    "relatedLanguages": ["ru"],
-    "direction": "ltr"
-  }, {
-    "id": "sr",
-    "description": "Serbian",
-    "relatedLanguages": ["sr"],
-    "direction": "ltr"
-  }, {
-    "id": "sk",
-    "description": "Slovak",
-    "relatedLanguages": ["sk"],
-    "direction": "ltr"
-  }, {
-    "id": "sl",
-    "description": "Slovenian",
-    "relatedLanguages": ["sl"],
-    "direction": "ltr"
-  }, {
-    "id": "es",
-    "description": "Spanish",
-    "relatedLanguages": ["es"],
-    "direction": "ltr"
-  }, {
-    "id": "sw",
-    "description": "Swahili",
-    "relatedLanguages": ["sw"],
-    "direction": "ltr"
-  }, {
-    "id": "sv",
-    "description": "Swedish",
-    "relatedLanguages": ["sv"],
-    "direction": "ltr"
-  }, {
-    "id": "ta",
-    "description": "Tamil",
-    "relatedLanguages": ["ta"],
-    "direction": "ltr"
-  }, {
-    "id": "te",
-    "description": "Telugu",
-    "relatedLanguages": ["te"],
-    "direction": "ltr"
-  }, {
-    "id": "th",
-    "description": "Thai",
-    "relatedLanguages": ["th"],
-    "direction": "ltr"
-  }, {
-    "id": "tr",
-    "description": "Turkish",
-    "relatedLanguages": ["tr"],
-    "direction": "ltr"
-  }, {
-    "id": "uk",
-    "description": "Ukrainian",
-    "relatedLanguages": ["uk"],
-    "direction": "ltr"
-  }, {
-    "id": "ur",
-    "description": "Urdu",
-    "relatedLanguages": ["ur"],
-    "direction": "rtl"
-  }, {
-    "id": "vi",
-    "description": "Vietnamese",
-    "relatedLanguages": ["vi"],
-    "direction": "ltr"
-  }],
+  SUPPORTED_AUDIO_LANGUAGES: [
+    {
+      id: "en",
+      description: "English",
+      relatedLanguages: ["en"],
+      direction: "ltr",
+    },
+    {
+      id: "ak",
+      description: "Akan",
+      relatedLanguages: ["ak"],
+      direction: "ltr",
+    },
+    {
+      id: "sq",
+      description: "Albanian",
+      relatedLanguages: ["sq"],
+      direction: "ltr",
+    },
+    {
+      id: "ar",
+      description: "Arabic",
+      relatedLanguages: ["ar"],
+      direction: "rtl",
+    },
+    {
+      id: "bg",
+      description: "Bulgarian",
+      relatedLanguages: ["bg"],
+      direction: "ltr",
+    },
+    {
+      id: "bn",
+      description: "Bangla",
+      relatedLanguages: ["bn"],
+      direction: "ltr",
+    },
+    {
+      id: "ms",
+      description: "Bahasa Melayu",
+      relatedLanguages: ["ms"],
+      direction: "ltr",
+    },
+    {
+      id: "ca",
+      description: "Catalan",
+      relatedLanguages: ["ca"],
+      direction: "ltr",
+    },
+    {
+      id: "zh",
+      description: "Chinese",
+      relatedLanguages: ["zh"],
+      direction: "ltr",
+    },
+    {
+      id: "hr",
+      description: "Croatian",
+      relatedLanguages: ["hr"],
+      direction: "ltr",
+    },
+    {
+      id: "cs",
+      description: "Czech",
+      relatedLanguages: ["cs"],
+      direction: "ltr",
+    },
+    {
+      id: "da",
+      description: "Danish",
+      relatedLanguages: ["da"],
+      direction: "ltr",
+    },
+    {
+      id: "prs",
+      description: "Dari",
+      relatedLanguages: ["prs"],
+      direction: "rtl",
+    },
+    {
+      id: "nl",
+      description: "Dutch",
+      relatedLanguages: ["nl"],
+      direction: "ltr",
+    },
+    {
+      id: "ee",
+      description: "Ewe",
+      relatedLanguages: ["ee"],
+      direction: "ltr",
+    },
+    {
+      id: "fat",
+      description: "Fanti",
+      relatedLanguages: ["ak", "fat"],
+      direction: "ltr",
+    },
+    {
+      id: "tl",
+      description: "Filipino",
+      relatedLanguages: ["tl"],
+      direction: "ltr",
+    },
+    {
+      id: "fi",
+      description: "Finnish",
+      relatedLanguages: ["fi"],
+      direction: "ltr",
+    },
+    {
+      id: "fr",
+      description: "French",
+      relatedLanguages: ["fr"],
+      direction: "ltr",
+    },
+    {
+      id: "lg",
+      description: "Ganda",
+      relatedLanguages: ["lg"],
+      direction: "ltr",
+    },
+    {
+      id: "de",
+      description: "German",
+      relatedLanguages: ["de"],
+      direction: "ltr",
+    },
+    {
+      id: "el",
+      description: "Greek",
+      relatedLanguages: ["el"],
+      direction: "ltr",
+    },
+    {
+      id: "gaa",
+      description: "Ga",
+      relatedLanguages: ["gaa"],
+      direction: "ltr",
+    },
+    {
+      id: "he",
+      description: "Hebrew",
+      relatedLanguages: ["he"],
+      direction: "rtl",
+    },
+    {
+      id: "hi",
+      description: "Hindi",
+      relatedLanguages: ["hi"],
+      direction: "ltr",
+    },
+    {
+      id: "hi-en",
+      description: "Hinglish",
+      relatedLanguages: ["hi", "en"],
+      direction: "ltr",
+    },
+    {
+      id: "hu",
+      description: "Hungarian",
+      relatedLanguages: ["hu"],
+      direction: "ltr",
+    },
+    {
+      id: "id",
+      description: "Indonesian",
+      relatedLanguages: ["id"],
+      direction: "ltr",
+    },
+    {
+      id: "it",
+      description: "Italian",
+      relatedLanguages: ["it"],
+      direction: "ltr",
+    },
+    {
+      id: "ja",
+      description: "Japanese",
+      relatedLanguages: ["ja"],
+      direction: "ltr",
+    },
+    {
+      id: "kab",
+      description: "Kabyle",
+      relatedLanguages: ["kab"],
+      direction: "ltr",
+    },
+    {
+      id: "ko",
+      description: "Korean",
+      relatedLanguages: ["ko"],
+      direction: "ltr",
+    },
+    {
+      id: "lv",
+      description: "Latvian",
+      relatedLanguages: ["lv"],
+      direction: "ltr",
+    },
+    {
+      id: "lt",
+      description: "Lithuanian",
+      relatedLanguages: ["lt"],
+      direction: "ltr",
+    },
+    {
+      id: "mr",
+      description: "Marathi",
+      relatedLanguages: ["mr"],
+      direction: "ltr",
+    },
+    {
+      id: "no",
+      description: "Norwegian",
+      relatedLanguages: ["no"],
+      direction: "ltr",
+    },
+    {
+      id: "fa",
+      description: "Persian",
+      relatedLanguages: ["fa"],
+      direction: "rtl",
+    },
+    {
+      id: "pl",
+      description: "Polish",
+      relatedLanguages: ["pl"],
+      direction: "ltr",
+    },
+    {
+      id: "pt",
+      description: "Portuguese",
+      relatedLanguages: ["pt"],
+      direction: "ltr",
+    },
+    {
+      id: "ps",
+      description: "Pashto",
+      relatedLanguages: ["ps"],
+      direction: "rtl",
+    },
+    {
+      id: "ro",
+      description: "Romanian",
+      relatedLanguages: ["ro"],
+      direction: "ltr",
+    },
+    {
+      id: "ru",
+      description: "Russian",
+      relatedLanguages: ["ru"],
+      direction: "ltr",
+    },
+    {
+      id: "sr",
+      description: "Serbian",
+      relatedLanguages: ["sr"],
+      direction: "ltr",
+    },
+    {
+      id: "sk",
+      description: "Slovak",
+      relatedLanguages: ["sk"],
+      direction: "ltr",
+    },
+    {
+      id: "sl",
+      description: "Slovenian",
+      relatedLanguages: ["sl"],
+      direction: "ltr",
+    },
+    {
+      id: "es",
+      description: "Spanish",
+      relatedLanguages: ["es"],
+      direction: "ltr",
+    },
+    {
+      id: "sw",
+      description: "Swahili",
+      relatedLanguages: ["sw"],
+      direction: "ltr",
+    },
+    {
+      id: "sv",
+      description: "Swedish",
+      relatedLanguages: ["sv"],
+      direction: "ltr",
+    },
+    {
+      id: "ta",
+      description: "Tamil",
+      relatedLanguages: ["ta"],
+      direction: "ltr",
+    },
+    {
+      id: "te",
+      description: "Telugu",
+      relatedLanguages: ["te"],
+      direction: "ltr",
+    },
+    {
+      id: "th",
+      description: "Thai",
+      relatedLanguages: ["th"],
+      direction: "ltr",
+    },
+    {
+      id: "tr",
+      description: "Turkish",
+      relatedLanguages: ["tr"],
+      direction: "ltr",
+    },
+    {
+      id: "uk",
+      description: "Ukrainian",
+      relatedLanguages: ["uk"],
+      direction: "ltr",
+    },
+    {
+      id: "ur",
+      description: "Urdu",
+      relatedLanguages: ["ur"],
+      direction: "rtl",
+    },
+    {
+      id: "vi",
+      description: "Vietnamese",
+      relatedLanguages: ["vi"],
+      direction: "ltr",
+    },
+  ],
 
-  "AUTOGENERATED_AUDIO_LANGUAGES": [{
-    "id": "en-auto",
-    "description": "English (auto)",
-    "explorationLanguage": "en",
-    "speechSynthesisCode": "en-US",
-    "speechSynthesisCodeMobile": "en_US"
-  }],
+  AUTOGENERATED_AUDIO_LANGUAGES: [
+    {
+      id: "en-auto",
+      description: "English (auto)",
+      explorationLanguage: "en",
+      speechSynthesisCode: "en-US",
+      speechSynthesisCodeMobile: "en_US",
+    },
+  ],
 
-  "TRANSLATION_TIPS": {
+  TRANSLATION_TIPS: {
     // Arabic.
-    "ar": [
+    ar: [
       // eslint-disable-next-line max-len
       "In Oppia, we prefer to use simple words that can be easily understood by children. For example, we use “تابع قائلًا” instead of “أردف قائلًا”. Furthermore, the English words that are used in the Arab society regularly can be translated as follows; Arabic word (The regularly used English word). For example, we can translate the word cupcakes this way; كعك القوالب الصغيرة (cupcakes). ",
       // eslint-disable-next-line max-len
@@ -5314,10 +5490,10 @@ export default {
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Arabic as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
       // eslint-disable-next-line max-len
-      "Use the hyperlinks to different cards as shown in the original English Text."
+      "Use the hyperlinks to different cards as shown in the original English Text.",
     ],
     // Bangla.
-    "bn": [
+    bn: [
       // eslint-disable-next-line max-len
       "Use simple Bangla words that are used in daily communication. Note that common English words (pencil, etc.) can be written as transliterations (e.g পেন্সিল ).",
       "Use proper punctuation.",
@@ -5325,10 +5501,10 @@ export default {
       // eslint-disable-next-line max-len
       "Use the same voice (active or passive) as in the original English text.",
       // eslint-disable-next-line max-len
-      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
     ],
     // Chinese.
-    "zh": [
+    zh: [
       // eslint-disable-next-line max-len
       "Write fractions or numbers as they are, unless they are written out in words. For instance, one-fifth would be (五分之一)",
       // eslint-disable-next-line max-len
@@ -5340,10 +5516,10 @@ export default {
       // eslint-disable-next-line max-len
       "Preserve bolding. If the original content has bold text, make sure it is bold in Chinese as well.",
       // eslint-disable-next-line max-len
-      "Make sure that you have selected the correct words (e.g. words such as 再 and 在 )."
+      "Make sure that you have selected the correct words (e.g. words such as 再 and 在 ).",
     ],
     // Hindi.
-    "hi": [
+    hi: [
       // eslint-disable-next-line max-len
       "Prefer simple Hindi words that are used in daily communication Note that common English words (pen, paper, cake, etc.) can be written as transliterations (पेन, पेपर, केक). For harder words, include the English word in parentheses, e.g. अंश (Numerator), हर (Denominator), भिन्न (Fraction).",
       // eslint-disable-next-line max-len
@@ -5353,26 +5529,26 @@ export default {
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hindi as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
       // eslint-disable-next-line max-len
-      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any).",
     ],
     // Spanish.
-    "es": [
+    es: [
       "Include proper punctuation, ¡blank!, ¿question? and accent marks.",
       // eslint-disable-next-line max-len
       "In Spanish, the nouns are usually gendered. Make sure to use the correct article gender for the noun gender (el gato, la casa , las mujeres, los hombres etc.) El is usually used for masculine singular and la is usually for feminine singular. Los for masculine plural and las for feminine plural.",
       // eslint-disable-next-line max-len
       "Try to make sure that the accents are placed correctly as it can make a big difference in meaning for the reader (tu = your vs. tú = informal you, si = if vs. sí = yes).",
       // eslint-disable-next-line max-len
-      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Spanish as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Spanish as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
     ],
     // Portuguese.
-    "pt": [
+    pt: [
       // eslint-disable-next-line max-len
-      "When translating names of mathematical terms, look for how these names are used in Brazilian education/literature instead of translating literally. For example, while the names may be similar in some cases (e.g. \"The Commutative Property of Multiplication\" would be \"A Propriedade Comutativa da Multiplicação\"), in other cases the literal translation will not match the names used in Brazil (e.g. \"The Carrying Method of multiplication\" would be \"O Método Tradicional de Multiplicação\"). Also, terms like \"Place Values\" may have a different translation depending on the context, which may be \"casa\"/\"ordem\" or \"valor relativo\".",
+      'When translating names of mathematical terms, look for how these names are used in Brazilian education/literature instead of translating literally. For example, while the names may be similar in some cases (e.g. "The Commutative Property of Multiplication" would be "A Propriedade Comutativa da Multiplicação"), in other cases the literal translation will not match the names used in Brazil (e.g. "The Carrying Method of multiplication" would be "O Método Tradicional de Multiplicação"). Also, terms like "Place Values" may have a different translation depending on the context, which may be "casa"/"ordem" or "valor relativo".',
       // eslint-disable-next-line max-len
-      "When writing a number, remember that \",\" in English corresponds to \".\" in Portuguese, and vice-versa.",
+      'When writing a number, remember that "," in English corresponds to "." in Portuguese, and vice-versa.',
       // eslint-disable-next-line max-len
-      "Prefer to use friendly words and sentences for children. For example, instead of using \"Diga-me o nome...\" or \"vou pedir-lhe ajuda\", you can write the sentence with a more informal language like \"Me diga o nome...\" or \"vou pedir a sua ajuda\".",
+      'Prefer to use friendly words and sentences for children. For example, instead of using "Diga-me o nome..." or "vou pedir-lhe ajuda", you can write the sentence with a more informal language like "Me diga o nome..." or "vou pedir a sua ajuda".',
       // eslint-disable-next-line max-len
       "In English some nouns/articles are neutral. In Portuguese the nouns are usually gendered. Be careful not to generate inconsistencies and make sure to use the correct article gender for the noun gender. For example: Nina and Sandra loved the cake. They went out to buy more. In Portuguese: Nina e Sandra adoraram o bolo. Elas saíram para comprar mais.",
       // eslint-disable-next-line max-len
@@ -5385,186 +5561,231 @@ export default {
       "If you think you need more context in order to get the right terms and nouns, please play the lesson once before submitting the translation.",
       // eslint-disable-next-line max-len
       "Keep in mind that some English puns may not work for Portuguese, so you might need to adjust them or construct the same sentence without the pun.",
-      "When translating a currency, replace \"Dollar\" for \"Real\"."
-    ]
+      'When translating a currency, replace "Dollar" for "Real".',
+    ],
   },
 
   // Types of view in creator dashboard page.
-  "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
-    "CARD": "card",
-    "LIST": "list"
+  ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS: {
+    CARD: "card",
+    LIST: "list",
   },
 
-  "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
-    "name": "Commonly Used",
-    "interaction_ids": [
-      "ImageClickInput",
-      "ItemSelectionInput",
-      "MultipleChoiceInput",
-      "TextInput",
-      "DragAndDropSortInput",
-      "NumericInput"
-    ]
-  }, {
-    "name": "Math",
-    "interaction_ids": [
-      "FractionInput",
-      "NumberWithUnits",
-      "NumericInput"
-    ]
-  }],
+  ALLOWED_QUESTION_INTERACTION_CATEGORIES: [
+    {
+      name: "Commonly Used",
+      interaction_ids: [
+        "ImageClickInput",
+        "ItemSelectionInput",
+        "MultipleChoiceInput",
+        "TextInput",
+        "DragAndDropSortInput",
+        "NumericInput",
+      ],
+    },
+    {
+      name: "Math",
+      interaction_ids: ["FractionInput", "NumberWithUnits", "NumericInput"],
+    },
+  ],
 
   // These are linked to the VALID_INTERACTION_IDS constant in
   // android_validation_constants.py.
-  "ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES": [{
-    "name": "General",
-    "interaction_ids": [
-      "Continue",
-      "EndExploration",
-      "ImageClickInput",
-      "ItemSelectionInput",
-      "MultipleChoiceInput",
-      "TextInput",
-      "DragAndDropSortInput"
-    ]
-  }, {
-    "name": "Math",
-    "interaction_ids": [
-      "FractionInput",
-      "NumericInput",
-      "NumericExpressionInput",
-      "AlgebraicExpressionInput",
-      "MathEquationInput",
-      "NumberWithUnits",
-      "RatioExpressionInput"
-    ]
-  }],
+  ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES: [
+    {
+      name: "General",
+      interaction_ids: [
+        "Continue",
+        "EndExploration",
+        "ImageClickInput",
+        "ItemSelectionInput",
+        "MultipleChoiceInput",
+        "TextInput",
+        "DragAndDropSortInput",
+      ],
+    },
+    {
+      name: "Math",
+      interaction_ids: [
+        "FractionInput",
+        "NumericInput",
+        "NumericExpressionInput",
+        "AlgebraicExpressionInput",
+        "MathEquationInput",
+        "NumberWithUnits",
+        "RatioExpressionInput",
+      ],
+    },
+  ],
 
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
-  "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "Commonly Used",
-    "interaction_ids": [
-      "Continue",
-      "EndExploration",
-      "ImageClickInput",
-      "ItemSelectionInput",
-      "MultipleChoiceInput",
-      "NumericInput",
-      "TextInput",
-      "DragAndDropSortInput"
-    ]
-  }, {
-    "name": "Math",
-    "interaction_ids": [
-      "FractionInput",
-      "GraphInput",
-      "NumericInput",
-      "SetInput",
-      "NumericExpressionInput",
-      "AlgebraicExpressionInput",
-      "MathEquationInput",
-      "NumberWithUnits",
-      "RatioExpressionInput"
-    ]
-  }, {
-    "name": "Programming",
-    "interaction_ids": [
-      "CodeRepl",
-      "PencilCodeEditor"
-    ]
-  }, {
-    "name": "Music",
-    "interaction_ids": [
-      "MusicNotesInput"
-    ]
-  }, {
-    "name": "Geography",
-    "interaction_ids": [
-      "InteractiveMap"
-    ]
-  }],
-
-  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
-  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
-  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
-  "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
-  "CONTRIBUTION_RIGHT_CATEGORIES": [
-    "translation", "voiceover", "question", "submit_question"
+  ALLOWED_INTERACTION_CATEGORIES: [
+    {
+      name: "Commonly Used",
+      interaction_ids: [
+        "Continue",
+        "EndExploration",
+        "ImageClickInput",
+        "ItemSelectionInput",
+        "MultipleChoiceInput",
+        "NumericInput",
+        "TextInput",
+        "DragAndDropSortInput",
+      ],
+    },
+    {
+      name: "Math",
+      interaction_ids: [
+        "FractionInput",
+        "GraphInput",
+        "NumericInput",
+        "SetInput",
+        "NumericExpressionInput",
+        "AlgebraicExpressionInput",
+        "MathEquationInput",
+        "NumberWithUnits",
+        "RatioExpressionInput",
+      ],
+    },
+    {
+      name: "Programming",
+      interaction_ids: ["CodeRepl", "PencilCodeEditor"],
+    },
+    {
+      name: "Music",
+      interaction_ids: ["MusicNotesInput"],
+    },
+    {
+      name: "Geography",
+      interaction_ids: ["InteractiveMap"],
+    },
   ],
 
-  "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
-  "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
-  "USER_FILTER_CRITERION_USERNAME": "username",
-  "USER_FILTER_CRITERION_ROLE": "role",
+  CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: "translation",
+  CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: "voiceover",
+  CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: "question",
+  CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: "submit_question",
+  CONTRIBUTION_RIGHT_CATEGORIES: [
+    "translation",
+    "voiceover",
+    "question",
+    "submit_question",
+  ],
+
+  ACTION_REMOVE_ALL_REVIEW_RIGHTS: "all",
+  ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS: "specific",
+  USER_FILTER_CRITERION_USERNAME: "username",
+  USER_FILTER_CRITERION_ROLE: "role",
 
   // Interaction IDs for which answer details cannot be solicited.
-  "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
+  INTERACTION_IDS_WITHOUT_ANSWER_DETAILS: ["EndExploration", "Continue"],
 
-  "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
+  WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS: [],
 
-  "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
+  FEEDBACK_SUBJECT_MAX_CHAR_LIMIT: 50,
 
-  "MAX_CURRENT_GOALS_COUNT": 5,
+  MAX_CURRENT_GOALS_COUNT: 5,
 
-  "ACTIVITY_STATUS_PRIVATE": "private",
-  "ACTIVITY_STATUS_PUBLIC": "public",
+  ACTIVITY_STATUS_PRIVATE: "private",
+  ACTIVITY_STATUS_PUBLIC: "public",
 
-  "SITE_FEEDBACK_FORM_URL": "",
+  SITE_FEEDBACK_FORM_URL: "",
 
-  "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
+  SYSTEM_USER_IDS: ["admin", "OppiaMigrationBot"],
 
   // A string containing the disallowed characters in state or exploration
   // names. The underscore is needed because spaces in names must be converted
   // to underscores when displayed as part of a URL or key. The other
   // conventions here are derived from the Wikipedia guidelines for naming
   // articles.
-  "INVALID_NAME_CHARS": [
-    ":", "#", "/", "|", "_", "%", "<", ">", "[", "]", "{", "}", "\\ufffd",
-    "\\\\", "\\u007f", "\\u0000", "\\u0001", "\\u0002", "\\u0003", "\\u0004",
-    "\\u0005", "\\u0006", "\\u0007", "\\b", "\\t", "\\n", "\\u000b", "\\f",
-    "\\r", "\\u000e", "\\u000f", "\\u0010", "\\u0011", "\\u0012", "\\u0013",
-    "\\u0014", "\\u0015", "\\u0016", "\\u0017", "\\u0018", "\\u0019", "\\u001a",
-    "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
+  INVALID_NAME_CHARS: [
+    ":",
+    "#",
+    "/",
+    "|",
+    "_",
+    "%",
+    "<",
+    ">",
+    "[",
+    "]",
+    "{",
+    "}",
+    "\\ufffd",
+    "\\\\",
+    "\\u007f",
+    "\\u0000",
+    "\\u0001",
+    "\\u0002",
+    "\\u0003",
+    "\\u0004",
+    "\\u0005",
+    "\\u0006",
+    "\\u0007",
+    "\\b",
+    "\\t",
+    "\\n",
+    "\\u000b",
+    "\\f",
+    "\\r",
+    "\\u000e",
+    "\\u000f",
+    "\\u0010",
+    "\\u0011",
+    "\\u0012",
+    "\\u0013",
+    "\\u0014",
+    "\\u0015",
+    "\\u0016",
+    "\\u0017",
+    "\\u0018",
+    "\\u0019",
+    "\\u001a",
+    "\\u001b",
+    "\\u001c",
+    "\\u001d",
+    "\\u001e",
+    "\\u001f",
   ],
 
-  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+  DEFAULT_SKILL_DIFFICULTY: 0.3,
 
-  "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
+  INLINE_RTE_COMPONENTS: ["link", "math", "skillreview"],
 
   // If new difficulties are added or the names changed, only the constants
   // below need to be edited.
-  "SKILL_DIFFICULTY_EASY": "Easy",
-  "SKILL_DIFFICULTY_MEDIUM": "Medium",
-  "SKILL_DIFFICULTY_HARD": "Hard",
+  SKILL_DIFFICULTY_EASY: "Easy",
+  SKILL_DIFFICULTY_MEDIUM: "Medium",
+  SKILL_DIFFICULTY_HARD: "Hard",
 
-  "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
+  SKILL_DIFFICULTIES: ["Easy", "Medium", "Hard"],
 
-  "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
-    "Easy": 0.3,
-    "Medium": 0.6,
-    "Hard": 0.9
+  SKILL_DIFFICULTY_LABEL_TO_FLOAT: {
+    Easy: 0.3,
+    Medium: 0.6,
+    Hard: 0.9,
   },
 
-  "ENABLE_PREREQUISITE_SKILLS": false,
+  ENABLE_PREREQUISITE_SKILLS: false,
 
-  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
+  ENABLE_NEW_STRUCTURE_VIEWER_UPDATES: true,
 
-  "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
+  ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE: true,
 
-  "MAX_SKILLS_PER_QUESTION": 3,
+  MAX_SKILLS_PER_QUESTION: 3,
 
-  "MAX_QUESTIONS_PER_SKILL": 50,
+  MAX_QUESTIONS_PER_SKILL: 50,
 
-  "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
+  NUM_EXPLORATIONS_PER_REVIEW_TEST: 3,
 
-  "NUM_QUESTIONS_PER_PAGE": 10,
+  NUM_QUESTIONS_PER_PAGE: 10,
 
-  "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
+  BULK_EMAIL_SERVICE_SIGNUP_URL: "",
 
   // The default number of opportunities to show on the contributor dashboard
   // page.
-  "OPPORTUNITIES_PAGE_SIZE": 10,
+  OPPORTUNITIES_PAGE_SIZE: 10,
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
@@ -5572,775 +5793,1011 @@ export default {
   // This represents the maximum number of characters in the URL fragment for
   // classroom in the classroom page URL. E.g. in /learn/math/...,
   // 'math' is the 'classroom URL fragment'.
-  "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
-  "MAX_CHARS_IN_TOPIC_NAME": 39,
-  "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
+  MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT: 20,
+  MAX_CHARS_IN_TOPIC_NAME: 39,
+  MAX_CHARS_IN_ABBREV_TOPIC_NAME: 12,
   // This represents the maximum number of characters in the URL fragment for
   // topic in the topic page URL. E.g. in /learn/math/fractions/...,
   // 'fractions' is the 'topic URL fragment'.
-  "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
-  "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
-  "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
-  "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
-  "MAX_CHARS_IN_STORY_TITLE": 39,
-  "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
-  "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
-  "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
-  "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
-  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
-  "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
-  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
-  "STORY_ID_LENGTH": 12,
+  MAX_CHARS_IN_TOPIC_URL_FRAGMENT: 20,
+  MAX_CHARS_IN_TOPIC_DESCRIPTION: 240,
+  MAX_CHARS_IN_SUBTOPIC_TITLE: 64,
+  MAX_CHARS_IN_SKILL_DESCRIPTION: 100,
+  MAX_CHARS_IN_STORY_TITLE: 39,
+  MAX_CHARS_IN_STORY_DESCRIPTION: 1000,
+  MAX_CHARS_IN_EXPLORATION_TITLE: 36,
+  MAX_CHARS_IN_CHAPTER_DESCRIPTION: 152,
+  MAX_CHARS_IN_MISCONCEPTION_NAME: 100,
+  MAX_CHARS_IN_BLOG_POST_TITLE: 40,
+  MIN_CHARS_IN_BLOG_POST_TITLE: 5,
+  MAX_CHARS_IN_BLOG_POST_SUMMARY: 300,
+  STORY_ID_LENGTH: 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
   // 'story URL fragment'.
-  "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
+  MAX_CHARS_IN_STORY_URL_FRAGMENT: 30,
   // This represents the maximum number of characters in the URL fragment for
   // subtopic in the revision page URL. E.g.
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
-  "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT: 25,
   // This represents the maximum number of characters in the URL fragment for
   // the blog post.
-  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
+  MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: 65,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
-  "MAX_CHARS_IN_META_TAG_CONTENT": 160,
-  "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
+  MAX_CHARS_IN_META_TAG_CONTENT: 160,
+  MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB: 50,
 
-  "NEW_STATE_TEMPLATE": {
-    "classifier_model_id": null,
-    "linked_skill_id": null,
-    "content": {
-      "html": "",
-      "content_id": "content"
+  NEW_STATE_TEMPLATE: {
+    classifier_model_id: null,
+    linked_skill_id: null,
+    content: {
+      html: "",
+      content_id: "content",
     },
-    "interaction": {
-      "id": null,
-      "customization_args": {},
-      "answer_groups": [],
-      "default_outcome": {
-        "dest": "Introduction",
-        "feedback": {
-          "content_id": "default_outcome",
-          "html": ""
+    interaction: {
+      id: null,
+      customization_args: {},
+      answer_groups: [],
+      default_outcome: {
+        dest: "Introduction",
+        feedback: {
+          content_id: "default_outcome",
+          html: "",
         },
-        "labelled_as_correct": false,
-        "param_changes": [],
-        "refresher_exploration_id": null,
-        "missing_prerequisite_skill_id": null
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
       },
-      "confirmed_unclassified_answers": [],
-      "hints": [],
-      "solution": null
+      confirmed_unclassified_answers: [],
+      hints: [],
+      solution: null,
     },
-    "next_content_id_index": 0,
-    "param_changes": [],
-    "recorded_voiceovers": {
-      "voiceovers_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
+    next_content_id_index: 0,
+    param_changes: [],
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {},
+      },
     },
-    "solicit_answer_details": false,
-    "card_is_checkpoint": false,
-    "written_translations": {
-      "translations_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
-    }
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+      },
+    },
   },
 
   // Data required for Google Analytics.
-  "ANALYTICS_ID": "",
-  "SITE_NAME_FOR_ANALYTICS": "",
+  ANALYTICS_ID: "",
+  SITE_NAME_FOR_ANALYTICS: "",
 
   // Data required for Firebase authentication.
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",
-  "FIREBASE_CONFIG_AUTH_DOMAIN": "",
-  "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
-  "FIREBASE_CONFIG_STORAGE_BUCKET": "",
-  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
-  "FIREBASE_CONFIG_APP_ID": "",
-  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
+  FIREBASE_CONFIG_API_KEY: "fake-api-key",
+  FIREBASE_CONFIG_AUTH_DOMAIN: "",
+  FIREBASE_CONFIG_PROJECT_ID: "dev-project-id",
+  FIREBASE_CONFIG_STORAGE_BUCKET: "",
+  FIREBASE_CONFIG_MESSAGING_SENDER_ID: "",
+  FIREBASE_CONFIG_APP_ID: "",
+  FIREBASE_CONFIG_GOOGLE_CLIENT_ID: "",
 
   // The name of the cookie Oppia will place the session cookie into. The name
   // is arbitrary. If it is changed later on, then the cookie will live on in
   // the users' browsers as garbage (although it'd expire eventually).
-  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
+  FIREBASE_AUTH_SESSION_COOKIE_NAME: "session",
 
-  "ALLOW_YAML_FILE_UPLOAD": false,
+  ALLOW_YAML_FILE_UPLOAD: false,
 
   // A regular expression for tags.
-  "TAG_REGEX": "^[a-z ]+$",
+  TAG_REGEX: "^[a-z ]+$",
 
   // A regular expression for allowed character in tags for blog post.
-  "BLOG_POST_TAG_REGEX": "^[a-zA-Z0-9 ]+$",
+  BLOG_POST_TAG_REGEX: "^[a-zA-Z0-9 ]+$",
 
   // A regular expression for allowed characters in URL fragment fields.
-  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+  VALID_URL_FRAGMENT_REGEX: "^[a-z]+(-[a-z]+)*$",
 
   // A regular expression for allowed characters for thumbnail filename.
-  "VALID_THUMBNAIL_FILENAME_REGEX": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
+  VALID_THUMBNAIL_FILENAME_REGEX: "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
 
   // A regular expression for allowed entity id's.
-  "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
+  ENTITY_ID_REGEX: "^[a-zA-Z0-9-_]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
-  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
+  VALID_BLOG_POST_TITLE_REGEX: "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
-  "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
+  VALID_URL_BLOG_FRAGMENT_REGEX: "^[a-z0-9]+(-[a-z0-9]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   // eslint-disable-next-line max-len
-  "VALID_THREAD_ID_REGEX": "(exploration|collection|skill).[a-zA-Z0-9]+.[a-zA-Z0-9=]+",
+  VALID_THREAD_ID_REGEX:
+    "(exploration|collection|skill).[a-zA-Z0-9]+.[a-zA-Z0-9=]+",
 
   // A regular expression for valid skill misconception id.
-  "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
+  VALID_SKILL_MISCONCEPTION_ID_REGEX: "[A-Za-z0-9]{12}-[0-9]+",
 
   // Invalid names for parameters used in expressions.
-  "INVALID_PARAMETER_NAMES": [
-    "answer", "choices", "abs", "all", "and", "any", "else",
-    "floor", "if", "log", "or", "pow", "round", "then"
+  INVALID_PARAMETER_NAMES: [
+    "answer",
+    "choices",
+    "abs",
+    "all",
+    "and",
+    "any",
+    "else",
+    "floor",
+    "if",
+    "log",
+    "or",
+    "pow",
+    "round",
+    "then",
   ],
 
   // Greek letters allowed in math interactions.
-  "GREEK_LETTER_NAMES_TO_SYMBOLS": {
-    "alpha": "α",
-    "beta": "β",
-    "gamma": "γ",
-    "delta": "δ",
-    "epsilon": "ε",
-    "zeta": "ζ",
-    "eta": "η",
-    "theta": "θ",
-    "iota": "ι",
-    "kappa": "κ",
-    "lambda": "λ",
-    "mu": "μ",
-    "nu": "ν",
-    "xi": "ξ",
-    "pi": "π",
-    "rho": "ρ",
-    "sigma": "σ",
-    "tau": "τ",
-    "upsilon": "υ",
-    "phi": "φ",
-    "chi": "χ",
-    "psi": "ψ",
-    "omega": "ω",
-    "Gamma": "Γ",
-    "Delta": "Δ",
-    "Theta": "Θ",
-    "Lambda": "Λ",
-    "Xi": "Ξ",
-    "Pi": "Π",
-    "Sigma": "Σ",
-    "Phi": "Φ",
-    "Psi": "Ψ",
-    "Omega": "Ω"
+  GREEK_LETTER_NAMES_TO_SYMBOLS: {
+    alpha: "α",
+    beta: "β",
+    gamma: "γ",
+    delta: "δ",
+    epsilon: "ε",
+    zeta: "ζ",
+    eta: "η",
+    theta: "θ",
+    iota: "ι",
+    kappa: "κ",
+    lambda: "λ",
+    mu: "μ",
+    nu: "ν",
+    xi: "ξ",
+    pi: "π",
+    rho: "ρ",
+    sigma: "σ",
+    tau: "τ",
+    upsilon: "υ",
+    phi: "φ",
+    chi: "χ",
+    psi: "ψ",
+    omega: "ω",
+    Gamma: "Γ",
+    Delta: "Δ",
+    Theta: "Θ",
+    Lambda: "Λ",
+    Xi: "Ξ",
+    Pi: "Π",
+    Sigma: "Σ",
+    Phi: "Φ",
+    Psi: "Ψ",
+    Omega: "Ω",
   },
 
   // The greek letters in the list should be in sync with the
   // GREEK_LETTER_NAMES_TO_SYMBOLS object's keys.
-  "VALID_ALGEBRAIC_IDENTIFIERS": [
-    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
-    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
-    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-    "T", "U", "V", "W", "X", "Y", "Z",
-    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
-    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
-    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
-    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
+  VALID_ALGEBRAIC_IDENTIFIERS: [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "alpha",
+    "beta",
+    "gamma",
+    "delta",
+    "epsilon",
+    "zeta",
+    "eta",
+    "theta",
+    "iota",
+    "kappa",
+    "lambda",
+    "mu",
+    "nu",
+    "xi",
+    "pi",
+    "rho",
+    "sigma",
+    "tau",
+    "upsilon",
+    "phi",
+    "chi",
+    "psi",
+    "omega",
+    "Gamma",
+    "Delta",
+    "Theta",
+    "Lambda",
+    "Xi",
+    "Pi",
+    "Sigma",
+    "Phi",
+    "Psi",
+    "Omega",
+  ],
 
   // Allowed letters in the OSK.
-  "VALID_CUSTOM_OSK_LETTERS": [
-    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
-    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
-    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-    "T", "U", "V", "W", "X", "Y", "Z",
-    "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
-    "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω", "Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ",
-    "Φ", "Ψ", "Ω"],
+  VALID_CUSTOM_OSK_LETTERS: [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "α",
+    "β",
+    "γ",
+    "δ",
+    "ε",
+    "ζ",
+    "η",
+    "θ",
+    "ι",
+    "κ",
+    "λ",
+    "μ",
+    "ν",
+    "ξ",
+    "π",
+    "ρ",
+    "σ",
+    "τ",
+    "υ",
+    "φ",
+    "χ",
+    "ψ",
+    "ω",
+    "Γ",
+    "Δ",
+    "Θ",
+    "Λ",
+    "Ξ",
+    "Π",
+    "Σ",
+    "Φ",
+    "Ψ",
+    "Ω",
+  ],
 
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.
-  "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
+  MAX_CUSTOM_LETTERS_FOR_OSK: 10,
 
   // Functions allowed in math interactions.
-  "MATH_FUNCTION_NAMES": [
-    "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
-    "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
+  MATH_FUNCTION_NAMES: [
+    "log",
+    "ln",
+    "sqrt",
+    "abs",
+    "sin",
+    "cos",
+    "tan",
+    "sec",
+    "csc",
+    "cot",
+    "arcsin",
+    "arccos",
+    "arctan",
+    "sinh",
+    "cosh",
+    "tanh",
   ],
 
-  "OSK_MAIN_TAB": "mainTab",
-  "OSK_FUNCTIONS_TAB": "functionsTab",
-  "OSK_LETTERS_TAB": "lettersTab",
+  OSK_MAIN_TAB: "mainTab",
+  OSK_FUNCTIONS_TAB: "functionsTab",
+  OSK_LETTERS_TAB: "lettersTab",
 
-  "CUSTOM_LETTERS_LATIN_TAB": "latinTab",
-  "CUSTOM_LETTERS_GREEK_TAB": "greekTab",
+  CUSTOM_LETTERS_LATIN_TAB: "latinTab",
+  CUSTOM_LETTERS_GREEK_TAB: "greekTab",
 
   // Name to human readable form mapping of the position of terms object.
-  "POSITION_OF_TERMS_MAPPING": [{
-    "name": "lhs",
-    "humanReadableName": "on Left Hand Side"
-  }, {
-    "name": "rhs",
-    "humanReadableName": "on Right Hand Side"
-  }, {
-    "name": "both",
-    "humanReadableName": "on both sides"
-  }, {
-    "name": "irrelevant",
-    "humanReadableName": "with reordering allowed around ="
-  }],
+  POSITION_OF_TERMS_MAPPING: [
+    {
+      name: "lhs",
+      humanReadableName: "on Left Hand Side",
+    },
+    {
+      name: "rhs",
+      humanReadableName: "on Right Hand Side",
+    },
+    {
+      name: "both",
+      humanReadableName: "on both sides",
+    },
+    {
+      name: "irrelevant",
+      humanReadableName: "with reordering allowed around =",
+    },
+  ],
 
   // Placeholder texts for the math interactions.
-  "MATH_INTERACTION_PLACEHOLDERS": {
-    "AlgebraicExpressionInput": "Type an expression here.",
-    "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+  MATH_INTERACTION_PLACEHOLDERS: {
+    AlgebraicExpressionInput: "Type an expression here.",
+    NumericExpressionInput: "Type an expression here, using only numbers.",
+    MathEquationInput: "Type an equation here.",
   },
 
   // Unfinished features.
-  "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
+  SHOW_TRAINABLE_UNRESOLVED_ANSWERS: false,
 
   // eslint-disable-next-line max-len
-  "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
+  DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR:
+    "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
 
-  "OPPORTUNITY_TYPE_SKILL": "skill",
-  "OPPORTUNITY_TYPE_TRANSLATION": "translation",
-  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
+  OPPORTUNITY_TYPE_SKILL: "skill",
+  OPPORTUNITY_TYPE_TRANSLATION: "translation",
+  OPPORTUNITY_TYPE_VOICEOVER: "voiceover",
 
   // The bucket name is set to app_default_bucket which is used to store files
   // in GCS when local development server is running. This should be changed
   // in prod appropriately.
-  "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
+  GCS_RESOURCE_BUCKET_NAME: "app_default_bucket",
 
-  "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-
-  // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
+  ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS: true,
 
   // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": true,
+  ENABLE_ACCOUNT_EXPORT: true,
 
   // Link to open when the Oppia avatar is clicked on any page.
-  "OPPIA_AVATAR_LINK_URL": null,
+  OPPIA_AVATAR_LINK_URL: null,
 
   // Maximum allowed length of a username.
-  "MAX_USERNAME_LENGTH": 30,
+  MAX_USERNAME_LENGTH: 30,
 
   // Maximum allowed length of a state name.
-  "MAX_STATE_NAME_LENGTH": 50,
+  MAX_STATE_NAME_LENGTH: 50,
 
-  "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
-    "Chrome", "Edge", "Safari", "Firefox", "Others"],
-  "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
+  PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES: [
+    "Chrome",
+    "Edge",
+    "Safari",
+    "Firefox",
+    "Others",
+  ],
+  PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES: ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.
-  "PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
-    "test", "alpha", "beta", "release"],
-  "PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP":
-    "^(\\d+(?:\\.\\d+){2})$",
-  "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
+  PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS: [
+    "test",
+    "alpha",
+    "beta",
+    "release",
+  ],
+  PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP: "^(\\d+(?:\\.\\d+){2})$",
+  PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP:
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
   // Maximum allowed commit message length. 375 characters because indexed
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
-  "MAX_COMMIT_MESSAGE_LENGTH": 375,
-  "MAX_REVIEW_MESSAGE_LENGTH": 10000,
+  MAX_COMMIT_MESSAGE_LENGTH: 375,
+  MAX_REVIEW_MESSAGE_LENGTH: 10000,
 
-  "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
+  EMAIL_DASHBOARD_PREDICATE_DEFINITION: [
     {
-      "backend_id": "user_inactivity",
-      "backend_attr": "inactive_in_last_n_days",
-      "description": "Inactive in last n days",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+      backend_id: "user_inactivity",
+      backend_attr: "inactive_in_last_n_days",
+      description: "Inactive in last n days",
+      schema: {
+        type: "int",
+        validators: [
+          {
+            id: "is_at_least",
+            min_value: 0,
+          },
+        ],
       },
-      "default_value": null
+      default_value: null,
     },
     {
-      "backend_id": "user_login_activity",
-      "backend_attr": "has_not_logged_in_for_n_days",
-      "description": "Has not logged in for n days",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+      backend_id: "user_login_activity",
+      backend_attr: "has_not_logged_in_for_n_days",
+      description: "Has not logged in for n days",
+      schema: {
+        type: "int",
+        validators: [
+          {
+            id: "is_at_least",
+            min_value: 0,
+          },
+        ],
       },
-      "default_value": null
+      default_value: null,
     },
     {
-      "backend_id": "minimum_exp_created",
-      "backend_attr": "created_at_least_n_exps",
-      "description": "Has created at least n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+      backend_id: "minimum_exp_created",
+      backend_attr: "created_at_least_n_exps",
+      description: "Has created at least n explorations",
+      schema: {
+        type: "int",
+        validators: [
+          {
+            id: "is_at_least",
+            min_value: 0,
+          },
+        ],
       },
-      "default_value": null
+      default_value: null,
     },
     {
-      "backend_id": "maximum_exp_created",
-      "backend_attr": "created_fewer_than_n_exps",
-      "description": "Has created fewer than n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+      backend_id: "maximum_exp_created",
+      backend_attr: "created_fewer_than_n_exps",
+      description: "Has created fewer than n explorations",
+      schema: {
+        type: "int",
+        validators: [
+          {
+            id: "is_at_least",
+            min_value: 0,
+          },
+        ],
       },
-      "default_value": null
+      default_value: null,
     },
     {
-      "backend_id": "minimum_exp_edited",
-      "backend_attr": "edited_at_least_n_exps",
-      "description": "Has edited at least n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+      backend_id: "minimum_exp_edited",
+      backend_attr: "edited_at_least_n_exps",
+      description: "Has edited at least n explorations",
+      schema: {
+        type: "int",
+        validators: [
+          {
+            id: "is_at_least",
+            min_value: 0,
+          },
+        ],
       },
-      "default_value": null
+      default_value: null,
     },
     {
-      "backend_id": "maximum_exp_edited",
-      "backend_attr": "edited_fewer_than_n_exps",
-      "description": "Has edited fewer than n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+      backend_id: "maximum_exp_edited",
+      backend_attr: "edited_fewer_than_n_exps",
+      description: "Has edited fewer than n explorations",
+      schema: {
+        type: "int",
+        validators: [
+          {
+            id: "is_at_least",
+            min_value: 0,
+          },
+        ],
       },
-      "default_value": null
+      default_value: null,
     },
     {
-      "backend_id": "created_collection",
-      "backend_attr": "created_collection",
-      "description": "Has created collection",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
+      backend_id: "created_collection",
+      backend_attr: "created_collection",
+      description: "Has created collection",
+      schema: {
+        type: "bool",
+        validators: [
+          {
+            id: "is_nonempty",
+          },
+        ],
       },
-      "default_value": false
-    }
+      default_value: false,
+    },
   ],
 
   // When the site cookie policy was last updated in UNIX time milliseconds.
-  "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+  COOKIE_POLICY_LAST_UPDATED_MSECS: 1624909164000,
 
   // Pages registered with angular router.
-  "PAGES_REGISTERED_WITH_FRONTEND": {
-    "ABOUT": {
-      "ROUTE": "about",
-      "TITLE": "About | Oppia",
-      "META": [
+  PAGES_REGISTERED_WITH_FRONTEND: {
+    ABOUT: {
+      ROUTE: "about",
+      TITLE: "About | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it.",
+        },
+      ],
     },
-    "ABOUT_FOUNDATION": {
-      "ROUTE": "about-foundation",
-      "TITLE": "About foundation | Oppia",
-      "META": []
+    ABOUT_FOUNDATION: {
+      ROUTE: "about-foundation",
+      TITLE: "About foundation | Oppia",
+      META: [],
     },
-    "CLASSROOM": {
-      "ROUTE": "learn/:classroom_url_fragment",
-      "TITLE": "Oppia",
+    CLASSROOM: {
+      ROUTE: "learn/:classroom_url_fragment",
+      TITLE: "Oppia",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": [
+      MANUALLY_REGISTERED_WITH_BACKEND: true,
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        }
-      ]
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it",
+        },
+      ],
     },
-    "CONTACT": {
-      "ROUTE": "contact",
-      "TITLE": "Contact | Oppia",
-      "META": [
+    CONTACT: {
+      ROUTE: "contact",
+      TITLE: "Contact | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
+          CONTENT:
+            "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
-        }
-      ]
+          CONTENT:
+            "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project.",
+        },
+      ],
     },
-    "DONATE": {
-      "ROUTE": "donate",
-      "TITLE": "Donate | Oppia",
-      "META": [
+    DONATE: {
+      ROUTE: "donate",
+      TITLE: "Donate | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+          CONTENT:
+            "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
-        }
-      ]
+          CONTENT:
+            "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve.",
+        },
+      ],
     },
-    "GET_STARTED": {
-      "ROUTE": "get-started",
-      "TITLE": "Get Started | Oppia",
-      "META": [
+    GET_STARTED: {
+      ROUTE: "get-started",
+      TITLE: "Get Started | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "Learn how to get started using Oppia."
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
+          CONTENT: "Learn how to get started using Oppia.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "Learn how to get started using Oppia."
-        }
-      ]
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
+          CONTENT: "Learn how to get started using Oppia.",
+        },
+      ],
     },
-    "LICENSE": {
-      "ROUTE": "license",
-      "TITLE": "License Page | Oppia",
-      "META": [
+    LICENSE: {
+      ROUTE: "license",
+      TITLE: "License Page | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "License terms that Oppia is attributed under."
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
+          CONTENT: "License terms that Oppia is attributed under.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "License terms that Oppia is attributed under."
-        }
-      ]
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
+          CONTENT: "License terms that Oppia is attributed under.",
+        },
+      ],
     },
-    "LOGIN": {
-      "ROUTE": "login",
-      "TITLE": "Sign in | Oppia",
-      "META": []
+    LOGIN: {
+      ROUTE: "login",
+      TITLE: "Sign in | Oppia",
+      META: [],
     },
-    "LOGOUT": {
-      "ROUTE": "logout",
-      "TITLE": "Logout | Oppia",
-      "META": []
+    LOGOUT: {
+      ROUTE: "logout",
+      TITLE: "Logout | Oppia",
+      META: [],
     },
-    "PARTNERSHIPS": {
-      "ROUTE": "partnerships",
-      "TITLE": "Partnerships | Oppia",
-      "META": []
+    PARTNERSHIPS: {
+      ROUTE: "partnerships",
+      TITLE: "Partnerships | Oppia",
+      META: [],
     },
-    "PLAYBOOK": {
-      "ROUTE": "creator-guidelines",
-      "TITLE": "Creator Guidelines | Oppia",
-      "META": [
+    PLAYBOOK: {
+      ROUTE: "creator-guidelines",
+      TITLE: "Creator Guidelines | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+          CONTENT:
+            "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
-        }
-      ]
+          CONTENT:
+            "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations.",
+        },
+      ],
     },
-    "PRIVACY": {
-      "ROUTE": "privacy-policy",
-      "TITLE": "Privacy Policy | Oppia",
-      "META": []
+    PRIVACY: {
+      ROUTE: "privacy-policy",
+      TITLE: "Privacy Policy | Oppia",
+      META: [],
     },
-    "SIGNUP": {
-      "ROUTE": "signup",
-      "TITLE": "Join the community - Oppia",
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": [
+    SIGNUP: {
+      ROUTE: "signup",
+      TITLE: "Join the community - Oppia",
+      MANUALLY_REGISTERED_WITH_BACKEND: true,
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
+          CONTENT: "Sign up for Oppia and begin exploring a new subject.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
-        }
-      ]
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
+          CONTENT: "Sign up for Oppia and begin exploring a new subject.",
+        },
+      ],
     },
-    "TEACH": {
-      "ROUTE": "teach",
-      "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
-      "META": [
+    TEACH: {
+      ROUTE: "teach",
+      TITLE: "Guide to Oppia for Parents and Teachers | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+          CONTENT:
+            "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
-        }
-      ]
+          CONTENT:
+            "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations.",
+        },
+      ],
     },
-    "TERMS": {
-      "ROUTE": "terms",
-      "TITLE": "Terms of Use | Oppia",
-      "META": [
+    TERMS: {
+      ROUTE: "terms",
+      TITLE: "Terms of Use | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+          CONTENT:
+            "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material.",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
-        }
-      ]
+          CONTENT:
+            "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material.",
+        },
+      ],
     },
-    "THANKS": {
-      "ROUTE": "thanks",
-      "TITLE": "Thanks | Oppia",
-      "META": [
+    THANKS: {
+      ROUTE: "thanks",
+      TITLE: "Thanks | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "Thank you for donating to The Oppia Foundation!"
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
+          CONTENT: "Thank you for donating to The Oppia Foundation!",
         },
         {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "Thank you for donating to The Oppia Foundation!"
-        }
-      ]
+          PROPERTY_TYPE: "property",
+          PROPERTY_VALUE: "og:description",
+          CONTENT: "Thank you for donating to The Oppia Foundation!",
+        },
+      ],
     },
-    "DELETE_ACCOUNT": {
-      "ROUTE": "delete-account",
-      "TITLE": "Delete Account | Oppia",
-      "META": []
+    DELETE_ACCOUNT: {
+      ROUTE: "delete-account",
+      TITLE: "Delete Account | Oppia",
+      META: [],
     },
-    "LIBRARY_INDEX": {
-      "ROUTE": "community-library",
-      "TITLE": "Oppia",
-      "META": [
+    LIBRARY_INDEX: {
+      ROUTE: "community-library",
+      TITLE: "Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
-        }
-      ]
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
+        },
+      ],
     },
-    "LIBRARY_RECENTLY_PUBLISHED": {
-      "ROUTE": "community-library/recently-published",
-      "TITLE": "Oppia",
-      "META": [
+    LIBRARY_RECENTLY_PUBLISHED: {
+      ROUTE: "community-library/recently-published",
+      TITLE: "Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
-        }
-      ]
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
+        },
+      ],
     },
-    "LIBRARY_SEARCH": {
-      "ROUTE": "search/find",
-      "TITLE": "Oppia",
-      "META": [
+    LIBRARY_SEARCH: {
+      ROUTE: "search/find",
+      TITLE: "Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
-        }
-      ]
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
+        },
+      ],
     },
-    "LIBRARY_TOP_RATED": {
-      "ROUTE": "community-library/top-rated",
-      "TITLE": "Oppia",
-      "META": [
+    LIBRARY_TOP_RATED: {
+      ROUTE: "community-library/top-rated",
+      TITLE: "Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
-        }
-      ]
+          CONTENT:
+            "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want.",
+        },
+      ],
     },
-    "PENDING_ACCOUNT_DELETION": {
-      "ROUTE": "pending-account-deletion",
-      "TITLE": "Pending Account Deletion | Oppia",
-      "META": []
+    PENDING_ACCOUNT_DELETION: {
+      ROUTE: "pending-account-deletion",
+      TITLE: "Pending Account Deletion | Oppia",
+      META: [],
     },
-    "PREFERENCES": {
-      "ROUTE": "preferences",
-      "TITLE": "Preferences | Oppia",
-      "META": [
+    PREFERENCES: {
+      ROUTE: "preferences",
+      TITLE: "Preferences | Oppia",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "Change your Oppia profile settings and preferences"
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
+          CONTENT: "Change your Oppia profile settings and preferences",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "Change your Oppia profile settings and preferences"
-        }
-      ]
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
+          CONTENT: "Change your Oppia profile settings and preferences",
+        },
+      ],
     },
-    "PROFILE": {
-      "ROUTE": "profile/:username_fragment",
-      "TITLE": "Profile | Oppia",
+    PROFILE: {
+      ROUTE: "profile/:username_fragment",
+      TITLE: "Profile | Oppia",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": []
+      MANUALLY_REGISTERED_WITH_BACKEND: true,
+      META: [],
     },
-    "RELEASE_COORDINATOR_PAGE": {
-      "ROUTE": "release-coordinator",
-      "TITLE": "Oppia Release Coordinator Panel",
-      "META": [
+    RELEASE_COORDINATOR_PAGE: {
+      ROUTE: "release-coordinator",
+      TITLE: "Oppia Release Coordinator Panel",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it.",
+        },
+      ],
     },
-    "SPLASH": {
-      "ROUTE": "",
-      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
-      "META": [
+    SPLASH: {
+      ROUTE: "",
+      TITLE: "Oppia | Free, Online and Interactive Lessons for Anyone",
+      META: [
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it.",
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
+          PROPERTY_TYPE: "itemprop",
+          PROPERTY_VALUE: "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
+          CONTENT:
+            "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it.",
+        },
+      ],
     },
-    "STORY_VIEWER": {
+    STORY_VIEWER: {
       // eslint-disable-next-line max-len
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
-      "TITLE": "Oppia",
+      ROUTE:
+        "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
+      TITLE: "Oppia",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": []
+      MANUALLY_REGISTERED_WITH_BACKEND: true,
+      META: [],
     },
-    "VOLUNTEER": {
-      "ROUTE": "volunteer",
-      "TITLE": "Volunteer | Oppia",
-      "META": []
-    }
+    VOLUNTEER: {
+      ROUTE: "volunteer",
+      TITLE: "Volunteer | Oppia",
+      META: [],
+    },
   },
 
-  "STEWARDS_LANDING_PAGE": {
-    "ROUTES": ["parents", "partners", "nonprofits", "teachers", "volunteers"],
-    "TITLE": "Getting Started with Oppia",
-    "META": []
+  STEWARDS_LANDING_PAGE: {
+    ROUTES: ["parents", "partners", "nonprofits", "teachers", "volunteers"],
+    TITLE: "Getting Started with Oppia",
+    META: [],
   },
 
   // A dict representing available landing pages, having subject as a key
@@ -6349,52 +6806,61 @@ export default {
   // TOPIC_LANDING_PAGE_DATA oppia constant defined in
   // core/templates/pages/landing-pages/topic-landing-page/
   // topic-landing-page.constants.ts file.
-  "AVAILABLE_LANDING_PAGES": {
-    "math": ["fractions", "negative-numbers", "ratios"]
+  AVAILABLE_LANDING_PAGES: {
+    math: ["fractions", "negative-numbers", "ratios"],
   },
 
-  "SCHEMA_FOR_TOPIC_URL_FRAGMENTS": {
-    "schema": {
-      "type": "basestring",
-      "validators": [{
-        "id": "is_regex_matched",
-        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
-      }, {
-        "id": "has_length_at_most",
-        "max_value": 20
-      }]
-    }
+  SCHEMA_FOR_TOPIC_URL_FRAGMENTS: {
+    schema: {
+      type: "basestring",
+      validators: [
+        {
+          id: "is_regex_matched",
+          regex_pattern: "^[a-z]+(-[a-z]+)*$",
+        },
+        {
+          id: "has_length_at_most",
+          max_value: 20,
+        },
+      ],
+    },
   },
 
-  "SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS": {
-    "schema": {
-      "type": "basestring",
-      "validators": [{
-        "id": "is_regex_matched",
-        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
-      }, {
-        "id": "has_length_at_most",
-        "max_value": 20
-      }]
-    }
+  SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS: {
+    schema: {
+      type: "basestring",
+      validators: [
+        {
+          id: "is_regex_matched",
+          regex_pattern: "^[a-z]+(-[a-z]+)*$",
+        },
+        {
+          id: "has_length_at_most",
+          max_value: 20,
+        },
+      ],
+    },
   },
 
-  "SCHEMA_FOR_STORY_URL_FRAGMENTS": {
-    "schema": {
-      "type": "basestring",
-      "validators": [{
-        "id": "is_regex_matched",
-        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
-      }, {
-        "id": "has_length_at_most",
-        "max_value": 30
-      }]
-    }
+  SCHEMA_FOR_STORY_URL_FRAGMENTS: {
+    schema: {
+      type: "basestring",
+      validators: [
+        {
+          id: "is_regex_matched",
+          regex_pattern: "^[a-z]+(-[a-z]+)*$",
+        },
+        {
+          id: "has_length_at_most",
+          max_value: 30,
+        },
+      ],
+    },
   },
 
-  "DEV_MODE": true,
-  "EMULATOR_MODE": true,
-  "ASSET_TYPE_AUDIO": "audio",
-  "ASSET_TYPE_IMAGE": "image",
-  "ASSET_TYPE_THUMBNAIL": "thumbnail"
+  DEV_MODE: true,
+  EMULATOR_MODE: true,
+  ASSET_TYPE_AUDIO: "audio",
+  ASSET_TYPE_IMAGE: "image",
+  ASSET_TYPE_THUMBNAIL: "thumbnail",
 } as const;

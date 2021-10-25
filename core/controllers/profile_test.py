@@ -812,7 +812,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
     def test_get_delete_account_page(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+        with self.swap(constants, True):
             response = self.get_html_response('/delete-account')
             self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
@@ -909,12 +909,12 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
     def test_delete_delete_account_page(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+        with self.swap(constants, True):
             data = self.delete_json('/delete-account-handler')
             self.assertEqual(data, {'success': True})
 
     def test_delete_delete_account_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+        with self.swap(constants, False):
             self.delete_json('/delete-account-handler', expected_status_int=404)
 
 
@@ -1073,7 +1073,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+        with self.swap(constants, True):
             response = self.get_html_response('/pending-account-deletion')
             self.assertIn(b'<oppia-root></oppia-root>', response.body)
 

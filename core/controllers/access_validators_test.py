@@ -102,13 +102,13 @@ class AccountDeletionIsEnabledValidationHandlerTests(
         self.login(self.EDITOR_EMAIL)
 
     def test_delete_account_validation_returns_true_if_enabled(self) -> None:
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+        with self.swap(constants, True):
             self.get_html_response( # type: ignore[no-untyped-call]
                 '%s/account_deletion_is_enabled' %
                 ACCESS_VALIDATION_HANDLER_PREFIX)
 
     def test_delete_account_validation_returns_false_if_disabled(self) -> None:
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+        with self.swap(constants, False):
             self.get_json(
                 '%s/account_deletion_is_enabled' %
                 ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=404)
