@@ -177,8 +177,11 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story_services.save_new_story(self.user_id, story)
 
         try:
-            file_format = image_validation_services.detect_and_validate_format_of_raw_image(raw_image)
-            image_validation_services.verify_image_type_and_extension(file_format, thumbnail_filename)
+            file_format = (
+                image_validation_services.
+                detect_and_validate_format_of_raw_image(raw_image))
+            image_validation_services.verify_image_type_and_extension(
+                file_format, thumbnail_filename)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

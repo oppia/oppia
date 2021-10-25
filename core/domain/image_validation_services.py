@@ -25,16 +25,13 @@ from core.domain import html_validation_service
 
 
 def validate_raw_image(raw_image):
-    """Validate the raw image
+    """Validate the raw image.
 
     Args:
         raw_image: str. The image content.
 
-    Returns:
-        None
-
     Raises:
-        ValidationError. Raw image failed size or name validation
+        ValidationError. Raw image failed size or name validation.
     """
     hundred_kb_in_bytes = 100 * 1024
 
@@ -52,10 +49,10 @@ def detect_and_validate_format_of_raw_image(raw_image):
         raw_image: str. The image content.
 
     Returns:
-        str. File type of the given raw image
+        str. File type of the given raw image.
 
     Raises:
-        ValidationError. File format of the given raw image cannot be determined
+        ValidationError. File format of the given raw image cannot be determined.
     """
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
@@ -89,9 +86,6 @@ def verify_image_type_and_extension(file_format, filename):
         file_format: str. The image format.
         filename: str. The filename for the image.
 
-    Returns:
-        None
-
     Raises:
         ValidationError. File format or name supplied fails one of the
             validation checks.
@@ -121,7 +115,7 @@ def validate_image_and_filename(raw_image, filename):
             validation checks.
     """
 
-    #Validate file name and raw_image
+    # Validate file name and raw image.
     validate_raw_image(raw_image)
     utils.require_valid_filename(filename)
 

@@ -35,9 +35,11 @@ from core import feconf
 from core import python_utils
 from core import utils
 from core.constants import constants
-from core.domain import expression_parser, image_validation_services
+from core.domain import expression_parser
 from core.domain import html_cleaner
-from core.domain import story_domain, user_domain
+from core.domain import image_validation_services
+from core.domain import story_domain
+from core.domain import user_domain
 
 from typing import Any, Callable, Dict, List, Optional, cast
 

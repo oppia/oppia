@@ -150,10 +150,13 @@ def validate_task_entries(task_entries):
 
 def validate_topic_and_sub_topic_change(obj):
     """Validates Topic or Sub topic change.
+    
     Args:
         obj: dict. Data that needs to be validated.
     """
-    allowed_commands = [command['name'] for command in topic_domain.ALLOWED_COMMANDS]
+    allowed_commands = [
+        command['name'] for command in topic_domain.ALLOWED_COMMANDS
+        ]
     if obj['cmd'] not in allowed_commands:
         raise base.BaseHandler.InvalidInputException(
             '%s cmd is not allowed.' % obj['cmd']
