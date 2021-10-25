@@ -397,6 +397,26 @@ def validate_explorations_for_story(exp_ids, strict):
     return validation_error_messages
 
 
+def populate_story_model_with_story(story_model, story):
+    """TODO"""
+    story_model.description = story.description
+    story_model.title = story.title
+    story_model.thumbnail_bg_color = story.thumbnail_bg_color
+    story_model.thumbnail_filename = story.thumbnail_filename
+    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
+    story_model.notes = story.notes
+    story_model.language_code = story.language_code
+    story_model.story_contents_schema_version = (
+        story.story_contents_schema_version)
+    story_model.story_contents = story.story_contents.to_dict()
+    story_model.corresponding_topic_id = story.corresponding_topic_id
+    story_model.version = story.version
+    story_model.url_fragment = story.url_fragment
+    story_model.meta_tag_content = story.meta_tag_content
+    return story_model
+
+
+
 def _save_story(
         committer_id, story, commit_message, change_list, story_is_published):
     """Validates a story and commits it to persistent storage. If
@@ -452,20 +472,7 @@ def _save_story(
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    story_model.description = story.description
-    story_model.title = story.title
-    story_model.thumbnail_bg_color = story.thumbnail_bg_color
-    story_model.thumbnail_filename = story.thumbnail_filename
-    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
-    story_model.notes = story.notes
-    story_model.language_code = story.language_code
-    story_model.story_contents_schema_version = (
-        story.story_contents_schema_version)
-    story_model.story_contents = story.story_contents.to_dict()
-    story_model.corresponding_topic_id = story.corresponding_topic_id
-    story_model.version = story.version
-    story_model.url_fragment = story.url_fragment
-    story_model.meta_tag_content = story.meta_tag_content
+    story_model = populate_story_model_with_story(story_model, story)
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -668,14 +675,10 @@ def create_story_summary(story_id):
     save_story_summary(story_summary)
 
 
-def save_story_summary(story_summary):
-    """Save a story summary domain object as a StorySummaryModel
-    entity in the datastore.
-
-    Args:
-        story_summary: StorySummary. The story summary object to be saved in the
-            datastore.
-    """
+def populate_story_summary_model_with_story_summary(
+    story_summary_model, story_summary
+):
+    """TODO"""
     story_summary_dict = {
         'title': story_summary.title,
         'description': story_summary.description,
@@ -690,18 +693,31 @@ def save_story_summary(story_summary):
         'story_model_created_on': (
             story_summary.story_model_created_on)
     }
-
-    story_summary_model = (
-        story_models.StorySummaryModel.get_by_id(story_summary.id))
     if story_summary_model is not None:
         story_summary_model.populate(**story_summary_dict)
-        story_summary_model.update_timestamps()
-        story_summary_model.put()
     else:
         story_summary_dict['id'] = story_summary.id
-        model = story_models.StorySummaryModel(**story_summary_dict)
-        model.update_timestamps()
-        model.put()
+        story_summary_model = story_models.StorySummaryModel(
+            **story_summary_dict)
+
+    return story_summary_model
+
+
+def save_story_summary(story_summary):
+    """Save a story summary domain object as a StorySummaryModel
+    entity in the datastore.
+
+    Args:
+        story_summary: StorySummary. The story summary object to be saved in the
+            datastore.
+    """
+    existing_skill_summary_model = (
+        story_models.StorySummaryModel.get_by_id(story_summary.id))
+    story_summary_model = populate_story_summary_model_with_story_summary(
+        existing_skill_summary_model, story_summary
+    )
+    story_summary_model.update_timestamps()
+    story_summary_model.put()
 
 
 def record_completed_node_in_story_context(user_id, story_id, node_id):

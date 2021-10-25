@@ -34,7 +34,7 @@ from core.platform import models
 import apache_beam as beam
 import result
 
-from typing import Sequence, Tuple
+from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -48,9 +48,8 @@ class MigrateSkillJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_skill(
-            skill_id_and_skill_model: Tuple[str, skill_models.SkillModel]
+        skill_id: str, skill_model: skill_models.SkillModel
     ) -> result.Result[skill_domain.Skill, Exception]:
-        skill_id, skill_model = skill_id_and_skill_model
         try:
             skill = skill_fetchers.get_skill_from_model(skill_model)
             skill.validate()
@@ -61,8 +60,8 @@ class MigrateSkillJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_skill_changes(
-            skill_model: skill_models.SkillModel
-    ) -> Tuple[str, skill_domain.SkillChange]:
+        skill_id: str, skill_model: skill_models.SkillModel
+    ) -> Iterable[Tuple[str, skill_domain.SkillChange]]:
         contents_version = skill_model.skill_contents_schema_version
         if contents_version <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
             skill_change = skill_domain.SkillChange({
@@ -71,7 +70,7 @@ class MigrateSkillJob(base_jobs.JobBase):
                 'from_version': skill_model.skill_contents_schema_version,
                 'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             })
-            yield skill_change
+            yield (skill_id, skill_change)
 
         misconceptions_version = skill_model.misconceptions_schema_version
         if misconceptions_version <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
@@ -81,7 +80,7 @@ class MigrateSkillJob(base_jobs.JobBase):
                 'from_version': skill_model.misconceptions_schema_version,
                 'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             })
-            yield skill_change
+            yield (skill_id, skill_change)
 
         rubric_schema_version = skill_model.rubric_schema_version
         if rubric_schema_version <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
@@ -91,7 +90,7 @@ class MigrateSkillJob(base_jobs.JobBase):
                 'from_version': skill_model.rubric_schema_version,
                 'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
             })
-            yield skill_change
+            yield (skill_id, skill_change)
 
     @staticmethod
     def _delete_skill_from_cache(
@@ -144,25 +143,28 @@ class MigrateSkillJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted skill models' >> (
                 ndb_io.GetModels(skill_models.SkillModel.get_all()))
-            | 'Add skill model ID' >> beam.GroupBy(
+            | 'Add skill model ID' >> beam.WithKeys(
                 lambda skill_model: skill_model.id)
         )
         skill_summary_models = (
             self.pipeline
             | 'Get all non-deleted skill summary models' >> (
                 ndb_io.GetModels(skill_models.SkillSummaryModel.get_all()))
-            | 'Add skill summary ID' >> beam.GroupBy(
+            | 'Add skill summary ID' >> beam.WithKeys(
                 lambda skill_summary_model: skill_summary_model.id)
         )
 
         migrated_skill_results = (
             unmigrated_skill_models
-            | 'Transform and migrate model' >> beam.Map(self._migrate_skill)
+            | 'Transform and migrate model' >> beam.MapTuple(
+                self._migrate_skill)
         )
         migrated_skills = (
             migrated_skill_results
-            | 'Filter oks' >> beam.Filter(lambda result: result.is_ok())
-            | 'Unwrap ok' >> beam.Map(lambda result: result.unwrap())
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
         )
         migrated_skill_job_run_results = (
             migrated_skill_results
@@ -172,9 +174,8 @@ class MigrateSkillJob(base_jobs.JobBase):
 
         skill_changes = (
             unmigrated_skill_models
-            | 'Generate skill changes' >> beam.Map(
-                lambda skill_id, skill_model: (
-                    skill_id, self._generate_skill_changes(skill_model)))
+            | 'Generate skill changes' >> beam.FlatMapTuple(
+                self._generate_skill_changes)
         )
 
         skill_objects_list = (
@@ -186,14 +187,14 @@ class MigrateSkillJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Reorganize the skill objects' >> beam.Map(lambda x: {
-                    'skill_model': x['skill_model'][0][0],
-                    'skill_summary_model': x['skill_summary_model'][0][0],
-                    'skill': x['skill'][0][0],
-                    'skill_changes': x['skill_changes'][0][0]
-                })
             | 'Remove unmigrated skills' >> beam.Filter(
                 lambda x: len(x['skill_changes']) > 0)
+            | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
+                    'skill_model': objects['skill_model'][0],
+                    'skill_summary_model': objects['skill_summary_model'][0],
+                    'skill': objects['skill'][0],
+                    'skill_changes': objects['skill_changes']
+                })
         )
 
         cache_deletion_job_run_results = (

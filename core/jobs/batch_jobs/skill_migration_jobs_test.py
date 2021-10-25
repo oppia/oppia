@@ -23,7 +23,7 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import recommendations_services
+from core.domain import skill_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import skill_migration_jobs
 from core.jobs.types import job_run_result
@@ -55,15 +55,60 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             misconceptions_schema_version=(
                 feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            rubrics=[{
+                'difficulty': 'Easy',
+                'explanations': 'a'
+            }, {
+                'difficulty': 'Medium',
+                'explanations': 'a'
+            }, {
+                'difficulty': 'Hard',
+                'explanations': 'a'
+            }],
             language_code='cs',
             skill_contents_schema_version=(
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
-            next_misconception_id='misconception_id',
-            all_questions_merged=True
+            skill_contents={
+                'explanation': {
+                    'content_id': 'content_id',
+                    'html': '<b>bold</b>'
+                },
+                'worked_examples': [],
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content_id': {}
+                    }
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content_id': {}
+                    }
+                }
+            },
+            next_misconception_id=2,
+            all_questions_merged=False,
+            version=1
         )
         skill_model.update_timestamps()
-        skill_model.put()
+        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+            'cmd': skill_domain.CMD_CREATE_NEW
+        }])
+
+        skill_summary_model = self.create_model(
+            skill_models.SkillSummaryModel,
+            id=self.SKILL_1_ID,
+            description='description',
+            misconception_count=0,
+            worked_examples_count=0,
+            language_code='cs',
+            skill_model_last_updated=skill_model.last_updated,
+            skill_model_created_on=skill_model.created_on,
+            version=1
+        )
+        skill_summary_model.update_timestamps()
+        skill_summary_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
+            job_run_result.JobRunResult(stdout='SKILL MIGRATION SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
         ])
