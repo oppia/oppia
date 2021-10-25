@@ -44,7 +44,6 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-
     return exp_domain.ExplorationChange(obj)
 
 
@@ -61,7 +60,6 @@ def validate_new_config_property_values(new_config_property):
     # and in the handler these dict values are used to set config properties
     # individually. Hence Conversion of dicts to domain objects is not required
     # for new_config_properties.
-
     for (name, value) in new_config_property.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
@@ -88,7 +86,6 @@ def validate_change_dict_for_blog_post(change_dict):
     # to update blog posts in the domain layer. This dict does not correspond
     # to any domain class so we are validating the fields of change_dict
     # as a part of schema validation.
-
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
             change_dict['title'], True)
@@ -139,8 +136,11 @@ def validate_state_dict(state_dict):
         State. The corresponding State domain object.
     """
     state_object = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
-    state_object.validate(None, True)
-    return state_object
+    state_object.validate(
+        exp_param_specs_dict=None, allow_null_interaction=True)
+    # Object should not be returned from here becasue the parameter is not
+    # transferred into the domain layer of the codebase.
+    return state_dict
 
 
 def validate_email_dashboard_data(
@@ -158,7 +158,6 @@ def validate_email_dashboard_data(
     # query params. This dict represents the UserQueryParams class, which is a
     # namedtuple. Hence the fields of the dict are being validated as a part of
     # schema validation before saving new user queries in the handler.
-
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
@@ -185,7 +184,6 @@ def validate_task_entries(task_entries):
     # task_entry_dict. Thus, it is not possible to create the full
     # domain object at the payload validation stage. Hence, the key-value pairs
     # of task_entry_dict are being validated as a part of schema validation.
-
     entity_version = task_entries.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(

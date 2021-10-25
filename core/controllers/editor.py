@@ -667,12 +667,12 @@ class StateYamlHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests."""
-        state_object = self.normalized_payload.get('state_dict')
+        state_dict = self.normalized_payload.get('state_dict')
         width = self.normalized_payload.get('width')
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
-                state_object, width),
+                state_dict, width),
         })
 
 
@@ -1068,7 +1068,6 @@ class EditorAutosaveHandler(ExplorationHandler):
         # validation.
         change_list = self.normalized_payload.get('change_list')
         version = self.normalized_payload.get('version')
-
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(

@@ -2673,18 +2673,26 @@ class State:
         return False
 
     @classmethod
-    def convert_state_dict_to_yaml(cls, state_object, width):
+    def convert_state_dict_to_yaml(cls, state_dict, width):
         """Converts the given state dict to yaml format.
-
         Args:
-            state_object: State. State obje in an exploration.
+            state_dict: dict. A dict representing a state in an exploration.
             width: int. The maximum number of characters in a line for the
                 returned YAML string.
-
         Returns:
             str. The YAML version of the state_dict.
+        Raises:
+            Exception. The state_dict does not represent a valid state.
         """
-        return python_utils.yaml_from_dict(state_object.to_dict(), width=width)
+        try:
+            # Check if the state_dict can be converted to a State.
+            state = cls.from_dict(state_dict)
+        except Exception as e:
+            logging.exception(
+                'Bad state dict: %s' % python_utils.UNICODE(state_dict))
+            raise e
+
+        return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a

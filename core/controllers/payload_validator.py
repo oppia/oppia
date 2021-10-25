@@ -27,9 +27,8 @@ from core import schema_utils
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
-def get_schema_type(arg_schema: Dict[str, Any]) -> Any:
-    """This method returns the schema type for an argument by accepting the
-    schema for the corresponding argument.
+def get_schema_type(arg_schema: Dict[str, Any]) -> str:
+    """Returns the schema type for an argument.
 
     Args:
         arg_schema: dict(str, *). Schema for an argument.
@@ -40,14 +39,14 @@ def get_schema_type(arg_schema: Dict[str, Any]) -> Any:
     return arg_schema['schema']['type']
 
 
-def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> Any:
-    """This method extracts the new key for an argument from its schema.
+def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
+    """Returns the new key for an argument from its schema.
 
     Args:
         arg_schema: dict(str, *). Schema for an argument.
 
     Returns:
-        str. Returns the new argument name as mentioned in the schema.
+        str. The new argument name.
     """
     return arg_schema['schema']['new_key_for_argument']
 
@@ -56,12 +55,11 @@ def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> Any:
 # passes their values to itself as arguments, so their type is Any.
 # See: https://github.com/python/mypy/issues/731
 def validate_arguments_against_schema(
-        handler_args: Any,
-        handler_args_schemas: Any,
-        allowed_extra_args: bool,
-        allow_string_to_bool_conversion: bool = False
-    ) -> Tuple[Dict[str, Any], List[str]]:
-
+    handler_args: Any,
+    handler_args_schemas: Any,
+    allowed_extra_args: bool,
+    allow_string_to_bool_conversion: bool = False
+) -> Tuple[Dict[str, Any], List[str]]:
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
@@ -79,24 +77,19 @@ def validate_arguments_against_schema(
     """
     # Collect all errors and present them at once.
     errors = []
-    # Dictionary to hold normalizad values of arguments after validation.
+    # Dictionary to hold normalized values of arguments after validation.
     normalized_value = {}
 
     for arg_key, arg_schema in handler_args_schemas.items():
 
         if arg_key not in handler_args or handler_args[arg_key] is None:
-            if (
-                    'default_value' in arg_schema and
-                    arg_schema['default_value'] is None
-            ):
-                # Skip validation because the argument is optional.
-                continue
-            elif (
-                    'default_value' in arg_schema and
-                    arg_schema['default_value'] is not None
-            ):
+            if 'default_value' in arg_schema:
+                if arg_schema['default_value'] is None:
+                    # Skip validation because the argument is optional.
+                    continue
+            elif arg_schema['default_value'] is not None:
                 handler_args[arg_key] = arg_schema['default_value']
-            elif 'default_value' not in arg_schema:
+            else:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
 
