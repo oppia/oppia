@@ -149,6 +149,8 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
+#The maximum number of characters allowed for feedback.
+MAX_FEEDBACK_LENGTH_IN_CHARS = 2000
 
 ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_COMPLETE: [],
