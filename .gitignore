@@ -63,3 +63,4 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
+.python-version

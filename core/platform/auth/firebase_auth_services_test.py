@@ -103,6 +103,7 @@ class FirebaseAdminSdkStub:
         'delete_user',
         'delete_users',
         'get_user',
+        'get_users',
         'get_user_by_email',
         'import_users',
         'list_users',
@@ -274,14 +275,40 @@ class FirebaseAdminSdkStub:
             uid: str. The Firebase account ID of the user.
 
         Returns:
-            UserRecord. The UserRecord object of the user.
+            firebase_auth.UserRecord. The UserRecord object of the user.
 
         Raises:
             UserNotFoundError. The Firebase account has not been created yet.
         """
-        if uid not in self._users_by_uid:
+        users = self.get_users([firebase_auth.UidIdentifier(uid)]).users
+        if len(users) == 0:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
-        return self._users_by_uid[uid]
+        return users[0]
+
+    def get_users(
+            self, identifiers: List[firebase_auth.UidIdentifier]
+    ) -> firebase_auth.GetUsersResult:
+        """Returns user with given ID if found, otherwise raises an error.
+
+        Args:
+            identifiers: list(firebase_auth.UserIdentifier). The Firebase
+                account IDs of the user.
+
+        Returns:
+            firebase_auth.GetUsersResult. The UserRecord object of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        found_users = [
+            self._users_by_uid[identifier.uid] for identifier in identifiers
+            if identifier.uid in self._users_by_uid
+        ]
+        not_found_identifiers = [
+            identifier for identifier in identifiers
+            if identifier.uid not in self._users_by_uid
+        ]
+        return firebase_auth.GetUsersResult(found_users, not_found_identifiers)
 
     def get_user_by_email(self, email: str) -> firebase_auth.UserRecord:
         """Returns user with given email if found, otherwise raises an error.
@@ -1425,16 +1452,27 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.user_id = user_settings.user_id
         firebase_auth_services.mark_user_for_deletion(self.user_id)
 
-    def swap_get_user_to_always_fail(
+    def swap_get_users_to_return_non_empty_users_result(
             self
     ) -> ContextManager[None]:
         """Swaps the get_user function so that it always fails."""
-        return self.swap_to_always_raise(
-            firebase_auth, 'get_user', error=self.UNKNOWN_ERROR)
+        return self.swap_to_always_return(
+            firebase_auth,
+            'get_users',
+            firebase_auth.GetUsersResult(
+                [firebase_auth.UserRecord({'localId': 'id'})], []
+            )
+        )
 
-    def swap_delete_user_to_always_fail(
-            self
-    ) -> ContextManager[None]:
+    def swap_get_users_to_raise_error(self) -> ContextManager[None]:
+        """Swaps the get_user function so that it always fails."""
+        return self.swap_to_always_raise(
+            firebase_auth,
+            'get_users',
+            firebase_exceptions.FirebaseError(message='error', code='E111')
+        )
+
+    def swap_delete_user_to_always_fail(self) -> ContextManager[None]:
         """Swaps the delete_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR)
@@ -1474,14 +1512,14 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             firebase_auth_services
             .verify_external_auth_associations_are_deleted(self.user_id))
 
-    def test_delete_external_auth_associations_when_get_user_fails(
+    def test_delete_external_auth_associations_when_get_users_fails(
             self
     ) -> None:
         firebase_auth_services.delete_external_auth_associations(self.user_id)
 
         self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
 
-        with self.swap_get_user_to_always_fail():
+        with self.swap_get_users_to_return_non_empty_users_result():
             self.assertFalse(
                 firebase_auth_services
                 .verify_external_auth_associations_are_deleted(self.user_id))
@@ -1489,3 +1527,26 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.assertTrue(
             firebase_auth_services
             .verify_external_auth_associations_are_deleted(self.user_id))
+
+    def test_delete_external_auth_associations_when_get_users_raise_error(
+            self
+    ) -> None:
+        firebase_auth_services.delete_external_auth_associations(self.user_id)
+
+        self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
+
+        with self.swap_get_users_to_raise_error():
+            with self.capture_logging() as logs:
+                self.assertFalse(
+                    firebase_auth_services
+                        .verify_external_auth_associations_are_deleted(
+                            self.user_id))
+                self.assertEqual(len(logs), 1)
+                self.assertEqual(
+                    logs[0].split('\n')[0],
+                    '[WIPEOUT] Firebase Admin SDK failed! Stack trace:'
+                )
+
+        self.assertTrue(
+            firebase_auth_services
+                .verify_external_auth_associations_are_deleted(self.user_id))
