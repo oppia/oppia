@@ -24,7 +24,7 @@ from core import utils
 from core.domain import html_validation_service
 
 
-def validate_raw_image(raw_image):
+def validate_raw_image(raw_image: str):
     """Validate the raw image.
 
     Args:
@@ -42,7 +42,7 @@ def validate_raw_image(raw_image):
             'Image exceeds file size limit of 100 KB.')
 
 
-def detect_and_validate_format_of_raw_image(raw_image):
+def detect_and_validate_format_of_raw_image(raw_image: str):
     """Determines the image type and validate.
 
     Args:
@@ -80,7 +80,7 @@ def detect_and_validate_format_of_raw_image(raw_image):
     return file_format
 
 
-def verify_image_type_and_extension(file_format, filename):
+def verify_image_type_and_extension(file_format: str, filename: str):
     """Verify whether the image type matches its file extension.
 
     Args:

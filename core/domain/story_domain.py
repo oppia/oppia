@@ -797,7 +797,7 @@ class Story:
             raise utils.ValidationError('Invalid story id.')
 
     @classmethod
-    def require_valid_title(cls, title):
+    def require_valid_title(cls, title: str):
         """Checks whether the story title is a valid one.
 
         Args:
