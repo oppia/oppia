@@ -17,6 +17,9 @@
  *               help tab in the navbar.
  */
 
+import { Subscription } from 'rxjs';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
+
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
@@ -152,10 +155,7 @@ require('services/internet-connectivity.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/ngb-modal.service.ts');
-
 require('components/on-screen-keyboard/on-screen-keyboard.component');
-import { Subscription } from 'rxjs';
-import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),

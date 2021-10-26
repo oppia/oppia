@@ -37,7 +37,7 @@ require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
-  'pages/exploration-player-page/services/' +
+  'pages/exploration-editor-page/services/' +
   'history-tab-backend-api.service.ts'
 );
 
