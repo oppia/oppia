@@ -26,6 +26,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
@@ -271,6 +272,23 @@ class ExplorationHandler(base.BaseHandler):
 class PretestHandler(base.BaseHandler):
     """Provides subsequent pretest questions after initial batch."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
@@ -299,6 +317,37 @@ class PretestHandler(base.BaseHandler):
 class StorePlaythroughHandler(base.BaseHandler):
     """Commits a playthrough recorded on the frontend to storage."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'issue_schema_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                },
+            },
+            'playthrough_data': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': stats_domain.Playthrough
+                }
+            },
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests. Appends to existing list of playthroughs or
@@ -307,15 +356,11 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        issue_schema_version = self.payload.get('issue_schema_version')
-        if issue_schema_version is None:
-            raise self.InvalidInputException('missing issue_schema_version')
+        issue_schema_version = self.normalized_payload.get(
+            'issue_schema_version')
 
-        playthrough_data = self.payload.get('playthrough_data')
-        try:
-            playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        playthrough_data = self.normalized_payload.get('playthrough_data')
+        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
 
         exp_issues = stats_services.get_exp_issues(
             exploration_id, playthrough.exp_version)
@@ -331,49 +376,43 @@ class StatsEventsHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def _require_aggregated_stats_are_valid(self, aggregated_stats):
-        """Checks whether the aggregated stats dict has the correct keys.
-
-        Args:
-            aggregated_stats: dict. Dict comprising of aggregated stats.
-        """
-        exploration_stats_properties = [
-            'num_starts',
-            'num_actual_starts',
-            'num_completions'
-        ]
-        state_stats_properties = [
-            'total_answers_count',
-            'useful_feedback_count',
-            'total_hit_count',
-            'first_hit_count',
-            'num_times_solution_viewed',
-            'num_completions'
-        ]
-
-        for exp_stats_property in exploration_stats_properties:
-            if exp_stats_property not in aggregated_stats:
-                raise self.InvalidInputException(
-                    '%s not in aggregated stats dict.' % (exp_stats_property))
-        for state_name in aggregated_stats['state_stats_mapping']:
-            for state_stats_property in state_stats_properties:
-                if state_stats_property not in aggregated_stats[
-                        'state_stats_mapping'][state_name]:
-                    raise self.InvalidInputException(
-                        '%s not in state stats mapping of %s in aggregated '
-                        'stats dict.' % (state_stats_property, state_name))
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'aggregated_stats': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_aggregated_stats),
+                }
+            },
+            'exp_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        aggregated_stats = self.payload.get('aggregated_stats')
-        exp_version = self.payload.get('exp_version')
-        if exp_version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Stats aggregation')
-        try:
-            self._require_aggregated_stats_are_valid(aggregated_stats)
-        except self.InvalidInputException as e:
-            logging.exception(e)
+        aggregated_stats = self.normalized_payload.get('aggregated_stats')
+        exp_version = self.normalized_payload.get('exp_version')
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})

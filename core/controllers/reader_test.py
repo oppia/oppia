@@ -1565,7 +1565,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
-            'playthrough_id': None
         }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1856,31 +1855,38 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self):
         self.aggregated_stats.pop('num_starts')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+        response = self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+        }, expected_status_int=400)
 
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn(
-            'num_starts not in aggregated stats dict.', captured_logs[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: num_starts not in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
             self):
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
-            self.post_json('/explorehandler/stats_events/%s' % (
+        response = self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+                    'exp_version': self.exp_version}, expected_status_int=400)
 
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn(
-            'total_hit_count not in state stats mapping '
-            'of Home in aggregated stats dict.', captured_logs[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: total_hit_count not in '
+            'state stats mapping of Home in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
