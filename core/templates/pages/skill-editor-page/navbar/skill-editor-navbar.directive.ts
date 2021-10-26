@@ -146,7 +146,10 @@ angular.module('oppia').directive('skillEditorNavbar', [
             $scope.activeTab = ACTIVE_TAB_EDITOR;
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(
-                () => $rootScope.$applyAsync()));
+                () => {
+                  ctrl.skill = SkillEditorStateService.getSkill();
+                  $rootScope.$applyAsync();
+                }));
           };
         }]
     };
