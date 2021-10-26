@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import base64
+import urllib
 
 from core import feconf
 from core import python_utils
@@ -121,7 +122,7 @@ def send_email_to_recipients(
         server = (
             ('https://api.mailgun.net/v3/%s/messages')
             % feconf.MAILGUN_DOMAIN_NAME)
-        encoded_url = python_utils.url_encode(data)
+        encoded_url = urllib.parse.urlencode(data)
         req = python_utils.url_request(server, encoded_url, header)
         resp = python_utils.url_open(req)
         # The function url_open returns a file_like object that can be queried

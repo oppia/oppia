@@ -209,7 +209,7 @@ export class ImagePreloaderService {
       if (imageFile.type === 'image/svg+xml') {
         callback(
           this.svgSanitizerService.getTrustedSvgResourceUrl(
-            <string> reader.result));
+            reader.result as string));
       } else {
         callback(reader.result);
       }

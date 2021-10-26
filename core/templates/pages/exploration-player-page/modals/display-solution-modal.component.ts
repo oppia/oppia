@@ -34,14 +34,17 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './display-solution-modal.component.html'
 })
 export class DisplaySolutionModalComponent {
-  COMPONENT_NAME_SOLUTION: string;
-  solution: Solution;
-  solutionContentId: string;
-  displayedCard: StateCard;
-  recordedVoiceovers: RecordedVoiceovers;
-  interaction: Interaction;
-  shortAnswerHtml: ShortAnswerResponse;
-  solutionExplanationHtml: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  COMPONENT_NAME_SOLUTION!: string;
+  solution!: Solution;
+  solutionContentId!: string;
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
+  interaction!: Interaction;
+  shortAnswerHtml!: ShortAnswerResponse;
+  solutionExplanationHtml!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -55,7 +58,7 @@ export class DisplaySolutionModalComponent {
 
   ngOnInit(): void {
     this.solution = this.hintsAndSolutionManagerService.displaySolution();
-    this.solutionContentId = this.solution.explanation.contentId;
+    this.solutionContentId = this.solution.explanation.contentId as string;
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();

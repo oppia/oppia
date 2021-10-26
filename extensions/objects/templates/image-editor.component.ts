@@ -824,8 +824,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   private updateValidationWithLatestDimensions(): void {
     const dimensions = this.calculateTargetImageDimensions();
     const imageDataURI = (
-      this.imgData || <string> this.data.metadata.uploadedImageData);
-    const mimeType = (<string>imageDataURI).split(';')[0];
+      this.imgData || this.data.metadata.uploadedImageData as string);
+    const mimeType = (imageDataURI as string).split(';')[0];
     if (mimeType === this.MIME_TYPE_GIF) {
       let successCb = obj => {
         this.validateProcessedFilesize(obj.image);
@@ -886,7 +886,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         };
         this.updateValidationWithLatestDimensions();
       };
-      img.src = <string>(reader.result);
+      img.src = (reader.result) as string;
     };
     reader.readAsDataURL(file);
   }

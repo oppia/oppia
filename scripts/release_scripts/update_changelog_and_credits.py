@@ -45,6 +45,7 @@ AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
+SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
 LIST_OF_FILEPATHS_TO_MODIFY = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
@@ -481,7 +482,7 @@ def get_release_summary_lines():
     return release_summary_lines
 
 
-def update_package_json():
+def update_version_in_config_files():
     """Updates version param in package json file to match the current
     release version.
     """
@@ -489,8 +490,17 @@ def update_package_json():
         common.get_current_branch_name())
 
     common.inplace_replace_file(
-        PACKAGE_JSON_FILEPATH, '"version": ".*"',
-        '"version": "%s"' % release_version)
+        PACKAGE_JSON_FILEPATH,
+        '"version": ".*"',
+        '"version": "%s"' % release_version,
+        expected_number_of_replacements=1
+    )
+    common.inplace_replace_file(
+        common.FECONF_PATH,
+        'OPPIA_VERSION = \'.*\'',
+        'OPPIA_VERSION = \'%s\'' % release_version,
+        expected_number_of_replacements=1
+    )
 
 
 def main():
@@ -576,7 +586,7 @@ def main():
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
-    update_package_json()
+    update_version_in_config_files()
 
     list_of_numbered_files = []
     for i, filepath in enumerate(LIST_OF_FILEPATHS_TO_MODIFY, start=1):
