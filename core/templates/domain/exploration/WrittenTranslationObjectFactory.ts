@@ -80,7 +80,7 @@ export class WrittenTranslation {
   setTranslation(translation: string|string[]): void {
     if (typeof translation !==
         typeof DATA_FORMAT_TO_DEFAULT_VALUES[
-          <DataFormatToDefaultValuesKey> this.dataFormat]) {
+          this.dataFormat as DataFormatToDefaultValuesKey]) {
       throw new Error(
         'This translation is not of the correct type for data format ' +
         this.dataFormat);
@@ -107,10 +107,10 @@ export class WrittenTranslationObjectFactory {
     }
 
     return new WrittenTranslation(
-      <DataFormatToDefaultValuesKey> dataFormat,
+      dataFormat as DataFormatToDefaultValuesKey,
       cloneDeep(
         DATA_FORMAT_TO_DEFAULT_VALUES[
-          <DataFormatToDefaultValuesKey> dataFormat
+          dataFormat as DataFormatToDefaultValuesKey
         ]
       ),
       false
@@ -120,7 +120,7 @@ export class WrittenTranslationObjectFactory {
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      <DataFormatToDefaultValuesKey> translationBackendDict.data_format,
+      translationBackendDict.data_format as DataFormatToDefaultValuesKey,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }

@@ -74,10 +74,10 @@ describe('AutosaveInfoModalsService', () => {
     ' modal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: showNonStrictValidationFailModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     autosaveInfoModalsService.showNonStrictValidationFailModal();
@@ -90,10 +90,10 @@ describe('AutosaveInfoModalsService', () => {
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: showNonStrictValidationFailModalRef,
             result: Promise.resolve('success')
-          });
+          } as NgbModalRef);
       });
 
       autosaveInfoModalsService.showNonStrictValidationFailModal();
@@ -110,10 +110,10 @@ describe('AutosaveInfoModalsService', () => {
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: showNonStrictValidationFailModalRef,
             result: Promise.reject('fail')
-          });
+          } as NgbModalRef);
       });
 
       autosaveInfoModalsService.showNonStrictValidationFailModal();
@@ -129,10 +129,10 @@ describe('AutosaveInfoModalsService', () => {
     ' modal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: showLostChangesModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
@@ -144,10 +144,10 @@ describe('AutosaveInfoModalsService', () => {
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: showLostChangesModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
@@ -164,10 +164,10 @@ describe('AutosaveInfoModalsService', () => {
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: showVersionMismatchModalRef,
             result: Promise.reject('fail')
-          });
+          } as NgbModalRef);
       });
 
       autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
@@ -183,10 +183,10 @@ describe('AutosaveInfoModalsService', () => {
     fakeAsync(() => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
+        return (
           { componentInstance: showLostChangesModalRef,
             result: Promise.resolve('success')
-          });
+          } as NgbModalRef);
       });
 
       autosaveInfoModalsService.showLostChangesModal(
@@ -199,10 +199,10 @@ describe('AutosaveInfoModalsService', () => {
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: showLostChangesModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
     autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
     expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
@@ -221,10 +221,10 @@ describe('AutosaveInfoModalsService', () => {
       .and.returnValue(null);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: showLostChangesModalRef,
           result: Promise.reject('fail')
-        });
+        } as NgbModalRef);
     });
 
     autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
