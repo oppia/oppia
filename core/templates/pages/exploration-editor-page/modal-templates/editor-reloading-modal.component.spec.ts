@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from
   '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditorReloadingModalComponent } from './editor-reloading-modal.component';
@@ -64,13 +64,15 @@ describe('Editor Reloading Modal Controller', () => {
     check = true;
   });
 
-  it('should dismiss modal after waiting timeout to finish', () => {
+  it('should dismiss modal after waiting timeout to finish', fakeAsync(() => {
     spyOn(ngbActiveModal, 'dismiss').and.callFake(() => {
       check = true;
     });
+
     component.ngOnInit();
-    setTimeout(() => {
-      expect(check).toBe(true);
-    }, 2501);
-  });
+
+    expect(check).toBe(false);
+    tick(2501);
+    expect(check).toBe(true);
+  }));
 });
