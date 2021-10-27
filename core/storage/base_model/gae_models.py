@@ -14,8 +14,7 @@
 
 """Base model class."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import enum
@@ -26,8 +25,9 @@ from core.constants import constants
 from core.platform import models
 
 from typing import ( # isort:skip
-    Any, Dict, List, Mapping, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
+    Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
 )
+from typing_extensions import TypedDict
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')
@@ -110,6 +110,13 @@ class MODEL_ASSOCIATION_TO_USER(enum.Enum): # pylint: disable=invalid-name
     MULTIPLE_INSTANCES_PER_USER = 'MULTIPLE_INSTANCES_PER_USER'
     # Indicates that a model should not be exported.
     NOT_CORRESPONDING_TO_USER = 'NOT_CORRESPONDING_TO_USER'
+
+
+class ModelsToPutDict(TypedDict, total=False):
+    snapshot_metadata_model: BaseSnapshotMetadataModel
+    snapshot_content_model: BaseSnapshotContentModel
+    versioned_model: VersionedModel
+    commit_log_model: BaseCommitLogEntryModel
 
 
 class BaseModel(datastore_services.Model):
@@ -244,9 +251,9 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get(
-            cls: Type[SELF_BASE_MODEL],
-            entity_id: str,
-            strict: bool = True
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+        strict: bool = True
     ) -> Optional[SELF_BASE_MODEL]:
         """Gets an entity by id.
 
@@ -901,7 +908,7 @@ class VersionedModel(BaseModel):
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         additional_models: Mapping[str, BaseModel]
-    ) -> Mapping[str, BaseModel]:
+    ) -> ModelsToPutDict:
         """Evaluates and executes commit. Main function for all commit types.
 
         Args:
@@ -952,17 +959,15 @@ class VersionedModel(BaseModel):
         snapshot = self.compute_snapshot()
         snapshot_id = self.get_snapshot_id(self.id, self.version)
 
-        snapshot_metadata_instance: BaseSnapshotMetadataModel = (
-            self.SNAPSHOT_METADATA_CLASS.create(
-                snapshot_id,
-                committer_id,
-                commit_type,
-                commit_message,
-                commit_cmds
-            )
+        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
+            snapshot_id,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds
         )
-        snapshot_content_instance: BaseSnapshotContentModel = (
-            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)
+        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS.create(
+            snapshot_id, snapshot
         )
 
         return {
@@ -1035,7 +1040,8 @@ class VersionedModel(BaseModel):
 
             self._trusted_commit(
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message,
-                commit_cmds)
+                commit_cmds
+            )
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -1168,11 +1174,18 @@ class VersionedModel(BaseModel):
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]]
-    ) -> Sequence[SELF_BASE_MODEL]:
-        return self._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds
-        ).values()
+        commit_cmds: List[Dict[str, Any]],
+        additional_models: Mapping[str, BaseModel]
+    ) -> Iterable[SELF_BASE_MODEL]:
+        return list(
+            self._trusted_commit(
+                committer_id,
+                commit_type,
+                commit_message,
+                commit_cmds,
+                additional_models
+            ).values()
+        )
 
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
     # remove Any from type-annotation below.

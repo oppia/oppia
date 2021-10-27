@@ -279,7 +279,7 @@ class ExplorationModel(base_models.VersionedModel):
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         additional_models: Mapping[str, base_models.BaseModel]
-    ) -> Mapping[str, base_models.BaseModel]:
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -715,7 +715,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         additional_models: Mapping[str, base_models.BaseModel]
-    ) -> Mapping[str, base_models.BaseModel]:
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -740,25 +740,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             additional_models
         )
 
-        # Create and delete events will already be recorded in the
-        # ExplorationModel.
-        if commit_type not in ['create', 'delete']:
-            models_to_put['commit_log_model'] = ExplorationCommitLogEntryModel(
-                id=('rights-%s-%s' % (self.id, self.version)),
-                user_id=committer_id,
-                exploration_id=self.id,
-                commit_type=commit_type,
-                commit_message=commit_message,
-                commit_cmds=commit_cmds,
-                version=None,
-                post_commit_status=self.status,
-                post_commit_community_owned=self.community_owned,
-                post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            )
-
-        snapshot_metadata_model: ExplorationRightsSnapshotMetadataModel = (
-            models_to_put['snapshot_metadata_model'])
+        snapshot_metadata_model = models_to_put['snapshot_metadata_model']
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
@@ -778,11 +760,29 @@ class ExplorationRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        return {
-            **models_to_put,
-            ,
+        # Create and delete events will already be recorded in the
+        # ExplorationModel.
+        if commit_type not in ['create', 'delete']:
+            exploration_commit_log = ExplorationCommitLogEntryModel(
+                id=('rights-%s-%s' % (self.id, self.version)),
+                user_id=committer_id,
+                exploration_id=self.id,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=None,
+                post_commit_status=self.status,
+                post_commit_community_owned=self.community_owned,
+                post_commit_is_private=(
+                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
+            )
+            return {
+                **models_to_put,
+                'commit_log_model': exploration_commit_log,
+            }
 
-        }
+        return models_to_put
+
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[str]]:

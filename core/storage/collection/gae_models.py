@@ -29,7 +29,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -278,8 +278,8 @@ class CollectionModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Optional[Dict[str, base_models.SELF_BASE_MODEL]]
-    ) -> base_models.ModelsToCommitDict:
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -319,9 +319,10 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights.community_owned
         )
         collection_commit_log.collection_id = self.id
-        models_to_put['commit_log_model'] = collection_commit_log
-
-        return models_to_put
+        return {
+            **models_to_put,
+            'commit_log_model': collection_commit_log
+        }
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -619,8 +620,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             commit_type: str,
             commit_message: str,
             commit_cmds: List[Dict[str, Any]],
-            additional_models: Dict[str, base_models.SELF_BASE_MODEL]
-    ) -> base_models.ModelsToCommitDict:
+            additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this overrides the superclass method.
@@ -645,25 +646,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             additional_models
         )
 
-        # Create and delete events will already be recorded in the
-        # CollectionModel.
-        if commit_type not in ['create', 'delete']:
-            models_to_put['commit_log_model'] = CollectionCommitLogEntryModel(
-                id=('rights-%s-%s' % (self.id, self.version)),
-                user_id=committer_id,
-                collection_id=self.id,
-                commit_type=commit_type,
-                commit_message=commit_message,
-                commit_cmds=commit_cmds,
-                version=None,
-                post_commit_status=self.status,
-                post_commit_community_owned=self.community_owned,
-                post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            )
-
-        snapshot_metadata_model: CollectionRightsSnapshotMetadataModel = (
-            models_to_put['snapshot_metadata_model'])
+        snapshot_metadata_model = models_to_put['snapshot_metadata_model']
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
@@ -682,6 +665,27 @@ class CollectionRightsModel(base_models.VersionedModel):
                 commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
+
+        # Create and delete events will already be recorded in the
+        # CollectionModel.
+        if commit_type not in ['create', 'delete']:
+            collection_commit_log = CollectionCommitLogEntryModel(
+                id=('rights-%s-%s' % (self.id, self.version)),
+                user_id=committer_id,
+                collection_id=self.id,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=None,
+                post_commit_status=self.status,
+                post_commit_community_owned=self.community_owned,
+                post_commit_is_private=(
+                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
+            )
+            return {
+                **models_to_put,
+                'commit_log_model': collection_commit_log,
+            }
 
         return models_to_put
 

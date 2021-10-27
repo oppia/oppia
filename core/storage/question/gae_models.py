@@ -26,7 +26,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -186,12 +186,13 @@ class QuestionModel(base_models.VersionedModel):
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
     def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -208,16 +209,23 @@ class QuestionModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        super(QuestionModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super()._trusted_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
         question_commit_log = QuestionCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
-        question_commit_log.update_timestamps()
-        question_commit_log.put()
+        return {
+            **models_to_put,
+            'commit_log_model': question_commit_log,
+        }
 
     # TODO(#13523): Change 'question_state_data' to TypedDict/Domain Object
     # to remove Any used below.
