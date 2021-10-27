@@ -225,16 +225,17 @@ describe('Translation opportunities component', () => {
     expect(component.languageSelected).toBe(false);
   }));
 
-  it('should show translation opportunities when language is changed', fakeAsync(() => {
-      spyOn(
-        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        null);
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
-      component.ngOnInit();
-      expect(component.languageSelected).toBe(false);
+  it('should show translation opportunities when language is changed'
+    , fakeAsync(() => {
+    spyOn(
+      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      null);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
+    component.ngOnInit();
+    expect(component.languageSelected).toBe(false);
 
-      activeLanguageChangedEmitter.emit();
+    activeLanguageChangedEmitter.emit();
 
-      expect(component.languageSelected).toBe(true);
-    }));
+    expect(component.languageSelected).toBe(true);
+  }));
 });
