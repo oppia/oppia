@@ -256,6 +256,16 @@ describe('Exploration editor page component', function() {
     ngbModal = TestBed.inject(NgbModal);
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -691,10 +701,10 @@ describe('Exploration editor page component', function() {
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           componentInstance: new MockNgbModalRef(),
           result: $q.resolve(explorationId)
-        }
+        } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
@@ -709,10 +719,10 @@ describe('Exploration editor page component', function() {
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           componentInstance: new MockNgbModalRef(),
           result: $q.reject(explorationId)
-        }
+        } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
