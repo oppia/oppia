@@ -285,8 +285,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         );
 
         if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
-          if ((<SubtitledHtml|SubtitledUnicode>value).contentId === null) {
-            (<SubtitledHtml|SubtitledUnicode>value).contentId = (
+          if ((value as SubtitledHtml|SubtitledUnicode).contentId === null) {
+            (value as SubtitledHtml|SubtitledUnicode).contentId = (
               `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`
             );
             StateNextContentIdIndexService.displayed += 1;
@@ -294,12 +294,12 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (
             let i = 0;
-            i < (<Object[]> value).length;
+            i < (value as Object[]).length;
             i++
           ) {
             traverseSchemaAndAssignContentIds(
               value[i],
-              <Schema> schema.items,
+              schema.items as Schema,
               `${contentIdPrefix}`);
           }
         } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
@@ -348,18 +348,18 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         );
 
         if (schemaIsSubtitledHtml) {
-          const subtitledHtmlValue = <SubtitledHtml> value;
+          const subtitledHtmlValue = value as SubtitledHtml;
           contentIdToContent[
             subtitledHtmlValue.contentId
           ] = subtitledHtmlValue.html;
         } else if (schemaIsSubtitledUnicode) {
-          const subtitledUnicodeValue = <SubtitledUnicode> value;
+          const subtitledUnicodeValue = value as SubtitledUnicode;
           contentIdToContent[
             subtitledUnicodeValue.contentId
           ] = subtitledUnicodeValue.unicode;
         } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-          for (let i = 0; i < (<Object[]> value).length; i++) {
-            traverseSchemaAndCollectContent(value[i], <Schema> schema.items);
+          for (let i = 0; i < (value as Object[]).length; i++) {
+            traverseSchemaAndCollectContent(value[i], schema.items as Schema);
           }
         } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
           schema.properties.forEach(property => {
