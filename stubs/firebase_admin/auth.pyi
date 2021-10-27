@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, List, Optional, Sequence, Union
 
-from . import App, FireBaseClaims
+from . import App, AuthClaimsDict
 
 
 class UserRecord:
@@ -20,7 +20,6 @@ class UserRecord:
 
     @property
     def disabled(self) -> bool: ...
-
 
 class ImportUserRecord:
     @property
@@ -110,7 +109,7 @@ def verify_session_cookie(
         session_cookie: str,
         check_revoked: bool = ...,
         app: Optional[App] = ...
-) -> FireBaseClaims: ...
+) -> AuthClaimsDict: ...
 
 
 class UserNotFoundError(Exception): ...
