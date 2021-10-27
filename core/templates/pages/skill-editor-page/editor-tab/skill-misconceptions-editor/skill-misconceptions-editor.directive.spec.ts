@@ -173,14 +173,14 @@ describe('Skill Misconception Editor Directive', function() {
   it('should open delete misconception modal when clicking on delete ' +
     'button', fakeAsync(function() {
     let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: {
           index: 'index'
         },
         result: Promise.resolve({result: {
           id: 'id'
         }})
-      });
+      }) as NgbModalRef;
     });
     let deleteMisconceptionSpy = spyOn(
       skillUpdateService, 'deleteMisconception').and.returnValue(null);
@@ -198,12 +198,12 @@ describe('Skill Misconception Editor Directive', function() {
   it('should close delete misconception modal when clicking on ' +
     'close button', fakeAsync(function() {
     let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: {
           index: 'index'
         },
         result: Promise.reject()
-      });
+      }) as NgbModalRef;
     });
     let deleteMisconceptionSpy = spyOn(
       skillUpdateService, 'deleteMisconception').and.returnValue(null);

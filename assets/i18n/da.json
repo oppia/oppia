@@ -30,6 +30,9 @@
 	"I18N_ACTION_BROWSE_LESSONS": "Gennemse vores lektioner",
 	"I18N_ACTION_CREATE_EXPLORATION": "Opret en udforskning",
 	"I18N_ACTION_CREATE_LESSON": "Opret din egen lektion",
+	"I18N_BLOG_POST_EDITOR_DELETE_BUTTON": "Slet",
+	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "Titel",
+	"I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE": "Indholdet af dette kort er for langt. Hold det venligst under 4500 tegn for at gemme.",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "Kommer snart",
 	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Udforsk flere lektioner",
 	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "Lavet af fællesskabet",
@@ -128,6 +131,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "Del din udforskning",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Forbedr din udforskning",
 	"I18N_GET_STARTED_PAGE_TITLE": "Kom i gang",
+	"I18N_GOT_IT": "Forstået",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Tilføj kant",
 	"I18N_INTERACTIONS_GRAPH_DELETE": "Slet",
 	"I18N_INTERACTIONS_GRAPH_ERROR_INVALID": "Ugyldig graf!",
@@ -315,5 +319,6 @@
 	"I18N_TOPNAV_MODERATOR_PAGE": "Moderator side",
 	"I18N_TOPNAV_SIGN_IN": "Log ind",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Log ind med Google",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervis med Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervis med Oppia",
+	"I18N_WARNING_MODAL_TITLE": "Advarsel!"
 }

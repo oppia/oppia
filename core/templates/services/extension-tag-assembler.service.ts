@@ -59,7 +59,7 @@ export class ExtensionTagAssemblerService {
       } else if (value instanceof Object) {
         type KeyOfValue = keyof typeof value;
         let _result: Record<KeyOfValue, Object> = {};
-        let keys = <KeyOfValue[]>Object.keys(value);
+        let keys = Object.keys(value) as KeyOfValue[];
         keys.forEach(key => {
           _result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
         });
@@ -84,8 +84,9 @@ export class ExtensionTagAssemblerService {
       element: JQuery,
       customizationArgs: InteractionCustomizationArgs
   ): JQuery {
-    const caBackendDict = <Record<string, Record<string, Object>>> (
-      this._convertCustomizationArgsToBackendDict(customizationArgs));
+    const caBackendDict = (
+      this._convertCustomizationArgsToBackendDict(customizationArgs)
+    ) as Record<string, Record<string, Object>>;
     for (const caName in customizationArgs) {
       const caBackendDictValue = caBackendDict[caName].value;
       element.attr(

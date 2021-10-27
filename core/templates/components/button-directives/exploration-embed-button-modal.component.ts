@@ -50,8 +50,8 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
       throw new Error('No CodeDiv was found!');
     }
     const range = document.createRange();
-    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild as Node);
-    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild as Node);
+    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
+    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     const selection = window.getSelection();
     if (selection === null) {
       throw new Error('Unable to Select!');
