@@ -36,7 +36,7 @@ describe('Editor Reloading Modal Controller', () => {
   let component: EditorReloadingModalComponent;
   let fixture: ComponentFixture<EditorReloadingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let check: boolean = false;
+  let modalDismissCalled: boolean = false;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,18 +61,18 @@ describe('Editor Reloading Modal Controller', () => {
   });
 
   afterAll(() => {
-    check = true;
+    modalDismissCalled = true;
   });
 
   it('should dismiss modal after waiting timeout to finish', fakeAsync(() => {
     spyOn(ngbActiveModal, 'dismiss').and.callFake(() => {
-      check = true;
+      modalDismissCalled = true;
     });
 
     component.ngOnInit();
 
-    expect(check).toBe(false);
+    expect(modalDismissCalled).toBe(false);
     tick(2501);
-    expect(check).toBe(true);
+    expect(modalDismissCalled).toBe(true);
   }));
 });
