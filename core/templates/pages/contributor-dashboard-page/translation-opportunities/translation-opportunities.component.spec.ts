@@ -175,27 +175,6 @@ describe('Translation opportunities component', () => {
       });
   });
 
-  it('should not show translation opportunities when language is not ' +
-    'selected', () => {
-    spyOn(
-      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      null);
-    component.ngOnInit();
-    expect(component.languageSelected).toBe(false);
-  });
-
-  it('should show translation opportunities when language is changed', () => {
-    spyOn(
-      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      null);
-    component.ngOnInit();
-    expect(component.languageSelected).toBe(false);
-
-    activeLanguageChangedEmitter.emit();
-
-    expect(component.languageSelected).toBe(true);
-  });
-
   it('should open translation modal when clicking button', fakeAsync(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
@@ -234,5 +213,28 @@ describe('Translation opportunities component', () => {
       tick();
 
       expect(modalService.open).not.toHaveBeenCalled();
+    }));
+
+  it('should not show translation opportunities when language is not ' +
+    'selected', fakeAsync(() => {
+    spyOn(
+      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      null);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
+    component.ngOnInit();
+    expect(component.languageSelected).toBe(false);
+  }));
+
+  it('should show translation opportunities when language is changed', fakeAsync(() => {
+      spyOn(
+        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+        null);
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
+      component.ngOnInit();
+      expect(component.languageSelected).toBe(false);
+
+      activeLanguageChangedEmitter.emit();
+
+      expect(component.languageSelected).toBe(true);
     }));
 });
