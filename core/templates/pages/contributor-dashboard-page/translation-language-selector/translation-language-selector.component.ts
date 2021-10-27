@@ -68,9 +68,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.featuredLanguages = featuredLanguages;
       });
 
-      this.languageSelection = this.activeLanguageCode ? (
-        this.languageIdToDescription[
-          this.activeLanguageCode]) : 'Select a language...';
+      this.languageSelection = (
+        this.activeLanguageCode ?
+        this.languageIdToDescription[this.activeLanguageCode] : 
+        'Select a language...'
+      );
   }
 
   toggleDropdown(): void {
