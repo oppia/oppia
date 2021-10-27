@@ -56,6 +56,7 @@ DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
 
 class ActivityRightsDict(TypedDict):
     """A dict version of ActivityRights suitable for use by the frontend."""
+
     cloned_from: Optional[str]
     status: str
     community_owned: bool
