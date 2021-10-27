@@ -87,7 +87,9 @@ class GeneralFileSystem:
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
-    def _validate_entity_parameters(self, entity_name: str, entity_id: str) -> None:  # noqa: C0301
+    def _validate_entity_parameters(
+            self, entity_name: str, entity_id: str
+    ) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:

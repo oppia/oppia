@@ -29,7 +29,6 @@ from typing_extensions import TypedDict
 
 class FeedbackThreadDict(TypedDict):
     """Object defining a domain object for a feedback thread"""
-
     last_updated_msecs: float
     original_author_username: Optional[str]
     status_name: str
@@ -43,7 +42,6 @@ class FeedbackThreadDict(TypedDict):
 
 class FeedbackMessageDict(TypedDict):
     """Object defining a feedback message"""
-
     author_username: Optional[str]
     created_on_msecs: float
     entity_type: str
@@ -57,7 +55,6 @@ class FeedbackMessageDict(TypedDict):
 class FeedbackThreadSummaryDict(TypedDict):
     """Object defining a domain object for the
     summary of a particular thread"""
-
     status: str
     original_author_id: str
     last_updated_msecs: float
