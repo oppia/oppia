@@ -680,9 +680,7 @@ class _Validators:
             return False
         if '/' in obj or '..' in obj:
             return False
-        if '.' not in obj:
-            return False
-        return True
+        return '.' in obj
 
     @staticmethod
     def is_valid_username_string(obj: str) -> bool:
