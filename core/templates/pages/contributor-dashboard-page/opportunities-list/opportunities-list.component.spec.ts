@@ -399,8 +399,8 @@ describe('Opportunities List Component', () => {
         inReviewCount: 20,
         totalCount: 100,
         translationsCount: 50
-      }])
-  }));
+      }]);
+    }));
 
     it('should not go to the new page when opportunities ' +
       'are less then page length', fakeAsync(() => {
