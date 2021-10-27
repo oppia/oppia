@@ -1539,6 +1539,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_topic_and_subtopic_pages_with_empty_commit_message(
             self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        # Test can have an empty commit message when not published.
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            None)
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        # Test must have a commit message when published.
         with self.assertRaisesRegexp(
             Exception, 'Expected a commit message, received none.'):
             topic_services.update_topic_and_subtopic_pages(

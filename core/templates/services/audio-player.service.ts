@@ -100,7 +100,7 @@ export class AudioPlayerService {
       if (this._currentTrack !== null) {
         // 'lastPauseOrSeekPos' will not be null since currentTrack exists.
         // We can safely typecast it to 'number'.
-        this._currentTrack.seek(<number> this._lastPauseOrSeekPos);
+        this._currentTrack.seek(this._lastPauseOrSeekPos as number);
       }
       interval(500).pipe(takeUntil(
         this._stopIntervalSubject)).subscribe(() => {

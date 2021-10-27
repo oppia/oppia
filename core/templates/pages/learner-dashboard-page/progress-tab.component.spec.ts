@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for for ProgressTabComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from
   '@angular/core/testing';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
@@ -24,10 +24,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ProgressTabComponent } from './progress-tab.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 describe('Progress tab Component', () => {
   let component: ProgressTabComponent;
@@ -35,6 +36,8 @@ describe('Progress tab Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let learnerDashboardBackendApiService:
     LearnerDashboardBackendApiService = null;
+  let windowDimensionsService: WindowDimensionsService;
+  let mockResizeEmitter: EventEmitter<void> = new EventEmitter();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -49,7 +52,14 @@ describe('Progress tab Component', () => {
       ],
       providers: [
         UrlInterpolationService,
-        LearnerDashboardBackendApiService
+        LearnerDashboardBackendApiService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => mockResizeEmitter,
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -61,6 +71,7 @@ describe('Progress tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     const sampleStorySummaryBackendDict = {
       id: '0',
       title: 'Story Title',
@@ -151,12 +162,18 @@ describe('Progress tab Component', () => {
     expect(component.width).toEqual(233);
   });
 
-  it('should detect when application is being used on a mobile', () => {
-    expect(component.checkMobileView()).toBe(false);
+  it('should check whether window is narrow', fakeAsync(() => {
+    // We use tick() as ngOnInit is an async function in the component.
+    component.ngOnInit();
+    tick();
 
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-    expect(component.checkMobileView()).toBe(true);
-  });
+    expect(component.windowIsNarrow).toBeTrue();
+
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    mockResizeEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
+  }));
 
   it('should get static image url', () => {
     const urlSpy = spyOn(
