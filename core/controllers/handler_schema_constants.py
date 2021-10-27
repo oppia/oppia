@@ -19,8 +19,7 @@
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 
-"""Validates handler args against its schema by calling schema utils.
-Also contains a list of handler class names which does not contain the schema.
+"""Contains a list of handler class names which does not contain the schema.
 """
 
 from __future__ import unicode_literals
