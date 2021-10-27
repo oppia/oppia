@@ -579,11 +579,10 @@ def _create_auth_claims(
     Returns:
         AuthClaims. Oppia's representation of auth claims.
     """
-    auth_id = firebase_claims.get('sub')
+    auth_id = firebase_claims['sub']
     email = firebase_claims.get('email')
     role_is_super_admin = (
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
-    assert auth_id is not None
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)

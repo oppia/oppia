@@ -141,9 +141,10 @@ class BlogPost:
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
-        if isinstance(self.thumbnail_filename, str):
-            self.require_valid_thumbnail_filename(
-                self.thumbnail_filename)
+        assert isinstance(self.thumbnail_filename, str), (
+            'Expected thumbnail filename to be a string, received %s'
+            % self.thumbnail_filename)
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
 
         if not isinstance(self.content, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -293,12 +294,12 @@ class BlogPost:
         if isinstance(blog_post_dict['last_updated'], str):
             last_updated = utils.convert_string_to_naive_datetime_object(
                 blog_post_dict['last_updated']
-        )
+            )
         published_on = None
         if isinstance(blog_post_dict['published_on'], str):
             published_on = utils.convert_string_to_naive_datetime_object(
                 blog_post_dict['published_on']
-        )
+            )
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
@@ -329,7 +330,7 @@ class BlogPost:
         self.url_fragment = new_url_fragment
 
     def update_thumbnail_filename(
-        self, new_thumbnail_filename: Optional[str] = None
+        self, new_thumbnail_filename: Optional[str]
     ) -> None:
         """Updates the thumbnail filename of a blog post object.
 
@@ -337,8 +338,10 @@ class BlogPost:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the blog post.
         """
-        if isinstance(self.thumbnail_filename, str):
-            self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        assert isinstance(self.thumbnail_filename, str), (
+            'Expected thumbnail filename to be a string, received %s'
+            % self.thumbnail_filename)
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
         self.thumbnail_filename = new_thumbnail_filename
 
     def update_content(self, content: str) -> None:
@@ -441,9 +444,10 @@ class BlogPostSummary:
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
-        if isinstance(self.thumbnail_filename, str):
-            self.require_valid_thumbnail_filename(
-                self.thumbnail_filename)
+        assert isinstance(self.thumbnail_filename, str), (
+            'Expected thumbnail filename to be a string, received %s'
+            % self.thumbnail_filename)
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
 
         if not isinstance(self.summary, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -540,9 +544,7 @@ class BlogPostSummary:
         if len(set(tags)) != len(tags):
             raise utils.ValidationError('Some tags duplicate each other')
 
-    def to_dict(
-        self
-    ) -> BlogPostSummaryDict:
+    def to_dict(self) -> BlogPostSummaryDict:
         """Returns a dict representing this blog post summary domain object.
 
         Returns:
@@ -586,9 +588,7 @@ class BlogPostRights:
         self.editor_ids = editor_ids
         self.blog_post_is_published = blog_post_is_published
 
-    def to_dict(
-        self
-    ) -> BlogPostRightsDict:
+    def to_dict(self) -> BlogPostRightsDict:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
@@ -601,7 +601,7 @@ class BlogPostRights:
             'blog_post_is_published': self.blog_post_is_published
         }
 
-    def is_editor(self, user_id: Optional[str] = None) -> bool:
+    def is_editor(self, user_id: Optional[str]) -> bool:
         """Checks whether given user is an editor of the blog post.
 
         Args:
