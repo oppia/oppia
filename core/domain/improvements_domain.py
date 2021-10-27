@@ -33,6 +33,7 @@ from typing_extensions import TypedDict
 
 class TaskEntryDict(TypedDict):
     """Object defining an actionable task from the improvements tab"""
+    
     entity_type: str
     entity_id: str
     entity_version: str
