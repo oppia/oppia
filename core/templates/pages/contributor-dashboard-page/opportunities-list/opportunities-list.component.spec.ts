@@ -292,7 +292,7 @@ describe('Opportunities List Component', () => {
   }));
 
   describe('when clicking on page number ', () => {
-    fit('should go to the new page when opportunities ' +
+    it('should go to the new page when opportunities ' +
       'are greater then page length', fakeAsync(() => {
       expect(component.activePageNumber).toBe(1);
 
@@ -310,8 +310,7 @@ describe('Opportunities List Component', () => {
       tick();
 
       expect(component.activePageNumber).toBe(2);
-      expect(component.visibleOpportunities).toEqual(  
-      [{
+      expect(component.visibleOpportunities).toEqual([{
         id: 'id11',
         labelText: 'text',
         labelColor: 'red',
@@ -401,7 +400,7 @@ describe('Opportunities List Component', () => {
         totalCount: 100,
         translationsCount: 50
       }])
-    }));
+  }));
 
     it('should not go to the new page when opportunities ' +
       'are less then page length', fakeAsync(() => {
