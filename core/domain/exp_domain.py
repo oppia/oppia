@@ -2610,7 +2610,7 @@ class Exploration:
                 recorded_voiceovers.voiceovers_mapping))
 
         recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
-            voiceover_langauge_mapping=voiceover_content_mapping_protos)
+            voiceover_content_mapping=voiceover_content_mapping_protos)
 
         return recorded_voiceover_proto
 
@@ -2626,9 +2626,8 @@ class Exploration:
         Returns:
             Proto Object. The recorded voiceovers proto object.
         """
-        voiceover_language_mapping_dict = {}
-        voiceover_content_mapping_protos = {}
-        temp_list = []
+        language_to_content_id_voiceover_file_map = (
+            collections.defaultdict(dict))
         for (content_id, language_code_to_voiceover) in (
             voiceovers_mapping.items()):
             for (language_code, voiceover) in (
@@ -2637,45 +2636,23 @@ class Exploration:
                     voiceover.filename,
                     voiceover.file_size_bytes,
                     voiceover.duration_secs)
-                voiceover_content_mapping_protos[content_id] = (
-                    voiceover_proto)
-                voiceover_content_mapping_proto = (
-                    languages_pb2.VoiceoverContentMapping(
-                        voiceover_content_mapping=(
-                            voiceover_content_mapping_protos)))
-                if language_code not in voiceover_language_mapping_dict:
-                    voiceover_language_mapping_dict[language_code] = (
-                        [voiceover_content_mapping_proto])
-                else:
-                    temp_list = (
-                        voiceover_language_mapping_dict[language_code])
-                    temp_list += [voiceover_content_mapping_proto]
-                    voiceover_language_mapping_dict[language_code] = (
-                        temp_list)
-                    temp_list = []
-                voiceover_content_mapping_protos = {}
+                language_to_content_id_voiceover_file_map[language_code][content_id] = voiceover_proto # pylint: disable=line-too-long
 
-        voiceover_langauge_mapping_protos_list = []
+        language_code_to_enum_map = {
+            'en': languages_pb2.LanguageType.ENGLISH,
+            'hi-en': languages_pb2.LanguageType.HINGLISH,
+            'ar': languages_pb2.LanguageType.ARABIC
+        }
+        voiceover_content_mapping_protos_list = []
 
-        for (language_code, content_list) in (
-            voiceover_language_mapping_dict.items()):
-            if language_code == 'en':
-                proto = languages_pb2.VoiceoverContentMapping(
-                    language=languages_pb2.LanguageType.ENGLISH,
-                    voiceover_content_mapping=content_list)
-                voiceover_langauge_mapping_protos_list.append(proto)
-            if language_code == 'hi-en':
-                proto = languages_pb2.VoiceoverContentMapping(
-                    language=languages_pb2.LanguageType.HINGLISH,
-                    voiceover_file_map=content_list)
-                voiceover_langauge_mapping_protos_list.append(proto)
-            if language_code == 'ar':
-                proto = languages_pb2.VoiceoverContentMapping(
-                    language=languages_pb2.LanguageType.ARABIC,
-                    voiceover_file_map=content_list)
-                voiceover_langauge_mapping_protos_list.append(proto)
+        for (language_code, voiceover_file_content_map) in (
+            language_to_content_id_voiceover_file_map.items()):
+            proto = languages_pb2.VoiceoverContentMapping(
+                language=language_code_to_enum_map[language_code],
+                voiceover_content_mapping=voiceover_file_content_map)
+            voiceover_content_mapping_protos_list.append(proto)
 
-        return voiceover_langauge_mapping_protos_list
+        return voiceover_content_mapping_protos_list
 
     @classmethod
     def _to_voiceover_proto(cls, filename, file_size_bytes, duration_secs):
@@ -2733,27 +2710,32 @@ class Exploration:
         Returns:
             Proto Object. The written translations proto object.
         """
-        translation_content_mapping_protos = {}
-        translation_content_mapping_list_proto = []
-
-        for (_, language_code_to_translation) in (
+        language_to_content_id_written_translation_map = (
+            collections.defaultdict(dict))
+        for (content_id, language_code_to_written_translation) in (
             translations_mapping.items()):
             for (language_code, written_transaltion) in (
-                language_code_to_translation.items()):
-                written_translation_proto = (
-                    cls._to_written_translation_proto(
+                language_code_to_written_translation.items()):
+                written_translation_proto = cls._to_written_translation_proto(
                     written_transaltion.data_format,
-                    written_transaltion.translation))
-                translation_content_mapping_protos[language_code] = (
-                    written_translation_proto)
-            translation_content_mapping_proto = (
-                languages_pb2.WrittenTranslationContentMapping(
-                    translation_content_mapping=(
-                        translation_content_mapping_protos)))
-            translation_content_mapping_list_proto.append(
-                translation_content_mapping_proto)
+                    written_transaltion.translation)
+                language_to_content_id_written_translation_map[language_code][content_id] = written_translation_proto # pylint: disable=line-too-long
 
-        return translation_content_mapping_list_proto
+        language_code_to_enum_map = {
+            'en': languages_pb2.LanguageType.ENGLISH,
+            'hi-en': languages_pb2.LanguageType.HINGLISH,
+            'ar': languages_pb2.LanguageType.ARABIC
+        }
+        written_translation_content_mapping_protos_list = []
+
+        for (language_code, written_translation_content_map) in (
+            language_to_content_id_written_translation_map.items()):
+            proto = languages_pb2.WrittenTranslationContentMapping(
+                language=language_code_to_enum_map[language_code],
+                translation_content_mapping=written_translation_content_map)
+            written_translation_content_mapping_protos_list.append(proto)
+
+        return written_translation_content_mapping_protos_list
 
     @classmethod
     def _to_written_translation_proto(cls, data_format, translation):
