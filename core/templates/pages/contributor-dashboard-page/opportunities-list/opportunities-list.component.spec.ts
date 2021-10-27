@@ -282,13 +282,13 @@ describe('Opportunities List Component', () => {
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
     expect(component.opportunities).toEqual(ExplorationOpportunityDict);
-    expect(component.opportunities.length).toEqual(17);
+    expect(component.opportunities.length).toEqual(20);
 
     // Removed opportunity with id as 'id2'.
     mockRemoveOpportunitiesEventEmitter.emit(['id2']);
     tick();
 
-    expect(component.opportunities.length).toEqual(16);
+    expect(component.opportunities.length).toEqual(19);
   }));
 
   describe('when clicking on page number ', () => {
@@ -299,10 +299,6 @@ describe('Opportunities List Component', () => {
       component.init();
       tick();
       mockReloadOpportunitiesEventEmitter.emit();
-      tick();
-      component.gotoPage(1);
-      tick();
-      component.gotoPage(2);
       tick();
       component.gotoPage(1);
       tick();
