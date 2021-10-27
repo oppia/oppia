@@ -121,6 +121,13 @@ describe('Exploration save and publish buttons component', function() {
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
