@@ -198,7 +198,7 @@ class TopicModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        super(TopicModel, self)._trusted_commit(
+        super()._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
         topic_rights = TopicRightsModel.get_by_id(self.id)

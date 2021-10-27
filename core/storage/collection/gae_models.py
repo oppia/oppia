@@ -29,7 +29,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -273,12 +273,13 @@ class CollectionModel(base_models.VersionedModel):
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
     # remove Any from type-annotation below.
     def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        additional_models: Optional[Dict[str, base_models.SELF_BASE_MODEL]]
+    ) -> base_models.ModelsToCommitDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -295,19 +296,32 @@ class CollectionModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        super(CollectionModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super()._trusted_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
-        collection_rights = CollectionRightsModel.get_by_id(self.id)
-
+        collection_rights: CollectionRightsModel = cast(
+            CollectionRightsModel,
+            additional_models['collection_rights_model']
+        )
         collection_commit_log = CollectionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
-            commit_cmds, collection_rights.status,
+            self.id,
+            self.version,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            collection_rights.status,
             collection_rights.community_owned
         )
         collection_commit_log.collection_id = self.id
-        collection_commit_log.update_timestamps()
-        collection_commit_log.put()
+        models_to_put['commit_log_model'] = collection_commit_log
+
+        return models_to_put
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -604,8 +618,9 @@ class CollectionRightsModel(base_models.VersionedModel):
             committer_id: str,
             commit_type: str,
             commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+            commit_cmds: List[Dict[str, Any]],
+            additional_models: Dict[str, base_models.SELF_BASE_MODEL]
+    ) -> base_models.ModelsToCommitDict:
         """Record the event to the commit log after the model commit.
 
         Note that this overrides the superclass method.
@@ -622,13 +637,18 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        super(CollectionRightsModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super()._trusted_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            CollectionCommitLogEntryModel(
+            models_to_put['commit_log_model'] = CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
                 collection_id=self.id,
@@ -640,13 +660,10 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
+            )
 
-        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version))
-        # Ruling out the possibility of None for mypy type checking.
-        assert snapshot_metadata_model is not None
-
+        snapshot_metadata_model: CollectionRightsSnapshotMetadataModel = (
+            models_to_put['snapshot_metadata_model'])
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
@@ -666,8 +683,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
-        snapshot_metadata_model.put()
+        return models_to_put
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[str]]:

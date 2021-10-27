@@ -28,7 +28,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -273,12 +273,13 @@ class ExplorationModel(base_models.VersionedModel):
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
     def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> Mapping[str, base_models.BaseModel]:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -295,18 +296,27 @@ class ExplorationModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        super(ExplorationModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super()._trusted_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
-        exp_rights = ExplorationRightsModel.get_by_id(self.id)
-
+        exp_rights = cast(
+            ExplorationRightsModel,
+            additional_models['exploration_rights_model']
+        )
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, exp_rights.status, exp_rights.community_owned
         )
         exploration_commit_log.exploration_id = self.id
-        exploration_commit_log.update_timestamps()
-        exploration_commit_log.put()
+        return {
+            **models_to_put,
+            'commit_log_model': exploration_commit_log
+        }
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -699,12 +709,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
     def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> Mapping[str, base_models.BaseModel]:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -721,14 +732,18 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-
-        super(ExplorationRightsModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super()._trusted_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            ExplorationCommitLogEntryModel(
+            models_to_put['commit_log_model'] = ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
                 exploration_id=self.id,
@@ -740,12 +755,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
+            )
 
-        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version))
-        # Ruling out the possibility of None for mypy type checking.
-        assert snapshot_metadata_model is not None
+        snapshot_metadata_model: ExplorationRightsSnapshotMetadataModel = (
+            models_to_put['snapshot_metadata_model'])
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
@@ -765,8 +778,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
-        snapshot_metadata_model.put()
+        return {
+            **models_to_put,
+            ,
+
+        }
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[str]]:
