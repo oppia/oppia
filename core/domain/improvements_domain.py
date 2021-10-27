@@ -19,15 +19,30 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 from core import utils
 from core.domain import user_services
 from core.platform import models
 
-from datetime import datetime
-from typing import Any, Dict
+from typing import TypedDict
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
+
+
+class TaskEntryDict(TypedDict):
+    entity_type: str
+    entity_id: str
+    entity_version: str
+    task_type: str
+    target_type: str
+    target_id: str
+    issue_description: str
+    status: str
+    resolver_username: str
+    resolver_profile_picture_data_url: str
+    resolved_on_msecs: float
 
 
 class TaskEntry:
@@ -54,17 +69,17 @@ class TaskEntry:
     """
 
     def __init__(
-        self, 
-        entity_type: str, 
-        entity_id: str, 
-        entity_version: str, 
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: str,
         task_type: str,
-        target_type: str, 
-        target_id: str, 
-        issue_description: str, 
-        status: str, 
+        target_type: str,
+        target_id: str,
+        issue_description: str,
+        status: str,
         resolver_id: str,
-        resolved_on: datetime
+        resolved_on: datetime,
     ):
         """Initializes a new TaskEntry domain object from the given values.
 
@@ -129,7 +144,7 @@ class TaskEntry:
         return improvements_models.TaskEntryModel.generate_composite_entity_id(
             self.entity_type, self.entity_id, self.entity_version)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> TaskEntryDict:
         """Returns a dict-representation of the task.
 
         Returns:

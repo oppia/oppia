@@ -29,13 +29,13 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     THREAD_ID = 'exp0.thread0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackThreadDomainUnitTests, self).setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_thread_dict = {
             'thread_id': self.THREAD_ID,
@@ -58,7 +58,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 
-    def test_get_last_two_message_ids_from_thread_with_many_messages(self):
+    def test_get_last_two_message_ids_from_thread_with_many_messages(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
@@ -70,7 +70,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             thread.get_last_two_message_ids(),
             ['exp0.thread0.4', 'exp0.thread0.3'])
 
-    def test_get_last_two_message_ids_from_thread_with_only_one_message(self):
+    def test_get_last_two_message_ids_from_thread_with_only_one_message(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
@@ -88,12 +88,12 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     THREAD_ID = 'exploration.exp0.thread0'
     FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackMessageDomainUnitTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message_dict = {
             'author_username': self.OWNER_USERNAME,
@@ -117,7 +117,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, 2)
         self.assertDictEqual(expected_thread_analytics.to_dict(), {
@@ -128,13 +128,13 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackMessageReferenceDomainTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
         self.thread_id = 'exp.thread'
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         expected_feedback_message_reference = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
