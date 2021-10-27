@@ -25,6 +25,7 @@ from core import python_utils
 from core import utils
 
 from typing import Any, Dict, Optional, Union
+import typing_extensions
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -48,6 +49,14 @@ class StaleAuthSessionError(Exception):
     """Error raised when an auth session needs to be refreshed."""
 
     pass
+
+
+class AuthClaimsDict(typing_extensions.TypedDict):
+    """Dictionary representing the AuthClaims object."""
+
+    sub: str
+    email: str
+    role: str
 
 
 class AuthClaims:

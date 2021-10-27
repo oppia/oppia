@@ -1,13 +1,5 @@
 from typing import Any, Dict, Optional
-import typing_extensions
 
-class AuthClaimsDict(typing_extensions.TypedDict):
-    """Dictionary representing the AuthClaims object."""
-
-    sub: str
-    email: str
-    role: str
-    
 class App:
     name: str = ...
     credential: Optional[object] = ...

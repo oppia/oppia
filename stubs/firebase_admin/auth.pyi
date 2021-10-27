@@ -1,7 +1,9 @@
+from core.domain import auth_domain
+
 import datetime
 from typing import Any, Dict, List, Optional, Sequence, Union
 
-from . import App, AuthClaimsDict
+from . import App
 
 
 class UserRecord:
@@ -109,7 +111,7 @@ def verify_session_cookie(
         session_cookie: str,
         check_revoked: bool = ...,
         app: Optional[App] = ...
-) -> AuthClaimsDict: ...
+) -> auth_domain.AuthClaimsDict: ...
 
 
 class UserNotFoundError(Exception): ...

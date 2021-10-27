@@ -66,7 +66,6 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 from typing import List, Optional
-import typing_extensions
 import webapp2
 
 MYPY = False
@@ -77,14 +76,6 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 transaction_services = models.Registry.import_transaction_services()
-
-
-class AuthClaimsDict(typing_extensions.TypedDict):
-    """Dictionary representing the AuthClaims object."""
-
-    sub: str
-    email: str
-    role: str
 
 
 def establish_firebase_connection() -> None:
@@ -577,7 +568,7 @@ def _get_auth_claims_from_session_cookie(
 
 
 def _create_auth_claims(
-    firebase_claims: AuthClaimsDict
+    firebase_claims: auth_domain.AuthClaimsDict
 ) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from Firebase claims.
 
