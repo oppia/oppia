@@ -45,8 +45,14 @@ export class SuggestionModalService {
   SUGGESTION_REJECTED: string = 'rejected';
 
   /**
-   * @param {object} $uibModalInstance - A IModalServiceInstance object.
-   * @param {object} paramDict - A ParamDict object.
+   * @param {object} $uibModalInstance - An IModalServiceInstance object.
+   * @param {object} paramDict - A ParamDict object which includes the
+   * the follwing keys:
+   * - action: action of the suggestion.
+   * - audioUpdateRequired: whether audio files exist for the content
+   *    being replace.
+   * - commitMessage: commit message for the suggestion.
+   * - reviewMessage: review message for the suggestion.
    */
   acceptSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
@@ -55,8 +61,14 @@ export class SuggestionModalService {
   }
 
   /**
-   * @param {object} $uibModalInstance - A IModalServiceInstance object.
-   * @param {object} paramDict - A ParamDict object.
+   * @param {object} $uibModalInstance - An IModalServiceInstance object.
+   * @param {object} paramDict - A ParamDict object which includes the
+   * the follwing keys:
+   * - action: action of the suggestion.
+   * - audioUpdateRequired: whether audio files exist for the content
+   *    being replace.
+   * - commitMessage: commit message for the suggestion.
+   * - reviewMessage: review message for the suggestion.
    */
   rejectSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
@@ -65,7 +77,7 @@ export class SuggestionModalService {
   }
 
   /**
-   * @param {object} $uibModalInstance - A IModalServiceInstance object.
+   * @param {object} $uibModalInstance - An IModalServiceInstance object.
    */
   cancelSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
