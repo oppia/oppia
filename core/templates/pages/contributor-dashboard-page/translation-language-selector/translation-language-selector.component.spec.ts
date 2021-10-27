@@ -162,6 +162,6 @@ describe('Translation language selector', () => {
 
       component.ngOnInit();
 
-      expect(component.initialCaption).toBe('Select a language...');
+      expect(component.languageSelection).toBe('Select a language...');
     });
 });

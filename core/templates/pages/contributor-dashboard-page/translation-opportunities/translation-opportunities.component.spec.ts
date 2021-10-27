@@ -215,17 +215,16 @@ describe('Translation opportunities component', () => {
       expect(modalService.open).not.toHaveBeenCalled();
     }));
 
-  it('should not show tranlsation opportunities when language is not ' +
-    'selected', fakeAsync(() => {
+  it('should not show translation opportunities when language is not ' +
+    'selected', () => {
     spyOn(
       translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       null);
     component.ngOnInit();
     expect(component.languageSelected).toBe(false);
-  }));
+  });
 
-  it('should show tranlsation opportunities when language is changed',
-    fakeAsync(() => {
+  it('should show translation opportunities when language is changed', () => {
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(
         null);
@@ -235,5 +234,5 @@ describe('Translation opportunities component', () => {
       activeLanguageChangedEmitter.emit();
 
       expect(component.languageSelected).toBe(true);
-    }));
+    });
 });
