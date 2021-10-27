@@ -25,9 +25,9 @@
     <div class="oppia-question-player-card question-player-results-header">
       <h3 class="oppia-question-player-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
       <h3 class="oppia-question-player-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
-      <score-ring score="$ctrl.totalScore"
-                  test-is-passed="$ctrl.testIsPassed">
-      </score-ring>
+      <oppia-score-ring [score]="$ctrl.totalScore"
+                        [test-is-passed]="$ctrl.testIsPassed">
+      </oppia-score-ring>
     </div>
 
     <div class="oppia-question-player-card question-player-skills-results">
