@@ -879,7 +879,8 @@ class ResolveIssueHandler(EditorHandler):
             'exp_issue_dict': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': stats_domain.ExplorationIssue
+                    'object_class': stats_domain.ExplorationIssue,
+                    'new_key_for_argument': 'exp_issue_object'
                 },
                 'default_value': None
             },
@@ -892,7 +893,7 @@ class ResolveIssueHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
-        exp_issue_object = self.normalized_payload.get('exp_issue_dict')
+        exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload.get('exp_version')
 
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
@@ -904,7 +905,7 @@ class ResolveIssueHandler(EditorHandler):
         # issues instance.
         issue_to_remove = None
         for issue in exp_issues.unresolved_issues:
-            if issue.to_dict() == exp_issue_object.to_dict():
+            if issue == exp_issue_object:
                 issue_to_remove = issue
                 break
 

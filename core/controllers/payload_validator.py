@@ -87,8 +87,8 @@ def validate_arguments_against_schema(
                 if arg_schema['default_value'] is None:
                     # Skip validation because the argument is optional.
                     continue
-            elif arg_schema['default_value'] is not None:
-                handler_args[arg_key] = arg_schema['default_value']
+                elif arg_schema['default_value'] is not None:
+                    handler_args[arg_key] = arg_schema['default_value']
             else:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
@@ -106,7 +106,11 @@ def validate_arguments_against_schema(
         # Modification of argument name if new_key_for_argument field is present
         # in the schema.
         if 'new_key_for_argument' in arg_schema['schema']:
+            old_arg_key = arg_key
             arg_key = get_corresponding_key_for_object(arg_schema)
+            handler_args[arg_key] = handler_args.pop(old_arg_key)
+            handler_args_schemas[arg_key] = (
+                handler_args_schemas.pop(old_arg_key))
 
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(

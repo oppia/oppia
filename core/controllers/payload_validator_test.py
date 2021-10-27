@@ -158,7 +158,7 @@ class CheckGetCorrespondingKeyForObjectMethod(test_utils.GenericTestBase):
     """Test class to check behaviour of get_corresponding_key_for_object
     method."""
 
-    def test_check_new_arg_key(self) -> None:
+    def test_get_new_arg_key_from_schema(self) -> None:
         """Test case to check behaviour of new arg key name."""
         sample_arg_schema = {
             'schema': {
@@ -174,7 +174,7 @@ class CheckGetCorrespondingKeyForObjectMethod(test_utils.GenericTestBase):
 class CheckGetSchemaTypeMethod(test_utils.GenericTestBase):
     """Test class to check behaviour of get_schema_type method."""
 
-    def test_check_new_arg_key(self) -> None:
+    def test_get_schema_type_from_schema(self) -> None:
         """Test case to check behaviour of get_schema_type method."""
         sample_arg_schema = {
             'schema': {

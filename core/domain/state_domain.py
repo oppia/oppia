@@ -2675,12 +2675,15 @@ class State:
     @classmethod
     def convert_state_dict_to_yaml(cls, state_dict, width):
         """Converts the given state dict to yaml format.
+
         Args:
             state_dict: dict. A dict representing a state in an exploration.
             width: int. The maximum number of characters in a line for the
                 returned YAML string.
+
         Returns:
             str. The YAML version of the state_dict.
+
         Raises:
             Exception. The state_dict does not represent a valid state.
         """
