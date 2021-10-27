@@ -333,6 +333,8 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - This text is shown when there is at least one collection in the complete section but no collections in the incomplete section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "Text displayed in the learner dashboard. - This text is shown when there is at least one exploration in the complete section but no explorations in the incomplete section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY": "Text displayed in the learner dashboard. - This text is shown when the user hasn't started any topic.",
+	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL": "Text displayed in the learner dashboard. - This text is shown when the user hasn't started any topic.",
+	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL": "Text displayed in the learner dashboard. - This text is shown when the user hasn't started any topic.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS": "Text displayed in the learner dashboard. - This text is shown when the user hasn't subscribed to any creator.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION": "Text displayed in the learner dashboard. - This text is shown when the user has completed or started all the topics on the server.",
 	"I18N_LEARNER_DASHBOARD_EVENING_GREETING":"Good evening greeting on the learner dashboard.",

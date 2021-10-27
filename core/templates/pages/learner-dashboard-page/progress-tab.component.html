@@ -33,8 +33,15 @@
         </span>
       </a>
     </div>
-    <div *ngIf="emptySkillProficiency">
+    <div *ngIf="emptySkillProficiency" class="empty-skill-proficiency-section">
       <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
+      </p>
+      <a id="setting-a-goal-link" (click)="changeActiveSection()">
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL' | translate"
+           class="empty-skill-proficiency">
+        </p>
+      </a>
+      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL' | translate">
       </p>
     </div>
     <div *ngIf="!emptySkillProficiency">
@@ -132,10 +139,14 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    min-height: 206px;
+    min-height: 220px;
     opacity: 1;
     padding: 0 0 30px 40px;
     width: 736px;
+  }
+  #setting-a-goal-link {
+    color: #00645C;
+    font-weight: bold;
   }
   .progress-tab .empty-section {
     padding: 0 113px 30px 40px;
@@ -154,9 +165,13 @@
   .progress-tab .empty-section .skill-proficiency-title {
     margin-bottom: 0;
   }
-  .progress-tab .empty-skill-proficiency {
-    color: #333;
+  .progress-tab .empty-skill-proficiency-section {
     font-size: 18px;
+  }
+  .progress-tab .empty-skill-proficiency {
+    display: inline;
+    font-size: 18px;
+    margin-bottom: 0;
     text-align: left;
   }
   .oppia-badge-image {

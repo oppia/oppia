@@ -44,6 +44,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyCompleted: boolean = false;
   thumbnailBgColor: string;
   starImageUrl: string = '';
+  cardIsHovered: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -125,6 +126,12 @@ export class LearnerStorySummaryTileComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isCardHovered(): string {
+    if (this.displayArea === 'homeTab' && this.cardIsHovered) {
+      return '-webkit-filter: blur(2px); filter: blur(2px);';
+    }
   }
 }
 

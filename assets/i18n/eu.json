@@ -131,7 +131,7 @@
 	"I18N_INTERACTIONS_SUBMIT": "Bidali",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Ikusi Oppia hemen:",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Bukatuta",
-	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Badirudi ez daukazula feedback hari aktiborik. Feedbackak zure atazen kalitatea hobetzen laguntzen du. Joan zaitez liburutegira zoragarria den zerbait ikastera eta bidali zure kritika baliogarria!",
+	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Oraindik ez duzu iritzi hari aktiborik. Zure iritziak gure ikasgaien kalitatea hobetzen laguntzen du. Horretarako, gure ikasgaietako bat hasi eta zure iritzi baliotsua bidaliko dugu!",
 	"I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED": "Azken erreprodukzioa",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION": "Kritiken Eguneraketa",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE": "Erantzun",

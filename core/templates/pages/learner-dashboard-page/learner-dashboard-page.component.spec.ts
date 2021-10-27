@@ -1015,48 +1015,156 @@ describe('Learner dashboard page', () => {
       expect(fetchDataSpy).toHaveBeenCalled();
     }));
 
-    it('should show an alert warning when fails to get collections data',
-      fakeAsync(() => {
-        const fetchDataSpy = spyOn(
-          learnerDashboardBackendApiService,
-          'fetchLearnerDashboardCollectionsDataAsync')
-          .and.rejectWith(404);
-        const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+    it('should show an alert warning when fails to get collections data' +
+      'in mobile view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
 
-        let newActiveSectionName = (
-          'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
-        component.setActiveSection(newActiveSectionName);
+      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
+      component.setActiveSubsection(newActiveSectionName);
 
-        tick();
-        fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
 
-        expect(alertsSpy).toHaveBeenCalledWith(
-          'Failed to get learner dashboard collections data');
-        expect(fetchDataSpy).toHaveBeenCalled();
-      }));
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard collections data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
 
-    it('should show an alert warning when fails to get explorations data',
-      fakeAsync(() => {
-        const fetchDataSpy = spyOn(
-          learnerDashboardBackendApiService,
-          'fetchLearnerDashboardExplorationsDataAsync')
-          .and.rejectWith(404);
-        const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+    it('should show an alert warning when fails to get explorations data in' +
+    'mobile view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
 
-        let newActiveSectionName = (
-          'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
-        component.setActiveSection(newActiveSectionName);
+      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
+      component.setActiveSubsection(newActiveSectionName);
 
-        tick();
-        fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
 
-        expect(alertsSpy).toHaveBeenCalledWith(
-          'Failed to get learner dashboard explorations data');
-        expect(fetchDataSpy).toHaveBeenCalled();
-      }));
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard explorations data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
 
     it('should get explorations and collections data when user clicks ' +
-    'communtiy lessons tab',
+    'communtiy lessons tab in mobile view',
+    fakeAsync(() => {
+      const fetchCollectionsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedCollectionsList: (
+            learnerDashboardCollectionsData.completed_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          incompleteCollectionsList: (
+            learnerDashboardCollectionsData.incomplete_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          collectionPlaylist: (
+            learnerDashboardCollectionsData.collection_playlist.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          completedToIncompleteCollections: (
+            learnerDashboardCollectionsData
+              .completed_to_incomplete_collections),
+          numberOfNonexistentCollections: (
+            NonExistentCollections.createFromBackendDict(
+              learnerDashboardCollectionsData
+                .number_of_nonexistent_collections)),
+        }));
+
+      const fetchExplorationsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedExplorationsList: (
+            learnerDashboardExplorationsData.completed_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          incompleteExplorationsList: (
+            learnerDashboardExplorationsData.incomplete_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          explorationPlaylist: (
+            learnerDashboardExplorationsData.exploration_playlist.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          numberOfNonexistentExplorations: (
+            NonExistentExplorations.createFromBackendDict(
+              learnerDashboardExplorationsData
+                .number_of_nonexistent_explorations)),
+          subscriptionList: (
+            learnerDashboardExplorationsData.subscription_list.map(
+              profileSummary => ProfileSummary
+                .createFromCreatorBackendDict(profileSummary)))
+        }));
+
+      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
+      component.setActiveSubsection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(fetchCollectionsDataSpy).toHaveBeenCalled();
+      flush();
+      expect(fetchExplorationsDataSpy).toHaveBeenCalled();
+      expect(component.communtiyLessonsDataLoaded).toEqual(true);
+    }));
+
+    it('should show an alert warning when fails to get collections data' +
+      'in web view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      let newActiveSectionName = (
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+      component.setActiveSection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard collections data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+
+    it('should show an alert warning when fails to get explorations data in' +
+    'web view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      let newActiveSectionName = (
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+      component.setActiveSection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard explorations data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+
+    it('should get explorations and collections data when user clicks ' +
+    'communtiy lessons tab in web view',
     fakeAsync(() => {
       const fetchCollectionsDataSpy = spyOn(
         learnerDashboardBackendApiService,

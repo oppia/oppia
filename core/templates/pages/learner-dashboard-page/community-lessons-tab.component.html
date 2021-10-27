@@ -351,16 +351,8 @@
     </div>
   </div>
 </div>
-<div class="subscriptions-section protractor-test-subscriptions-section">
+<div class="subscriptions-section protractor-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
-  <div *ngIf="subscriptionsList.length === 0">
-    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS' | translate" class="empty-section"></p>
-    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
-       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-       href="/community-library"
-       [routerLink]="communityLibraryUrl">
-    </a>
-  </div>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
       *ngFor="let subscription of subscriptionsList">

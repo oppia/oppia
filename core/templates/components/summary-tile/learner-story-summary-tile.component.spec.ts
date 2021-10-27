@@ -122,6 +122,13 @@ describe('Learner Story Summary Tile Component', () => {
     expect(component.nextIncompleteNodeTitle).toEqual('Chapter 1: Chapter 1');
   });
 
+  it('should make the tile blurred if it is hovered', () => {
+    component.cardIsHovered = true;
+    component.displayArea = 'homeTab';
+    expect(component.isCardHovered()).toBe(
+      '-webkit-filter: blur(2px); filter: blur(2px);');
+  });
+
   it('should get story link url for exploration page on homeTab', () => {
     component.displayArea = 'homeTab';
     let nodeDict = {
