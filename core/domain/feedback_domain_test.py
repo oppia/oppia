@@ -58,7 +58,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 
-    def test_get_last_two_message_ids_from_thread_with_many_messages(self):
+    def test_get_last_two_message_ids_from_thread_with_many_messages(self) -> None:  # pylint: disable=line-too-long
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
@@ -70,7 +70,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             thread.get_last_two_message_ids(),
             ['exp0.thread0.4', 'exp0.thread0.3'])
 
-    def test_get_last_two_message_ids_from_thread_with_only_one_message(self):
+    def test_get_last_two_message_ids_from_thread_with_only_one_message(self) -> None:  # pylint: disable=line-too-long
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
