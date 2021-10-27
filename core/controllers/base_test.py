@@ -1315,7 +1315,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     architecture.
     """
     handler_class_names_with_no_schema = (
+<<<<<<< HEAD
         payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+=======
+        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+>>>>>>> 8e39dab46 (fixed errors)
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
@@ -1507,7 +1511,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
+<<<<<<< HEAD
             payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+=======
+        handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+>>>>>>> 8e39dab46 (fixed errors)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
