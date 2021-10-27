@@ -389,6 +389,10 @@ describe('Exploration save service ' +
       ]
     });
   });
+<<<<<<< HEAD
+
+=======
+>>>>>>> develop
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
       open: () => {
@@ -398,6 +402,10 @@ describe('Exploration save service ' +
       }
     });
   }));
+<<<<<<< HEAD
+
+=======
+>>>>>>> develop
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
