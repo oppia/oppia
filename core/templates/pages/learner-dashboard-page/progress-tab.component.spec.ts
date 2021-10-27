@@ -191,6 +191,12 @@ describe('Progress tab Component', () => {
     expect(component.displaySkills[0]).toEqual(true);
   });
 
+  it('should switch the tab to Goals', () => {
+    const setActiveSection = spyOn(component.setActiveSection, 'emit');
+    component.changeActiveSection();
+    expect(setActiveSection).toHaveBeenCalled();
+  });
+
   it('should get the topic Mastery', () => {
     component.subtopicMastery = {
       BqXdwH8YOsGX: {
