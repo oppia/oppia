@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, List, Optional, Sequence, Union
 
-from . import App
+from . import App, FireBaseClaims
 
 
 class UserRecord:
@@ -110,7 +110,7 @@ def verify_session_cookie(
         session_cookie: str,
         check_revoked: bool = ...,
         app: Optional[App] = ...
-) -> Dict[str, Any]: ...
+) -> FireBaseClaims: ...
 
 
 class UserNotFoundError(Exception): ...

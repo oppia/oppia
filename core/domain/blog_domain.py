@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 from core.domain import html_cleaner
 
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 import typing_extensions
 
 # This is same as base_models.ID_Length.
@@ -35,12 +35,34 @@ BLOG_POST_ID_LENGTH = 12
 
 
 class BlogPostDict(typing_extensions.TypedDict):
-    """Dict type for blog post dict."""
+    """Dict type for BlogPost object."""
 
     id: str
     title: str
     author_id: str
     content: str
+    url_fragment: str
+    tags: List[str]
+    thumbnail_filename: Optional[str]
+    last_updated: Optional[str]
+    published_on: Optional[str]
+
+
+class BlogPostRightsDict(typing_extensions.TypedDict):
+    """Dict type for BlogPostRights object."""
+
+    blog_post_id: str
+    editor_ids: List[str]
+    blog_post_is_published: bool
+
+
+class BlogPostSummaryDict(typing_extensions.TypedDict):
+    """Dict type for BlogPostSummary object."""
+
+    id: str
+    title: str
+    author_id: str
+    summary: str
     url_fragment: str
     tags: List[str]
     thumbnail_filename: Optional[str]
@@ -232,9 +254,7 @@ class BlogPost:
                 'Only lowercase words, numbers separated by hyphens are'
                 ' allowed. Received %s.' % (url_fragment))
 
-    def to_dict(
-        self
-    ) -> BlogPostDict:
+    def to_dict(self) -> BlogPostDict:
         """Returns a dict representing this blog post domain object.
 
         Returns:
@@ -258,8 +278,7 @@ class BlogPost:
 
     @classmethod
     def from_dict(
-        cls,
-        blog_post_dict: BlogPostDict
+        cls, blog_post_dict: BlogPostDict
     ) -> 'BlogPost':
         """Returns a blog post domain object from a dictionary.
 
@@ -270,24 +289,16 @@ class BlogPost:
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
-        assert isinstance(blog_post_dict['last_updated'], str)
-        assert isinstance(blog_post_dict['id'], str)
-        assert isinstance(blog_post_dict['author_id'], str)
-        assert isinstance(blog_post_dict['title'], str)
-        assert isinstance(blog_post_dict['content'], str)
-        assert isinstance(blog_post_dict['url_fragment'], str)
-        assert isinstance(blog_post_dict['tags'], list)
-        assert isinstance(
-            blog_post_dict['thumbnail_filename'], str
-            ) or blog_post_dict['thumbnail_filename'] is None
-        last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['last_updated'])
-            if blog_post_dict['last_updated'] else None)
-        published_on = (
-                utils.convert_string_to_naive_datetime_object(
-                    blog_post_dict['published_on']) # type: ignore[arg-type]
-        ) if blog_post_dict['published_on'] else None
+        last_updated = None
+        if isinstance(blog_post_dict['last_updated'], str):
+            last_updated = utils.convert_string_to_naive_datetime_object(
+                blog_post_dict['last_updated']
+        )
+        published_on = None
+        if isinstance(blog_post_dict['published_on'], str):
+            published_on = utils.convert_string_to_naive_datetime_object(
+                blog_post_dict['published_on']
+        )
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
@@ -531,7 +542,7 @@ class BlogPostSummary:
 
     def to_dict(
         self
-    ) -> Dict[str, Union[str, List[str], Optional[datetime.datetime]]]:
+    ) -> BlogPostSummaryDict:
         """Returns a dict representing this blog post summary domain object.
 
         Returns:
@@ -577,7 +588,7 @@ class BlogPostRights:
 
     def to_dict(
         self
-    ) -> Dict[str, Union[str, List[str], bool]]:
+    ) -> BlogPostRightsDict:
         """Returns a dict suitable for use by the frontend.
 
         Returns:

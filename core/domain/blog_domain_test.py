@@ -46,6 +46,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate(strict=True)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self, expected_error_substring: str
     ) -> None:
@@ -65,9 +67,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             blog_domain.BlogPost.require_valid_tags(tags, False)
 
     def _assert_valid_thumbnail_filename_for_blog_post(
-            self,
-            expected_error_substring: str,
-            thumbnail_filename: str
+        self,
+        expected_error_substring: str,
+        thumbnail_filename: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -76,9 +78,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-            self,
-            expected_error_substring: str,
-            thumbnail_filename: str
+        self,
+        expected_error_substring: str,
+        thumbnail_filename: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -87,7 +89,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename)
 
     def _assert_strict_valid_title_for_blog_post(
-            self, expected_error_substring: str, title: str
+        self, expected_error_substring: str, title: str
     ) -> None:
         """Checks that blog post passes strict validation for title."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -295,9 +297,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_summary_by_id(self.blog_post_id))  # type: ignore[no-untyped-call]
 
     def _assert_valid_thumbnail_filename_for_blog_post(
-            self,
-            expected_error_substring: str,
-            thumbnail_filename: str
+        self,
+        expected_error_substring: str,
+        thumbnail_filename: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -306,9 +308,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-            self,
-            expected_error_substring: str,
-            thumbnail_filename: str
+        self,
+        expected_error_substring: str,
+        thumbnail_filename: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -403,6 +405,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate(strict=True)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self, expected_error_substring: str
     ) -> None:

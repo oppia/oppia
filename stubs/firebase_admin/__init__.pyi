@@ -1,10 +1,18 @@
 from typing import Any, Dict, Optional
+import typing_extensions
 
 class App:
     name: str = ...
     credential: Optional[object] = ...
     options: Optional[Dict[str, Any]] = ...
     project_id: str = ...
+
+class FireBaseClaims(typing_extensions.TypedDict):
+    """Dictionary representing the AuthClaims object."""
+
+    sub: str
+    email: str
+    role: str
 
 def get_app(name: Optional[str] = ...) -> App: ...
 
