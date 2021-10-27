@@ -225,14 +225,14 @@ describe('Translation opportunities component', () => {
   });
 
   it('should show translation opportunities when language is changed', () => {
-      spyOn(
-        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        null);
-      component.ngOnInit();
-      expect(component.languageSelected).toBe(false);
+    spyOn(
+      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      null);
+    component.ngOnInit();
+    expect(component.languageSelected).toBe(false);
 
-      activeLanguageChangedEmitter.emit();
+    activeLanguageChangedEmitter.emit();
 
-      expect(component.languageSelected).toBe(true);
-    });
+    expect(component.languageSelected).toBe(true);
+  });
 });
