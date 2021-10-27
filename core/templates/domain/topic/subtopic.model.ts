@@ -39,11 +39,10 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  // 'null' to indicate the lack of thumbnail file.
+  // The thumbnail and URL fragment might not be set,
+  // then they will be 'null'.
   _thumbnailFilename: string | null;
-  // 'null' to indicate the lack of thumbnail background color.
   _thumbnailBgColor: string | null;
-  // 'null' to indicate the lack of url fragment.
   _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
