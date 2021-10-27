@@ -432,9 +432,7 @@ export class Topic {
   rearrangeSkillInSubtopic(
       subtopicId: number, fromIndex: number, toIndex: number): void {
     const subtopic = this.getSubtopicById(subtopicId);
-    if (subtopic === null) {
-      throw new Error('Subtopic does not exist');
-    } else {
+    if (subtopic !== null) {
       const skillToMove = cloneDeep(
         subtopic.getSkillSummaries()[fromIndex]);
       subtopic._skillSummaries.splice(fromIndex, 1);
