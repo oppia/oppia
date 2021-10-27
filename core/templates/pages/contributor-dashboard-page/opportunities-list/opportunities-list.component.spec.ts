@@ -156,15 +156,6 @@ describe('Opportunities List Component', () => {
     translationsCount: 50
   },
   {
-    id: 'id5',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50
-  },
-  {
     id: 'id14',
     labelText: 'text',
     labelColor: 'red',
@@ -190,6 +181,42 @@ describe('Opportunities List Component', () => {
     inReviewCount: 20,
     totalCount: 100,
     translationsCount: 30
+  },
+  {
+    id: 'id17',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id18',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id19',
+    labelText: 'text',
+    labelColor: 'blue',
+    progressPercentage: 30,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 30
+  },
+  {
+    id: 'id20',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
   }];
 
   beforeEach(() => {
@@ -265,7 +292,7 @@ describe('Opportunities List Component', () => {
   }));
 
   describe('when clicking on page number ', () => {
-    it('should go to the new page when opportunities ' +
+    fit('should go to the new page when opportunities ' +
       'are greater then page length', fakeAsync(() => {
       expect(component.activePageNumber).toBe(1);
 
@@ -273,14 +300,107 @@ describe('Opportunities List Component', () => {
       tick();
       mockReloadOpportunitiesEventEmitter.emit();
       tick();
+      component.gotoPage(1);
+      tick();
       component.gotoPage(2);
       tick();
       component.gotoPage(1);
       tick();
-      component.gotoPage(3);
+      component.gotoPage(2);
       tick();
 
-      expect(component.activePageNumber).toBe(3);
+      expect(component.activePageNumber).toBe(2);
+      expect(component.visibleOpportunities).toEqual(  
+      [{
+        id: 'id11',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id12',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id13',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id14',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id15',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id16',
+        labelText: 'text',
+        labelColor: 'blue',
+        progressPercentage: 30,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 30
+      },
+      {
+        id: 'id17',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id18',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id19',
+        labelText: 'text',
+        labelColor: 'blue',
+        progressPercentage: 30,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 30
+      },
+      {
+        id: 'id20',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      }])
     }));
 
     it('should not go to the new page when opportunities ' +
