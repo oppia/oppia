@@ -2,15 +2,15 @@
   <div class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
     {{ getTimeOfDay() | translate }}, {{ username }}!
   </div>
-  <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
+  <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
     <p class="continue-where-you-left-off-heading"
-       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="currentGoals.length !== 0">
+       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="continueWhereYouLeftOffList.length !== 0">
     </p>
     <p class="continue-where-you-left-off-heading"
        [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
-       *ngIf="currentGoals.length === 0">
+       *ngIf="continueWhereYouLeftOffList.length === 0">
     </p>
-    <div class="empty-continue-where-you-left-off-section" *ngIf="currentGoals.length === 0">
+    <div class="empty-continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length === 0">
       <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
       </p>
       <a id="setting-a-goal-link" (click)="changeActiveSection()">
@@ -19,9 +19,9 @@
       </a>
     </div>
     <div class="continue-where-you-left-off-scroll">
-      <div class="continue-where-you-left-off-section" *ngIf="currentGoals.length !== 0"
+      <div class="continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
         [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
-        <div *ngFor="let topicSummaryTile of currentGoals" class="topic-summary">
+        <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
           <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                class="story-summary-tile">
             <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
@@ -38,7 +38,7 @@
     <div class="suggested-for-you-section">
       <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
         <div *ngIf="item.value.length !== 0" class="classroom-name">
-          {{item.key}}
+          Basic {{item.key}}
         </div>
         <div class="topic-summary-tile-scroll">
           <div class="topic-summary-tile-section d-flex"
@@ -60,7 +60,7 @@
       </div>
     </div>
   </div>
-  <div class="empty-suggested-for-you" *ngIf="!isNonemptyObject(untrackedTopics) && currentGoals.length === 0">
+  <div class="empty-suggested-for-you" *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="empty-suggested-for-you-section">
@@ -121,7 +121,7 @@
     background-color: #EEE ;
     border-radius: 4px;
     float: right;
-    height: 184px;
+    height: 210px;
     margin: 0 2px 30px 6px;
     padding: 0;
     position: relative;
@@ -136,7 +136,7 @@
     position: relative;
     text-align: center;
     text-transform: capitalize;
-    top: 70px;
+    top: 85px;
   }
   .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
     display: inline-block;
@@ -182,15 +182,18 @@
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
       overflow: scroll;
     }
-    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar {
+    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
+    .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
     -webkit-appearance: none;
     }
-    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb {
+    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
+    .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
       background-color: #EEE;
       border: 1px solid #fff;
       border-radius: 8px;
     }
-    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal {
+    .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
+    .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
       height: 5px;
     }
   }
