@@ -17,19 +17,18 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from datetime import datetime
+import datetime
 
 from core import python_utils
 from core import utils
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional
+from typing_extensions import TypedDict
 
 
 class FeedbackThreadDict(TypedDict):
-    """
-    Object defining a domain object for a feedback thread
-    """
+    """Object defining a domain object for a feedback thread"""
 
     last_updated_msecs: float
     original_author_username: Optional[str]
@@ -43,9 +42,7 @@ class FeedbackThreadDict(TypedDict):
 
 
 class FeedbackMessageDict(TypedDict):
-    """
-    Object defining a feedback message
-    """
+    """Object defining a feedback message"""
 
     author_username: Optional[str]
     created_on_msecs: float
@@ -58,9 +55,8 @@ class FeedbackMessageDict(TypedDict):
 
 
 class FeedbackThreadSummaryDict(TypedDict):
-    """
-    Object defining a domain object for the summary of a particular thread
-    """
+    """Object defining a domain object for the
+    summary of a particular thread"""
 
     status: str
     original_author_id: str
@@ -106,7 +102,7 @@ class FeedbackThread:
     """
 
     def __init__(
-        self, 
+        self,
         thread_id: str,
         entity_type: str,
         entity_id: str,
@@ -337,7 +333,11 @@ class FeedbackMessageReference:
     """
 
     def __init__(
-            self, entity_type: str, entity_id: str, thread_id: str, message_id: str
+        self,
+        entity_type: str,
+        entity_id: str,
+        thread_id: str,
+        message_id: str,
     ):
         """Initializes FeedbackMessageReference object."""
         self.entity_type = entity_type

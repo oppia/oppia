@@ -25,13 +25,15 @@ from core import utils
 from core.domain import user_services
 from core.platform import models
 
-from typing import TypedDict
+from typing_extensions import TypedDict
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 
 
 class TaskEntryDict(TypedDict):
+    """Object defining an actionable task from the improvements tab"""
+
     entity_type: str
     entity_id: str
     entity_version: str
