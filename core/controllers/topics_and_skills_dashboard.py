@@ -261,7 +261,7 @@ class NewTopicHandler(base.BaseHandler):
                     }, {
                         'id': 'has_length_at_most',
                         'max_value': (
-                          android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
+                            android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
                         )
                     }]
                 }
@@ -273,7 +273,7 @@ class NewTopicHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'has_length_at_most',
                         'max_value': (
-                          android_validation_constants
+                            android_validation_constants
                             .MAX_CHARS_IN_TOPIC_DESCRIPTION
                         )
                     }]
@@ -363,7 +363,7 @@ class NewSkillHandler(base.BaseHandler):
                     }, {
                         'id': 'has_length_at_most',
                         'max_value': (
-                          android_validation_constants
+                            android_validation_constants
                             .MAX_CHARS_IN_SKILL_DESCRIPTION
                         )
                     }]

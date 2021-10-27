@@ -665,7 +665,7 @@ class _Validators:
 
     @staticmethod
     def is_valid_filename(obj: str) -> bool:
-        """Checks if the given obj (a string) is a valid username string.
+        """Checks if the given obj (a string) is a valid filename string.
 
         Args:
             obj: str. The filename to verify.
