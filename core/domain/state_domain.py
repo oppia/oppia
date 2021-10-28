@@ -548,7 +548,7 @@ class InteractionInstance:
             solution_dict)
 
     @classmethod
-    def _to_interaction_proto(cls, interaction):
+    def to_interaction_proto(cls, interaction):
         """Creates a InteractionInstance proto object.
 
         Args:
@@ -654,7 +654,7 @@ class InteractionInstance:
         """
         customization_arg_proto = (
             state_pb2.ContinueInstance.CustomizationArgs(
-                button_text=State._to_subtitled_text_proto(
+                button_text=State.to_subtitled_text_proto(
                     customization_args['buttonText'].value.content_id,
                     customization_args['buttonText'].value.unicode_str)))
 
@@ -675,7 +675,7 @@ class InteractionInstance:
         Returns:
             Proto Object. The Outcome proto object.
         """
-        feedback_proto = State._to_subtitled_text_proto(
+        feedback_proto = State.to_subtitled_text_proto(
             feedback.content_id,
             feedback.html)
         outcome_proto = state_pb2.Outcome(
@@ -1081,7 +1081,7 @@ class InteractionInstance:
             Proto Object. The BaseSolution proto object.
         """
         base_solution_proto = state_pb2.BaseSolution(
-            explanation=State._to_subtitled_text_proto(
+            explanation=State.to_subtitled_text_proto(
                 explanation.content_id,
                 explanation.html))
 
@@ -1182,7 +1182,7 @@ class InteractionInstance:
         """
         choices_list_proto = []
         for value in customization_args['choices'].value:
-            value_proto = State._to_subtitled_text_proto(
+            value_proto = State.to_subtitled_text_proto(
                 value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
@@ -1210,7 +1210,7 @@ class InteractionInstance:
 
         for hint in hints:
             hint_content_proto = (
-                State._to_subtitled_text_proto(
+                State.to_subtitled_text_proto(
                     hint.hint_content.content_id,
                     hint.hint_content.html))
             hint_proto = state_pb2.Hint(
@@ -1297,7 +1297,7 @@ class InteractionInstance:
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = State._to_subtitled_text_proto(
+            value_proto = State.to_subtitled_text_proto(
                 value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
@@ -2325,7 +2325,7 @@ class InteractionInstance:
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = State._to_subtitled_text_proto(
+            value_proto = State.to_subtitled_text_proto(
                 value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
@@ -3361,7 +3361,7 @@ class WrittenTranslation:
             written_translation_dict['needs_update'])
 
     @classmethod
-    def _to_written_translations_proto(cls, written_translations):
+    def to_written_translations_proto(cls, written_translations):
         """Creates a WrittenTranslations proto object.
 
         Args:
@@ -3432,21 +3432,20 @@ class WrittenTranslation:
             Proto Object. The written translation proto object.
         """
         if data_format == (
-            state_domain.WrittenTranslation.DATA_FORMAT_HTML):
+            WrittenTranslation.DATA_FORMAT_HTML):
             return cls._to_html_written_translatable(translation)
 
         if data_format == (
-            state_domain.WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
+            WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             return cls._to_unicode_written_translatable(translation)
 
         if data_format == (
-                state_domain.WrittenTranslation
+                WrittenTranslation
                 .DATA_FORMAT_SET_OF_NORMALIZED_STRING):
             return cls._to_normalized_set_written_translatable(translation)
 
         if data_format == (
-                state_domain.WrittenTranslation
-                .DATA_FORMAT_SET_OF_UNICODE_STRING):
+                WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
             return cls._to_unicode_set_written_translatable(translation)
 
     @classmethod
@@ -3895,7 +3894,7 @@ class RecordedVoiceovers:
         return cls(voiceovers_mapping)
 
     @classmethod
-    def _to_recorded_voiceover_proto(cls, recorded_voiceovers):
+    def to_recorded_voiceover_proto(cls, recorded_voiceovers):
         """Creates a RecordedVoiceovers proto object.
 
         Args:
@@ -5428,7 +5427,7 @@ class State:
             False, is_initial_state, 0)
 
     @classmethod
-    def _to_state_proto(cls, states):
+    def to_state_proto(cls, states):
         """Creates a State proto object.
 
         Args:
@@ -5441,21 +5440,23 @@ class State:
         state_protos = {}
         for (state_name, state) in states.items():
             state_proto = state_pb2.State(
-                content=cls._to_subtitled_text_proto(
+                content=cls.to_subtitled_text_proto(
                     state.content.content_id,
                     state.content.html),
-                recorded_voiceovers=RecordedVoiceovers._to_recorded_voiceover_proto(
-                    state.recorded_voiceovers),
-                written_translations=WrittenTranslation._to_written_translations_proto(
-                    state.written_translations),
-                interaction=InteractionInstance._to_interaction_proto(
+                recorded_voiceovers=(
+                    RecordedVoiceovers.to_recorded_voiceover_proto(
+                    state.recorded_voiceovers)),
+                written_translations=(
+                    WrittenTranslation.to_written_translations_proto(
+                    state.written_translations)),
+                interaction=InteractionInstance.to_interaction_proto(
                     state.interaction))
             state_protos[state_name] = state_proto
 
         return state_protos
 
     @classmethod
-    def _to_subtitled_text_proto(cls, content_id, text):
+    def to_subtitled_text_proto(cls, content_id, text):
         """Creates a SubtitledText proto object.
 
         Args:

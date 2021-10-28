@@ -42,9 +42,6 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 from proto_files.org.oppia.proto.v1.structure import exploration_pb2
-from proto_files.org.oppia.proto.v1.structure import languages_pb2
-from proto_files.org.oppia.proto.v1.structure import objects_pb2
-from proto_files.org.oppia.proto.v1.structure import state_pb2
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -2538,7 +2535,7 @@ class Exploration:
         """
         state_protos = None
         if states is not None:
-            state_protos = state_domain.State._to_state_proto(states)
+            state_protos = state_domain.State.to_state_proto(states)
 
         exploration_proto = exploration_pb2.Exploration(
             id=exploration_id,
