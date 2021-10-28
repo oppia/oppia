@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -99,7 +98,7 @@ class GeneralFileSystem:
                 entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
-        if not isinstance(entity_id, python_utils.BASESTRING):
+        if not isinstance(entity_id, str):
             raise utils.ValidationError(
                 'Invalid entity_id received: %s' % entity_id)
         if entity_id == '':
@@ -339,9 +338,11 @@ class AbstractFileSystem:
         # be stored in a file opened in binary mode. However, it is not
         # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
+
+        if isinstance(raw_bytes, str):
+            raw_bytes = raw_bytes.encode('utf-8')
         file_content = (
-            python_utils.convert_to_bytes(raw_bytes)
-            if mimetype != 'application/octet-stream' else raw_bytes)
+            raw_bytes if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(filepath, file_content, mimetype)
 

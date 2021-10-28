@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -334,13 +333,8 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
             )
 
         if (
-                not isinstance(
-                    self.payload.get('translation_html'),
-                    python_utils.BASESTRING)
-                and
-                not isinstance(
-                    self.payload.get('translation_html'),
-                    list)
+                not isinstance(self.payload.get('translation_html'), str)
+                and not isinstance(self.payload.get('translation_html'), list)
         ):
             raise self.InvalidInputException(
                 'The parameter \'translation_html\' should be a string or a' +

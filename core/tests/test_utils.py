@@ -474,8 +474,9 @@ class ElasticSearchStub:
                 for _, v in term.items():
                     values = v['query'].split(' ')
                     for doc in result_docs:
-                        strs = [val for val in doc.values() if isinstance(
-                            val, python_utils.BASESTRING)]
+                        strs = [
+                            val for val in doc.values() if isinstance(val, str)
+                        ]
                         words = []
                         for s in strs:
                             words += s.split(' ')
@@ -925,7 +926,7 @@ class MemoryCacheServicesStub:
         Returns:
             int. Number of successfully deleted keys.
         """
-        assert all(isinstance(key, python_utils.BASESTRING) for key in keys)
+        assert all(isinstance(key, str) for key in keys)
         keys_to_delete = [key for key in keys if key in self._CACHE_DICT]
         for key in keys_to_delete:
             del self._CACHE_DICT[key]
@@ -2111,7 +2112,7 @@ title: Title
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
-        return python_utils.UNICODE(abs(hash(email)))
+        return str(abs(hash(email)))
 
     def get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
@@ -3369,8 +3370,7 @@ class LinterTestBase(GenericTestBase):
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
+            self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 

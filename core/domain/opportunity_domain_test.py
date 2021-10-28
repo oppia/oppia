@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import re
 
-from core import python_utils
 from core.constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
@@ -84,8 +83,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             obj = opportunity_domain.ExplorationOpportunitySummary.from_dict(
                 exploration_opportunity_summary_dict)
 
-        self.assertTrue(isinstance(
-            obj, opportunity_domain.ExplorationOpportunitySummary))
+        self.assertIsInstance(
+            obj, opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(obj.to_dict(), {
             'id': 'exp_1',
             'topic_name': 'A topic',
@@ -97,8 +96,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         })
 
     def test_invalid_topic_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_id, python_utils.BASESTRING))
+        self.assertIsInstance(self.valid_exp_opp_summary.topic_id, str)
         with self.mock_supported_audio_languages_context:
             # Object with topic_id as string passes the validation check.
             self.valid_exp_opp_summary.validate()
@@ -109,8 +107,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected topic_id to be a string, received 5')
 
     def test_invalid_topic_name_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_name, python_utils.BASESTRING))
+        self.assertIsInstance(self.valid_exp_opp_summary.topic_name, str)
 
         with self.mock_supported_audio_languages_context:
             # Object with topic_name as string passes the validation check.
@@ -122,8 +119,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected topic_name to be a string, received True')
 
     def test_invalid_story_id_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_id, python_utils.BASESTRING))
+        self.assertIsInstance(self.valid_exp_opp_summary.story_id, str)
         with self.mock_supported_audio_languages_context:
             # Object with story_id as string passes the validation check.
             self.valid_exp_opp_summary.validate()
@@ -134,8 +130,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected story_id to be a string, received 5')
 
     def test_invalid_story_title_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_title, python_utils.BASESTRING))
+        self.assertIsInstance(self.valid_exp_opp_summary.story_title, str)
 
         with self.mock_supported_audio_languages_context:
             # Object with story_title as string passes the validation check.
@@ -147,8 +142,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected story_title to be a string, received True')
 
     def test_invalid_chapter_title_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.chapter_title, python_utils.BASESTRING))
+        self.assertIsInstance(self.valid_exp_opp_summary.chapter_title, str)
 
         with self.mock_supported_audio_languages_context:
             # Object with chapter_title as string passes the validation check.
@@ -160,8 +154,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected chapter_title to be a string, received True')
 
     def test_invalid_content_count_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.content_count, int))
+        self.assertIsInstance(self.valid_exp_opp_summary.content_count, int)
 
         with self.mock_supported_audio_languages_context:
             # Object with content_count as int passes the validation check.
@@ -172,8 +165,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected content_count to be an integer, received 123abc')
 
     def test_negative_content_count_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.content_count, int))
+        self.assertIsInstance(self.valid_exp_opp_summary.content_count, int)
 
         with self.mock_supported_audio_languages_context:
             # Object with content_count as int passes the validation check.
@@ -399,9 +391,8 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         })
 
     def test_invalid_skill_description_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.skill_description,
-            python_utils.BASESTRING))
+        self.assertIsInstance(
+            self.valid_skill_opportunity.skill_description, str)
 
         # Object with skill_description as string passes the validation check.
         self.valid_skill_opportunity.validate()
@@ -412,8 +403,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
             'Expected skill_description to be a string, received True')
 
     def test_invalid_question_count_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.question_count, int))
+        self.assertIsInstance(self.valid_skill_opportunity.question_count, int)
 
         # Object with question_count as int passes the validation check.
         self.valid_skill_opportunity.validate()
@@ -423,8 +413,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
             'Expected question_count to be an integer, received 123abc')
 
     def test_negative_question_count_fails_validation_check(self):
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.question_count, int))
+        self.assertIsInstance(self.valid_skill_opportunity.question_count, int)
 
         # Object with question_count as int passes the validation check.
         self.valid_skill_opportunity.validate()

@@ -1,4 +1,4 @@
-<div class="learner-story-summary-tile">
+<div class="learner-story-summary-tile" (mouseover)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
   <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
     {{nextIncompleteNodeTitle}}
   </div>
@@ -6,7 +6,7 @@
     <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
       <div class="story-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-          <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+          <img class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
           <div class="oppia-story-completion">
             <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
             <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
@@ -109,6 +109,7 @@
     padding-bottom: 12px;
     text-align: left;
     text-transform: uppercase;
+    width: 100%;
   }
   .learner-story-summary-tile .oppia-story-completed-percent {
     bottom: 24px;
@@ -133,7 +134,7 @@
     border-radius: 4px;
     box-shadow: 0 3px 6px #00000029;
     display: inline-block;
-    height: 224px;
+    height: 250px;
     margin: 0 2px 30px 6px;
     padding: 0;
     position: relative;
@@ -157,9 +158,5 @@
   .learner-story-summary-tile .oppia-story-dashboard-card .story-card:hover + .continue-button {
     display: block;
     float: left;
-  }
-  .learner-story-summary-tile .oppia-story-dashboard-card:hover .oppia-thumbnail-image {
-    -webkit-filter: blur(2px);
-    filter: blur(2px);
   }
 </style>
