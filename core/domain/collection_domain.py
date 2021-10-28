@@ -429,11 +429,12 @@ class Collection(python_utils.OBJECT):
         # YAML representation.
         del collection_dict['id']
 
-        collection_yaml = yaml.dump(
-              collection_dict, allow_unicode=True,
-              default_flow_style=False)
+        return yaml.dump(
+            collection_dict,
+            allow_unicode=True,
+            default_flow_style=False
+        )
 
-        return collection_yaml
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
