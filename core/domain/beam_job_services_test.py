@@ -60,7 +60,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(BeamJobRunServicesTests, self).setUp()
-        self._id_iter = (python_utils.UNICODE(i) for i in itertools.count())
+        self._id_iter = (str(i) for i in itertools.count())
 
     def create_beam_job_run_model(
         self, dataflow_job_id: str = 'abc',

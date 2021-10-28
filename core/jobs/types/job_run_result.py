@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 
 import heapq
 
-from core import python_utils
 from core import utils
 
 from typing import Any, List, Tuple # isort: skip
@@ -140,9 +139,7 @@ class JobRunResult:
         Returns:
             int. The number of bytes encoded by the JobRunResult instance.
         """
-        output_bytes = (
-            python_utils.convert_to_bytes(s) for s in (self.stdout, self.stderr)
-        )
+        output_bytes = (s.encode('utf-8') for s in (self.stdout, self.stderr))
         return sum(len(output) for output in output_bytes)
 
     def __repr__(self) -> str:

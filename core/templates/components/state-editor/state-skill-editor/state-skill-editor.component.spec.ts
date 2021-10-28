@@ -172,10 +172,11 @@ describe('State Skill Editor Component', () => {
     mockNgbModal.modal = 'add_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
-        });
+        }
+      ) as NgbModalRef;
     });
     componentInstance.addSkill();
     fixture.detectChanges();
@@ -193,10 +194,11 @@ describe('State Skill Editor Component', () => {
     mockNgbModal.modal = 'delete_skill';
     const modalSpy = spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModal,
           result: Promise.resolve('success')
-        });
+        }
+      ) as NgbModalRef;
     });
     componentInstance.deleteSkill();
     fixture.detectChanges();

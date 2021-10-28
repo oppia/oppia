@@ -1,4 +1,4 @@
-<div class="oppia-goals-box protractor-test-current-goals-section" [ngStyle]="{'margin-top': checkMobileView()? '35px': '64px'}">
+<div class="oppia-goals-box protractor-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
   <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
   </p>
   <div *ngIf="currentGoals.length > 0">
@@ -234,7 +234,7 @@
     width: 656px
   }
   .oppia-checkbox {
-    left: 570px;
+    left: 585px;
     position: absolute;
     text-align: center;
     transform: translateY(0%);
@@ -248,7 +248,7 @@
     width: 32px;
   }
   .oppia-svg-book-image {
-    left: 565px;
+    left: 580px;
     position: absolute;
     text-align: center;
     transform: translateY(0%);
@@ -297,10 +297,10 @@
   }
   @media screen and (max-width: 1200px) {
     .oppia-checkbox {
-      left: 570px;
+      left: 585px;
     }
     .oppia-svg-book-image {
-      left: 565px;
+      left: 580px;
     }
   }
   @media screen and (max-width: 767px) {
@@ -326,13 +326,14 @@
       width: 300px;
     }
     .oppia-edit-goals-learn-title {
+      right: 8px;
       text-align: end;
     }
     .oppia-edit-goals-content {
       width: 300px;
     }
     .oppia-checkbox {
-      left: 267px;
+      left: 310px;
       text-align: start;
       width: 100px;
     }
@@ -356,11 +357,11 @@
       width: 270px;
     }
     .oppia-svg-book-image {
-      left: 263px;
+      left: 305px;
       text-align: start;
     }
     .oppia-svg-paw-image {
-      left: 47px;
+      left: 90px;
     }
     .oppia-svg-star-image {
       position: relative;
@@ -381,12 +382,12 @@
       width: 430px;
     }
     .oppia-checkbox {
-      left: 215px;
+      left: 207px;
       text-align: end;
       width: 144px;
     }
     .oppia-svg-book-image {
-      left: 340px;
+      left: 328px;
     }
     .oppia-current-goals-content {
       width: 410px;
@@ -400,6 +401,22 @@
     }
     .oppia-current-goals-topic-name {
       width: 365px;
+    }
+  }
+
+  @media(max-width: 400px) {
+    .oppia-goals-box {
+      width: 355px;
+    }
+
+    .oppia-goals-topic-name {
+      width: 200px
+    }
+
+    .oppia-svg-book-image,
+    .oppia-checkbox {
+      left: 260px;
+      margin-left: 0;
     }
   }
 </style>

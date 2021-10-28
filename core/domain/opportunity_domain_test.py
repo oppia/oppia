@@ -85,8 +85,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             obj = opportunity_domain.ExplorationOpportunitySummary.from_dict(
                 exploration_opportunity_summary_dict)
 
-        self.assertTrue(isinstance(
-            obj, opportunity_domain.ExplorationOpportunitySummary))
+        self.assertIsInstance(
+            obj, opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(obj.to_dict(), {
             'id': 'exp_1',
             'topic_name': 'A topic',

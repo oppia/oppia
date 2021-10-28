@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
@@ -43,8 +42,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     EXP_MIGRATION_CHANGE_LIST = [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
         'from_version': '0',
-        'to_version': python_utils.UNICODE(
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
     })]
     DRAFT_CHANGELIST = [exp_domain.ExplorationChange({
         'cmd': 'edit_exploration_property',
@@ -151,8 +149,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
             self.assertEqual(exploration.version, 2)
             self.assertEqual(
-                python_utils.UNICODE(exploration.states_schema_version),
-                target_schema_version)
+                str(exploration.states_schema_version), target_schema_version)
 
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
