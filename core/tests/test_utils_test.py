@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import logging
 import os
 import re
-from unittest import mock
 import sys
+from unittest import mock
 
 from core import python_utils
 from core.constants import constants
