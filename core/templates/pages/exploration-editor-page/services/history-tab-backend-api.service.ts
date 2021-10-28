@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * @fileoverview Backend api service for fetching the learner data;
+ * @fileoverview Backend api service for history tab component;
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';

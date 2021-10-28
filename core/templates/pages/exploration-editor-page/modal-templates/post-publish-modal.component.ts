@@ -64,8 +64,8 @@ export class PostPublishModalComponent
     range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
     range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     let selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
+    selection.removeAllRanges();
+    selection.addRange(range);
     document.execCommand('copy');
     this.explorationLinkCopied = true;
   }
