@@ -163,5 +163,16 @@ describe('Translation language selector', () => {
       component.ngOnInit();
 
       expect(component.languageSelection).toBe('Select a language...');
+      expect(component.activeLanguageCode).toBe(null);
+    });
+
+  it('should display the selected language when the language is already' +
+    ' selected', () => {
+      component.activeLanguageCode = 'en';
+
+      component.ngOnInit();
+
+      expect(component.languageSelection).toBe('English');
+      expect(component.activeLanguageCode).toBe('en');
     });
 });

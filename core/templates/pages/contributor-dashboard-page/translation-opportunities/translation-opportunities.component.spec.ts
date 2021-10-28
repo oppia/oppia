@@ -221,7 +221,10 @@ describe('Translation opportunities component', () => {
       translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       null);
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
+    expect(component.languageSelected).toBe(false);
+
     component.ngOnInit();
+
     expect(component.languageSelected).toBe(false);
   }));
 
