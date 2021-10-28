@@ -74,7 +74,7 @@ angular.module('oppia').controller(
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
           updatedTranslation,
-          (success) => {
+          () => {
             $scope.translationHtml = updatedTranslation;
             $scope.translationUpdated = true;
             ContributionOpportunitiesService.
@@ -231,6 +231,17 @@ angular.module('oppia').controller(
         }
       };
 
+      // Returns the HTML content representing the most up-to-date exploration
+      // content for the active suggestion.
+      $scope.displayExplorationContent = function() {
+        return (
+          $scope.hasExplorationContentChanged() ?
+          $scope.explorationContentHtml :
+          $scope.contentHtml);
+      };
+
+      // Returns whether the active suggestion's exploration_content_html
+      // differs from the content_html of the suggestion's change object.
       $scope.hasExplorationContentChanged = function() {
         if (
           Array.isArray($scope.contentHtml) ||
