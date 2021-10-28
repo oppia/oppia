@@ -41,10 +41,10 @@ from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-from proto_files.org.oppia.proto.v1  import exploration_pb2
-from proto_files.org.oppia.proto.v1  import languages_pb2
-from proto_files.org.oppia.proto.v1  import objects_pb2
-from proto_files.org.oppia.proto.v1  import state_pb2
+from proto_files.org.oppia.proto.v1.structure import exploration_pb2
+from proto_files.org.oppia.proto.v1.structure import languages_pb2
+from proto_files.org.oppia.proto.v1.structure import objects_pb2
+from proto_files.org.oppia.proto.v1.structure import state_pb2
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
