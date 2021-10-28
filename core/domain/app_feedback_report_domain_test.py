@@ -1313,7 +1313,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             ),
             'android_sdk_version': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1})
+                    str(ANDROID_SDK_VERSION): 1})
             ),
             'version_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -1342,8 +1342,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
                 'audio_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
-                'android_sdk_version': {
-                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1},
+                'android_sdk_version': {str(ANDROID_SDK_VERSION): 1},
                 'version_name': {ANDROID_PLATFORM_VERSION: 1}
             }
         }

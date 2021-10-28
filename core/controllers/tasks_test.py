@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -347,9 +346,9 @@ class TasksTests(test_utils.EmailTestBase):
 
         headers = {
             # Need to convert to bytes since test app doesn't allow unicode.
-            'X-Appengine-QueueName': python_utils.convert_to_bytes('queue'),
-            'X-Appengine-TaskName': python_utils.convert_to_bytes('None'),
-            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+            'X-Appengine-QueueName': b'queue',
+            'X-Appengine-TaskName': b'None',
+            'X-AppEngine-Fake-Is-Admin': b'1'
         }
         csrf_token = self.get_new_csrf_token()
 

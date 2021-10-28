@@ -24,7 +24,6 @@ import re
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -246,8 +245,7 @@ class StoryNode:
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + python_utils.UNICODE(
-            current_number + 1)
+        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
         return incremented_node_id
 
     @classmethod
@@ -257,7 +255,7 @@ class StoryNode:
         Args:
             node_id: str. The node id to be validated.
         """
-        if not isinstance(node_id, python_utils.BASESTRING):
+        if not isinstance(node_id, str):
             raise utils.ValidationError(
                 'Expected node ID to be a string, received %s' %
                 node_id)
@@ -358,7 +356,7 @@ class StoryNode:
                 invalid.
         """
         if self.exploration_id:
-            if not isinstance(self.exploration_id, python_utils.BASESTRING):
+            if not isinstance(self.exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
@@ -383,17 +381,17 @@ class StoryNode:
                 'Expected exploration ID to not be an empty string, '
                 'received %s' % self.exploration_id)
 
-        if not isinstance(self.outline, python_utils.BASESTRING):
+        if not isinstance(self.outline, str):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s' %
                 self.description)
@@ -424,7 +422,7 @@ class StoryNode:
                 'Expected prerequisite skill ids to be a list, received %s' %
                 self.prerequisite_skill_ids)
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each prerequisite skill id to be a string, '
                     'received %s' % skill_id)
@@ -439,7 +437,7 @@ class StoryNode:
                 'Expected acquired skill ids to be a list, received %s' %
                 self.acquired_skill_ids)
         for skill_id in self.acquired_skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each acquired skill id to be a string, '
                     'received %s' % skill_id)
@@ -726,7 +724,7 @@ class Story:
         """
         self.require_valid_title(self.title)
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -748,7 +746,7 @@ class Story:
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Story thumbnail background color is not specified.')
-        if not isinstance(self.notes, python_utils.BASESTRING):
+        if not isinstance(self.notes, str):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
 
@@ -765,7 +763,7 @@ class Story:
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                     self.story_contents_schema_version))
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -774,8 +772,7 @@ class Story:
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if not isinstance(
-                self.corresponding_topic_id, python_utils.BASESTRING):
+        if not isinstance(self.corresponding_topic_id, str):
             raise utils.ValidationError(
                 'Expected corresponding_topic_id should be a string, received: '
                 '%s' % self.corresponding_topic_id)
@@ -789,7 +786,7 @@ class Story:
         Args:
             story_id: str. The story id to validate.
         """
-        if not isinstance(story_id, python_utils.BASESTRING):
+        if not isinstance(story_id, str):
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
@@ -804,7 +801,7 @@ class Story:
             title: str. The title to validate.
         """
 
-        if not isinstance(title, python_utils.BASESTRING):
+        if not isinstance(title, str):
             raise utils.ValidationError('Title should be a string.')
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
@@ -1573,14 +1570,14 @@ class StorySummary:
                 self.url_fragment, 'Story Url Fragment',
                 constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
 
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
 
         if self.title == '':
             raise utils.ValidationError('Title field should not be empty')
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -1591,7 +1588,7 @@ class StorySummary:
                     self.node_titles))
 
         for title in self.node_titles:
-            if not isinstance(title, python_utils.BASESTRING):
+            if not isinstance(title, str):
                 raise utils.ValidationError(
                     'Expected each chapter title to be a string, received %s'
                     % title)
@@ -1611,7 +1608,7 @@ class StorySummary:
             raise utils.ValidationError(
                 'Story thumbnail background color is not specified.')
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

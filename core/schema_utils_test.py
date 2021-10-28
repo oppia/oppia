@@ -23,7 +23,6 @@ import inspect
 import re
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core.domain import email_manager
 from core.tests import test_utils
@@ -382,16 +381,14 @@ def validate_schema(schema: Dict[str, Any]) -> None:
                 prop,
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION])
-            assert isinstance(prop[SCHEMA_KEY_NAME], python_utils.BASESTRING), (
-                'Expected %s, got %s' % (
-                    python_utils.BASESTRING, prop[SCHEMA_KEY_NAME]))
+            assert isinstance(prop[SCHEMA_KEY_NAME], str), (
+                'Expected %s, got %s' % (str, prop[SCHEMA_KEY_NAME]))
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
                 assert isinstance(
-                    prop[SCHEMA_KEY_DESCRIPTION], python_utils.BASESTRING), (
+                    prop[SCHEMA_KEY_DESCRIPTION], str), (
                         'Expected %s, got %s' % (
-                            python_utils.BASESTRING,
-                            prop[SCHEMA_KEY_DESCRIPTION]))
+                            str, prop[SCHEMA_KEY_DESCRIPTION]))
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         _validate_dict_keys(
             schema,
@@ -1376,7 +1373,7 @@ class ValidateClassForTesting:
 
     def validate(self) -> None:
         """Method to validate the test object."""
-        if not isinstance(self.arg_a, python_utils.BASESTRING):
+        if not isinstance(self.arg_a, str):
             raise Exception('Invalid type arg_a.')
-        if not isinstance(self.arg_b, python_utils.BASESTRING):
+        if not isinstance(self.arg_b, str):
             raise Exception('Invalid type arg_b.')

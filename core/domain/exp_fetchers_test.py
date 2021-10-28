@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -441,10 +440,8 @@ title: Old Title
         # Version 4 is an upgrade based on the migration job.
         commit_cmds = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': python_utils.UNICODE(
-                exploration_model.states_schema_version),
-            'to_version': python_utils.UNICODE(
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+            'from_version': str(exploration_model.states_schema_version),
+            'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USERNAME, exploration_model.id, commit_cmds,
@@ -504,8 +501,7 @@ title: Old Title
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '41',
-                'to_version': python_utils.UNICODE(
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
             'version_number': 4,
         }

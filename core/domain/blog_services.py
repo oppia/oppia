@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
@@ -302,7 +301,7 @@ def does_blog_post_with_url_fragment_exist(url_fragment):
     Raises:
         Exception. Blog Post URL fragment is not a string.
     """
-    if not isinstance(url_fragment, python_utils.BASESTRING):
+    if not isinstance(url_fragment, str):
         raise utils.ValidationError(
             'Blog Post URL fragment should be a string. Recieved:'
             '%s' % url_fragment)

@@ -23,7 +23,6 @@ import datetime
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import exp_services
@@ -215,7 +214,7 @@ class AppFeedbackReport:
             ValidationError. The user id is not a string.
             ValidationError. The user id is not a valid id format.
         """
-        if not isinstance(scrubber_id, python_utils.BASESTRING):
+        if not isinstance(scrubber_id, str):
             raise utils.ValidationError(
                 'The scrubbed_by user must be a string, but got %r' % (
                     scrubber_id))
@@ -544,7 +543,7 @@ class UserSuppliedFeedback:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
                         category))
-            if not isinstance(other_text_input, python_utils.BASESTRING):
+            if not isinstance(other_text_input, str):
                 raise utils.ValidationError(
                     'Invalid input text, must be a string, received: %r.' % (
                         other_text_input))
@@ -562,7 +561,7 @@ class UserSuppliedFeedback:
             ValidationError. The item is not a valid selection option.
         """
         for item in selected_items:
-            if not isinstance(item, python_utils.BASESTRING):
+            if not isinstance(item, str):
                 raise utils.ValidationError(
                     'Invalid option %s selected by user.' % item)
 
@@ -690,7 +689,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
         if self.device_model is None:
             raise utils.ValidationError('No device model supplied.')
-        if not isinstance(self.device_model, python_utils.BASESTRING):
+        if not isinstance(self.device_model, str):
             raise utils.ValidationError(
                 'Android device model must be an string, received: %r.' % (
                     self.device_model))
@@ -698,7 +697,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.require_valid_sdk_version(self.sdk_version)
         if self.build_fingerprint is None:
             raise utils.ValidationError('No build fingerprint supplied.')
-        if not isinstance(self.build_fingerprint, python_utils.BASESTRING):
+        if not isinstance(self.build_fingerprint, str):
             raise utils.ValidationError(
                 'Build fingerprint must be a string, received: %r.' % (
                     self.build_fingerprint))
@@ -718,7 +717,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """
         if version_name is None:
             raise utils.ValidationError('No version name supplied.')
-        if not isinstance(version_name, python_utils.BASESTRING):
+        if not isinstance(version_name, str):
             raise utils.ValidationError(
                 'Version name must be a string, received: %r.' % version_name)
         if len(version_name.split(
@@ -769,7 +768,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if locale_code is None:
             raise utils.ValidationError(
                 'No device %s locale code supplied.' % locale_type)
-        if not isinstance(locale_code, python_utils.BASESTRING):
+        if not isinstance(locale_code, str):
             raise utils.ValidationError(
                 'The device\'s %s locale code must be an string, '
                 'received: %r.' % (locale_type, locale_code))
@@ -1014,7 +1013,7 @@ class AndroidAppContext(AppContext):
         if language_code is None:
             raise utils.ValidationError(
                 'No app %s language code supplied.' % language_type)
-        if not isinstance(language_code, python_utils.BASESTRING):
+        if not isinstance(language_code, str):
             raise utils.ValidationError(
                 'Expected the app\'s %s language code to be a string, '
                 'received: %r' % (language_type, language_code))
@@ -1133,7 +1132,7 @@ class EntryPoint:
         expected_name = expected_entry_point.name
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
-        if not isinstance(actual_name, python_utils.BASESTRING):
+        if not isinstance(actual_name, str):
             raise utils.ValidationError(
                 'Entry point name must be a string, received: %r.' % (
                     actual_name))
@@ -1157,7 +1156,7 @@ class EntryPoint:
         Raises:
             ValidationError. The exploration ID is not a valid ID.
         """
-        if not isinstance(exploration_id, python_utils.BASESTRING):
+        if not isinstance(exploration_id, str):
             raise utils.ValidationError(
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
@@ -1429,7 +1428,7 @@ class AppFeedbackReportTicket:
         Raises:
             ValidationError. The id is an invalid format.
         """
-        if not isinstance(ticket_id, python_utils.BASESTRING):
+        if not isinstance(ticket_id, str):
             raise utils.ValidationError(
                 'The ticket id should be a string, received: %s' % (
                     ticket_id))
@@ -1449,7 +1448,7 @@ class AppFeedbackReportTicket:
         """
         if ticket_name is None:
             raise utils.ValidationError('No ticket name supplied.')
-        if not isinstance(ticket_name, python_utils.BASESTRING):
+        if not isinstance(ticket_name, str):
             raise utils.ValidationError(
                 'The ticket name should be a string, received: %s' % (
                     ticket_name))
@@ -1494,7 +1493,7 @@ class AppFeedbackReportTicket:
         Raises:
             ValidationError. The repo name is invalid.
         """
-        if not isinstance(repo_name, python_utils.BASESTRING):
+        if not isinstance(repo_name, str):
             raise utils.ValidationError(
                 'The Github repo name should be a string, received: %s' % (
                     repo_name))
@@ -1592,7 +1591,7 @@ class AppFeedbackReportDailyStats:
         Raises:
             ValidationError. The id is an invalid format.
         """
-        if not isinstance(stats_id, python_utils.BASESTRING):
+        if not isinstance(stats_id, str):
             raise utils.ValidationError(
                 'The stats id should be a string, received: %r' % stats_id)
         if len(stats_id.split(constants.STATS_ID_DELIMITER)) != 3:
@@ -1660,7 +1659,7 @@ class ReportStatsParameterValueCounts:
                 ReportStatsParameterValueCounts are not valid.
         """
         for (param_value, param_count) in self.parameter_value_counts.items():
-            if not isinstance(param_value, python_utils.BASESTRING):
+            if not isinstance(param_value, str):
                 raise utils.ValidationError(
                     'The parameter value should be a string, received: %r' % (
                         param_value))

@@ -29,7 +29,6 @@ import copy
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
@@ -303,7 +302,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     Returns:
         Exploration. The domain object corresponding to the given exploration.
     """
-    sub_namespace = python_utils.UNICODE(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_exploration = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION,
         sub_namespace,

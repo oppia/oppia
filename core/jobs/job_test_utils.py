@@ -24,7 +24,6 @@ import contextlib
 import datetime
 import re
 
-from core import python_utils
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.types import job_run_result
@@ -243,7 +242,7 @@ def decorate_beam_errors() -> Iterator[None]:
     try:
         yield
     except beam_testing_util.BeamAssertException as exception:
-        exception_message = python_utils.UNICODE(exception)
+        exception_message = str(exception)
         match = (
             re.match(
                 r'.*'

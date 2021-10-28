@@ -813,8 +813,7 @@ class FirebaseAdminSdkStub:
             page.users = page_list[page_index]
             page.has_next_page = (page_index + 1) < len(page_list)
             page.next_page_token = (
-                '' if not page.has_next_page else
-                python_utils.UNICODE(page_index + 1))
+                '' if not page.has_next_page else str(page_index + 1))
             page.get_next_page = lambda: (
                 None if not page.has_next_page else
                 self._create_list_users_page_fragile(page_list, page_index + 1))

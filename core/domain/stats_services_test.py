@@ -1939,7 +1939,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, python_utils.UNICODE(self.exploration.version),
+            self.exploration.id, str(self.exploration.version),
             self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 

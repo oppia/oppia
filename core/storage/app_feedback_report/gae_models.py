@@ -276,8 +276,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             submitted_on_datetime)
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
-                python_utils.UNICODE(
-                    utils.get_random_int(base_models.RAND_RANGE)),
+                str(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
                 platform, int(submitted_datetime_in_msec), random_hash)
@@ -546,8 +545,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             name_hash = utils.convert_to_hash(
                 ticket_name, base_models.ID_LENGTH)
             random_hash = utils.convert_to_hash(
-                python_utils.UNICODE(
-                    utils.get_random_int(base_models.RAND_RANGE)),
+                str(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
                 int(current_datetime_in_msec), name_hash, random_hash)

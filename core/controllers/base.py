@@ -561,7 +561,7 @@ class BaseHandler(webapp2.RequestHandler):
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
                 self.response.headers['X-Frame-Options'] = (
-                    python_utils.UNICODE(iframe_restriction))
+                    str(iframe_restriction))
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -672,31 +672,26 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(
-                401, {'error': python_utils.UNICODE(exception)})
+            self._render_exception(401, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(
-                400, {'error': python_utils.UNICODE(exception)})
+            self._render_exception(400, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(
-                500, {'error': python_utils.UNICODE(exception)})
+            self._render_exception(500, {'error': str(exception)})
             return
 
         if isinstance(exception, self.TemporaryMaintenanceException):
             self.error(503)
-            self._render_exception(
-                503, {'error': python_utils.UNICODE(exception)})
+            self._render_exception(503, {'error': str(exception)})
             return
 
         self.error(500)
-        self._render_exception(
-            500, {'error': python_utils.UNICODE(exception)})
+        self._render_exception(500, {'error': str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -754,7 +749,7 @@ class CsrfTokenManager:
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = python_utils.UNICODE(int(issued_on))
+        issued_on = str(int(issued_on))
 
         digester = hmac.new(CSRF_SECRET.value.encode('utf-8'))
         digester.update(user_id.encode('utf-8'))

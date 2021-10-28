@@ -23,7 +23,6 @@ import datetime
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -1991,8 +1990,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             len(self.learner_answer_details.learner_answer_info_list), 1)
         for i in range(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + python_utils.UNICODE(
-                    i), answer, answer_details, created_on)
+                id_base + str(i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
         self.assertEqual(

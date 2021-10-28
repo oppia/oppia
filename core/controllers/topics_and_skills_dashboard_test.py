@@ -361,8 +361,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             json_response['skill_summary_dicts'][1]['id'],
             self.subtopic_skill_id)
         self.assertTrue(json_response['more'])
-        self.assertTrue(
-            isinstance(json_response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(json_response['next_cursor'], str)
 
         next_cursor = json_response['next_cursor']
 
