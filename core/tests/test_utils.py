@@ -2324,7 +2324,7 @@ title: Title
         """
         if use_payload:
             if 'files' in data:
-                # bytes type data cannot be used as the json value
+                # Bytes type data cannot be used as the json value
                 # json cannot serialize object of type bytes.
                 data['files'] = {k: str(v) for k, v in data['files'].items()}
             data = {'payload': json.dumps(data)}
