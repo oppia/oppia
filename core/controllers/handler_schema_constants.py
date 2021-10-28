@@ -19,7 +19,7 @@
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 
-"""Contains a list of handler class names which does not contain the schema.
+"""Contains a list of handler class names that do not contain schema.
 """
 
 from __future__ import unicode_literals
