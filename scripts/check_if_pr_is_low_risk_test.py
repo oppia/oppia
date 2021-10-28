@@ -99,7 +99,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/modified\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '-    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             if tokens[-1] == 'old':
                 return (
@@ -109,7 +109,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ /dev/null\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '-    print(s)\n'
-                    '-    python_utils.PRINT(s)\n'
+                    '-    print(s)\n'
                 )
             if tokens[-1] == 'new':
                 return (
@@ -119,7 +119,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/new\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '+    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             if tokens[-1] == 'added':
                 return (
@@ -129,7 +129,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/added\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '+    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             raise AssertionError(
                 'Unknown args to mock_run_cmd: %s' % tokens)
@@ -171,19 +171,19 @@ class LoadDiffTests(test_utils.GenericTestBase):
         expected_file_diffs = {
             'modified': [
                 '-    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
             'old': [
                 '-    print(s)',
-                '-    python_utils.PRINT(s)',
+                '-    print(s)',
             ],
             'new': [
                 '+    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
             'added': [
                 '+    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
         }
         self.assertListEqual(diff_files, expected_diff_files)
@@ -638,7 +638,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            python_utils, 'PRINT', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type changelog '
                     'because: Source branch does not indicate a '
@@ -731,7 +731,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            python_utils, 'PRINT', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '
@@ -824,7 +824,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            python_utils, 'PRINT', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Invalid change foo',
@@ -921,7 +921,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            python_utils, 'PRINT', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '

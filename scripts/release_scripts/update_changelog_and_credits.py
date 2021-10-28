@@ -128,16 +128,17 @@ def is_order_of_sections_valid(release_summary_lines):
     sections = [
         line for line in release_summary_lines if line.startswith('###')
     ]
+    
     for section, next_section in EXPECTED_ORDERING_DICT.items():
         if section not in sections:
-            python_utils.PRINT(
+            print(
                 'Expected release_summary to have %s section to ensure '
                 'that automatic updates to changelog and credits are '
                 'correct.' % section.strip())
             return False
         index = sections.index(section)
         if index + 1 >= len(sections) or sections[index + 1] != next_section:
-            python_utils.PRINT(
+            print(
                 'Expected %s section to be followed by %s section in '
                 'release_summary to ensure that automatic updates to '
                 'changelog and credits are correct.' % (
@@ -213,7 +214,7 @@ def update_changelog(
             ../release_summary.md.
         current_release_version_number: str. The version of current release.
     """
-    python_utils.PRINT('Updating Changelog...')
+    print('Updating Changelog...')
     start_index = release_summary_lines.index(
         constants.release_constants.CHANGELOG_HEADER) + 1
     end_index = release_summary_lines.index(
@@ -251,7 +252,7 @@ def update_changelog(
     with python_utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
         for line in changelog_lines:
             changelog_file.write(line)
-    python_utils.PRINT('Updated Changelog!')
+    print('Updated Changelog!')
 
 
 def get_new_authors(release_summary_lines):
@@ -309,10 +310,10 @@ def update_authors(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating AUTHORS file...')
+    print('Updating AUTHORS file...')
     new_authors = get_new_authors(release_summary_lines)
     update_sorted_file(AUTHORS_FILEPATH, new_authors)
-    python_utils.PRINT('Updated AUTHORS file!')
+    print('Updated AUTHORS file!')
 
 
 def update_contributors(release_summary_lines):
@@ -322,10 +323,10 @@ def update_contributors(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating CONTRIBUTORS file...')
+    print('Updating CONTRIBUTORS file...')
     new_contributors = get_new_contributors(release_summary_lines)
     update_sorted_file(CONTRIBUTORS_FILEPATH, new_contributors)
-    python_utils.PRINT('Updated CONTRIBUTORS file!')
+    print('Updated CONTRIBUTORS file!')
 
 
 def update_developer_names(release_summary_lines):
@@ -335,7 +336,7 @@ def update_developer_names(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating about-page file...')
+    print('Updating about-page file...')
     new_developer_names = get_new_contributors(
         release_summary_lines, return_only_names=True)
 
@@ -355,7 +356,7 @@ def update_developer_names(release_summary_lines):
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
             about_page_file.write(python_utils.UNICODE(line))
-    python_utils.PRINT('Updated about-page file!')
+    print('Updated about-page file!')
 
 
 def remove_updates_and_delete_branch(repo_fork, target_branch):
@@ -396,7 +397,7 @@ def create_branch(
         github_username: str. The github username of the user.
         current_release_version_number: str. The version of current release.
     """
-    python_utils.PRINT(
+    print(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
         'CHANGELOG, about-page, and package.json...')
     sb = repo.get_branch('develop')
@@ -414,7 +415,7 @@ def create_branch(
         'https://github.com/oppia/oppia/compare/develop...%s:%s?'
         'expand=1&title=Update authors and changelog for v%s' % (
             github_username, target_branch, current_release_version_number))
-    python_utils.PRINT(
+    print(
         'Pushed changes to Github. '
         'Please create a pull request from the %s branch\n\n'
         'Note: PR title should be exactly: '
@@ -440,7 +441,7 @@ def is_invalid_email_present(release_summary_lines):
     invalid_email_ids = [
         email_id for email_id in new_email_ids
         if constants.release_constants.INVALID_EMAIL_SUFFIX in email_id]
-    python_utils.PRINT(
+    print(
         'Following email ids are invalid: %s' % invalid_email_ids)
     return bool(invalid_email_ids)
 
@@ -541,7 +542,7 @@ def main():
     remove_updates_and_delete_branch(repo_fork, target_branch)
 
     # Opens Credit Form.
-    python_utils.PRINT(
+    print(
         'Note: Make following changes directly to %s and make sure to '
         'save the file after making these changes.' % (
             constants.release_constants.RELEASE_SUMMARY_FILEPATH))

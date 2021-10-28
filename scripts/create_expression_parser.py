@@ -21,8 +21,6 @@ import argparse
 import os
 import subprocess
 
-from core import python_utils
-
 from . import common
 from . import setup
 
@@ -50,7 +48,7 @@ def main(args=None):
         os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
         expression_parser_definition, expression_parser_js])
 
-    python_utils.PRINT('Done!')
+    print('Done!')
 
 
 if __name__ == '__main__':

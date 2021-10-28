@@ -88,7 +88,7 @@ def load_diff(base_branch):
             continue
         split = line.split()
         if len(split) < 2 or len(split) > 3:
-            python_utils.PRINT(
+            print(
                 'Failed to parse diff --name-status line "%s"'
                 % line)
             return [], {}
@@ -121,7 +121,7 @@ def load_diff(base_branch):
             if i == len(file_diff_split):
                 # We reached the end of the diff without finding the
                 # header, or the header consumes the entire diff.
-                python_utils.PRINT(
+                print(
                     'Failed to find end of header in "%s" diff'
                     % filename)
                 return [], {}
@@ -311,13 +311,13 @@ def main(tokens=None):
         reason_not_low_risk = low_risk_checker(
             pr, diff_files, file_diffs)
         if reason_not_low_risk:
-            python_utils.PRINT(
+            print(
                 'PR is not a low-risk PR of type %s because: %s' %
                 (low_risk_type, reason_not_low_risk))
         else:
-            python_utils.PRINT('PR is low-risk. Skipping some CI checks.')
+            print('PR is low-risk. Skipping some CI checks.')
             return 0
-    python_utils.PRINT('PR is not low-risk. Running all CI checks.')
+    print('PR is not low-risk. Running all CI checks.')
     return 1
 
 

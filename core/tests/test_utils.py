@@ -991,7 +991,7 @@ class TestBase(unittest.TestCase):
         that calls the test.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
-        python_utils.PRINT(
+        print(
             b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
 
     def shortDescription(self):
@@ -3362,7 +3362,7 @@ class LinterTestBase(GenericTestBase):
         self.linter_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             linter_stdout list.
 
             Args:

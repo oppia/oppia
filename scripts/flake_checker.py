@@ -20,8 +20,6 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-from core import python_utils
-
 import requests
 
 FLAKE_CHECK_AND_REPORT_URL = (
@@ -65,7 +63,7 @@ def _print_color_message(message):
         message: str. The success message to print.
     """
     # \033[91m is the ANSI escape sequences for green color.
-    python_utils.PRINT('\033[92m' + message + '\033[0m\n')
+    print('\033[92m' + message + '\033[0m\n')
 
 
 def check_if_on_ci():

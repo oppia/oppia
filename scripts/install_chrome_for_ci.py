@@ -82,7 +82,7 @@ def main():
                 'Version {} was found instead.'
             ).format(CHROME_VERSION, found_version)
         )
-    python_utils.PRINT(
+    print(
         'Chrome version {} installed.'.format(found_version))
 
 

@@ -22,8 +22,6 @@ import os
 import subprocess
 import sys
 
-from core import python_utils
-
 from . import build
 from . import check_frontend_test_coverage
 from . import common
@@ -69,10 +67,10 @@ _PARSER.add_argument(
     action='store_true'
 )
 
-
+print
 def run_dtslint_type_tests():
     """Runs the dtslint type tests in typings/tests."""
-    python_utils.PRINT('Running dtslint type tests.')
+    ('Running dtslint type tests.')
 
     # Pass the local version of typescript. Otherwise, dtslint will download and
     # install all versions of typescript.
@@ -89,9 +87,9 @@ def run_dtslint_type_tests():
         if len(line) == 0 and task.poll() is not None:
             break
         if line:
-            python_utils.PRINT(line, end='')
+            print(line, end='')
             output_lines.append(line)
-    python_utils.PRINT('Done!')
+    print('Done!')
     if task.returncode:
         sys.exit('The dtslint (type tests) failed.')
 
@@ -118,7 +116,7 @@ def main(args=None):
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
     if parsed_args.run_minified_tests:
-        python_utils.PRINT('Running test in production environment')
+        print('Running test in production environment')
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
@@ -141,16 +139,16 @@ def main(args=None):
         if line and not '[web-server]:' in line.decode('utf-8'):
             # Standard output is in bytes, we need to decode
             # the line to print it.
-            python_utils.PRINT(line.decode('utf-8'), end='')
+            print(line.decode('utf-8'), end='')
             output_lines.append(line)
     # Standard output is in bytes, we need to decode the line to print it.
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)
 
-    python_utils.PRINT('Done!')
+    print('Done!')
 
     if 'Trying to get the Angular injector' in concatenated_output:
-        python_utils.PRINT(
+        print(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
             'Frontend-unit-tests-guide#how-to-handle-common-errors'

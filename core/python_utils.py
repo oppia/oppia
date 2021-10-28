@@ -50,7 +50,6 @@ BASESTRING = past.builtins.basestring
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
-PRINT = print
 UNICODE = builtins.str
 ZIP = builtins.zip
 

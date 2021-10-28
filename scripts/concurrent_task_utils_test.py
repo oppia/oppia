@@ -41,7 +41,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.task_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             task_stdout list.
 
             Args:
