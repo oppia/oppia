@@ -29,6 +29,9 @@ from typing_extensions import TypedDict
 class PartialExplorationOpportunitySummaryDict(TypedDict):
     """A dictionary representing partial fields of
     ExplorationOpportunitySummary object.
+
+    This dict has only required fields to represent
+    an opportunity to a contributor
     """
 
     id: str
