@@ -28,13 +28,13 @@ from core.constants import constants
 from core.domain import html_cleaner
 
 from typing import List, Optional
-import typing_extensions
+from typing_extensions import TypedDict
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
 
 
-class BlogPostDict(typing_extensions.TypedDict):
+class BlogPostDict(TypedDict):
     """Dict type for BlogPost object."""
 
     id: str
@@ -48,7 +48,7 @@ class BlogPostDict(typing_extensions.TypedDict):
     published_on: Optional[str]
 
 
-class BlogPostRightsDict(typing_extensions.TypedDict):
+class BlogPostRightsDict(TypedDict):
     """Dict type for BlogPostRights object."""
 
     blog_post_id: str
@@ -56,7 +56,7 @@ class BlogPostRightsDict(typing_extensions.TypedDict):
     blog_post_is_published: bool
 
 
-class BlogPostSummaryDict(typing_extensions.TypedDict):
+class BlogPostSummaryDict(TypedDict):
     """Dict type for BlogPostSummary object."""
 
     id: str
@@ -142,8 +142,8 @@ class BlogPost:
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
         assert isinstance(self.thumbnail_filename, str), (
-            'Expected thumbnail filename to be a string, received %s'
-            % self.thumbnail_filename)
+            'Expected thumbnail filename to be a string, received %s' %
+            self.thumbnail_filename)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
 
         if not isinstance(self.content, python_utils.BASESTRING):
@@ -340,7 +340,7 @@ class BlogPost:
         """
         assert isinstance(self.thumbnail_filename, str), (
             'Expected thumbnail filename to be a string, received %s'
-            % self.thumbnail_filename)
+            % new_thumbnail_filename)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         self.thumbnail_filename = new_thumbnail_filename
 

@@ -25,7 +25,7 @@ from core import python_utils
 from core import utils
 
 from typing import Any, Dict, Optional, Union
-import typing_extensions
+from typing_extensions import TypedDict
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -51,7 +51,7 @@ class StaleAuthSessionError(Exception):
     pass
 
 
-class AuthClaimsDict(typing_extensions.TypedDict):
+class AuthClaimsDict(TypedDict):
     """Dictionary representing the AuthClaims object."""
 
     sub: str
