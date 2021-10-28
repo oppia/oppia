@@ -17,7 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -40,8 +39,3 @@ export class EditorReloadingModalComponent
     }, 2500);
   }
 }
-
-angular.module('oppia').factory('oppiaEditorReloadingModal',
-  downgradeComponent({
-    component: EditorReloadingModalComponent
-  }) as angular.IDirectiveFactory);
