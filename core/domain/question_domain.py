@@ -39,6 +39,9 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
+from proto_files import languages_pb2
+from proto_files import objects_pb2
+from proto_files import state_pb2
 
 from pylatexenc import latex2text
 
@@ -138,7 +141,7 @@ class Question:
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids,
-            created_on=None, last_updated=None):
+            proto_size_in_bytes=None, created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
@@ -160,6 +163,7 @@ class Question:
                 created.
             last_updated: datetime.datetime. Date and time when the
                 question was last updated.
+            proto_size_in_bytes: int. Size of question.
         """
         self.id = question_id
         self.question_state_data = question_state_data
@@ -172,6 +176,7 @@ class Question:
             inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -187,6 +192,7 @@ class Question:
             'language_code': self.language_code,
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
+            'proto_size_in_bytes': self.proto_size_in_bytes,
             'inapplicable_skill_misconception_ids': (
                 self.inapplicable_skill_misconception_ids)
         }
@@ -1320,6 +1326,11 @@ class Question:
                 'Expected version to be an integer, received %s' %
                 self.version)
 
+        if not isinstance(self.proto_size_in_bytes, int):
+            raise utils.ValidationError(
+                'Expected proto size to be a int, received %s'
+                % self.proto_size_in_bytes)
+
         self.partial_validate()
 
     @classmethod
@@ -1335,7 +1346,8 @@ class Question:
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['inapplicable_skill_misconception_ids'])
+            question_dict['inapplicable_skill_misconception_ids'],
+            question_dict['proto_size_in_bytes'])
 
         return question
 
@@ -1351,11 +1363,18 @@ class Question:
             Question. A Question domain object with default values.
         """
         default_question_state_data = cls.create_default_question_state()
-
-        return cls(
+        question = cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [])
+
+        question_android_proto = cls.to_proto(
+            question_id, default_question_state_data, 0, skill_ids)
+        question_android_proto_size = cls.calculate_size_of_proto(
+            question_android_proto)
+        cls.update_proto_size_in_bytes(cls, question_android_proto_size)
+
+        return question
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -1373,6 +1392,13 @@ class Question:
             linked_skill_ids: list(str). The skill ids linked to the question.
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
+
+    def update_proto_size_in_bytes(self, proto_size_in_bytes):
+        """Update question's size in proto.
+        Args:
+            proto_size_in_bytes: int. Size of exploration.
+        """
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     def update_inapplicable_skill_misconception_ids(
             self, inapplicable_skill_misconception_ids):
@@ -1395,6 +1421,44 @@ class Question:
                 representing the question state data.
         """
         self.question_state_data = question_state_data
+
+    @classmethod
+    def to_proto(
+            cls, question_id, question_state_data, question_state_data_schema_version, skill_ids):
+        """Calculate the question size by setting question proto.
+        Args:
+            question_id: str. The unique ID of the question.
+            question_state_data_schema_version: int. The schema version of the
+                question states (equivalent to the states schema version of
+                explorations).
+            skill_ids: list(str). List of skill IDs attached to this question.
+            question_state_data: list. The list of state
+                domain objects.
+        Returns:
+            Proto Object. The exploration proto object.
+        """
+        state_protos = None
+        if question_state_data is not None:
+            state_protos = state_domain.State._to_state_proto(question_state_data)
+
+        linked_skill_id_list_proto = cls._to_linked_skill_id_list_proto(skill_ids)
+
+        question_proto = question_pb2.Question(
+            id=question_id,
+            linked_skill_ids=linked_skill_id_list_proto,
+            content_version=question_state_data_schema_version,
+            question_state=state_protos
+        )
+        print(question_proto)
+        return question_proto
+
+    def _to_linked_skill_id_list_proto(cls, skill_ids):
+        lined_skill_id_list = []
+        
+        for skill_id in skill_ids:
+            lined_skill_id_list.append(skill_id)
+
+        return lined_skill_id_list
 
 
 class QuestionSummary:
