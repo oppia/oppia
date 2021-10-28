@@ -207,9 +207,7 @@ def validate_suggestion_images(files):
 
     Args:
         files: dict. Data that needs to be validated.
-
     """
-    for filename,raw_image in files.items():
+    for filename, raw_image in files.items():
         image_validation_services.validate_image_and_filename(
-            raw_image,filename)
-
+            raw_image, filename)
