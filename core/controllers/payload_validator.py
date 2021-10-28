@@ -27,6 +27,8 @@ from core import schema_utils
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
+# Here Dict[str, Any] is used for arg_schema because the value field of the
+# schema is itself a dict which furthur contains several nested dicts.
 def get_schema_type(arg_schema: Dict[str, Any]) -> str:
     """Returns the schema type for an argument.
 
@@ -39,6 +41,8 @@ def get_schema_type(arg_schema: Dict[str, Any]) -> str:
     return arg_schema['schema']['type']
 
 
+# Here Dict[str, Any] is used for arg_schema because the value field of the
+# schema is itself a dict which furthur contains several nested dicts.
 def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
     """Returns the new key for an argument from its schema.
 
