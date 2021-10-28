@@ -26,8 +26,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { Collection } from 'domain/collection/collection.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Collection editor navbar breadcrumb component', () => {
+describe('Collection editor navbar breadcrumb component', () => {
   let collectionEditorStateService: CollectionEditorStateService;
   let collectionEditorRoutingService: CollectionEditorRoutingService;
   let focusManagerService: FocusManagerService;
