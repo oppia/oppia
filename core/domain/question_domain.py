@@ -39,9 +39,9 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
-from proto_files import languages_pb2
-from proto_files import objects_pb2
-from proto_files import state_pb2
+from proto_files.org.oppia.proto.v1 import languages_pb2
+from proto_files.org.oppia.proto.v1 import objects_pb2
+from proto_files.org.oppia.proto.v1 import state_pb2
 
 from pylatexenc import latex2text
 
@@ -1439,9 +1439,11 @@ class Question:
         """
         state_protos = None
         if question_state_data is not None:
-            state_protos = state_domain.State._to_state_proto(question_state_data)
+            state_protos = state_domain.State._to_state_proto(
+                question_state_data)
 
-        linked_skill_id_list_proto = cls._to_linked_skill_id_list_proto(skill_ids)
+        linked_skill_id_list_proto = cls._to_linked_skill_id_list_proto(
+            skill_ids)
 
         question_proto = question_pb2.Question(
             id=question_id,
@@ -1449,12 +1451,11 @@ class Question:
             content_version=question_state_data_schema_version,
             question_state=state_protos
         )
-        print(question_proto)
         return question_proto
 
     def _to_linked_skill_id_list_proto(cls, skill_ids):
         lined_skill_id_list = []
-        
+
         for skill_id in skill_ids:
             lined_skill_id_list.append(skill_id)
 
