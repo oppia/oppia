@@ -24,7 +24,6 @@ import sys
 import tarfile
 import urllib.request as urlrequest
 
-from core import python_utils
 
 from . import common
 

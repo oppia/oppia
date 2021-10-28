@@ -128,7 +128,6 @@ def is_order_of_sections_valid(release_summary_lines):
     sections = [
         line for line in release_summary_lines if line.startswith('###')
     ]
-    
     for section, next_section in EXPECTED_ORDERING_DICT.items():
         if section not in sections:
             print(

@@ -26,7 +26,6 @@ import site
 import subprocess
 import sys
 
-from core import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 

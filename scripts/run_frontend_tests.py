@@ -67,10 +67,10 @@ _PARSER.add_argument(
     action='store_true'
 )
 
-print
+
 def run_dtslint_type_tests():
     """Runs the dtslint type tests in typings/tests."""
-    ('Running dtslint type tests.')
+    print('Running dtslint type tests.')
 
     # Pass the local version of typescript. Otherwise, dtslint will download and
     # install all versions of typescript.
