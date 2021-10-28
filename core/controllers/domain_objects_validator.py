@@ -30,6 +30,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import image_validation_services
 
 from typing import Dict, Optional, Union
 
@@ -200,3 +201,15 @@ def validate_aggregated_stats(aggregated_stats):
                 raise base.BaseHandler.InvalidInputException(
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
+
+def validate_suggestion_images(files):
+    """Validates the files dict.
+
+    Args:
+        files: dict. Data that needs to be validated.
+
+    """
+    for filename,raw_image in files.items():
+        image_validation_services.validate_image_and_filename(
+            raw_image,filename)
+
