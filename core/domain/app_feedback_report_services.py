@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
@@ -121,8 +120,7 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
     # is only aggregated on Android reports.
     report_obj.device_system_context.__class__ = (
         app_feedback_report_domain.AndroidDeviceSystemContext)
-    sdk_version = python_utils.UNICODE(
-        report_obj.device_system_context.sdk_version)
+    sdk_version = str(report_obj.device_system_context.sdk_version)
     version_name = report_obj.device_system_context.version_name
 
     stats_id = (
@@ -493,19 +491,17 @@ def save_feedback_report_to_storage(
             user_supplied_feedback.user_feedback_other_text_input),
         'event_logs': app_context.event_logs,
         'logcat_logs': app_context.logcat_logs,
-        'package_version_code': python_utils.UNICODE(
-            device_system_context.package_version_code),
+        'package_version_code': str(device_system_context.package_version_code),
         'android_device_language_locale_code': (
             device_system_context.device_language_locale_code),
         'build_fingerprint': device_system_context.build_fingerprint,
         'network_type': device_system_context.network_type.name,
         'text_size': app_context.text_size.name,
-        'only_allows_wifi_download_and_update': python_utils.UNICODE(
+        'only_allows_wifi_download_and_update': str(
             app_context.only_allows_wifi_download_and_update),
-        'automatically_update_topics': python_utils.UNICODE(
+        'automatically_update_topics': str(
             app_context.automatically_update_topics),
-        'account_is_profile_admin': python_utils.UNICODE(
-            app_context.account_is_profile_admin)
+        'account_is_profile_admin': str(app_context.account_is_profile_admin)
     }
 
     if new_incoming_report:

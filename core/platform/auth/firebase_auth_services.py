@@ -95,7 +95,7 @@ def establish_firebase_connection() -> None:
     try:
         firebase_admin.get_app()
     except ValueError as error:
-        if 'initialize_app' in python_utils.UNICODE(error):
+        if 'initialize_app' in str(error):
             firebase_admin.initialize_app(
                 options={'projectId': feconf.OPPIA_PROJECT_ID})
         else:

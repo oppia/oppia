@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import time
 
-from core import python_utils
 from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
 
@@ -45,7 +44,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             'Task %s in queue %s with payload %s is sent to %s.' % (
                 task_name if task_name else 'Default',
                 queue_name,
-                python_utils.UNICODE(payload),
+                str(payload),
                 url)
         )
 
@@ -112,7 +111,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.UNICODE(self.payload1),
+                    str(self.payload1),
                     self.url)
             ]
         )
@@ -124,11 +123,11 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.UNICODE(self.payload1),
+                    str(self.payload1),
                     self.url),
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name2,
-                    python_utils.UNICODE(self.payload2),
+                    str(self.payload2),
                     self.url),
             ]
         )
@@ -149,11 +148,11 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.UNICODE(self.payload1),
+                    str(self.payload1),
                     self.url),
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name2,
-                    python_utils.UNICODE(self.payload2),
+                    str(self.payload2),
                     self.url),
             ]
         )
