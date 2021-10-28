@@ -384,7 +384,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return user_data
 
     @classmethod
-    def _generate_id(cls, thread_id: str, message_id: str) -> str:
+    def _generate_id(cls, thread_id: str, message_id: int) -> str:
         """Generates full message ID given the thread ID and message ID.
 
         Args:
@@ -471,7 +471,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         # Generate the new ids.
         instance_ids = [
-            cls._generate_id(thread_id, message_id) for thread_id, message_id
+            cls._generate_id(thread_id, message_id) for thread_id, message_id  # type: ignore
             in python_utils.ZIP(thread_ids, message_ids)
         ]
 
