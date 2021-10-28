@@ -435,7 +435,6 @@ class Collection(python_utils.OBJECT):
             default_flow_style=False
         )
 
-
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
         """Converts a v1 collection dict into a v2 collection dict.
