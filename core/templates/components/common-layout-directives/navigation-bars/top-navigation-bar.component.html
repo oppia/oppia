@@ -215,7 +215,7 @@
       </div>
       <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'">
         <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
-          <a (click)="changeLanguage(language.id, language.text)">
+          <a (click)="changeLanguage(language.id)">
             <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
               <span *ngIf="currentLanguageCode === language.id">
                 <i class="material-icons"> &#xE876; </i>

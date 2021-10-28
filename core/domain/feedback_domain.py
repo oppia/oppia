@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+
 import datetime
 
 from core import python_utils
@@ -169,7 +170,7 @@ class FeedbackThread:
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, python_utils.UNICODE(message_id)])
+        return '.'.join([self.id, str(message_id)])
 
     def get_last_two_message_ids(self) -> List[Optional[str]]:
         """Returns the full message ids of the last two messages of the thread.

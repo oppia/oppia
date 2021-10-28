@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
-from core import python_utils
 from core.domain import recommendations_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -115,8 +114,8 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
         sorted_similarities = sorted(
             similarities, reverse=True, key=lambda x: x['similarity_score'])
         return [
-            python_utils.UNICODE(item['exp_id']) for item in sorted_similarities
-        ][:MAX_RECOMMENDATIONS]
+                str(item['exp_id']) for item in sorted_similarities
+            ][:MAX_RECOMMENDATIONS]
 
     @staticmethod
     def _create_recommendation(

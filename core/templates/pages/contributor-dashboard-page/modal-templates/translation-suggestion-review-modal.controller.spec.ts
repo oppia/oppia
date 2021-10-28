@@ -173,6 +173,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect($scope.reviewMessage).toBe('');
       // Suggestion 1's exploration_content_html matches its content_html.
       expect($scope.hasExplorationContentChanged()).toBe(false);
+      expect($scope.displayExplorationContent()).toEqual(
+        suggestion1.change.content_html);
 
       spyOn(
         SiteAnalyticsService,
@@ -195,6 +197,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       // Suggestion 2's exploration_content_html does not match its
       // content_html.
       expect($scope.hasExplorationContentChanged()).toBe(true);
+      expect($scope.displayExplorationContent()).toEqual(
+        suggestion2.exploration_content_html);
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
