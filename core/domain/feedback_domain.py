@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 import datetime
 
-from core import python_utils
 from core import utils
 from core.domain import user_services
 
