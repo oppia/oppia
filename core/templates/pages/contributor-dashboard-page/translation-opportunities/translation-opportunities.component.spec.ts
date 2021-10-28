@@ -220,7 +220,7 @@ describe('Translation opportunities component', () => {
     spyOn(
       translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       null);
-    spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     component.ngOnInit();
     expect(component.languageSelected).toBe(false);
   }));
@@ -230,7 +230,7 @@ describe('Translation opportunities component', () => {
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(
         null);
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
       component.ngOnInit();
       expect(component.languageSelected).toBe(false);
 
