@@ -46,7 +46,11 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
 class ExplorationOpportunitySummaryDict(
     PartialExplorationOpportunitySummaryDict
 ):
-    """A dictionary representing ExplorationOpportunitySummary object."""
+    """A dictionary representing ExplorationOpportunitySummary object.
+
+    contains all fields of an ExplorationOpportunitySummary object
+    It gets the required fields from PartialExplorationOpportunitySummaryDict
+    """
 
     topic_id: str
     story_id: str
