@@ -556,8 +556,9 @@ def _upload_suggestion_images(request, suggestion, filenames):
     suggestion_image_context = suggestion.image_context
     # TODO(#10513) : Find a way to save the images before the suggestion is
     # created.
+    images=request.get('files')
     for filename in filenames:
-        image = request.get('image')
+        image=images.get(filename)
         if not image:
             logging.exception(
                 'Image not provided for file with name %s when the '
