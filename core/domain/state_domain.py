@@ -127,9 +127,7 @@ class AnswerGroup:
                 % self.rule_specs)
 
         if self.tagged_skill_misconception_id is not None:
-            if not isinstance(
-                    self.tagged_skill_misconception_id,
-                    python_utils.BASESTRING):
+            if not isinstance(self.tagged_skill_misconception_id, str):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
@@ -212,8 +210,7 @@ class AnswerGroup:
                             elif (html_type_format ==
                                   feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                                 for value in rule_input_variable:
-                                    if isinstance(
-                                            value, python_utils.BASESTRING):
+                                    if isinstance(value, str):
                                         html_list += [value]
                             elif (html_type_format ==
                                   feconf.
@@ -663,7 +660,7 @@ class InteractionInstance:
             ValidationError. One or more attributes of the InteractionInstance
                 are invalid.
         """
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
                 self.id)
@@ -1310,9 +1307,7 @@ class Outcome:
                 '%s' % self.labelled_as_correct)
 
         if self.missing_prerequisite_skill_id is not None:
-            if not isinstance(
-                    self.missing_prerequisite_skill_id,
-                    python_utils.BASESTRING):
+            if not isinstance(self.missing_prerequisite_skill_id, str):
                 raise utils.ValidationError(
                     'Expected outcome missing_prerequisite_skill_id to be a '
                     'string, received %s' % self.missing_prerequisite_skill_id)
@@ -1325,8 +1320,7 @@ class Outcome:
             param_change.validate()
 
         if self.refresher_exploration_id is not None:
-            if not isinstance(
-                    self.refresher_exploration_id, python_utils.BASESTRING):
+            if not isinstance(self.refresher_exploration_id, str):
                 raise utils.ValidationError(
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
@@ -1412,7 +1406,7 @@ class Voiceover:
             ValidationError. One or more attributes of the Voiceover are
                 invalid.
         """
-        if not isinstance(self.filename, python_utils.BASESTRING):
+        if not isinstance(self.filename, str):
             raise utils.ValidationError(
                 'Expected audio filename to be a string, received %s' %
                 self.filename)
@@ -1688,7 +1682,7 @@ class WrittenTranslations:
 
         for (content_id, language_code_to_written_translation) in (
                 self.translations_mapping.items()):
-            if not isinstance(content_id, python_utils.BASESTRING):
+            if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
@@ -1698,7 +1692,7 @@ class WrittenTranslations:
                     % language_code_to_written_translation)
             for (language_code, written_translation) in (
                     language_code_to_written_translation.items()):
-                if not isinstance(language_code, python_utils.BASESTRING):
+                if not isinstance(language_code, str):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
@@ -1757,7 +1751,7 @@ class WrittenTranslations:
         Raises:
             Exception. The content id isn't a string.
         """
-        if not isinstance(content_id, python_utils.BASESTRING):
+        if not isinstance(content_id, str):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id in self.translations_mapping:
@@ -1775,7 +1769,7 @@ class WrittenTranslations:
         Raises:
             Exception. The content id isn't a string.
         """
-        if not isinstance(content_id, python_utils.BASESTRING):
+        if not isinstance(content_id, str):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id not in self.translations_mapping:
@@ -1922,7 +1916,7 @@ class RecordedVoiceovers:
 
         for (content_id, language_code_to_voiceover) in (
                 self.voiceovers_mapping.items()):
-            if not isinstance(content_id, python_utils.BASESTRING):
+            if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
@@ -1932,7 +1926,7 @@ class RecordedVoiceovers:
                     % language_code_to_voiceover)
             for (language_code, voiceover) in (
                     language_code_to_voiceover.items()):
-                if not isinstance(language_code, python_utils.BASESTRING):
+                if not isinstance(language_code, str):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
@@ -1969,7 +1963,7 @@ class RecordedVoiceovers:
             Exception. The content id already exist in the voiceovers_mapping
                 dict.
         """
-        if not isinstance(content_id, python_utils.BASESTRING):
+        if not isinstance(content_id, str):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id in self.voiceovers_mapping:
@@ -1989,7 +1983,7 @@ class RecordedVoiceovers:
             Exception. The content id does not exist in the voiceovers_mapping
                 dict.
         """
-        if not isinstance(content_id, python_utils.BASESTRING):
+        if not isinstance(content_id, str):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id not in self.voiceovers_mapping:
@@ -2091,9 +2085,7 @@ class RuleSpec:
         for (param_name, param_value) in self.inputs.items():
             param_obj = rule_params_dict[param_name]
             # Validate the parameter type given the value.
-            if isinstance(
-                    param_value,
-                    python_utils.BASESTRING) and '{{' in param_value:
+            if isinstance(param_value, str) and '{{' in param_value:
                 # Value refers to a parameter spec. Cross-validate the type of
                 # the parameter spec with the rule parameter.
                 start_brace_index = param_value.index('{{') + 2
@@ -2173,8 +2165,7 @@ class RuleSpec:
                             if isinstance(rule_input_variable, list):
                                 for value_index, value in enumerate(
                                         rule_input_variable):
-                                    if isinstance(
-                                            value, python_utils.BASESTRING):
+                                    if isinstance(value, str):
                                         rule_spec_dict['inputs'][
                                             input_variable][value_index] = (
                                                 conversion_fn(value))
@@ -2255,12 +2246,12 @@ class SubtitledHtml:
             ValidationError. One or more attributes of the SubtitledHtml are
                 invalid.
         """
-        if not isinstance(self.content_id, python_utils.BASESTRING):
+        if not isinstance(self.content_id, str):
             raise utils.ValidationError(
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        if not isinstance(self.html, python_utils.BASESTRING):
+        if not isinstance(self.html, str):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
@@ -2329,12 +2320,12 @@ class SubtitledUnicode:
             ValidationError. One or more attributes of the SubtitledUnicode are
                 invalid.
         """
-        if not isinstance(self.content_id, python_utils.BASESTRING):
+        if not isinstance(self.content_id, str):
             raise utils.ValidationError(
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        if not isinstance(self.unicode_str, python_utils.BASESTRING):
+        if not isinstance(self.unicode_str, str):
             raise utils.ValidationError(
                 'Invalid content unicode: %s' % self.unicode_str)
 
@@ -2577,9 +2568,7 @@ class State:
         self.recorded_voiceovers.validate(content_id_list)
 
         if self.linked_skill_id is not None:
-            if not isinstance(
-                    self.linked_skill_id,
-                    python_utils.BASESTRING):
+            if not isinstance(self.linked_skill_id, str):
                 raise utils.ValidationError(
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
@@ -2691,8 +2680,7 @@ class State:
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception as e:
-            logging.exception(
-                'Bad state dict: %s' % python_utils.UNICODE(state_dict))
+            logging.exception('Bad state dict: %s' % str(state_dict))
             raise e
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
@@ -2978,7 +2966,7 @@ class State:
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
-                    if (isinstance(value, python_utils.BASESTRING) and
+                    if (isinstance(value, str) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types.

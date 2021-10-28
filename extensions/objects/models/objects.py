@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import copy
 import json
 
-from core import python_utils
 from core import schema_utils
 from core.constants import constants
 
@@ -736,17 +735,14 @@ class CheckedProof(BaseObject):
         """
         try:
             assert isinstance(raw, dict)
-            assert isinstance(
-                raw['assumptions_string'], python_utils.BASESTRING)
-            assert isinstance(raw['target_string'], python_utils.BASESTRING)
-            assert isinstance(raw['proof_string'], python_utils.BASESTRING)
+            assert isinstance(raw['assumptions_string'], str)
+            assert isinstance(raw['target_string'], str)
+            assert isinstance(raw['proof_string'], str)
             assert raw['correct'] in [True, False]
             if not raw['correct']:
-                assert isinstance(
-                    raw['error_category'], python_utils.BASESTRING)
-                assert isinstance(raw['error_code'], python_utils.BASESTRING)
-                assert isinstance(
-                    raw['error_message'], python_utils.BASESTRING)
+                assert isinstance(raw['error_category'], str)
+                assert isinstance(raw['error_code'], str)
+                assert isinstance(raw['error_message'], str)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:
@@ -1611,7 +1607,7 @@ class JsonEncodedInString(BaseObject):
             *. The normalized value of any type, it depends on the raw value
             which we want to load from json.
         """
-        if not isinstance(raw, python_utils.BASESTRING):
+        if not isinstance(raw, str):
             raise Exception('Expected string received %s of type %s' % (
                 raw, type(raw))
             )
