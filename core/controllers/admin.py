@@ -22,7 +22,6 @@ import logging
 import random
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -289,7 +288,7 @@ class AdminHandler(base.BaseHandler):
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
+            self.render_json({'error': str(e)})
             raise e
 
     def _reload_exploration(self, exploration_id):
@@ -306,10 +305,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.UNICODE(exploration_id))
+            exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(),
-                python_utils.UNICODE(exploration_id))
+                user_services.get_system_user(), exploration_id)
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -579,15 +577,13 @@ class AdminHandler(base.BaseHandler):
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
-            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
-                random.getrandbits(32))
+            skill_name = 'Dummy Skill %s' % str(random.getrandbits(32))
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
             for i in range(15):
                 question_id = question_services.get_new_question_id()
-                question_name = 'Question number %s %s' % (
-                    python_utils.UNICODE(i), skill_name)
+                question_name = 'Question number %s %s' % (str(i), skill_name)
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)

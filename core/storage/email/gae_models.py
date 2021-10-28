@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -162,9 +161,8 @@ class SentEmailModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
-                utils.convert_to_hash(
-                    python_utils.UNICODE(utils.get_random_int(
-                        base_models.RAND_RANGE)),
+                utils.convert_to_hash(str(utils.get_random_int(
+                    base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id

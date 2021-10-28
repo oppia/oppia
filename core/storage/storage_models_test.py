@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 
 import re
 
-from core import python_utils
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
@@ -124,9 +123,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for model in all_models:
             export_policy = model.get_export_policy()
             self.assertEqual(
-                sorted([
-                    python_utils.UNICODE(prop) for prop
-                    in model._properties]), # pylint: disable=protected-access
+                sorted([str(prop) for prop in model._properties]), # pylint: disable=protected-access
                 sorted(export_policy.keys())
             )
             self.assertTrue(

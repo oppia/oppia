@@ -24,7 +24,6 @@ import logging
 import re
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -1343,7 +1342,7 @@ def update_translation_suggestion(suggestion_id, translation_html):
     # Clean the translation HTML if not a list of strings.
     suggestion.change.translation_html = (
         html_cleaner.clean(translation_html)
-        if isinstance(translation_html, python_utils.BASESTRING)
+        if isinstance(translation_html, str)
         else translation_html
     )
     suggestion.edited_by_reviewer = True
