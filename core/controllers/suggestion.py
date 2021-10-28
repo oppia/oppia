@@ -84,10 +84,13 @@ class SuggestionHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'image': {
+            'files': {
                 'schema': {
-                    'type': 'basestring'
-                },
+                    'type': 'object_dict', 
+                    'validation_method': (
+                        domain_objects_validator.validate_suggestion_images
+                    )
+                    },
                 'default_value': None
             }
         }
