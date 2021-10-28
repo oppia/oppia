@@ -65,7 +65,9 @@ describe('Editor Reloading Modal Controller', () => {
     component.ngOnInit();
 
     expect(ngbActiveModal.dismiss).not.toHaveBeenCalled();
+
     tick(2501);
+
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   }));
 });
