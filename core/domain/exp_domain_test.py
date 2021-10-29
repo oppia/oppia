@@ -3312,31 +3312,7 @@ title: Title
 
         exploration_proto_size = exp_domain.Exploration.calculate_size_of_proto(
             exploration_proto)
-        self.assertEqual(exploration_proto_size, 6502)
-
-    def test_exploration_proto_is_correct(self):
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp_id', self.sample_yaml_content_for_proto)
-        exploration_proto = exp_domain.Exploration.to_proto(
-            exploration.id, exploration.title, exploration.version,
-            exploration.init_state_name, exploration.states)
-
-        self.assertEqual(exploration_proto.id, exploration.id)
-        self.assertEqual(exploration_proto.title, exploration.title)
-        self.assertEqual(
-            exploration_proto.content_version,
-            exploration.version)
-        self.assertEqual(
-            exploration_proto.init_state_name,
-            exploration.init_state_name)
-
-        for (state_name, state) in exploration.states.items():
-            self.assertEqual(
-                exploration_proto.states[state_name].content.content_id,
-                state.content.content_id)
-            self.assertEqual(
-                exploration_proto.states[state_name].content.html,
-                state.content.html)
+        self.assertEqual(exploration_proto_size, 4456)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
