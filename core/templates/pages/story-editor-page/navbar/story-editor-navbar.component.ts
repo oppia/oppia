@@ -249,7 +249,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.directiveSubscriptions.add(
-      this.undoRedoService.onUndoRedoChangeApplied$().subscribe(
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
         () => this._validateStory()
       )
     );

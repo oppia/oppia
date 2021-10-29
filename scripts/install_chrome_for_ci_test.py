@@ -19,12 +19,10 @@ from __future__ import unicode_literals
 
 import subprocess
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
-
 from scripts import install_chrome_for_ci
-
 
 URL = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'

@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -27,7 +28,6 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
-import feconf
 
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN

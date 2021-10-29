@@ -17,13 +17,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
-import feconf
 from proto_files import training_job_response_payload_pb2
 
 

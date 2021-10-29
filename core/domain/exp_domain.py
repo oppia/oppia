@@ -30,17 +30,17 @@ import json
 import re
 import string
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import schema_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -356,7 +356,7 @@ class ExplorationChange(change_domain.BaseChange):
         'delete_gadget', 'rename_gadget']
 
 
-class ExplorationCommitLogEntry(python_utils.OBJECT):
+class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
     def __init__(
@@ -424,7 +424,7 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
         }
 
 
-class ExpVersionReference(python_utils.OBJECT):
+class ExpVersionReference:
     """Value object representing an exploration ID and a version number."""
 
     def __init__(self, exp_id, version):
@@ -456,7 +456,7 @@ class ExpVersionReference(python_utils.OBJECT):
             ValidationError. One or more attributes of the ExpVersionReference
                 are invalid.
         """
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
+        if not isinstance(self.exp_id, str):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
@@ -465,7 +465,7 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected version to be an int, received %s' % self.version)
 
 
-class ExplorationVersionsDiff(python_utils.OBJECT):
+class ExplorationVersionsDiff:
     """Domain object for the difference between two versions of an Oppia
     exploration.
 
@@ -530,7 +530,7 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         }
 
 
-class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
+class VersionedExplorationInteractionIdsMapping:
     """Domain object representing the mapping of state names to interaction ids
     in an exploration.
     """
@@ -548,7 +548,7 @@ class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration(python_utils.OBJECT):
+class Exploration:
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -799,25 +799,25 @@ class Exploration(python_utils.OBJECT):
             ValidationError. One or more attributes of the Exploration are
                 invalid.
         """
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
-        if not isinstance(self.category, python_utils.BASESTRING):
+        if not isinstance(self.category, str):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the exploration category', allow_empty=True)
 
-        if not isinstance(self.objective, python_utils.BASESTRING):
+        if not isinstance(self.objective, str):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -829,7 +829,7 @@ class Exploration(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received %s' % self.tags)
         for tag in self.tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+            if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
                     '\'%s\'' % tag)
@@ -855,11 +855,11 @@ class Exploration(python_utils.OBJECT):
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
 
-        if not isinstance(self.blurb, python_utils.BASESTRING):
+        if not isinstance(self.blurb, str):
             raise utils.ValidationError(
                 'Expected blurb to be a string, received %s' % self.blurb)
 
-        if not isinstance(self.author_notes, python_utils.BASESTRING):
+        if not isinstance(self.author_notes, str):
             raise utils.ValidationError(
                 'Expected author_notes to be a string, received %s' %
                 self.author_notes)
@@ -883,8 +883,7 @@ class Exploration(python_utils.OBJECT):
                 if not answer_group.outcome.dest:
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
-                if not isinstance(
-                        answer_group.outcome.dest, python_utils.BASESTRING):
+                if not isinstance(answer_group.outcome.dest, str):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
@@ -892,9 +891,7 @@ class Exploration(python_utils.OBJECT):
                 if not state.interaction.default_outcome.dest:
                     raise utils.ValidationError(
                         'Every outcome should have a destination.')
-                if not isinstance(
-                        state.interaction.default_outcome.dest,
-                        python_utils.BASESTRING):
+                if not isinstance(state.interaction.default_outcome.dest, str):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
@@ -927,7 +924,7 @@ class Exploration(python_utils.OBJECT):
                 '%s' % self.correctness_feedback_enabled)
 
         for param_name in self.param_specs:
-            if not isinstance(param_name, python_utils.BASESTRING):
+            if not isinstance(param_name, str):
                 raise utils.ValidationError(
                     'Expected parameter name to be a string, received %s (%s).'
                     % (param_name, type(param_name)))
@@ -1107,12 +1104,12 @@ class Exploration(python_utils.OBJECT):
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.UNICODE(e))
+                warnings_list.append(str(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings_list.append(python_utils.UNICODE(e))
+                warnings_list.append(str(e))
 
             if not self.title:
                 warnings_list.append(
@@ -1887,33 +1884,37 @@ class Exploration(python_utils.OBJECT):
 
         for state_dict in states_dict.values():
             list_of_subtitled_unicode_content_ids = []
-            customisation_args = (
-                state_domain.InteractionInstance
-                .convert_customization_args_dict_to_customization_args(
-                    state_dict['interaction']['id'],
-                    state_dict['interaction']['customization_args']))
-            for ca_name in customisation_args:
-                list_of_subtitled_unicode_content_ids.extend(
-                    state_domain.InteractionCustomizationArg
-                    .traverse_by_schema_and_get(
-                        customisation_args[ca_name].schema,
-                        customisation_args[ca_name].value,
-                        [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
-                        lambda subtitled_unicode: subtitled_unicode.content_id
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                customisation_args = (
+                    state_domain.InteractionInstance
+                    .convert_customization_args_dict_to_customization_args(
+                        state_dict['interaction']['id'],
+                        state_dict['interaction']['customization_args']))
+                for ca_name in customisation_args:
+                    list_of_subtitled_unicode_content_ids.extend(
+                        state_domain.InteractionCustomizationArg
+                        .traverse_by_schema_and_get(
+                            customisation_args[ca_name].schema,
+                            customisation_args[ca_name].value,
+                            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                            lambda subtitled_unicode:
+                            subtitled_unicode.content_id
+                        )
                     )
-                )
-            translations_mapping = (
-                state_dict['written_translations']['translations_mapping'])
-            for content_id in translations_mapping:
-                if content_id in list_of_subtitled_unicode_content_ids:
-                    for language_code in translations_mapping[content_id]:
-                        written_translation = (
-                            translations_mapping[content_id][language_code])
-                        written_translation['data_format'] = (
-                            schema_utils.SCHEMA_TYPE_UNICODE)
-                        written_translation['translation'] = (
-                            html_cleaner.strip_html_tags(
-                                written_translation['translation']))
+                translations_mapping = (
+                    state_dict['written_translations']['translations_mapping'])
+                for content_id in translations_mapping:
+                    if content_id in list_of_subtitled_unicode_content_ids:
+                        for language_code in translations_mapping[content_id]:
+                            written_translation = (
+                                translations_mapping[content_id][language_code])
+                            written_translation['data_format'] = (
+                                schema_utils.SCHEMA_TYPE_UNICODE)
+                            written_translation['translation'] = (
+                                html_cleaner.strip_html_tags(
+                                    written_translation['translation']))
         return states_dict
 
     @classmethod
@@ -1932,9 +1933,13 @@ class Exploration(python_utils.OBJECT):
         """
 
         for state_dict in states_dict.values():
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service
+                    .convert_svg_diagram_tags_to_image_tags)
         return states_dict
 
     @classmethod
@@ -1952,9 +1957,40 @@ class Exploration(python_utils.OBJECT):
         """
 
         for state_dict in states_dict.values():
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.fix_incorrectly_encoded_chars)
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service.fix_incorrectly_encoded_chars)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
+        """Converts from version 48 to 49. Version 49 adds
+        requireNonnegativeInput customization arg to NumericInput
+        interaction which allows creators to set input should be greater
+        than or equal to zero.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'NumericInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                })
+
         return states_dict
 
     @classmethod
@@ -1994,7 +2030,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 53
+    CURRENT_EXP_SCHEMA_VERSION = 54
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2156,6 +2192,28 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v53_dict_to_v54_dict(cls, exploration_dict):
+        """Converts a v53 exploration dict into a v54 exploration dict.
+        Adds a new customization arg to NumericInput interaction
+        which allows creators to set input greator than or equal to zero.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v53.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v54.
+        """
+        exploration_dict['schema_version'] = 54
+
+        exploration_dict['states'] = cls._convert_states_v48_dict_to_v49_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 49
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2225,6 +2283,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v52_dict_to_v53_dict(
                 exploration_dict)
             exploration_schema_version = 53
+
+        if exploration_schema_version == 53:
+            exploration_dict = cls._convert_v53_dict_to_v54_dict(
+                exploration_dict)
+            exploration_schema_version = 54
 
         return exploration_dict
 
@@ -2399,7 +2462,7 @@ class Exploration(python_utils.OBJECT):
         return html_list
 
 
-class ExplorationSummary(python_utils.OBJECT):
+class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
@@ -2478,25 +2541,25 @@ class ExplorationSummary(python_utils.OBJECT):
             ValidationError. One or more attributes of the ExplorationSummary
                 are invalid.
         """
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the exploration title', allow_empty=True)
 
-        if not isinstance(self.category, python_utils.BASESTRING):
+        if not isinstance(self.category, str):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the exploration category', allow_empty=True)
 
-        if not isinstance(self.objective, python_utils.BASESTRING):
+        if not isinstance(self.objective, str):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -2508,7 +2571,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received %s' % self.tags)
         for tag in self.tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+            if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
                     '\'%s\'' % tag)
@@ -2559,7 +2622,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
 
-        if not isinstance(self.status, python_utils.BASESTRING):
+        if not isinstance(self.status, str):
             raise utils.ValidationError(
                 'Expected status to be string, received %s' % self.status)
 
@@ -2572,7 +2635,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected owner_ids to be list, received %s' % self.owner_ids)
         for owner_id in self.owner_ids:
-            if not isinstance(owner_id, python_utils.BASESTRING):
+            if not isinstance(owner_id, str):
                 raise utils.ValidationError(
                     'Expected each id in owner_ids to '
                     'be string, received %s' % owner_id)
@@ -2581,7 +2644,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected editor_ids to be list, received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
-            if not isinstance(editor_id, python_utils.BASESTRING):
+            if not isinstance(editor_id, str):
                 raise utils.ValidationError(
                     'Expected each id in editor_ids to '
                     'be string, received %s' % editor_id)
@@ -2591,7 +2654,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected voice_artist_ids to be list, received %s' % (
                     self.voice_artist_ids))
         for voice_artist_id in self.voice_artist_ids:
-            if not isinstance(voice_artist_id, python_utils.BASESTRING):
+            if not isinstance(voice_artist_id, str):
                 raise utils.ValidationError(
                     'Expected each id in voice_artist_ids to '
                     'be string, received %s' % voice_artist_id)
@@ -2600,7 +2663,7 @@ class ExplorationSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected viewer_ids to be list, received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, python_utils.BASESTRING):
+            if not isinstance(viewer_id, str):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
@@ -2610,7 +2673,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected contributor_ids to be list, received %s' % (
                     self.contributor_ids))
         for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, python_utils.BASESTRING):
+            if not isinstance(contributor_id, str):
                 raise utils.ValidationError(
                     'Expected each id in contributor_ids to '
                     'be string, received %s' % contributor_id)
@@ -2686,7 +2749,7 @@ class ExplorationSummary(python_utils.OBJECT):
         self.contributor_ids = list(self.contributors_summary.keys())
 
 
-class ExplorationChangeMergeVerifier(python_utils.OBJECT):
+class ExplorationChangeMergeVerifier:
     """Class to check for mergeability.
 
     Attributes:

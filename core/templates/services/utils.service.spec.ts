@@ -179,4 +179,32 @@ describe('Utils Service', () => {
 
     expect(uts.isOverflowing(null)).toBeFalse();
   });
+
+  describe('getting safe return URLs', () => {
+    // An array of (inputUrl, expectedUrl) tuples.
+    const testCases: [string, string][] = [
+      ['javascript:alert(0)', '/'],
+      ['data:text/html,<script>alert(0)</script>', '/'],
+      ['>\'>"><img src=x onerror=alert(0)>', '/'],
+      ['https://evil.com', '/'],
+      ['evil.com', '/'],
+      ['//evil.com', '/'],
+      ['///', '/'],
+      ['%', '/'],
+      ['a', '/'],
+      ['/', '/'],
+      ['/learner-dashboard', '/learner-dashboard'],
+    ];
+
+    for (const [inputUrl, expectedUrl] of testCases) {
+      it('should return ' + expectedUrl + ' from ' + inputUrl, () => {
+        expect(uts.getSafeReturnUrl(inputUrl)).toEqual(expectedUrl);
+      });
+
+      const encodedInputUrl = encodeURIComponent(inputUrl);
+      it('should return ' + expectedUrl + ' from ' + encodedInputUrl, () => {
+        expect(uts.getSafeReturnUrl(encodedInputUrl)).toEqual(expectedUrl);
+      });
+    }
+  });
 });

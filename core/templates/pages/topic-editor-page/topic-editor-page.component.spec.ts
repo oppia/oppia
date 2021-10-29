@@ -100,12 +100,12 @@ describe('Topic editor page', function() {
     spyOnProperty(TopicEditorRoutingService, 'updateViewEventEmitter')
       .and.returnValue(topicUpdateViewEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
 
     ctrl.$onInit();
 
     expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledTimes(2);
 
     ctrl.$onDestroy();
   });
@@ -124,7 +124,7 @@ describe('Topic editor page', function() {
   it('should addListener by passing getChangeCount to ' +
   'PreventPageUnloadEventService', function() {
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     spyOn(PreventPageUnloadEventService, 'addListener').and
       .callFake((callback) => callback());
@@ -229,14 +229,14 @@ describe('Topic editor page', function() {
   it('should load topic based on its id on url when undo or redo action' +
   ' is performed', function() {
     let mockUndoRedoChangeEventEmitter = new EventEmitter();
-    spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
-      mockUndoRedoChangeEventEmitter);
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(UndoRedoService, 'getUndoRedoChangeEventEmitter')
+      .and.returnValue(mockUndoRedoChangeEventEmitter);
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     ctrl.$onInit();
     mockUndoRedoChangeEventEmitter.emit();
 
-    expect(PageTitleService.setPageTitle)
+    expect(PageTitleService.setDocumentTitle)
       .toHaveBeenCalledWith('New Name - Oppia');
     expect(ctrl.topic).toEqual(topic);
 

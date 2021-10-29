@@ -21,25 +21,19 @@ from __future__ import unicode_literals
 
 import collections
 
-from constants import constants
-import feconf
-import python_utils
-import utils
+from core import feconf
+from core import utils
+from core.constants import constants
 
 attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
 UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
-    'UserQueryParams', attribute_names)
-
-# TODO(#12275): In python 2, the default values in collection has to be assigned
-# to None. Once migrated to python 3, this has to be removed.
-UserQueryParams.__new__.__defaults__ = (None,) * len(
-    UserQueryParams._fields)
+    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names))
 
 
-class UserQuery(python_utils.OBJECT):
+class UserQuery:
     """Domain object for the UserQueryModel."""
 
     def __init__(
@@ -84,7 +78,7 @@ class UserQuery(python_utils.OBJECT):
             ValidationError. Expected user ID in user_ids to be a valid user ID.
             ValidationError. Expected sent_email_model_id to be a string.
         """
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
@@ -93,7 +87,7 @@ class UserQuery(python_utils.OBJECT):
                 'Expected params to be of type tuple, received %s'
                 % type(self.params))
 
-        if not isinstance(self.submitter_id, python_utils.BASESTRING):
+        if not isinstance(self.submitter_id, str):
             raise utils.ValidationError(
                 'Expected submitter ID to be a string, received %s' %
                 self.submitter_id)
@@ -102,7 +96,7 @@ class UserQuery(python_utils.OBJECT):
                 'Expected submitter ID to be a valid user ID, received %s' %
                 self.submitter_id)
 
-        if not isinstance(self.status, python_utils.BASESTRING):
+        if not isinstance(self.status, str):
             raise utils.ValidationError(
                 'Expected status to be a string, received %s' % self.status)
         if self.status not in feconf.ALLOWED_USER_QUERY_STATUSES:
@@ -113,7 +107,7 @@ class UserQuery(python_utils.OBJECT):
                 'Expected user_ids to be a list, received %s' %
                 type(self.user_ids))
         for user_id in self.user_ids:
-            if not isinstance(user_id, python_utils.BASESTRING):
+            if not isinstance(user_id, str):
                 raise utils.ValidationError(
                     'Expected each user ID in user_ids to be a string, '
                     'received %s' % user_id)
@@ -124,7 +118,7 @@ class UserQuery(python_utils.OBJECT):
                     'received %s' % user_id)
 
         if self.sent_email_model_id and not isinstance(
-                self.sent_email_model_id, python_utils.BASESTRING):
+                self.sent_email_model_id, str):
             raise utils.ValidationError(
                 'Expected sent_email_model_id to be a string, received %s'
                 % self.sent_email_model_id)

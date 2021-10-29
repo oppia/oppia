@@ -19,11 +19,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))

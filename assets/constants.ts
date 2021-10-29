@@ -5590,6 +5590,7 @@ export default {
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5667,6 +5668,11 @@ export default {
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
+
+  // The name of the cookie Oppia will place the session cookie into. The name
+  // is arbitrary. If it is changed later on, then the cookie will live on in
+  // the users' browsers as garbage (although it'd expire eventually).
+  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

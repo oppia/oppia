@@ -19,12 +19,11 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -124,12 +123,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 producing too many collisions.
         """
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(
-                        utils.get_random_int(base_models.RAND_RANGE)),
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -195,7 +193,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def query_new_and_pending_training_jobs(
             cls, offset: int
-    ) -> Tuple[List['ClassifierTrainingJobModel'], int]:
+    ) -> Tuple[Sequence['ClassifierTrainingJobModel'], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -221,11 +219,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             .order(cls.next_scheduled_check_time)
         )
 
-        classifier_job_models = cast(
-            List[ClassifierTrainingJobModel],
+        classifier_job_models: Sequence[ClassifierTrainingJobModel] = (
             query.fetch(
-                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
-        )
+                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset))
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 

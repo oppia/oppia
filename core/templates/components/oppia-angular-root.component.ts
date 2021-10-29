@@ -63,8 +63,6 @@
 
 import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
-import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheService } from 'ngx-translate-cache';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -94,7 +92,7 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
+import { I18nService } from 'i18n/i18n.service';
 
 const componentMap = {
   Collapsible: {
@@ -140,17 +138,14 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static translateService: TranslateService;
-  static translateCacheService: TranslateCacheService;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
-    private documentAttributeCustomizationService:
-      DocumentAttributeCustomizationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private htmlEscaperService: HtmlEscaperService,
+    private i18nService: I18nService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private ngZone: NgZone,
     private pageTitleService: PageTitleService,
@@ -158,8 +153,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private ratingComputationService: RatingComputationService,
     private reviewTestBackendApiService: ReviewTestBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
-    private translateService: TranslateService,
-    private translateCacheService: TranslateCacheService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private injector: Injector
@@ -204,9 +197,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       this.reviewTestBackendApiService);
     OppiaAngularRootComponent.storyViewerBackendApiService = (
       this.storyViewerBackendApiService);
-    OppiaAngularRootComponent.translateService = this.translateService;
-    OppiaAngularRootComponent.translateCacheService = (
-      this.translateCacheService);
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
@@ -254,24 +244,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     ]);
 
     // Initialize translations.
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => {
-        this.translateService.use(code);
-        for (var i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
-          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
-            this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
-            break;
-          }
-        }
-        this.documentAttributeCustomizationService.addAttribute('lang', code);
-      }
-    );
-    this.translateCacheService.init();
-
-    const cachedLanguage = this.translateCacheService.getCachedLanguage();
-    if (cachedLanguage) {
-      this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
-    }
+    this.i18nService.initialize();
+    this.i18nService.directionChangeEventEmitter.subscribe((direction) => {
+      this.direction = direction;
+    });
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

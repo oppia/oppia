@@ -17,9 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (base_models, beam_job_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.beam_job])

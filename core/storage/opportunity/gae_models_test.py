@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,12 +35,12 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
 
     def setUp(self) -> None:
-        super(ExplorationOpportunitySummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
 
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id1',
             topic_id='topic_id1',
-            topic_name='A topic',
+            topic_name='a_topic name',
             story_id='story_id1',
             story_title='A story title',
             chapter_title='A chapter title',
@@ -54,7 +53,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id2',
             topic_id='topic_id2',
-            topic_name='A new topic',
+            topic_name='b_topic name',
             story_id='story_id2',
             story_title='A new story title',
             chapter_title='A new chapter title',
@@ -62,6 +61,58 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
             language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='opportunity_id3',
+            topic_id='topic_id1',
+            topic_name='a_topic name',
+            story_id='story_id3',
+            story_title='A third story title',
+            chapter_title='A third chapter title',
+            content_count=120,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+            language_codes_needing_voice_artists=[],
+            language_codes_with_assigned_voice_artists=[]
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='opportunity_id4',
+            topic_id='topic_id3',
+            topic_name='c_topic name',
+            story_id='story_id4',
+            story_title='A fourth story title',
+            chapter_title='A fourth chapter title',
+            content_count=120,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+            language_codes_needing_voice_artists=[],
+            language_codes_with_assigned_voice_artists=[]
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='opportunity_id5',
+            topic_id='topic_id4',
+            topic_name='d_topic name',
+            story_id='story_id5',
+            story_title='A fifth story title',
+            chapter_title='A fifth chapter title',
+            content_count=120,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+            language_codes_needing_voice_artists=[],
+            language_codes_with_assigned_voice_artists=[]
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='opportunity_id6',
+            topic_id='topic_id3',
+            topic_name='c_topic name',
+            story_id='story_id6',
+            story_title='A sixth story title',
+            chapter_title='A sixth chapter title',
+            content_count=120,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+            language_codes_needing_voice_artists=[],
             language_codes_with_assigned_voice_artists=[]
         ).put()
 
@@ -74,35 +125,59 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_all_translation_opportunities(self) -> None:
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(5, None, 'hi'))
+            .get_all_translation_opportunities(6, None, 'hi', ''))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertEqual(len(results), 6)
+        self.assertEqual(results[0].topic_name, 'a_topic name')
+        self.assertEqual(results[1].topic_name, 'a_topic name')
+        self.assertEqual(results[2].topic_name, 'b_topic name')
+        self.assertEqual(results[3].topic_name, 'c_topic name')
+        self.assertEqual(results[4].topic_name, 'c_topic name')
+        self.assertEqual(results[5].topic_name, 'd_topic name')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_all_translation_opportunities_pagination(self) -> None:
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, None, 'hi'))
+            .get_all_translation_opportunities(1, None, 'hi', ''))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertEqual(results[0].topic_name, 'a_topic name')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
-        results, new_cursor, more = (
+        results, second_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, cursor, 'hi'))
+            .get_all_translation_opportunities(1, cursor, 'hi', ''))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertEqual(results[0].topic_name, 'a_topic name')
+        self.assertTrue(more)
+        self.assertTrue(isinstance(second_cursor, str))
+
+        results, third_cursor, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(1, second_cursor, 'hi', ''))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].topic_name, 'b_topic name')
+        self.assertTrue(more)
+        self.assertTrue(isinstance(third_cursor, str))
+
+    def test_get_translation_opportunities_by_topic(self) -> None:
+        results, cursor, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(5, None, 'hi', 'a_topic name'))
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertEqual(results[1].id, 'opportunity_id3')
         self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_all_voiceover_opportunities(self) -> None:
         results, cursor, more = (
@@ -114,7 +189,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_all_voiceover_opportunities_pagination(self) -> None:
         results, cursor, more = (
@@ -125,7 +200,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -135,7 +210,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(new_cursor, str))
 
     def test_get_by_topic(self) -> None:
         model_list = (
@@ -143,7 +218,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_by_topic('topic_id1'))
         # Ruling out the possibility of None for mypy type checking.
         assert model_list is not None
-        self.assertEqual(len(model_list), 1)
+        self.assertEqual(len(model_list), 2)
         self.assertEqual(model_list[0].id, 'opportunity_id1')
 
         model_list = (
@@ -165,7 +240,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_delete_all(self) -> None:
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, None, 'hi'))
+            .get_all_translation_opportunities(1, None, 'hi', ''))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
@@ -175,7 +250,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
 
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, None, 'hi'))
+            .get_all_translation_opportunities(1, None, 'hi', ''))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 0)
@@ -186,7 +261,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunityModel class."""
 
     def setUp(self) -> None:
-        super(SkillOpportunityModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(SkillOpportunityModelTest, self).setUp()
 
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id1',
@@ -214,7 +289,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_get_skill_opportunities_pagination(self) -> None:
         results, cursor, more = (
@@ -225,7 +300,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
@@ -235,7 +310,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+        self.assertTrue(isinstance(cursor, str))
 
     def test_delete_all_skill_opportunities(self) -> None:
         results, _, more = (

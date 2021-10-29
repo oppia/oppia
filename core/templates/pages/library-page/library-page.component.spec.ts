@@ -231,7 +231,7 @@ describe('Library Page Component', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.returnValue(Promise.resolve(true));
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(libraryPageBackendApiService, 'fetchLibraryGroupDataAsync')
       .and.returnValue(Promise.resolve({
         activity_list: [],
@@ -250,7 +250,7 @@ describe('Library Page Component', () => {
     expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
       .toHaveBeenCalled();
     expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBeTrue();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(libraryPageBackendApiService.fetchLibraryGroupDataAsync)
       .toHaveBeenCalled();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit)
@@ -265,7 +265,7 @@ describe('Library Page Component', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.returnValue(Promise.resolve(true));
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
@@ -294,7 +294,7 @@ describe('Library Page Component', () => {
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
     expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
       .toHaveBeenCalled();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(libraryPageBackendApiService.fetchLibraryIndexDataAsync)
       .toHaveBeenCalled();
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
@@ -309,7 +309,7 @@ describe('Library Page Component', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
         .and.returnValue(Promise.resolve(true));
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(pageTitleService, 'setDocumentTitle');
       windowRef.nativeWindow.location.pathname = '/community-library';
       fixture.detectChanges();
       spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
@@ -338,7 +338,7 @@ describe('Library Page Component', () => {
       expect(
         classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
         .toHaveBeenCalled();
-      expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
       expect(userService.getUserInfoAsync).toHaveBeenCalled();
       expect(loggerService.error).toHaveBeenCalledWith(
         'The actual width of tile is different than the ' +
@@ -353,7 +353,7 @@ describe('Library Page Component', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.returnValue(Promise.resolve(true));
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     windowRef.nativeWindow.location.pathname = '/not-valid';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
@@ -376,7 +376,7 @@ describe('Library Page Component', () => {
     expect(
       classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
       .toHaveBeenCalled();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
     expect(loggerService.error).toHaveBeenCalled();
   }));

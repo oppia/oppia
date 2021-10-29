@@ -29,7 +29,6 @@ from . import python_linter
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
-PYTHON_UTILS_FILEPATH = os.path.join(os.getcwd(), 'python_utils.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
 INVALID_PYCODESTYLE_FILEPATH = os.path.join(
@@ -101,29 +100,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             'invalid_docstring\n\n\nW: 27, 0: Period is not used at '
             'the end of the docstring. \n')
 
-    def test_python_utils_file_with_no_files(self):
-        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
-            [PYTHON_UTILS_FILEPATH]
-        ).lint_py_files_for_python3_compatibility()
-        self.assert_same_list_elements([
-            'There are no Python files to lint for Python 3 '
-            'compatibility.'], lint_task_report[0].get_report())
-        self.assertEqual(
-            'Pylint for Python 3 compatibility', lint_task_report[0].name)
-        self.assertFalse(lint_task_report[0].failed)
-
-    def test_for_python_three_incompatibility(self):
-        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
-            [INVALID_PYTHON3_FILEPATH]
-        ).lint_py_files_for_python3_compatibility()
-        self.assert_same_list_elements(
-            ['W1618: import missing `from __future__ import absolute_import` '
-             '(no-absolute-import)'],
-            lint_task_report.get_report())
-        self.assertEqual(
-            'Pylint for Python 3 compatibility', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
     def test_third_party_linter_with_no_files(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             []).perform_all_lint_checks()
@@ -142,7 +118,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
         self.assert_same_list_elements(
-            ['27:1: E302 expected 2 blank lines, found 1'],
+            ['25:1: E302 expected 2 blank lines, found 1'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

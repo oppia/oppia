@@ -1,0 +1,29 @@
+<mat-card class="oppia-page-card oppia-long-text" *ngIf="hasPageLoaded()">
+  <h2>Collection Permissions</h2>
+  <div class="row">
+    <div class="col-lg-5 col-md-5 col-sm-5">
+      <h3>Managers</h3>
+      <ul>
+        <li *ngFor="let ownerName of collectionRights.getOwnerNames()">
+          {{ ownerName }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-lg-7 col-md-7 col-sm-7">
+      <h3>Permissions</h3>
+      <div *ngIf="collectionRights.isPrivate()">
+        This collection is <strong>private</strong>.
+        <br>
+        <br>
+        It is <strong>not shown</strong> in the Oppia library.
+      </div>
+      <div *ngIf="collectionRights.isPublic()">
+        This collection is <strong>public</strong>: anyone can access it.
+        <br>
+        <br>
+        It is <strong>available</strong> in the Oppia library.
+      </div>
+    </div>
+  </div>
+</mat-card>

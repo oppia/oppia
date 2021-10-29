@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import blog_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 
 class BlogDashboardPageTests(test_utils.GenericTestBase):

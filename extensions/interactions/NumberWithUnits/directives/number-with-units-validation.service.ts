@@ -63,9 +63,9 @@ export class NumberWithUnitsValidationService {
 
     var checkEquality = (earlierRule: Rule, laterRule: Rule) => {
       var answer = this.unitObjectFactory.fromDict(
-         <NumberWithUnitsAnswer> earlierRule.inputs.f);
+         earlierRule.inputs.f as NumberWithUnitsAnswer);
       var inputs = this.unitObjectFactory.fromDict(
-         <NumberWithUnitsAnswer> laterRule.inputs.f);
+         laterRule.inputs.f as NumberWithUnitsAnswer);
 
       var answerString = answer.toMathjsCompatibleString();
       var inputsString = inputs.toMathjsCompatibleString();
@@ -80,9 +80,9 @@ export class NumberWithUnitsValidationService {
 
     var checkEquivalency = (earlierRule: Rule, laterRule: Rule) => {
       var earlierInput = this.unitObjectFactory.fromDict(
-        <NumberWithUnitsAnswer> earlierRule.inputs.f);
+        earlierRule.inputs.f as NumberWithUnitsAnswer);
       var laterInput = this.unitObjectFactory.fromDict(
-         <NumberWithUnitsAnswer> laterRule.inputs.f);
+         laterRule.inputs.f as NumberWithUnitsAnswer);
       if (earlierInput.type === 'fraction') {
         earlierInput.type = 'real';
         earlierInput.real = earlierInput.fraction.toFloat();
@@ -95,12 +95,12 @@ export class NumberWithUnitsValidationService {
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
-      } catch (e) {
+      } catch (e: unknown) {
         var additionalInfo = (
           '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
           '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
         );
-        e.message += additionalInfo;
+        (e as Error).message += additionalInfo;
         throw e;
       }
     };

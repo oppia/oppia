@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 from core.platform import models
-import utils
 
 from typing import Dict, Optional
 

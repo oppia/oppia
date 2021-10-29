@@ -21,7 +21,7 @@ import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { BehaviorSubject, combineLatest, interval, Observable, of, Subscription, zip } from 'rxjs';
+import { BehaviorSubject, combineLatest, interval, NEVER, Observable, of, Subscription, zip } from 'rxjs';
 import { catchError, distinctUntilChanged, first, map, startWith, switchMap } from 'rxjs/operators';
 
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
@@ -96,17 +96,30 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
       )
     );
 
-    // Intervals need to be executed outside of Angular so that they don't
+    // Intervals need to be executed *outside* of Angular so that they don't
     // interfere with testability (otherwise, the Angular component will never
     // be "ready" since an interval executes indefinitely).
     this.ngZone.runOutsideAngular(() => {
       this.beamJobRunsRefreshIntervalSubscription = (
         interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
-          .pipe(switchMap(() => this.backendApiService.getBeamJobRuns()))
+          .pipe(switchMap(() => {
+            // If every job in the current list is in a terminal state (won't
+            // ever change), then we return NEVER (an Observable which neither
+            // completes nor emits values) to avoid calling out to the backend.
+            //
+            // We do this because there's no point in trying to update the state
+            // of jobs that have already reached their terminal (final) state.
+            if (this.beamJobRuns.value.every(j => j.inTerminalState())) {
+              return NEVER;
+            } else {
+              // Otherwise, try to reach out to the backend and retrieve an
+              // update on the state of our jobs.
+              return this.backendApiService.getBeamJobRuns();
+            }
+          }))
           .subscribe(beamJobRuns => {
-            // When we're ready to update the beam jobs, however, we want the
-            // update to occur within Angular so that change detection can
-            // notice it.
+            // When we're ready to update the beam jobs, we want the update to
+            // execute *inside* of Angular so that change detection can notice.
             this.ngZone.run(() => this.beamJobRuns.next(beamJobRuns));
           })
       );

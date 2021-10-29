@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
+from core import python_utils
 from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -66,7 +66,7 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         Skill or None. The domain object representing a skill with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.UNICODE(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_skill = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_SKILL,
         sub_namespace,

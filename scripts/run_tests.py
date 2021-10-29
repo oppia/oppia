@@ -29,7 +29,7 @@ from __future__ import unicode_literals
 import argparse
 import subprocess
 
-import python_utils
+from core import python_utils
 
 from . import run_backend_tests
 from . import run_frontend_tests

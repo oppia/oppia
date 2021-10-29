@@ -47,7 +47,7 @@ describe('Collection Creation backend api service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    explorationCreationBackendApiService.registerNewExplorationAsync().then(
+    explorationCreationBackendApiService.registerNewExplorationAsync({}).then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -67,7 +67,7 @@ describe('Collection Creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      explorationCreationBackendApiService.registerNewExplorationAsync().then(
+      explorationCreationBackendApiService.registerNewExplorationAsync({}).then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

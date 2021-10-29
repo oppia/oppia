@@ -63,7 +63,7 @@ describe('Practice session page', function() {
       '["1","2","3","4","5"]');
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
 
     $httpBackend.expectGET(
       '/practice_session/data/math/abbrev-topic?' +
@@ -83,8 +83,8 @@ describe('Practice session page', function() {
     expect(ctrl.questionPlayerConfig).toEqual({
       resultActionButtons: [
         {
-          type: 'BOOST_SCORE',
-          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+          type: 'REVIEW_LOWEST_SCORED_SKILL',
+          i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
         },
         {
           type: 'RETRY_SESSION',
@@ -103,7 +103,7 @@ describe('Practice session page', function() {
       questionCount: 20,
       questionsSortedByDifficulty: false
     });
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'Practice Session: Foo Topic - Oppia');
   });
 });

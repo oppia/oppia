@@ -138,7 +138,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
-            PageTitleService.setPageSubtitleForMobileView($scope.currentTitle);
+            PageTitleService.setNavbarSubtitleForMobileView(
+              $scope.currentTitle);
             $scope.editableTitle = $scope.currentTitle;
             $scope.currentDescription = $scope.getDescription();
             $scope.editableDescription = $scope.currentDescription;
@@ -422,7 +423,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.explorationInputButtonsAreShown = false;
             $scope.chapterOutlineButtonsAreShown = false;
             $scope.skillIdToSummaryMap = {};
-            PageTitleService.setPageTitleForMobileView('Chapter Editor');
+            PageTitleService.setNavbarTitleForMobileView('Chapter Editor');
             $scope.chapterOutlineIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.chapterTodoCardIsShown = (

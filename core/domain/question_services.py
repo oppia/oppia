@@ -20,16 +20,15 @@ from __future__ import unicode_literals
 import copy
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
@@ -568,7 +567,7 @@ def apply_change_list(question_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, question_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_question(committer_id, question, change_list, commit_message):

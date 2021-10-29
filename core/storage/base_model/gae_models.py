@@ -20,12 +20,10 @@ from __future__ import unicode_literals
 import datetime
 import enum
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.platform import models
-import feconf
-import python_utils
-
-import utils
 
 from typing import ( # isort:skip
     Any, Dict, List, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
@@ -398,7 +396,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_all(
-            cls, include_deleted: bool = False
+            cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
     ) -> datastore_services.Query:
         """Gets iterable of all entities of this class.
 
@@ -431,7 +429,7 @@ class BaseModel(datastore_services.Model):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(MAX_RETRIES):
+        for _ in range(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH
@@ -447,7 +445,7 @@ class BaseModel(datastore_services.Model):
             query: datastore_services.Query,
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List[SELF_BASE_MODEL], Optional[str], bool]:
+    ) -> Tuple[Sequence[SELF_BASE_MODEL], Optional[str], bool]:
         """Fetches a page of entities sorted by their last_updated attribute in
         descending order (newly updated first).
 
@@ -478,16 +476,18 @@ class BaseModel(datastore_services.Model):
         )
 
         last_updated_query = query.order(-cls.last_updated)
-        query_models, next_cursor, _ = last_updated_query.fetch_page(
-            page_size, start_cursor=start_cursor)
+        fetch_result: Tuple[
+            Sequence[SELF_BASE_MODEL], datastore_services.Cursor, bool
+        ] = last_updated_query.fetch_page(page_size, start_cursor=start_cursor)
+        query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = last_updated_query.fetch_page(
+        fetch_result = last_updated_query.fetch_page(
             page_size + 1, start_cursor=start_cursor)
-        base_model_results = cast(List[SELF_BASE_MODEL], query_models)
+        plus_one_query_models, _, _ = fetch_result
         # The urlsafe returns bytes and we need to decode them to string.
         return (
-            base_model_results,
+            query_models,
             (next_cursor.urlsafe().decode('utf-8') if next_cursor else None),
             len(plus_one_query_models) == page_size + 1
         )
@@ -710,7 +710,7 @@ class BaseCommitLogEntryModel(BaseModel):
             cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[str], bool]:
+    ) -> Tuple[Sequence[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[str], bool]:
         """Fetches a list of all the commits sorted by their last updated
         attribute.
 
@@ -974,7 +974,7 @@ class VersionedModel(BaseModel):
         if force_deletion:
             current_version = self.version
 
-            version_numbers = python_utils.RANGE(1, current_version + 1)
+            version_numbers = range(1, current_version + 1)
             snapshot_ids = [
                 self.get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
@@ -1051,7 +1051,7 @@ class VersionedModel(BaseModel):
             all_models_content_keys = []
             all_models_commit_keys: List[datastore_services.Key] = []
             for model in versioned_models:
-                model_version_numbers = python_utils.RANGE(1, model.version + 1)
+                model_version_numbers = range(1, model.version + 1)
                 model_snapshot_ids = [
                     model.get_snapshot_id(model.id, version_number)
                     for version_number in model_version_numbers]
@@ -1085,7 +1085,7 @@ class VersionedModel(BaseModel):
                 all_models_commit_keys +
                 versioned_models_keys
             )
-            for i in python_utils.RANGE(
+            for i in range(
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -1121,6 +1121,9 @@ class VersionedModel(BaseModel):
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
+            # We need the cast here in order to convey to MyPy that all these
+            # lists can be merged together for the purpose of putting them into
+            # the datastore.
             entities = (
                 cast(List[BaseModel], snapshot_metadata_models) +
                 cast(List[BaseModel], snapshot_content_models) +
@@ -1241,7 +1244,7 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
-    def get_version( # type: ignore[return]
+    def get_version(
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
@@ -1278,10 +1281,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError:
+        except cls.EntityNotFoundError as e:
             if not strict:
                 return None
-            python_utils.reraise_exception() # type: ignore[no-untyped-call]
+            raise e
 
     @classmethod
     def get_multi_versions(
@@ -1429,6 +1432,8 @@ class VersionedModel(BaseModel):
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
 
+        # We need the cast here to make sure that returned_models only contains
+        # BaseSnapshotMetadataModel and not None.
         returned_models_without_none = cast(
             List[BaseSnapshotMetadataModel], returned_models)
         return [{
@@ -1582,11 +1587,9 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
-        metadata_models = cast(
-            List[BaseSnapshotMetadataModel],
-            cls.query(cls.committer_id == user_id).fetch(
-                projection=[cls.commit_type, cls.commit_message])
-        )
+        metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(
+            cls.committer_id == user_id
+        ).fetch(projection=[cls.commit_type, cls.commit_message])
         user_data = {}
         for metadata_model in metadata_models:
             user_data[metadata_model.id] = {

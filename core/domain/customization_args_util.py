@@ -19,9 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
-import schema_utils
-import utils
+from core import schema_utils
+from core import utils
 
 
 def get_full_customization_args(customization_args, ca_specs):
@@ -94,7 +93,7 @@ def validate_customization_args_and_values(
 
     # Check for extra invalid keys.
     for arg_name in customization_args.keys():
-        if not isinstance(arg_name, python_utils.BASESTRING):
+        if not isinstance(arg_name, str):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:

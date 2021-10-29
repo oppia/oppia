@@ -21,10 +21,9 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -105,7 +104,7 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.fetch_page(1, None, None))
         self.assertEqual(skill_summaries[0].id, 'skill_id2')
         self.assertTrue(more)
-        self.assertTrue(isinstance(next_cursor, python_utils.BASESTRING))
+        self.assertIsInstance(next_cursor, str)
 
         skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(10, None, None))

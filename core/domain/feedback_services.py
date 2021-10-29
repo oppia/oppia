@@ -22,6 +22,8 @@ from __future__ import unicode_literals
 import datetime
 import itertools
 
+from core import feconf
+from core import python_utils
 from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import rights_manager
@@ -29,8 +31,6 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
 
 (
     email_models, expl_models, feedback_models,
@@ -728,8 +728,7 @@ def get_exp_thread_summaries(user_id, thread_ids):
                 t.get_last_two_message_ids() for t in threads)))
     last_two_message_models_of_threads = [
         flattened_last_two_message_models_of_threads[i:i + 2]
-        for i in python_utils.RANGE(
-            0, len(flattened_last_two_message_models_of_threads), 2)
+        for i in range(0, len(flattened_last_two_message_models_of_threads), 2)
     ]
 
     thread_summaries = []

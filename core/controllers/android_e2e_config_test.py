@@ -19,14 +19,14 @@ from __future__ import unicode_literals
 
 import os
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import exp_fetchers
 from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
-import feconf
 
 
 class AndroidConfigTest(test_utils.GenericTestBase):

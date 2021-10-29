@@ -31,14 +31,16 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
-import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
 import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
+import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 
 @NgModule({
   imports: [
@@ -51,7 +53,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
-    ContentLanguageSelectorComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -60,10 +61,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
+    WelcomeModalComponent,
+    StateDiffModalComponent,
+    PostPublishModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
-    ContentLanguageSelectorComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -71,6 +74,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
+    WelcomeModalComponent,
+    StateDiffModalComponent,
+    PostPublishModalComponent,
   ],
   providers: [
     {

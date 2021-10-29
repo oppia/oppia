@@ -78,4 +78,32 @@ describe('Event Bus Group', () => {
     eventbusGroup.emit(new CustomEvent('Event'));
     eventbusGroup.unsubscribe();
   }));
+
+  it('should throw uncaught errors that are not Error type', waitForAsync(
+    () => {
+      spyOn(Subject.prototype, 'subscribe').and.callFake(
+        (f) => {
+          // This throws "This expression is not callable. Not all constituents
+          // of type 'PartialObserver<any> | ((value: any) => void) |
+          // ((value: any) => void)' are callable. Type 'NextObserver<any>'
+          // has no call signatures". We need to suppress this error because of
+          // strict type checking.
+          // @ts-ignore
+          // The eslint error is suppressed since we need to test if
+          // just a string was thrown.
+          // eslint-disable-next-line oppia/no-to-throw
+          expect(() => f()).toThrow('Random Error');
+          return new Subscription();
+        }
+      );
+      eventbusGroup.on(CustomEvent as Newable<CustomEvent>, _ => {
+        // The eslint error is suppressed since we need to throw just a string
+        // for testing purposes.
+        // eslint-disable-next-line no-throw-literal
+        throw 'Random Error';
+      });
+      eventbusGroup.emit(new CustomEvent('Event'));
+      eventbusGroup.unsubscribe();
+    }
+  ));
 });

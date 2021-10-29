@@ -96,8 +96,8 @@ export class UtilsService {
       const getKeyValue = (key: string) =>
         (obj: Record<string, Object>) => obj[key];
       if (!this.isEquivalent(
-        getKeyValue(propName)(<Record<string, object>>a),
-        getKeyValue(propName)(<Record<string, object>>b))
+        getKeyValue(propName)(a as Record<string, object>),
+        getKeyValue(propName)(b as Record<string, object>))
       ) {
         return false;
       }
@@ -126,6 +126,46 @@ export class UtilsService {
       return (
         element.offsetWidth < element.scrollWidth ||
         element.offsetHeight < element.scrollHeight);
+    }
+  }
+
+  // Determines whether the URL is pointing to a page on the Oppia site.
+  getSafeReturnUrl(urlString: string): string {
+    try {
+      // Make sure the URL can be decoded properly.
+      urlString = decodeURIComponent(urlString);
+    } catch (_) {
+      // The URL could not be decoded, so reject it and return '/' instead.
+      return '/';
+    }
+
+    try {
+      // Throws an exception when the URL does not have a scheme.
+      const url = new URL(urlString);
+
+      // Does this URL originate from this website?
+      if (url.origin !== new URL(document.URL, document.baseURI).origin) {
+        // This is an external URL, so reject it and return '/' instead.
+        return '/';
+      }
+    } catch (_) {
+      // Continue to the next validation strategy.
+    }
+
+    try {
+      // Throws an exception if the URL is truly malformed in some way.
+      new URL(urlString, document.baseURI);
+    } catch (_) {
+      // This is a truly malformed URL, so reject it and return '/' instead.
+      return '/';
+    }
+
+    if (urlString.charAt(0) !== '/' || urlString.charAt(1) === '/') {
+      // The URL is not a relative path, so reject it and return '/' instead.
+      return '/';
+    } else {
+      // The URL is a safe, relative path.
+      return urlString;
     }
   }
 }

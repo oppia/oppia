@@ -71,6 +71,6 @@ describe('Delete Account Service', () => {
     tick(150);
 
     expect(windowRef.nativeWindow.location.href).toBe(
-      '/logout?redirect_url=pending-account-deletion');
+      '/logout?redirect_url=/pending-account-deletion');
   }));
 });

@@ -101,7 +101,9 @@ describe('Enable correctness feedback and set correctness', function() {
     // Create interaction first.
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
+      await forms.toRichText('Wrong!'),
+      await forms.toRichText('Not correct'),
+      await forms.toRichText('Wrong again')
     ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
@@ -221,7 +223,9 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
+      await forms.toRichText('Wrong!'),
+      await forms.toRichText('Not correct'),
+      await forms.toRichText('Wrong again')
     ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
@@ -238,7 +242,9 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
+      await forms.toRichText('Wrong!'),
+      await forms.toRichText('Not correct'),
+      await forms.toRichText('Wrong again')
     ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
@@ -246,6 +252,12 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Wrong!'),
       'First', false, 'Equals', 'Wrong!');
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Not correct'),
+      'First', false, 'Equals', 'Not correct');
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Wrong again'),
+      'First', false, 'Equals', 'Wrong again');
 
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
@@ -347,7 +359,10 @@ describe('Core exploration functionality', function() {
         await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
       });
       await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-        await forms.toRichText('option A'), await forms.toRichText('option B')
+        await forms.toRichText('option A'),
+        await forms.toRichText('option B'),
+        await forms.toRichText('option C'),
+        await forms.toRichText('option D')
       ]);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(
         'default');
@@ -361,7 +376,9 @@ describe('Core exploration functionality', function() {
       await general.moveToPlayer();
       await explorationPlayerPage.expectExplorationToNotBeOver();
       await explorationPlayerPage.expectInteractionToMatch(
-        'MultipleChoiceInput', ['option A', 'option B']);
+        'MultipleChoiceInput',
+        ['option A', 'option B', 'option C', 'option D']
+      );
       await explorationPlayerPage.submitAnswer(
         'MultipleChoiceInput', 'option B');
       await explorationPlayerPage.expectExplorationToBeOver();
@@ -420,9 +437,10 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
-    // Numeric input does not have any customization arguments. Therefore the
-    // customization modal and the save interaction button does not appear.
-    await explorationEditorMainTab.setInteraction('NumericInput');
+    // NumberWithUnits input does not have any customization arguments.
+    // Therefore the customization modal and the save interaction button do
+    // not appear.
+    await explorationEditorMainTab.setInteraction('NumberWithUnits');
     await explorationEditorMainTab.deleteInteraction();
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
@@ -434,11 +452,11 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
-    // Numeric input does not have any customization arguments. Therefore, on
-    // re-clicking, a modal opens up informing the user that this interaction
-    // does not have any customization options. To dismiss this modal, user
-    // clicks 'Okay' implying that he/she has got the message.
-    await explorationEditorMainTab.setInteraction('NumericInput');
+    // NumberWithUnits input does not have any customization arguments.
+    // Therefore, on re-clicking, a modal opens up informing the user that
+    // this interaction does not have any customization options. To dismiss
+    // this modal, user clicks 'Okay' implying that he/she has got the message.
+    await explorationEditorMainTab.setInteraction('NumberWithUnits');
     var testInteractionButton = element(by.css('.protractor-test-interaction'));
     await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(

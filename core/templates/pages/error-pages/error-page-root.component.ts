@@ -41,6 +41,6 @@ export class ErrorPageRootComponent {
     this.statusCode = bodyTag[0].getAttribute('errorCode') ?
       bodyTag[0].getAttribute('errorCode') : '404';
     // Update the default page title.
-    this.pageTitleService.setPageTitle(`Error ${this.statusCode} | Oppia`);
+    this.pageTitleService.setDocumentTitle(`Error ${this.statusCode} | Oppia`);
   }
 }

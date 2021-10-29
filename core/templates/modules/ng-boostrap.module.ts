@@ -19,7 +19,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
-  NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+  NgbModalModule, NgbPopoverModule,
+  NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
-    NgbPopoverModule
+    NgbPopoverModule,
+    NgbTypeaheadModule
   ],
   exports: [
     CommonModule,
@@ -36,7 +38,8 @@ import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
-    NgbPopoverModule
+    NgbPopoverModule,
+    NgbTypeaheadModule
   ]
 })
 export class NgBootstrapModule {}

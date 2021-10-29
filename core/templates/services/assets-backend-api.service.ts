@@ -17,7 +17,7 @@
  * assets from Google Cloud Storage.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -106,8 +106,11 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveAudioResponse>(
         this.getAudioUploadUrl(explorationId), form).toPromise();
-    } catch (reason) {
-      return Promise.reject(reason.error);
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse) {
+        return Promise.reject(error.error);
+      }
+      throw error;
     }
   }
 
@@ -122,8 +125,11 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveImageResponse>(
         this.getImageUploadUrl(entityType, entityId), form).toPromise();
-    } catch (reason) {
-      return Promise.reject(reason.error);
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse) {
+        return Promise.reject(error.error);
+      }
+      throw error;
     }
   }
 

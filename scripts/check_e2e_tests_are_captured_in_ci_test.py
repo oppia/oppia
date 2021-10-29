@@ -20,8 +20,8 @@ from __future__ import unicode_literals
 import os
 import re
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import check_e2e_tests_are_captured_in_ci
 

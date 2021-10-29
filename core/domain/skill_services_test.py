@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import config_services
 from core.domain import question_domain
 from core.domain import skill_domain
@@ -32,8 +33,6 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (skill_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.suggestion])
@@ -96,7 +95,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
     def test_apply_change_list_with_invalid_property_name(self):
-        class MockSkillChange(python_utils.OBJECT):
+        class MockSkillChange:
             def __init__(self, cmd, property_name):
                 self.cmd = cmd
                 self.property_name = property_name

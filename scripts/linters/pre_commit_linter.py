@@ -64,7 +64,7 @@ import subprocess
 import sys
 import threading
 
-import python_utils
+from core import python_utils
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
@@ -89,7 +89,7 @@ SHARDS = {
         'core/storage/',
         'core/controllers/',
         'core/platform',
-        'jobs/',
+        'core/jobs/',
     ],
     'other': None,
 }
@@ -152,7 +152,7 @@ for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
 
-class FileCache(python_utils.OBJECT):
+class FileCache:
     """Provides thread-safe access to cached file content."""
 
     def __init__(self):
@@ -289,7 +289,7 @@ def _get_changed_filepaths():
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
     all_changed_filepaths = unstaged_files + staged_files
-    return all_changed_filepaths[:]
+    return [filepath.decode('utf-8') for filepath in all_changed_filepaths]
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
@@ -482,7 +482,7 @@ def _get_all_filepaths(
     all_matching_filepaths = [
         filename for filename in all_filepaths if not
         any(
-            fnmatch.fnmatch(filename, pattern) for pattern  # pylint: disable=comprehension-escape
+            fnmatch.fnmatch(filename, pattern) for pattern
             in general_purpose_linter.EXCLUDED_PATHS
         )
     ]

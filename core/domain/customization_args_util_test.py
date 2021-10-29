@@ -22,12 +22,12 @@ from __future__ import unicode_literals
 import os
 import re
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 
 class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
@@ -456,16 +456,16 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         for line in lines:
             # Checks that the customization args interfaces are being used
             # to typecast the customization args. Matches patterns
-            # <XCustomizationArgs> or <XCustomizationArgsBackendDict> where
-            # X is an interaction id.
-            # Group 1: Matches the string '<'.
+            # 'as XCustomizationArgs' or 'as XCustomizationArgsBackendDict'
+            # where X is an interaction id.
+            # Group 1: Matches the string 'as'
             # Group 2: Matches an interaction id.
             # Group 3: Matches the string 'CustomizationArgs'.
             # Group 4: Matches the string 'BackendDict' (optional).
-            # Group 5: Matches the string '>'.
+
             used_match = (
                 re.search(
-                    r'(<)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?(>)',
+                    r'(as )([a-zA-Z]+)(CustomizationArgs)(BackendDict)?',
                     line
                 ))
             if used_match:

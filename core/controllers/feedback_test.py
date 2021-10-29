@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -29,8 +30,6 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
@@ -307,13 +306,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Generate 10 users.
         num_users = 10
-        for num in python_utils.RANGE(num_users):
+        for num in range(num_users):
             username = _get_username(num)
             email = _get_email(num)
             self.signup(email, username)
 
         # Each of these users posts a new message to the same thread.
-        for num in python_utils.RANGE(num_users):
+        for num in range(num_users):
             self.login(_get_email(num))
             csrf_token = self.get_new_csrf_token()
             self.post_json(
@@ -335,7 +334,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.EDITOR_USERNAME)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
-        for num in python_utils.RANGE(num_users):
+        for num in range(num_users):
             self.assertEqual(
                 response_dict['messages'][num + 1]['author_username'],
                 _get_username(num))

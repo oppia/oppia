@@ -22,14 +22,14 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
-import feconf
-import python_utils
-import utils
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -113,7 +113,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             max_age: Optional[datetime.timedelta] = None
-    ) -> Tuple[List['CollectionCommitLogEntryModel'], Optional[str], bool]:
+    ) -> Tuple[Sequence['CollectionCommitLogEntryModel'], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their last
         updated attribute.
 
@@ -656,7 +656,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = python_utils.NEXT(
+            user_id_attribute_names = next(
                 cmd['user_id_attribute_names']
                 for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
                 if cmd['name'] == commit_cmd['cmd']
@@ -844,24 +844,20 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> List['CollectionSummaryModel']:
+    def get_non_private(cls) -> Sequence['CollectionSummaryModel']:
         """Returns an iterable with non-private collection summary models.
 
         Returns:
             iterable. An iterable with non-private collection summary models.
         """
-        summary_models = CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        return cls.get_all().filter(
+            cls.status != constants.ACTIVITY_STATUS_PRIVATE
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[CollectionSummaryModel], summary_models)
 
     @classmethod
     def get_private_at_least_viewable(
             cls, user_id: str
-    ) -> List['CollectionSummaryModel']:
+    ) -> Sequence['CollectionSummaryModel']:
         """Returns an iterable with private collection summary models that are
         at least viewable by the given user.
 
@@ -872,23 +868,20 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with private collection summary models that
             are at least viewable by the given user.
         """
-        summary_models = CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
+        return cls.get_all().filter(
+            cls.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             datastore_services.any_of(
-                CollectionSummaryModel.owner_ids == user_id,
-                CollectionSummaryModel.editor_ids == user_id,
-                CollectionSummaryModel.viewer_ids == user_id)
-        ).filter(
-            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.viewer_ids == user_id
+            )
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[CollectionSummaryModel], summary_models)
 
     @classmethod
     def get_at_least_editable(
             cls, user_id: str
-    ) -> List['CollectionSummaryModel']:
+    ) -> Sequence['CollectionSummaryModel']:
         """Returns an iterable with collection summary models that are at least
         editable by the given user.
 
@@ -899,12 +892,9 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
-        summary_models = CollectionSummaryModel.query().filter(
+        return CollectionSummaryModel.get_all().filter(
             datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
-                CollectionSummaryModel.editor_ids == user_id)
-        ).filter(
-            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+                CollectionSummaryModel.editor_ids == user_id
+            )
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[CollectionSummaryModel], summary_models)

@@ -26,6 +26,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
+from core.platform.search import elastic_search_services as search_services
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
 from core.storage.activity import gae_models as activity_models
@@ -34,6 +35,7 @@ from core.storage.app_feedback_report import (
 from core.storage.audit import gae_models as audit_models
 from core.storage.auth import gae_models as auth_models
 from core.storage.base_model import gae_models as base_models
+from core.storage.beam_job import gae_models as beam_job_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.classifier import gae_models as classifier_models
 from core.storage.collection import gae_models as collection_models
@@ -61,6 +63,7 @@ __all__ = [
     'audit_models',
     'auth_models',
     'base_models',
+    'beam_job_models',
     'blog_models',
     'classifier_models',
     'collection_models',
@@ -74,6 +77,7 @@ __all__ = [
     'opportunity_models',
     'question_models',
     'recommendations_models',
+    'search_services',
     'skill_models',
     'stats_models',
     'story_models',
