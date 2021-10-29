@@ -2530,17 +2530,18 @@ class Exploration:
         Returns:
             Proto Object. The exploration proto object.
         """
-        state_protos = None
+        state_protos = {}
+        exploration_proto = {}
         if states is not None:
             state_protos = state_domain.State.to_state_proto(states)
 
-        exploration_proto = exploration_pb2.Exploration(
-            id=exploration_id,
-            content_version=version,
-            init_state_name=init_state_name,
-            title=title,
-            states=state_protos
-        )
+        if isinstance(title, str):
+            exploration_proto = exploration_pb2.Exploration(
+                id=exploration_id,
+                content_version=version,
+                init_state_name=init_state_name,
+                title=title,
+                states=state_protos)
         return exploration_proto
 
     @classmethod

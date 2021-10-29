@@ -564,9 +564,11 @@ def apply_change_list(exploration_id, change_list):
                             change.to_version))
 
         exp_android_proto = exploration.to_proto(
-            exploration_id, exploration.title, exploration.version,
+            exploration.id, exploration.title, exploration.version,
             exploration.init_state_name, exploration.states)
-        exp_android_proto_size = int(exp_android_proto.ByteSize())
+        exp_android_proto_size = 0
+        if exp_android_proto != {}:
+            exp_android_proto_size = int(exp_android_proto.ByteSize())
         exploration.update_proto_size_in_bytes(exp_android_proto_size)
         return exploration
 
