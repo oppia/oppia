@@ -2255,7 +2255,7 @@ class Exploration:
             following schema version v55.
         """
 
-        exploration_dict['proto_size_in_bytes'] = None
+        exploration_dict['proto_size_in_bytes'] = 0
         return exploration_dict
 
     @classmethod
