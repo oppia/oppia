@@ -21,10 +21,13 @@ from __future__ import unicode_literals
 
 from typing import Dict, List, Tuple
 
+
 class TakeoutData:
     """Domain object for all information exported as part of Takeout."""
 
-    def __init__(self, user_data: Dict[str, str], user_images: List[object]) -> None:
+    def __init__(
+        self, user_data: Dict[str, str], user_images: List[object]
+    ) -> None:
         """Constructs a TakeoutData domain object.
 
         Args:
@@ -60,7 +63,9 @@ class TakeoutImageReplacementInstruction:
     with a path corresponding to a file in the final zip.
     """
 
-    def __init__(self, dictionary_path: Tuple[str], export_filename: str, new_key: str) -> None:
+    def __init__(
+        self, dictionary_path: Tuple[str], export_filename: str, new_key: str
+    ) -> None:
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:

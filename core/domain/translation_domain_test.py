@@ -27,7 +27,7 @@ from core.tests import test_utils
 class MachineTranslationTests(test_utils.GenericTestBase):
     """Tests for the MachineTranslation domain object."""
 
-    translation : translation_domain.MachineTranslation
+    translation: translation_domain.MachineTranslation
 
     def setUp(self) -> None:
         """Setup for MachineTranslation domain object tests."""
@@ -72,7 +72,9 @@ class MachineTranslationTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
-    def test_validate_with_same_source_target_language_codes_raises(self) -> None:
+    def test_validate_with_same_source_target_language_codes_raises(
+        self
+    ) -> None:
         self.translation.target_language_code = 'en'
         self.translation.source_language_code = 'en'
         expected_error_message = (

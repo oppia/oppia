@@ -19,17 +19,17 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from typing import Dict
-
 from core import utils
+
+from typing import Dict
 
 
 class MachineTranslation:
     """Domain object for machine translation of exploration content."""
 
     def __init__(
-            self, source_language_code: str, target_language_code: str, source_text: str,
-            translated_text: str) -> None:
+            self, source_language_code: str, target_language_code: str,
+            source_text: str, translated_text: str) -> None:
         """Initializes a MachineTranslation domain object.
 
         Args:
