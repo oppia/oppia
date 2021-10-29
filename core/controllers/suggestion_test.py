@@ -1056,9 +1056,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
-                'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, expected_status_int=400, upload_files=(
-                ('image', 'file.svg', large_image),),)
+                'skill_difficulty': 0.6,
+                'files': {'file.svg': large_image}
+            }, csrf_token=csrf_token, expected_status_int=400,
+        )
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -1590,9 +1591,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID,
                     'skill_difficulty': 0.3
                 },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token, upload_files=(
-                ('image', 'file.svg', raw_image), ))
+                'description': 'Add new question to skill',
+                'files': {'file.svg': raw_image}
+            }, csrf_token=csrf_token,)
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_provided(self):
@@ -1684,11 +1685,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID,
                     'skill_difficulty': 0.3
                 },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token,
-            upload_files=(
-                ('image', 'file.svg', large_image),),
-            expected_status_int=400)
+                'description': 'Add new question to skill',
+                'files': {'file.svg': large_image}
+            }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
