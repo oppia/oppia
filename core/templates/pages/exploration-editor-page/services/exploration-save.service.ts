@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
+import { ExplorationPublishModal } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -132,12 +133,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      $uibModal.open({
-        template: require(
-          'pages/exploration-editor-page/modal-templates/' +
-          'exploration-publish-modal.template.html'),
+      NgbModal.open(ExplorationPublishModal, {
         backdrop: 'static',
-        controller: 'ConfirmOrCancelModalController'
       }).result.then(function() {
         if (onStartSaveCallback) {
           onStartSaveCallback();
