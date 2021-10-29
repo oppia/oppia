@@ -3414,7 +3414,8 @@ class WrittenTranslation:
                     translation_content_mapping=written_translation_content_map)
             else:
                 proto = languages_pb2.WrittenTranslationContentMapping(
-                    language=languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED,
+                    language=(
+                        languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
                     translation_content_mapping=written_translation_content_map)
             written_translation_content_mapping_protos_list.append(proto)
 
@@ -3437,12 +3438,12 @@ class WrittenTranslation:
                 WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
-                    set_of_translatable_text=cls._to_written_translatable_set(
+                    set_of_translatable_text=cls._to_written_translatable_text(
                         translation)))
         else:
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
-                    translatable_text=cls._to_written_translatable_text(
+                    translatable_text=cls._to_written_translatable_set(
                         translation)))
 
         return written_translation_proto
@@ -3919,7 +3920,8 @@ class RecordedVoiceovers:
                     voiceover_content_mapping=voiceover_file_content_map)
             else:
                 proto = languages_pb2.VoiceoverContentMapping(
-                    language=languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED,
+                    language=(
+                        languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
                     voiceover_content_mapping=voiceover_file_content_map)
             voiceover_content_mapping_protos_list.append(proto)
 
