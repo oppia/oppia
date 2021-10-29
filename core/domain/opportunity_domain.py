@@ -31,7 +31,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     ExplorationOpportunitySummary object.
 
     This dict has only required fields to represent
-    an opportunity to a contributor
+    an opportunity to a contributor.
     """
 
     id: str
@@ -48,8 +48,8 @@ class ExplorationOpportunitySummaryDict(
 ):
     """A dictionary representing ExplorationOpportunitySummary object.
 
-    contains all fields of an ExplorationOpportunitySummary object
-    It gets the required fields from PartialExplorationOpportunitySummaryDict
+    Contains all fields of an ExplorationOpportunitySummary object.
+    It gets the required fields from PartialExplorationOpportunitySummaryDict.
     """
 
     topic_id: str
