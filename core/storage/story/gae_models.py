@@ -150,7 +150,7 @@ class StoryModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -182,7 +182,9 @@ class StoryModel(base_models.VersionedModel):
         )
         story_commit_log_entry.story_id = self.id
         return {
-            **models_to_put,
+            'versioned_model': models_to_put['versioned_model'],
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': story_commit_log_entry,
         }
 

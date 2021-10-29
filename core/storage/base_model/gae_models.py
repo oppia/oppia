@@ -112,11 +112,11 @@ class MODEL_ASSOCIATION_TO_USER(enum.Enum): # pylint: disable=invalid-name
     NOT_CORRESPONDING_TO_USER = 'NOT_CORRESPONDING_TO_USER'
 
 
-class ModelsToPutDict(TypedDict, total=False):
+class ModelsToPutDict(TypedDict):
+    versioned_model: VersionedModel
     snapshot_metadata_model: BaseSnapshotMetadataModel
     snapshot_content_model: BaseSnapshotContentModel
-    versioned_model: VersionedModel
-    commit_log_model: BaseCommitLogEntryModel
+    commit_log_model: Optional[BaseCommitLogEntryModel]
 
 
 class BaseModel(datastore_services.Model):
@@ -341,7 +341,7 @@ class BaseModel(datastore_services.Model):
     @classmethod
     def update_timestamps_multi(
         cls,
-        entities: Sequence[SELF_BASE_MODEL],
+        entities: List[SELF_BASE_MODEL],
         update_last_updated_time: bool = True
     ) -> None:
         """Update the created_on and last_updated fields of all given entities.
@@ -907,7 +907,7 @@ class VersionedModel(BaseModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, BaseModel]
+        additional_models: Optional[Mapping[str, BaseModel]] = None
     ) -> ModelsToPutDict:
         """Evaluates and executes commit. Main function for all commit types.
 
@@ -971,19 +971,20 @@ class VersionedModel(BaseModel):
         )
 
         return {
+            'versioned_model': self,
             'snapshot_metadata_model': snapshot_metadata_instance,
             'snapshot_content_model': snapshot_content_instance,
-            'versioned_model': self
+            'commit_log_model': None
         }
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def delete( # type: ignore[override]
-            self,
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        self,
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False,
     ) -> None:
         """Deletes this model instance.
 
@@ -1039,8 +1040,10 @@ class VersionedModel(BaseModel):
             }]
 
             self._trusted_commit(
-                committer_id, self._COMMIT_TYPE_DELETE, commit_message,
-                commit_cmds
+                committer_id,
+                self._COMMIT_TYPE_DELETE,
+                commit_message,
+                commit_cmds,
             )
 
     # We have ignored [override] here because the signature of this method
@@ -1175,16 +1178,14 @@ class VersionedModel(BaseModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, BaseModel]
-    ) -> Iterable[SELF_BASE_MODEL]:
-        return list(
-            self._trusted_commit(
-                committer_id,
-                commit_type,
-                commit_message,
-                commit_cmds,
-                additional_models
-            ).values()
+        additional_models: Optional[Mapping[str, BaseModel]] = None
+    ) -> ModelsToPutDict:
+        return self._trusted_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
         )
 
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
@@ -1218,8 +1219,11 @@ class VersionedModel(BaseModel):
             if self.version == 0
             else self._COMMIT_TYPE_EDIT
         )
-        models_to_put: Sequence[BaseModel] = self.prepare_models_to_commit(
-            committer_id, commit_type, commit_message, commit_cmds
+        models_to_put = cast(
+            List[BaseModel],
+            self.prepare_models_to_commit(
+                committer_id, commit_type, commit_message, commit_cmds
+            ).values()
         )
         BaseModel.update_timestamps_multi(models_to_put)
         BaseModel.put_multi_transactional(models_to_put)

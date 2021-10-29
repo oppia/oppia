@@ -278,7 +278,7 @@ class CollectionModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -304,10 +304,17 @@ class CollectionModel(base_models.VersionedModel):
             additional_models
         )
 
-        collection_rights: CollectionRightsModel = cast(
-            CollectionRightsModel,
-            additional_models['collection_rights_model']
-        )
+        if (
+                isinstance(additional_models, dict) and
+                'rights_model' in additional_models
+        ):
+            collection_rights = cast(
+                CollectionRightsModel,
+                additional_models['collection_rights_model']
+            )
+        else:
+            collection_rights = CollectionRightsModel.get_by_id(self.id)
+
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id,
             self.version,
@@ -320,7 +327,9 @@ class CollectionModel(base_models.VersionedModel):
         )
         collection_commit_log.collection_id = self.id
         return {
-            **models_to_put,
+            'versioned_model': models_to_put['versioned_model'],
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': collection_commit_log
         }
 
@@ -620,7 +629,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             commit_type: str,
             commit_message: str,
             commit_cmds: List[Dict[str, Any]],
-            additional_models: Mapping[str, base_models.BaseModel]
+            additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -683,7 +692,11 @@ class CollectionRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             )
             return {
-                **models_to_put,
+                'versioned_model': models_to_put['versioned_model'],
+                'snapshot_metadata_model': (
+                    models_to_put['snapshot_metadata_model']),
+                'snapshot_content_model': (
+                    models_to_put['snapshot_content_model']),
                 'commit_log_model': collection_commit_log,
             }
 

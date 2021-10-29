@@ -26,7 +26,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -191,7 +191,7 @@ class QuestionModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -223,7 +223,9 @@ class QuestionModel(base_models.VersionedModel):
         )
         question_commit_log.question_id = self.id
         return {
-            **models_to_put,
+            'versioned_model': models_to_put['versioned_model'],
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': question_commit_log,
         }
 

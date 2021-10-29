@@ -278,7 +278,7 @@ class ExplorationModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -304,17 +304,26 @@ class ExplorationModel(base_models.VersionedModel):
             additional_models
         )
 
-        exp_rights = cast(
-            ExplorationRightsModel,
-            additional_models['exploration_rights_model']
-        )
+        if (
+                isinstance(additional_models, dict) and
+                'rights_model' in additional_models
+        ):
+            exp_rights = cast(
+                ExplorationRightsModel,
+                additional_models['exploration_rights_model']
+            )
+        else:
+            exp_rights = ExplorationRightsModel.get_by_id(self.id)
+
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, exp_rights.status, exp_rights.community_owned
         )
         exploration_commit_log.exploration_id = self.id
         return {
-            **models_to_put,
+            'versioned_model': models_to_put['versioned_model'],
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': exploration_commit_log
         }
 
@@ -714,7 +723,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -777,7 +786,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             )
             return {
-                **models_to_put,
+                'versioned_model': models_to_put['versioned_model'],
+                'snapshot_metadata_model': (
+                    models_to_put['snapshot_metadata_model']),
+                'snapshot_content_model': (
+                    models_to_put['snapshot_content_model']),
                 'commit_log_model': exploration_commit_log,
             }
 
