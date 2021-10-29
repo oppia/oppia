@@ -139,7 +139,7 @@ class Question:
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids,
-            proto_size_in_bytes=None, created_on=None, last_updated=None):
+            proto_size_in_bytes=0, created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
