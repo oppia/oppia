@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from typing import Dict
+
 from core import utils
 
 
@@ -26,8 +28,8 @@ class MachineTranslation:
     """Domain object for machine translation of exploration content."""
 
     def __init__(
-            self, source_language_code, target_language_code, source_text,
-            translated_text):
+            self, source_language_code: str, target_language_code: str, source_text: str,
+            translated_text: str) -> None:
         """Initializes a MachineTranslation domain object.
 
         Args:
@@ -45,7 +47,7 @@ class MachineTranslation:
         self.source_text = source_text
         self.translated_text = translated_text
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the MachineTranslation.
 
         Raises:
@@ -101,7 +103,7 @@ class MachineTranslation:
                 self.translated_text
             )
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Converts the MachineTranslation domain instance into a dictionary
         form with its keys as the attributes of this class.
 
