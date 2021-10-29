@@ -187,8 +187,8 @@ export class ThreadDataBackendApiService {
             dict => this.setFeedbackThreadFromBackendDict(dict)),
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
-              dict, <SuggestionBackendDict>suggestionBackendDictsByThreadId.get(
-                dict?.thread_id)))
+              dict, suggestionBackendDictsByThreadId.get(
+                dict?.thread_id) as SuggestionBackendDict))
         };
       },
       async() => Promise.reject('Error on retrieving feedback threads.'));

@@ -91,7 +91,7 @@ class ExplorationConversionError(Exception):
 
 def get_file_contents(
         filepath: str, raw_bytes: bool = False, mode: str = 'r'
-) -> str:
+) -> bytes:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -117,7 +117,7 @@ def get_file_contents(
 
 def get_exploration_components_from_dir(
         dir_path: str
-) -> Tuple[str, List[Tuple[str, str]]]:
+) -> Tuple[bytes, List[Tuple[str, bytes]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -205,8 +205,7 @@ def to_ascii(input_string: str) -> str:
     Returns:
         str. String containing the ascii representation of the input string.
     """
-    normalized_string = unicodedata.normalize(
-        'NFKD', python_utils.UNICODE(input_string))
+    normalized_string = unicodedata.normalize('NFKD', str(input_string))
     return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
@@ -311,7 +310,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
         raise Exception('The given string does not represent a PNG data URL.')
 
 
-def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
+def convert_png_binary_to_data_url(content: bytes) -> str:
     """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
@@ -323,9 +322,6 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    # We accept unicode but imghdr.what(file, h) accepts 'h' of type bytes.
-    # So we have casted content to be bytes.
-    content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX, urllib.parse.quote(base64.b64encode(content))
@@ -390,7 +386,7 @@ def set_url_query_parameter(
         Exception. If the query parameter sent is not of string type,
             them this exception is raised.
     """
-    if not isinstance(param_name, python_utils.BASESTRING):
+    if not isinstance(param_name, str):
         raise Exception(
             'URL query parameter name must be a string, received %s'
             % param_name)
@@ -437,7 +433,7 @@ def convert_to_hash(input_string: str, max_length: int) -> str:
         Exception. If the input string is not the instance of the str,
             them this exception is raised.
     """
-    if not isinstance(input_string, python_utils.BASESTRING):
+    if not isinstance(input_string, str):
         raise Exception(
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
@@ -446,8 +442,7 @@ def convert_to_hash(input_string: str, max_length: int) -> str:
     # Prefixing altchars with b' to ensure that all characters in encoded_string
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
-        hashlib.sha1(
-            python_utils.convert_to_bytes(input_string)).digest(),
+        hashlib.sha1(input_string.encode('utf-8')).digest(),
         altchars=b'ab'
     ).replace(b'=', b'c')
 
@@ -463,8 +458,7 @@ def base64_from_int(value: int) -> str:
     Returns:
         str. Returns the base64 representation of the number passed.
     """
-    byte_value = (
-        b'[' + python_utils.UNICODE(value).encode('utf-8') + b']')
+    byte_value = b'[' + str(value).encode('utf-8') + b']'
     return base64.b64encode(byte_value).decode('utf-8')
 
 
@@ -661,7 +655,7 @@ def require_valid_name(
         ValidationError. Adjacent whitespace in name_type isn't collapsed.
         ValidationError. Invalid character is present in name.
     """
-    if not isinstance(name, python_utils.BASESTRING):
+    if not isinstance(name, str):
         raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
@@ -706,7 +700,7 @@ def require_valid_url_fragment(
         ValidationError. The length of the name_type is not correct.
         ValidationError. Invalid character is present in the name.
     """
-    if not isinstance(name, python_utils.BASESTRING):
+    if not isinstance(name, str):
         raise ValidationError(
             '%s field must be a string. Received %s.' % (name_type, name))
 
@@ -741,7 +735,7 @@ def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
             ValidationError. Thumbnail filename extension is not svg.
         """
     if thumbnail_filename is not None:
-        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+        if not isinstance(thumbnail_filename, str):
             raise ValidationError(
                 'Expected thumbnail filename to be a string, received %s'
                 % thumbnail_filename)
@@ -778,7 +772,7 @@ def require_valid_image_filename(image_filename: str) -> None:
             ValidationError. Image filename does not include an extension.
         """
     if image_filename is not None:
-        if not isinstance(image_filename, python_utils.BASESTRING):
+        if not isinstance(image_filename, str):
             raise ValidationError(
                 'Expected image filename to be a string, received %s'
                 % image_filename)
@@ -804,7 +798,7 @@ def require_valid_meta_tag_content(meta_tag_content: str) -> None:
             ValidationError. Meta tag content is not a string.
             ValidationError. Meta tag content is longer than expected.
         """
-    if not isinstance(meta_tag_content, python_utils.BASESTRING):
+    if not isinstance(meta_tag_content, str):
         raise ValidationError(
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
@@ -828,7 +822,7 @@ def require_valid_page_title_fragment_for_web(
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
-    if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
+    if not isinstance(page_title_fragment_for_web, str):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
             % page_title_fragment_for_web)
