@@ -3401,15 +3401,21 @@ class WrittenTranslation:
         language_code_to_enum_map = {
             'en': languages_pb2.LanguageType.ENGLISH,
             'hi-en': languages_pb2.LanguageType.HINGLISH,
-            'ar': languages_pb2.LanguageType.ARABIC
+            'ar': languages_pb2.LanguageType.ARABIC,
+            'hi': languages_pb2.LanguageType.HINDI
         }
         written_translation_content_mapping_protos_list = []
 
         for (language_code, written_translation_content_map) in (
             language_to_content_id_written_translation_map.items()):
-            proto = languages_pb2.WrittenTranslationContentMapping(
-                language=language_code_to_enum_map[language_code],
-                translation_content_mapping=written_translation_content_map)
+            if language_code in language_code_to_enum_map:
+                proto = languages_pb2.WrittenTranslationContentMapping(
+                    language=language_code_to_enum_map[language_code],
+                    translation_content_mapping=written_translation_content_map)
+            else:
+                proto = languages_pb2.WrittenTranslationContentMapping(
+                    language=languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED,
+                    translation_content_mapping=written_translation_content_map)
             written_translation_content_mapping_protos_list.append(proto)
 
         return written_translation_content_mapping_protos_list
@@ -3900,15 +3906,21 @@ class RecordedVoiceovers:
         language_code_to_enum_map = {
             'en': languages_pb2.LanguageType.ENGLISH,
             'hi-en': languages_pb2.LanguageType.HINGLISH,
-            'ar': languages_pb2.LanguageType.ARABIC
+            'ar': languages_pb2.LanguageType.ARABIC,
+            'hi': languages_pb2.LanguageType.HINDI
         }
         voiceover_content_mapping_protos_list = []
 
         for (language_code, voiceover_file_content_map) in (
             language_to_content_id_voiceover_file_map.items()):
-            proto = languages_pb2.VoiceoverContentMapping(
-                language=language_code_to_enum_map[language_code],
-                voiceover_content_mapping=voiceover_file_content_map)
+            if language_code in language_code_to_enum_map:
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=language_code_to_enum_map[language_code],
+                    voiceover_content_mapping=voiceover_file_content_map)
+            else:
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED,
+                    voiceover_content_mapping=voiceover_file_content_map)
             voiceover_content_mapping_protos_list.append(proto)
 
         return voiceover_content_mapping_protos_list

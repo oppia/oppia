@@ -5306,7 +5306,8 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+proto_size_in_bytes: 0
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5559,7 +5560,8 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+proto_size_in_bytes: 0
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5784,7 +5786,8 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+proto_size_in_bytes: 0
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
