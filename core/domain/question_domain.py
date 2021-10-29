@@ -39,9 +39,7 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
 from extensions import domain
-from proto_files.org.oppia.proto.v1 import languages_pb2
-from proto_files.org.oppia.proto.v1 import objects_pb2
-from proto_files.org.oppia.proto.v1 import state_pb2
+from proto_files.org.oppia.proto.v1.structure import question_pb2
 
 from pylatexenc import latex2text
 
@@ -1395,6 +1393,7 @@ class Question:
 
     def update_proto_size_in_bytes(self, proto_size_in_bytes):
         """Update question's size in proto.
+
         Args:
             proto_size_in_bytes: int. Size of exploration.
         """
@@ -1424,8 +1423,10 @@ class Question:
 
     @classmethod
     def to_proto(
-            cls, question_id, question_state_data, question_state_data_schema_version, skill_ids):
+            cls, question_id, question_state_data,
+            question_state_data_schema_version, skill_ids):
         """Calculate the question size by setting question proto.
+
         Args:
             question_id: str. The unique ID of the question.
             question_state_data_schema_version: int. The schema version of the
@@ -1434,32 +1435,22 @@ class Question:
             skill_ids: list(str). List of skill IDs attached to this question.
             question_state_data: list. The list of state
                 domain objects.
+
         Returns:
             Proto Object. The exploration proto object.
         """
         state_protos = None
         if question_state_data is not None:
-            state_protos = state_domain.State._to_state_proto(
+            state_protos = state_domain.State.to_state_proto(
                 question_state_data)
-
-        linked_skill_id_list_proto = cls._to_linked_skill_id_list_proto(
-            skill_ids)
 
         question_proto = question_pb2.Question(
             id=question_id,
-            linked_skill_ids=linked_skill_id_list_proto,
+            linked_skill_ids=skill_ids,
             content_version=question_state_data_schema_version,
             question_state=state_protos
         )
         return question_proto
-
-    def _to_linked_skill_id_list_proto(cls, skill_ids):
-        lined_skill_id_list = []
-
-        for skill_id in skill_ids:
-            lined_skill_id_list.append(skill_id)
-
-        return lined_skill_id_list
 
 
 class QuestionSummary:
