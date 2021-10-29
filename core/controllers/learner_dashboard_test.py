@@ -700,10 +700,24 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.OWNER_USERNAME)
         self.logout()
 
+
+class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+    EXP_ID_1 = 'EXP_ID_1'
+    EXP_TITLE_1 = 'Exploration title 1'
+
+    def setUp(self):
+        super(LearnerDashboardFeedbackUpdatesHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL)
         thread_summaries = response['thread_summaries']
         self.assertEqual(thread_summaries, [])
 
@@ -713,7 +727,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             'exploration', self.EXP_ID_1, self.owner_id, 'a subject',
             'some text')
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)

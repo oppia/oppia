@@ -290,7 +290,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # any language code other than english (what the dummy explorations
         # were written in) can be tested here.
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
+            opportunity_services.get_translation_opportunities('hi', '', None))
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 

@@ -33,7 +33,7 @@ export class RatingComputationService {
 
     let totalNumber: number = 0;
     for (var value in ratingFrequencies) {
-      totalNumber += ratingFrequencies[<ExplorationRatingsKey> value];
+      totalNumber += ratingFrequencies[value as ExplorationRatingsKey];
     }
 
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
@@ -50,7 +50,7 @@ export class RatingComputationService {
       var totalNumber = 0;
       var totalValue = 0.0;
       for (var value in ratingFrequencies) {
-        let _value = <ExplorationRatingsKey> value;
+        let _value = value as ExplorationRatingsKey;
         totalValue += parseInt(_value) * ratingFrequencies[_value];
         totalNumber += ratingFrequencies[_value];
       }
