@@ -138,8 +138,9 @@ def validate_state_dict(state_dict):
     state_object = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
     state_object.validate(
         exp_param_specs_dict=None, allow_null_interaction=True)
-    # Object should not be returned from here becasue the parameter is not
-    # transferred into the domain layer of the codebase.
+    # State dict is used as dictionary form in the handler and the data is not
+    # transferred into the domain layer. Hence dict form of the data is returned
+    # after schema validation.
     return state_dict
 
 
@@ -212,6 +213,8 @@ def validate_aggregated_stats(aggregated_stats):
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
     """
+    # The aggregated_stats parameter do not represents any domain class, hence
+    # dict form of the data is returned from here.
     exploration_stats_properties = [
         'num_starts',
         'num_actual_starts',
