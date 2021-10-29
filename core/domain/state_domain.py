@@ -3438,12 +3438,12 @@ class WrittenTranslation:
                 WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
-                    set_of_translatable_text=cls._to_written_translatable_text(
+                    translatable_text=cls._to_written_translatable_text(
                         translation)))
         else:
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
-                    translatable_text=cls._to_written_translatable_set(
+                    set_of_translatable_text=cls._to_written_translatable_set(
                         translation)))
 
         return written_translation_proto
