@@ -86,9 +86,9 @@ export class MathEquationInputValidationService {
     for (let i = 0; i < answerGroups.length; i++) {
       let rules = answerGroups[i].rules;
       for (let j = 0; j < rules.length; j++) {
-        let currentInput = <string> rules[j].inputs.x;
-        let currentPositionOfTerms = <string> rules[j].inputs.y;
-        let currentRuleType = <string> rules[j].type;
+        let currentInput = rules[j].inputs.x as string;
+        let currentPositionOfTerms = rules[j].inputs.y as string;
+        let currentRuleType = rules[j].type as string;
 
         let splitInput = currentInput.split('=');
 
@@ -111,8 +111,8 @@ export class MathEquationInputValidationService {
         }
 
         for (let seenRule of seenRules) {
-          let seenInput = <string> seenRule.inputs.x;
-          let seenRuleType = <string> seenRule.type;
+          let seenInput = seenRule.inputs.x as string;
+          let seenRuleType = seenRule.type as string;
 
           if (seenRuleType === 'IsEquivalentTo' && (
             meirs.IsEquivalentTo(seenInput, {x: currentInput}))) {
