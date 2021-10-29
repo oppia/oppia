@@ -561,8 +561,9 @@ def apply_change_list(question_id, change_list):
                         change.new_value)
 
         question_android_proto = question.to_proto(
-            question_id, question.question_state_data, 
-            question.question_state_data_schema_version, question.linked_skill_ids)
+            question_id, question.question_state_data,
+            question.question_state_data_schema_version,
+            question.linked_skill_ids)
         question_android_proto_size = int(question_android_proto.ByteSize())
         question.update_proto_size_in_bytes(question_android_proto_size)
 
