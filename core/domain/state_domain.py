@@ -3431,87 +3431,51 @@ class WrittenTranslation:
         Returns:
             Proto Object. The written translation proto object.
         """
-        if data_format == (
-            WrittenTranslation.DATA_FORMAT_HTML):
-            return cls._to_html_written_translatable(translation)
+        written_translation_proto = None
+        if isinstance(translation, collections.Iterable):
+            written_translation_proto = (
+                languages_pb2.WrittenTranslation(
+                    set_of_translatable_text=cls._to_written_translatable_set(
+                        translation)))
+        else:
+            written_translation_proto = (
+                languages_pb2.WrittenTranslation(
+                    translatable_text=cls._to_written_translatable_text(
+                        translation)))
 
-        if data_format == (
-            WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
-            return cls._to_unicode_written_translatable(translation)
-
-        if data_format == (
-                WrittenTranslation
-                .DATA_FORMAT_SET_OF_NORMALIZED_STRING):
-            return cls._to_normalized_set_written_translatable(translation)
-
-        if data_format == (
-                WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
-            return cls._to_unicode_set_written_translatable(translation)
+        return written_translation_proto
 
     @classmethod
-    def _to_html_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableHtml proto object.
+    def _to_written_translatable_text(cls, translation):
+        """Creates a WrittenTranslatableText proto object.
 
         Args:
-            translation: str|list(str). The translated content.
+            translation: str. The translated content.
 
         Returns:
-            Proto Object. The written translatable html proto object.
+            Proto Object. The written translatable text proto object.
         """
-        written_translatable_html_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableHtml(translation=translation))
+        written_translatable_text_proto = (
+            languages_pb2.WrittenTranslatableText(
+                translation=translation))
 
-        return written_translatable_html_proto
+        return written_translatable_text_proto
 
     @classmethod
-    def _to_unicode_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableUnicode proto object.
+    def _to_written_translatable_set(cls, translation):
+        """Creates a SetOfWrittenTranslatableText proto object.
 
         Args:
-            translation: str|list(str). The translated content.
+            translation: list(str). The translated content.
 
         Returns:
-            Proto Object. The written translatable unicode proto object.
+            Proto Object. The written translatable set proto object.
         """
-        written_translatable_unicode_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableUnicode(translation=translation))
+        written_translatable_set_proto = (
+            languages_pb2.SetOfWrittenTranslatableText(
+                translation=translation))
 
-        return written_translatable_unicode_proto
-
-    @classmethod
-    def _to_normalized_set_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableSetOfNormalizedString proto object.
-
-        Args:
-            translation: str|list(str). The translated content.
-
-        Returns:
-            Proto Object. The written translatable normalized
-            set proto object.
-        """
-        written_translatable_normalized_set_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableSetOfNormalizedString(translation=translation))
-
-        return written_translatable_normalized_set_proto
-
-    @classmethod
-    def _to_unicode_set_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableSetOfUnicodeString proto object.
-
-        Args:
-            translation: str|list(str). The translated content.
-
-        Returns:
-            Proto Object. The written translatable unicode set proto object.
-        """
-        written_translatable_unicode_set_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableSetOfUnicodeString(translation=translation))
-
-        return written_translatable_unicode_set_proto
+        return written_translatable_set_proto
 
     def validate(self):
         """Validates properties of the WrittenTranslation, normalizing the
