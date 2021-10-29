@@ -558,7 +558,7 @@ class Exploration:
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            proto_size_in_bytes=None, created_on=None, last_updated=None):
+            proto_size_in_bytes=0, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
