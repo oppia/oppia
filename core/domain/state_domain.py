@@ -3426,7 +3426,9 @@ class WrittenTranslation:
             Proto Object. The written translation proto object.
         """
         written_translation_proto = None
-        if isinstance(translation, collections.Iterable):
+        if data_format == (
+            WrittenTranslation.DATA_FORMAT_HTML) or data_format == (
+                WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
                     set_of_translatable_text=cls._to_written_translatable_set(
