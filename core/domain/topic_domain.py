@@ -26,7 +26,6 @@ import re
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -319,7 +318,7 @@ class StoryReference:
             ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
-        if not isinstance(self.story_id, python_utils.BASESTRING):
+        if not isinstance(self.story_id, str):
             raise utils.ValidationError(
                 'Expected story id to be a string, received %s' %
                 self.story_id)
@@ -459,7 +458,7 @@ class Subtopic:
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
 
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
                 self.title)
@@ -476,7 +475,7 @@ class Subtopic:
                 self.skill_ids)
 
         for skill_id in self.skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each skill id to be a string, received %s' %
                     skill_id)
@@ -715,7 +714,7 @@ class Topic:
         Args:
             topic_id: str. The topic id to validate.
         """
-        if not isinstance(topic_id, python_utils.BASESTRING):
+        if not isinstance(topic_id, str):
             raise utils.ValidationError(
                 'Topic id should be a string, received: %s' % topic_id)
 
@@ -729,7 +728,7 @@ class Topic:
         Args:
             name: str. The name to validate.
         """
-        if not isinstance(name, python_utils.BASESTRING):
+        if not isinstance(name, str):
             raise utils.ValidationError('Name should be a string.')
 
         if name == '':
@@ -1018,11 +1017,11 @@ class Topic:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
         if strict:
-            if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
+            if not isinstance(self.thumbnail_filename, str):
                 raise utils.ValidationError(
                     'Expected thumbnail filename to be a string, received %s.'
                     % self.thumbnail_filename)
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -1089,7 +1088,7 @@ class Topic:
                 'Subtopic url fragments are not unique across '
                 'subtopics in the topic')
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -1284,7 +1283,7 @@ class Topic:
         Raises:
             ValidationError. Name should be a string.
         """
-        if not isinstance(new_name, python_utils.BASESTRING):
+        if not isinstance(new_name, str):
             raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
@@ -1812,12 +1811,12 @@ class TopicSummary:
                 are not valid.
         """
         self.require_valid_url_fragment(self.url_fragment)
-        if not isinstance(self.name, python_utils.BASESTRING):
+        if not isinstance(self.name, str):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -1837,13 +1836,13 @@ class TopicSummary:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
 
-        if not isinstance(self.canonical_name, python_utils.BASESTRING):
+        if not isinstance(self.canonical_name, str):
             raise utils.ValidationError('Canonical name should be a string.')
         if self.canonical_name == '':
             raise utils.ValidationError(
                 'Canonical name field should not be empty')
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
