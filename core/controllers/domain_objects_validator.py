@@ -21,7 +21,6 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -61,7 +60,7 @@ def validate_new_config_property_values(new_config_property):
     # individually. Hence Conversion of dicts to domain objects is not required
     # for new_config_properties.
     for (name, value) in new_config_property.items():
-        if not isinstance(name, python_utils.BASESTRING):
+        if not isinstance(name, str):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
