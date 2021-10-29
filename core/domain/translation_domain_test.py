@@ -40,26 +40,10 @@ class MachineTranslationTests(test_utils.GenericTestBase):
             'en', 'es', 'hello world', 'hola mundo')
         self.translation.validate()
 
-    def test_validate_with_non_string_source_language_code_raises(self) -> None:
-        self.translation.source_language_code = 3 # type: ignore[assignment]
-        expected_error_message = (
-            'Expected source_language_code to be a string, received 3')
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
     def test_validate_with_invalid_source_language_code_raises(self) -> None:
         self.translation.source_language_code = 'ABC'
         expected_error_message = (
             'Invalid source language code: ABC')
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_validate_with_non_string_target_language_code_raises(self) -> None:
-        self.translation.target_language_code = 3 # type: ignore[assignment]
-        expected_error_message = (
-            'Expected target_language_code to be a string, received 3')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_message):
             self.translation.validate()
@@ -80,22 +64,6 @@ class MachineTranslationTests(test_utils.GenericTestBase):
         expected_error_message = (
             'Expected source_language_code to be different from '
             'target_language_code: "en" = "en"')
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_validate_with_non_string_source_text_raises(self) -> None:
-        self.translation.source_text = 3 # type: ignore[assignment]
-        expected_error_message = (
-            'Expected source_text to be a string, received 3')
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_validate_with_non_string_translated_text_raises(self) -> None:
-        self.translation.translated_text = 3 # type: ignore[assignment]
-        expected_error_message = (
-            'Expected translated_text to be a string, received 3')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_message):
             self.translation.validate()

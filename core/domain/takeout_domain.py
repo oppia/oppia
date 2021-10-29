@@ -46,7 +46,11 @@ class TakeoutImage:
     for a single image.
     """
 
-    def __init__(self, b64_image_data: str, image_export_path: str) -> None:
+    def __init__(
+        self,
+        b64_image_data: str,
+        image_export_path: str
+    ) -> None:
         """Constructs a TakeoutImage domain object.
 
         Args:
@@ -64,7 +68,9 @@ class TakeoutImageReplacementInstruction:
     """
 
     def __init__(
-        self, dictionary_path: Tuple[str], export_filename: str, new_key: str
+        self, dictionary_path: Tuple[str],
+        export_filename: str,
+        new_key: str
     ) -> None:
         """Constructs a TakeoutImageReplacementInstruction object.
 
