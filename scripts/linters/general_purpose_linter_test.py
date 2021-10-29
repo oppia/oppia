@@ -74,8 +74,8 @@ INVALID_MERGE_CONFLICT_FILEPATH = os.path.join(
 INVALID_TODO_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_todo.py')
 INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
-INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
+INVALID_ANNOTATIONS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_annotations.py')
 CONSTANTS_FILEPATH = 'constants.ts'
 VALID_PY_IGNORE_PRAGMA_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
@@ -228,6 +228,16 @@ class GeneralLintTests(test_utils.LinterTestBase):
             'Line 30: Please assign TODO comments to a user in the format'
             ' TODO(username): XXX.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_missing_unicode_literal(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_ANNOTATIONS_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_mandatory_patterns()
+        self.assert_same_list_elements([
+            'Please ensure this file should contain annotations future import.'
+        ], lint_task_report.trimmed_messages)
+        self.assertEqual('Mandatory pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
     def test_missing_copyright(self):

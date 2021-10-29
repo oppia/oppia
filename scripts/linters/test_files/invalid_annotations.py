@@ -18,8 +18,6 @@
 python_linter_test. This file does not contain unicode literal future import.
 """
 
-from __future__ import annotations
-
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
