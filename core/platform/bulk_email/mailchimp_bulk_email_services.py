@@ -24,7 +24,6 @@ import hashlib
 import logging
 
 from core import feconf
-from core import python_utils
 
 import mailchimp3
 from mailchimp3 import mailchimpclient
@@ -42,7 +41,7 @@ def _get_subscriber_hash(email: str) -> str:
     Raises:
         Exception. Invalid type for email, expected string.
     """
-    if not isinstance(email, python_utils.BASESTRING):
+    if not isinstance(email, str):
         raise Exception(
             'Invalid type for email. Expected string, received %s' % email)
     md5_hash = hashlib.md5()
@@ -106,7 +105,7 @@ def _create_user_in_mailchimp_db(user_email: str) -> bool:
     try:
         client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
     except mailchimpclient.MailChimpError as error:
-        error_message = ast.literal_eval(python_utils.UNICODE(error))
+        error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
         # user was permanently deleted from the Mailchimp database earlier.
         # This was found by experimenting with the MailChimp API. Note that the
@@ -154,7 +153,7 @@ def permanently_delete_user_from_list(user_email: str) -> None:
         # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
         # workaround for Python2, the 'message' attribute is obtained by
         # str() and then it is converted to dict. This works in Python3 as well.
-        error_message = ast.literal_eval(python_utils.UNICODE(error))
+        error_message = ast.literal_eval(str(error))
         # Ignore if the error corresponds to "User does not exist".
         if error_message['status'] != 404:
             raise Exception(error_message['detail'])
@@ -227,7 +226,7 @@ def add_or_update_user_status(
         # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
         # workaround for Python2, the 'message' attribute is obtained by
         # str() and then it is converted to dict. This works in Python3 as well.
-        error_message = ast.literal_eval(python_utils.UNICODE(error))
+        error_message = ast.literal_eval(str(error))
         # Error 404 corresponds to "User does not exist".
         if error_message['status'] == 404:
             if can_receive_email_updates:

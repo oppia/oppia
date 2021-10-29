@@ -4010,8 +4010,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_migrate_exp_to_latest_version_migrates_to_version(self):
         """Test migrate exploration state schema to the latest version."""
-        latest_schema_version = python_utils.UNICODE(
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        latest_schema_version = str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
@@ -4025,15 +4024,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
-            python_utils.UNICODE(
-                exploration.states_schema_version),
+            str(exploration.states_schema_version),
             latest_schema_version)
 
     def test_migrate_exp_to_earlier_version_raises_exception(self):
         """Test migrate state schema to earlier version raises exception."""
         latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        not_latest_schema_version = python_utils.UNICODE(
-            latest_schema_version - 1)
+        not_latest_schema_version = str(latest_schema_version - 1)
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
@@ -5280,9 +5277,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
+    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
+    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
