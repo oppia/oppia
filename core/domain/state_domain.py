@@ -3467,7 +3467,7 @@ class WrittenTranslation:
         """
         written_translatable_set_proto = (
             languages_pb2.SetOfWrittenTranslatableText(
-                translation=translation))
+                translations=translation))
 
         return written_translatable_set_proto
 
