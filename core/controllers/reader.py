@@ -893,11 +893,7 @@ class FlagExplorationHandler(base.BaseHandler):
         'POST': {
             'report_text': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': feconf.MAX_TEXT_REPORT_LENGTH_IN_CHARS
-                    }]
+                    'type': 'basestring'
                 }
             }
         }

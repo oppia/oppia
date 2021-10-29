@@ -149,8 +149,6 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
-# The maximum number of characters allowed for text report.
-MAX_TEXT_REPORT_LENGTH_IN_CHARS = 20
 
 ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_COMPLETE: [],
