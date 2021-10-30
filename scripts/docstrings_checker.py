@@ -19,12 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import ast
 import os
 import re
 import sys
 
-from core import python_utils
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
