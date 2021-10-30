@@ -474,35 +474,35 @@ angular.module('oppia').component('settingsTab', {
 
         SettingTabBackendApiService
           .getData(moderatorEmailDraftUrl).then(function(response) {
-          // If the draft email body is empty, email functionality will not
-          // be exposed to the mdoerator.
-          var draftEmailBody = response.draft_email_body;
+            // If the draft email body is empty, email functionality will not
+            // be exposed to the mdoerator.
+            var draftEmailBody = response.draft_email_body;
 
-          $uibModal.open({
-            template: require(
-              'pages/exploration-editor-page/settings-tab/templates/' +
-              'moderator-unpublish-exploration-modal.template.html'),
-            backdrop: true,
-            resolve: {
-              draftEmailBody: () => draftEmailBody
-            },
-            controller: 'ModeratorUnpublishExplorationModalController'
-          }).result.then(function(emailBody) {
-            ExplorationRightsService.saveModeratorChangeToBackendAsync(
-              emailBody).then(function() {
-              UserExplorationPermissionsService.fetchPermissionsAsync()
-                .then(function(permissions) {
-                  ctrl.canUnpublish = permissions.canUnpublish;
-                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the controller is migrated to angular.
-                  $rootScope.$applyAsync();
-                });
+            $uibModal.open({
+              template: require(
+                'pages/exploration-editor-page/settings-tab/templates/' +
+                'moderator-unpublish-exploration-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                draftEmailBody: () => draftEmailBody
+              },
+              controller: 'ModeratorUnpublishExplorationModalController'
+            }).result.then(function(emailBody) {
+              ExplorationRightsService.saveModeratorChangeToBackendAsync(
+                emailBody).then(function() {
+                UserExplorationPermissionsService.fetchPermissionsAsync()
+                  .then(function(permissions) {
+                    ctrl.canUnpublish = permissions.canUnpublish;
+                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$applyAsync();
+                  });
+              });
+            }, function() {
+              AlertsService.clearWarnings();
             });
-          }, function() {
-            AlertsService.clearWarnings();
           });
-        });
       };
 
       ctrl.isExplorationLockedForEditing = function() {
