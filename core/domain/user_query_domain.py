@@ -35,15 +35,21 @@ attribute_names = [ # pylint: disable=invalid-name
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
 UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
-    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names))
+    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names)) # type: ignore
 
 
 class UserQuery:
     """Domain object for the UserQueryModel."""
 
     def __init__(
-            self, query_id: str, query_params: UserQueryParams, submitter_id: str, query_status: str, user_ids: List[str],
-            sent_email_model_id: Optional[str] =None, created_on: Optional[datetime] =None, deleted: bool =False
+        self, query_id: str,
+        query_params: UserQueryParams,
+        submitter_id: str,
+        query_status: str,
+        user_ids: List[str],
+        sent_email_model_id: Optional[str] =None,
+        created_on: Optional[datetime] =None,
+        deleted: bool =False
     ) -> None:
         """Create user query domain object.
 
@@ -129,7 +135,12 @@ class UserQuery:
                 % self.sent_email_model_id)
 
     @classmethod
-    def create_default(cls: Type[T], query_id: str, query_params: UserQueryParams, submitter_id: str) -> T:
+    def create_default(
+        cls: Type[T],
+        query_id: str,
+        query_params: UserQueryParams,
+        submitter_id: str
+    ) -> T:
         """Create default user query.
 
         Args:
