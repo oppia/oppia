@@ -42,6 +42,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
+import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 
 @NgModule({
   imports: [
@@ -65,7 +66,8 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
-    ExplorationPublishModalComponent
+    ExplorationPublishModalComponent,
+    EditorReloadingModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -79,7 +81,8 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
-    ExplorationPublishModalComponent
+    ExplorationPublishModalComponent,
+    EditorReloadingModalComponent
   ],
   providers: [
     {
