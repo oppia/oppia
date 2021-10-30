@@ -37,6 +37,7 @@ from core import utils
 from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
+from core.domain import image_validation_services
 from core.domain import user_domain
 
 from typing import Any, Callable, Dict, List, Optional, cast
@@ -674,13 +675,11 @@ class _Validators:
             bool. Whether the given object is a valid filename.
         """
 
-        if not obj:
+        try:
+            image_validation_services.validate_filename(obj)
+            return True
+        except utils.ValidationError:
             return False
-        if obj.rfind('.') == 0:
-            return False
-        if '/' in obj or '..' in obj:
-            return False
-        return '.' in obj
 
     @staticmethod
     def is_valid_username_string(obj: str) -> bool:
