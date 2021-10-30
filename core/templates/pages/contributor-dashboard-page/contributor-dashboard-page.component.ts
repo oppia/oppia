@@ -58,21 +58,17 @@ angular.module('oppia').component('contributorDashboardPage', {
     'FocusManagerService', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'TranslationTopicService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
-    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
-    'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'OPPIA_AVATAR_LINK_URL',
+    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_TOPIC_NAME',
+    'OPPIA_AVATAR_LINK_URL',
     function(
         $rootScope, $timeout, ContributionOpportunitiesService,
         FocusManagerService, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, TranslationTopicService,
         UrlInterpolationService, UserService, WindowRef,
-        CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_LANGUAGE_CODE,
-        DEFAULT_OPPORTUNITY_TOPIC_NAME, OPPIA_AVATAR_LINK_URL) {
+        CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_TOPIC_NAME,
+        OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
-      var prevSelectedLanguageCode = (
-        LocalStorageService.getLastSelectedTranslationLanguageCode());
-      var allAudioLanguageCodes = (
-        LanguageUtilService.getAllVoiceoverLanguageCodes());
 
       var getLanguageDescriptions = function(languageCodes) {
         var languageDescriptions = [];
@@ -83,6 +79,8 @@ angular.module('oppia').component('contributorDashboardPage', {
         });
         return languageDescriptions;
       };
+
+      ctrl.languageCode = TranslationLanguageService.getActiveLanguageCode();
 
       ctrl.onChangeLanguage = function(languageCode: string) {
         ctrl.languageCode = languageCode;
@@ -200,13 +198,6 @@ angular.module('oppia').component('contributorDashboardPage', {
           // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
-
-        ctrl.languageCode = (
-          allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
-          prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
-
-        TranslationLanguageService.setActiveLanguageCode(
-          ctrl.languageCode);
 
         ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
         TranslationTopicService.setActiveTopicName(ctrl.topicName);

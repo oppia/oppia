@@ -40,6 +40,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   options: {id: string, description: string}[];
   languageIdToDescription: {[id: string]: string} = {};
   featuredLanguages: FeaturedTranslationLanguage[] = [];
+  languageSelection: string;
 
   dropdownShown = false;
   explanationPopupShown = false;
@@ -66,6 +67,12 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       .then((featuredLanguages: FeaturedTranslationLanguage[]) => {
         this.featuredLanguages = featuredLanguages;
       });
+
+    this.languageSelection = (
+      this.activeLanguageCode ?
+      this.languageIdToDescription[this.activeLanguageCode] :
+      'Select a language...'
+    );
   }
 
   toggleDropdown(): void {
@@ -74,6 +81,8 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
   selectOption(activeLanguageCode: string): void {
     this.setActiveLanguageCode.emit(activeLanguageCode);
+    this.languageSelection = this.languageIdToDescription[
+      activeLanguageCode];
     this.dropdownShown = false;
   }
 
