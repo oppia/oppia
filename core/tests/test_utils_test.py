@@ -449,7 +449,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 obj.func()
             except Exception as e:
                 self.assertIs(type(e), Exception)
-                self.assertEqual(python_utils.UNICODE(e), '')
+                self.assertEqual(str(e), '')
             else:
                 self.fail(msg='obj.func() did not raise an Exception')
 

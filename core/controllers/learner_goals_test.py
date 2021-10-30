@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import learner_goals_services
 from core.domain import learner_progress_services
@@ -174,8 +173,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_GOALS_DATA_URL,
                 constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 'topic_id_%s' %
-                python_utils.UNICODE(
-                    feconf.MAX_CURRENT_GOALS_COUNT + 3)),
+                str(feconf.MAX_CURRENT_GOALS_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['goals_limit_exceeded'], True)
 

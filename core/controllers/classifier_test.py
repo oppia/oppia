@@ -120,9 +120,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(self.secret),
-            python_utils.convert_to_bytes(
-                self.payload_proto.job_result.SerializeToString()),
+            self.secret.encode('utf-8'),
+            self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
 
         self.payload_for_fetching_next_job_request = {
@@ -132,9 +131,9 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
 
         self.payload_for_fetching_next_job_request['signature'] = (
             classifier_services.generate_signature(
-                python_utils.convert_to_bytes(self.secret),
-                python_utils.convert_to_bytes(
-                    self.payload_for_fetching_next_job_request['message']),
+                self.secret.encode('utf-8'),
+                self.payload_for_fetching_next_job_request['message'].encode(
+                    'utf-8'),
                 self.payload_for_fetching_next_job_request['vm_id']))
 
     def test_trained_classifier_handler(self):
@@ -239,9 +238,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         # Altering message dict to result in invalid dict.
         self.payload_proto.job_result.ClearField('classifier_frozen_model')
         self.payload_proto.signature = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(self.secret),
-            python_utils.convert_to_bytes(
-                self.payload_proto.job_result.SerializeToString()),
+            self.secret.encode('utf-8'),
+            self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
         self.post_blob(
             '/ml/trainedclassifierhandler',
@@ -562,8 +560,8 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload['message'] = json.dumps({})
         self.payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(self.payload['message']),
+            secret.encode('utf-8'),
+            self.payload['message'].encode('utf-8'),
             self.payload['vm_id'])
 
     def test_next_job_handler(self):
