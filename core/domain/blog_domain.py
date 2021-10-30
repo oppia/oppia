@@ -125,10 +125,10 @@ class BlogPost:
             ValidationError. Provided thumbnail filename is invalid.
         """
         if strict:
-            if not isinstance(thumbnail_filename, str):
-                raise utils.ValidationError(
+            assert isinstance(thumbnail_filename, str), (
                     'Expected thumbnail filename to be a string, received: %s.'
-                    % thumbnail_filename)
+                    % thumbnail_filename
+            )
 
         if thumbnail_filename == '':
             raise utils.ValidationError(
@@ -249,10 +249,11 @@ class BlogPost:
         Raises:
             ValidationErrors. URL fragment provided is invalid.
         """
-        if not isinstance(url_fragment, str):
-            raise utils.ValidationError(
+        assert isinstance(url_fragment, str), (
                 'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
+                'Received %s.' % (url_fragment)
+        )
+
         if not url_fragment:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
@@ -303,16 +304,12 @@ class BlogPost:
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
-        last_updated = None
-        if isinstance(blog_post_dict['last_updated'], str):
-            last_updated = utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['last_updated']
-            )
-        published_on = None
-        if isinstance(blog_post_dict['published_on'], str):
-            published_on = utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['published_on']
-            )
+        last_updated = utils.convert_string_to_naive_datetime_object(
+            blog_post_dict['last_updated']
+        ) if isinstance(blog_post_dict['last_updated'], str) else None
+        published_on = utils.convert_string_to_naive_datetime_object(
+            blog_post_dict['published_on']
+        ) if isinstance(blog_post_dict['published_on'], str) else None
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
@@ -378,8 +375,7 @@ class BlogPost:
         Args:
             blog_id: str. The blog post id to validate.
         """
-        if not isinstance(blog_id, str):
-            raise utils.ValidationError(
+        assert isinstance(blog_id, str), (
                 'Blog Post ID should be a string, received: %s' % blog_id)
 
         if len(blog_id) != BLOG_POST_ID_LENGTH:
@@ -443,10 +439,10 @@ class BlogPostSummary:
             ValidationErrors. Thumbnail filename provided is invalid.
         """
         if strict:
-            if not isinstance(thumbnail_filename, str):
-                raise utils.ValidationError(
+            assert isinstance(thumbnail_filename, str), (
                     'Expected thumbnail filename to be a string, received: %s.'
-                    % thumbnail_filename)
+                    % thumbnail_filename
+            )
 
         if thumbnail_filename == '':
             raise utils.ValidationError(
@@ -492,10 +488,10 @@ class BlogPostSummary:
         Raises:
             ValidationErrors. URL fragment provided is invalid.
         """
-        if not isinstance(url_fragment, str):
-            raise utils.ValidationError(
+        assert isinstance(url_fragment, str), (
                 'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
+                'Received %s.' % (url_fragment)
+        )
 
         if not url_fragment:
             raise utils.ValidationError(
@@ -524,8 +520,7 @@ class BlogPostSummary:
         Raises:
             ValidationErrors. Title provided is invalid.
         """
-        if not isinstance(title, str):
-            raise utils.ValidationError('Title should be a string.')
+        assert isinstance(title, str), ('Title should be a string.')
 
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
@@ -549,10 +544,10 @@ class BlogPostSummary:
             ValidationErrors.One or more tags provided are invalid.
         """
         for tag in tags:
-            if not isinstance(tag, str):
-                raise utils.ValidationError(
+            assert isinstance(tag, str), (
                     'Expected each tag in \'tags\' to be a string, received: '
-                    '\'%s\'' % tag)
+                    '\'%s\'' % tag
+            )
 
             if not tag:
                 raise utils.ValidationError(
