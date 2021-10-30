@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
+import { EditorReloadingModalComponent } from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -28,9 +29,6 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.component.ts');
-require(
-  'pages/exploration-editor-page/modal-templates/' +
-  'editor-reloading-modal.controller.ts');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'exploration-metadata-modal.controller');
@@ -245,13 +243,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
           AlertsService.clearWarnings();
           ExternalSaveService.onExternalSave.emit();
 
-          $uibModal.open({
-            template: require(
-              'pages/exploration-editor-page/modal-templates/' +
-              'editor-reloading-modal.template.html'),
+          NgbModal.open(EditorReloadingModalComponent, {
             backdrop: 'static',
             keyboard: false,
-            controller: 'EditorReloadingModalController',
             windowClass: 'oppia-loading-modal'
           }).result.then(() => {}, () => {
             // Note to developers:
