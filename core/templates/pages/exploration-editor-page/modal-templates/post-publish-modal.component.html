@@ -1,3 +1,30 @@
+<div class="oppia-share-publish-modal protractor-test-share-publish-modal">
+  <div class="modal-header oppia-share-publish-header">
+    <img [src]="congratsImgUrl">
+    <h3>Awesome!</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text oppia-share-publish-body">
+    <p>
+      Now that you're a published Oppia teacher, you can share your creation.
+    </p>
+    <div class="oppia-share-publish-link">
+      Here's your exploration link: <br>
+      <div (click)="selectText($event)">{{explorationLink}}</div>
+      <span *ngIf="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
+    </div>
+    <sharing-links layoutType="row"
+                   layoutAlignType="center center"
+                   shareType="exploration"
+                   [explorationId]="explorationId">
+    </sharing-links>
+    <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
+            (click)="cancel()">
+      Close
+    </button>
+  </div>
+</div>
+
 <style>
   .oppia-share-publish-modal .oppia-share-publish-body,
   .oppia-share-publish-body p {
@@ -70,30 +97,3 @@
     padding-left: 6px;
   }
 </style>
-
-<div class="oppia-share-publish-modal protractor-test-share-publish-modal">
-  <div class="modal-header oppia-share-publish-header">
-    <img ng-src="<[congratsImgUrl]>">
-    <h3>Awesome!</h3>
-  </div>
-
-  <div class="modal-body oppia-long-text oppia-share-publish-body">
-    <p>
-      Now that you're a published Oppia teacher, you can share your creation.
-    </p>
-    <div class="oppia-share-publish-link">
-      Here's your exploration link:<br>
-      <div ng-click="selectText($event)"><[explorationLink]></div>
-      <span ng-show="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
-    </div>
-    <sharing-links layout-type="row"
-                   layout-align-type="center center"
-                   share-type="exploration"
-                   [exploration-id]="explorationId">
-    </sharing-links>
-    <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
-            ng-click="cancel()">
-      Close
-    </button>
-  </div>
-</div>

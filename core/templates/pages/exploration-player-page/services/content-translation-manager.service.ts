@@ -219,14 +219,14 @@ export class ContentTranslationManagerService {
       if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
         this._swapContent(
           writtenTranslations, languageCode,
-          <SubtitledHtml|SubtitledUnicode>value);
+          value as SubtitledHtml|SubtitledUnicode);
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        (<Object[]> value).forEach(
+        (value as Object[]).forEach(
           item => traverseSchemaAndSwapTranslatableContent(
-            item, <Schema> schema.items));
+            item, schema.items as Schema));
       } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
         schema.properties.forEach(property => {
-          const name = <keyof typeof value> property.name;
+          const name = property.name as keyof typeof value;
           traverseSchemaAndSwapTranslatableContent(
             value[name],
             property.schema);
@@ -235,14 +235,14 @@ export class ContentTranslationManagerService {
     };
 
     const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
-      <InteractionSpecsKey>interactionId
+      interactionId as InteractionSpecsKey
     ].customization_arg_specs;
     for (const caSpec of caSpecs) {
-      const name = <keyof InteractionCustomizationArgs>caSpec.name;
+      const name = caSpec.name as keyof InteractionCustomizationArgs;
       if (caValues.hasOwnProperty(name)) {
-        const attr = <{value: Object}> caValues[name];
+        const attr = caValues[name] as {value: Object};
         traverseSchemaAndSwapTranslatableContent(
-          attr.value, <Schema>caSpec.schema);
+          attr.value, caSpec.schema as Schema);
       }
     }
 
@@ -263,7 +263,7 @@ export class ContentTranslationManagerService {
           let ruleInputValue = rule.inputs[key];
           if (this._isTranslatableObject(ruleInputValue)) {
             const writtenTranslation = writtenTranslations.translationsMapping[
-              <string>ruleInputValue.contentId
+              ruleInputValue.contentId as string
             ][languageCode];
             // There must be at least one translation.
             if (
@@ -281,9 +281,9 @@ export class ContentTranslationManagerService {
 
             // Retrieve the value corresponding to the other key.
             let nonContentIdKey = (
-              <keyof BaseTranslatableObject>ruleInputValueKeys[0]);
+              ruleInputValueKeys[0] as keyof BaseTranslatableObject);
             ruleInputValue[nonContentIdKey] = (
-              <string>writtenTranslation.translation);
+              writtenTranslation.translation as string);
           }
         }
       });

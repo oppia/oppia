@@ -196,9 +196,9 @@ describe('CreateActivityButtonComponent', () => {
         }
       });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
       });
       const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
@@ -215,9 +215,9 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/creator-dashboard');
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
       });
       const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
@@ -234,9 +234,9 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/creator-dashboard');
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.reject('cancel')
-        });
+        } as NgbModalRef);
       });
 
       component.initCreationProcess();

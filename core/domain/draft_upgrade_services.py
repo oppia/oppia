@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import logging
 
-from core import python_utils
 from core import utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
@@ -138,7 +137,7 @@ class DraftUpgradeUtil:
                             new_value['choices']['value'][value_index][
                                 'html'
                             ] = conversion_fn(value['html'])
-                        elif isinstance(value, python_utils.BASESTRING):
+                        elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
             elif (change.property_name ==
@@ -185,8 +184,7 @@ class DraftUpgradeUtil:
                             if isinstance(html_list, list):
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
-                                    if isinstance(
-                                            answer_html, python_utils.UNICODE):
+                                    if isinstance(answer_html, str):
                                         new_value['correct_answer'][list_index][
                                             answer_html_index] = (
                                                 conversion_fn(answer_html))

@@ -26,7 +26,7 @@ from core.tests import test_utils
 class LearnerProgressInTopicsAndStoriesUnitTests(test_utils.GenericTestBase):
     """Tests the learner progress in topics and stories domain object."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
             learner_progress_domain.LearnerProgressInTopicsAndStories(
@@ -49,7 +49,7 @@ class LearnerProgressInTopicsAndStoriesUnitTests(test_utils.GenericTestBase):
 class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
     """Tests the learner progress in collections domain object."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
             learner_progress_domain.LearnerProgressInCollections(
@@ -66,7 +66,7 @@ class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
 class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):
     """Tests the learner progress in explorations domain object."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
             learner_progress_domain.LearnerProgressInExplorations(
@@ -82,7 +82,7 @@ class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
     """Tests the activity ids in learner dashboard domain object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         incomplete_exp_ids = ['0']
         incomplete_coll_ids = ['1']
         partially_learnt_topic_ids = ['3']
