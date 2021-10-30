@@ -183,13 +183,14 @@ export class StateObjectFactory {
     });
     if (newState.interaction.defaultOutcome !== null) {
       let defaultOutcome = newState.interaction.defaultOutcome;
-      defaultOutcome.dest = <string> newStateName;
+      defaultOutcome.dest = newStateName as string;
     }
     return newState;
   }
 
   createFromBackendDict(
-      stateName: string | null, stateDict: StateBackendDict): State {
+      stateName: string | null, stateDict: StateBackendDict
+  ): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,

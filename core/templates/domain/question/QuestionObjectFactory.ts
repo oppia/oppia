@@ -25,6 +25,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 
+type InteractionId = keyof typeof INTERACTION_SPECS;
 
 export interface QuestionBackendDict {
   'id': string | null;
@@ -101,8 +102,7 @@ export class Question {
 
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
-    type InteractionId = keyof typeof INTERACTION_SPECS;
-    var interactionId = <InteractionId> interaction.id;
+    var interactionId = interaction.id as InteractionId;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
       return 'Please enter a question.';
@@ -139,15 +139,17 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(
-      misconceptionsBySkill: Record<string, Misconception[]>): string[] {
+      misconceptionsBySkill: Record<string, Misconception[]>
+  ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
         answerGroups[i].taggedSkillMisconceptionId !== null) {
           type InteractionhId = keyof typeof taggedSkillMisconceptionIds;
-          var interactionhId =
-           <InteractionhId> answerGroups[i].taggedSkillMisconceptionId;
+          var interactionhId = (
+            answerGroups[i].taggedSkillMisconceptionId as InteractionhId
+          );
           taggedSkillMisconceptionIds[interactionhId] = true;
       }
     }
@@ -156,7 +158,8 @@ export class Question {
     type MisconceptionsBySkillKeys = (
       keyof typeof misconceptionsBySkill)[ ];
     var misconceptionsBySkillKeys = (
-       <MisconceptionsBySkillKeys> Object.keys(misconceptionsBySkill));
+      Object.keys(misconceptionsBySkill) as MisconceptionsBySkillKeys
+    );
 
     misconceptionsBySkillKeys.forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
