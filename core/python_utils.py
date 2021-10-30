@@ -46,12 +46,10 @@ import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-impor
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
-BASESTRING = past.builtins.basestring
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-UNICODE = builtins.str
 ZIP = builtins.zip
 
 
@@ -367,28 +365,6 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def convert_to_bytes(string_to_convert) -> bytes:
-    """Converts the string to bytes.
-
-    Args:
-        string_to_convert: unicode|str. Required string to be converted into
-            bytes.
-
-    Returns:
-        bytes. The encoded string.
-    """
-    if isinstance(string_to_convert, UNICODE):
-        return string_to_convert.encode('utf-8')
-    elif isinstance(string_to_convert, int):
-        raise Exception(
-            'Passing int is not allowed, since it is insecure, because when a '
-            'big number is passed to the bytes function it can spend some time '
-            'generating an array with empty bytes. '
-            'See: https://beginnersbook.com/2019/05/python-bytes/'
-        )
-    return bytes(string_to_convert)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
@@ -411,7 +387,7 @@ def _recursively_convert_to_str(value):
         }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == UNICODE:  # pylint: disable=unidiomatic-typecheck
+    elif type(value) == str:  # pylint: disable=unidiomatic-typecheck
         return value
     elif type(value) == builtins.bytes:  # pylint: disable=unidiomatic-typecheck
         return value.decode('utf-8')
