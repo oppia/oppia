@@ -30,7 +30,6 @@ describe('I18nLanguageCodeService', () => {
     testSubscriptions.add(
       i18nLanguageCodeService.onI18nLanguageCodeChange
         .subscribe((code: string) => languageCode = code));
-
   });
 
   afterEach(() => {
