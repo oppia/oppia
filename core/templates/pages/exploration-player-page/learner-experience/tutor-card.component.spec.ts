@@ -43,12 +43,6 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { TutorCardComponent } from './tutor-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
-    return true;
-  }
-}
-
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -71,6 +65,7 @@ describe('Tutor card component', () => {
   let currentInteractionService: CurrentInteractionService;
   let deviceInfoService: DeviceInfoService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let playerPositionService: PlayerPositionService;
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
@@ -100,10 +95,6 @@ describe('Tutor card component', () => {
         CurrentInteractionService,
         DeviceInfoService,
         ExplorationPlayerStateService,
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
         LearnerAnswerInfoService,
         PlayerPositionService,
         UrlInterpolationService,
@@ -139,6 +130,10 @@ describe('Tutor card component', () => {
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {

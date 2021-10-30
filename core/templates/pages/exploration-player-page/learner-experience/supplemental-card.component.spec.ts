@@ -32,12 +32,6 @@ import { HelpCardEventResponse, PlayerPositionService } from '../services/player
 import { SupplementalCardComponent } from './supplemental-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
-    return true;
-  }
-}
-
 describe('Supplemental card component', () => {
   let fixture: ComponentFixture<SupplementalCardComponent>;
   let componentInstance: SupplementalCardComponent;
@@ -48,6 +42,7 @@ describe('Supplemental card component', () => {
   let playerPositionService: PlayerPositionService;
   let urlInterpolationService: UrlInterpolationService;
   let windowRef: WindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockStateCard = new StateCard(
     'state_name', 'html', 'html', null, [], null,
     null, '', null);
@@ -73,10 +68,6 @@ describe('Supplemental card component', () => {
           useClass: MockChangeDetectorRef
         },
         CurrentInteractionService,
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
         PlayerPositionService,
         UrlInterpolationService,
         WindowRef
@@ -97,6 +88,10 @@ describe('Supplemental card component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowRef = TestBed.inject(WindowRef);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {

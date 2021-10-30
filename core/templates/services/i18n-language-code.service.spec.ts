@@ -30,6 +30,7 @@ describe('I18nLanguageCodeService', () => {
     testSubscriptions.add(
       i18nLanguageCodeService.onI18nLanguageCodeChange
         .subscribe((code: string) => languageCode = code));
+
   });
 
   afterEach(() => {
@@ -45,6 +46,15 @@ describe('I18nLanguageCodeService', () => {
     i18nLanguageCodeService.setI18nLanguageCode('es');
     const latestCode = i18nLanguageCodeService.getCurrentI18nLanguageCode();
     expect(latestCode).toBe('es');
+  });
+
+  it('should get whether the current language is RTL correctly', () => {
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+    expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(true);
   });
 
   it('should get event emitter for loading of preferred language codes', () => {

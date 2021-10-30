@@ -35,12 +35,6 @@ import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.com
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
-    return true;
-  }
-}
-
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
@@ -52,6 +46,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let newCard: StateCard;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -60,10 +55,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe],
-      providers: [{
-        provide: I18nLanguageCodeService,
-        useClass: MockI18nLanguageCodeService
-      }]
+      providers: []
     }).compileComponents();
   }));
 
@@ -75,6 +67,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       .inject(HintsAndSolutionManagerService);
     writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
@@ -92,6 +85,8 @@ describe('HintAndSolutionButtonsComponent', () => {
       new EventEmitter<void>());
     spyOn(hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
       .and.returnValue(new EventEmitter<void>());
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
 
     // A StateCard which supports hints.
     newCard = StateCard.createNewCard(

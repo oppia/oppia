@@ -25,18 +25,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
-    return true;
-  }
-}
-
 describe('InteractiveGraphInput', () => {
   let component: InteractiveGraphInput;
   let playerPositionService: PlayerPositionService;
   let mockNewCardAvailableEmitter = new EventEmitter();
   let fixture: ComponentFixture<InteractiveGraphInput>;
   let currentInteractionService: CurrentInteractionService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   class mockInteractionAttributesExtractorService {
     getValuesFromAttributes(interactionId, attributes) {
@@ -97,10 +92,6 @@ describe('InteractiveGraphInput', () => {
         {
           provide: CurrentInteractionService,
           useValue: mockCurrentInteractionService
-        },
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -112,6 +103,10 @@ describe('InteractiveGraphInput', () => {
     playerPositionService = TestBed.get(PlayerPositionService);
     fixture = TestBed.createComponent(InteractiveGraphInput);
     component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
 
     component.graphWithValue = '{' +
     '  "isWeighted": false,' +

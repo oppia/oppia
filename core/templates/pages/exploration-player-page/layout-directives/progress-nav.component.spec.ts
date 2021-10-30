@@ -33,12 +33,6 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
-    return true;
-  }
-}
-
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
   let componentInstance: ProgressNavComponent;
@@ -51,6 +45,7 @@ describe('Progress nav component', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
   let explorationEngineService: ExplorationEngineService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
@@ -69,10 +64,6 @@ describe('Progress nav component', () => {
         ExplorationEngineService,
         ExplorationPlayerStateService,
         FocusManagerService,
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
         PlayerPositionService,
         PlayerTranscriptService,
         UrlService,
@@ -94,6 +85,10 @@ describe('Progress nav component', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {

@@ -28,12 +28,6 @@ import { BrowserCheckerService } from 'domain/utilities/browser-checker.service'
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
-    return true;
-  }
-}
-
 class MockAttributionService {
   init() {
     return;
@@ -89,6 +83,7 @@ class MockContextService {
 describe('Attribution Guide Component', function() {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -100,11 +95,7 @@ describe('Attribution Guide Component', function() {
         { provide: AttributionService, useClass: MockAttributionService },
         { provide: BrowserCheckerService, useClass: MockBrowserCheckerService },
         { provide: UrlService, useClass: MockUrlService },
-        { provide: ContextService, useClass: MockContextService },
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        }
+        { provide: ContextService, useClass: MockContextService }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -112,7 +103,11 @@ describe('Attribution Guide Component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AttributionGuideComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
     component = fixture.componentInstance;
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should initialize component properties correctly', () => {
