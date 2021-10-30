@@ -68,7 +68,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
         for adict in test_dicts:
             yaml_str = yaml.dump(
-                adict, allow_unicode=True, default_flow_style=False
+                adict, allow_unicode=True,
             )
 
             yaml_dict = utils.dict_from_yaml(yaml_str)

@@ -431,7 +431,6 @@ class Collection(python_utils.OBJECT):
         return yaml.dump(
             collection_dict,
             allow_unicode=True,
-            default_flow_style=False
         )
 
     @classmethod

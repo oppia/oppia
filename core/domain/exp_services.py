@@ -343,7 +343,6 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_dict[state] = yaml.dump(
             exploration.states[state].to_dict(),
             allow_unicode=True,
-            default_flow_style=False,
             width=width
         )
     return exploration_dict
