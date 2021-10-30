@@ -26,7 +26,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './exploration-publish-modal.component.html'
 })
 
-export class ExplorationPublishModal
+export class ExplorationPublishModalComponent
   extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal
