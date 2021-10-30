@@ -57,7 +57,7 @@ describe('Expression evaluator service', () => {
 
   describe('Getting params from expressions', () => {
     type TestParam = [string, string[]];
-    (<TestParam[]> [
+    ([
       ['numZero', ['numZero']],
       ['b + a', ['a', 'b']],
       ['a + b + a', ['a', 'b']],
@@ -84,7 +84,7 @@ describe('Expression evaluator service', () => {
       ['pow(num100_001, numZero)', ['num100_001', 'numZero']],
       ['log(9, 3)', []],
       ['numZero + numOne', ['numOne', 'numZero']]
-    ]).forEach(([expression, expectedParams]) => {
+    ] as TestParam[]).forEach(([expression, expectedParams]) => {
       it('should get references from the expression ' +
         JSON.stringify(expression), () => {
         expect(
@@ -96,7 +96,7 @@ describe('Expression evaluator service', () => {
 
   describe('Evaluating valid expressions', () => {
     type TestParam = [string, Expr];
-    (<TestParam[]> [
+    ([
       ['numZero', 0],
       ['+10', 10],
       ['2   + 10', 12],
@@ -117,7 +117,7 @@ describe('Expression evaluator service', () => {
       ['abs(-3)', 3],
       ['pow(num100_001, numZero)', 1],
       ['log(9, 3)', 2],
-    ]).forEach(([expression, expected]) => {
+    ] as TestParam[]).forEach(([expression, expected]) => {
       it('should evaluate ' + JSON.stringify(expression) + ' correctly', () => {
         expect(
           expressionSyntaxTreeService.applyFunctionToParseTree(
@@ -132,11 +132,11 @@ describe('Expression evaluator service', () => {
 
   describe('Evaluating invalid expressions', () => {
     type TestParam = [string, Expr[], Type<ExpressionError>];
-    (<TestParam[]> [
+    ([
       ['there are too many args', ['+', 10, 20, 30], ExprWrongNumArgsError],
       ['there are too few args', ['==', true], ExprWrongNumArgsError],
       ['an arg has the wrong type', ['+', 'abc', 1], ExprWrongArgTypeError],
-    ]).forEach(([problemDescription, expression, errorType]) => {
+    ] as TestParam[]).forEach(([problemDescription, expression, errorType]) => {
       it('should report an error when ' + problemDescription, () => {
         expect(
           () => expressionSyntaxTreeService.applyFunctionToParseTree(

@@ -1,10 +1,10 @@
-<background-banner *ngIf="!checkMobileView() || (checkMobileView() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div class="oppia-learner-dashboard-container position-relative" [ngStyle]="checkMobileView() && {'min-height': '85.5vh'}">
+<background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
+<div class="oppia-learner-dashboard-container position-relative overflow-auto" [ngStyle]="windowIsNarrow && {'min-height': '85.5vh'}">
   <div class="row oppia-row"
-       [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+       [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
     <div class="col-md-3 oppia-learner-dashboard-side-content"
-         *ngIf="!checkMobileView()">
+         *ngIf="!windowIsNarrow">
       <mat-card class="oppia-learner-dashboard-main-menu">
         <h4 class="oppia-learner-dashboard-menu protractor-test-home-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
@@ -34,8 +34,8 @@
         </h4>
       </mat-card>
     </div>
-    <footer class="oppia-learner-dashboard-buttons" *ngIf="checkMobileView()">
-      <mat-card class="oppia-learner-dashboard-button-menu">
+    <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow" headroom>
+      <mat-card class="oppia-learner-dashboard-button-menu d-flex justify-content-around">
         <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
           <img [src]="homeImageUrl" alt="home image" class="oppia-svg-image">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate" class="home-button"></span>
@@ -51,8 +51,8 @@
       </mat-card>
     </footer>
 
-    <div *ngIf="checkMobileView() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS">
-      <mat-card class="oppia-learner-dashboard-progress-button-menu">
+    <div *ngIf="windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS">
+      <mat-card class="oppia-learner-dashboard-progress-button-menu d-flex justify-content-around">
         <div class="oppia-learner-dashboard-progress-button-menu-options" [ngStyle]="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY && {'border-bottom': '2px solid #00645C'}" (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
           <p [innerHTML]="'I18N_DASHBOARD_SKILL_PROFICIENCY' | translate">
           </p>
@@ -69,7 +69,7 @@
     </div>
 
     <div class="col-md-8 oppia-learner-dashboard-main-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
       <div>
         <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
           <span [innerHTML]="activeSection | translate">
@@ -78,7 +78,7 @@
 
         <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-sort-options"
               *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
-              [ngClass]="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}">
+              [ngClass]="{'oppia-learner-dashboard-sort-mobile': windowIsNarrow}">
           <p class="sort-by-text mt-0">Sort By</p>
           <select [(ngModel)]="currentFeedbackThreadsSortType"
                   class="sort-options oppia-sort-options"
@@ -94,7 +94,8 @@
           </span>
         </span>
       </div>
-      <div class="oppia-learner-dashboard-main-content-container">
+      <div class="oppia-learner-dashboard-main-content-container d-flex"
+           [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [untrackedTopics]="untrackedTopics"
@@ -111,20 +112,20 @@
                            [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
           </oppia-goals-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !checkMobileView()">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList">
           </oppia-progress-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && checkMobileView()">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && windowIsNarrow">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
                               [activeSubsection]="activeSubsection">
           </oppia-progress-tab>
         </div>
-        <div *ngIf="((!checkMobileView() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (checkMobileView() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
+        <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
           <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
                                        [incompleteCollectionsList]="incompleteCollectionsList"
                                        [completedExplorationsList]="completedExplorationsList"
@@ -330,8 +331,7 @@
     </div>
 
     <div class="col-md-2 oppia-learner-dashboard-side-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
-
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
     </div>
   </div>
 </div>
@@ -368,10 +368,6 @@
     margin-top: 0;
     padding-top: 65.5px;
     text-align: center;
-  }
-
-  .oppia-learner-dashboard-button-menu {
-    padding: 8px;
   }
 
   .oppia-learner-dashboard-section-not-active-button {
@@ -420,7 +416,6 @@
   .oppia-buttons {
     cursor: pointer;
     display: inline-block;
-    margin-left: 48px;
   }
 
   .oppia-svg-image {
@@ -617,10 +612,6 @@
     padding: 0 7.5px;
   }
 
-  .oppia-learner-dashboard-main-content-container {
-    padding-left: 11px;
-  }
-
   .oppia-learner-dashboard-feedback-section {
     margin: 0 23px 0 0;
   }
@@ -737,6 +728,10 @@
     .oppia-learner-dashboard-feedback-section .feedback-thread-message-body {
       margin-left: 43px;
     }
+
+    .oppia-learner-dashboard-container {
+      margin-bottom: 0;
+    }
   }
 
   @media screen and (min-width: 768px) and (max-width: 1000px) {
@@ -748,6 +743,12 @@
     }
     .oppia-learner-dashboard-progress-button-menu-options {
       margin: 0 70px;
+    }
+  }
+
+  @media(max-width:450px) {
+    .oppia-learner-dashboard-progress-button-menu-options {
+      font-size: 16px;
     }
   }
 
@@ -790,6 +791,10 @@
     .sort-explorations-select.oppia-learner-dashboard-sort {
       padding: 0 0 6px 7.5px;
       width: 100%;
+    }
+
+    .oppia-learner-dashboard-main-content-container {
+      margin-bottom: 10vh;
     }
   }
 
@@ -886,5 +891,31 @@
     margin-right: 14px;
     margin-top: 8px;
     text-align: right;
+  }
+
+  /* The css below helps in using headroom.js for footer. */
+  .oppia-learner-dashboard-buttons.headroom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .oppia-learner-dashboard-buttons.headroom--top {
+    margin-bottom: 70px;
+  }
+
+  .oppia-learner-dashboard-buttons.headroom--unfixed {
+    position: relative;
+    transform: translateY(0);
+  }
+  .oppia-learner-dashboard-buttons.headroom--scrolled {
+    transition: transform 200ms ease-in-out;
+  }
+  .oppia-learner-dashboard-buttons.headroom--unpinned {
+    bottom: -30px;
+  }
+  .oppia-learner-dashboard-buttons.headroom--pinned {
+    margin-bottom: 50px;
+    position: fixed;
+    transform: translateY(-100%);
   }
 </style>

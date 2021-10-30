@@ -378,7 +378,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     var i18nCompleted = true;
     var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
     for (var i = 0; i < tabs.length; i++) {
-      if ((<HTMLElement>tabs[i]).innerText.length === 0) {
+      if ((tabs[i] as HTMLElement).innerText.length === 0) {
         i18nCompleted = false;
         break;
       }

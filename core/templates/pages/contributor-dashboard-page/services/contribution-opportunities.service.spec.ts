@@ -95,10 +95,11 @@ describe('Contribution Opportunities Service', () => {
 
   it('should open login modal when user is not logged in', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }
+      ) as NgbModalRef;
     });
 
     contributionOpportunitiesService.showRequiresLoginModal();

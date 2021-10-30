@@ -219,13 +219,16 @@ def modify_constants(
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"DEV_MODE": (true|false)',
-        dev_mode_variable)
+        dev_mode_variable,
+        expected_number_of_replacements=1
+    )
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
-        emulator_mode_variable
+        emulator_mode_variable,
+        expected_number_of_replacements=1
     )
 
     enable_maintenance_mode_variable = (
@@ -233,7 +236,9 @@ def modify_constants(
     common.inplace_replace_file(
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
-        enable_maintenance_mode_variable)
+        enable_maintenance_mode_variable,
+        expected_number_of_replacements=1
+    )
 
 
 def set_constants_to_default():

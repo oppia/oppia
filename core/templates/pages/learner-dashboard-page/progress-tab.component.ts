@@ -19,11 +19,12 @@
 import { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { LearnerDashboardBackendApiService, SubtopicMasterySummaryBackendDict } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 
  @Component({
@@ -49,9 +50,11 @@ export class ProgressTabComponent implements OnInit {
   width: number;
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+  windowIsNarrow: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   constructor(
-    private deviceInfoService: DeviceInfoService,
+    private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
@@ -91,6 +94,12 @@ export class ProgressTabComponent implements OnInit {
       this.emptySkillProficiency = false;
     }
     this.getTopicMastery();
+
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+      }));
   }
 
   showSkills(index: number): void {
@@ -100,10 +109,6 @@ export class ProgressTabComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  checkMobileView(): boolean {
-    return this.deviceInfoService.isMobileDevice();
   }
 
   getTopicMastery(): void {

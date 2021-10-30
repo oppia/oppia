@@ -1,6 +1,6 @@
 <div class="home-tab">
-  <div class="greeting" [ngStyle]="!checkMobileView() && {'margin-top': '64px'}">
-    Good {{getTimeOfDay()}}, {{username}}!
+  <div class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+    {{ getTimeOfDay() | translate }}, {{ username }}!
   </div>
   <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
     <p class="continue-where-you-left-off-heading"
@@ -20,7 +20,7 @@
     </div>
     <div class="continue-where-you-left-off-scroll">
       <div class="continue-where-you-left-off-section" *ngIf="currentGoals.length !== 0"
-        [ngStyle]="checkMobileView() && {'width': width + 'px'}">
+        [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
         <div *ngFor="let topicSummaryTile of currentGoals" class="topic-summary">
           <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                class="story-summary-tile">
@@ -33,7 +33,7 @@
     </div>
   </div>
   <div class="suggested-for-you protractor-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics)">
-    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
+    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="suggested-for-you-section">
       <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
@@ -41,8 +41,8 @@
           {{item.key}}
         </div>
         <div class="topic-summary-tile-scroll">
-          <div class="topic-summary-tile-section"
-            [ngStyle]="checkMobileView() && {'width': getWidth(item.value.length) + 'px'}">
+          <div class="topic-summary-tile-section d-flex"
+            [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
             <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
               <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
               </oppia-learner-topic-summary-tile>
@@ -61,7 +61,7 @@
     </div>
   </div>
   <div class="empty-suggested-for-you" *ngIf="!isNonemptyObject(untrackedTopics) && currentGoals.length === 0">
-    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
+    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="empty-suggested-for-you-section">
       <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
@@ -202,7 +202,7 @@
     .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
     .home-tab .empty-suggested-for-you {
       margin: 18px 0 25px 20px;
-      width: 365px;
+      width: 465px;
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
     .home-tab .suggested-for-you .suggested-for-you-heading {
@@ -253,6 +253,22 @@
     }
     .home-tab .empty-suggested-for-you-section {
       padding: 17px 32px 0 0;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
+    .home-tab .empty-suggested-for-you {
+      margin-left: auto;
+      width: 335px;
+    }
+
+    .home-tab .suggested-for-you .topic-summary-tile-scroll {
+      width: 265px;
+    }
+
+    .home-tab .greeting {
+      margin-left: 0;
     }
   }
 </style>

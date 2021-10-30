@@ -1,5 +1,5 @@
 <div class="progress-tab">
-  <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': checkMobileView()? '35px': '64px'}" *ngIf="!checkMobileView() || (checkMobileView() && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
+  <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}" *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
     <div class="skill-proficiency-heading">
       <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROFICIENCY_SECTION' | translate">
       </p>
@@ -75,8 +75,8 @@
       </div>
     </div>
   </div>
-  <div class="completed-stories" [ngStyle]="checkMobileView() && {'margin-top': '35px'}"
-       *ngIf="(!checkMobileView() && completedStoriesList.length !== 0) || (checkMobileView() && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
+  <div class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+       *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
       </p>
@@ -86,7 +86,7 @@
       <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="oppia-svg-star-image">
     </div>
     <div class="scroll-content">
-      <div class="completed-stories-content" [ngStyle]="checkMobileView() && {'width': width + 'px'}">
+      <div class="completed-stories-content" [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
         <div *ngFor="let tile of completedStoriesList" class="story-tile">
           <oppia-learner-story-summary-tile [storySummary]="tile"
                                             [displayArea]="progressTab">
@@ -95,8 +95,8 @@
       </div>
     </div>
   </div>
-  <div class="empty-completed-stories" [ngStyle]="checkMobileView() && {'margin-top': '35px'}"
-    *ngIf="checkMobileView() && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
+  <div class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+    *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
       </p>
@@ -405,7 +405,12 @@
       overflow: hidden;
     }
     .progress-tab .empty-section {
-    padding: 0 50px 30px 40px;
+      padding: 0 50px 30px 40px;
+    }
   }
+  @media(max-width: 430px) {
+    .progress-tab .empty-completed-stories {
+      width: 355px;
+    }
   }
 </style>
