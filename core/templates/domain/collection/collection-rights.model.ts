@@ -19,7 +19,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface CollectionRightsBackendDict {
-  'collection_id': number | null;
+  'collection_id': string | null;
   'can_edit': boolean | null;
   'can_unpublish': boolean | null;
   'is_private': boolean | null;
@@ -27,7 +27,7 @@ export interface CollectionRightsBackendDict {
 }
 
 export class CollectionRights {
-  _collectionId: number | null;
+  _collectionId: string | null;
   _canEdit: boolean | null;
   _canUnpublish: boolean | null;
   _isPrivate: boolean | null;
@@ -59,7 +59,7 @@ export class CollectionRights {
     });
   }
 
-  getCollectionId(): number | null {
+  getCollectionId(): string | null {
     return this._collectionId;
   }
 

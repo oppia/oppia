@@ -20,16 +20,15 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import copy
+import importlib
 import inspect
 import os
-import pkgutil
 
-import feconf
-import python_utils
-import utils
+from core import feconf
+from core import utils
 
 
-class BaseValueGenerator(python_utils.OBJECT):
+class BaseValueGenerator:
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -72,7 +71,7 @@ class BaseValueGenerator(python_utils.OBJECT):
             'generate_value() method has not yet been implemented')
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Maintains a registry of all the value generators.
 
     Attributes:
@@ -91,20 +90,13 @@ class Registry(python_utils.OBJECT):
 
         # Assemble all generators in
         # extensions/value_generators/models/generators.py.
-        value_generator_paths = [os.path.join(
-            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'models')]
+        module_path_parts = feconf.VALUE_GENERATORS_DIR.split(os.sep)
+        module_path_parts.extend(['models', 'generators'])
+        module = importlib.import_module('.'.join(module_path_parts))
 
-        # Crawl the directories and add new generator instances to the
-        # registries.
-        for loader, name, _ in pkgutil.iter_modules(
-                path=value_generator_paths):
-            if name.endswith('_test'):
-                continue
-            module = loader.find_module(name).load_module(name)
-            for _, clazz in inspect.getmembers(
-                    module, predicate=inspect.isclass):
-                if issubclass(clazz, BaseValueGenerator):
-                    cls.value_generators_dict[clazz.__name__] = clazz
+        for _, clazz in inspect.getmembers(module, predicate=inspect.isclass):
+            if issubclass(clazz, BaseValueGenerator):
+                cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_all_generator_classes(cls):

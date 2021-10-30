@@ -21,6 +21,8 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import feconf
+from core import python_utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -28,8 +30,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.platform import models
-import feconf
-import python_utils
 
 (feedback_models, stats_models, user_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.statistics, models.NAMES.user])
@@ -37,7 +37,7 @@ import python_utils
 transaction_services = models.Registry.import_transaction_services()
 
 
-class BaseEventHandler(python_utils.OBJECT):
+class BaseEventHandler:
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by

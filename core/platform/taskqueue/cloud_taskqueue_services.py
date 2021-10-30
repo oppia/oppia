@@ -23,14 +23,13 @@ import datetime
 import json
 import logging
 
-from constants import constants
-import feconf
+from core import feconf
+from core.constants import constants
 
 from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
-
 from typing import Any, Dict, Optional
 
 CLIENT = tasks_v2.CloudTasksClient(
@@ -78,7 +77,7 @@ def create_http_task(
     task: Dict[str, Any] = {
         # Specify the type of request.
         'app_engine_http_request': {
-            'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
+            'http_method': tasks_v2.types.HttpMethod.POST,
             'relative_uri': url,
         }
     }
@@ -111,7 +110,7 @@ def create_http_task(
     # Note: retry=retry.Retry() means that the default retry arguments
     # are used. It cannot be removed since then some failures that occur in
     # Taskqueue API are not repeated.
-    response = CLIENT.create_task(parent, task, retry=retry.Retry())
+    response = CLIENT.create_task(parent=parent, task=task, retry=retry.Retry())
 
     logging.info('Created task %s' % response.name)
     return response

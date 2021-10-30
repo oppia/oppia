@@ -26,7 +26,9 @@ from __future__ import unicode_literals
 import copy
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -37,9 +39,6 @@ from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
@@ -222,7 +221,7 @@ def apply_change_list(story_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, story_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def does_story_exist_with_url_fragment(url_fragment):

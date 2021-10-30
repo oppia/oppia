@@ -22,7 +22,7 @@ import { CollectionRights } from
 describe('Collection rights model', () => {
   it('should not be able to modify owner names', () => {
     var initialCollectionRightsBackendObject = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: false,
       is_private: true,
@@ -40,7 +40,7 @@ describe('Collection rights model', () => {
   it('should accept accept changes to the bindable list of collection nodes',
     () => {
       var initialCollectionRightsBackendObject = {
-        collection_id: 0,
+        collection_id: '',
         can_edit: true,
         can_unpublish: false,
         is_private: true,
@@ -58,7 +58,7 @@ describe('Collection rights model', () => {
 
   it('should be able to set public when canEdit is true', () => {
     var initialCollectionRightsBackendObject = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: false,
       is_private: true,
@@ -78,7 +78,7 @@ describe('Collection rights model', () => {
   it('should throw error and not be able to set public when canEdit is false',
     () => {
       var initialCollectionRightsBackendObject = {
-        collection_id: 0,
+        collection_id: '',
         can_edit: false,
         can_unpublish: false,
         is_private: true,
@@ -100,7 +100,7 @@ describe('Collection rights model', () => {
 
   it('should be able to set private when canUnpublish is true', () => {
     var initialCollectionRightsBackendObject = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: true,
       is_private: false,
@@ -120,7 +120,7 @@ describe('Collection rights model', () => {
   it('should throw error when when canUnpublish is false during unpublishing',
     () => {
       var noUnpublishCollectionRightsBackendObject = {
-        collection_id: 0,
+        collection_id: '',
         can_edit: true,
         can_unpublish: false,
         is_private: false,
@@ -155,7 +155,7 @@ describe('Collection rights model', () => {
 
   it('should make a copy from another collection rights', () => {
     var noUnpublishCollectionRightsBackendObject = {
-      collection_id: 0,
+      collection_id: '',
       can_edit: true,
       can_unpublish: false,
       is_private: false,
@@ -170,7 +170,7 @@ describe('Collection rights model', () => {
 
     emptyCollectionRightsBackendObject.copyFromCollectionRights(
       sampleCollectionRights);
-    expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
+    expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual('');
     expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
     expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
     expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);

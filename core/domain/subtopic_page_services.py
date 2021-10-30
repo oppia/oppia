@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
 from core.domain import subtopic_page_domain
 from core.platform import models
-import feconf
 
 (subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
 datastore_services = models.Registry.import_datastore_services()

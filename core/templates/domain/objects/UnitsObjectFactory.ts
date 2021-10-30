@@ -20,10 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { createUnit, unit } from 'mathjs';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { Unit } from
-  'interactions/answer-defs';
+import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
+import { Unit } from 'interactions/answer-defs';
 
 interface UnitsBackendDict {
   units: Unit[];
@@ -73,7 +71,7 @@ export class UnitsObjectFactory {
   isLastElementUnit(unitList: string[]): boolean {
     return (
       unitList.length > 0 &&
-      this.isunit(<string> unitList.slice(-1).pop())
+      this.isunit(unitList.slice(-1).pop() as string)
     );
   }
 
@@ -125,7 +123,7 @@ export class UnitsObjectFactory {
       } else if (unitList[ind] === ')') {
         var elem = parenthesisStack.pop();
         if (elem) {
-          multiplier = parseInt(<string> elem[1]) * multiplier;
+          multiplier = parseInt(elem[1] as string) * multiplier;
         } else {
           throw new Error('Close parenthesis with no open parenthesis');
         }
@@ -183,7 +181,7 @@ export class UnitsObjectFactory {
 
   createCurrencyUnits(): void {
     var keys = (
-      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
     );
     for (var i = 0; i < keys.length; i++) {
       let baseUnitValue = (
@@ -215,7 +213,7 @@ export class UnitsObjectFactory {
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
     var keys = (
-      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
     );
     for (var i = 0; i < keys.length; i++) {
       for (
@@ -254,11 +252,7 @@ export class UnitsObjectFactory {
 
     var compatibleUnits = this.toMathjsCompatibleString(units);
     if (compatibleUnits !== '') {
-      try {
-        unit(compatibleUnits);
-      } catch (err) {
-        throw new Error(err);
-      }
+      unit(compatibleUnits);
     }
     return new Units(this.fromStringToList(units));
   }

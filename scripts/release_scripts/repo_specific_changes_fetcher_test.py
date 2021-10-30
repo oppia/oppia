@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import os
 
+from core import python_utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import repo_specific_changes_fetcher
@@ -126,3 +127,20 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             self.assertEqual(
                 repo_specific_changes_fetcher.get_changes('release_tag'),
                 expected_changes)
+
+    def test_main(self):
+        def mock_get_changes(unused_release_tag_to_diff_against):
+            return ['change1', 'change2', 'change3']
+
+        printed_lines = []
+        def mock_print(text_to_print):
+            printed_lines.append(text_to_print)
+
+        get_changes_swap = self.swap(
+            repo_specific_changes_fetcher, 'get_changes', mock_get_changes)
+        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+
+        with get_changes_swap, print_swap:
+            repo_specific_changes_fetcher.main(args=['--release_tag', 'tag'])
+
+        self.assertEqual(printed_lines, ['change1\nchange2\nchange3'])

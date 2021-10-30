@@ -155,7 +155,7 @@ export class StoryViewerPageComponent implements OnInit {
         this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
         this.storyId = this.storyPlaythroughObject.getStoryId();
         this.topicName = this.storyPlaythroughObject.topicName;
-        this.pageTitleService.setPageTitle(
+        this.pageTitleService.setDocumentTitle(
           `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
         this.pageTitleService.updateMetaTag(
           storyDataDict.getMetaTagContent());

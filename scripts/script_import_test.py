@@ -71,7 +71,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 'third_party/python_libs',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'six==1.15.0', '--target',
+                'six==1.16.0', '--target',
                 'third_party/python_libs',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',

@@ -77,9 +77,9 @@ export class InteractionAttributesExtractorService {
       return ca;
     }
     const caValues: InteractionCustomizationArgs = {};
-    const caKeys = <(keyof InteractionCustomizationArgs)[]> Object.keys(ca);
+    const caKeys = Object.keys(ca) as (keyof InteractionCustomizationArgs)[];
     caKeys.forEach(caName => {
-      const attr = <{ value: Object }> ca[caName];
+      const attr = ca[caName] as { value: Object };
       Object.defineProperty(caValues, caName, {
         value: attr.value,
         enumerable: true

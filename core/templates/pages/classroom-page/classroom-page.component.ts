@@ -73,7 +73,7 @@ export class ClassroomPageComponent {
         this.classroomData = classroomData;
         this.classroomDisplayName = this.capitalizePipe.transform(
           classroomData.getName());
-        this.pageTitleService.setPageTitle(
+        this.pageTitleService.setDocumentTitle(
           `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
         this.loaderService.hideLoadingScreen();
         this.classroomBackendApiService.onInitializeTranslation.emit();

@@ -26,9 +26,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { ContentLanguageSelectorComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -42,12 +39,6 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     InteractionExtensionsModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
-  ],
-  declarations: [
-    ContentLanguageSelectorComponent,
-  ],
-  entryComponents: [
-    ContentLanguageSelectorComponent,
   ],
   providers: [
     {

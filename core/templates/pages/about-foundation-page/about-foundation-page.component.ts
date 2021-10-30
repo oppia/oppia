@@ -34,7 +34,7 @@ export class AboutFoundationPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
   ngOnInit(): void {
-    this.pageTitleService.setPageTitle('About foundation | Oppia');
+    this.pageTitleService.setDocumentTitle('About foundation | Oppia');
   }
 }
 

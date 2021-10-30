@@ -25,6 +25,9 @@ import os
 import re
 import zipfile
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
@@ -42,9 +45,6 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (
     feedback_models, exp_models, opportunity_models,
@@ -4010,8 +4010,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_migrate_exp_to_latest_version_migrates_to_version(self):
         """Test migrate exploration state schema to the latest version."""
-        latest_schema_version = python_utils.UNICODE(
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        latest_schema_version = str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
@@ -4025,15 +4024,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
-            python_utils.UNICODE(
-                exploration.states_schema_version),
+            str(exploration.states_schema_version),
             latest_schema_version)
 
     def test_migrate_exp_to_earlier_version_raises_exception(self):
         """Test migrate state schema to earlier version raises exception."""
         latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        not_latest_schema_version = python_utils.UNICODE(
-            latest_schema_version - 1)
+        not_latest_schema_version = str(latest_schema_version - 1)
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
@@ -4327,7 +4324,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
+        for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -4357,7 +4354,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in python_utils.RANGE(len(snapshots_metadata) - 1):
+        for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -4735,7 +4732,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             'add_documents_to_index',
             add_docs_counter)
 
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             self.save_new_valid_exploration(
                 all_exp_ids[i],
                 self.owner_id,
@@ -4744,7 +4741,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         # We're only publishing the first 4 explorations, so we're not
         # expecting the last exploration to be indexed.
-        for i in python_utils.RANGE(4):
+        for i in range(4):
             rights_manager.publish_exploration(
                 self.owner, expected_exp_ids[i])
 
@@ -5280,9 +5277,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
+    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
+    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'

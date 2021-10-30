@@ -21,14 +21,13 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import blog_domain
 from core.domain import html_cleaner
 from core.domain import role_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (blog_models,) = models.Registry.import_models([models.NAMES.blog])
 datastore_services = models.Registry.import_datastore_services()
@@ -302,7 +301,7 @@ def does_blog_post_with_url_fragment_exist(url_fragment):
     Raises:
         Exception. Blog Post URL fragment is not a string.
     """
-    if not isinstance(url_fragment, python_utils.BASESTRING):
+    if not isinstance(url_fragment, str):
         raise utils.ValidationError(
             'Blog Post URL fragment should be a string. Recieved:'
             '%s' % url_fragment)

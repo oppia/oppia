@@ -255,4 +255,21 @@ describe('Question update service', function() {
     QuestionUndoRedoService.undoChange(sampleQuestion);
     expect(sampleQuestion.getStateData()).toEqual(oldStateData);
   });
+
+  it('should set question inapplicable skills misconception ids when ' +
+    'calling \'setQuestionInapplicableSkillMisconceptionIds\'', function() {
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toBe(undefined);
+
+    QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
+      sampleQuestion, ['id1']);
+
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toEqual(['id1']);
+
+    QuestionUndoRedoService.undoChange(sampleQuestion);
+
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toBe(undefined);
+  });
 });

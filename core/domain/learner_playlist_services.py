@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

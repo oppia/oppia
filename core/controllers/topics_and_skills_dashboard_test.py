@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_services
 from core.domain import question_services
 from core.domain import skill_fetchers
@@ -28,8 +30,6 @@ from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
@@ -361,8 +361,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             json_response['skill_summary_dicts'][1]['id'],
             self.subtopic_skill_id)
         self.assertTrue(json_response['more'])
-        self.assertTrue(
-            isinstance(json_response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(json_response['next_cursor'], str)
 
         next_cursor = json_response['next_cursor']
 

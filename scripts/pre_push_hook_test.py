@@ -25,9 +25,8 @@ import subprocess
 import sys
 import tempfile
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import common
 from . import install_backend_python_libs
@@ -787,6 +786,43 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '|Currently Installed Version',
                 'library                             |version                  '
                 '|version                  ',
+                '\n',
+                'Please fix these discrepancies by editing the '
+                '`requirements.in`\nfile or running '
+                '`scripts.install_third_party` to regenerate\nthe '
+                '`third_party/python_libs` directory.\n\n'
+            ])
+
+    def test_main_exits_when_missing_backend_python_lib(self):
+        """Test that main exits with correct error message when a python
+        library required in `requirements.txt` is missing in
+        `third_party/python_libs`.
+        """
+        def mock_get_mismatches():
+            return {
+                'library': ('version', None)
+            }
+
+        def mock_exit_error(error_code):
+            self.assertEqual(error_code, 1)
+
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches',
+            mock_get_mismatches)
+        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
+        with self.print_swap, swap_sys_exit, swap_get_mismatches:
+            pre_push_hook.check_for_backend_python_library_inconsistencies()
+
+        self.assertEqual(
+            self.print_arr,
+            [
+                'Your currently installed python libraries do not match the\n'
+                'libraries listed in your "requirements.txt" file. Here is a\n'
+                'full list of library/version discrepancies:\n',
+                'Library                             |Requirements Version     '
+                '|Currently Installed Version',
+                'library                             |version                  '
+                '|None                     ',
                 '\n',
                 'Please fix these discrepancies by editing the '
                 '`requirements.in`\nfile or running '

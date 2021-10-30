@@ -27,8 +27,8 @@ import math
 import random
 import time
 
+from core import feconf
 from core.platform import models
-import feconf
 
 (audit_models,) = models.Registry.import_models([models.NAMES.audit])
 

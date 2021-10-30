@@ -23,12 +23,11 @@ import datetime
 import json
 import sys
 
+from core import feconf
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1543,12 +1542,11 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(
-                        utils.get_random_int(base_models.RAND_RANGE)),
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1878,14 +1876,12 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             list(str). List of versions corresponding to annotation models
             with given exp_id.
         """
-        return [
-            annotations.version for annotations in
-            cast(
-                List[ExplorationAnnotationsModel],
-                cls.get_all().filter(
-                    cls.exploration_id == exploration_id
-                ).fetch(feconf.DEFAULT_QUERY_LIMIT))
-        ]
+        annotations_result: Sequence[ExplorationAnnotationsModel] = (
+            cls.get_all().filter(
+                cls.exploration_id == exploration_id
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+        return [annotations.version for annotations in annotations_result]
 
     @staticmethod
     def get_model_association_to_user(
@@ -2057,11 +2053,10 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in python_utils.RANGE(
+                    for shard_id in range(
                         1, main_shard.shard_count + 1)]
                 all_models += cast(
-                    List[StateAnswersModel],
-                    cls.get_multi(shard_ids))
+                    List[StateAnswersModel], cls.get_multi(shard_ids))
             return all_models
         else:
             return None
@@ -2138,7 +2133,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in python_utils.RANGE(1, len(sharded_answer_lists)):
+        for i in range(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
@@ -2226,8 +2221,11 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, python_utils.UNICODE(exploration_version),
-            state_name, python_utils.UNICODE(shard_id)])
+            exploration_id,
+            str(exploration_version),
+            state_name,
+            str(shard_id)
+        ])
 
     # TODO(#13523): Change answer lists to TypedDict/Domain Object
     # to remove Any used below.

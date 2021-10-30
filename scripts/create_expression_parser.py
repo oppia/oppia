@@ -21,7 +21,7 @@ import argparse
 import os
 import subprocess
 
-import python_utils
+from core import python_utils
 
 from . import common
 from . import setup

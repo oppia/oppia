@@ -17,12 +17,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import user_services
-import feconf
-import python_utils
 
 
 class RecentCommitsHandler(base.BaseHandler):

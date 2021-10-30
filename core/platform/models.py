@@ -20,10 +20,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
-from types import ModuleType # pylint: disable=import-only-modules
-from constants import constants
-import feconf
-import python_utils
+from types import ModuleType  # pylint: disable=import-only-modules
+
+from core import feconf
+from core import python_utils
+from core.constants import constants
 
 from typing import List, Tuple, Type
 
@@ -54,7 +55,7 @@ MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
 GAE_PLATFORM = 'gae'
 
 
-class Platform(python_utils.OBJECT):
+class Platform:
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
@@ -387,7 +388,7 @@ class _Gae(Platform):
     NAME = 'gae'
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Platform-agnostic interface for retrieving platform-specific
     modules.
     """

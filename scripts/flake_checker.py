@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-import python_utils
+from core import python_utils
 
 import requests
 

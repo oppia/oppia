@@ -21,17 +21,12 @@ from __future__ import unicode_literals
 
 import re
 
-from constants import constants
-
-from core.platform import models
-import feconf
-import python_utils
-import utils
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+from core import feconf
+from core import utils
+from core.constants import constants
 
 
-class UserSettings(python_utils.OBJECT):
+class UserSettings:
     """Value object representing a user's settings.
 
     Attributes:
@@ -166,7 +161,7 @@ class UserSettings(python_utils.OBJECT):
             ValidationError. The pin is not str.
             ValidationError. The display alias is not str.
         """
-        if not isinstance(self.user_id, python_utils.BASESTRING):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
@@ -197,7 +192,7 @@ class UserSettings(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Roles contains duplicate values: %s' % self.roles)
             for role in self.roles:
-                if not isinstance(role, python_utils.BASESTRING):
+                if not isinstance(role, str):
                     raise utils.ValidationError(
                         'Expected roles to be a string, received %s' % role)
 
@@ -213,7 +208,7 @@ class UserSettings(python_utils.OBJECT):
                     'Expected roles to contains one default role.')
 
         if self.pin is not None:
-            if not isinstance(self.pin, python_utils.BASESTRING):
+            if not isinstance(self.pin, str):
                 raise utils.ValidationError(
                     'Expected PIN to be a string, received %s' %
                     self.pin
@@ -235,13 +230,13 @@ class UserSettings(python_utils.OBJECT):
                         )
 
         if (self.display_alias is not None and
-                not isinstance(self.display_alias, python_utils.BASESTRING)):
+                not isinstance(self.display_alias, str)):
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s' %
                 self.display_alias
             )
 
-        if not isinstance(self.email, python_utils.BASESTRING):
+        if not isinstance(self.email, str):
             raise utils.ValidationError(
                 'Expected email to be a string, received %s' % self.email)
         if not self.email:
@@ -251,8 +246,7 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
 
-        if not isinstance(
-                self.creator_dashboard_display_pref, python_utils.BASESTRING):
+        if not isinstance(self.creator_dashboard_display_pref, str):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
@@ -276,11 +270,7 @@ class UserSettings(python_utils.OBJECT):
                 attribute.
         """
         if (not modifiable_user_data.display_alias or
-                not isinstance(
-                    modifiable_user_data.display_alias,
-                    python_utils.BASESTRING
-                )
-           ):
+                not isinstance(modifiable_user_data.display_alias, str)):
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s.' %
                 modifiable_user_data.display_alias
@@ -383,7 +373,7 @@ class UserSettings(python_utils.OBJECT):
         return username.lower() if username else None
 
     @classmethod
-    def require_valid_username(cls, username):
+    def require_valid_username(cls, username: str):
         """Checks if the given username is valid or not.
 
         Args:
@@ -432,7 +422,7 @@ class UserSettings(python_utils.OBJECT):
         self.roles = [default_role]
 
 
-class UserActionsInfo(python_utils.OBJECT):
+class UserActionsInfo:
     """A class representing information of user actions.
     Attributes:
         user_id: str. The unique ID of the user.
@@ -473,7 +463,7 @@ class UserActionsInfo(python_utils.OBJECT):
         return self._actions
 
 
-class UserContributions(python_utils.OBJECT):
+class UserContributions:
     """Value object representing a user's contributions.
 
     Attributes:
@@ -513,7 +503,7 @@ class UserContributions(python_utils.OBJECT):
             ValidationError. The exploration_id in edited_exploration_ids
                 is not str.
         """
-        if not isinstance(self.user_id, python_utils.BASESTRING):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
@@ -524,7 +514,7 @@ class UserContributions(python_utils.OBJECT):
                 'Expected created_exploration_ids to be a list, received %s'
                 % self.created_exploration_ids)
         for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, python_utils.BASESTRING):
+            if not isinstance(exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration_id in created_exploration_ids '
                     'to be a string, received %s' % (
@@ -535,14 +525,14 @@ class UserContributions(python_utils.OBJECT):
                 'Expected edited_exploration_ids to be a list, received %s'
                 % self.edited_exploration_ids)
         for exploration_id in self.edited_exploration_ids:
-            if not isinstance(exploration_id, python_utils.BASESTRING):
+            if not isinstance(exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration_id in edited_exploration_ids '
                     'to be a string, received %s' % (
                         exploration_id))
 
 
-class UserGlobalPrefs(python_utils.OBJECT):
+class UserGlobalPrefs:
     """Domain object for user global email preferences.
 
     Attributes:
@@ -588,7 +578,7 @@ class UserGlobalPrefs(python_utils.OBJECT):
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
 
-class UserExplorationPrefs(python_utils.OBJECT):
+class UserExplorationPrefs:
     """Domain object for user exploration email preferences.
 
     Attributes:
@@ -634,7 +624,7 @@ class UserExplorationPrefs(python_utils.OBJECT):
         }
 
 
-class ExpUserLastPlaythrough(python_utils.OBJECT):
+class ExpUserLastPlaythrough:
     """Domain object for an exploration last playthrough model."""
 
     def __init__(
@@ -661,7 +651,7 @@ class ExpUserLastPlaythrough(python_utils.OBJECT):
         self.last_played_state_name = last_played_state_name
 
 
-class IncompleteActivities(python_utils.OBJECT):
+class IncompleteActivities:
     """Domain object for the incomplete activities model."""
 
     def __init__(
@@ -751,7 +741,7 @@ class IncompleteActivities(python_utils.OBJECT):
         self.partially_learnt_topic_ids.remove(partially_learnt_topic_id)
 
 
-class CompletedActivities(python_utils.OBJECT):
+class CompletedActivities:
     """Domain object for the activities completed by learner model."""
 
     def __init__(
@@ -841,7 +831,7 @@ class CompletedActivities(python_utils.OBJECT):
         self.learnt_topic_ids.remove(learnt_topic_id)
 
 
-class LearnerGoals(python_utils.OBJECT):
+class LearnerGoals:
     """Domain object for the learner goals model."""
 
     def __init__(
@@ -879,7 +869,7 @@ class LearnerGoals(python_utils.OBJECT):
         }
 
 
-class LearnerPlaylist(python_utils.OBJECT):
+class LearnerPlaylist:
     """Domain object for the learner playlist model."""
 
     def __init__(
@@ -946,7 +936,7 @@ class LearnerPlaylist(python_utils.OBJECT):
         self.collection_ids.remove(collection_id)
 
 
-class UserContributionProficiency(python_utils.OBJECT):
+class UserContributionProficiency:
     """Domain object for UserContributionProficiencyModel."""
 
     def __init__(self, user_id, score_category, score, onboarding_email_sent):
@@ -984,7 +974,7 @@ class UserContributionProficiency(python_utils.OBJECT):
         self.onboarding_email_sent = True
 
 
-class UserContributionRights(python_utils.OBJECT):
+class UserContributionRights:
     """Domain object for the UserContributionRightsModel."""
 
     def __init__(
@@ -1055,7 +1045,7 @@ class UserContributionRights(python_utils.OBJECT):
                 'found: %s' % type(self.can_submit_questions))
 
 
-class ModifiableUserData(python_utils.OBJECT):
+class ModifiableUserData:
     """Domain object to represent the new values in a UserSettingsModel change
     submitted by the Android client.
     """

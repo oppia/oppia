@@ -400,8 +400,16 @@ export interface NumericExpressionInputCustomizationArgs {
 }
 
 
-export interface NumericInputCustomizationArgsBackendDict { }
-export interface NumericInputCustomizationArgs { }
+export interface NumericInputCustomizationArgsBackendDict {
+  requireNonnegativeInput: {
+    value: boolean;
+  };
+}
+export interface NumericInputCustomizationArgs {
+  requireNonnegativeInput: {
+    value: boolean;
+  };
+}
 
 
 export interface NumberWithUnitsCustomizationArgsBackendDict { }

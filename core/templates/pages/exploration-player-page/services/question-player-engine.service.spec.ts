@@ -477,14 +477,14 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService.init(
       multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
     let currentQuestion1 = questionPlayerEngineService.getCurrentQuestion();
-    expect(currentQuestion1.getId()).toBe('questionId1');
+    expect(currentQuestion1.getId()).toBe(multipleQuestionsBackendDict[0].id);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
     let currentQuestion2 = questionPlayerEngineService.getCurrentQuestion();
 
-    expect(currentQuestion2.getId()).toBe('questionId2');
+    expect(currentQuestion2.getId()).toBe(multipleQuestionsBackendDict[1].id);
   });
 
   it('should return the current question Id', () => {
@@ -503,7 +503,7 @@ describe('Question player engine service ', () => {
       multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getCurrentQuestionId())
-      .toBe('questionId1');
+      .toBe(multipleQuestionsBackendDict[0].id);
   });
 
   it('should return number of questions', () => {
@@ -567,21 +567,21 @@ describe('Question player engine service ', () => {
       multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
     let languageCode = questionPlayerEngineService.getLanguageCode();
 
-    expect(languageCode).toBe('en');
+    expect(languageCode).toBe(multipleQuestionsBackendDict[0].language_code);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
-    expect(languageCode).toBe('br');
+    expect(languageCode).toBe(multipleQuestionsBackendDict[1].language_code);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
-    expect(languageCode).toBe('ab');
+    expect(languageCode).toBe(multipleQuestionsBackendDict[2].language_code);
   });
 
   it('should always return false when calling \'isInPreviewMode()\'', () => {
@@ -805,7 +805,8 @@ describe('Question player engine service ', () => {
         answer, textInputService, submitAnswerSuccessCb);
 
       expect(
-        questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId1');
+        questionPlayerEngineService.getCurrentQuestionId()).toBe(
+        multipleQuestionsBackendDict[0].id);
       expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
       questionPlayerEngineService.recordNewCardAdded();
@@ -814,7 +815,8 @@ describe('Question player engine service ', () => {
         answer, textInputService, submitAnswerSuccessCb);
 
       expect(
-        questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId2');
+        questionPlayerEngineService.getCurrentQuestionId()).toBe(
+        multipleQuestionsBackendDict[1].id);
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
       questionPlayerEngineService.recordNewCardAdded();
@@ -823,7 +825,8 @@ describe('Question player engine service ', () => {
         answer, textInputService, submitAnswerSuccessCb);
 
       expect(
-        questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId3');
+        questionPlayerEngineService.getCurrentQuestionId()).toBe(
+        multipleQuestionsBackendDict[2].id);
       // Please note that after submitting answer to the final question,
       // a new card was not created, hence createNewCardSpy was not called.
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);

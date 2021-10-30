@@ -66,8 +66,10 @@ export class FractionEditorComponent implements OnInit {
       }
       this.errorMessage = '';
       this.currentFractionValueIsValid = true;
-    } catch (parsingError) {
-      this.errorMessage = parsingError.message;
+    } catch (parsingError: unknown) {
+      if (parsingError instanceof Error) {
+        this.errorMessage = parsingError.message;
+      }
       this.currentFractionValueIsValid = false;
     } finally {
       this.eventBus.emit(new ObjectFormValidityChangeEvent(

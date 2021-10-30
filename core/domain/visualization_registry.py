@@ -22,10 +22,9 @@ from __future__ import unicode_literals
 import inspect
 
 from extensions.visualizations import models
-import python_utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.

@@ -17,12 +17,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import user_services
-import feconf
-import python_utils
-import utils
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -51,7 +51,7 @@ DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
 DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
 
 
-class ActivityRights(python_utils.OBJECT):
+class ActivityRights:
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """

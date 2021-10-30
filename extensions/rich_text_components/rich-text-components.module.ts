@@ -32,12 +32,13 @@ import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.
 import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
-import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { ConceptCardComponent } from 'components/concept-card/concept-card.component';
 import { PortalModule } from '@angular/cdk/portal';
-
+import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
 
 @NgModule({
   imports: [
+    CommonElementsModule,
     CommonModule,
     DynamicContentModule,
     MatButtonModule,

@@ -71,6 +71,9 @@ describe('Voiceover opportunities component', function() {
           content_count: 2,
           translation_counts: {
             en: 1
+          },
+          translation_in_review_counts: {
+            hi: 20
           }
         }),
         ExplorationOpportunitySummary.createFromBackendDict({
@@ -81,6 +84,9 @@ describe('Voiceover opportunities component', function() {
           content_count: 4,
           translation_counts: {
             en: 2
+          },
+          translation_in_review_counts: {
+            hi: 20
           }
         }),
       ], true));
@@ -95,6 +101,9 @@ describe('Voiceover opportunities component', function() {
           content_count: 3,
           translation_counts: {
             en: 3
+          },
+          translation_in_review_counts: {
+            hi: 20
           }
         }),
       ], true));

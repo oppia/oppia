@@ -282,7 +282,7 @@ angular.module('oppia').component('topicEditorNavbar', {
         $scope.prepublishValidationIssues = [];
         $scope.topicRights = TopicEditorStateService.getTopicRights();
         ctrl.directiveSubscriptions.add(
-          UndoRedoService.onUndoRedoChangeApplied$().subscribe(
+          UndoRedoService.getUndoRedoChangeEventEmitter().subscribe(
             () => _validateTopic()
           )
         );

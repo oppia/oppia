@@ -21,8 +21,7 @@ Also contains a list of handler class names which does not contain the schema.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
-import schema_utils
+from core import schema_utils
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -36,7 +35,6 @@ def validate(
         allowed_extra_args: bool,
         allow_string_to_bool_conversion: bool = False
 ) -> Tuple[Dict[str, Any], List[str]]:
-
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
@@ -74,7 +72,7 @@ def validate(
         if (
                 allow_string_to_bool_conversion and
                 arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
-                and isinstance(handler_args[arg_key], python_utils.BASESTRING)
+                and isinstance(handler_args[arg_key], str)
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
@@ -95,7 +93,6 @@ def validate(
 
 
 def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
-
     """Converts a request param of type string into expected bool type.
 
     Args:
@@ -163,11 +160,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PendingAccountDeletionPage',
     'PreferenceHandler',
     'PreferencesHandler',
-    'PretestHandler',
     'ProfileHandler',
     'ProfilePage',
-    'ProfilePictureHandler',
-    'ProfilePictureHandlerByUsernameHandler',
     'PromoBarHandler',
     'QuebstionsListHandler',
     'QuestionCountDataHandler',
@@ -195,15 +189,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StartedTranslationTutorialEventHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
-    'StatsEventsHandler',
-    'StorePlaythroughHandler',
-    'StoryEditorPage',
-    'StoryPage',
-    'StoryPageDataHandler',
-    'StoryProgressHandler',
-    'StoryPublishHandler',
     'StoryUrlFragmentHandler',
-    'SubscribeHandler',
     'SubtopicPageDataHandler',
     'SubtopicViewerPage',
     'SuggestionEmailHandler',
@@ -225,7 +211,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'TopicsAndSkillsDashboardPage',
     'TopicsAndSkillsDashboardPageDataHandler',
     'UnsentFeedbackEmailHandler',
-    'UnsubscribeHandler',
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
     'UrlHandler',

@@ -6,7 +6,7 @@
       <ngx-mat-select-search ngModel
                              (ngModelChange)="filterChoices($event)"
                              [placeholderLabel]="searchLabel"
-                             noEntriesFoundLabel="No matches found">
+                             [noEntriesFoundLabel]="noEntriesFoundLabel">
       </ngx-mat-select-search>
     </mat-option>
     <mat-option *ngFor="let choice of filteredChoices" [value]="choice">

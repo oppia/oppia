@@ -55,7 +55,7 @@ INVALID_FILEPATH_WITH_BLANKET_CODEOWNER_ONLY = os.path.join(
 
 
 CODEOWNER_IMPORTANT_PATHS = [
-    '/manifest.json',
+    '/dependencies.json',
     '/package.json',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
@@ -71,7 +71,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
 
         def mock_listdir(unused_arg):
             return [
-                'manifest.json',
+                'dependencies.json',
                 'package.json',
                 'yarn.lock',
                 'scripts/install_third_party_libs.py',
@@ -80,7 +80,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
 
         def mock_listdir_with_blanket_codeowner_only_file(unused_arg):
             return [
-                'manifest.json',
+                'dependencies.json',
                 'package.json',
                 'yarn.lock',
                 'scripts/install_third_party_libs.py',

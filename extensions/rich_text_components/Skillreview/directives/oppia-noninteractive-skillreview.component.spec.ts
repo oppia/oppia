@@ -107,10 +107,10 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve()
-          });
+          }) as NgbModalRef;
     });
 
     component.openConceptCard(e);
@@ -133,10 +133,10 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject('cancel')
-          });
+          }) as NgbModalRef;
     });
 
     component.openConceptCard(e);
@@ -160,21 +160,21 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject('close')
-          });
+          }) as NgbModalRef;
     });
 
     let error;
     try {
       component.openConceptCard(e);
       flush();
-    } catch (e) {
-      error = e;
+    } catch (e: unknown) {
+      error = e as Error;
+      expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
     }
-
-    expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
+    expect(error).not.toBeUndefined();
   }));
 
   it('should not open modal when ck Editor copy mode is active',

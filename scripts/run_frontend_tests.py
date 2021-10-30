@@ -22,7 +22,7 @@ import os
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 
 from . import build
 from . import check_frontend_test_coverage

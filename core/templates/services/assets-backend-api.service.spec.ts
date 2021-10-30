@@ -216,6 +216,29 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).toHaveBeenCalled();
     }));
 
+    it('should handle rejection when saving a math SVG fails with non HTTP err',
+      fakeAsync(() => {
+        const onSuccess = jasmine.createSpy('onSuccess');
+        const onFailure = jasmine.createSpy('onFailure');
+
+        spyOn(
+          // This throws "Argument of type 'getImageUploadUrl' is not assignable
+          // to parameter of type 'keyof AssetsBackendApiService'. We need to
+          // suppress this error because of strict type checking.
+          // @ts-ignore
+          assetsBackendApiService, 'getImageUploadUrl'
+        ).and.throwError(Error('token'));
+
+        assetsBackendApiService.saveMathExpresionImage(
+          imageBlob, 'new.svg', 'exploration', 'expid12345'
+        ).then(onSuccess, onFailure);
+        flushMicrotasks();
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onFailure).toHaveBeenCalled();
+      })
+    );
+
     it('should handle rejection when saving a file fails', fakeAsync(() => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
@@ -232,6 +255,29 @@ describe('Assets Backend API Service', () => {
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();
     }));
+
+    it('should handle rejection when saving a file fails with non HTTP error',
+      fakeAsync(() => {
+        const onSuccess = jasmine.createSpy('onSuccess');
+        const onFailure = jasmine.createSpy('onFailure');
+
+        spyOn(
+          // This throws "Argument of type 'getImageUploadUrl' is not assignable
+          // to parameter of type 'keyof AssetsBackendApiService'. We need to
+          // suppress this error because of strict type checking.
+          // @ts-ignore
+          assetsBackendApiService, 'getAudioUploadUrl'
+        ).and.throwError(Error('token'));
+
+        assetsBackendApiService.saveAudio(
+          '0', 'a.mp3', audioBlob
+        ).then(onSuccess, onFailure);
+        flushMicrotasks();
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onFailure).toHaveBeenCalled();
+      })
+    );
 
     it('should successfully fetch and cache image', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');

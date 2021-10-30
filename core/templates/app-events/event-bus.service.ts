@@ -50,16 +50,20 @@ export class EventBusService {
       action: (event: T) => void,
       callbackContext = null): Subscription {
     return this._subject$.pipe(
-      <OperatorFunction<BaseEvent, T>>filter(
+      filter(
         (event: T): boolean => {
           return (event instanceof eventType);
         }
-      )).subscribe(
+      ) as OperatorFunction<BaseEvent, T>).subscribe(
       (event: T): void => {
         try {
           action.call(callbackContext, event);
-        } catch (error) {
-          this._errorHandler(error);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            this._errorHandler(error as Error);
+          } else {
+            throw error;
+          }
         }
       }
     );

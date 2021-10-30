@@ -44,8 +44,8 @@ import json
 import re
 import subprocess
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 from scripts import common
 
 
@@ -281,7 +281,7 @@ def execute_branch_cut(target_version, hotfix_number):
     python_utils.PRINT(
         'Please confirm: are Actions checks passing on %s? (y/n) ' % (
             branch_to_check))
-    answer = python_utils.INPUT().lower()
+    answer = input().lower()
     if answer not in common.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
             'Tests should pass on %s before this script is run.' % (

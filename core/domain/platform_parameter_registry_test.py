@@ -19,15 +19,14 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
-
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])

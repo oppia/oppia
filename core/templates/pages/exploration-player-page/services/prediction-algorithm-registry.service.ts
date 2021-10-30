@@ -24,7 +24,7 @@ import { TextInputPredictionService } from
 import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface PredictionService {
-  predict(classifierData: ArrayBuffer, answer: InteractionAnswer): number;
+  predict: (classifierData: ArrayBuffer, answer: InteractionAnswer) => number;
 }
 
 type AlgorithmIdPredictionServiceMap = (

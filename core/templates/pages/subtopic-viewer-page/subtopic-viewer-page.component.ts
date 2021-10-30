@@ -76,7 +76,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       this.parentTopicId = subtopicDataObject.getParentTopicId();
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.TOPIC, this.parentTopicId);
-      this.pageTitleService.setPageTitle(
+      this.pageTitleService.setDocumentTitle(
         `Review ${this.subtopicTitle} | Oppia`);
       this.pageTitleService.updateMetaTag(
         `Review the skill of ${this.subtopicTitle.toLowerCase()}.`);

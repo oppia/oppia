@@ -18,6 +18,7 @@
 
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 import { OpportunitiesListItemComponent } from './opportunities-list-item.component';
@@ -29,7 +30,9 @@ describe('Opportunities List Item Component', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [],
+      imports: [
+        NgbTooltipModule
+      ],
       declarations: [
         OpportunitiesListItemComponent,
         LazyLoadingComponent,
@@ -48,7 +51,10 @@ describe('Opportunities List Item Component', () => {
         id: '1',
         labelText: 'Label text',
         labelColor: '#fff',
-        progressPercentage: 50
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 0
       };
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
@@ -71,7 +77,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.progressBarStyle).toEqual({
           width: '50%'
         });
-        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
+        expect(component.correspondingOpportunityDeleted).toBe(false);
       });
 
     describe('when opportunity subheading corresponds to deleted ' +
@@ -84,9 +90,60 @@ describe('Opportunities List Item Component', () => {
         component.ngOnInit();
       });
 
-      it('should initialize isCorrespondingOpportunityDeleted to true',
+      it('should initialize correspondingOpportunityDeleted to true',
         () => {
-          expect(component.isCorrespondingOpportunityDeleted).toBe(true);
+          expect(component.correspondingOpportunityDeleted).toBe(true);
+        });
+    });
+  });
+
+  describe('when a translation opportunity is provided', () => {
+    beforeEach(() => {
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 25
+      };
+      component.opportunityType = 'translation';
+      component.clickActionButton.emit =
+        () => jasmine.createSpy('click', () => {});
+      component.labelRequired = true;
+      component.progressBarRequired = true;
+      component.opportunityHeadingTruncationLength = 35;
+      fixture.detectChanges();
+      component.ngOnInit();
+    });
+
+    it('should initialize $scope properties after controller is initialized',
+      () => {
+        expect(component.opportunityDataIsLoading).toBe(false);
+        expect(component.labelText).toBe('Label text');
+        expect(component.labelStyle).toEqual({
+          'background-color': '#fff'
+        });
+        expect(component.opportunityHeadingTruncationLength).toBe(35);
+        expect(component.progressPercentage).toBe('50%');
+        expect(component.correspondingOpportunityDeleted).toBe(false);
+        expect(component.translationProgressBar).toBe(true);
+      });
+
+    describe('when opportunity subheading corresponds to deleted ' +
+      'opportunity', () => {
+      beforeEach(() => {
+        component.opportunity.subheading = (
+          ContributorDashboardConstants
+            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should initialize correspondingOpportunityDeleted to true',
+        () => {
+          expect(component.correspondingOpportunityDeleted).toBe(true);
         });
     });
   });
@@ -94,11 +151,13 @@ describe('Opportunities List Item Component', () => {
   describe('when opportunity is not provided', () => {
     beforeEach(() => {
       component.opportunity = null;
+      component.opportunityType = null;
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = null;
+      component.opportunityType = '';
       fixture.detectChanges();
       component.ngOnInit();
     });
@@ -109,7 +168,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.labelText).toBe(undefined);
         expect(component.labelStyle).toBe(undefined);
         expect(component.opportunityHeadingTruncationLength).toBe(40);
-        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
+        expect(component.correspondingOpportunityDeleted).toBe(false);
       });
   });
 });

@@ -17,11 +17,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 def exploration_features_url(exp_id):

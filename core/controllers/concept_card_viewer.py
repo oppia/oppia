@@ -17,10 +17,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
-import feconf
 
 
 class ConceptCardDataHandler(base.BaseHandler):

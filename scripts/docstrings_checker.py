@@ -24,7 +24,7 @@ import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -217,7 +217,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     ), flags=re.X | re.S | re.M)
 
 
-class ASTDocStringChecker(python_utils.OBJECT):
+class ASTDocStringChecker:
     """Checks that docstrings meet the code style."""
 
     def __init__(self):

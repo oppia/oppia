@@ -23,7 +23,7 @@ import datetime
 import threading
 import time
 import traceback
-import python_utils
+from core import python_utils
 
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -44,7 +44,7 @@ def log(message, show_time=False):
             python_utils.PRINT(message)
 
 
-class TaskResult(python_utils.OBJECT):
+class TaskResult:
     """Task result for concurrent_task_utils."""
 
     def __init__(self, name, failed, trimmed_messages, messages):
