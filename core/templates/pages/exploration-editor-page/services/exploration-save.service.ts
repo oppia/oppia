@@ -133,7 +133,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      NgbModal.open(ExplorationPublishModal, {
+      NgbModal.open(ExplorationPublishModal, {  
         backdrop: 'static',
       }).result.then(function() {
         if (onStartSaveCallback) {

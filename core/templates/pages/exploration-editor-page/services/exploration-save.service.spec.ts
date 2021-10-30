@@ -22,6 +22,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditabilityService } from 'services/editability.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -282,32 +283,6 @@ describe('Exploration save service ' +
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
-  }));
-
-  it('should not publish exploration in case of backend ' +
-    'error', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject('failure')
-    });
-    let publishSpy = spyOn(ExplorationRightsService, 'publish')
-      .and.resolveTo();
-
-    ExplorationTitleService.savedMemento = true;
-    ExplorationObjectiveService.savedMemento = true;
-    ExplorationCategoryService.savedMemento = true;
-    explorationLanguageCodeService.savedMemento = 'afk';
-    explorationTagsService.savedMemento = 'invalid';
-
-    explorationSaveService.showPublishExplorationModal();
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
-    tick();
-    $rootScope.$apply();
-    tick();
-    $rootScope.$apply();
-
-    expect(publishSpy).not.toHaveBeenCalled();
   }));
 
   it('should mark exploaration as editable', fakeAsync(function() {
