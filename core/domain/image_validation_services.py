@@ -24,7 +24,7 @@ from core import utils
 from core.domain import html_validation_service
 
 
-def validate_filename(filename):
+def validate_filename(filename: str):
     """Validates the filename.
 
     Args:
