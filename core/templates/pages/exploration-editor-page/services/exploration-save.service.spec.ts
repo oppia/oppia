@@ -145,6 +145,7 @@ describe('Exploration save service ' +
       {
         result: Promise.resolve()
       });
+
     spyOn(changeListService, 'discardAllChanges')
       .and.returnValue(Promise.resolve(null));
 
