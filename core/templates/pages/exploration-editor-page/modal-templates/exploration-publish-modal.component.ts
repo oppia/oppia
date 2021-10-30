@@ -22,17 +22,15 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-    selector: 'oppia-exploration-publish-modal',
-    templateUrl: './exploration-publish-modal.component.html'
+  selector: 'oppia-exploration-publish-modal',
+  templateUrl: './exploration-publish-modal.component.html'
 })
 
 export class ExplorationPublishModal
-  extends ConfirmOrCancelModal{
-
+  extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal
-  ){
+  ) {
     super(ngbActiveModal);
   }
-
 }
