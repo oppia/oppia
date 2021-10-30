@@ -90,7 +90,7 @@ require('services/context.service');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
-  'setting-tab-api.service.ts'
+  'setting-tab-backend-api.service.ts'
 );
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

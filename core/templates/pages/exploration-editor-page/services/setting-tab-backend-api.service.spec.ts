@@ -18,7 +18,7 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { SettingTabBackendApiService } from './setting-tab-api.service';
+import { SettingTabBackendApiService } from './setting-tab-backend-api.service';
 
 describe('History Tab Backend Api Service', () => {
   let service: SettingTabBackendApiService;
