@@ -25,7 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, TypeVar, Type
+from typing import List, TypeVar, Type, Optional
 from datetime import datetime
 
 T = TypeVar('T', bound='UserQuery')
@@ -43,7 +43,7 @@ class UserQuery:
 
     def __init__(
             self, query_id: str, query_params: UserQueryParams, submitter_id: str, query_status: str, user_ids: List[str],
-            sent_email_model_id: str =None, created_on: datetime =None, deleted: bool =False
+            sent_email_model_id: Optional[str] =None, created_on: Optional[datetime] =None, deleted: bool =False
     ) -> None:
         """Create user query domain object.
 
@@ -145,7 +145,7 @@ class UserQuery:
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id: str =None) ->None:
+    def archive(self, sent_email_model_id: Optional[str] =None) ->None:
         """Archive the query.
 
         Args:
