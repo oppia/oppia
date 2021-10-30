@@ -88,7 +88,10 @@ require('services/exploration-features.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/context.service');
 require('pages/exploration-editor-page/services/router.service.ts');
-
+require(
+  'pages/exploration-editor-page/services/' +
+  'setting-tab-api.service.ts'
+);
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
@@ -99,7 +102,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'ContextService', 'EditabilityService',
     'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
@@ -114,8 +117,9 @@ angular.module('oppia').component('settingsTab', {
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService', 'WindowRef',
     'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
+    'SettingTabBackendApiService',
     function(
-        $http, $rootScope, $uibModal, AlertsService, ChangeListService,
+        $rootScope, $uibModal, AlertsService, ChangeListService,
         ContextService, EditabilityService,
         EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
@@ -129,7 +133,8 @@ angular.module('oppia').component('settingsTab', {
         RouterService, UserEmailPreferencesService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService, WindowRef,
-        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
+        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX,
+        SettingTabBackendApiService) {
       var ctrl = this;
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
       var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -467,10 +472,10 @@ angular.module('oppia').component('settingsTab', {
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
-        $http.get(moderatorEmailDraftUrl).then(function(response) {
+        SettingTabBackendApiService.getData(moderatorEmailDraftUrl).then(function(response) {
           // If the draft email body is empty, email functionality will not
           // be exposed to the mdoerator.
-          var draftEmailBody = response.data.draft_email_body;
+          var draftEmailBody = response.draft_email_body;
 
           $uibModal.open({
             template: require(

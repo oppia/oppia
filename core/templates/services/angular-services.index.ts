@@ -383,6 +383,7 @@ import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pag
 import { StateDiffModalBackendApiService } from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';
 import { I18nService } from 'i18n/i18n.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { SettingTabBackendApiService } from 'pages/exploration-editor-page/services/setting-tab-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -675,6 +676,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ServerConnectionBackendApiService', ServerConnectionBackendApiService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
+  ['SettingTabBackendApiService', SettingTabBackendApiService],
   ['SidebarStatusService', SidebarStatusService],
   ['SignupPageBackendApiService', SignupPageBackendApiService],
   ['SiteAnalyticsService', SiteAnalyticsService],
