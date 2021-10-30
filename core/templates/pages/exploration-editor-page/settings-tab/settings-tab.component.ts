@@ -113,11 +113,11 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'RouterService', 'UserEmailPreferencesService',
+    'RouterService', 'SettingTabBackendApiService',
+    'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService', 'WindowRef',
     'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
-    'SettingTabBackendApiService',
     function(
         $rootScope, $uibModal, AlertsService, ChangeListService,
         ContextService, EditabilityService,
@@ -130,11 +130,11 @@ angular.module('oppia').component('settingsTab', {
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        RouterService, UserEmailPreferencesService,
+        RouterService, SettingTabBackendApiService,
+        UserEmailPreferencesService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService, WindowRef,
-        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX,
-        SettingTabBackendApiService) {
+        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
       var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -472,11 +472,13 @@ angular.module('oppia').component('settingsTab', {
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
-        SettingTabBackendApiService.getData(moderatorEmailDraftUrl).then(function(response) {
+        SettingTabBackendApiService
+          .getData(moderatorEmailDraftUrl).then(function(response) {
           // If the draft email body is empty, email functionality will not
           // be exposed to the mdoerator.
           var draftEmailBody = response.draft_email_body;
 
+          console.log(response);//delete
           $uibModal.open({
             template: require(
               'pages/exploration-editor-page/settings-tab/templates/' +

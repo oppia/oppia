@@ -168,7 +168,8 @@ describe('Settings Tab Component', () => {
       $uibModal = $injector.get('$uibModal');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
-      settingTabBackendApiService = $injector.get('SettingTabBackendApiService');
+      settingTabBackendApiService = $injector.get(
+        'SettingTabBackendApiService');
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
@@ -893,7 +894,8 @@ describe('Settings Tab Component', () => {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
-      settingTabBackendApiService = $injector.get('SettingTabBackendApiService');
+      settingTabBackendApiService = $injector.get(
+        'SettingTabBackendApiService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));

@@ -20,11 +20,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 interface SettingTabBackendDict {
-  'draft_email_body': string;
+  'draftEmailBody': string;
 }
 
 interface SettingTabResposne {
-  draft_email_body: string;
+  draftEmailBody: string
 }
 
 @Injectable({
@@ -44,5 +44,5 @@ export class SettingTabBackendApiService {
 }
 
 angular.module('oppia').factory(
-    'SettingTabBackendApiService',
-    downgradeInjectable(SettingTabBackendApiService));
+  'SettingTabBackendApiService',
+  downgradeInjectable(SettingTabBackendApiService));

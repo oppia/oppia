@@ -45,13 +45,13 @@ describe('History Tab Backend Api Service', () => {
       service.getData(
         moderatorEmailDraftUrl
       ).then(successHandler, failHandler);
- 
+
       let req = httpTestingController.expectOne('check');
       expect(req.request.method).toEqual('GET');
       req.flush([]);
- 
+
       flushMicrotasks();
- 
+
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     })
