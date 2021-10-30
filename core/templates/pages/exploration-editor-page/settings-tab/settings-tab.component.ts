@@ -478,7 +478,6 @@ angular.module('oppia').component('settingsTab', {
           // be exposed to the mdoerator.
           var draftEmailBody = response.draft_email_body;
 
-          console.log(response);//delete
           $uibModal.open({
             template: require(
               'pages/exploration-editor-page/settings-tab/templates/' +
