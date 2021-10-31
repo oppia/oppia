@@ -891,6 +891,7 @@ textarea {
   list-style: none;
   margin-bottom: 0;
   padding-left: 0;
+  padding-right: 0;
 }
 
 .nav > li {
@@ -918,6 +919,7 @@ textarea {
   left: auto;
   right: 0;
 }
+
 .dropdown-item.active, .dropdown-item:active {
   background-color: transparent;
 }
