@@ -19,6 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 import { EditorReloadingModalComponent } from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+import { ConfirmDiscardChangesModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-discard-changes-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -232,13 +233,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
       },
 
       discardChanges: function() {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/modal-templates/' +
-            'confirm-discard-changes-modal.template.html'),
+        NgbModal.open(ConfirmDiscardChangesModalComponent, {
           backdrop: 'static',
-          keyboard: false,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
           ExternalSaveService.onExternalSave.emit();
