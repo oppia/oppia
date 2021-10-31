@@ -16,7 +16,7 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -137,6 +137,12 @@ export class TutorCardComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.displayedCard) {
+      this.updateDisplayedCard();
+    }
   }
 
   isAudioBarExpandedOnMobileDevice(): boolean {
