@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import exp_domain
@@ -1887,7 +1886,7 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
         expected_scores_dict = {}
         for index in range(1, 4):
-            key = 'category%s' % python_utils.UNICODE(index)
+            key = 'category%s' % str(index)
             expected_scores_dict[key] = index
 
         scores_dict = suggestion_services.get_all_scores_of_user(
