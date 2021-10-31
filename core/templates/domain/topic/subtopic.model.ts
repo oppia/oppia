@@ -84,6 +84,7 @@ export class Subtopic {
     this._title = title;
   }
 
+  // Returns 'null' if there is no url fragment.
   getUrlFragment(): string | null {
     return this._urlFragment;
   }
