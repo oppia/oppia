@@ -35,6 +35,7 @@ export class I18nLanguageCodeService {
    */
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
+  static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
 
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
@@ -44,6 +45,12 @@ export class I18nLanguageCodeService {
   getCurrentI18nLanguageCode(): string {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     return I18nLanguageCodeService.languageCode;
+  }
+
+  isCurrentLanguageRTL(): boolean {
+    return (
+      I18nLanguageCodeService.rtlLanguageCodes.indexOf(
+        this.getCurrentI18nLanguageCode()) !== -1);
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {

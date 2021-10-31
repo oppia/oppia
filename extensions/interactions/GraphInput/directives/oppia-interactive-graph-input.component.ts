@@ -31,6 +31,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
 import { GraphInputRulesService } from './graph-input-rules.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-interactive-graph-input',
@@ -66,6 +67,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     private graphInputRulesService: GraphInputRulesService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService
   ) {}
 
@@ -147,6 +149,10 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     this.currentInteractionService.onSubmit(
       cloneDeep<GraphAnswer>(this.graph) as unknown as string,
       this.graphInputRulesService as unknown as InteractionRulesService);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   resetGraph(): void {

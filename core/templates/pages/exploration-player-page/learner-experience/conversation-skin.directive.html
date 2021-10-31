@@ -85,6 +85,7 @@
         <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                      ng-click="submitAnswerFromProgressNav()"
+                     ng-style="isLanguageRTL() ? {'left': '8px', 'right': 'auto'} : {'right': '8px', 'left': 'auto'}"
                      ng-disabled="isSubmitButtonDisabled()"
                      translate="I18N_INTERACTIONS_SUBMIT">
           </md-button>
@@ -247,7 +248,6 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
   .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
     height: 100px;
-    left: -87px;
     top: -20px;
     width: 100px;
   }
@@ -293,8 +293,7 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-supplemental-card-container {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 1;
-    margin-bottom: 200px;
-    margin-left: 12px;
+    margin: 0 12px 200px 12px;
     position: relative;
     width: 650px;
     z-index: 2;

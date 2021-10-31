@@ -23,6 +23,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { InteractiveGraphInput } from './oppia-interactive-graph-input.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('InteractiveGraphInput', () => {
   let component: InteractiveGraphInput;
@@ -30,6 +31,7 @@ describe('InteractiveGraphInput', () => {
   let mockNewCardAvailableEmitter = new EventEmitter();
   let fixture: ComponentFixture<InteractiveGraphInput>;
   let currentInteractionService: CurrentInteractionService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   class mockInteractionAttributesExtractorService {
     getValuesFromAttributes(interactionId, attributes) {
@@ -101,6 +103,10 @@ describe('InteractiveGraphInput', () => {
     playerPositionService = TestBed.get(PlayerPositionService);
     fixture = TestBed.createComponent(InteractiveGraphInput);
     component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
 
     component.graphWithValue = '{' +
     '  "isWeighted": false,' +
@@ -251,6 +257,10 @@ describe('InteractiveGraphInput', () => {
     expect(component.canAddEdge).toBe(false);
     expect(component.canDeleteEdge).toBe(false);
     expect(component.canEditEdgeWeight).toBe(false);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should set the last answer given by the user as the graph when the' +

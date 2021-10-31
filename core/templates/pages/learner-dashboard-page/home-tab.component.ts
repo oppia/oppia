@@ -22,6 +22,8 @@ import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/lear
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
  @Component({
    selector: 'oppia-home-tab',
    templateUrl: './home-tab.component.html'
@@ -42,6 +44,7 @@ export class HomeTabComponent {
   directiveSubscriptions = new Subscription();
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
@@ -65,6 +68,10 @@ export class HomeTabComponent {
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getTimeOfDay(): string {

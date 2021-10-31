@@ -33,6 +33,7 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
@@ -45,6 +46,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let newCard: StateCard;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -52,7 +54,8 @@ describe('HintAndSolutionButtonsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe]
+      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe],
+      providers: []
     }).compileComponents();
   }));
 
@@ -64,6 +67,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       .inject(HintsAndSolutionManagerService);
     writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
@@ -81,6 +85,8 @@ describe('HintAndSolutionButtonsComponent', () => {
       new EventEmitter<void>());
     spyOn(hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
       .and.returnValue(new EventEmitter<void>());
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
 
     // A StateCard which supports hints.
     newCard = StateCard.createNewCard(
@@ -176,6 +182,10 @@ describe('HintAndSolutionButtonsComponent', () => {
 
     expect(component.displayedCard).toEqual(newCard);
   }));
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 
   it('should reset local hints array if active card is' +
     ' changed to the last one', fakeAsync(() => {

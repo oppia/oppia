@@ -255,6 +255,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.i18nService.updateUserPreferredLanguage(languageCode);
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(
       (loginUrl) => {
