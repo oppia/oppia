@@ -155,13 +155,14 @@ def normalize_against_schema(
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
-        assert isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert isinstance(obj, (str, bytes)), (
             'Expected unicode HTML string, received %s' % obj)
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.UNICODE(obj)
-        assert isinstance(obj, python_utils.UNICODE), (
+            obj = str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -177,28 +178,31 @@ def normalize_against_schema(
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
-        assert isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert isinstance(obj, (str, bytes)), (
             'Expected string, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
-        assert isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert isinstance(obj, (str, bytes)), (
             'Expected unicode string, received %s' % obj)
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.UNICODE(obj)
-        assert isinstance(obj, python_utils.UNICODE), (
+            obj = str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
-        assert obj is None or isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert obj is None or isinstance(obj, (str, bytes)), (
             'Expected unicode string or None, received %s' % obj)
         if obj is not None:
             if isinstance(obj, bytes):
                 obj = obj.decode('utf-8')
             else:
-                obj = python_utils.UNICODE(obj)
-            assert isinstance(obj, python_utils.UNICODE), (
+                obj = str(obj)
+            assert isinstance(obj, str), (
                 'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
@@ -505,8 +509,7 @@ class _Validators:
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
-        string_types = (python_utils.BASESTRING, python_utils.UNICODE)
-        if isinstance(obj, string_types):
+        if isinstance(obj, str):
             return not bool(re.search(EMAIL_REGEX, obj))
         return True
 

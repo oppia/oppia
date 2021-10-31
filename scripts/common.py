@@ -608,7 +608,12 @@ def create_readme(dir_path, readme_content):
         f.write(readme_content)
 
 
-def inplace_replace_file(filename, regex_pattern, replacement_string):
+def inplace_replace_file(
+    filename,
+    regex_pattern,
+    replacement_string,
+    expected_number_of_replacements=None
+):
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
@@ -620,20 +625,39 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         filename: str. The name of the file to be changed.
         regex_pattern: str. The pattern to check.
         replacement_string: str. The content to be replaced.
+        expected_number_of_replacements: optional(int). The number of
+            replacements that should be made. When None no check is done.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
     new_contents = []
+    total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
         with python_utils.open_file(backup_filename, 'r') as f:
             for line in f:
-                new_contents.append(regex.sub(replacement_string, line))
+                new_line, number_of_replacements = regex.subn(
+                    replacement_string, line)
+                new_contents.append(new_line)
+                total_number_of_replacements += number_of_replacements
 
         with python_utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
+
+        if (
+                expected_number_of_replacements is not None and
+                total_number_of_replacements != expected_number_of_replacements
+        ):
+            raise ValueError(
+                'Wrong number of replacements. Expected %s. Performed %s.' % (
+                    expected_number_of_replacements,
+                    total_number_of_replacements
+                )
+            )
+
         os.remove(backup_filename)
+
     except Exception:
         # Restore the content if there was en error.
         os.remove(filename)

@@ -92,8 +92,8 @@ export class AttributionGuideComponent implements OnInit {
   copyAttribution(className: string): void {
     const codeDiv = document.getElementsByClassName(className)[0];
     const range = document.createRange();
-    range.setStartBefore(<Node>(<HTMLDivElement>codeDiv).firstChild);
-    range.setEndAfter(<Node>(<HTMLDivElement>codeDiv).lastChild);
+    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
+    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     // 'getSelection()' will not return 'null' since it is not called on an
     // undisplayed <iframe>. That is why we can use '?'.
     const selection = window.getSelection();

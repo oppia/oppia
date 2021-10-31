@@ -21,7 +21,6 @@ import datetime
 import json
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import exp_domain
@@ -1186,9 +1185,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
                 self.assertEqual(
-                    sorted([
-                        python_utils.UNICODE(key)
-                        for key in exported_data.keys()]),
+                    sorted([str(key) for key in exported_data.keys()]),
                     sorted(exported_field_names)
                 )
             elif (export_method ==
@@ -1223,7 +1220,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         )
                     self.assertEqual(
                         sorted([
-                            python_utils.UNICODE(key)
+                            str(key)
                             for key in exported_data[model_id].keys()]),
                         sorted(exported_field_names)
                     )

@@ -895,10 +895,10 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   it('should reset editor when user clicks \'Clear Image and Regions\'' +
   ' editor', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue(<NgbModalRef>(
+    spyOn(ngbModal, 'open').and.returnValue((
       {
         result: Promise.resolve('success')
-      }));
+      }) as NgbModalRef);
     spyOn(component, 'imageValueChanged');
     spyOn(component, 'initializeEditor');
 
@@ -957,10 +957,10 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   it('should reset editor when user clicks \'cancel\'' +
   ' in the modal', () => {
-    spyOn(ngbModal, 'open').and.returnValue(<NgbModalRef>(
+    spyOn(ngbModal, 'open').and.returnValue((
       {
         result: Promise.reject('failure')
-      }));
+      }) as NgbModalRef);
     spyOn(component, 'imageValueChanged');
     spyOn(component, 'initializeEditor');
 
