@@ -1,5 +1,5 @@
 <div *ngIf="isHintButtonVisible(0) && currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-left">
-  <ul class="list-inline float-right">
+  <ul [ngStyle]="isLanguageRTL() ? {'left': '0'} : {'right': 0}" [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}" class="list-inline">
     <span class="float-left footer-hints-label" translate="I18N_PLAYER_HINTS"></span>
     <li *ngFor="let hintIndex of hintIndexes; index as idx">
       <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
@@ -24,7 +24,7 @@
     </li>
   </ul>
   <div class="hint-container" *ngIf="isVisible && isTooltipVisible()">
-    <div class="hint-box">
+    <div [ngClass]="{'rtl-hint-box-add-ons': isLanguageRTL(), 'ltr-hint-box-add-ons': !isLanguageRTL()}" class="hint-box">
       <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
       <button type="button"
               class="btn close"
@@ -40,9 +40,40 @@
   .close {
     bottom: 10px;
     font-size: 22px;
-    left: 115px;
     margin-left: 10px;
     position: relative;
+  }
+
+  .rtl-hint-box-add-ons {
+    left: 5px;
+  }
+
+  .rtl-hint-box-add-ons .close {
+    left: -15px;
+  }
+
+  .rtl-hint-box-add-ons::after {
+    margin-left: -173px;
+  }
+
+  .rtl-hint-box-add-ons::before {
+    margin-left: -175px;
+  }
+
+  .ltr-hint-box-add-ons {
+    left: -5.5px;
+  }
+
+  .ltr-hint-box-add-ons .close {
+    left: 0;
+  }
+
+  .ltr-hint-box-add-ons::after {
+    margin-left: 163px;
+  }
+
+  .ltr-hint-box-add-ons::before {
+    margin-left: 161px;
   }
 
   .hint-box {
@@ -51,13 +82,13 @@
     background-color: #f0ffff;
     border: 1px solid #2d4a9d;
     border-radius: 5px;
-    bottom: 71px;
+    bottom: 135px;
     box-shadow: 0 0 6px #2d4a9d;
     color: #2d4a9d;
+    display: flex;
     font-size: 17px;
     height: 40px;
-    left: -5.5px;
-    padding: 20px 0 20px 10px;
+    padding: 20px 10px 20px 10px;
     position: relative;
     text-align: center;
     white-space: nowrap;
@@ -78,14 +109,12 @@
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 25px solid #f0ffff;
-    margin-left: 163px;
   }
 
   .hint-box::before {
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
     border-top: 32px solid #2d4a9d;
-    margin-left: 161px;
   }
 
   @keyframes bounce {
@@ -119,7 +148,7 @@
   }
 
   @media screen and (max-width: 768px) {
-    .close {
+    .ltr-hint-box-add-ons .close {
       bottom: 10px;
       font-size: 22px;
       left: 295px;
@@ -127,18 +156,40 @@
       position: fixed;
     }
 
-    .hint-box::before {
+    .rtl-hint-box-add-ons .close {
+      bottom: 10px;
+      font-size: 22px;
+      left: -5px;
+      margin: 0 10px;
+      position: fixed;
+    }
+
+    .ltr-hint-box-add-ons {
+      left: -18px;
+    }
+
+    .rtl-hint-box-add-ons {
+      left: -58px;
+    }
+
+    .ltr-hint-box-add-ons::before {
       margin-left: 125px;
     }
 
-    .hint-box::after {
+    .ltr-hint-box-add-ons::after {
       margin-left: 127px;
     }
 
+    .rtl-hint-box-add-ons::before {
+      margin-left: -142px;
+    }
+
+    .rtl-hint-box-add-ons::after {
+      margin-left: -140px;
+    }
+
     .hint-box {
-      bottom: 86px;
       font-size: 14px;
-      left: -18px;
       text-align: left;
       width: 325px;
     }
@@ -152,7 +203,6 @@
       bottom: -17px;
       padding: 0 10px;
       position: fixed;
-      right: 0;
     }
   }
 
@@ -166,6 +216,10 @@
     margin-right: 10px;
     margin-top: 21px;
     text-transform: uppercase;
+  }
+
+  .oppia-hint-and-solution-buttons .list-inline {
+    display: flex;
   }
 
   .oppia-hint-and-solution-buttons .list-inline > li {

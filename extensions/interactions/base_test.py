@@ -68,9 +68,9 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [
-    ('name', python_utils.BASESTRING),
-    ('display_mode', python_utils.BASESTRING),
-    ('description', python_utils.BASESTRING),
+    ('name', str),
+    ('display_mode', str),
+    ('description', str),
     ('_customization_arg_specs', list),
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
@@ -132,11 +132,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(all(hasattr(ca_spec, attr) for attr in [
                 'name', 'description', 'schema', 'default_value']))
 
-            self.assertTrue(
-                isinstance(ca_spec.name, python_utils.BASESTRING))
+            self.assertIsInstance(ca_spec.name, str)
             self.assertTrue(self._is_alphanumeric_string(ca_spec.name))
-            self.assertTrue(
-                isinstance(ca_spec.description, python_utils.BASESTRING))
+            self.assertIsInstance(ca_spec.description, str)
             self.assertGreater(len(ca_spec.description), 0)
 
             schema_utils_test.validate_schema(ca_spec.schema)
@@ -160,8 +158,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 visualization specs to be validated.
         """
         _answer_visualizations_specs_schema = [
-            ('id', python_utils.BASESTRING), ('options', dict),
-            ('calculation_id', python_utils.BASESTRING),
+            ('id', str),
+            ('options', dict),
+            ('calculation_id', str),
             ('addressed_info_is_supported', bool)]
         _answer_visualization_keys = [
             item[0] for item in _answer_visualizations_specs_schema]
@@ -170,8 +169,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for spec in answer_visualization_specs:
             self.assertItemsEqual(list(spec.keys()), _answer_visualization_keys)
             for key, item_type in _answer_visualizations_specs_schema:
-                self.assertTrue(isinstance(spec[key], item_type))
-                if item_type == python_utils.BASESTRING:
+                self.assertIsInstance(spec[key], item_type)
+                if item_type == str:
                     self.assertTrue(spec[key])
 
     def _listdir_omit_ignored(self, directory):
@@ -350,9 +349,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     # accommodate more than one interaction. Corresponding
                     # checks in state_domain.AnswerGroup
                     # get_all_html_content_strings() also needs to be updated.
-                    if isinstance(
-                            html_type_dict['interactionId'],
-                            python_utils.BASESTRING):
+                    if isinstance(html_type_dict['interactionId'], str):
                         # The above type check is required because,
                         # all the keys in the generated html type
                         # dict is initialized as defaultdict object.
@@ -637,9 +634,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
-                self.assertTrue(isinstance(
-                    getattr(interaction, item), item_type))
-                if item_type == python_utils.BASESTRING:
+                self.assertIsInstance(getattr(interaction, item), item_type)
+                if item_type == str:
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
@@ -680,9 +676,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIsNone(interaction.instructions)
                 self.assertIsNone(interaction.narrow_instructions)
             else:
-                self.assertTrue(
-                    isinstance(
-                        interaction.instructions, python_utils.BASESTRING))
+                self.assertIsInstance(interaction.instructions, str)
                 self.assertIsNotNone(interaction.instructions)
                 self.assertIsNotNone(interaction.narrow_instructions)
 
@@ -694,9 +688,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # default_outcome_heading property.
             if interaction.is_linear:
                 self.assertTrue(
-                    isinstance(
-                        interaction.default_outcome_heading,
-                        python_utils.BASESTRING)
+                    isinstance(interaction.default_outcome_heading, str)
                     and interaction.default_outcome_heading)
             else:
                 self.assertIsNone(interaction.default_outcome_heading)

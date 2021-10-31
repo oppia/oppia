@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -120,8 +119,7 @@ class BlogPostModel(base_models.BaseModel):
         """
         for _ in range(base_models.MAX_RETRIES):
             blog_post_id = utils.convert_to_hash(
-                python_utils.UNICODE(
-                    utils.get_random_int(base_models.RAND_RANGE)),
+                str(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(blog_post_id):
                 return blog_post_id
