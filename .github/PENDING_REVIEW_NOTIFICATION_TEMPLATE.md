@@ -1,6 +1,6 @@
 Hi {{ username }},
 
-It looks like you haven't reviewed the following PRs within the expected time:
+It looks like you haven't reviewed the following Oppia-web PRs within the expected time:
 {{ pr_list }}
 
 Can you please review the pending PRs as soon as possible?
