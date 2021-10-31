@@ -223,6 +223,10 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
+          $scope.isNotesLengthExceeded = function(editableNotes) {
+            return (editableNotes.length > 4000);
+          };
+
           $scope.navigateToChapterWithId = function(id, index) {
             StoryEditorNavigationService.navigateToChapterEditorWithId(
               id, index);

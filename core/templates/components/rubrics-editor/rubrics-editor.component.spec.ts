@@ -182,4 +182,8 @@ describe('Rubrics Editor Component', () => {
     expect(componentInstance.isAnyExplanationEmptyForDifficulty(difficulty))
       .toBeFalse();
   });
+
+  it('should return true when explanation length is below 300', () => {
+    expect(componentInstance.isExplanationLengthValid('abcd')).toBeTrue();
+  });
 });
