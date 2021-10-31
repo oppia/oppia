@@ -35,8 +35,8 @@ import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { I18nService } from 'i18n/i18n.service';
 
 interface LanguageInfo {
   id: string;
@@ -114,6 +114,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private i18nService: I18nService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private debouncerService: DebouncerService,
@@ -123,9 +125,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService,
     private focusManagerService: FocusManagerService
   ) {}
 
@@ -172,26 +172,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.getPreferredSiteLanguageCode()) {
-        // TODO(#14052): Find a better way to structure and encapsulate language
-        // translations related code.
-        this.i18nLanguageCodeService.setI18nLanguageCode(
-          userInfo.getPreferredSiteLanguageCode());
+    this.i18nService.updateViewToUserPreferredSiteLanguage();
 
-        // This removes the language parameter from the URL if it is present,
-        // since, when the user is logged in and has a preferred site language,
-        // we always choose the language code based on their preferred site
-        // language to load the webpage, overriding the URL language parameter.
-        this.removeUrlLangParam();
-      }
-      this.currentLanguageCode = (
-        this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-      this.supportedSiteLanguages.forEach(element => {
-        if (element.id === this.currentLanguageCode) {
-          this.currentLanguageText = element.text;
-        }
-      });
+    this.userService.getUserInfoAsync().then((userInfo) => {
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
@@ -268,28 +251,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  changeLanguage(languageCode: string, languageText: string): void {
-    this.currentLanguageCode = languageCode;
-    this.currentLanguageText = languageText;
-    this.i18nLanguageCodeService.setI18nLanguageCode(languageCode);
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.isLoggedIn()) {
-        this.userBackendApiService.updatePreferredSiteLanguageAsync(
-          this.currentLanguageCode);
-      }
-    });
-    // When user changes site language, it will override the lang parameter in
-    // the URL and render it invalid, so we remove it (if it's present) to avoid
-    // confusion.
-    this.removeUrlLangParam();
-  }
-
-  removeUrlLangParam(): void {
-    if (this.url.searchParams.has('lang')) {
-      this.url.searchParams.delete('lang');
-      this.windowRef.nativeWindow.history.pushState(
-        {}, '', this.url.toString());
-    }
+  changeLanguage(languageCode: string): void {
+    this.i18nService.updateUserPreferredLanguage(languageCode);
   }
 
   onLoginButtonClicked(): void {

@@ -98,6 +98,7 @@
            [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
+                          [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
                           (setActiveSection)="setActiveSection($event)">
@@ -115,7 +116,8 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
-                              [learntTopicsList]="learntTopicsList">
+                              [learntTopicsList]="learntTopicsList"
+                              (setActiveSection)="setActiveSection($event)">
           </oppia-progress-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && windowIsNarrow">
@@ -142,12 +144,12 @@
           <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
                    *ngIf="threadSummaries.length === 0">
             <div>
-              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate"></p>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate" class="empty-feedback-threads"></p>
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 href="/community-library"
-                 [routerLink]="communityLibraryUrl">
+                 href="/learn/math"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE">
               </a>
             </div>
           </mat-card>
@@ -340,26 +342,15 @@
     overflow-x: visible;
   }
 
-  .oppia-flex-row {
-    box-sizing: border-box;
-    display: flex !important;
-    flex-direction: row;
-    margin: 10px 0;
-  }
-
-  .oppia-flex-row>:first-child {
-    margin-top: 10px;
-  }
-
-  .oppia-flex-row>:last-child {
-    margin-bottom: 10px;
-  }
-
   .oppia-learner-dashboard-container {
     margin: 0 auto 30px auto;
     max-width: 1400px;
   }
 
+  .oppia-learner-dashboard-button-menu {
+    padding: 8px;
+
+  }
   .oppia-learner-dashboard-title {
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -413,6 +404,12 @@
     text-align: center;
   }
 
+  .empty-feedback-threads {
+    color: #333;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 18px;
+  }
+
   .oppia-buttons {
     cursor: pointer;
     display: inline-block;
@@ -424,42 +421,12 @@
     width: 64px;
   }
 
-  .oppia-learner-dashboard-title-mobile {
-    font-size: 2.5em;
-    margin-bottom: 25px;
-  }
-
-  .oppia-learner-dashboard-mascot {
-    float: right;
-    margin-top: -40px;
-    padding-left: 10px;
-    width: 140px;
-  }
-
   .oppia-learner-dashboard-menu {
-    color: black;
     cursor: pointer;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 1em;
-    font-weight: normal;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 18px;
     margin: 0;
     padding: 17px 20px 17px 20px;
-  }
-
-  .oppia-learner-dashboard-main-menu .oppia-learner-dashboard-sub-section-active {
-    background-color: #aed2e9;
-    border: 1px solid lightgreen;
-    color: black;
-  }
-
-  .oppia-learner-dashboard-submenu {
-    background-color: #fff;
-    border: 1px solid #d0d0d0;
-    color: #757575;
-    cursor: pointer;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 16px;
-    padding: 12px 20px 12px 40px;
   }
 
   .oppia-learner-dashboard-section-active {
@@ -476,22 +443,6 @@
   .oppia-learner-dashboard-main-content {
     padding: 0;
     width: 60%;
-  }
-
-  .oppia-learner-dashboard-main-content .stats-card {
-    min-height: 63px;
-    position: relative;
-  }
-
-  .oppia-learner-dashboard-main-content .stats-card .stat-description {
-    line-height: 1.646;
-    margin-bottom: 35px;
-    padding-right: 10px;
-  }
-
-  .oppia-learner-dashboard-main-content .stats-card .stat-value {
-    bottom: 0;
-    position: absolute;
   }
 
   .oppia-learner-dashboard-main-content .remove-icon {
@@ -518,76 +469,11 @@
     width: 100%;
   }
 
-  .oppia-learner-dashboard-mascot-mobile {
-    margin-left: -76px;
-    margin-top: 307px;
-    position: absolute;
-  }
-
-  .oppia-learner-dashboard-intro-card {
-    background: #fff;
-    border-left: none;
-    border-radius: 5px;
-    margin: 1em 0 0;
-    padding: 37px 30px;
-    text-align: center;
-  }
-
-  .oppia-learner-dashboard-intro-card:before {
-    background: #fff;
-    border-bottom-right-radius: 80px 50px;
-    bottom: -1.88em;
-    content: "";
-    display: block;
-    height: 30px;
-    position: absolute;
-    width: 50px;
-    z-index: 10;
-  }
-
-  .oppia-learner-dashboard-intro-card:after {
-    background: #e8e7e3;
-    border-bottom-right-radius: 40px 50px;
-    bottom: -1.88em;
-    content: "";
-    display: block;
-    height: 30px;
-    position: absolute;
-    width: 20px;
-    z-index: 10;
-  }
-
-  .oppia-learner-dashboard-intro-button {
-    background-color: #00645c;
-    border-radius: 4px;
-    color: #fff;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.7px;
-    margin-top: 25px;
-    padding: 8px;
-    text-transform: uppercase;
-    width: 250px;
-  }
-
-  .oppia-learner-dashboard-intro-button:hover,
-  .oppia-learner-dashboard-intro-button:active {
-    background-color: #3d9991;
-    color: #fff;
-  }
-
-  .oppia-learner-dashboard-intro-card-message {
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-  }
-
   .oppia-learner-dashboard-main-content-title {
     color: #076962;
     display: inline-block;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 1.3em;
+    font-size: 24px;
     margin: 64px 0 0 0;
     padding: 16px;
     padding-bottom: 8px;
@@ -650,41 +536,12 @@
   .oppia-row {
     display: flex;
   }
-  .oppia-learner-dashboard-intro-card-message-part-1 {
-    padding-top: 6px;
-  }
-  .oppia-learner-dashboard-intro-card-message-part-2 {
-    padding-top: 15px;
-  }
-  .oppia-navbar-breadcrumb-separator-icon {
-    margin: 0 1px;
-  }
-  .oppia-explorations-select {
-    margin-bottom: 7px;
-  }
   .oppia-sort-options {
     width: auto;
-  }
-  .oppia-learner-dashboard-nonexistent-exploration {
-    display: block;
-    padding: 5px 7.5px;
   }
   .oppia-learner-dashboard-intro-button-link {
     margin-top: 13px;
     width: 230px;
-  }
-  .oppia-exploration-summary-tile-container {
-    display: inline-block;
-    margin-left: 1px;
-  }
-  .oppia-exploration-summary-tile {
-    height: 100%;
-  }
-  .oppia-impact-text {
-    font-size: 14.5px;
-  }
-  .oppia-message-count-container {
-    width: 21%;
   }
   .oppia-btn-secondary {
     padding: 0 3px;
@@ -784,10 +641,6 @@
   }
 
   @media (max-width: 810px) {
-    .oppia-learner-dashboard-title {
-      font-size: 2.8em;
-    }
-
     .sort-explorations-select.oppia-learner-dashboard-sort {
       padding: 0 0 6px 7.5px;
       width: 100%;
@@ -799,18 +652,6 @@
   }
 
   @media (max-width: 500px) {
-    .oppia-learner-dashboard-title {
-      font-size: 2.5em;
-    }
-
-    .oppia-learner-dashboard-intro-card:before {
-      left: 17em;
-    }
-
-    .oppia-learner-dashboard-intro-card:after {
-      left: 17em;
-    }
-
     .oppia-learner-dashboard-main-content-container {
       padding: 7px;
     }
@@ -828,50 +669,6 @@
 
     .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
       margin-left: 15px;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .oppia-learner-dashboard-title-mobile {
-      padding-top: 54.5px;
-    }
-
-    .oppia-learner-dashboard-mascot {
-      margin-top: 335px;
-    }
-
-    .oppia-learner-dashboard-intro-card:before {
-      left: 15em;
-    }
-
-    .oppia-learner-dashboard-intro-card:after {
-      left: 15em;
-    }
-  }
-
-  .oppia-dashboard-tooltip {
-    display: inline-block;
-    position: relative;
-  }
-
-  .oppia-dashboard-tooltip-text {
-    background-color: #018477;
-    border-radius: 6px;
-    bottom: 97%;
-    color: #fff;
-    font-size: 0.6em;
-    padding: 5px;
-    position: absolute;
-    text-align: center;
-    visibility: hidden;
-    width: auto;
-    z-index: 1;
-  }
-
-  @media screen and (max-width: 500px) {
-    .oppia-dashboard-tooltip-text {
-      margin-left: -80%;
-      width: 90%;
     }
   }
 

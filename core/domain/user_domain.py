@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 
@@ -162,7 +161,7 @@ class UserSettings:
             ValidationError. The pin is not str.
             ValidationError. The display alias is not str.
         """
-        if not isinstance(self.user_id, python_utils.BASESTRING):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
@@ -193,7 +192,7 @@ class UserSettings:
                 raise utils.ValidationError(
                     'Roles contains duplicate values: %s' % self.roles)
             for role in self.roles:
-                if not isinstance(role, python_utils.BASESTRING):
+                if not isinstance(role, str):
                     raise utils.ValidationError(
                         'Expected roles to be a string, received %s' % role)
 
@@ -209,7 +208,7 @@ class UserSettings:
                     'Expected roles to contains one default role.')
 
         if self.pin is not None:
-            if not isinstance(self.pin, python_utils.BASESTRING):
+            if not isinstance(self.pin, str):
                 raise utils.ValidationError(
                     'Expected PIN to be a string, received %s' %
                     self.pin
@@ -231,13 +230,13 @@ class UserSettings:
                         )
 
         if (self.display_alias is not None and
-                not isinstance(self.display_alias, python_utils.BASESTRING)):
+                not isinstance(self.display_alias, str)):
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s' %
                 self.display_alias
             )
 
-        if not isinstance(self.email, python_utils.BASESTRING):
+        if not isinstance(self.email, str):
             raise utils.ValidationError(
                 'Expected email to be a string, received %s' % self.email)
         if not self.email:
@@ -247,8 +246,7 @@ class UserSettings:
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
 
-        if not isinstance(
-                self.creator_dashboard_display_pref, python_utils.BASESTRING):
+        if not isinstance(self.creator_dashboard_display_pref, str):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
@@ -272,11 +270,7 @@ class UserSettings:
                 attribute.
         """
         if (not modifiable_user_data.display_alias or
-                not isinstance(
-                    modifiable_user_data.display_alias,
-                    python_utils.BASESTRING
-                )
-           ):
+                not isinstance(modifiable_user_data.display_alias, str)):
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s.' %
                 modifiable_user_data.display_alias
@@ -509,7 +503,7 @@ class UserContributions:
             ValidationError. The exploration_id in edited_exploration_ids
                 is not str.
         """
-        if not isinstance(self.user_id, python_utils.BASESTRING):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
@@ -520,7 +514,7 @@ class UserContributions:
                 'Expected created_exploration_ids to be a list, received %s'
                 % self.created_exploration_ids)
         for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, python_utils.BASESTRING):
+            if not isinstance(exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration_id in created_exploration_ids '
                     'to be a string, received %s' % (
@@ -531,7 +525,7 @@ class UserContributions:
                 'Expected edited_exploration_ids to be a list, received %s'
                 % self.edited_exploration_ids)
         for exploration_id in self.edited_exploration_ids:
-            if not isinstance(exploration_id, python_utils.BASESTRING):
+            if not isinstance(exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration_id in edited_exploration_ids '
                     'to be a string, received %s' % (

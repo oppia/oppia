@@ -72,17 +72,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
 
-    def test_convert_to_bytes(self):
-        string1 = 'Home'
-        string2 = u'Лорем'
-        self.assertEqual(
-            python_utils.convert_to_bytes(string1),
-            string1.encode(encoding='utf-8')
-        )
-        self.assertEqual(
-            python_utils.convert_to_bytes(string2),
-            string2.encode(encoding='utf-8'))
-
     def test_url_unsplit(self):
         response = urllib.parse.urlsplit('http://www.google.com')
         self.assertEqual(
@@ -102,8 +91,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.geturl(), 'http://www.google.com')
 
     def test_recursively_convert_to_str_with_dict(self):
-        test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
-        test_var_2_in_unicode = python_utils.UNICODE('test_var_2')
+        test_var_1_in_unicode = str('test_var_1')
+        test_var_2_in_unicode = str('test_var_2')
         test_var_3_in_bytes = test_var_1_in_unicode.encode(encoding='utf-8')
         test_var_4_in_bytes = test_var_2_in_unicode.encode(encoding='utf-8')
         test_dict = {
@@ -115,7 +104,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             {'test_var_1': b'test_var_1', 'test_var_2': b'test_var_2'})
 
         for key, val in test_dict.items():
-            self.assertEqual(type(key), python_utils.UNICODE)
+            self.assertEqual(type(key), str)
             self.assertEqual(type(val), builtins.bytes)
 
         dict_in_str = python_utils._recursively_convert_to_str(test_dict)  # pylint: disable=protected-access
@@ -124,11 +113,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             {'test_var_1': 'test_var_1', 'test_var_2': 'test_var_2'})
 
         for key, val in dict_in_str.items():
-            self.assertEqual(type(key), python_utils.UNICODE)
-            self.assertEqual(type(val), python_utils.UNICODE)
+            self.assertEqual(type(key), str)
+            self.assertEqual(type(val), str)
 
     def test_recursively_convert_to_str_with_nested_structure(self):
-        test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
+        test_var_1_in_unicode = str('test_var_1')
         test_list_1 = [
             test_var_1_in_unicode,
             test_var_1_in_unicode.encode(encoding='utf-8'),
@@ -197,29 +186,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             [''.join(g) for g in python_utils.zip_longest(
                 'ABC', 'DE', 'F', fillvalue='x')],
             ['ADF', 'BEx', 'Cxx'])
-
-
-@unittest.skipUnless(
-    sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')
-class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
-    """Tests for feature detection utilities for Python 2."""
-
-    def test_string_io(self):
-        stdout = python_utils.string_io()
-        self.assertIsInstance(stdout, io.StringIO)
-
-    def test_unicode_and_str_chars_in_file(self):
-        self.assertIsInstance(
-            unicode_and_str_handler.SOME_STR_TEXT, python_utils.UNICODE)
-        self.assertIsInstance(
-            unicode_and_str_handler.SOME_UNICODE_TEXT, python_utils.UNICODE)
-        self.assertIsInstance(
-            unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
-
-        with python_utils.open_file(
-            'core/tests/data/unicode_and_str_handler.py', 'r') as f:
-            file_content = f.read()
-            self.assertIsInstance(file_content, python_utils.UNICODE)
 
 
 @unittest.skipUnless(

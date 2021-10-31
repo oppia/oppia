@@ -22,7 +22,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
-from core import python_utils
 
 import elasticsearch
 
@@ -56,7 +55,7 @@ def _create_index(index_name: str) -> None:
     Raises:
         elasticsearch.RequestError. The index already exists.
     """
-    assert isinstance(index_name, python_utils.BASESTRING)
+    assert isinstance(index_name, str)
     ES.indices.create(index_name)
 
 
@@ -81,7 +80,7 @@ def add_documents_to_index(
     Raises:
         SearchException. A document cannot be added to the index.
     """
-    assert isinstance(index_name, python_utils.BASESTRING)
+    assert isinstance(index_name, str)
 
     for document in documents:
         assert 'id' in document
@@ -106,9 +105,9 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
             from the index.
         index_name: str. The name of the index to delete the document from.
     """
-    assert isinstance(index_name, python_utils.BASESTRING)
+    assert isinstance(index_name, str)
     for doc_id in doc_ids:
-        assert isinstance(doc_id, python_utils.BASESTRING)
+        assert isinstance(doc_id, str)
 
     for doc_id in doc_ids:
         try:
@@ -129,7 +128,7 @@ def clear_index(index_name: str) -> None:
     Args:
         index_name: str. The name of the index to clear.
     """
-    assert isinstance(index_name, python_utils.BASESTRING)
+    assert isinstance(index_name, str)
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
@@ -268,7 +267,7 @@ def search(
         # There is at least one more page of results to fetch. Trim the results
         # in this call to the desired size.
         matched_search_docs = matched_search_docs[:size]
-        resulting_offset = python_utils.UNICODE(int(offset) + size)
+        resulting_offset = str(int(offset) + size)
 
     if ids_only:
         result_docs = [doc['_id'] for doc in matched_search_docs]
