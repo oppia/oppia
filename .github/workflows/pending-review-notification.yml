@@ -20,9 +20,11 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
-      - uses: DubeySandeep/pending-review-notification@init
+      - uses: DubeySandeep/pending-review-notification@v1
         with:
           team-slur: oppia-codeowners
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
+        env:
+          TEST_MODE_ENV: ${{ true}}
 
