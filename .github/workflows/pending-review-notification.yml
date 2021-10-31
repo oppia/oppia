@@ -28,4 +28,3 @@ jobs:
         with:
           message: "A pending-review-notification workflow failed."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-
