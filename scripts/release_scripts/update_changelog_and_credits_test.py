@@ -281,7 +281,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
         ) as f:
             for line in about_page_lines:
-                f.write(python_utils.UNICODE(line))
+                f.write(str(line))
 
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         new_developer_names = update_changelog_and_credits.get_new_contributors(

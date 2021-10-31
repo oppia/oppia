@@ -60,16 +60,9 @@
  *       variables and emitting an event to inform that angular has finished
  *       loading
  */
-interface LanguageInfo {
-  id: string;
-  text: string;
-  direction: string;
-}
 
 import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
-import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -99,9 +92,7 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CookieService } from 'ngx-cookie';
+import { I18nService } from 'i18n/i18n.service';
 
 const componentMap = {
   Collapsible: {
@@ -135,7 +126,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
-  url: URL;
 
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
@@ -148,18 +138,14 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static translateService: TranslateService;
-  static translateCacheService: TranslateCacheService;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
-    private cookieService: CookieService,
-    private documentAttributeCustomizationService:
-      DocumentAttributeCustomizationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private htmlEscaperService: HtmlEscaperService,
+    private i18nService: I18nService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private ngZone: NgZone,
     private pageTitleService: PageTitleService,
@@ -167,12 +153,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private ratingComputationService: RatingComputationService,
     private reviewTestBackendApiService: ReviewTestBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
-    private translateService: TranslateService,
-    private translateCacheSettings: TranslateCacheSettings,
-    private translateCacheService: TranslateCacheService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private windowRef: WindowRef,
     private injector: Injector
   ) {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
@@ -215,9 +197,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       this.reviewTestBackendApiService);
     OppiaAngularRootComponent.storyViewerBackendApiService = (
       this.storyViewerBackendApiService);
-    OppiaAngularRootComponent.translateService = this.translateService;
-    OppiaAngularRootComponent.translateCacheService = (
-      this.translateCacheService);
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
@@ -265,65 +244,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     ]);
 
     // Initialize translations.
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => {
-        this.translateService.use(code);
-        for (let i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
-          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
-            this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
-            break;
-          }
-        }
-        this.documentAttributeCustomizationService.addAttribute('lang', code);
-      }
-    );
-
-    // TODO(#14052): Find a better way to structure and encapsulate language
-    // translations related code.
-    // Code to load site according to the language parameter in URL if present.
-    this.url = new URL(this.windowRef.nativeWindow.location.toString());
-    const searchParams = this.url.searchParams;
-
-    if (searchParams.has('lang')) {
-      let supportedSiteLanguageCodes: string[] = (
-        AppConstants.SUPPORTED_SITE_LANGUAGES.map(
-          (languageInfo: LanguageInfo) => {
-            return languageInfo.id;
-          }
-        )
-      );
-      let siteLanguageCode = searchParams.get('lang');
-      if (supportedSiteLanguageCodes.includes(siteLanguageCode)) {
-        // When translation cache is initialized, language code stored in cookie
-        // is used to set the site language. To have a single source of truth,
-        // we first directly update the language code in cookie using URL before
-        // intializing the translation cache, so that we always read the
-        // language code from the cookie to set site language. This removes
-        // the need of continously syncing URL lang param and cache, and
-        // avoids race conditions.
-        this.cookieService.put(
-          this.translateCacheSettings.cacheName, siteLanguageCode);
-      } else {
-        // In the case where the URL contains an invalid language code, we
-        // load the site using last cached language code and remove the language
-        // param from the URL.
-        this.url.searchParams.delete('lang');
-        this.windowRef.nativeWindow.history.pushState(
-          {}, '', this.url.toString());
-      }
-    }
-
-    // The translateCacheService should only be initialized after the
-    // translation cache is set according to the URL language parameter (if
-    // present).This avoids race conditions between the URL language parameter
-    // and the language code stored in the local cookie.
-    this.translateCacheService.init();
-
-    const cachedLanguageCode = (
-      this.translateCacheService.getCachedLanguage());
-    if (cachedLanguageCode) {
-      this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguageCode);
-    }
+    this.i18nService.initialize();
+    this.i18nService.directionChangeEventEmitter.subscribe((direction) => {
+      this.direction = direction;
+    });
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
