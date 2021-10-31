@@ -381,4 +381,23 @@ describe('OutcomeEditorComponent', () => {
     expect(ctrl.savedOutcome.refresherExplorationId).toBe(null);
     expect(ctrl.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
+
+  it('should check if outcome feedback has length of atmost 1000 characters',
+    () => {
+      let text = 'Feedback Text ';
+
+      ctrl.outcome = {
+        feedback: {
+          _html: '<p> ' + text + ' </p>'
+        }
+      };
+      expect(ctrl.isFeedbackLengthExceeded()).toBe(false);
+
+      ctrl.outcome = {
+        feedback: {
+          _html: '<p> ' + text.repeat(75) + ' </p>'
+        }
+      };
+      expect(ctrl.isFeedbackLengthExceeded()).toBe(true);
+    });
 });

@@ -29,6 +29,10 @@
       </schema-based-editor>
     </div>
 
+    <div ng-if="$ctrl.isSolutionExplanationLengthExceeded()" class="oppia-length-validation-error">
+      The solution explanation is too long. Please use at most 3000 characters.
+    </div>
+
     <div class="oppia-rule-save-cancel-buttons">
       <div class="float-right">
         <button type="button"
@@ -38,7 +42,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.html"
+                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.html || $ctrl.isSolutionExplanationLengthExceeded()"
                 ng-click="$ctrl.saveThisExplanation()">
           Save
         </button>

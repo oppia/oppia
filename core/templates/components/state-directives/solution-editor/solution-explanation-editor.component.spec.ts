@@ -113,4 +113,25 @@ describe('SolutionExplanationEditorComponent', () => {
 
     expect(ctrl.explanationEditorIsOpen).toBe(false);
   });
+
+  it('should check if solution explanation length has exceeded 200 characters',
+    () => {
+      var solutionExplanation = 'Solution explanation';
+
+      StateSolutionService.displayed = {
+        explanation: {
+          contentId: 'contentID',
+          html: '<p> ' + solutionExplanation + ' </p>'
+        }
+      };
+      expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(false);
+
+      StateSolutionService.displayed = {
+        explanation: {
+          contentId: 'contentID',
+          html: '<p> ' + solutionExplanation.repeat(180) + ' </p>'
+        }
+      };
+      expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(true);
+    });
 });

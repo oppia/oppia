@@ -83,4 +83,11 @@ describe('Add Hint Modal Controller', function() {
       contentId: contentId
     });
   });
+
+  it('should check if hint length exceeded 500 characters', function() {
+    var hint1 = 'This is a hint ';
+    var hint2 = hint1.repeat(35);
+    expect($scope.isHintLengthExceeded(hint1)).toBe(false);
+    expect($scope.isHintLengthExceeded(hint2)).toBe(true);
+  });
 });

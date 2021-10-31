@@ -14,11 +14,14 @@
       </schema-based-editor>
     </div>
   </form>
+  <div ng-if="isHintLengthExceeded(tmpHint)" class="oppia-length-validation-error">
+    The hint length is too long. Please use at most 500 characters.
+  </div>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-cancel-hint" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint">Save Hint</button>
+  <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint || isHintLengthExceeded(tmpHint)">Save Hint</button>
 </div>
 
 <style>

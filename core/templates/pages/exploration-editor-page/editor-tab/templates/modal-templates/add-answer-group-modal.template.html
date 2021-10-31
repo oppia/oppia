@@ -35,6 +35,9 @@
       <oppia-outcome-feedback-editor [outcome]="tmpOutcome">
       </oppia-outcome-feedback-editor>
     </div>
+    <div ng-if="isFeedbackLengthExceeded(tmpOutcome)" class="oppia-length-validation-error">
+      The feedback length is too long. Please use at most 1000 characters.
+    </div>
     <br>
 
     <outcome-destination-editor outcome="tmpOutcome"
@@ -60,8 +63,8 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
-  <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
+  <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
+  <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
 </div>
 <style>
   oppia-outcome-feedback-editor {

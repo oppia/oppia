@@ -100,6 +100,10 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         stateName && !tmpOutcome.hasNonemptyFeedback());
     };
 
+    $scope.isFeedbackLengthExceeded = function(tmpOutcome) {
+      return (tmpOutcome.feedback._html.length > 1000);
+    };
+
     $scope.addAnswerGroupForm = {};
 
     $scope.saveResponse = function(reopen) {
