@@ -1,11 +1,8 @@
 name: Send pending review notifications to reviewer on github-discussion
-# on:
-#   schedule:
-#     - cron: '0 0 * * 2,5'
 on:
-  pull_request:
-    branches:
-      - develop
+  schedule:
+    # Every Tuesday and Thrusday at 00:00 UTC.
+    - cron: '0 0 * * 2,5'
 
 jobs:
   send_notifications:
@@ -22,9 +19,6 @@ jobs:
           architecture: 'x64'
       - uses: DubeySandeep/pending-review-notification@v1
         with:
-          team-slur: oppia-codeowners
+          team-slug: oppia-codeowners
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
-        env:
-          TEST_MODE_ENV: ${{ true}}
-
