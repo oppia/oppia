@@ -131,6 +131,7 @@ describe('Collection editor navbar breadcrumb component', () => {
       component.ngOnInit();
       fixture.whenStable()
         .then(() => {
+          expect(component.activeTabName).toBe(activeTab);
           component.editCollectionTitle();
           expect(component.activeTabName).toBe('Settings');
           expect(focusManagerService.setFocus).toHaveBeenCalledWith(
