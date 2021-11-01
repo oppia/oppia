@@ -21,10 +21,10 @@ from __future__ import annotations
 import contextlib
 import unittest
 
-from . import docstrings_checker  # isort:skip
+from . import docstrings_checker  
 
-import astroid  # isort:skip
-from pylint.checkers import utils # isort:skip
+import astroid  
+from pylint.checkers import utils 
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):
