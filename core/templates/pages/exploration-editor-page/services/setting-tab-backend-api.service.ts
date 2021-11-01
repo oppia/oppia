@@ -24,20 +24,19 @@ interface SettingTabBackendDict {
   'draftEmailBody': string;
 }
 
-interface SettingTabResposne {
+interface SettingTabResponse {
   draftEmailBody: string
 }
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class SettingTabBackendApiService {
   constructor(
     private http: HttpClient
   ) {}
 
-  getData(url: string): Promise<SettingTabResposne> {
+  getData(url: string): Promise<SettingTabResponse> {
     return this.http.get<SettingTabBackendDict>(
       url
     ).toPromise();
