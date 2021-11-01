@@ -16,8 +16,7 @@
 subclasses for each type of suggestion.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
@@ -1425,7 +1424,7 @@ class TranslationContributionStats:
     @classmethod
     def create_default(
         cls, language_code=None, contributor_user_id=None, topic_id=None
-    ) -> 'TranslationContributionStats':
+    ) -> TranslationContributionStats:
         """Create default translation contribution stats.
 
         Args:

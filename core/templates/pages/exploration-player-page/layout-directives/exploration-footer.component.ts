@@ -25,6 +25,7 @@ import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -44,6 +45,7 @@ export class ExplorationFooterComponent {
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService
@@ -99,6 +101,10 @@ export class ExplorationFooterComponent {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 
