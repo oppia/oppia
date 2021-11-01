@@ -14,8 +14,7 @@
 
 """Tests for config services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import config_domain
 from core.domain import config_services
