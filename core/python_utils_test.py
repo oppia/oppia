@@ -16,8 +16,7 @@
 
 """Tests for feature detection utilities for Python 2 and Python 3."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import ast
 import builtins

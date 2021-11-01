@@ -19,8 +19,7 @@ version of Chrome for our CI tests and checks that the correct version
 was installed.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 
