@@ -41,6 +41,7 @@ import { WelcomeModalComponent } from './modal-templates/welcome-modal.component
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
+import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 
 @NgModule({
@@ -65,6 +66,7 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
+    ExplorationPublishModalComponent,
     EditorReloadingModalComponent
   ],
   entryComponents: [
@@ -79,6 +81,7 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
+    ExplorationPublishModalComponent,
     EditorReloadingModalComponent
   ],
   providers: [
