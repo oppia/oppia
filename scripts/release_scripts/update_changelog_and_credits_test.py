@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/release_scripts/update_changelog_and_credits.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import builtins
 import contextlib
@@ -281,7 +280,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
         ) as f:
             for line in about_page_lines:
-                f.write(python_utils.UNICODE(line))
+                f.write(str(line))
 
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         new_developer_names = update_changelog_and_credits.get_new_contributors(
