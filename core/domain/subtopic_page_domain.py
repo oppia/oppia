@@ -16,11 +16,9 @@
 
 """Domain objects for the pages for subtopics, and related models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -367,7 +365,7 @@ class SubtopicPage:
             ValidationError. One or more attributes of the subtopic page are
                 invalid.
         """
-        if not isinstance(self.topic_id, python_utils.BASESTRING):
+        if not isinstance(self.topic_id, str):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' %
                 self.topic_id)
@@ -391,7 +389,7 @@ class SubtopicPage:
                     self.page_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

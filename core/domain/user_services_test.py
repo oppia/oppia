@@ -16,8 +16,7 @@
 
 """Unit tests for core.domain.user_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import logging
@@ -282,7 +281,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                python_utils.UNICODE(ind), actual_email)
+                str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_user_id_from_username(self):

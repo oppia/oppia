@@ -27,12 +27,14 @@ import { HomeTabComponent } from './home-tab.component';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
 
   beforeEach(async(() => {
@@ -55,7 +57,7 @@ describe('Home tab Component', () => {
             isWindowNarrow: () => true,
             getResizeEvent: () => mockResizeEmitter,
           }
-        },
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -66,6 +68,10 @@ describe('Home tab Component', () => {
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -153,6 +159,10 @@ describe('Home tab Component', () => {
 
     expect(component.getTimeOfDay())
       .toEqual('I18N_LEARNER_DASHBOARD_MORNING_GREETING');
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should get time of day as afternoon', () => {
