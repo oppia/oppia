@@ -14,8 +14,7 @@
 
 """Tests for core.storage.question.gae_models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform import models
 from core.tests import test_utils
