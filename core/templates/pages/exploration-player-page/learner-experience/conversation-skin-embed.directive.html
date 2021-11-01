@@ -24,10 +24,10 @@
 
       <div class="conversation-skin-main-tutor-card-embed"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
-        <tutor-card displayed-card="displayedCard"
-                    avatar-image-is-shown="true"
-                    start-card-change-animation="startCardChangeAnimation">
-        </tutor-card>
+        <oppia-tutor-card [displayed-card]="displayedCard"
+                          [avatar-image-is-shown]="true"
+                          [start-card-change-animation]="startCardChangeAnimation">
+        </oppia-tutor-card>
         <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
           <supplemental-card on-click-continue-button="showUpcomingCard()"
                              displayed-card="displayedCard">

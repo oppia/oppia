@@ -21,8 +21,7 @@ Usage: Run this script from your oppia root folder:
     python -m scripts.release_scripts.update_configs
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import getpass
@@ -139,18 +138,18 @@ def check_updates_to_terms_of_service(
         'Are the terms of service changed? Check commits/changes made '
         'to the files in: core/templates/pages/terms-page. '
         'Enter y/ye/yes if they are changed else enter n/no.')
-    terms_of_service_are_changed = python_utils.INPUT().lower()
+    terms_of_service_are_changed = input().lower()
     while terms_of_service_are_changed not in ['y', 'ye', 'yes', 'n', 'no']:
         python_utils.PRINT(
             'Invalid Input: %s. Please enter yes or no.' % (
                 terms_of_service_are_changed))
-        terms_of_service_are_changed = python_utils.INPUT().lower()
+        terms_of_service_are_changed = input().lower()
 
     if terms_of_service_are_changed in (
             common.AFFIRMATIVE_CONFIRMATIONS):
         python_utils.PRINT(
             'Enter sha of the commit which changed the terms of service.')
-        commit_sha = python_utils.INPUT().lstrip().rstrip()
+        commit_sha = input().lstrip().rstrip()
         commit_time = repo.get_commit(commit_sha).commit.committer.date
         time_tuple = (
             commit_time.year, commit_time.month, commit_time.day,

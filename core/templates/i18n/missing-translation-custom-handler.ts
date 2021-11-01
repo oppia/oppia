@@ -26,7 +26,8 @@ export class MissingTranslationCustomHandler implements
   handle(params: MissingTranslationHandlerParams): string {
     if (params.key in AppConstants.DEFAULT_TRANSLATIONS) {
       return (
-        AppConstants.DEFAULT_TRANSLATIONS[<DefaultTranslationsKey> params.key]);
+        AppConstants.DEFAULT_TRANSLATIONS[params.key as
+           DefaultTranslationsKey]);
     }
     return params.key;
   }

@@ -14,8 +14,7 @@
 
 """Check for decrease in coverage from 100% of frontend files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import fnmatch
 import logging
@@ -90,7 +89,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
-    'tutor-card.directive.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',

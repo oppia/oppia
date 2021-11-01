@@ -15,15 +15,14 @@
 
 """Unit tests for scripts/run_e2e_tests.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import contextlib
 import os
 import subprocess
 import sys
 import time
 
-from core import python_utils
 from core.tests import test_utils
 from scripts import build
 from scripts import common
@@ -48,7 +47,7 @@ def mock_managed_process(*unused_args, **unused_kwargs):
         Context manager. A context manager that always yields a mock
         process.
     """
-    return python_utils.nullcontext(
+    return contextlib.nullcontext(
         enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
@@ -57,7 +56,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RunE2ETestsTests, self).setUp()
-        self.exit_stack = python_utils.ExitStack()
+        self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
@@ -272,7 +271,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_work_with_non_ascii_chars(self):
         def mock_managed_protractor_server(**unused_kwargs):  # pylint: disable=unused-argument
-            return python_utils.nullcontext(
+            return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
                     alive=False))

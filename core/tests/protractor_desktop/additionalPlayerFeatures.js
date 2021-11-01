@@ -244,7 +244,12 @@ describe('Full exploration editor', function() {
       await forms.toRichText('Parent Exploration Content'));
     await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [await forms.toRichText('Correct'), await forms.toRichText('Incorrect')]);
+      [
+        await forms.toRichText('Correct'),
+        await forms.toRichText('Incorrect'),
+        await forms.toRichText('Wrong'),
+        await forms.toRichText('Not correct')
+      ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -271,7 +276,12 @@ describe('Full exploration editor', function() {
       'Parent Exploration Content'));
     await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [await forms.toRichText('Correct'), await forms.toRichText('Incorrect')]);
+      [
+        await forms.toRichText('Correct'),
+        await forms.toRichText('Incorrect'),
+        await forms.toRichText('Wrong'),
+        await forms.toRichText('Not correct')
+      ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -391,7 +401,9 @@ describe('Full exploration editor', function() {
         'MultipleChoiceInput',
         [
           await forms.toRichText('return'),
-          await forms.toRichText('complete')
+          await forms.toRichText('complete'),
+          await forms.toRichText('incomplete'),
+          await forms.toRichText('needs to be done')
         ]
       );
       await explorationEditorMainTab.addResponse(

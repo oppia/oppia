@@ -14,15 +14,14 @@
 
 """Tests for generic controller behavior."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import contextlib
 
 from core.platform import models
 from core.tests import test_utils
 import main
-from typing import Any, ContextManager, Dict, cast
+from typing import ContextManager, Dict, cast
 import webapp2
 import webtest
 
@@ -55,10 +54,8 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(type(response), webtest.TestResponse)
             return response
 
-        # TODO(13427): Replace Any with proper type after we can import types
-        # from datastore_services.
         def get_ndb_context_mock(
-                global_cache: Any
+                global_cache: datastore_services.RedisCache
         ) -> ContextManager[None]:
             """Mock the NDB context.
 

@@ -16,11 +16,11 @@
 
 """Domain object for a reference to an activity."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
 from core.constants import constants
+
+from typing import Dict, List
 
 
 class ActivityReference:
@@ -35,7 +35,7 @@ class ActivityReference:
         id: str. The activity id.
     """
 
-    def __init__(self, activity_type, activity_id):
+    def __init__(self, activity_type: str, activity_id: str) -> None:
         """Constructs an ActivityReference domain object.
 
         Args:
@@ -45,11 +45,15 @@ class ActivityReference:
         self.type = activity_type
         self.id = activity_id
 
-    def get_hash(self):
-        """Returns a unique string for this ActivityReference domain object."""
+    def get_hash(self) -> str:
+        """Returns a unique string for this ActivityReference domain object.
+
+        Returns:
+            str. A unique string hash for this ActivityReference domain object.
+        """
         return '%s:%s' % (self.type, self.id)
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that all fields of this ActivityReference domain object
         are valid.
 
@@ -59,11 +63,11 @@ class ActivityReference:
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing this ActivityReference domain object.
 
         Returns:
@@ -76,7 +80,9 @@ class ActivityReference:
         }
 
     @classmethod
-    def from_dict(cls, activity_reference_dict):
+    def from_dict(
+        cls, activity_reference_dict: Dict[str, str]
+    ) -> ActivityReference:
         """Return the ActivityReference object from a dict.
 
         Args:
@@ -84,7 +90,7 @@ class ActivityReference:
                 of the object.
 
         Returns:
-            ActivityReference. The correcponding ActivityReference object.
+            ActivityReference. The corresponding ActivityReference object.
         """
         return cls(
             activity_reference_dict['type'], activity_reference_dict['id'])
@@ -98,7 +104,7 @@ class ActivityReferences:
             ActivityReference domain objects.
     """
 
-    def __init__(self, activity_reference_list):
+    def __init__(self, activity_reference_list: List[ActivityReference]):
         """Constructs an ActivityReferences domain object.
 
         Args:
@@ -107,7 +113,7 @@ class ActivityReferences:
         """
         self.activity_reference_list = activity_reference_list
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that all ActivityReference domain object in
         self.activity_reference_list are valid.
 

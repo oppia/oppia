@@ -71,7 +71,7 @@ export class UnitsObjectFactory {
   isLastElementUnit(unitList: string[]): boolean {
     return (
       unitList.length > 0 &&
-      this.isunit(<string> unitList.slice(-1).pop())
+      this.isunit(unitList.slice(-1).pop() as string)
     );
   }
 
@@ -123,7 +123,7 @@ export class UnitsObjectFactory {
       } else if (unitList[ind] === ')') {
         var elem = parenthesisStack.pop();
         if (elem) {
-          multiplier = parseInt(<string> elem[1]) * multiplier;
+          multiplier = parseInt(elem[1] as string) * multiplier;
         } else {
           throw new Error('Close parenthesis with no open parenthesis');
         }
@@ -181,7 +181,7 @@ export class UnitsObjectFactory {
 
   createCurrencyUnits(): void {
     var keys = (
-      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
     );
     for (var i = 0; i < keys.length; i++) {
       let baseUnitValue = (
@@ -213,7 +213,7 @@ export class UnitsObjectFactory {
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
     var keys = (
-      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
     );
     for (var i = 0; i < keys.length; i++) {
       for (

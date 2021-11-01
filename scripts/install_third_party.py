@@ -14,8 +14,7 @@
 
 """Installation script for Oppia third-party libraries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import contextlib
@@ -24,6 +23,7 @@ import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 import zipfile
 
 from core import python_utils
@@ -34,7 +34,7 @@ from . import install_backend_python_libs
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
-MANIFEST_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
+DEPENDENCIES_FILE_PATH = os.path.join(os.getcwd(), 'dependencies.json')
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
@@ -53,7 +53,7 @@ _DOWNLOAD_FORMAT_ZIP = 'zip'
 _DOWNLOAD_FORMAT_TAR = 'tar'
 _DOWNLOAD_FORMAT_FILES = 'files'
 
-DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
+DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS = {
     'zip': {
         'mandatory_keys': ['version', 'url', 'downloadFormat'],
         'optional_key_pairs': [
@@ -99,7 +99,7 @@ def download_files(source_url_root, target_dir, source_filenames):
         if not os.path.exists(os.path.join(target_dir, filename)):
             python_utils.PRINT(
                 'Downloading file %s to %s ...' % (filename, target_dir))
-            python_utils.url_retrieve(
+            urlrequest.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
                 filename=os.path.join(target_dir, filename))
 
@@ -130,7 +130,7 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
+        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -182,7 +182,7 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
+        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -217,20 +217,20 @@ def return_json(filepath):
     return json.loads(response)
 
 
-def test_manifest_syntax(dependency_type, dependency_dict):
-    """This checks syntax of the manifest.json dependencies.
+def test_dependencies_syntax(dependency_type, dependency_dict):
+    """This checks syntax of the dependencies.json dependencies.
     Display warning message when there is an error and terminate the program.
 
     Args:
         dependency_type: str. Dependency download format.
-        dependency_dict: dict. A manifest.json dependency dict.
+        dependency_dict: dict. A dependencies.json dependency dict.
     """
     keys = list(dependency_dict.keys())
-    mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+    mandatory_keys = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
     # to be available as a key in the dependency_dict.
-    optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+    optional_key_pairs = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:
         if key not in keys:
@@ -273,14 +273,14 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         sys.exit(1)
 
 
-def validate_manifest(filepath):
-    """This validates syntax of the manifest.json
+def validate_dependencies(filepath):
+    """This validates syntax of the dependencies.json
 
     Args:
         filepath: str. The path to the json file.
     """
-    manifest_data = return_json(filepath)
-    dependencies = manifest_data['dependencies']
+    dependencies_data = return_json(filepath)
+    dependencies = dependencies_data['dependencies']
     for _, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
             if 'downloadFormat' not in dependency_contents:
@@ -288,18 +288,18 @@ def validate_manifest(filepath):
                     'downloadFormat not specified in %s' %
                     dependency_contents)
             download_format = dependency_contents['downloadFormat']
-            test_manifest_syntax(download_format, dependency_contents)
+            test_dependencies_syntax(download_format, dependency_contents)
 
 
-def download_manifest_files(filepath):
-    """This download all files to the required folders
+def download_all_dependencies(filepath):
+    """This download all files to the required folders.
 
     Args:
         filepath: str. The path to the json file.
     """
-    validate_manifest(filepath)
-    manifest_data = return_json(filepath)
-    dependencies = manifest_data['dependencies']
+    validate_dependencies(filepath)
+    dependencies_data = return_json(filepath)
+    dependencies = dependencies_data['dependencies']
     for data, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
             dependency_rev = dependency_contents['version']
@@ -387,11 +387,11 @@ def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
     cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
-    redis package installed in manifest.json (redis-3.5.3). The redis-3.5.3
-    package detailed in manifest.json is the Python library that allows users to
-    communicate with any Redis cache using Python. The redis-cli-6.0.6 package
-    installed in this function contains C++ scripts for the redis-cli and
-    redis-server programs detailed below.
+    redis package installed in dependencies.json (redis-3.5.3). The redis-3.5.3
+    package detailed in dependencies.json is the Python library that allows
+    users to communicate with any Redis cache using Python. The redis-cli-6.0.6
+    package installed in this function contains C++ scripts for the redis-cli
+    and redis-server programs detailed below.
 
     The redis-cli program is the command line interface that serves up an
     interpreter that allows users to connect to a redis database cache and
@@ -454,7 +454,7 @@ def main(args=None):
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
     install_backend_python_libs.main()
-    download_manifest_files(MANIFEST_FILE_PATH)
+    download_all_dependencies(DEPENDENCIES_FILE_PATH)
     install_redis_cli()
     install_elasticsearch_dev_server()
 

@@ -16,8 +16,7 @@
 
 """Common utilities for test classes."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import contextlib
@@ -474,8 +473,9 @@ class ElasticSearchStub:
                 for _, v in term.items():
                     values = v['query'].split(' ')
                     for doc in result_docs:
-                        strs = [val for val in doc.values() if isinstance(
-                            val, python_utils.BASESTRING)]
+                        strs = [
+                            val for val in doc.values() if isinstance(val, str)
+                        ]
                         words = []
                         for s in strs:
                             words += s.split(' ')
@@ -532,7 +532,7 @@ class AuthServicesStub:
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -676,7 +676,7 @@ class AuthServicesStub:
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return python_utils.NEXT(
+        return next(
             (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
             None)
 
@@ -925,7 +925,7 @@ class MemoryCacheServicesStub:
         Returns:
             int. Number of successfully deleted keys.
         """
-        assert all(isinstance(key, python_utils.BASESTRING) for key in keys)
+        assert all(isinstance(key, str) for key in keys)
         keys_to_delete = [key for key in keys if key in self._CACHE_DICT]
         for key in keys_to_delete:
             del self._CACHE_DICT[key]
@@ -1222,13 +1222,13 @@ class TestBase(unittest.TestCase):
             self.longMessage = True
 
             if expected_args:
-                next_args = python_utils.NEXT(expected_args_iter, None)
+                next_args = next(expected_args_iter, None)
                 self.assertEqual(
                     args, next_args, msg='*args to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))
 
             if expected_kwargs:
-                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                next_kwargs = next(expected_kwargs_iter, None)
                 self.assertEqual(
                     kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))
@@ -1820,7 +1820,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
@@ -2111,7 +2111,7 @@ title: Title
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
-        return python_utils.UNICODE(abs(hash(email)))
+        return str(abs(hash(email)))
 
     def get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
@@ -2127,10 +2127,9 @@ title: Title
                 filepath = os.path.relpath(
                     os.path.join(_dir, file_name), start=current_dir)
                 if (
-                        filepath.endswith('.py') and (
-                            filepath.startswith('core/') or
-                            filepath.startswith('extensions/')
-                        )
+                        filepath.endswith('.py') and
+                        filepath.startswith(('core/', 'extensions/')) and
+                        not filepath.startswith('core/tests')
                 ):
                     module = filepath[:-3].replace('/', '.')
                     files_in_directory.append(module)
@@ -2299,7 +2298,6 @@ title: Title
             self, url, data, headers=None, csrf_token=None,
             expected_status_int=200, upload_files=None, use_payload=True,
             source=None):
-
         """Post an object to the server by JSON; return the received object.
 
         Args:
@@ -2622,7 +2620,7 @@ title: Title
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
-                from_state, python_utils.NEXT(interaction_ids))
+                from_state, next(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
             if correctness_feedback_enabled:
                 from_state.interaction.default_outcome.labelled_as_correct = (
@@ -3371,8 +3369,7 @@ class LinterTestBase(GenericTestBase):
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
+            self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 

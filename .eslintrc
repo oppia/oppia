@@ -431,6 +431,7 @@
         "default": "array"
       }
     ],
+    "@typescript-eslint/consistent-type-assertions": ["error"],
     "@typescript-eslint/no-non-null-assertion": ["error"],
     "@typescript-eslint/no-non-null-asserted-optional-chain": ["error"],
     "@typescript-eslint/prefer-namespace-keyword": ["error"],
