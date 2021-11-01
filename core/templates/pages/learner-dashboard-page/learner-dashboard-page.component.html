@@ -1,5 +1,6 @@
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div class="oppia-learner-dashboard-container position-relative overflow-auto" [ngStyle]="windowIsNarrow && {'min-height': '85.5vh'}">
+<div [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
+     class="oppia-learner-dashboard-container position-relative overflow-auto">
   <div class="row oppia-row"
        [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
@@ -436,7 +437,6 @@
 
   .oppia-learner-dashboard-side-content {
     min-width: 241px;
-    padding-left: 100px;
     width: 20%;
   }
 
@@ -687,7 +687,6 @@
     font-weight: bold;
     margin-right: 14px;
     margin-top: 8px;
-    text-align: right;
   }
 
   /* The css below helps in using headroom.js for footer. */

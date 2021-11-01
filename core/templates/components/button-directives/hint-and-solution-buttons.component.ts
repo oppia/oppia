@@ -27,6 +27,7 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-hint-and-solution-buttons',
@@ -48,6 +49,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private statsReportingService: StatsReportingService
@@ -91,6 +93,10 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   resetLocalHintsArray(): void {
