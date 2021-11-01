@@ -30,6 +30,7 @@ import { AudioTranslationManagerService } from '../services/audio-translation-ma
 import { CurrentInteractionService } from '../services/current-interaction.service';
 import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
 import { SupplementalCardComponent } from './supplemental-card.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Supplemental card component', () => {
   let fixture: ComponentFixture<SupplementalCardComponent>;
@@ -41,6 +42,7 @@ describe('Supplemental card component', () => {
   let playerPositionService: PlayerPositionService;
   let urlInterpolationService: UrlInterpolationService;
   let windowRef: WindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockStateCard = new StateCard(
     'state_name', 'html', 'html', null, [], null,
     null, '', null);
@@ -86,6 +88,10 @@ describe('Supplemental card component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowRef = TestBed.inject(WindowRef);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
@@ -149,6 +155,10 @@ describe('Supplemental card component', () => {
     expect(componentInstance.helpCardHtml).toBeNull();
     expect(componentInstance.helpCardHasContinueButton).toBeFalse();
     expect(componentInstance.maxHelpCardHeightSeen).toEqual(0);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 
   it('should tell if help card is tall', () => {
