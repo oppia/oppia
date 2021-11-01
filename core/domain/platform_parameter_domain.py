@@ -16,8 +16,7 @@
 
 """Domain objects for platform parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 import re
@@ -551,8 +550,7 @@ class PlatformParameter:
 
     DATA_TYPE_PREDICATES_DICT = {
         DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: (
-            lambda x: isinstance(x, python_utils.BASESTRING)),
+        DATA_TYPES.string.value: lambda x: isinstance(x, str),
         DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
     }
 

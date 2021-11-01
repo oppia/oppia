@@ -16,8 +16,7 @@
 
 """Tests for learner progress domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import learner_progress_domain
 from core.tests import test_utils

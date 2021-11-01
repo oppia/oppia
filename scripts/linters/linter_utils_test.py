@@ -16,8 +16,7 @@
 
 """Unit tests for linter_utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import os
@@ -242,7 +241,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         def mock_print(*args):
             """Mock for python_utils.PRINT."""
-            self.log = ' '.join(python_utils.UNICODE(arg) for arg in args)
+            self.log = ' '.join(str(arg) for arg in args)
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
