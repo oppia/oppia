@@ -233,6 +233,24 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e)
 
 
+def yaml_from_dict(dictionary: Dict, width: int =80) -> str:
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    return yaml.dump(
+            dictionary,
+            allow_unicode=True,
+            width=width
+    )
+
+
 # Here obj has a recursive structure. The list element or dictionary value
 # could recursively be the same structure, hence we use Any as their types.
 def recursively_remove_key(

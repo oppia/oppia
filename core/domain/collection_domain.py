@@ -33,7 +33,6 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-import yaml
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -428,10 +427,7 @@ class Collection(python_utils.OBJECT):
         # YAML representation.
         del collection_dict['id']
 
-        return yaml.dump(
-            collection_dict,
-            allow_unicode=True,
-        )
+        return utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):

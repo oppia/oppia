@@ -63,7 +63,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
-import yaml
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -340,11 +339,7 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
         exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
-        exploration_dict[state] = yaml.dump(
-            exploration.states[state].to_dict(),
-            allow_unicode=True,
-            width=width
-        )
+        exploration_dict[state] = utils.yaml_from_dict(exploration.states[state].to_dict())
     return exploration_dict
 
 

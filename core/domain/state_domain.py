@@ -38,8 +38,6 @@ from core.domain import rules_registry
 from core.domain import translatable_object_registry
 from extensions.objects.models import objects
 
-import yaml
-
 
 class AnswerGroup(python_utils.OBJECT):
     """Value object for an answer group. Answer groups represent a set of rules
@@ -2696,11 +2694,7 @@ class State(python_utils.OBJECT):
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             python_utils.reraise_exception()
 
-        return yaml.dump(
-            state.to_dict(),
-            allow_unicode=True,
-            width=width
-        )
+        return utils.yaml_from_dict(state.to_dict())
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a

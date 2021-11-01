@@ -31,7 +31,6 @@ from core.constants import constants
 from core.tests import test_utils
 
 from typing import Any, Dict, List
-import yaml
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -67,9 +66,7 @@ class UtilsTests(test_utils.GenericTestBase):
         test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = yaml.dump(
-                adict, allow_unicode=True,
-            )
+            yaml_str = utils.yaml_from_dict(adict)
 
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)

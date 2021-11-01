@@ -527,22 +527,6 @@ def _recursively_convert_to_str(value):
     else:
         return value
 
-
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    dictionary = _recursively_convert_to_str(dictionary)
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
 def reraise_exception():
     """Reraise exception with complete stacktrace."""
     # TODO(#11547): This method can be replace by 'raise e' after we migrate
