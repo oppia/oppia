@@ -75,13 +75,13 @@
           </div>
           <br>
           <div *ngIf="!this.isMediumLevelExplanationValid(this.rubric.getDifficulty(), this.editableExplanations[this.rubric.getDifficulty()][idx])"
-                class="rubric-error-message">
-            There should be at least one explanation for the Medium rubric level.
+               class="rubric-error-message">
+            There should be at least one explanation for the Medium level rubric.
           </div>
           <div *ngIf="!this.isExplanationLengthValid(this.editableExplanations[this.rubric.getDifficulty()][idx])" class="rubric-error-message">
             Explanation length should be below 300 characters.
           </div>
-          <div class="oppia-card-content-limit-error" *ngIf="this.isTotalExplanationsLengthExceeded()">
+          <div class="oppia-card-content-limit-error" *ngIf="this.isTotalExplanationsLengthReached()">
             There can be total of 10 explanations considering all levels.
           </div>
         </div>
@@ -90,7 +90,7 @@
     <button class="btn add-explanation-button skill-editor-add-btn protractor-test-add-explanation-button-{{this.rubric.getDifficulty()}}"
             type="button"
             (click)="this.addExplanationForDifficulty(this.rubric.getDifficulty())"
-            [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.isTotalExplanationsLengthExceeded()">
+            [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.isTotalExplanationsLengthReached()">
       + ADD EXPLANATION FOR DIFFICULTY
     </button>
   </div>
