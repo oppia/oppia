@@ -25,8 +25,7 @@ TODO(#11475): Add lint checks that ensure all "jobs.transforms.*_audits" modules
 are imported into this file.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import auth_validation         # pylint: disable=unused-import  # isort: skip
