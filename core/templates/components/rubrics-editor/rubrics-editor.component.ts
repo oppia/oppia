@@ -113,11 +113,12 @@ export class RubricsEditorComponent {
   }
 
   isTotalExplanationsLengthExceeded(): boolean {
-    let totalEasyExplanations = this.rubrics[0]._explanations.length
-    let totalMediumExplanations = this.rubrics[1]._explanations.length
-    let totalHardExplanations = this.rubrics[2]._explanations.length
+    let totalEasyExplanations = this.rubrics[0]._explanations.length;
+    let totalMediumExplanations = this.rubrics[1]._explanations.length;
+    let totalHardExplanations = this.rubrics[2]._explanations.length;
 
-    return (totalEasyExplanations + totalMediumExplanations + totalHardExplanations >= 10)
+    return (totalEasyExplanations + totalMediumExplanations +
+      totalHardExplanations >= 10);
   }
 
   isExplanationLengthValid(data: string): boolean {

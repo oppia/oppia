@@ -75,7 +75,7 @@
           </div>
           <br>
           <div *ngIf="!this.isMediumLevelExplanationValid(this.rubric.getDifficulty(), this.editableExplanations[this.rubric.getDifficulty()][idx])"
-              class="rubric-error-message">
+                class="rubric-error-message">
             There should be at least one explanation for the Medium rubric level.
           </div>
           <div *ngIf="!this.isExplanationLengthValid(this.editableExplanations[this.rubric.getDifficulty()][idx])" class="rubric-error-message">
