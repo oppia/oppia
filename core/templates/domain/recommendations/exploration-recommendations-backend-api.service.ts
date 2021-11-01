@@ -30,6 +30,7 @@ import {
 // If we send these params always, the request URL would have something like
 // '?collection_id=null' and the backend would start looking for a collection
 // with id "null" which is not correct.
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type RecommendationsUrlParams = {
   'stringified_author_recommended_ids': string;
   'collection_id'?: string;
