@@ -16,8 +16,7 @@
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import os
@@ -449,7 +448,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 obj.func()
             except Exception as e:
                 self.assertIs(type(e), Exception)
-                self.assertEqual(python_utils.UNICODE(e), '')
+                self.assertEqual(str(e), '')
             else:
                 self.fail(msg='obj.func() did not raise an Exception')
 
