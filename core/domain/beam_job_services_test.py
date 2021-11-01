@@ -16,8 +16,7 @@
 
 """Unit tests for core.domain.beam_job_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import itertools
 
@@ -60,7 +59,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(BeamJobRunServicesTests, self).setUp()
-        self._id_iter = (python_utils.UNICODE(i) for i in itertools.count())
+        self._id_iter = (str(i) for i in itertools.count())
 
     def create_beam_job_run_model(
         self, dataflow_job_id: str = 'abc',

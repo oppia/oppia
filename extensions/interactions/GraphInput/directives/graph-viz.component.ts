@@ -39,6 +39,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UtilsService } from 'services/utils.service';
 import { EdgeCentre, GraphDetailService } from './graph-detail.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const debounce = (delay: number = 5): MethodDecorator => {
   return function(
@@ -136,6 +137,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     private element: ElementRef,
     private focusManagerService: FocusManagerService,
     private graphDetailService: GraphDetailService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private utilsService: UtilsService
   ) {}
@@ -206,6 +208,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     } else {
       return this.DEFAULT_COLOR;
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getVertexColor(index: number): string {
