@@ -17,28 +17,10 @@
 """Domain objects for Takeout."""
 
 from __future__ import absolute_import
+from __future__ import annotations
 from __future__ import unicode_literals
 
 from typing import Dict, List, Tuple
-
-
-class TakeoutImage:
-    """Domain object for storing Base64 image data and the Takeout export path
-    for a single image.
-    """
-
-    def __init__(
-        self, b64_image_data: str, image_export_path: str
-    ) -> None:
-        """Constructs a TakeoutImage domain object.
-
-        Args:
-            b64_image_data: str. A Base64-encoded string representing the image.
-            image_export_path: str. The path within the images/ folder to write
-                image to in the final Takeout zip.
-        """
-        self.b64_image_data = b64_image_data
-        self.image_export_path = image_export_path
 
 
 class TakeoutData:
@@ -58,6 +40,25 @@ class TakeoutData:
         """
         self.user_data = user_data
         self.user_images = user_images
+
+
+class TakeoutImage:
+    """Domain object for storing Base64 image data and the Takeout export path
+    for a single image.
+    """
+
+    def __init__(
+        self, b64_image_data: str, image_export_path: str
+    ) -> None:
+        """Constructs a TakeoutImage domain object.
+
+        Args:
+            b64_image_data: str. A Base64-encoded string representing the image.
+            image_export_path: str. The path within the images/ folder to write
+                image to in the final Takeout zip.
+        """
+        self.b64_image_data = b64_image_data
+        self.image_export_path = image_export_path
 
 
 class TakeoutImageReplacementInstruction:

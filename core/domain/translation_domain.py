@@ -58,11 +58,7 @@ class MachineTranslation:
             ValidationError. One or more attributes of the MachineTranslation
                 are invalid.
         """
-        if not isinstance(self.source_language_code, str):
-            raise utils.ValidationError(
-                'Expected source_language_code to be a string, received %s' %
-                self.source_language_code
-            )
+
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
         if not utils.is_supported_audio_language_code(
@@ -73,11 +69,6 @@ class MachineTranslation:
             raise utils.ValidationError(
                 'Invalid source language code: %s' % self.source_language_code)
 
-        if not isinstance(self.target_language_code, str):
-            raise utils.ValidationError(
-                'Expected target_language_code to be a string, received %s' %
-                self.target_language_code
-            )
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
         if not utils.is_supported_audio_language_code(
@@ -94,18 +85,6 @@ class MachineTranslation:
                     'Expected source_language_code to be different from '
                     'target_language_code: "%s" = "%s"') % (
                         self.source_language_code, self.target_language_code))
-
-        if not isinstance(self.source_text, str):
-            raise utils.ValidationError(
-                'Expected source_text to be a string, received %s' %
-                self.source_text
-            )
-
-        if not isinstance(self.translated_text, str):
-            raise utils.ValidationError(
-                'Expected translated_text to be a string, received %s' %
-                self.translated_text
-            )
 
     def to_dict(self) -> Dict[str, str]:
         """Converts the MachineTranslation domain instance into a dictionary
