@@ -20,6 +20,8 @@ from __future__ import unicode_literals
 from core import utils
 from core.platform import models
 
+from typing import Dict, Optional
+
 USER_DELETION_SUCCESS = 'SUCCESS'
 USER_DELETION_ALREADY_DONE = 'ALREADY DONE'
 
@@ -33,11 +35,12 @@ class PendingDeletionRequest:
 
     def __init__(
             self,
-            user_id,
-            email,
-            normalized_long_term_username,
-            deletion_complete,
-            pseudonymizable_entity_mappings):
+            user_id: str,
+            email: str,
+            normalized_long_term_username: Optional[str],
+            deletion_complete: bool,
+            pseudonymizable_entity_mappings: Dict[str, Dict[str, str]]
+    ) -> None:
         """Constructs a PendingDeletionRequest domain object.
 
         Args:
@@ -59,7 +62,11 @@ class PendingDeletionRequest:
 
     @classmethod
     def create_default(
-            cls, user_id, email, normalized_long_term_username=None):
+            cls,
+            user_id: str,
+            email: str,
+            normalized_long_term_username: Optional[str] = None
+    ) -> 'PendingDeletionRequest':
         """Creates a PendingDeletionRequest object with default values.
 
         Args:
@@ -77,7 +84,7 @@ class PendingDeletionRequest:
         return cls(
             user_id, email, normalized_long_term_username, False, {})
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that the domain object is valid.
 
         Raises:
