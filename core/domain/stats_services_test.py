@@ -16,8 +16,7 @@
 
 """Unit tests for core.domain.stats_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
@@ -954,7 +953,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
-            for _ in python_utils.RANGE(num_times_answered_incorrectly))
+            for _ in range(num_times_answered_incorrectly))
         actions.append({
             'action_type': 'ExplorationQuit',
             'action_customization_args': {
@@ -1939,7 +1938,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, python_utils.UNICODE(self.exploration.version),
+            self.exploration.id, str(self.exploration.version),
             self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 

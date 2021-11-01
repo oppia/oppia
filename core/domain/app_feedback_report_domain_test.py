@@ -16,8 +16,7 @@
 
 """Tests for app feedback reporting domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -1198,9 +1197,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'The ticket name should be a string')
 
     def test_validation_ticket_name_too_long_fails(self) -> None:
-        long_name = 'too long'
-        for _ in python_utils.RANGE(constants.MAXIMUM_TICKET_NAME_LENGTH):
-            long_name += 'x'
+        long_name = 'too long' + 'x' * constants.MAXIMUM_TICKET_NAME_LENGTH
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(
             self.ticket_obj,
@@ -1315,7 +1312,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             ),
             'android_sdk_version': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1})
+                    str(ANDROID_SDK_VERSION): 1})
             ),
             'version_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -1344,8 +1341,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
                 'audio_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
-                'android_sdk_version': {
-                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1},
+                'android_sdk_version': {str(ANDROID_SDK_VERSION): 1},
                 'version_name': {ANDROID_PLATFORM_VERSION: 1}
             }
         }

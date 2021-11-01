@@ -16,20 +16,34 @@
  * @fileoverview Component for the completion graph of the improvements tab.
  */
 
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 
-angular.module('oppia').component('completionGraph', {
-  bindings: { completionRate: '<' },
-  template: require('./completion-graph.component.html'),
-  controller: function() {
-    this.$onInit = () => {
-      this.completionBarStyle = {
-        'stroke-dasharray': ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH,
-        'stroke-dashoffset': (
-          (1.0 - this.completionRate) *
-          ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH),
-      };
+@Component({
+  selector: 'oppia-completion-graph',
+  templateUrl: './completion-graph.component.html',
+})
+export class CompletionGraphComponent implements OnInit {
+  @Input() completionRate: number;
+  completionBarStyle: {
+    'stroke-dasharray': number;
+    'stroke-dashoffset': number;
+  };
+
+  constructor() {}
+
+  ngOnInit(): void {
+    this.completionBarStyle = {
+      'stroke-dasharray': ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH,
+      'stroke-dashoffset': (
+        (1.0 - this.completionRate) *
+        ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH),
     };
-  },
-});
+  }
+}
+
+angular.module('oppia').directive('oppiaCompletionGraph',
+  downgradeComponent({
+    component: CompletionGraphComponent
+  }) as angular.IDirectiveFactory);

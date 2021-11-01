@@ -16,8 +16,7 @@
 
 """Utility methods for docstring checking."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import ast
 import os
@@ -217,7 +216,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     ), flags=re.X | re.S | re.M)
 
 
-class ASTDocStringChecker(python_utils.OBJECT):
+class ASTDocStringChecker:
     """Checks that docstrings meet the code style."""
 
     def __init__(self):

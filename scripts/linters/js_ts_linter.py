@@ -16,8 +16,7 @@
 
 """Lint checks for Js and Ts files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import os
@@ -25,8 +24,6 @@ import re
 import shutil
 import subprocess
 import sys
-
-from core import python_utils
 
 from .. import common
 from .. import concurrent_task_utils
@@ -144,7 +141,7 @@ def compile_all_ts_files():
     subprocess.call(cmd, stdout=subprocess.PIPE, shell=True)
 
 
-class JsTsLintChecksManager(python_utils.OBJECT):
+class JsTsLintChecksManager:
     """Manages all the Js and Ts linting functions."""
 
     def __init__(self, js_files, ts_files, file_cache):
@@ -443,7 +440,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return linter_stdout
 
 
-class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
+class ThirdPartyJsTsLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint):

@@ -14,8 +14,7 @@
 
 """Registry for typed objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import inspect
@@ -26,7 +25,7 @@ from core import python_utils
 from extensions.objects.models import objects
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all objects."""
 
     # Dict mapping object class names to their classes.

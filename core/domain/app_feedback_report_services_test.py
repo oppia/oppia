@@ -16,13 +16,11 @@
 
 """Tests for services that operate on app feedback reports."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
@@ -145,7 +143,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER.name: 1},
         'text_language_code': {TEXT_LANGUAGE_CODE_ENGLISH: 1},
         'audio_language_code': {AUDIO_LANGUAGE_CODE_ENGLISH: 1},
-        'android_sdk_version': {python_utils.UNICODE(ANDROID_SDK_VERSION): 1},
+        'android_sdk_version': {str(ANDROID_SDK_VERSION): 1},
         'version_name': {ANDROID_PLATFORM_VERSION: 1}
     }
 
@@ -503,7 +501,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     {self.AUDIO_LANGUAGE_CODE_ENGLISH: 1})),
             'android_sdk_version': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {python_utils.UNICODE(self.ANDROID_SDK_VERSION): 1})),
+                    {str(self.ANDROID_SDK_VERSION): 1})),
             'version_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts(
                     {self.ANDROID_PLATFORM_VERSION: 1}))
@@ -629,7 +627,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
             constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
-                python_utils.UNICODE(self.ANDROID_SDK_VERSION): 2
+                str(self.ANDROID_SDK_VERSION): 2
             },
             constants.STATS_PARAMETER_NAMES.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
@@ -679,7 +677,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
             constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
-                python_utils.UNICODE(self.ANDROID_SDK_VERSION): 2
+                str(self.ANDROID_SDK_VERSION): 2
             },
             constants.STATS_PARAMETER_NAMES.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
@@ -897,7 +895,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
             },
             constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
-                python_utils.UNICODE(self.ANDROID_SDK_VERSION): 1
+                str(self.ANDROID_SDK_VERSION): 1
             },
             constants.STATS_PARAMETER_NAMES.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 1
@@ -958,7 +956,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
             constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
-                python_utils.UNICODE(self.ANDROID_SDK_VERSION): 0
+                str(self.ANDROID_SDK_VERSION): 0
             },
             constants.STATS_PARAMETER_NAMES.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
@@ -1011,7 +1009,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
             constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
-                python_utils.UNICODE(self.ANDROID_SDK_VERSION): 0
+                str(self.ANDROID_SDK_VERSION): 0
             },
             constants.STATS_PARAMETER_NAMES.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
@@ -1062,7 +1060,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_obj, self.android_ticket_obj)
         older_timestamp = (
             self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=1))
-        for i in python_utils.RANGE(1, 4):
+        for i in range(1, 4):
             # Set timestamps in increasing timestamp order so that the test will
             # iterate through them all and reassign the latest timestamp.
             temp_timestamp = (

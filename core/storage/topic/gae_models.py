@@ -16,11 +16,9 @@
 
 """Models for topics and related constructs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.platform import models
 
@@ -217,7 +215,7 @@ class TopicModel(base_models.VersionedModel):
         topic_commit_log_entry.put()
 
     @classmethod
-    def get_by_name(cls, topic_name: str) -> Optional['TopicModel']:
+    def get_by_name(cls, topic_name: str) -> Optional[TopicModel]:
         """Gets TopicModel by topic_name. Returns None if the topic with
         name topic_name doesn't exist.
 
@@ -233,7 +231,7 @@ class TopicModel(base_models.VersionedModel):
         ).get()
 
     @classmethod
-    def get_by_url_fragment(cls, url_fragment: str) -> Optional['TopicModel']:
+    def get_by_url_fragment(cls, url_fragment: str) -> Optional[TopicModel]:
         """Gets TopicModel by url_fragment. Returns None if the topic with
         name url_fragment doesn't exist.
 
@@ -461,7 +459,7 @@ class TopicRightsModel(base_models.VersionedModel):
         ).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_user(cls, user_id: str) -> Sequence['TopicRightsModel']:
+    def get_by_user(cls, user_id: str) -> Sequence[TopicRightsModel]:
         """Retrieves the rights object for all topics assigned to given user
 
         Args:
@@ -530,7 +528,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = python_utils.NEXT(
+            user_id_attribute_names = next(
                 cmd['user_id_attribute_names']
                 for cmd in feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
                 if cmd['name'] == commit_cmd['cmd']

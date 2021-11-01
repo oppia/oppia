@@ -50,13 +50,13 @@ describe('Exploration stats backend api service', () => {
       num_completions: 0,
       state_stats_mapping: {
         Introduction: (
-          <StateStatsBackendDict>{
+          {
             total_answers_count: 0,
             useful_feedback_count: 0,
             total_hit_count: 0,
             first_hit_count: 0,
             num_completions: 0,
-          }),
+          } as StateStatsBackendDict),
       },
     };
     let explorationStats: ExplorationStats = (

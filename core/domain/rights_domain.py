@@ -14,8 +14,7 @@
 
 """Domain objects for rights for various user actions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core import python_utils
@@ -51,7 +50,7 @@ DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
 DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
 
 
-class ActivityRights(python_utils.OBJECT):
+class ActivityRights:
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """

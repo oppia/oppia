@@ -27,8 +27,7 @@ On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import collections
@@ -71,7 +70,7 @@ STRICT_TYPESCRIPT_CHECKS_CMDS = [
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
-class ChangedBranch(python_utils.OBJECT):
+class ChangedBranch:
     """Context manager class that changes branch when there are modified files
     that need to be linted. It does not change branch when modified files are
     not committed.

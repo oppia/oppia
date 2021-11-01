@@ -16,8 +16,7 @@
 
 """Registry for interactions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import importlib
 import itertools
@@ -29,7 +28,7 @@ from core import python_utils
 from core.constants import constants
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all interactions."""
 
     # Dict mapping interaction ids to instances of the interactions.
