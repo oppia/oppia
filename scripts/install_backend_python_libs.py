@@ -14,8 +14,7 @@
 
 """Installation script for Oppia python backend libraries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import json
@@ -298,21 +297,12 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.UNICODE(requirements_version)
-            )
+            _install_library(normalized_library_name, str(requirements_version))
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.UNICODE(requirements_version)
-            )
-            _remove_metadata(
-                normalized_library_name,
-                python_utils.UNICODE(directory_version)
-            )
+            _install_library(normalized_library_name, str(requirements_version))
+            _remove_metadata(normalized_library_name, str(directory_version))
 
 
 def _is_git_url_mismatch(mismatch_item):
