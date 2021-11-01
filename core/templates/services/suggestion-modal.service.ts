@@ -44,17 +44,71 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
+  /**
+   * @param {object} $uibModalInstance - An IModalServiceInstance object which
+   * includes the following methods and properties.
+   * - close: a method that can be used to close a modal.
+   * - dismiss: a method that can be used to dismiss a modal.
+   * - result: a promise that is resolved when a modal is closed and rejected
+   *    when a modal is dismissed.
+   * - opened: a promise that is resolved when a modal gets opened after
+   *    downloading content's template and resolving all variables.
+   * - rendered: a promise that is resolved when a modal is rendered.
+   * - closed: a promise that is resolved when a modal is closed and the
+   *    animation completes.
+   * @param {object} paramDict - A ParamDict object which includes the
+   * the follwing keys:
+   * - action: action of the suggestion.
+   * - audioUpdateRequired: whether audio files exist for the content
+   *    being replace.
+   * - commitMessage: commit message for the suggestion.
+   * - reviewMessage: review message for the suggestion.
+   */
   acceptSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
       paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
+  /**
+   * @param {object} $uibModalInstance - An IModalServiceInstance object which
+   * includes the following methods and properties.
+   * - close: a method that can be used to close a modal.
+   * - dismiss: a method that can be used to dismiss a modal.
+   * - result: a promise that is resolved when a modal is closed and rejected
+   *    when a modal is dismissed.
+   * - opened: a promise that is resolved when a modal gets opened after
+   *    downloading content's template and resolving all variables.
+   * - rendered: a promise that is resolved when a modal is rendered.
+   * - closed: a promise that is resolved when a modal is closed and the
+   *    animation completes.
+   * @param {object} paramDict - A ParamDict object which includes the
+   * the follwing keys:
+   * - action: action of the suggestion.
+   * - audioUpdateRequired: whether audio files exist for the content
+   *    being replace.
+   * - commitMessage: commit message for the suggestion.
+   * - reviewMessage: review message for the suggestion.
+   */
   rejectSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
       paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
+
+  /**
+   * @param {object} $uibModalInstance - An IModalServiceInstance object which
+   * includes the following methods and properties.
+   * - close: a method that can be used to close a modal.
+   * - dismiss: a method that can be used to dismiss a modal.
+   * - result: a promise that is resolved when a modal is closed and rejected
+   *    when a modal is dismissed.
+   * - opened: a promise that is resolved when a modal gets opened after
+   *    downloading content's template and resolving all variables.
+   * - rendered: a promise that is resolved when a modal is rendered.
+   * - closed: a promise that is resolved when a modal is closed and the
+   *    animation completes.
+   */
   cancelSuggestion(
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
     $uibModalInstance.dismiss('cancel');
