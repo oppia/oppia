@@ -21,26 +21,13 @@
       </div>
       <div class="oppia-suggestion-review-panel">
         <ul ng-if="isSetOfStringsContent">
-          <li ng-repeat="item in contentHtml track by $index">
+          <li ng-repeat="item in displayExplorationContent() track by $index">
             <[item]>
           </li>
         </ul>
         <angular-html-bind ng-if="!isSetOfStringsContent"
-                           html-data="contentHtml">
+                           html-data="displayExplorationContent()">
         </angular-html-bind>
-        <div ng-if="hasExplorationContentChanged()">
-          <p class="oppia-suggestion-review-panel-exploration-change-note">
-            <strong>NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The current content is:</strong>
-          </p>
-          <ul ng-if="isSetOfStringsContent">
-            <li ng-repeat="item in explorationContentHtml track by $index">
-              <[item]>
-            </li>
-          </ul>
-          <angular-html-bind ng-if="!isSetOfStringsContent"
-                             html-data="explorationContentHtml">
-          </angular-html-bind>
-        </div>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
@@ -69,6 +56,21 @@
           <button class="btn btn-success" ng-if="startedEditing" ng-click="updateSuggestion()">Update</button>
         </div>
       </div>
+    </div>
+  </section>
+  <section class="oppia-suggestion-review-exploration-change" ng-if="hasExplorationContentChanged()">
+    <p class="oppia-suggestion-review-exploration-change-note">
+      <strong>NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The original content at the time of submission was:</strong>
+    </p>
+    <div class="oppia-suggestion-review-panel">
+      <ul ng-if="isSetOfStringsContent">
+        <li ng-repeat="item in contentHtml track by $index">
+          <[item]>
+        </li>
+      </ul>
+      <angular-html-bind ng-if="!isSetOfStringsContent"
+                         html-data="contentHtml">
+      </angular-html-bind>
     </div>
   </section>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
@@ -110,8 +112,7 @@
   .oppia-suggestion-review-panel {
     border: 1px solid #ccc;
     height: 88%;
-    padding-left: 10px;
-    padding-top: 10px;
+    padding: 10px 0 10px 10px;
   }
   .oppia-suggestion-review-message {
     margin-left: 10px;
@@ -123,7 +124,10 @@
   .oppia-suggestion-review-panel-header-container {
     height: 12%;
   }
-  .oppia-suggestion-review-panel-exploration-change-note {
+  .oppia-suggestion-review-exploration-change {
+    padding: 0 10px;
+  }
+  .oppia-suggestion-review-exploration-change-note {
     margin-top: 18px;
   }
   .oppia-translation-review-edit-buttons {

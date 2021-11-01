@@ -175,6 +175,17 @@ why they need to be overriden.  */
   min-width: 55px;
 }
 
+.oppia-length-validation-error {
+  align-items: center;
+  background-color: #f8d7da;
+  border: 0.0625rem solid #dc3545;
+  border-radius: 0.25rem;
+  color: #dc3545;
+  display: flex;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
 .md-button.oppia-learner-confirm-button,
 .mat-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
@@ -891,6 +902,7 @@ textarea {
   list-style: none;
   margin-bottom: 0;
   padding-left: 0;
+  padding-right: 0;
 }
 
 .nav > li {
@@ -918,6 +930,7 @@ textarea {
   left: auto;
   right: 0;
 }
+
 .dropdown-item.active, .dropdown-item:active {
   background-color: transparent;
 }

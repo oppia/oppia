@@ -34,6 +34,7 @@ import { LazyLoadingComponent } from 'components/common-layout-directives/common
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { EventEmitter } from '@angular/core';
 
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -54,6 +55,7 @@ describe('Translation opportunities component', () => {
   );
 
   let opportunitiesArray: ExplorationOpportunitySummary[] = [];
+  let activeLanguageChangedEmitter = new EventEmitter();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -86,6 +88,8 @@ describe('Translation opportunities component', () => {
     userService = TestBed.inject(UserService);
     modalService = TestBed.inject(NgbModal);
     spyOn(modalService, 'open').and.returnValue(translationModal);
+    spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
+      .returnValue(activeLanguageChangedEmitter);
   });
 
   afterEach(() => {
@@ -93,9 +97,6 @@ describe('Translation opportunities component', () => {
   });
 
   beforeEach(() => {
-    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      'en');
-
     opportunitiesArray = [
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '1',
@@ -131,6 +132,8 @@ describe('Translation opportunities component', () => {
   });
 
   it('should load translation opportunities', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
       .resolveTo({
@@ -145,6 +148,8 @@ describe('Translation opportunities component', () => {
   });
 
   it('should load more translation opportunities', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
       .resolveTo({
@@ -171,6 +176,8 @@ describe('Translation opportunities component', () => {
   });
 
   it('should open translation modal when clicking button', fakeAsync(() => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
@@ -187,6 +194,9 @@ describe('Translation opportunities component', () => {
 
   it('should not open translation modal when user is not logged', fakeAsync(
     () => {
+      spyOn(
+        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+        'en');
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
       spyOn(
         contributionOpportunitiesService,
@@ -203,5 +213,32 @@ describe('Translation opportunities component', () => {
       tick();
 
       expect(modalService.open).not.toHaveBeenCalled();
+    }));
+
+  it('should not show translation opportunities when language is not ' +
+    'selected', fakeAsync(() => {
+    spyOn(
+      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      null);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
+    expect(component.languageSelected).toBe(false);
+
+    component.ngOnInit();
+
+    expect(component.languageSelected).toBe(false);
+  }));
+
+  it('should show translation opportunities when language is changed'
+    , fakeAsync(() => {
+      spyOn(
+        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+        null);
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
+      component.ngOnInit();
+      expect(component.languageSelected).toBe(false);
+
+      activeLanguageChangedEmitter.emit();
+
+      expect(component.languageSelected).toBe(true);
     }));
 });

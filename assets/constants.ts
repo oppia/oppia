@@ -75,6 +75,8 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  "RTL_LANGUAGE_CODES": ["ar"],
+
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
     "topic": ["#C6DCDA"],
