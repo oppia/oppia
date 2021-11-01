@@ -16,15 +16,13 @@
 
 """Services for executing Apache Beam jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import logging
 import pprint
 
 from core import feconf
-from core import python_utils
 from core.domain import beam_job_services
 from core.jobs import base_jobs
 from core.jobs import job_options
@@ -236,7 +234,7 @@ def _job_bookkeeping_context(
 
     except Exception as exception:
         run_model.latest_job_state = beam_job_models.BeamJobState.FAILED.value
-        _put_job_stderr(run_model.id, python_utils.UNICODE(exception))
+        _put_job_stderr(run_model.id, str(exception))
 
     finally:
         run_model.put()
