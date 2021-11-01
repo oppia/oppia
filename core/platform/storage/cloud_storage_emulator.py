@@ -16,16 +16,13 @@
 
 """An emulator that mocks the core.platform.storage API."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import annotations  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import mimetypes
 
 from core import feconf
 
 import redis
-
 from typing import Dict, List, Mapping, Optional, Union
 
 
