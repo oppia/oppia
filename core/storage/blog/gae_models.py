@@ -16,8 +16,7 @@
 
 """Models for storing data related to blog posts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import utils
 from core.platform import models

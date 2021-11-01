@@ -16,8 +16,7 @@
 
 """Models relating to configuration properties and platform parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
@@ -144,11 +143,11 @@ class PlatformParameterModel(base_models.VersionedModel):
     # remove Any from type-annotation below.
     @classmethod
     def create(
-            cls,
-            param_name: str,
-            rule_dicts: List[Dict[str, Any]],
-            rule_schema_version: int
-    ) -> 'PlatformParameterModel':
+        cls,
+        param_name: str,
+        rule_dicts: List[Dict[str, Any]],
+        rule_schema_version: int
+    ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
         Args:

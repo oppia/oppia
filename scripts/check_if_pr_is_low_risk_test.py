@@ -14,8 +14,7 @@
 
 """Unit tests for scripts/check_if_pr_is_low_risk.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import python_utils
 from core.tests import test_utils

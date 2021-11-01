@@ -18,8 +18,7 @@
 python_linter_test. This file contain non alphabetical import order.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse  # pylint: disable=unused-import
 import fnmatch  # pylint: disable=unused-import

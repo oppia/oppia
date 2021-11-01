@@ -16,8 +16,7 @@
 
 """Models for Oppia users."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform import models
 
@@ -96,7 +95,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             language_code: str,
             topic_name: str
     ) -> Tuple[
-        Sequence['ExplorationOpportunitySummaryModel'], Optional[str], bool
+        Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
         """Returns a list of opportunities available for translation in a
         specific language.
@@ -164,12 +163,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_voiceover_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            language_code: str
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        language_code: str
     ) -> Tuple[
-        Sequence['ExplorationOpportunitySummaryModel'], Optional[str], bool
+        Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
         """Returns a list of opportunities available for voiceover in a
         specific language.
@@ -225,9 +224,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_by_topic(
-            cls,
-            topic_id: str
-    ) -> Sequence['ExplorationOpportunitySummaryModel']:
+        cls, topic_id: str
+    ) -> Sequence[ExplorationOpportunitySummaryModel]:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
@@ -283,10 +281,8 @@ class SkillOpportunityModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_skill_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[Sequence['SkillOpportunityModel'], Optional[str], bool]:
+        cls, page_size: int, urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:

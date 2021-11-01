@@ -18,8 +18,7 @@ Google Cloud Dataflow workers (Apache Beam).
 The package is built by running 'python setup.py sdist' in the build.py.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 

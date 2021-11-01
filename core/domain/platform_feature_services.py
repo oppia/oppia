@@ -30,8 +30,7 @@ For more details of the usage of these two methods, please refer their
 docstrings in this file.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import platform_feature_list
 from core.constants import constants

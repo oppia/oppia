@@ -17,8 +17,7 @@ app. This file should only contain validations which affect UI display and
 general functionality on Android.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 

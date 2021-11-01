@@ -16,8 +16,7 @@
 
 """Tests for dev_mode_cloud_translate_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform.translate import dev_mode_translate_services
 from core.tests import test_utils

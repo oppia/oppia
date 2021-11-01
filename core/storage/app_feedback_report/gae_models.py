@@ -14,8 +14,7 @@
 
 """Models for Oppia feedback reports from both Android and web."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -288,7 +287,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unscrubbed_expiring_report_models(
-            cls) -> Sequence['AppFeedbackReportModel']:
+        cls
+    ) -> Sequence[AppFeedbackReportModel]:
         """Fetches the reports that are past their 90-days in storage and must
         be scrubbed.
 
@@ -302,9 +302,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
         # the latter throws "Cannot filter a non-Node argument; received False".
-        report_models: Sequence['AppFeedbackReportModel'] = cls.query(
+        report_models: Sequence[AppFeedbackReportModel] = cls.query(
             cls.created_on < datetime_before_which_to_scrub,
-            cls.scrubbed_by == None).fetch()  # pylint: disable=singleton-comparison
+            cls.scrubbed_by == None  # pylint: disable=singleton-comparison
+        ).fetch()
         return report_models
 
     @classmethod
@@ -696,8 +697,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_stats_for_ticket(
-            cls, ticket_id: str
-    ) -> Sequence['AppFeedbackReportStatsModel']:
+        cls, ticket_id: str
+    ) -> Sequence[AppFeedbackReportStatsModel]:
         """Fetches the stats for a single ticket.
 
         Args:

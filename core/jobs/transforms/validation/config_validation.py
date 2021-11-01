@@ -16,8 +16,7 @@
 
 """Beam DoFns and PTransforms to provide validation of config models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import config_domain
 from core.domain import platform_parameter_domain as parameter_domain

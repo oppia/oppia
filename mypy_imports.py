@@ -21,8 +21,7 @@ which uses storage models and platform services. This file will be imported only
 in mypy checks not during runtime.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)

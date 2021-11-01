@@ -19,8 +19,7 @@ called with a URL to a PR, this script exits with code 0 if and only if
 the PR is low-risk. Otherwise, the exit code is nonzero.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import json

@@ -19,8 +19,7 @@ Unless the strings are explicitly wrapped with b'', they would denote unicode,
 otherwise str.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import sys

@@ -16,8 +16,7 @@
 
 """Tests for the Firebase Authentication platform services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import datetime
@@ -224,7 +223,7 @@ class FirebaseAdminSdkStub:
 
     def delete_users(
             self, uids: List[str], force_delete: bool = False
-    ) -> 'firebase_auth.BatchDeleteAccountsResponse':
+    ) -> firebase_auth.BatchDeleteAccountsResponse:
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -646,8 +645,8 @@ class FirebaseAdminSdkStub:
             itertools.cycle(individual_error_pattern))
 
         def mock_delete_users(
-                uids: List[str], force_delete: bool = False
-        ) -> 'firebase_auth.BatchDeleteAccountsResponse':
+            uids: List[str], force_delete: bool = False
+        ) -> firebase_auth.BatchDeleteAccountsResponse:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
@@ -828,8 +827,8 @@ class FirebaseAdminSdkStub:
         return page
 
     def _create_delete_users_result_fragile(
-            self, errors: List[Tuple[int, str]]
-    ) -> 'firebase_auth.BatchDeleteAccountsResponse':
+        self, errors: List[Tuple[int, str]]
+    ) -> firebase_auth.BatchDeleteAccountsResponse:
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
 
@@ -939,8 +938,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         super(FirebaseAuthServicesTestBase, self).tearDown()
 
     def capture_logging(
-            self, min_level: int = logging.INFO
-    ) -> 'contextlib._GeneratorContextManager[List[str]]':
+        self, min_level: int = logging.INFO
+    ) -> contextlib._GeneratorContextManager[List[str]]:
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.

@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/linters/python_linter.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import multiprocessing
 import os
@@ -117,8 +116,9 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
     def test_pycodestyle_with_error_message(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
+        print(lint_task_report.trimmed_messages)
         self.assert_same_list_elements(
-            ['25:1: E302 expected 2 blank lines, found 1'],
+            ['24:1: E302 expected 2 blank lines, found 1'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

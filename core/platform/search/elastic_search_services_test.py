@@ -16,8 +16,7 @@
 
 """Tests for the python elastic search wrapper."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform.search import elastic_search_services
 from core.tests import test_utils

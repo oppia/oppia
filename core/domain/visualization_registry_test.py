@@ -16,8 +16,7 @@
 
 """Tests for methods in the visualization registry."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import importlib
 import inspect

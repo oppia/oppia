@@ -16,8 +16,7 @@
 
 """Constants used for app feedback reporting."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core import python_utils
 from core.platform import models

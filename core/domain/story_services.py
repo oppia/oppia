@@ -20,8 +20,7 @@ delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import logging

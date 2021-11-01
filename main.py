@@ -14,8 +14,7 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
@@ -993,9 +992,9 @@ class NdbWsgiMiddleware:
         self.wsgi_app = wsgi_app
 
     def __call__(
-            self,
-            environ: Dict[str, str],
-            start_response: webapp2.Response
+        self,
+        environ: Dict[str, str],
+        start_response: webapp2.Response
     ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]

@@ -16,8 +16,7 @@
 
 """Tests for cloud_translate_emulator."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform.translate import cloud_translate_emulator
 from core.tests import test_utils

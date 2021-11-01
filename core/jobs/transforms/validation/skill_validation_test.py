@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.transforms.skill_validation."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.transforms.validation import skill_validation

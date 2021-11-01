@@ -22,8 +22,7 @@ Therefore, in order to allow continued execution after the requirements
 file is generated, we must call the CLI in a separate process.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re

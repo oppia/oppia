@@ -21,8 +21,7 @@ This emulator is an extension of the emulator from this github page:
 https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime  # pylint: disable=unused-import
 import threading
