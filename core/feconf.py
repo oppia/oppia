@@ -207,7 +207,8 @@ DEFAULT_CLASSIFIER_LABEL = '_default'
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
-# The maximum number of results to retrieve in a datastore query.
+# The maximum number of results to retrieve in a datastore query
+# for suggestions.
 DEFAULT_SUGGESTION_QUERY_LIMIT = 100
 
 # The maximum number of results to retrieve in a datastore query
