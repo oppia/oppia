@@ -7,6 +7,13 @@
         "url": "https://github.com/oppia/oppia-ml-proto/archive/0.0.0.zip",
         "rootDirPrefix": "oppia-ml-proto-",
         "targetDirPrefix": "oppia-ml-proto-"
+      },
+      "oppiaAndroidProto": {
+        "version": "",
+        "downloadFormat": "zip",
+        "url": "https://github.com/oppia/oppia-proto-api/archive/refs/heads/introduce-proto-api-v1.zip",
+        "rootDirPrefix": "oppia-proto-api-introduce-proto-api-v1",
+        "targetDirPrefix": "oppia-proto-api-introduce-proto-api-v1"
       }
     },
     "frontend": {

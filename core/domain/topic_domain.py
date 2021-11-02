@@ -32,6 +32,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
+from proto_files.org.proto.v1.structure import topic_summary_pb2
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -495,7 +496,7 @@ class Topic:
             subtopics, subtopic_schema_version, next_subtopic_id,
             language_code, version, story_reference_schema_version,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web, created_on=None, last_updated=None):
+            page_title_fragment_for_web, proto_size_in_bytes=0, created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -532,6 +533,7 @@ class Topic:
             practice_tab_is_displayed: bool. Whether the practice tab is shown.
             page_title_fragment_for_web: str. The page title fragment in the
                 topic viewer page.
+            proto_size_in_bytes: int. Proto size of topic.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -560,6 +562,7 @@ class Topic:
         self.meta_tag_content = meta_tag_content
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -596,8 +599,13 @@ class Topic:
                 self.story_reference_schema_version),
             'meta_tag_content': self.meta_tag_content,
             'practice_tab_is_displayed': self.practice_tab_is_displayed,
-            'page_title_fragment_for_web': self.page_title_fragment_for_web
+            'page_title_fragment_for_web': self.page_title_fragment_for_web,
+            'proto_size_in_bytes': self.proto_size_in_bytes
         }
+
+    def to_proto():
+
+
 
     def serialize(self):
         """Returns the object serialized as a JSON string.
@@ -672,6 +680,7 @@ class Topic:
             topic_dict['meta_tag_content'],
             topic_dict['practice_tab_is_displayed'],
             topic_dict['page_title_fragment_for_web'],
+            topic_dict['proto_size_in_bytes',]
             topic_created_on,
             topic_last_updated)
 
@@ -1130,6 +1139,11 @@ class Topic:
                 'Expected uncategorized skill ids to be a list, received %s'
                 % self.uncategorized_skill_ids)
 
+        if not isinstance(self.proto_size_in_bytes, int):
+            raise utils.ValidationError(
+                'Expected proto size to be a int, received %s'
+                % self.proto_size_in_bytes)
+
     @classmethod
     def create_default_topic(
             cls, topic_id, name, url_fragment, description):
@@ -1146,12 +1160,58 @@ class Topic:
         Returns:
             Topic. The Topic domain object with the default values.
         """
-        return cls(
+        topic = cls(
             topic_id, name, name, url_fragment, None, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
+
+        topic_android_proto = cls.to_proto(
+            topic_id, name, description, [], [], 0)
+        topic_android_proto_size = cls.calculate_size_of_proto(
+            topic_android_proto)
+        cls.update_proto_size_in_bytes(cls, topic_android_proto_size)
+
+    @classmethod
+    def to_proto(
+        cls, topic_id, topic_name, topic_description,
+        canonical_story_references, subtopics, topic_version):
+        """Calculate the question size by setting question proto.
+
+        Args:
+            topic_id: str. The unique id of the topic.
+            topic_name: str. The initial name for the topic.
+            topic_description: str. The description for the topic.
+            canonical_story_references: list(StoryReference). A set of story
+                reference objects representing the canonical stories that are
+                part of this topic.
+            subtopics: list(Subtopic). The list of subtopics that are part of
+                the topic.
+            topic_version: int. The version of the topic.
+
+        Returns:
+            Proto Object. The topic proto object.
+        """
+        story_summaries_proto_list = []
+        subtopic_summaries_proto_list = []
+
+        topic_proto = DownloadableTopicSummary(
+            id=topic_id,
+            name=topic_name,
+            description=topic_description,
+            story_summaries=story_summaries_proto_list,
+            subtopic_summaries=subtopic_summaries_proto_list,
+            content_version=topic_version)
+
+        return topic_proto
+
+    def update_proto_size_in_bytes(self, proto_size_in_bytes):
+        """Update question's size in proto.
+        Args:
+            proto_size_in_bytes: int. Proto size of topic.
+        """
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(cls, topic_id, subtopic_dict):

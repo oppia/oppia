@@ -88,7 +88,9 @@ BUF_DIR = os.path.join(
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
+    os.path.join(
+        common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1')]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
