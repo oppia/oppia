@@ -57,7 +57,6 @@ class MachineTranslation:
             ValidationError. One or more attributes of the MachineTranslation
                 are invalid.
         """
-
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
         if not utils.is_supported_audio_language_code(
