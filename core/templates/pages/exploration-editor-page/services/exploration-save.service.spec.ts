@@ -183,6 +183,7 @@ describe('Exploration save service ' +
   let ExplorationRightsService = null;
   let explorationTagsService: ExplorationTagsService = null;
   let ExplorationTitleService = null;
+  let NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -227,6 +228,7 @@ describe('Exploration save service ' +
     ExplorationRightsService = $injector.get('ExplorationRightsService');
     explorationTagsService = $injector.get('ExplorationTagsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    NgbModal = $injector.get('NgbModal');
   }));
 
   it('should not open version mismatch modal', fakeAsync(function() {
@@ -286,7 +288,7 @@ describe('Exploration save service ' +
 
   it('should not publish exploration in case of backend ' +
     'error', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(NgbModal, 'open').and.returnValue({
       result: Promise.reject('failure')
     });
     let publishSpy = spyOn(ExplorationRightsService, 'publish')
