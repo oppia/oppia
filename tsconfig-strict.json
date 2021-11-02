@@ -257,6 +257,8 @@
     "core/templates/domain/topic/creator-topic-summary.model.spec.ts",
     "core/templates/domain/topic/subtopic-page-contents.model.ts",
     "core/templates/domain/topic/subtopic-page-contents.model.spec.ts",
+    "core/templates/domain/topic/subtopic.model.ts",
+    "core/templates/domain/topic/subtopic.model.spec.ts",
     "core/templates/domain/topic/topic-creation-backend-api.service.ts",
     "core/templates/domain/topic/topic-creation-backend-api.service.spec.ts",
     "core/templates/domain/topic/topic-domain.constants.ts",
