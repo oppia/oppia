@@ -106,12 +106,9 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             rubrics=[],
             skill_contents={},
             next_misconception_id=0,
-            misconceptions_schema_version=
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=
-                feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=0,
+            rubric_schema_version=0,
+            skill_contents_schema_version=0,
             superseding_skill_id='blah',
             all_questions_merged=False,
             prerequisite_skill_ids=[]
@@ -126,12 +123,9 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             rubrics=[],
             skill_contents={},
             next_misconception_id=0,
-            misconceptions_schema_version=
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=
-                feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=0,
+            rubric_schema_version=0,
+            skill_contents_schema_version=0,
             superseding_skill_id='blah',
             all_questions_merged=False,
             prerequisite_skill_ids=[]
@@ -157,7 +151,8 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model_1 is not None
         self.assertEqual(opportunity_model_1.id, self.SKILL_1_ID)
-        self.assertEqual(opportunity_model_1.skill_description, 
+        self.assertEqual(
+            opportunity_model_1.skill_description,
             self.SKILL_1_DESCRIPTION)
         self.assertEqual(opportunity_model_1.question_count, 0)
 
@@ -166,7 +161,8 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
                 self.SKILL_2_ID))
         assert opportunity_model_2 is not None
         self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
-        self.assertEqual(opportunity_model_2.skill_description, 
+        self.assertEqual(
+            opportunity_model_2.skill_description,
             self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 0)
 

@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import question_models
-        from mypy_imports import skill_models
+    from mypy_imports import skill_models
     from mypy_imports import story_models
     from mypy_imports import topic_models
 
