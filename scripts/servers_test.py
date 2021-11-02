@@ -348,6 +348,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn(
             'beta emulators datastore start', popen_calls[0].program_args)
+        self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
     def test_managed_cloud_datastore_emulator_creates_missing_data_dir(self):
@@ -366,7 +367,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(makedirs_counter.times_called, 1)
 
     def test_managed_cloud_datastore_emulator_clears_data_dir(self):
-        self.exit_stack.enter_context(self.swap_popen())
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
         rmtree_counter, makedirs_counter = self.exit_stack.enter_context(
             self.swap_managed_cloud_datastore_emulator_io_operations(True))
@@ -377,11 +378,13 @@ class ManagedProcessTests(test_utils.TestBase):
             clear_datastore=True))
         self.exit_stack.close()
 
+        self.assertIn('--no-store-on-disk', popen_calls[0].program_args)
+
         self.assertEqual(rmtree_counter.times_called, 1)
         self.assertEqual(makedirs_counter.times_called, 1)
 
     def test_managed_cloud_datastore_emulator_acknowledges_data_dir(self):
-        self.exit_stack.enter_context(self.swap_popen())
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
         rmtree_counter, makedirs_counter = self.exit_stack.enter_context(
             self.swap_managed_cloud_datastore_emulator_io_operations(True))
@@ -391,6 +394,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(servers.managed_cloud_datastore_emulator(
             clear_datastore=False))
         self.exit_stack.close()
+
+        self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
 
         self.assertEqual(rmtree_counter.times_called, 0)
         self.assertEqual(makedirs_counter.times_called, 0)
