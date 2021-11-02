@@ -45,11 +45,12 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         domain_objects_validator.validate_exploration_change(
             correct_change_dict)
 
+
 class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
 
-    def test_incorrect_exp_domain_object_raises_exception(self)-> None:
-        incorrect_domain_dict={
+    def test_incorrect_exp_domain_object_raises_exception(self) -> None:
+        incorrect_domain_dict = {
                 'suggestion_type': 'translate_content',
                 'target_type': 'exploration',
                 'target_id': '',
@@ -69,8 +70,8 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
             domain_objects_validator.validate_exploration_or_question_change(
                 incorrect_domain_dict)
 
-    def test_correct_exp_domain_object_do_not_raises_exception(self)-> None:
-        correct_domain_dict={
+    def test_correct_exp_domain_object_do_not_raises_exception(self) -> None:
+        correct_domain_dict = {
                 'suggestion_type': 'translate_content',
                 'target_type': 'exploration',
                 'target_id': '1234567exp1',
@@ -84,11 +85,12 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
                     'translation_html': '<p>In Hindi</p>',
                     'data_format': 'html'
                 },
-                'description':'test'
+                'description': 'test'
         }
         domain_objects_validator.validate_exploration_or_question_change(
             correct_domain_dict
         )
+
 
 class ValidateCollectionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
