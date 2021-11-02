@@ -81,7 +81,7 @@ export class Story {
 
   // Some methods have either string or null return value,
   // because when we create interstitial story object
-  // thier fields get null value.
+  // their fields get null value.
   getId(): string | null {
     return this._id;
   }
@@ -247,7 +247,7 @@ export class StoryObjectFactory {
   }
 
   /**
- * TODO(sll) : Remove the interstitial story so that full story can be
+ * TODO(#14169): Remove the interstitial story so that full story can be
  * created from start.
  */
   // Create an interstitial story that would be displayed in the editor until
