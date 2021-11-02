@@ -335,39 +335,38 @@
 
 
 # Lesson Analytics team.
-# TODO(#14094): Revert ownership of all files in this section to @seanlip after 2021-10-31.
-/core/controllers/features*.py @vojtechjelinek
-/core/controllers/improvements*.py @vojtechjelinek
-/core/domain/action_registry*.py @vojtechjelinek
-/core/domain/calculation_registry*.py @vojtechjelinek
-/core/domain/event_services*.py @vojtechjelinek
-/core/domain/improvements_domain*.py @vojtechjelinek
-/core/domain/improvements_services*.py @vojtechjelinek
-/core/domain/playthrough_issue_registry*.py @vojtechjelinek
-/core/domain/stats*.py @vojtechjelinek
-/core/domain/visualization_registry*.py @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @vojtechjelinek
-/core/templates/components/statistics-directives/ @vojtechjelinek
-/core/templates/domain/statistics/ @vojtechjelinek
-/core/templates/domain/improvements/ @vojtechjelinek
-/core/templates/pages/exploration-editor-page/improvements-tab/ @vojtechjelinek
-/core/templates/pages/exploration-editor-page/statistics-tab/ @vojtechjelinek
-/core/templates/services/exploration-improvements.service*.ts @vojtechjelinek
-/core/templates/services/exploration-improvements-backend-api.service*.ts @vojtechjelinek
-/core/templates/services/exploration-improvements-task-registry.service*.ts @vojtechjelinek
-/core/templates/services/exploration-stats.service*.ts @vojtechjelinek
-/core/templates/services/exploration-stats-backend-api.service*.ts @vojtechjelinek
-/core/templates/services/improvements.service*.ts @vojtechjelinek
-/core/templates/services/messenger.service.ts @vojtechjelinek
-/core/templates/services/playthrough*.ts @vojtechjelinek
-/core/templates/services/state-interaction-stats.service*.ts @vojtechjelinek
-/core/templates/services/state-top-answers-stats*.ts @vojtechjelinek
-/extensions/actions/ @vojtechjelinek
-/extensions/answer_summarizers/ @vojtechjelinek
-/extensions/issues/ @vojtechjelinek
-/extensions/visualizations/ @vojtechjelinek
+/core/controllers/features*.py @oppia/learner-analytics-reviewers
+/core/controllers/improvements*.py @oppia/learner-analytics-reviewers
+/core/domain/action_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/calculation_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/event_services*.py @oppia/learner-analytics-reviewers
+/core/domain/improvements_domain*.py @oppia/learner-analytics-reviewers
+/core/domain/improvements_services*.py @oppia/learner-analytics-reviewers
+/core/domain/playthrough_issue_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/stats*.py @oppia/learner-analytics-reviewers
+/core/domain/visualization_registry*.py @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/learner-analytics-reviewers
+/core/templates/components/statistics-directives/ @oppia/learner-analytics-reviewers
+/core/templates/domain/statistics/ @oppia/learner-analytics-reviewers
+/core/templates/domain/improvements/ @oppia/learner-analytics-reviewers
+/core/templates/pages/exploration-editor-page/improvements-tab/ @oppia/learner-analytics-reviewers
+/core/templates/pages/exploration-editor-page/statistics-tab/ @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements-backend-api.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements-task-registry.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-stats.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-stats-backend-api.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/improvements.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/messenger.service.ts @oppia/learner-analytics-reviewers
+/core/templates/services/playthrough*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/state-interaction-stats.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/state-top-answers-stats*.ts @oppia/learner-analytics-reviewers
+/extensions/actions/ @oppia/learner-analytics-reviewers
+/extensions/answer_summarizers/ @oppia/learner-analytics-reviewers
+/extensions/issues/ @oppia/learner-analytics-reviewers
+/extensions/visualizations/ @oppia/learner-analytics-reviewers
 
 
 # Library page.
