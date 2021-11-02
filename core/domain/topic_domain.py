@@ -32,7 +32,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
-from proto_files.org.proto.v1.structure import topic_summary_pb2
+from proto_files.org.oppia.proto.v1.structure import topic_summary_pb2
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -676,7 +676,7 @@ class Topic:
             topic_dict['meta_tag_content'],
             topic_dict['practice_tab_is_displayed'],
             topic_dict['page_title_fragment_for_web'],
-            topic_dict['proto_size_in_bytes',]
+            topic_dict['proto_size_in_bytes'],
             topic_created_on,
             topic_last_updated)
 
