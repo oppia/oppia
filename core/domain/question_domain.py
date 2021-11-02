@@ -1190,11 +1190,12 @@ class Question:
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in question_state_dict.values():
-            state_domain.State.update_image_sizes_in_bytes_in_state(
-                state_dict,
-                feconf.ENTITY_TYPE_QUESTION,
-                question_id)
+
+        state_domain.State.update_image_sizes_in_bytes_in_state(
+            question_state_dict,
+            feconf.ENTITY_TYPE_QUESTION,
+            question_id)
+
         return question_state_dict
 
     @classmethod
@@ -1226,8 +1227,9 @@ class Question:
         if current_state_schema_version == 49:
             versioned_question_state['state'] = conversion_fn(
                 question_id, versioned_question_state['state'])
-        versioned_question_state['state'] = conversion_fn(
-            versioned_question_state['state'])
+        else:
+            versioned_question_state['state'] = conversion_fn(
+                versioned_question_state['state'])
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the

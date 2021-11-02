@@ -32,6 +32,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
+from core.domain import state_domain
 
 
 class QuestionCreationHandler(base.BaseHandler):
@@ -104,12 +105,6 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Skill difficulties must be between 0 and 1')
 
-        question_services.add_question(self.user_id, question)
-        question_services.link_multiple_skills_for_question(
-            self.user_id,
-            question.id,
-            skill_ids,
-            skill_difficulties)
         html_list = question.question_state_data.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
@@ -137,6 +132,21 @@ class QuestionCreationHandler(base.BaseHandler):
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
                 'image', image_is_compressible)
+
+        question.question_state_data = (
+            state_domain.State.from_dict(
+                state_domain.State.update_image_sizes_in_bytes_in_state(
+                    question_dict['question_state_data'],
+                    entity_type=feconf.ENTITY_TYPE_QUESTION,
+                    entity_id=question.id
+                )))
+
+        question_services.add_question(self.user_id, question)
+        question_services.link_multiple_skills_for_question(
+            self.user_id,
+            question.id,
+            skill_ids,
+            skill_difficulties)
 
         self.values.update({
             'question_id': question.id
