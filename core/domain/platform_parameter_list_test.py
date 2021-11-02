@@ -16,8 +16,7 @@
 
 """Tests for registered platform parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import platform_parameter_list as params
 from core.tests import test_utils
