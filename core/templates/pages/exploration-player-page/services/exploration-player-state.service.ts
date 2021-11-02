@@ -23,7 +23,7 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
+import { Question } from 'domain/question/QuestionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -164,21 +164,21 @@ export class ExplorationPlayerStateService {
   }
 
   initializePretestServices(
-      pretestQuestionDicts: QuestionBackendDict[],
+      pretestQuestionObjects: Question[],
       callback: (
         initialCard: StateCard, nextFocusLabel: string) => void): void {
     this.playerCorrectnessFeedbackEnabledService.init(true);
     this.questionPlayerEngineService.init(
-      pretestQuestionDicts, callback, () => {});
+      pretestQuestionObjects, callback, () => {});
   }
 
   initializeQuestionPlayerServices(
-      questionDicts: QuestionBackendDict[],
+      questionObjects: Question[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.playerCorrectnessFeedbackEnabledService.init(true);
     this.questionPlayerEngineService.init(
-      questionDicts, successCallback, errorCallback);
+      questionObjects, successCallback, errorCallback);
   }
 
   setExplorationMode(): void {

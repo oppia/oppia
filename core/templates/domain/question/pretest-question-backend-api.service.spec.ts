@@ -22,15 +22,18 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { QuestionObjectFactory } from
+  'domain/question/QuestionObjectFactory';
 
 describe('Pretest question backend API service', function() {
   let pretestQuestionBackendApiService:
     PretestQuestionBackendApiService = null;
   let httpTestingController: HttpTestingController;
+  let questionObjectFactory: QuestionObjectFactory;
 
   var ERROR_STATUS_CODE = 500;
 
-  var sampleDataResults = {
+  var responseDictionaries = {
     pretest_question_dicts: [{
       id: '0',
       question_state_data: {
@@ -76,6 +79,13 @@ describe('Pretest question backend API service', function() {
     }]
   };
 
+  var sampleDataResultsObjects = {
+    pretest_question_objects: [
+      questionObjectFactory.createFromBackendDict(
+        responseDictionaries.pretest_question_dicts[0])
+    ]
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -84,6 +94,7 @@ describe('Pretest question backend API service', function() {
     pretestQuestionBackendApiService = TestBed.get(
       PretestQuestionBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
   });
 
   afterEach(() => {
@@ -101,12 +112,12 @@ describe('Pretest question backend API service', function() {
       var req = httpTestingController.expectOne(
         '/pretest_handler/expId?story_url_fragment=story-fragment');
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+      req.flush(responseDictionaries);
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults.pretest_question_dicts);
+        sampleDataResultsObjects.pretest_question_objects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

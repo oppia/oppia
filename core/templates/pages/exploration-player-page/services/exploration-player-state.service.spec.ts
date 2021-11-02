@@ -25,7 +25,7 @@ import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
 import { PretestQuestionBackendApiService }
   from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService }
@@ -60,7 +60,9 @@ describe('Exploration Player State Service', () => {
   let questionBackendApiService: QuestionBackendApiService;
   let pretestQuestionBackendApiService:
     PretestQuestionBackendApiService;
+  let questionObjectFactory: QuestionObjectFactory;
   let urlService: UrlService;
+  let questionObject: Question;
 
   let returnDict = {
     can_edit: true,
@@ -191,6 +193,9 @@ describe('Exploration Player State Service', () => {
     pretestQuestionBackendApiService = (
       pretestQuestionBackendApiService as unknown) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    questionObject = questionObjectFactory.createFromBackendDict(
+      questionBackendDict);
     urlService = (TestBed.inject(UrlService) as unknown) as
       jasmine.SpyObj<UrlService>;
   });
@@ -230,11 +235,11 @@ describe('Exploration Player State Service', () => {
   it('should initialize pretest services', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
-    let pretestQuestionDicts = [];
+    let pretestQuestionObjects = [];
     let callback = () => {};
 
     explorationPlayerStateService.initializePretestServices(
-      pretestQuestionDicts, callback);
+      pretestQuestionObjects, callback);
     expect(playerCorrectnessFeedbackEnabledService.init)
       .toHaveBeenCalledWith(true);
     expect(questionPlayerEngineService.init).toHaveBeenCalled();
@@ -329,7 +334,7 @@ describe('Exploration Player State Service', () => {
   it('should init question player', fakeAsync(() => {
     spyOn(explorationPlayerStateService, 'setQuestionPlayerMode');
     spyOn(questionBackendApiService, 'fetchQuestionsAsync')
-      .and.returnValue(Promise.resolve([questionBackendDict]));
+      .and.returnValue(Promise.resolve([questionObject]));
     spyOn(explorationPlayerStateService.onTotalQuestionsReceived, 'emit');
     spyOn(explorationPlayerStateService, 'initializeQuestionPlayerServices');
 
@@ -358,7 +363,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
       .and.returnValue(Promise.resolve(explorationFeatures));
     spyOn(pretestQuestionBackendApiService, 'fetchPretestQuestionsAsync')
-      .and.returnValue(Promise.resolve([questionBackendDict]));
+      .and.returnValue(Promise.resolve([questionObject]));
     spyOn(explorationFeaturesService, 'init');
     spyOn(explorationPlayerStateService, 'initializePretestServices');
     spyOn(explorationPlayerStateService, 'setPretestMode');
