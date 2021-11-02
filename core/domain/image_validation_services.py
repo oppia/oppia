@@ -38,7 +38,7 @@ def validate_image_and_filename(raw_image, filename):
             validation checks.
     """
     hundred_kb_in_bytes = 100 * 1024
-    if isinstance(raw_image,str):
+    if isinstance(raw_image, str):
         raw_image = raw_image.encode('ISO-8859-1')
     if not raw_image:
         raise utils.ValidationError('No image supplied')
