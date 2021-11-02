@@ -16,8 +16,7 @@
 
 """Models for machine translation."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import utils
 from core.platform import models
@@ -142,11 +141,11 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @classmethod
     def get_machine_translation(
-            cls,
-            source_language_code: str,
-            target_language_code: str,
-            source_text: str
-    ) -> Optional['MachineTranslationModel']:
+        cls,
+        source_language_code: str,
+        target_language_code: str,
+        source_text: str
+    ) -> Optional[MachineTranslationModel]:
         """Gets MachineTranslationModel by language codes and source text.
 
         Args:

@@ -20,8 +20,7 @@ Responses are prepopulated, to add additional translations, use:
         source_language_code, target_language_code, source_text, response)
 See cloud_translate_emulator.py for more details"""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform.translate import cloud_translate_emulator
 from core.platform.translate import cloud_translate_services
