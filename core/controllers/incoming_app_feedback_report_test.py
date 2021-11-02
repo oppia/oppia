@@ -16,19 +16,19 @@
 
 """Tests for the controller managing incoming feedback reports."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
-import android_validation_constants
+from core import android_validation_constants
 from core.platform import models
 from core.tests import test_utils
 
-from mypy_imports import (
-    app_feedback_report_models) # pylint: disable=unused-import
+from typing import Any, Dict, Sequence
 
-from typing import Dict, Any, Sequence, cast # isort:skip # pylint: disable=unused-import
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])

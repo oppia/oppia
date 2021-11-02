@@ -16,20 +16,17 @@
 
 """Lint checks for python files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
 import subprocess
 
-import python_utils
-
 from .. import common
 from .. import concurrent_task_utils
 
 
-class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
+class ThirdPartyCSSLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, config_path, files_to_lint):

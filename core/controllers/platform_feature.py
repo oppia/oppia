@@ -14,16 +14,15 @@
 
 """Controllers for the platform feature handlers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
 from core import platform_feature_list
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import platform_feature_services
-import feconf
-import utils
 
 
 class PlatformFeaturesEvaluationHandler(base.BaseHandler):

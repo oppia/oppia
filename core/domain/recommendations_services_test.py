@@ -16,16 +16,15 @@
 
 """Unit tests for recommendations_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (recommendations_models, exp_models,) = models.Registry.import_models([
     models.NAMES.recommendations, models.NAMES.exploration])

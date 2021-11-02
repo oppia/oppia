@@ -23,13 +23,12 @@ Note: The test scripts are arranged in increasing order of time taken. This
 enables a broken build to be detected as quickly as possible.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import subprocess
 
-import python_utils
+from core import python_utils
 
 from . import run_backend_tests
 from . import run_frontend_tests

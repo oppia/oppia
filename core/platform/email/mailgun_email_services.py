@@ -16,13 +16,13 @@
 
 """Provides mailgun api to send emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
+import urllib
 
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
 
 from typing import Dict, List, Optional, Union
 
@@ -89,7 +89,7 @@ def send_email_to_recipients(
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_lists = [
         recipient_emails[i:i + 1000]
-        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
+        for i in range(0, len(recipient_emails), 1000)]
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,
@@ -121,7 +121,7 @@ def send_email_to_recipients(
         server = (
             ('https://api.mailgun.net/v3/%s/messages')
             % feconf.MAILGUN_DOMAIN_NAME)
-        encoded_url = python_utils.url_encode(data)
+        encoded_url = urllib.parse.urlencode(data)
         req = python_utils.url_request(server, encoded_url, header)
         resp = python_utils.url_open(req)
         # The function url_open returns a file_like object that can be queried

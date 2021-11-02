@@ -14,20 +14,18 @@
 
 """Registry for typed objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import inspect
 import json
 
+from core import feconf
+from core import python_utils
 from extensions.objects.models import objects
-import feconf
-import python_utils
-import utils
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all objects."""
 
     # Dict mapping object class names to their classes.
@@ -76,5 +74,5 @@ def get_default_object_values():
     """Returns a dictionary containing the default object values."""
     # TODO(wxy): Cache this as it is accessed many times.
 
-    return json.loads(
-        utils.get_file_contents(feconf.OBJECT_DEFAULT_VALUES_FILE_PATH))
+    return json.loads(python_utils.get_package_file_contents(
+        'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH))

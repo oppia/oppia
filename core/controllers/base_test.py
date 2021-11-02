@@ -16,9 +16,10 @@
 
 """Tests for generic controller behavior."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import contextlib
+import importlib
 import inspect
 import io
 import json
@@ -28,24 +29,22 @@ import re
 import sys
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import main
-import python_utils
-import utils
 
 import webapp2
 import webtest
@@ -312,19 +311,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_dev_mode_cannot_be_true_on_production(self):
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['feconf']
         server_software_swap = self.swap(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
-            # This pragma is needed since we are re-importing under
-            # invalid conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import feconf  # pylint: disable-all
+            # This reloads the feconf module so that all the checks in
+            # the module are reexecuted.
+            importlib.reload(feconf)  # pylint: disable-all
 
     def test_frontend_error_handler(self):
         observed_log_messages = []
@@ -387,7 +381,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '/logout', expected_status_int=200)
 
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -404,7 +398,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -422,7 +416,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_signup_attempt_on_wrong_page_fails(self):
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -462,7 +456,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
-        with python_utils.ExitStack() as context_stack:
+        with contextlib.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()
@@ -1293,8 +1287,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1307,8 +1301,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(

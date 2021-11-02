@@ -16,17 +16,16 @@
 
 """Tests for methods in the image_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import os
 import re
 
+from core import feconf
+from core import python_utils
 from core.domain import image_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 from PIL import Image
 from PIL import ImageChops

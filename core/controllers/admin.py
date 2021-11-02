@@ -14,14 +14,15 @@
 
 """Controllers for the admin view."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import logging
 import random
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -56,9 +57,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
-import python_utils
-import utils
 
 
 class AdminPage(base.BaseHandler):
@@ -289,8 +287,8 @@ class AdminHandler(base.BaseHandler):
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+            self.render_json({'error': str(e)})
+            raise e
 
     def _reload_exploration(self, exploration_id):
         """Reloads the exploration in dev_mode corresponding to the given
@@ -306,10 +304,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.UNICODE(exploration_id))
+            exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(),
-                python_utils.UNICODE(exploration_id))
+                user_services.get_system_user(), exploration_id)
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -579,15 +576,13 @@ class AdminHandler(base.BaseHandler):
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
-            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
-                random.getrandbits(32))
+            skill_name = 'Dummy Skill %s' % str(random.getrandbits(32))
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
-            for i in python_utils.RANGE(15):
+            for i in range(15):
                 question_id = question_services.get_new_question_id()
-                question_name = 'Question number %s %s' % (
-                    python_utils.UNICODE(i), skill_name)
+                question_name = 'Question number %s %s' % (str(i), skill_name)
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)
@@ -642,7 +637,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in python_utils.RANGE(num_dummy_exps_to_generate):
+            for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()

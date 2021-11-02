@@ -35,8 +35,8 @@ import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { I18nService } from 'i18n/i18n.service';
 
 interface LanguageInfo {
   id: string;
@@ -51,6 +51,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText: string;
   @Input() subheaderText: string;
 
+  url: URL;
   currentLanguageCode: string;
   currentLanguageText: string;
   isModerator: boolean;
@@ -113,6 +114,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private i18nService: I18nService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private debouncerService: DebouncerService,
@@ -122,9 +125,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService,
     private focusManagerService: FocusManagerService
   ) {}
 
@@ -132,6 +133,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.getProfileImageDataAsync();
     this.currentUrl =
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
+    this.url = new URL(this.windowRef.nativeWindow.location.toString());
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
@@ -170,18 +172,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       )
     );
 
+    this.i18nService.updateViewToUserPreferredSiteLanguage();
+
     this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.getPreferredSiteLanguageCode()) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(
-          userInfo.getPreferredSiteLanguageCode());
-      }
-      this.currentLanguageCode = (
-        this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-      this.supportedSiteLanguages.forEach(element => {
-        if (element.id === this.currentLanguageCode) {
-          this.currentLanguageText = element.text;
-        }
-      });
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
@@ -232,6 +225,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         (code) => {
           if (this.currentLanguageCode !== code) {
             this.currentLanguageCode = code;
+            this.supportedSiteLanguages.forEach(element => {
+              if (element.id === this.currentLanguageCode) {
+                this.currentLanguageText = element.text;
+              }
+            });
             this.changeDetectorRef.detectChanges();
           }
         })
@@ -253,16 +251,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  changeLanguage(languageCode: string, languageText: string): void {
-    this.currentLanguageCode = languageCode;
-    this.currentLanguageText = languageText;
-    this.i18nLanguageCodeService.setI18nLanguageCode(languageCode);
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.isLoggedIn()) {
-        this.userBackendApiService.updatePreferredSiteLanguageAsync(
-          this.currentLanguageCode);
-      }
-    });
+  changeLanguage(languageCode: string): void {
+    this.i18nService.updateUserPreferredLanguage(languageCode);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   onLoginButtonClicked(): void {
@@ -351,7 +345,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     var i18nCompleted = true;
     var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
     for (var i = 0; i < tabs.length; i++) {
-      if ((<HTMLElement>tabs[i]).innerText.length === 0) {
+      if ((tabs[i] as HTMLElement).innerText.length === 0) {
         i18nCompleted = false;
         break;
       }

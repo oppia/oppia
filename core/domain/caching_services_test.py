@@ -16,12 +16,12 @@
 
 """Tests for methods in core.domain.caching_services"""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import collection_domain
@@ -32,7 +32,6 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 memory_cache_services = models.Registry.import_cache_services()
 

@@ -14,15 +14,13 @@
 
 """ Tests for services relating to emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import email_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()

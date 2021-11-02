@@ -16,8 +16,7 @@
 
 """Tests for the exploration editor page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import io
@@ -25,7 +24,9 @@ import logging
 import os
 import zipfile
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
 from core.domain import exp_domain
@@ -40,8 +41,6 @@ from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (exp_models, user_models, stats_models) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])

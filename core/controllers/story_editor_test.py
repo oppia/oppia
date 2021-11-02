@@ -14,15 +14,14 @@
 
 """Tests for the story editor page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseStoryEditorControllerTests(test_utils.GenericTestBase):

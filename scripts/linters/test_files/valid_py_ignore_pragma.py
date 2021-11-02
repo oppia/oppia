@@ -19,14 +19,11 @@ python_linter_test. This file has a disallowed function usage but
 uses a pragma to ignore this invalid call.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-import python_utils
+from __future__ import annotations
 
 __author__ = "Something" # disable-bad-pattern-check
 
-class FakeClass(python_utils.OBJECT):
+class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):

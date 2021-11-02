@@ -16,11 +16,11 @@
 
 """Tests for subtopic page domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 
+from core import feconf
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -28,8 +28,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
 
 (base_models, subtopic_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.subtopic])

@@ -74,7 +74,7 @@ angular.module('oppia').controller(
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
           updatedTranslation,
-          (success) => {
+          () => {
             $scope.translationHtml = updatedTranslation;
             $scope.translationUpdated = true;
             ContributionOpportunitiesService.
@@ -143,6 +143,8 @@ angular.module('oppia').controller(
         $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
+        $scope.explorationContentHtml = (
+          $scope.activeSuggestion.exploration_content_html);
         $scope.isHtmlContent = (
           $scope.activeSuggestion.change.data_format === 'html'
         );
@@ -227,6 +229,32 @@ angular.module('oppia').controller(
             ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
             generateCommitMessage(), $scope.showNextItemToReview);
         }
+      };
+
+      // Returns the HTML content representing the most up-to-date exploration
+      // content for the active suggestion.
+      $scope.displayExplorationContent = function() {
+        return (
+          $scope.hasExplorationContentChanged() ?
+          $scope.explorationContentHtml :
+          $scope.contentHtml);
+      };
+
+      // Returns whether the active suggestion's exploration_content_html
+      // differs from the content_html of the suggestion's change object.
+      $scope.hasExplorationContentChanged = function() {
+        if (
+          Array.isArray($scope.contentHtml) ||
+          Array.isArray($scope.explorationContentHtml)) {
+          // Check equality of all array elements.
+          return (
+            $scope.contentHtml.length !==
+              $scope.explorationContentHtml.length ||
+            $scope.contentHtml.some(
+              (val, index) => val !== $scope.explorationContentHtml[index])
+          );
+        }
+        return $scope.contentHtml !== $scope.explorationContentHtml;
       };
 
       $scope.editSuggestion = function() {

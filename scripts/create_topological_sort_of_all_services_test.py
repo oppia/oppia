@@ -14,14 +14,14 @@
 
 """Unit tests for scripts/create_topological_sort_of_all_services.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import os
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
+
 from . import create_topological_sort_of_all_services
 
 MOCK_DIRECTORY_NAMES = [os.path.join('core', 'tests', 'services_sources')]

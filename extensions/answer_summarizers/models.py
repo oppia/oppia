@@ -37,18 +37,16 @@ calculation may look like this:
     }]
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import itertools
 import operator
 
+from core import feconf
+from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
-import feconf
-import python_utils
-import utils
 
 CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
@@ -63,7 +61,7 @@ UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES = frozenset([
 ])
 
 
-class HashableAnswer(python_utils.OBJECT):
+class HashableAnswer:
     """Wraps answer with object that can be placed into sets and dicts."""
 
     def __init__(self, answer):
@@ -151,7 +149,7 @@ def _get_top_unresolved_answers_by_frequency(
     ])
 
 
-class BaseCalculation(python_utils.OBJECT):
+class BaseCalculation:
     """Base calculation class.
 
     This is the superclass for all calculations used to generate interaction

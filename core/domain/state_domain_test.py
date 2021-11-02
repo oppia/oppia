@@ -16,14 +16,17 @@
 
 """Tests for state domain objects and methods defined on them."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import contextlib
 import copy
 import logging
 import os
 import re
 
+from core import feconf
+from core import schema_utils
+from core import utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -33,10 +36,6 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -3954,7 +3953,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(

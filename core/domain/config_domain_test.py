@@ -16,15 +16,14 @@
 
 """Tests for the config property registry."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
+from core import schema_utils_test
+from core import utils
 from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import schema_utils_test
-import utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 

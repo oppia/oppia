@@ -19,12 +19,11 @@ version of Chrome for our CI tests and checks that the correct version
 was installed.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 
@@ -65,8 +64,7 @@ def get_chrome_version():
     Returns:
         str. The version of Chrome we found.
     """
-    output = python_utils.UNICODE(
-        common.run_cmd(['google-chrome', '--version']))
+    output = str(common.run_cmd(['google-chrome', '--version']))
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     return chrome_version
 

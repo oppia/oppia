@@ -14,10 +14,10 @@
 
 """Tests for voiceover services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
@@ -31,8 +31,6 @@ from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -70,7 +68,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)

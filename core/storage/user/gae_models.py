@@ -16,17 +16,15 @@
 
 """Models for Oppia users."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import random
 import string
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
 
@@ -310,10 +308,10 @@ class UserSettingsModel(base_models.BaseModel):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
+                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
             if (
                     not cls.get_by_id(new_id) and
                     not DeletedUserModel.get_by_id(new_id)
@@ -346,9 +344,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_normalized_username(
-            cls,
-            normalized_username: str
-    ) -> Optional['UserSettingsModel']:
+        cls, normalized_username: str
+    ) -> Optional[UserSettingsModel]:
         """Returns a user model given a normalized username.
 
         Args:
@@ -363,7 +360,7 @@ class UserSettingsModel(base_models.BaseModel):
         ).get()
 
     @classmethod
-    def get_by_email(cls, email: str) -> Optional['UserSettingsModel']:
+    def get_by_email(cls, email: str) -> Optional[UserSettingsModel]:
         """Returns a user model given an email.
 
         Args:
@@ -376,7 +373,7 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.query(cls.email == email).get()
 
     @classmethod
-    def get_by_role(cls, role: str) -> Sequence['UserSettingsModel']:
+    def get_by_role(cls, role: str) -> Sequence[UserSettingsModel]:
         """Returns user models with given role.
 
         Args:
@@ -669,10 +666,10 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            user_id: str,
-            exploration_id: str
-    ) -> 'ExpUserLastPlaythroughModel':
+        cls,
+        user_id: str,
+        exploration_id: str
+    ) -> ExpUserLastPlaythroughModel:
         """Creates a new ExpUserLastPlaythroughModel instance and returns it.
 
         Args:
@@ -691,10 +688,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            user_id: str,
-            exploration_id: str
-    ) -> Optional['ExpUserLastPlaythroughModel']:
+        cls, user_id: str, exploration_id: str
+    ) -> Optional[ExpUserLastPlaythroughModel]:
         """Gets the ExpUserLastPlaythroughModel for the given user and
         exploration id.
 
@@ -713,8 +708,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls, user_id: str
     ) -> Dict[str, Dict[str, Union[int, str, None]]]:
         """Takeout: Export ExpUserLastPlaythroughModel user-relevant properties.
 
@@ -1387,7 +1381,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         return cls.get_by_id(user_id) is not None
 
     @classmethod
-    def get_or_create(cls, user_id: str) -> 'UserStatsModel':
+    def get_or_create(cls, user_id: str) -> UserStatsModel:
         """Creates a new UserStatsModel instance, if it does not already exist.
 
         Args:
@@ -1405,7 +1399,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def export_data(
-            user_id: str
+        user_id: str
     ) -> Dict[str, Union[float, List[Dict[str, Dict[str, float]]]]]:
         """(Takeout) Export the user-relevant properties of UserStatsModel.
 
@@ -1568,10 +1562,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            user_id: str,
-            exploration_id: str
-    ) -> 'ExplorationUserDataModel':
+        cls, user_id: str, exploration_id: str
+    ) -> ExplorationUserDataModel:
         """Creates a new ExplorationUserDataModel instance and returns it.
 
         Note that the client is responsible for actually saving this entity to
@@ -1593,10 +1585,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            user_id: str,
-            exploration_id: str
-    ) -> Optional['ExplorationUserDataModel']:
+        cls, user_id: str, exploration_id: str
+    ) -> Optional[ExplorationUserDataModel]:
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 
@@ -1616,10 +1606,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-            cls,
-            user_ids: List[str],
-            exploration_id: str
-    ) -> List[Optional['ExplorationUserDataModel']]:
+        cls, user_ids: List[str], exploration_id: str
+    ) -> List[Optional[ExplorationUserDataModel]]:
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 
@@ -1638,8 +1626,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, float, bool, None]]]:
         """Takeout: Export user-relevant properties of ExplorationUserDataModel.
 
@@ -1767,10 +1754,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            user_id: str,
-            collection_id: str
-    ) -> 'CollectionProgressModel':
+        cls, user_id: str, collection_id: str
+    ) -> CollectionProgressModel:
         """Creates a new CollectionProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -1792,10 +1777,8 @@ class CollectionProgressModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            user_id: str,
-            collection_id: str
-    ) -> Optional['CollectionProgressModel']:
+        cls, user_id: str, collection_id: str
+    ) -> Optional[CollectionProgressModel]:
         """Gets the CollectionProgressModel for the given user and collection
         id.
 
@@ -1815,10 +1798,8 @@ class CollectionProgressModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-            cls,
-            user_id: str,
-            collection_ids: List[str]
-    ) -> List[Optional['CollectionProgressModel']]:
+        cls, user_id: str, collection_ids: List[str]
+    ) -> List[Optional[CollectionProgressModel]]:
         """Gets the CollectionProgressModels for the given user and collection
         ids.
 
@@ -1838,10 +1819,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(
-            cls,
-            user_id: str,
-            collection_id: str
-    ) -> 'CollectionProgressModel':
+        cls, user_id: str, collection_id: str
+    ) -> CollectionProgressModel:
         """Gets the CollectionProgressModel for the given user and collection
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -1963,7 +1942,7 @@ class StoryProgressModel(base_models.BaseModel):
         return '%s.%s' % (user_id, story_id)
 
     @classmethod
-    def create(cls, user_id: str, story_id: str) -> 'StoryProgressModel':
+    def create(cls, user_id: str, story_id: str) -> StoryProgressModel:
         """Creates a new StoryProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -1985,11 +1964,8 @@ class StoryProgressModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            user_id: str,
-            story_id: str,
-            strict: bool = True
-    ) -> Optional['StoryProgressModel']:
+        cls, user_id: str, story_id: str, strict: bool = True
+    ) -> Optional[StoryProgressModel]:
         """Gets the StoryProgressModel for the given user and story
         id.
 
@@ -2011,10 +1987,8 @@ class StoryProgressModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-            cls,
-            user_id: str,
-            story_ids: List[str]
-    ) -> List[Optional['StoryProgressModel']]:
+        cls, user_id: str, story_ids: List[str]
+    ) -> List[Optional[StoryProgressModel]]:
         """Gets the StoryProgressModels for the given user and story
         ids.
 
@@ -2033,7 +2007,7 @@ class StoryProgressModel(base_models.BaseModel):
             instance_ids)
 
     @classmethod
-    def get_or_create(cls, user_id: str, story_id: str) -> 'StoryProgressModel':
+    def get_or_create(cls, user_id: str, story_id: str) -> StoryProgressModel:
         """Gets the StoryProgressModel for the given user and story
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -2190,10 +2164,10 @@ class UserQueryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def fetch_page(
-            cls,
-            page_size: int,
-            cursor: Optional[str]
-    ) -> Tuple[Sequence['UserQueryModel'], Optional[str], bool]:
+        cls,
+        page_size: int,
+        cursor: Optional[str]
+    ) -> Tuple[Sequence[UserQueryModel], Optional[str], bool]:
         """Fetches a list of all query_models sorted by creation date.
 
         Args:
@@ -2499,9 +2473,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def get_all_scores_of_user(
-            cls,
-            user_id: str
-    ) -> Sequence['UserContributionProficiencyModel']:
+        cls, user_id: str
+    ) -> Sequence[UserContributionProficiencyModel]:
         """Gets all scores for a given user.
 
         Args:
@@ -2515,9 +2488,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def get_all_users_with_score_above_minimum_for_category(
-            cls,
-            score_category: str
-    ) -> Sequence['UserContributionProficiencyModel']:
+        cls, score_category: str
+    ) -> Sequence[UserContributionProficiencyModel]:
         """Gets all instances which have score above the
         MINIMUM_SCORE_REQUIRED_TO_REVIEW threshold for the given category.
 
@@ -2551,10 +2523,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            user_id: str,
-            score_category: str
-    ) -> Optional['UserContributionProficiencyModel']:
+        cls, user_id: str, score_category: str
+    ) -> Optional[UserContributionProficiencyModel]:
         """Gets the user's scoring model corresponding to the score category.
 
         Args:
@@ -2571,12 +2541,12 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            user_id: str,
-            score_category: str,
-            score: float,
-            onboarding_email_sent: bool = False
-    ) -> 'UserContributionProficiencyModel':
+        cls,
+        user_id: str,
+        score_category: str,
+        score: float,
+        onboarding_email_sent: bool = False
+    ) -> UserContributionProficiencyModel:
         """Creates a new UserContributionProficiencyModel entry.
 
         Args:
@@ -2933,10 +2903,10 @@ class PseudonymizedUserModel(base_models.BaseModel):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = 'pid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
+                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id

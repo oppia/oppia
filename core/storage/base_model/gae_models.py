@@ -14,18 +14,15 @@
 
 """Base model class."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import enum
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.platform import models
-import feconf
-import python_utils
-
-import utils
 
 from typing import ( # isort:skip
     Any, Dict, List, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
@@ -431,7 +428,7 @@ class BaseModel(datastore_services.Model):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in python_utils.RANGE(MAX_RETRIES):
+        for _ in range(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH
@@ -778,10 +775,10 @@ class VersionedModel(BaseModel):
 
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
-    SNAPSHOT_METADATA_CLASS: Optional[Type['BaseSnapshotMetadataModel']] = None
+    SNAPSHOT_METADATA_CLASS: Optional[Type[BaseSnapshotMetadataModel]] = None
     # The class designated as the snapshot content model. This should be a
     # subclass of BaseSnapshotContentModel.
-    SNAPSHOT_CONTENT_CLASS: Optional[Type['BaseSnapshotContentModel']] = None
+    SNAPSHOT_CONTENT_CLASS: Optional[Type[BaseSnapshotContentModel]] = None
     # The class designated as the commit log entry model. This should be
     # a subclass of BaseCommitLogEntryModel. In cases where we do not need
     # to log the commits it can be None.
@@ -976,7 +973,7 @@ class VersionedModel(BaseModel):
         if force_deletion:
             current_version = self.version
 
-            version_numbers = python_utils.RANGE(1, current_version + 1)
+            version_numbers = range(1, current_version + 1)
             snapshot_ids = [
                 self.get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
@@ -1053,7 +1050,7 @@ class VersionedModel(BaseModel):
             all_models_content_keys = []
             all_models_commit_keys: List[datastore_services.Key] = []
             for model in versioned_models:
-                model_version_numbers = python_utils.RANGE(1, model.version + 1)
+                model_version_numbers = range(1, model.version + 1)
                 model_snapshot_ids = [
                     model.get_snapshot_id(model.id, version_number)
                     for version_number in model_version_numbers]
@@ -1087,7 +1084,7 @@ class VersionedModel(BaseModel):
                 all_models_commit_keys +
                 versioned_models_keys
             )
-            for i in python_utils.RANGE(
+            for i in range(
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -1246,7 +1243,7 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
-    def get_version( # type: ignore[return]
+    def get_version(
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
@@ -1283,10 +1280,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError:
+        except cls.EntityNotFoundError as e:
             if not strict:
                 return None
-            python_utils.reraise_exception() # type: ignore[no-untyped-call]
+            raise e
 
     @classmethod
     def get_multi_versions(

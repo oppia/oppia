@@ -14,15 +14,14 @@
 
 """Tests for the handler that returns concept card for a skill."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class ConceptCardDataHandlerTest(test_utils.GenericTestBase):

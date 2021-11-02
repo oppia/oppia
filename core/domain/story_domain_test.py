@@ -14,21 +14,20 @@
 
 """Tests for story domain objects and methods defined on them."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import fs_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 
 class StoryChangeTests(test_utils.GenericTestBase):
@@ -556,7 +555,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, python_utils.BASESTRING))
+        self.assertIsInstance(valid_topic_id, str)
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 

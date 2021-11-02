@@ -16,14 +16,13 @@
 
 """Methods for returning the correct file system class to the client."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
+from core import utils
 from core.domain import fs_domain
 from core.domain import image_services
 from core.platform import models
-import feconf
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 

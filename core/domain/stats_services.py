@@ -16,19 +16,18 @@
 
 """Services for exploration-related statistics."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import datetime
 import itertools
 
+from core import feconf
+from core import utils
 from core.domain import exp_fetchers
 from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
-import feconf
-import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()

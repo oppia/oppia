@@ -14,12 +14,12 @@
 
 """Tests for the creator dashboard and the notifications dashboard."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -33,7 +33,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models, stats_models, suggestion_models, feedback_models) = (
     models.Registry.import_models(

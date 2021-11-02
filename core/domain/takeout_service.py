@@ -16,15 +16,14 @@
 user_id.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 
+from core import feconf
 from core.domain import takeout_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
 
 (
     base_models, collection_models, email_models,

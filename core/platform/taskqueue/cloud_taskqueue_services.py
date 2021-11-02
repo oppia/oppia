@@ -16,21 +16,19 @@
 
 """Provides functionality for Google Cloud Tasks-related operations."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import json
 import logging
 
-from constants import constants
-import feconf
+from core import feconf
+from core.constants import constants
 
 from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
-
 from typing import Any, Dict, Optional
 
 CLIENT = tasks_v2.CloudTasksClient(

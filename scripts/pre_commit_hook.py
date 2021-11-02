@@ -26,8 +26,7 @@ On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
@@ -36,10 +35,10 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-import python_utils  # isort:skip  # pylint: disable=wrong-import-position
+from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
-FECONF_FILEPATH = os.path.join('.', 'feconf.py')
+FECONF_FILEPATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
 KEYS_UPDATED_IN_FECONF = [
     b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',

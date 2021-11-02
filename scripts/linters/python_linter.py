@@ -16,15 +16,14 @@
 
 """Lint checks for Python files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 
 from . import linter_utils
 from .. import common
@@ -45,7 +44,7 @@ import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import
 import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
-class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
+class ThirdPartyPythonLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint):

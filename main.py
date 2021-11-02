@@ -14,13 +14,13 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-import android_validation_constants
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core.constants import constants
 from core.controllers import access_validators
 from core.controllers import acl_decorators
 from core.controllers import admin
@@ -77,12 +77,10 @@ from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
 from core.platform import models
 from core.platform.auth import firebase_auth_services
-import feconf
 
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
-
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -292,6 +290,9 @@ URLS = [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
+        r'/getalltopicnames',
+        contributor_dashboard.AllTopicNamesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -381,8 +382,17 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
-        learner_dashboard.LearnerDashboardHandler),
+        r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
+        learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
+        learner_dashboard.LearnerDashboardCollectionsProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
+        learner_dashboard.LearnerDashboardExplorationsProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
@@ -937,6 +947,16 @@ URLS.extend((
     get_redirect_route(
         r'/cron/app_feedback_report/scrub_expiring_reports',
         cron.CronAppFeedbackReportsScrubberHandlerPage),
+    get_redirect_route(
+        r'/cron/explorations/recommendations',
+        cron.CronExplorationRecommendationsHandler),
+    get_redirect_route(
+        r'/cron/explorations/search_rank', cron.CronActivitySearchRankHandler),
+    get_redirect_route(
+        r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
+    get_redirect_route(
+        r'/cron/suggestions/translation_contribution_stats',
+        cron.CronTranslationContributionStatsHandler),
 ))
 
 # Add tasks urls.
@@ -972,14 +992,17 @@ class NdbWsgiMiddleware:
         self.wsgi_app = wsgi_app
 
     def __call__(
-            self,
-            environ: Dict[str, str],
-            start_response: webapp2.Response
-    ) -> Any:
+        self,
+        environ: Dict[str, str],
+        start_response: webapp2.Response
+    ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            return self.wsgi_app(environ, start_response)
+            # Cast is needed since webapp2.WSGIApplication is not
+            # correctly typed.
+            return cast(
+                webapp2.Response, self.wsgi_app(environ, start_response))
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)

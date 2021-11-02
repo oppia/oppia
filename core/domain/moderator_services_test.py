@@ -16,12 +16,11 @@
 
 """Unit tests for core.domain.moderator services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.domain import moderator_services
 from core.tests import test_utils
-import feconf
 
 
 class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):

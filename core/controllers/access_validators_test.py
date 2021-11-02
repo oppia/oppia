@@ -14,13 +14,12 @@
 
 """Tests for core.domain.access_validator."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import config_services
 from core.tests import test_utils
-import feconf
 
 ACCESS_VALIDATION_HANDLER_PREFIX = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
 

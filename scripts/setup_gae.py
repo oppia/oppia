@@ -14,16 +14,16 @@
 
 """Python execution environment setup for scripts that require GAE."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
-import python_utils
+from core import python_utils
 
 from . import common
 
@@ -59,9 +59,9 @@ def main(args=None):
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding
-            # lines (GAE_DIR and GCLOUD_PATH) in release_constants.json should
-            # also be updated.
-            python_utils.url_retrieve(
+            # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
+            # should also be updated.
+            urlrequest.urlretrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')

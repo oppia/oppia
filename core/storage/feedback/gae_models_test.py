@@ -16,17 +16,16 @@
 
 """Tests for core.storage.feedback.gae_models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import types
 
+from core import feconf
+from core import utils
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 from typing import Dict
 

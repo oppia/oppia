@@ -16,10 +16,9 @@
 
 """Models related to Oppia improvement tasks."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
 
 from typing import Dict, List, Optional

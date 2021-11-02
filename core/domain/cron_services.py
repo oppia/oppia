@@ -14,13 +14,12 @@
 
 """Service functions relating to cron controllers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
 from core.platform import models
-import feconf
 
 (base_models, job_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job, models.NAMES.user])

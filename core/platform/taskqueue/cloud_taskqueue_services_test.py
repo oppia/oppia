@@ -16,8 +16,7 @@
 
 """Tests for methods in the cloud_taskqueue_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import json
@@ -25,19 +24,17 @@ import json
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
-import python_utils
 
 from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
-
 from typing import Any, Dict, Optional
 
 
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_taskqueue_services."""
 
-    class Response(python_utils.OBJECT):
+    class Response:
         """Mock for the response object that is returned from a Cloud
         Tasks query.
         """

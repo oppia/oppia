@@ -16,15 +16,14 @@
 
 """Tests for the domain objects relating to platform parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 
+from core import feconf
+from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
-import feconf
-import utils
 
 SERVER_MODES = parameter_domain.SERVER_MODES
 

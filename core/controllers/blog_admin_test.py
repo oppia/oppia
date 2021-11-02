@@ -14,15 +14,14 @@
 
 """Tests for the blog admin page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
+from core import feconf
 from core.domain import config_domain
 from core.domain import config_services
 from core.tests import test_utils
-import feconf
 
 
 class BlogAdminPageTests(test_utils.GenericTestBase):

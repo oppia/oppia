@@ -14,15 +14,14 @@
 
 """This script runs unit tests for frontend JavaScript code (using Karma)."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 
 from . import build
 from . import check_frontend_test_coverage

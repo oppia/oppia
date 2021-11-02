@@ -14,13 +14,12 @@
 
 """Controllers for the release coordinator page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
-import feconf
 
 
 class MemoryCacheHandler(base.BaseHandler):

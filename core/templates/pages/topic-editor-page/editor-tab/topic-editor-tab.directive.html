@@ -71,6 +71,7 @@
                         ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                         ng-change="updateTopicDescriptionStatus(editableDescription)"
                         ng-blur="updateTopicDescription(editableDescription)"
+                        ng-disabled="!topicRights.canEditTopic()"
                         aria-label="Topic Description"
                         placeholder="Enter the description of the topic">
               </textarea>
@@ -88,6 +89,7 @@
               <textarea type="text" class="form-control topic-description protractor-test-topic-page-title-fragment-field"
                         ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
                         ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
+                        ng-disabled="!topicRights.canEditTopic()"
                         aria-label="Page Title Fragment"
                         placeholder="Enter the page title for the topic">
               </textarea>
@@ -103,6 +105,7 @@
               <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
                         ng-model="editableMetaTagContent" maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
                         ng-blur="updateTopicMetaTagContent(editableMetaTagContent)"
+                        ng-disabled="!topicRights.canEditTopic()"
                         placeholder="Enter the meta tag content for the topic"
                         aria-label="Meta Tag Content">
               </textarea>
@@ -156,7 +159,11 @@
       <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(SUBTOPIC_LIST)">
         <div class="subtopic-reassign-header">
           <h3>Subtopics</h3>
-          <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">REASSIGN</span>
+          <button class="reassign-button protractor-test-reassign-skill-button"
+                  ng-click="reassignSkillsInSubtopics()"
+                  ng-disabled="!topicRights.canEditTopic()">
+            REASSIGN
+          </button>
           <i class="fa fa-caret-down"
              ng-if="!subtopicsListIsShown"
              aria-hidden="true">
@@ -170,12 +177,14 @@
       <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <div>
           <label>
-            <input class="practice-tab-checkbox protractor-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)">
+            <input class="practice-tab-checkbox protractor-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)" ng-disabled="!topicRights.canEditTopic()">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
           </label>
           <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. It is recommended that this option be enabled only if there are at least 5 questions attached to the topic"></i>
         </div>
-        <button class="btn add-subtopic-btn protractor-test-add-subtopic-button puppeteer-test-add-subtopic-button" ng-click="createSubtopic()">
+        <button class="btn add-subtopic-btn protractor-test-add-subtopic-button puppeteer-test-add-subtopic-button"
+                ng-click="createSubtopic()"
+                ng-disabled="!topicRights.canEditTopic()">
           + ADD SUBTOPIC
         </button>
         <button ng-if="skillCreationIsAllowed" class="btn add-skill-btn protractor-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
@@ -282,7 +291,7 @@
       </div>
       <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
         <button class="btn add-story-btn protractor-test-create-story-button oppia-autofocus"
-                ng-click="createCanonicalStory()" focus-on="addStoryBtn">
+                ng-click="createCanonicalStory()" focus-on="addStoryBtn" ng-disabled="!topicRights.canEditTopic()">
           + ADD STORY
         </button>
         <div class="canonical-stories">
@@ -561,8 +570,9 @@
   }
 
   .topic-editor .reassign-button {
+    background: none;
+    border: none;
     color: #0b6c63;
-    cursor: pointer;
   }
 
   .topic-editor .subtopic-reassign-header {

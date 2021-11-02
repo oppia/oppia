@@ -16,14 +16,14 @@
 
 """Domain object for a reference to an activity."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
-import python_utils
+from core.constants import constants
+
+from typing import Dict, List
 
 
-class ActivityReference(python_utils.OBJECT):
+class ActivityReference:
     """Domain object for an activity reference.
 
     An activity is a piece of learning material that can be created in Oppia.
@@ -35,7 +35,7 @@ class ActivityReference(python_utils.OBJECT):
         id: str. The activity id.
     """
 
-    def __init__(self, activity_type, activity_id):
+    def __init__(self, activity_type: str, activity_id: str) -> None:
         """Constructs an ActivityReference domain object.
 
         Args:
@@ -45,11 +45,15 @@ class ActivityReference(python_utils.OBJECT):
         self.type = activity_type
         self.id = activity_id
 
-    def get_hash(self):
-        """Returns a unique string for this ActivityReference domain object."""
+    def get_hash(self) -> str:
+        """Returns a unique string for this ActivityReference domain object.
+
+        Returns:
+            str. A unique string hash for this ActivityReference domain object.
+        """
         return '%s:%s' % (self.type, self.id)
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that all fields of this ActivityReference domain object
         are valid.
 
@@ -59,11 +63,11 @@ class ActivityReference(python_utils.OBJECT):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing this ActivityReference domain object.
 
         Returns:
@@ -76,7 +80,9 @@ class ActivityReference(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, activity_reference_dict):
+    def from_dict(
+        cls, activity_reference_dict: Dict[str, str]
+    ) -> ActivityReference:
         """Return the ActivityReference object from a dict.
 
         Args:
@@ -84,13 +90,13 @@ class ActivityReference(python_utils.OBJECT):
                 of the object.
 
         Returns:
-            ActivityReference. The correcponding ActivityReference object.
+            ActivityReference. The corresponding ActivityReference object.
         """
         return cls(
             activity_reference_dict['type'], activity_reference_dict['id'])
 
 
-class ActivityReferences(python_utils.OBJECT):
+class ActivityReferences:
     """Domain object for a list of activity references.
 
     Attributes:
@@ -98,7 +104,7 @@ class ActivityReferences(python_utils.OBJECT):
             ActivityReference domain objects.
     """
 
-    def __init__(self, activity_reference_list):
+    def __init__(self, activity_reference_list: List[ActivityReference]):
         """Constructs an ActivityReferences domain object.
 
         Args:
@@ -107,7 +113,7 @@ class ActivityReferences(python_utils.OBJECT):
         """
         self.activity_reference_list = activity_reference_list
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that all ActivityReference domain object in
         self.activity_reference_list are valid.
 

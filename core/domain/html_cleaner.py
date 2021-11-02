@@ -16,15 +16,14 @@
 
 """HTML sanitizing service."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import html
 import json
 import logging
+import urllib
 
 from core.domain import rte_component_registry
-import python_utils
 
 import bleach
 import bs4
@@ -47,7 +46,7 @@ def filter_a(tag, name, value):
     if name in ('title', 'target'):
         return True
     if name == 'href':
-        url_components = python_utils.url_split(value)
+        url_components = urllib.parse.urlsplit(value)
         if url_components[0] in ['http', 'https']:
             return True
         logging.error('Found invalid URL href: %s' % value)

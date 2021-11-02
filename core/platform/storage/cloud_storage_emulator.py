@@ -16,17 +16,13 @@
 
 """An emulator that mocks the core.platform.storage API."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import annotations  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import mimetypes
 
-import feconf
-import python_utils
+from core import feconf
 
 import redis
-
 from typing import Dict, List, Mapping, Optional, Union
 
 
@@ -38,7 +34,7 @@ REDIS_CLIENT = redis.StrictRedis(
 )
 
 
-class EmulatorBlob(python_utils.OBJECT):
+class EmulatorBlob:
     """Object for storing the file data."""
 
     def __init__(
@@ -176,7 +172,7 @@ class EmulatorBlob(python_utils.OBJECT):
                 self.name, self.content_type))
 
 
-class CloudStorageEmulator(python_utils.OBJECT):
+class CloudStorageEmulator:
     """Emulator for the storage client."""
 
     def __init__(self) -> None:

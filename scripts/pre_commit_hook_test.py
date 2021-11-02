@@ -16,16 +16,14 @@
 
 """Unit tests for scripts/pre_commit_hook.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import shutil
 import subprocess
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import pre_commit_hook
 

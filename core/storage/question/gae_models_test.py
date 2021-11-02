@@ -14,19 +14,17 @@
 
 """Tests for core.storage.question.gae_models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import random
 import types
 
-from constants import constants
+from core import utils
+from core.constants import constants
 from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
-import python_utils
-import utils
 
 from typing import List
 
@@ -530,7 +528,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
             self
     ) -> None:
-        skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
+        skill_ids = ['skill_id%s' % number for number in range(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
@@ -738,7 +736,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model4])
 
     def test_request_too_many_skills_raises_error(self) -> None:
-        skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
+        skill_ids = ['skill_id%s' % number for number in range(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
             (

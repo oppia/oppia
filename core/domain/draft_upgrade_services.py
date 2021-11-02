@@ -16,18 +16,16 @@
 
 """Commands that can be used to upgrade draft to newer Exploration versions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
+from core import utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
-import python_utils
-import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -72,8 +70,7 @@ def try_upgrading_draft_to_exp_version(
     if current_draft_version == to_exp_version:
         return None
 
-    exp_versions = list(
-        python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
+    exp_versions = list(range(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
         exp_models.ExplorationCommitLogEntryModel.get_multi(
             exp_id, exp_versions))
@@ -100,7 +97,7 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-class DraftUpgradeUtil(python_utils.OBJECT):
+class DraftUpgradeUtil:
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
@@ -139,7 +136,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             new_value['choices']['value'][value_index][
                                 'html'
                             ] = conversion_fn(value['html'])
-                        elif isinstance(value, python_utils.BASESTRING):
+                        elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
             elif (change.property_name ==
@@ -186,8 +183,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             if isinstance(html_list, list):
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
-                                    if isinstance(
-                                            answer_html, python_utils.UNICODE):
+                                    if isinstance(answer_html, str):
                                         new_value['correct_answer'][list_index][
                                             answer_html_index] = (
                                                 conversion_fn(answer_html))

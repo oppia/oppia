@@ -16,15 +16,14 @@
 
 """Tests for core.storage.email.gae_models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import types
 
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 from typing import Sequence
 
@@ -32,7 +31,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import email_models
-    from mypy_imports import user_models # pylint: disable=unused-import
+    from mypy_imports import user_models  # pylint: disable=unused-import
 
 (base_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])

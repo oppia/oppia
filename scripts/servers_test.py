@@ -14,8 +14,7 @@
 
 """Unit tests for scripts/servers.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import contextlib
@@ -30,8 +29,8 @@ import threading
 import time
 from unittest import mock
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
@@ -47,7 +46,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def setUp(self):
         super(ManagedProcessTests, self).setUp()
-        self.exit_stack = python_utils.ExitStack()
+        self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
@@ -96,7 +95,7 @@ class ManagedProcessTests(test_utils.TestBase):
             stdout = b''.join(b'%b\n' % o for o in outputs)
             child_procs = [
                 scripts_test_utils.PopenStub(pid=i, unresponsive=unresponsive)
-                for i in python_utils.RANGE(pid + 1, pid + 1 + num_children)
+                for i in range(pid + 1, pid + 1 + num_children)
             ]
             return scripts_test_utils.PopenStub(
                 pid=pid, stdout=stdout, unresponsive=unresponsive,
@@ -130,7 +129,7 @@ class ManagedProcessTests(test_utils.TestBase):
         new_makedirs = test_utils.CallCounter(
             lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw))
 
-        with python_utils.ExitStack() as exit_stack:
+        with contextlib.ExitStack() as exit_stack:
             exit_stack.enter_context(self.swap(os.path, 'exists', new_exists))
             exit_stack.enter_context(self.swap(shutil, 'rmtree', new_rmtree))
             exit_stack.enter_context(self.swap(os, 'makedirs', new_makedirs))
@@ -691,7 +690,7 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
             outputs=[b'abc', b'Built at: 123', b'def']))
         str_io = python_utils.string_io()
-        self.exit_stack.enter_context(python_utils.redirect_stdout(str_io))
+        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(servers.managed_webpack_compiler(
@@ -715,7 +714,7 @@ class ManagedProcessTests(test_utils.TestBase):
         # NOTE: The 'Built at: ' message is never printed.
         self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
         str_io = python_utils.string_io()
-        self.exit_stack.enter_context(python_utils.redirect_stdout(str_io))
+        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
         self.assertRaisesRegexp(
             IOError, 'First build never completed',
@@ -932,7 +931,7 @@ class ManagedProcessTests(test_utils.TestBase):
             common, 'is_x64_architecture', value=True))
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'inplace_replace_file_context',
-            lambda *_: python_utils.nullcontext(), expected_args=[
+            lambda *_: contextlib.nullcontext(), expected_args=[
                 (
                     common.CHROME_PROVIDER_FILE_PATH,
                     re.escape('this.osArch = os.arch();'),

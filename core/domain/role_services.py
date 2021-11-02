@@ -19,16 +19,15 @@ actions permitted to the roles and the functions needed to access roles
 and actions.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import math
 import random
 import time
 
+from core import feconf
 from core.platform import models
-import feconf
 
 (audit_models,) = models.Registry.import_models([models.NAMES.audit])
 

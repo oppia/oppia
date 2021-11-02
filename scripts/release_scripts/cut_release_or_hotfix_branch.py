@@ -36,16 +36,15 @@ d is number of the hotfix being created, e.g. 1. The generated branch
 name will be release-x.y.z-hotfix-d, e.g. release-2.5.3-hotfix-1.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import json
 import re
 import subprocess
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 from scripts import common
 
 
@@ -281,7 +280,7 @@ def execute_branch_cut(target_version, hotfix_number):
     python_utils.PRINT(
         'Please confirm: are Actions checks passing on %s? (y/n) ' % (
             branch_to_check))
-    answer = python_utils.INPUT().lower()
+    answer = input().lower()
     if answer not in common.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
             'Tests should pass on %s before this script is run.' % (

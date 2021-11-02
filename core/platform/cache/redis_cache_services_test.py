@@ -16,15 +16,14 @@
 
 """Tests for methods in the redis_cache_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
+from core import feconf
+from core import python_utils
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
-import feconf
-import python_utils
 from scripts import common
 
 
@@ -129,5 +128,4 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
-            self.assertEqual(
-                elements[1], python_utils.UNICODE(feconf.REDISPORT))
+            self.assertEqual(elements[1], str(feconf.REDISPORT))

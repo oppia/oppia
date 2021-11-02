@@ -14,13 +14,15 @@
 
 """Tests for the admin page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -49,9 +51,6 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (
     audit_models, blog_models, exp_models, opportunity_models,
@@ -290,7 +289,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # any language code other than english (what the dummy explorations
         # were written in) can be tested here.
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
+            opportunity_services.get_translation_opportunities('hi', '', None))
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 

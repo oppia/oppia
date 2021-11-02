@@ -14,10 +14,10 @@
 
 """ Tests for the questions list. """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_domain
@@ -25,8 +25,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
@@ -66,7 +64,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
     def test_get_questions_succeeds(self):
-        for _ in python_utils.RANGE(0, 4):
+        for _ in range(4):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -96,7 +94,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
             self.assertEqual(len(question_summary_dicts_2), 2)
-            for i in python_utils.RANGE(0, 2):
+            for i in range(2):
                 self.assertEqual(
                     question_summary_dicts[i]['skill_descriptions'],
                     ['Skill Description 2', 'Skill Description'])
@@ -122,7 +120,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             question_summary_dicts_3 = (
                 json_response['question_summary_dicts'])
             self.assertEqual(len(question_summary_dicts_3), 2)
-            for i in python_utils.RANGE(0, 2):
+            for i in range(2):
                 self.assertEqual(
                     question_summary_dicts_3[i]['skill_description'],
                     'Skill Description')

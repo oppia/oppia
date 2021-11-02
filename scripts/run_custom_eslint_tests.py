@@ -16,15 +16,14 @@
 
 """Script for running tests for custom eslint checks."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 

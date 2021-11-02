@@ -46,10 +46,10 @@ imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
+import contextlib
 import importlib
 import inspect
 import json
@@ -62,13 +62,12 @@ import threading
 import time
 import unittest
 
-
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -103,15 +102,15 @@ _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=python_utils.UNICODE)
+    type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.UNICODE)
+    type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_shard',
     help='optional name of shard to run',
-    type=python_utils.UNICODE)
+    type=str)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
@@ -161,7 +160,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TestingTaskSpec(python_utils.OBJECT):
+class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):
@@ -345,7 +344,7 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_cloud_datastore_emulator())
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:

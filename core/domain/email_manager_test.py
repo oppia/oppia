@@ -14,14 +14,15 @@
 
 """Tests for methods relating to sending emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import logging
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
@@ -34,8 +35,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
@@ -1782,7 +1781,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator_id)
             self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(
@@ -1794,7 +1793,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator2_id)
             self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(

@@ -14,19 +14,23 @@
 
 """Controllers for the cron jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
+from core.domain import beam_job_services
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-import feconf
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs
+from core.jobs.batch_jobs import user_stats_computation_jobs
 
 
 class CronModelsCleanupHandler(base.BaseHandler):
@@ -195,3 +199,64 @@ class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
         """
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+
+
+class CronDashboardStatsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                user_stats_computation_jobs.CollectWeeklyDashboardStatsJob))
+
+
+class CronExplorationRecommendationsHandler(base.BaseHandler):
+    """Handler for computing exploration recommendations."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                exp_recommendation_computation_jobs
+                .ComputeExplorationRecommendationsJob))
+
+
+class CronActivitySearchRankHandler(base.BaseHandler):
+    """Handler for computing activity search ranks."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob)
+
+
+class CronTranslationContributionStatsHandler(base.BaseHandler):
+    """Handler for running the translation contribution stats populate job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                suggestion_stats_computation_jobs
+                .GenerateTranslationContributionStatsJob))

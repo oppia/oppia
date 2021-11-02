@@ -16,15 +16,14 @@
 
 """Tests for the email services API wrapper in DEV_MODE."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import textwrap
 
+from core import feconf
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
-import feconf
 
 from typing import Any, Dict, Union
 

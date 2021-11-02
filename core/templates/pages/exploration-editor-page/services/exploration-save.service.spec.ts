@@ -72,6 +72,14 @@ describe('Exploration save service ' +
         reload() {}
       }
     });
+
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -175,6 +183,7 @@ describe('Exploration save service ' +
   let ExplorationRightsService = null;
   let explorationTagsService: ExplorationTagsService = null;
   let ExplorationTitleService = null;
+  let NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -195,6 +204,16 @@ describe('Exploration save service ' +
     });
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
@@ -209,6 +228,7 @@ describe('Exploration save service ' +
     ExplorationRightsService = $injector.get('ExplorationRightsService');
     explorationTagsService = $injector.get('ExplorationTagsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    NgbModal = $injector.get('NgbModal');
   }));
 
   it('should not open version mismatch modal', fakeAsync(function() {
@@ -268,7 +288,7 @@ describe('Exploration save service ' +
 
   it('should not publish exploration in case of backend ' +
     'error', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(NgbModal, 'open').and.returnValue({
       result: Promise.reject('failure')
     });
     let publishSpy = spyOn(ExplorationRightsService, 'publish')
@@ -371,6 +391,16 @@ describe('Exploration save service ' +
       ]
     });
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
@@ -601,10 +631,20 @@ describe('Exploration save service ' +
             }
           }
         },
+        FocusManagerService
       ]
     });
-    focusManagerService = TestBed.inject(FocusManagerService);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
@@ -618,6 +658,7 @@ describe('Exploration save service ' +
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
     RouterService = $injector.get('RouterService');
     statesObjectFactory = $injector.get('StatesObjectFactory');
+    focusManagerService = $injector.get('FocusManagerService');
   }));
 
   it('should open exploration save modal', fakeAsync(function() {
@@ -650,6 +691,45 @@ describe('Exploration save service ' +
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
+  }));
+
+  it('should remove focus after exploration save modal ' +
+    'is closed', fakeAsync(function() {
+    let startLoadingCb = jasmine.createSpy('startLoadingCb');
+    let endLoadingCb = jasmine.createSpy('endLoadingCb');
+    let sampleStates = statesObjectFactory.createFromBackendDict(
+      statesBackendDict);
+    let mockEventEmitter = new EventEmitter();
+    spyOn(RouterService, 'savePendingChanges')
+      .and.returnValue(null);
+    spyOn(ExplorationStatesService, 'getStates')
+      .and.returnValue(sampleStates);
+    spyOn(explorationDiffService, 'getDiffGraphData')
+      .and.returnValue({
+        nodes: 'nodes',
+        links: ['links'],
+        finalStateIds: ['finalStaeIds'],
+        originalStateIds: ['Hola'],
+        stateIds: [],
+      });
+    spyOn($uibModal, 'open').and.callThrough();
+    let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
+      .and.returnValue(mockEventEmitter);
+
+    explorationSaveService.saveChanges(
+      startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
+    flush();
+    $rootScope.$apply();
+    $timeout.flush();
+    flush();
+    $rootScope.$apply();
+
+    mockEventEmitter.emit('labelForClearingFocus');
+    tick();
+
+    expect(focusSpy).toHaveBeenCalled();
   }));
 
   it('should not open exploration save modal in case of ' +

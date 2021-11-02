@@ -14,10 +14,10 @@
 
 """Tests for the contributor dashboard controllers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -32,8 +32,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -75,7 +73,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -116,7 +114,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -149,7 +147,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 0',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
 
         self.expected_opportunity_dict_2 = {
@@ -158,7 +157,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'story_title': 'title 1',
             'chapter_title': 'Node1',
             'content_count': 2,
-            'translation_counts': {}
+            'translation_counts': {},
+            'translation_in_review_counts': {}
         }
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
@@ -182,14 +182,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={})
-
         self.assertEqual(
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
             self):
@@ -203,8 +201,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_does_not_throw_for_deleted_topics(self):
         topic_services.delete_topic(self.admin_id, self.topic_id)
@@ -216,8 +213,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data(self):
         response = self.get_json(
@@ -229,8 +225,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_voiceover_opportunity_data(self):
         response = self.get_json(
@@ -243,8 +238,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
         self.assertFalse(response['more'])
-        self.assertTrue(
-            isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -256,8 +250,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 response['opportunities'],
                 [self.expected_skill_opportunity_dict_0])
             self.assertTrue(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(response['next_cursor'], str)
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
@@ -269,9 +262,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_skill_opportunity_dict_1])
             self.assertFalse(next_response['more'])
-            self.assertTrue(
-                isinstance(
-                    next_response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination_multiple_fetches(self):
         # Unassign topic 0 from the classroom.
@@ -338,8 +329,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     }
                 ])
             self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -350,8 +340,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(response['next_cursor'], str)
 
             next_response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
@@ -365,9 +354,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
-            self.assertTrue(
-                isinstance(
-                    next_response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_voiceover_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -378,8 +365,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(response['next_cursor'], str)
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
@@ -391,8 +377,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
-            self.assertTrue(isinstance(
-                next_response['next_cursor'], python_utils.BASESTRING))
+            self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -486,7 +471,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -510,7 +495,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'description %d' % i,
             '0',
             'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(2)]
+        ) for i in range(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -939,4 +924,45 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response,
             {'featured_translation_languages': new_value}
+        )
+
+
+class AllTopicNamesHandlerTest(test_utils.GenericTestBase):
+    """Test for the AllTopicNamesHandler."""
+
+    def setUp(self):
+        super(AllTopicNamesHandlerTest, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+    def test_get_all_topic_names(self):
+        response = self.get_json('/getalltopicnames')
+        self.assertEqual(
+            response,
+            {'topic_names': []}
+        )
+
+        topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+        response = self.get_json('/getalltopicnames')
+        self.assertEqual(
+            response,
+            {'topic_names': ['topic']}
         )

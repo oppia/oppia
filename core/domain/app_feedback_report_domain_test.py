@@ -16,22 +16,23 @@
 
 """Tests for app feedback reporting domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 from core.tests import test_utils
 
-import feconf
-from mypy_imports import app_feedback_report_models
-import python_utils
-import utils
+from typing import List
 
-from typing import List # isort:skip # pylint: disable=unused-import
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -1196,9 +1197,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'The ticket name should be a string')
 
     def test_validation_ticket_name_too_long_fails(self) -> None:
-        long_name = 'too long'
-        for _ in python_utils.RANGE(constants.MAXIMUM_TICKET_NAME_LENGTH):
-            long_name += 'x'
+        long_name = 'too long' + 'x' * constants.MAXIMUM_TICKET_NAME_LENGTH
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(
             self.ticket_obj,
@@ -1313,7 +1312,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             ),
             'android_sdk_version': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1})
+                    str(ANDROID_SDK_VERSION): 1})
             ),
             'version_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -1342,8 +1341,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
                 'audio_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
-                'android_sdk_version': {
-                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1},
+                'android_sdk_version': {str(ANDROID_SDK_VERSION): 1},
                 'version_name': {ANDROID_PLATFORM_VERSION: 1}
             }
         }

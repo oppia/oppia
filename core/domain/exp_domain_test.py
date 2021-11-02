@@ -16,14 +16,15 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import os
 import re
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -33,9 +34,6 @@ from core.domain import rights_manager
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -519,7 +517,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
 
-        for i in python_utils.RANGE(8):
+        for i in range(8):
             self.exploration.add_states(['State%s' % i])
             self.exploration.states['State%s' % i].card_is_checkpoint = True
             self.set_interaction_for_state(
@@ -2822,7 +2820,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        for version_num in python_utils.RANGE(
+        for version_num in range(
                 feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
                 current_states_schema_version):
             self.assertTrue(hasattr(
@@ -2841,7 +2839,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        for version_num in python_utils.RANGE(
+        for version_num in range(
                 exp_domain.Exploration.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 current_exp_schema_version):
             self.assertTrue(hasattr(

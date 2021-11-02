@@ -14,10 +14,9 @@
 
 """Models for storing the story data models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
 
 from typing import Any, Dict, List, Optional
@@ -204,7 +203,7 @@ class StoryModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_by_url_fragment(cls, url_fragment: str) -> Optional['StoryModel']:
+    def get_by_url_fragment(cls, url_fragment: str) -> Optional[StoryModel]:
         """Gets StoryModel by url_fragment. Returns None if the story with
         name url_fragment doesn't exist.
 

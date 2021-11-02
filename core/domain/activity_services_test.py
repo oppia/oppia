@@ -16,10 +16,9 @@
 
 """Unit tests for core.domain.activity_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services

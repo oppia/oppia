@@ -16,22 +16,19 @@
 
 """Domain objects relating to blogs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 
-from constants import constants
+from core import utils
+from core.constants import constants
 from core.domain import html_cleaner
-
-import python_utils
-import utils
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
 
 
-class BlogPost(python_utils.OBJECT):
+class BlogPost:
     """Domain object for an Oppia Blog Post."""
 
     def __init__(
@@ -76,7 +73,7 @@ class BlogPost(python_utils.OBJECT):
             ValidationError. Provided thumbnail filename is invalid.
         """
         if strict:
-            if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+            if not isinstance(thumbnail_filename, str):
                 raise utils.ValidationError(
                     'Expected thumbnail filename to be a string, received: %s.'
                     % thumbnail_filename)
@@ -102,7 +99,7 @@ class BlogPost(python_utils.OBJECT):
         self.require_valid_thumbnail_filename(
             self.thumbnail_filename, strict=strict)
 
-        if not isinstance(self.content, python_utils.BASESTRING):
+        if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected contents to be a string, received: %s' % self.content)
 
@@ -128,7 +125,7 @@ class BlogPost(python_utils.OBJECT):
                 'Expected \'tags\' to be a list, received: %s' % tags)
 
         for tag in tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+            if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received: '
                     '\'%s\'' % tag)
@@ -173,7 +170,7 @@ class BlogPost(python_utils.OBJECT):
         Raises:
             ValidationErrors. Title provided is invalid.
         """
-        if not isinstance(title, python_utils.BASESTRING):
+        if not isinstance(title, str):
             raise utils.ValidationError('Title should be a string.')
 
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
@@ -200,7 +197,7 @@ class BlogPost(python_utils.OBJECT):
         Raises:
             ValidationErrors. URL fragment provided is invalid.
         """
-        if not isinstance(url_fragment, python_utils.BASESTRING):
+        if not isinstance(url_fragment, str):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
                 'Received %s.' % (url_fragment))
@@ -323,7 +320,7 @@ class BlogPost(python_utils.OBJECT):
         Args:
             blog_id: str. The blog post id to validate.
         """
-        if not isinstance(blog_id, python_utils.BASESTRING):
+        if not isinstance(blog_id, str):
             raise utils.ValidationError(
                 'Blog Post ID should be a string, received: %s' % blog_id)
 
@@ -331,7 +328,7 @@ class BlogPost(python_utils.OBJECT):
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
 
-class BlogPostSummary(python_utils.OBJECT):
+class BlogPostSummary:
     """Domain object for Blog Post Summary."""
 
     def __init__(
@@ -377,7 +374,7 @@ class BlogPostSummary(python_utils.OBJECT):
             ValidationErrors. Thumbnail filename provided is invalid.
         """
         if strict:
-            if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+            if not isinstance(thumbnail_filename, str):
                 raise utils.ValidationError(
                     'Expected thumbnail filename to be a string, received: %s.'
                     % thumbnail_filename)
@@ -403,7 +400,7 @@ class BlogPostSummary(python_utils.OBJECT):
         self.require_valid_thumbnail_filename(
             self.thumbnail_filename, strict=strict)
 
-        if not isinstance(self.summary, python_utils.BASESTRING):
+        if not isinstance(self.summary, str):
             raise utils.ValidationError(
                 'Expected summary to be a string, received: %s' % self.summary)
 
@@ -422,7 +419,7 @@ class BlogPostSummary(python_utils.OBJECT):
         Raises:
             ValidationErrors. URL fragment provided is invalid.
         """
-        if not isinstance(url_fragment, python_utils.BASESTRING):
+        if not isinstance(url_fragment, str):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
                 'Received %s.' % (url_fragment))
@@ -454,7 +451,7 @@ class BlogPostSummary(python_utils.OBJECT):
         Raises:
             ValidationErrors. Title provided is invalid.
         """
-        if not isinstance(title, python_utils.BASESTRING):
+        if not isinstance(title, str):
             raise utils.ValidationError('Title should be a string.')
 
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
@@ -482,7 +479,7 @@ class BlogPostSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected \'tags\' to be a list, received: %s' % tags)
         for tag in tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+            if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received: '
                     '\'%s\'' % tag)
@@ -537,7 +534,7 @@ class BlogPostSummary(python_utils.OBJECT):
         }
 
 
-class BlogPostRights(python_utils.OBJECT):
+class BlogPostRights:
     """Domain object for Blog Post rights."""
 
     def __init__(self, blog_post_id, editor_ids, blog_post_is_published=False):

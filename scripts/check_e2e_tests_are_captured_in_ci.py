@@ -16,14 +16,13 @@
 the same e2e test suites.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.

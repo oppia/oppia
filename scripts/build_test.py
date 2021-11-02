@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/build.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import ast
 import collections
@@ -29,8 +28,8 @@ import subprocess
 import tempfile
 import threading
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import build
 from . import common
@@ -105,7 +104,7 @@ class BuildTests(test_utils.GenericTestBase):
         """
         # Prepare a file_stream object from python_utils.string_io().
         third_party_js_stream = python_utils.string_io()
-        # Get all filepaths from manifest.json.
+        # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
         build._join_files(dependency_filepaths['js'], third_party_js_stream)  # pylint: disable=protected-access
@@ -126,7 +125,7 @@ class BuildTests(test_utils.GenericTestBase):
         tasks matches the number of font files.
         """
         copy_tasks = collections.deque()
-        # Get all filepaths from manifest.json.
+        # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Setup a sandbox folder for copying fonts.
         test_target = os.path.join('target', 'fonts', '')
@@ -494,7 +493,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test generate_build_tasks_to_build_files_from_filepaths queues up a
         corresponding number of build tasks to the number of file changes.
         """
-        new_filename = 'manifest.json'
+        new_filename = 'dependencies.json'
         recently_changed_filenames = [
             os.path.join(MOCK_ASSETS_DEV_DIR, new_filename)]
         build_tasks = collections.deque()
@@ -764,9 +763,10 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": true,\n')
-            tmp.write(u'};')
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": true,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
@@ -781,6 +781,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -793,6 +794,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -811,9 +813,10 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": false,\n')
-            tmp.write(u'};')
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": false,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
@@ -828,6 +831,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -890,13 +894,15 @@ class BuildTests(test_utils.GenericTestBase):
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False
+            'compare_file_count_gets_called': False,
+            'generate_python_package_called': False,
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
             'modify_constants_gets_called': True,
-            'compare_file_count_gets_called': True
+            'compare_file_count_gets_called': True,
+            'generate_python_package_called': True,
         }
 
         expected_config_path = build.WEBPACK_PROD_CONFIG
@@ -914,49 +920,8 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
-            build, 'build_using_webpack', mock_build_using_webpack)
-        modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
-        compare_file_count_swap = self.swap(
-            build, '_compare_file_count', mock_compare_file_count)
-
-        with ensure_files_exist_swap, build_using_webpack_swap:
-            with modify_constants_swap, compare_file_count_swap:
-                build.main(args=['--prod_env'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_build_with_deparallelize_terser(self):
-        check_function_calls = {
-            'build_using_webpack_gets_called': False,
-            'ensure_files_exist_gets_called': False,
-            'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False
-        }
-        expected_check_function_calls = {
-            'build_using_webpack_gets_called': True,
-            'ensure_files_exist_gets_called': True,
-            'modify_constants_gets_called': True,
-            'compare_file_count_gets_called': True,
-        }
-
-        expected_config_path = build.WEBPACK_TERSER_CONFIG
-
-        def mock_build_using_webpack(config_path):
-            self.assertEqual(config_path, expected_config_path)
-            check_function_calls['build_using_webpack_gets_called'] = True
-
-        def mock_ensure_files_exist(unused_filepaths):
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
-            check_function_calls['modify_constants_gets_called'] = True
-
-        def mock_compare_file_count(unused_first_dir, unused_second_dir):
-            check_function_calls['compare_file_count_gets_called'] = True
+        def mock_generate_python_package():
+            check_function_calls['generate_python_package_called'] = True
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
@@ -966,10 +931,13 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
+        generate_python_package_swap = self.swap(
+            build, 'generate_python_package', mock_generate_python_package)
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
-                build.main(args=['--prod_env', '--deparallelize_terser'])
+                with generate_python_package_swap:
+                    build.main(args=['--prod_env'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -1014,40 +982,6 @@ class BuildTests(test_utils.GenericTestBase):
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
                 build.main(args=['--prod_env', '--source_maps'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_cannot_build_with_source_maps_with_terser_config(self):
-        check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'modify_constants_gets_called': False
-        }
-        expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
-            'modify_constants_gets_called': True
-        }
-
-        def mock_ensure_files_exist(unused_filepaths):
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
-            check_function_calls['modify_constants_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist)
-        modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception,
-            'source_maps flag shouldn\'t be used with '
-            'deparallelize_terser flag.')
-
-        with ensure_files_exist_swap, modify_constants_swap:
-            with assert_raises_regexp_context_manager:
-                build.main(
-                    args=[
-                        '--prod_env', '--source_maps',
-                        '--deparallelize_terser'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

@@ -16,12 +16,12 @@
 
 """Controllers for the collections editor."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
@@ -29,7 +29,6 @@ from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
-import feconf
 
 
 def _require_valid_version(version_from_payload, collection_version):

@@ -16,17 +16,15 @@
 
 """Provides a taskqueue API for the platform layer in DEV_MODE."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime  # pylint: disable=unused-import
 import os
 
+from core import feconf
 from core.platform.taskqueue import cloud_tasks_emulator
-import feconf
 
 import requests
-
 from typing import Any, Dict, Optional
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
