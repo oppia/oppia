@@ -552,7 +552,7 @@ def _upload_suggestion_images(request, suggestion, filenames):
     # created.
     images = request.get('files')
     for filename in filenames:
-        image = images.get(filename) if images else None
+        image = images.get(filename).encode('ISO-8859-1') if images else None
         if not image:
             logging.exception(
                 'Image not provided for file with name %s when the '
