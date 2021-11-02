@@ -116,8 +116,7 @@ export class RubricsEditorComponent {
     if (this.rubrics[0] === undefined || this.rubrics[1] === undefined ||
       this.rubrics[2] === undefined) {
       return false;
-    }
-    else {
+    } else {
       let totalEasyExplanations = this.rubrics[0]._explanations.length;
       let totalMediumExplanations = this.rubrics[1]._explanations.length;
       let totalHardExplanations = this.rubrics[2]._explanations.length;
