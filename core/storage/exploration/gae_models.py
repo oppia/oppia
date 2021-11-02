@@ -16,8 +16,7 @@
 
 """Model for an Oppia exploration."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -97,10 +96,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-            cls,
-            exp_id: str,
-            exp_versions: List[int]
-    ) -> List[Optional['ExplorationCommitLogEntryModel']]:
+        cls, exp_id: str, exp_versions: List[int]
+    ) -> List[Optional[ExplorationCommitLogEntryModel]]:
         """Gets the ExplorationCommitLogEntryModels for the given exploration
         id and exploration versions.
 
@@ -137,11 +134,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # tuple(list, str|None, bool)  to a domain object.
     @classmethod
     def get_all_non_private_commits(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            max_age: Optional[datetime.timedelta] = None
-    ) -> Tuple[Sequence['ExplorationCommitLogEntryModel'], Optional[str], bool]:
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        max_age: Optional[datetime.timedelta] = None
+    ) -> Tuple[Sequence[ExplorationCommitLogEntryModel], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their
         last updated attribute.
 
@@ -396,7 +393,7 @@ class ExplorationModel(base_models.VersionedModel):
     def _reconstitute(
             self,
             snapshot_dict: Dict[str, Any]
-    ) -> 'ExplorationModel':
+    ) -> ExplorationModel:
         """Populates the model instance with the snapshot.
         Some old ExplorationSnapshotContentModels can contain fields
         and field values that are no longer supported and would cause
@@ -680,7 +677,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def _reconstitute(
             self,
             snapshot_dict: Dict[str, Any]
-    ) -> 'ExplorationRightsModel':
+    ) -> ExplorationRightsModel:
         """Populates the model instance with the snapshot.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -920,7 +917,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> Sequence['ExpSummaryModel']:
+    def get_non_private(cls) -> Sequence[ExpSummaryModel]:
         """Returns an iterable with non-private ExpSummary models.
 
         Returns:
@@ -933,7 +930,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_top_rated(cls, limit: int) -> Sequence['ExpSummaryModel']:
+    def get_top_rated(cls, limit: int) -> Sequence[ExpSummaryModel]:
         """Fetches the top-rated exp summaries that are public in descending
         order of scaled_average_rating.
 
@@ -954,9 +951,8 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_private_at_least_viewable(
-            cls,
-            user_id: str
-    ) -> Sequence['ExpSummaryModel']:
+        cls, user_id: str
+    ) -> Sequence[ExpSummaryModel]:
         """Fetches private exp summaries that are at least viewable by the
         given user.
 
@@ -980,7 +976,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_at_least_editable(cls, user_id: str) -> Sequence['ExpSummaryModel']:
+    def get_at_least_editable(cls, user_id: str) -> Sequence[ExpSummaryModel]:
         """Fetches exp summaries that are at least editable by the given user.
 
         Args:
@@ -999,7 +995,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_recently_published(cls, limit: int) -> Sequence['ExpSummaryModel']:
+    def get_recently_published(cls, limit: int) -> Sequence[ExpSummaryModel]:
         """Fetches exp summaries that are recently published.
 
         Args:
