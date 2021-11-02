@@ -155,11 +155,11 @@ class Question:
             inapplicable_skill_misconception_ids: list(str). Optional
                 misconception ids that are marked as not relevant to the
                 question.
+            proto_size_in_bytes: int. Size of question.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
                 question was last updated.
-            proto_size_in_bytes: int. Size of question.
         """
         self.id = question_id
         self.question_state_data = question_state_data
@@ -170,9 +170,9 @@ class Question:
         self.linked_skill_ids = linked_skill_ids
         self.inapplicable_skill_misconception_ids = (
             inapplicable_skill_misconception_ids)
+        self.proto_size_in_bytes = proto_size_in_bytes
         self.created_on = created_on
         self.last_updated = last_updated
-        self.proto_size_in_bytes = proto_size_in_bytes
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -188,7 +188,6 @@ class Question:
             'language_code': self.language_code,
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
-            'proto_size_in_bytes': self.proto_size_in_bytes,
             'inapplicable_skill_misconception_ids': (
                 self.inapplicable_skill_misconception_ids)
         }
@@ -1340,8 +1339,7 @@ class Question:
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['inapplicable_skill_misconception_ids'],
-            question_dict['proto_size_in_bytes'])
+            question_dict['inapplicable_skill_misconception_ids'])
 
         return question
 
