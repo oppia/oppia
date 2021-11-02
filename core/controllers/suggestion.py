@@ -127,7 +127,7 @@ class SuggestionHandler(base.BaseHandler):
             return
 
         _upload_suggestion_images(
-            self.request,
+            self.normalized_payload,
             suggestion,
             suggestion.get_new_image_filenames_added_in_suggestion())
 
@@ -456,7 +456,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             )
         )
         _upload_suggestion_images(
-            self.request, updated_suggestion, new_image_filenames)
+            self.payload, updated_suggestion, new_image_filenames)
 
         self.render_json(self.values)
 
@@ -541,7 +541,7 @@ def _upload_suggestion_images(request, suggestion, filenames):
     """Saves a suggestion's images to storage.
 
     Args:
-        request: webapp2.Request. Request object containing a mapping of image
+        request: Payload. Payload containing a mapping of image
             filename to image blob.
         suggestion: BaseSuggestion. The suggestion for which images are being
             uploaded.
