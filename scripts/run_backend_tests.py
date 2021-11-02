@@ -50,17 +50,16 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import importlib
-import inspect
 import json
 import multiprocessing
 import os
+import random
 import re
+import socket
 import subprocess
 import sys
 import threading
 import time
-import unittest
 
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
@@ -130,13 +129,14 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
+def run_shell_cmd(
+        exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=None):
     """Runs a shell command and captures the stdout and stderr output.
 
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
+    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
     last_stdout_str, last_stderr_str = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
     # compatible with rest of the code.
@@ -169,49 +169,50 @@ class TestingTaskSpec:
 
     def run(self):
         """Runs all tests corresponding to the given test target."""
+        env = os.environ.copy()
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, COVERAGE_MODULE_PATH, 'run', '-p',
+                sys.executable, COVERAGE_MODULE_PATH, 'run',
                 TEST_RUNNER_PATH, test_target_flag
             ]
+            rand = random.Random(os.urandom(8)).randint(0, 999999)
+            data_file = '.coverage.%s.%s.%06d' % (
+                socket.gethostname(), os.getpid(), rand)
+            env['COVERAGE_FILE'] = data_file
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        result = run_shell_cmd(exc_list)
+        result = run_shell_cmd(exc_list, env=env)
+        messages = [result]
 
-        return [concurrent_task_utils.TaskResult(None, None, None, [result])]
+        if self.generate_coverage_report:
+            covered_path = self.test_target.replace('.', '/')
+            covered_path = covered_path[:-len('_test')]
+            covered_path += '.py'
+            if os.path.exists(covered_path):
+                report, coverage = _check_coverage(
+                    False, data_file=data_file, include=(covered_path,))
+            else:
+                # Some test files (e.g. scripts/script_import_test.py)
+                # have no corresponding code file, so we treat them as
+                # fully covering their (nonexistent) associated code
+                # file.
+                report = ''
+                coverage = 100
+            messages.append(report)
+            messages.append(coverage)
+
+        return [concurrent_task_utils.TaskResult(
+            None, None, None, messages)]
 
 
 def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
-    def _get_test_target_classes(path):
-        """Returns a list of all test classes in a given test file path.
-
-        Args:
-            path: str. The path of the test file from which all test classes
-                are to be extracted.
-
-        Returns:
-            list. A list of all test classes in a given test file path.
-        """
-        class_names = []
-        test_target_path = os.path.relpath(
-            path, start=os.getcwd())[:-3].replace('/', '.')
-        python_module = importlib.import_module(test_target_path)
-        for name, clazz in inspect.getmembers(
-                python_module, predicate=inspect.isclass):
-            if unittest.TestCase in inspect.getmro(clazz):
-                class_names.append(name)
-
-        return [
-            '%s.%s' % (test_target_path, class_name)
-            for class_name in class_names]
-
     base_path = os.path.join(os.getcwd(), test_path or '')
-    result = []
+    paths = []
     excluded_dirs = [
         '.git', 'third_party', 'node_modules', 'venv',
         'core/tests/data', 'core/tests/build_sources']
@@ -219,8 +220,7 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
         if any(s in root for s in excluded_dirs):
             continue
         if root.endswith('_test.py'):
-            result = result + (
-                _get_test_target_classes(os.path.join(base_path, root)))
+            paths.append(os.path.join(base_path, root))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if any(s in subroot for s in excluded_dirs):
                 continue
@@ -228,9 +228,10 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
                 continue
             for f in files:
                 if f.endswith('_test.py'):
-                    result = result + (
-                        _get_test_target_classes(os.path.join(subroot, f)))
-
+                    paths.append(os.path.join(subroot, f))
+    result = [
+        os.path.relpath(path, start=os.getcwd())[:-3].replace('/', '.')
+        for path in paths]
     return result
 
 
@@ -321,11 +322,6 @@ def main(args=None):
             raise Exception(
                 'Coverage is not installed, please run the start script.')
 
-        pythonpath_components = [COVERAGE_DIR]
-        if os.environ.get('PYTHONPATH'):
-            pythonpath_components.append(os.environ.get('PYTHONPATH'))
-        os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
-
     test_specs_provided = sum([
         1 if argument else 0
         for argument in (
@@ -409,6 +405,7 @@ def main(args=None):
     total_count = 0
     total_errors = 0
     total_failures = 0
+    incomplete_coverage = 0
     for task in tasks:
         spec = task_to_taskspec[task]
 
@@ -452,6 +449,7 @@ def main(args=None):
                     '    This is most likely due to an import error.')
                 python_utils.PRINT(
                     '------------------------------------------------------')
+                raise task.exception
         else:
             try:
                 tests_run_regex_match = re.search(
@@ -466,6 +464,13 @@ def main(args=None):
                 python_utils.PRINT(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
+            if parsed_args.generate_coverage_report:
+                coverage = task.task_results[0].get_report()[-2]
+                if coverage != 100:
+                    python_utils.PRINT('INCOMPLETE COVERAGE (%s%%): %s' % (
+                        coverage, spec.test_target))
+                    incomplete_coverage += 1
+                    python_utils.PRINT(task.task_results[0].get_report()[-3])
 
         total_count += test_count
 
@@ -488,26 +493,67 @@ def main(args=None):
     elif total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
+    elif incomplete_coverage:
+        raise Exception(
+            '%s tests incompletely cover associated code files.' %
+            incomplete_coverage)
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
-        process = subprocess.Popen(
-            [sys.executable, COVERAGE_MODULE_PATH, 'report',
-             '--omit="%s*","third_party/*","/usr/share/*"'
-             % common.OPPIA_TOOLS_DIR, '--show-missing'],
-            stdout=subprocess.PIPE, encoding='utf-8')
-
-        report_stdout, _ = process.communicate()
+        report_stdout, coverage = _check_coverage(True)
         python_utils.PRINT(report_stdout)
 
-        coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
-        if (coverage_result.group('total') != '100'
+        if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')
+
+
+def _check_coverage(
+        combine, data_file=None, include=tuple()):
+    """Check code coverage of backend tests.
+
+    Args:
+        combine: bool. Whether to run `coverage combine` first to
+            combine coverage data from multiple test runs.
+        data_file: str|None. Path to the coverage data file to use.
+        include: tuple(str). Paths of code files to consider when
+            computing coverage. If an empty tuple is provided, all code
+            files will be used.
+
+    Returns:
+        str, float. Tuple of the coverage report and the coverage
+        percentage.
+    """
+    if combine:
+        subprocess.run(
+            [sys.executable, COVERAGE_MODULE_PATH, 'combine'],
+            check=True)
+    cmd = [
+        sys.executable, COVERAGE_MODULE_PATH, 'report',
+         '--omit="%s*","third_party/*","/usr/share/*"'
+         % common.OPPIA_TOOLS_DIR, '--show-missing']
+    if include:
+        cmd.append('--include=%s' % ','.join(include))
+
+    env = os.environ.copy()
+    if data_file:
+        env['COVERAGE_FILE'] = data_file
+
+    process = subprocess.run(
+        cmd, capture_output=True, encoding='utf-8', env=env, check=True)
+    report_stdout = process.stdout
+
+    coverage_result = re.search(
+        r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+    if coverage_result:
+        coverage = float(coverage_result.group('total'))
+    else:
+        # There was no coverage data to report.
+        coverage = 0
+    return report_stdout, coverage
 
 
 if __name__ == '__main__':
