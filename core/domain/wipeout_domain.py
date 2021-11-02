@@ -33,12 +33,12 @@ class PendingDeletionRequest:
     """Domain object for a PendingDeletionRequest."""
 
     def __init__(
-            self,
-            user_id: str,
-            email: str,
-            normalized_long_term_username: Optional[str],
-            deletion_complete: bool,
-            pseudonymizable_entity_mappings: Dict[str, Dict[str, str]]
+        self,
+        user_id: str,
+        email: str,
+        normalized_long_term_username: Optional[str],
+        deletion_complete: bool,
+        pseudonymizable_entity_mappings: Dict[str, Dict[str, str]]
     ) -> None:
         """Constructs a PendingDeletionRequest domain object.
 
@@ -50,8 +50,8 @@ class PendingDeletionRequest:
                 the Oppia site only for a short time and thus the username
                 hasn't been well-established yet.
             deletion_complete: bool. Whether the deletion is completed.
-            pseudonymizable_entity_mappings: dict(str, str). Mapping between
-                the entity IDs and pseudonymized user IDs.
+            pseudonymizable_entity_mappings: dict(str, dict(str, str)).
+                Mapping between the entity IDs and pseudonymized user IDs.
         """
         self.user_id = user_id
         self.email = email
@@ -61,11 +61,11 @@ class PendingDeletionRequest:
 
     @classmethod
     def create_default(
-            cls,
-            user_id: str,
-            email: str,
-            normalized_long_term_username: Optional[str] = None
-    ) -> 'PendingDeletionRequest':
+        cls,
+        user_id: str,
+        email: str,
+        normalized_long_term_username: Optional[str] = None
+    ) -> PendingDeletionRequest:
         """Creates a PendingDeletionRequest object with default values.
 
         Args:
