@@ -470,15 +470,20 @@ def _construct_exploration_suggestions(suggestions):
         exploration_content_html field representing the target
         exploration's current content.
     """
+    exp_id_to_suggestion = {
+        suggestion.target_id: suggestion for suggestion in suggestions
+    }
+    exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
+        exp_id_to_suggestion.values()
+    )
+
     suggestion_dicts = []
-    for suggestion in suggestions:
-        exploration = exp_fetchers.get_exploration_by_id(
-            suggestion.target_id)
-        content_html = exploration.get_content_html(
-            suggestion.change.state_name, suggestion.change.content_id)
-        suggestion_dict = suggestion.to_dict()
+    for exp_id, exp in exp_id_to_exp:
+        suggestion_change = exp_id_to_suggestion[exp_id].change
+        content_html = exp.get_content_html(
+            suggestion_change.state_name, suggestion_change.content_id)
+        suggestion_dict = suggestion_change.to_dict()
         suggestion_dict['exploration_content_html'] = content_html
-        suggestion_dicts.append(suggestion_dict)
     return suggestion_dicts
 
 
