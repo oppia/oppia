@@ -99,6 +99,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     job.
 
     """
+
     @staticmethod
     def _create_skill_opportunity_model(
         skill_opportunity: opportunity_domain.SkillOpportunity
