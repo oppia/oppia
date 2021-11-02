@@ -16,9 +16,7 @@
 
 """Jobs that manage Exploration Opportunity models."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
 import itertools
 

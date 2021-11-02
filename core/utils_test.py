@@ -16,8 +16,7 @@
 
 """Unit tests for utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
 import copy
@@ -217,7 +216,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_generate_random_string(self) -> None:
         # Generate a random string of length 12.
         random_string = utils.generate_random_string(12)
-        self.assertTrue(isinstance(random_string, python_utils.BASESTRING))
+        self.assertIsInstance(random_string, str)
         self.assertEqual(len(random_string), 12)
 
     def test_convert_png_data_url_to_binary_with_incorrect_prefix(self) -> None:

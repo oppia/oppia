@@ -139,6 +139,13 @@ describe('Add Or Update Solution Modal Controller', function() {
           true, 'answer', 'Explanation html', 'cont_1')
       });
     });
+
+    it('should not show solution explanation length validation error',
+      function() {
+        var solutionExplanation = 'Explanation html';
+        expect($scope.isSolutionExplanationLengthExceeded(solutionExplanation))
+          .toBe(false);
+      });
   });
 
   describe('when solution is not valid', function() {
@@ -173,5 +180,12 @@ describe('Add Or Update Solution Modal Controller', function() {
         $scope.saveSolution();
       }).toThrowError('Cannot save invalid solution');
     });
+
+    it('should show solution explanation length validation error',
+      function() {
+        var solutionExplanation = 'Solution explanation'.repeat(180);
+        expect($scope.isSolutionExplanationLengthExceeded(solutionExplanation))
+          .toBe(true);
+      });
   });
 });

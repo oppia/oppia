@@ -18,8 +18,7 @@
 python_linter_test.py. This file does not have period at the end of docstring.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 
 class FakeClass():
