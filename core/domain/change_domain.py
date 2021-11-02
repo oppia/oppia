@@ -224,4 +224,4 @@ class BaseChange:
         return base_change_dict
 
     def __getattr__(self, name: str) -> str:
-        return self.name
+        return self.__dict__[name]
