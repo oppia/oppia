@@ -14,8 +14,7 @@
 
 """Unit tests for core.storage.beam_job.gae_models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import utils
 from core.platform import models

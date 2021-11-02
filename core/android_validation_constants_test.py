@@ -16,8 +16,7 @@
 constants are the same.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import android_validation_constants
 from core.constants import constants

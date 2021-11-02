@@ -14,8 +14,7 @@
 
 """Tests for story domain objects and methods defined on them."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import os
@@ -556,7 +555,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, python_utils.BASESTRING))
+        self.assertIsInstance(valid_topic_id, str)
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
