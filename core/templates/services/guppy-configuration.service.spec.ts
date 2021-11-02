@@ -35,7 +35,6 @@ class MockGuppy {
   asciimath(): string {
     return 'Dummy value';
   }
-  'import_text'(value: string): void {}
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
     handler({focused: true});
@@ -71,8 +70,8 @@ class MockComponentB implements OnInit {
 let guppyConfigurationService: GuppyConfigurationService;
 
 describe('GuppyConfigurationService', () => {
-  beforeAll(() => {
-    guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
+  beforeEach(() => {
+    guppyConfigurationService = TestBed.get(GuppyConfigurationService);
     window.Guppy = MockGuppy;
   });
 
@@ -91,7 +90,9 @@ describe('GuppyConfigurationService', () => {
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
     });
   });
+});
 
+describe('GuppyConfigurationService', () => {
   describe('Components calling the service', () => {
     let component: MockComponentB;
     let fixture: ComponentFixture<MockComponentB>;
@@ -103,6 +104,8 @@ describe('GuppyConfigurationService', () => {
           declarations: [MockComponentB],
         }
       ).compileComponents();
+      guppyConfigurationService = TestBed.get(GuppyConfigurationService);
+      window.Guppy = MockGuppy;
     }));
     beforeEach(() => {
       fixture = TestBed.createComponent(
