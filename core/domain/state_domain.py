@@ -3400,15 +3400,22 @@ class WrittenTranslation:
         language_code_to_enum_map = {
             'en': languages_pb2.LanguageType.ENGLISH,
             'hi-en': languages_pb2.LanguageType.HINGLISH,
-            'ar': languages_pb2.LanguageType.ARABIC
+            'ar': languages_pb2.LanguageType.ARABIC,
+            'hi': languages_pb2.LanguageType.HINDI
         }
         written_translation_content_mapping_protos_list = []
 
         for (language_code, written_translation_content_map) in (
             language_to_content_id_written_translation_map.items()):
-            proto = languages_pb2.WrittenTranslationContentMapping(
-                language=language_code_to_enum_map[language_code],
-                translation_content_mapping=written_translation_content_map)
+            if language_code in language_code_to_enum_map:
+                proto = languages_pb2.WrittenTranslationContentMapping(
+                    language=language_code_to_enum_map[language_code],
+                    translation_content_mapping=written_translation_content_map)
+            else:
+                proto = languages_pb2.WrittenTranslationContentMapping(
+                    language=(
+                        languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
+                    translation_content_mapping=written_translation_content_map)
             written_translation_content_mapping_protos_list.append(proto)
 
         return written_translation_content_mapping_protos_list
@@ -3424,86 +3431,53 @@ class WrittenTranslation:
         Returns:
             Proto Object. The written translation proto object.
         """
+        written_translation_proto = None
         if data_format == (
-            WrittenTranslation.DATA_FORMAT_HTML):
-            return cls._to_html_written_translatable(translation)
+            WrittenTranslation.DATA_FORMAT_HTML) or data_format == (
+                WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
+            written_translation_proto = (
+                languages_pb2.WrittenTranslation(
+                    translatable_text=cls._to_written_translatable_text(
+                        translation)))
+        else:
+            written_translation_proto = (
+                languages_pb2.WrittenTranslation(
+                    set_of_translatable_text=cls._to_written_translatable_set(
+                        translation)))
 
-        if data_format == (
-            WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
-            return cls._to_unicode_written_translatable(translation)
-
-        if data_format == (
-                WrittenTranslation.DATA_FORMAT_SET_OF_NORMALIZED_STRING):
-            return cls._to_normalized_set_written_translatable(translation)
-
-        if data_format == (
-                WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
-            return cls._to_unicode_set_written_translatable(translation)
+        return written_translation_proto
 
     @classmethod
-    def _to_html_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableHtml proto object.
+    def _to_written_translatable_text(cls, translation):
+        """Creates a WrittenTranslatableText proto object.
 
         Args:
-            translation: str|list(str). The translated content.
+            translation: str. The translated content.
 
         Returns:
-            Proto Object. The written translatable html proto object.
+            Proto Object. The written translatable text proto object.
         """
-        written_translatable_html_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableHtml(translation=translation))
+        written_translatable_text_proto = (
+            languages_pb2.WrittenTranslatableText(
+                translation=translation))
 
-        return written_translatable_html_proto
+        return written_translatable_text_proto
 
     @classmethod
-    def _to_unicode_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableUnicode proto object.
+    def _to_written_translatable_set(cls, translation):
+        """Creates a SetOfWrittenTranslatableText proto object.
 
         Args:
-            translation: str|list(str). The translated content.
+            translation: list(str). The translated content.
 
         Returns:
-            Proto Object. The written translatable unicode proto object.
+            Proto Object. The written translatable set proto object.
         """
-        written_translatable_unicode_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableUnicode(translation=translation))
+        written_translatable_set_proto = (
+            languages_pb2.SetOfWrittenTranslatableText(
+                translations=translation))
 
-        return written_translatable_unicode_proto
-
-    @classmethod
-    def _to_normalized_set_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableSetOfNormalizedString proto object.
-
-        Args:
-            translation: str|list(str). The translated content.
-
-        Returns:
-            Proto Object. The written translatable normalized
-            set proto object.
-        """
-        written_translatable_normalized_set_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableSetOfNormalizedString(translation=translation))
-
-        return written_translatable_normalized_set_proto
-
-    @classmethod
-    def _to_unicode_set_written_translatable(cls, translation):
-        """Creates a WrittenTranslatableSetOfUnicodeString proto object.
-
-        Args:
-            translation: str|list(str). The translated content.
-
-        Returns:
-            Proto Object. The written translatable unicode set proto object.
-        """
-        written_translatable_unicode_set_proto = (
-            languages_pb2.WrittenTranslation.data_format
-            .WrittenTranslatableSetOfUnicodeString(translation=translation))
-
-        return written_translatable_unicode_set_proto
+        return written_translatable_set_proto
 
     def validate(self):
         """Validates properties of the WrittenTranslation, normalizing the
@@ -3932,15 +3906,22 @@ class RecordedVoiceovers:
         language_code_to_enum_map = {
             'en': languages_pb2.LanguageType.ENGLISH,
             'hi-en': languages_pb2.LanguageType.HINGLISH,
-            'ar': languages_pb2.LanguageType.ARABIC
+            'ar': languages_pb2.LanguageType.ARABIC,
+            'hi': languages_pb2.LanguageType.HINDI
         }
         voiceover_content_mapping_protos_list = []
 
         for (language_code, voiceover_file_content_map) in (
             language_to_content_id_voiceover_file_map.items()):
-            proto = languages_pb2.VoiceoverContentMapping(
-                language=language_code_to_enum_map[language_code],
-                voiceover_content_mapping=voiceover_file_content_map)
+            if language_code in language_code_to_enum_map:
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=language_code_to_enum_map[language_code],
+                    voiceover_content_mapping=voiceover_file_content_map)
+            else:
+                proto = languages_pb2.VoiceoverContentMapping(
+                    language=(
+                        languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
+                    voiceover_content_mapping=voiceover_file_content_map)
             voiceover_content_mapping_protos_list.append(proto)
 
         return voiceover_content_mapping_protos_list
@@ -5431,10 +5412,10 @@ class State:
                     state.content.html),
                 recorded_voiceovers=(
                     RecordedVoiceovers.to_recorded_voiceover_proto(
-                        state.recorded_voiceovers)),
+                    state.recorded_voiceovers)),
                 written_translations=(
                     WrittenTranslation.to_written_translations_proto(
-                        state.written_translations)),
+                    state.written_translations)),
                 interaction=InteractionInstance.to_interaction_proto(
                     state.interaction))
             state_protos[state_name] = state_proto
