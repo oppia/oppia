@@ -1,6 +1,6 @@
 <form>
   <div *ngFor="let choice of choices"
-       class="multiple-choice-option-container protractor-test-multiple-choice-option-container">
+       dir="auto" class="multiple-choice-option-container protractor-test-multiple-choice-option-container">
     <button class="multiple-choice-option"
             (click)="selectAnswer($event, choice.originalIndex)">
       <div class="multiple-choice-radio-button-container">

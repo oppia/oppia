@@ -1,5 +1,6 @@
 <div class="conversation-skin-supplemental-card">
   <div *ngIf="helpCardHtml"
+       [ngClass]="{'left-align-card': isLanguageRTL()}"
        class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
        [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
@@ -7,7 +8,8 @@
        [href]="OPPIA_AVATAR_LINK_URL"
        target="_blank"
        rel="noopener">
-      <img class="conversation-skin-oppia-avatar"
+      <img [ngStyle]="isLanguageRTL() ? {'right': '-15px'} : {'left': '-15px'}"
+           class="conversation-skin-oppia-avatar"
            [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
     </a>
     <button type="button" class="conversation-skin-close-help-card-button protractor-test-close-help-card-button"
@@ -42,6 +44,16 @@
 </div>
 
 <style>
+  /* The important tags are required since this is a conditional class for only
+     RTL languages. These styles are meant to override the corresponding styles
+     in the other non conditional classes for the same div.
+  */
+  .left-align-card {
+    left: 0;
+    right: auto !important;
+    text-align: right !important;
+  }
+
   .conversation-skin-help-card {
     background: #fff;
     border-radius: 2px;
@@ -74,7 +86,6 @@
   }
 
   .conversation-skin-help-card .conversation-skin-oppia-avatar {
-    left: -15px;
     top: 12px;
   }
 
