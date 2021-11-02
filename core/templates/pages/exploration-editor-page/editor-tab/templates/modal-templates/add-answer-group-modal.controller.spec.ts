@@ -149,6 +149,18 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
+  it('should check if outcome feedback has length of atmost 1000 characters',
+    function() {
+      var text = 'Feedback Text ';
+      var outcome1 = outcomeObjectFactory.createNew(
+        'State Name', '1', text, []);
+      expect($scope.isFeedbackLengthExceeded(outcome1)).toBe(false);
+
+      var outcome2 = outcomeObjectFactory.createNew(
+        'State Name', '1', text.repeat(75), []);
+      expect($scope.isFeedbackLengthExceeded(outcome2)).toBe(true);
+    });
+
   it('should save answer group response when closing the modal', function() {
     $scope.saveResponse(null);
 
