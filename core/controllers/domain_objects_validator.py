@@ -42,14 +42,16 @@ def validate_exploration_or_question_change(obj):
     # No explicit call to validate_dict is required, because
     # ExplorationChange or QuestionSuggestionChange calls
     # validate method while initialization.
-    if obj['cmd'] in exp_domain.LIST_CMD_EXPLORATION_CHANGE:
+    if obj.get('cmd') == None:
+        raise base.BaseHandler.InternalErrorException(
+            'Missing cmd key in change dict')
+    elif obj['cmd'] in exp_domain.LIST_CMD_EXPLORATION_CHANGE:
         exp_domain.ExplorationChange(obj)
     elif obj['cmd'] in question_domain.LIST_CMD_QUESTION_CHANGE:
         question_domain.QuestionSuggestionChange(obj)
     else:
         raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % obj['cmd']
-        )
+            '%s cmd is not allowed.' % obj['cmd'])
 
 
 def validate_exploration_change(obj):
