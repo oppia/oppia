@@ -22,11 +22,11 @@ from __future__ import unicode_literals
 
 import itertools
 
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -199,10 +199,10 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Get skill from model' >> beam.Map(
                 skill_fetchers.get_skill_from_model)
             | 'Filter out any skills with an existing SkillOpportunityModel'
-                >> beam.Filter(lambda n:
-                    opportunity_models.SkillOpportunityModel
-                    .get_by_id(this.skill_id)
-                    == None)
+                >> beam.Filter(
+                    lambda n: opportunity_models.SkillOpportunityModel
+                        .get_by_id is None
+                    )
             | 'Get number of questions linked to skill' >> beam.Map(
                 lambda skill: [skill, self._get_num_questions(skill.skill_id)]
             )
