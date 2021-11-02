@@ -58,8 +58,10 @@ if MYPY: # pragma: no cover
     models.NAMES.topic, models.NAMES.skill, models.NAMES.question
 ])
 
+
 class DeleteSkillOpportunityModelJob(base_jobs.JobBase):
     """Job that deletes SkillOpportunityModels."""
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         deleting SkillOpportunityModel.
@@ -90,12 +92,13 @@ class DeleteSkillOpportunityModelJob(base_jobs.JobBase):
                 lambda n: job_run_result.JobRunResult(stdout='SUCCESS %s' % n))
         )
 
+
 class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     """Job for regenerating SkillOpportunityModel.
 
     NOTE: The DeleteSkillOpportunityModelJob must be run before this
     job.
-    
+
     """
     @staticmethod
     def _create_skill_opportunity_model(
@@ -168,7 +171,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
             count = (
                 question_skill_link_models
-                | 'Map to question IDs' >> beam.Map(lambda n : n.question_id)
+                | 'Map to question IDs' >> beam.Map(lambda n: n.question_id)
                 | 'Get the number of distinct question IDs' >> beam.Distinct()
                 | 'Get the total number' >> beam.combiners.Count.Globally()
 
@@ -196,18 +199,18 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Get skill from model' >> beam.Map(
                 skill_fetchers.get_skill_from_model)
             | 'Filter out any skills with an existing SkillOpportunityModel'
-                >> beam.Filter(lambda n :
+                >> beam.Filter(lambda n:
                     opportunity_models.SkillOpportunityModel.get_by_id(this.skill_id)
                     == None)
             | 'Get number of questions linked to skill' >> beam.Map(
-                lambda skill : [ skill, self._get_num_questions(skill.skill_id) ]
+                lambda skill: [skill, self._get_num_questions(skill.skill_id)]
             )
         )
 
         opportunities_results = (
             skills_with_questions
             | beam.Map(
-                lambda n :
+                lambda n:
                 self._create_skill_opportunity_model( 
                     opportunity_domain.SkillOpportunity(
                         skill_id=n[0].skill_id,
@@ -229,7 +232,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Fetch the job results' >> beam.Map(
                 lambda result: result['job_result'])
         )
-    
+
 
 class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
     """Job that deletes ExplorationOpportunitySummaryModels."""

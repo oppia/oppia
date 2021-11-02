@@ -45,6 +45,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = (
@@ -52,7 +53,7 @@ class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
-    
+
     def test_job_deletes_all_opportunities(self) -> None:
         skill_opportunity_model_1 = self.create_model(
             opportunity_models.SkillOpportunityModel,
@@ -82,6 +83,7 @@ class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         all_skill_opportunity_models = list(
             opportunity_models.SkillOpportunityModel.get_all())
         self.assertEqual(len(all_skill_opportunity_models), 0)
+
 
 class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
@@ -159,6 +161,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
         self.assertEqual(opportunity_model_2.skill_description, self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 0)
+
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 
