@@ -2327,8 +2327,9 @@ title: Title
             if 'files' in data:
                 # Bytes type data cannot be used as the json value
                 # json cannot serialize object of type bytes.
-                data['files'] = {k: v.decode('ISO-8859-1') if isinstance(v,bytes)
-                                else v for k, v in data['files'].items()}
+                data['files'] = {k: v.decode('ISO-8859-1')
+                                if isinstance(v, bytes) else v
+                                for k, v in data['files'].items()}
             data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
