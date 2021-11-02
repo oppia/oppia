@@ -603,10 +603,6 @@ class Topic:
             'proto_size_in_bytes': self.proto_size_in_bytes
         }
 
-    def to_proto():
-
-
-
     def serialize(self):
         """Returns the object serialized as a JSON string.
 
