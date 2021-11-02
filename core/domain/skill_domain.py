@@ -27,6 +27,7 @@ from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
+from proto_files.org.oppia.proto.v1.structure import topic_summary_pb2
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -1536,8 +1537,8 @@ class SkillSummary:
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count, skill_model_created_on,
-            skill_model_last_updated):
+            misconception_count, worked_examples_count, proto_size_in_bytes,
+            skill_model_created_on, skill_model_last_updated):
         """Constructs a SkillSummary domain object.
 
         Args:
@@ -1549,6 +1550,7 @@ class SkillSummary:
                 with the skill.
             worked_examples_count: int. The number of worked examples in the
                 skill.
+            proto_size_in_bytes: int. Proto size of topic.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
@@ -1560,6 +1562,7 @@ class SkillSummary:
         self.version = version
         self.misconception_count = misconception_count
         self.worked_examples_count = worked_examples_count
+        self.proto_size_in_bytes = proto_size_in_bytes
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
@@ -1604,6 +1607,11 @@ class SkillSummary:
                 'Expected worked_examples_count to be non-negative, '
                 'received \'%s\'' % self.worked_examples_count)
 
+        if not isinstance(self.proto_size_in_bytes, int):
+            raise utils.ValidationError(
+                'Expected proto size to be a int, received %s'
+                % self.proto_size_in_bytes)
+
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
 
@@ -1617,11 +1625,31 @@ class SkillSummary:
             'version': self.version,
             'misconception_count': self.misconception_count,
             'worked_examples_count': self.worked_examples_count,
+            'proto_size_in_bytes': self.proto_size_in_bytes,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
+
+    @classmethod
+    def to_proto(cls, skill_id, skill_description, skill_version):
+        """Returns a Skill proto object from its respective items.
+
+        Args:
+            skill_id: str. The unique id of the skill.
+            skill_description: str. The short description of the skill.
+            skill_version: int. The version of the skill.
+
+        Returns:
+            Proto Object. The skill summary proto object.
+        """
+        skill_summary_proto = topic_summary_pb2.SkillSummary(
+            id=skill_id,
+            name=skill_description,
+            content_version=skill_version)
+
+        return skill_summary_proto
 
 
 class AugmentedSkillSummary:

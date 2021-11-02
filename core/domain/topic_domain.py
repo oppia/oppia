@@ -496,7 +496,8 @@ class Topic:
             subtopics, subtopic_schema_version, next_subtopic_id,
             language_code, version, story_reference_schema_version,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web, proto_size_in_bytes=0, created_on=None, last_updated=None):
+            page_title_fragment_for_web, proto_size_in_bytes=0,
+            created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -1169,11 +1170,13 @@ class Topic:
             topic_android_proto)
         cls.update_proto_size_in_bytes(cls, topic_android_proto_size)
 
+        return topic
+
     @classmethod
     def to_proto(
         cls, topic_id, topic_name, topic_description,
         canonical_story_references, subtopics, topic_version):
-        """Calculate the question size by setting question proto.
+        """Returns a Topic proto object from its respective items.
 
         Args:
             topic_id: str. The unique id of the topic.
@@ -1189,10 +1192,10 @@ class Topic:
         Returns:
             Proto Object. The topic proto object.
         """
-        story_summaries_proto_list = []
-        subtopic_summaries_proto_list = []
+        story_summaries_proto_list = canonical_story_references
+        subtopic_summaries_proto_list = subtopics
 
-        topic_proto = DownloadableTopicSummary(
+        topic_proto = topic_summary_pb2.DownloadableTopicSummary(
             id=topic_id,
             name=topic_name,
             description=topic_description,
@@ -1204,6 +1207,7 @@ class Topic:
 
     def update_proto_size_in_bytes(self, proto_size_in_bytes):
         """Update question's size in proto.
+
         Args:
             proto_size_in_bytes: int. Proto size of topic.
         """
