@@ -378,7 +378,7 @@ class BaseHandler(webapp2.RequestHandler):
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).
         extra_args_are_allowed = (
-            self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+            self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_HTML and
             request_method == 'GET')
 
         if self.URL_PATH_ARGS_SCHEMAS is None:
@@ -393,7 +393,11 @@ class BaseHandler(webapp2.RequestHandler):
         )
 
         if errors:
-            raise self.InvalidInputException('\n'.join(errors))
+            raise self.InvalidInputException(
+                'At \'%s\' these errors are happening:\n%s' % (
+                    self.request.uri, '\n'.join(errors)
+                )
+            )
 
         # This check ensures that if a request method is not defined
         # in the handler class then schema validation will not raise
@@ -657,7 +661,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.exception('Exception raised: %s', exception)
+        logging.exception(
+            'Exception raised at %s: %s', self.request.uri, exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
