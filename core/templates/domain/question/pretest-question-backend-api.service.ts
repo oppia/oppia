@@ -71,8 +71,7 @@ export class PretestQuestionBackendApiService {
         function(pretestQuestionDict) {
           return this.questionObjectFactory.createFromBackendDict(
             pretestQuestionDict);
-        }
-      );
+        }, this);
       if (successCallback) {
         successCallback(pretestQuestionObjects);
       }

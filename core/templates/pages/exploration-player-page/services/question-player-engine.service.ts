@@ -183,8 +183,6 @@ export class QuestionPlayerEngineService {
   }
 
   getCurrentQuestionId(): string {
-    console.log("this.questions");
-    console.log(this.questions);
     return this.questions[this.currentIndex].getId();
   }
 
@@ -197,10 +195,6 @@ export class QuestionPlayerEngineService {
   }
 
   getLanguageCode(): string {
-    console.log("this.questions");
-    console.log(this.questions);
-    console.log("this.currentIndex");
-    console.log(this.currentIndex);
     return this.questions[this.currentIndex].getLanguageCode();
   }
 

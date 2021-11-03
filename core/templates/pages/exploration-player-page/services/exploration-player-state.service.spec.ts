@@ -89,7 +89,116 @@ describe('Exploration Player State Service', () => {
 
   let questionBackendDict: QuestionBackendDict = {
     id: '',
-    question_state_data: null,
+    question_state_data: {
+      classifier_model_id: null,
+      param_changes: [],
+      next_content_id_index: 1,
+      solicit_answer_details: false,
+      content: {
+        content_id: '1',
+        html: 'Question 1'
+      },
+      written_translations: {
+        translations_mapping: {
+          1: {},
+          ca_placeholder_0: {},
+          feedback_id: {},
+          solution: {},
+          hint_1: {}
+        }
+      },
+      interaction: {
+        answer_groups: [{
+          outcome: {
+            dest: 'State 1',
+            feedback: {
+              content_id: 'feedback_1',
+              html: '<p>Try Again.</p>'
+            },
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+            labelled_as_correct: true,
+          },
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 0}
+          }],
+          training_data: null,
+          tagged_skill_misconception_id: null,
+        },
+        {
+          outcome: {
+            dest: 'State 2',
+            feedback: {
+              content_id: 'feedback_2',
+              html: '<p>Try Again.</p>'
+            },
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+            labelled_as_correct: true,
+          },
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 0}
+          }],
+          training_data: null,
+          tagged_skill_misconception_id: 'misconceptionId',
+        }],
+        default_outcome: {
+          dest: null,
+          labelled_as_correct: true,
+          missing_prerequisite_skill_id: null,
+          refresher_exploration_id: null,
+          param_changes: [],
+          feedback: {
+            content_id: 'feedback_id',
+            html: '<p>Dummy Feedback</p>'
+          }
+        },
+        id: 'TextInput',
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: '',
+              content_id: 'ca_placeholder_0'
+            }
+          }
+        },
+        confirmed_unclassified_answers: [],
+        hints: [
+          {
+            hint_content: {
+              content_id: 'hint_1',
+              html: '<p>This is a hint.</p>'
+            }
+          }
+        ],
+        solution: {
+          correct_answer: 'Solution',
+          explanation: {
+            content_id: 'solution',
+            html: '<p>This is a solution.</p>'
+          },
+          answer_is_exclusive: false
+        }
+      },
+      linked_skill_id: null,
+      card_is_checkpoint: true,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          1: {},
+          ca_placeholder_0: {},
+          feedback_id: {},
+          solution: {},
+          hint_1: {}
+        }
+      }
+    },
     question_state_data_schema_version: 2,
     language_code: '',
     version: 1,

@@ -433,17 +433,10 @@ describe('Question player engine service ', () => {
 
     singleQuestionObject = questionObjectFactory.createFromBackendDict(
       singleQuestionBackendDict);
-    multipleQuestionsObjects = [
-      questionObjectFactory.
-        createFromBackendDict(multipleQuestionsBackendDict[0]),
-      questionObjectFactory.
-        createFromBackendDict(multipleQuestionsBackendDict[1]),
-      questionObjectFactory.
-        createFromBackendDict(multipleQuestionsBackendDict[2])
-    ]; /*multipleQuestionsBackendDict.map(
+    multipleQuestionsObjects = multipleQuestionsBackendDict.map(
       function(questionDict) {
         return questionObjectFactory.createFromBackendDict(questionDict);
-      });*/
+      });
   });
 
   it('should load questions when initialized', () => {
@@ -493,18 +486,13 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService.init(
       multipleQuestionsObjects, initSuccessCb, initErrorCb);
     let currentQuestion1 = questionPlayerEngineService.getCurrentQuestion();
-    console.log("currentQuestion1");
-    console.log(currentQuestion1);
-    expect(currentQuestion1.getId()).toBe(multipleQuestionsBackendDict[0].id);
+    expect(currentQuestion1.getId()).toBe(multipleQuestionsObjects[0]._id);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
     let currentQuestion2 = questionPlayerEngineService.getCurrentQuestion();
-    console.log("currentQuestion2");
-    console.log(currentQuestion2);
-
-    expect(currentQuestion2.getId()).toBe(multipleQuestionsBackendDict[1].id);
+    expect(currentQuestion2.getId()).toBe(multipleQuestionsObjects[1]._id);
   });
 
   it('should return the current question Id', () => {
@@ -519,20 +507,11 @@ describe('Question player engine service ', () => {
     }).toThrowError(
       'Cannot read properties of undefined (reading \'getId\')');
 
-    console.log("after expect error");
-
     questionPlayerEngineService.init(
       multipleQuestionsObjects, initSuccessCb, initErrorCb);
 
-    console.log("after init questionPlayerEngineService");
-
-    console.log("multipleQuestionsBackendDict");
-    console.log(multipleQuestionsBackendDict);
-    console.log("multipleQuestionsObjects");
-    console.log(multipleQuestionsObjects);
-
     expect(questionPlayerEngineService.getCurrentQuestionId())
-      .toBe(multipleQuestionsBackendDict[0].id);
+      .toBe(multipleQuestionsObjects[0]._id);
   });
 
   it('should return number of questions', () => {
@@ -574,7 +553,7 @@ describe('Question player engine service ', () => {
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
   });
 
-  fit('should return the language code correctly when an answer is ' +
+  it('should return the language code correctly when an answer is ' +
     'submitted and a new card is recorded', () => {
     let submitAnswerSuccessCb = jasmine.createSpy('success');
     let initSuccessCb = jasmine.createSpy('success');
@@ -596,21 +575,21 @@ describe('Question player engine service ', () => {
       multipleQuestionsObjects, initSuccessCb, initErrorCb);
     let languageCode = questionPlayerEngineService.getLanguageCode();
 
-    expect(languageCode).toBe(multipleQuestionsBackendDict[0].language_code);
+    expect(languageCode).toBe(multipleQuestionsObjects[0]._languageCode);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
-    expect(languageCode).toBe(multipleQuestionsBackendDict[1].language_code);
+    expect(languageCode).toBe(multipleQuestionsObjects[1]._languageCode);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
-    expect(languageCode).toBe(multipleQuestionsBackendDict[2].language_code);
+    expect(languageCode).toBe(multipleQuestionsObjects[2]._languageCode);
   });
 
   it('should always return false when calling \'isInPreviewMode()\'', () => {
@@ -837,7 +816,7 @@ describe('Question player engine service ', () => {
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe(
-        multipleQuestionsBackendDict[0].id);
+        multipleQuestionsObjects[0]._id);
       expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
       questionPlayerEngineService.recordNewCardAdded();
@@ -847,7 +826,7 @@ describe('Question player engine service ', () => {
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe(
-        multipleQuestionsBackendDict[1].id);
+        multipleQuestionsObjects[1]._id);
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
       questionPlayerEngineService.recordNewCardAdded();
@@ -857,7 +836,7 @@ describe('Question player engine service ', () => {
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe(
-        multipleQuestionsBackendDict[2].id);
+        multipleQuestionsObjects[2]._id);
       // Please note that after submitting answer to the final question,
       // a new card was not created, hence createNewCardSpy was not called.
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);
