@@ -77,6 +77,8 @@ COVERAGE_DIR = os.path.join(
 COVERAGE_MODULE_PATH = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
     'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
+COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
+    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt')
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
@@ -291,6 +293,17 @@ def _check_shards_match_tests(include_load_tests=True):
         test_extra, SHARDS_WIKI_LINK)
 
 
+def _load_coverage_exclusion_list(path):
+    exclusion_list = []
+    with open(path, 'r') as exclusion_file:
+        for line in exclusion_file:
+            line = line.strip()
+            if line.startswith('#') or not line:
+                continue
+            exclusion_list.append(line)
+    return exclusion_list
+
+
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -399,6 +412,9 @@ def main(args=None):
     python_utils.PRINT('+------------------+')
     python_utils.PRINT('')
 
+    coverage_exclusions = _load_coverage_exclusion_list(
+        COVERAGE_EXCLUSION_LIST_PATH)
+
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
@@ -469,6 +485,8 @@ def main(args=None):
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
             if parsed_args.generate_coverage_report:
                 coverage = task.task_results[0].get_report()[-2]
+                if spec.test_target in coverage_exclusions:
+                    continue
                 if coverage != 100:
                     python_utils.PRINT('INCOMPLETE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
