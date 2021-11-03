@@ -50,24 +50,21 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
 
     def test_incorrect_exp_domain_object_raises_exception(self) -> None:
-        incorrect_domain_dict = {
-                'change': {
+        incorrect_change_dict = {
                     'state_name': 'State 3',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
                     'translation_html': '<p>In Hindi</p>',
                     'data_format': 'html'
-                },
         }
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Missing cmd key in  change dict'):
+            Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_exploration_or_question_change(
-                incorrect_domain_dict)
+                incorrect_change_dict)
 
     def test_correct_exp_domain_object_do_not_raises_exception(self) -> None:
-        correct_domain_dict = {
-                'change': {
+        correct_change_dict = {
                     'cmd': 'add_written_translation',
                     'state_name': 'State 3',
                     'content_id': 'content',
@@ -75,10 +72,9 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
                     'content_html': '<p>old content html</p>',
                     'translation_html': '<p>In Hindi</p>',
                     'data_format': 'html'
-                },
         }
         domain_objects_validator.validate_exploration_or_question_change(
-            correct_domain_dict)
+            correct_change_dict)
 
 
 class ValidateCollectionChangeTests(test_utils.GenericTestBase):

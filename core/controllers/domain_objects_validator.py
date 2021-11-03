@@ -43,7 +43,7 @@ def validate_exploration_or_question_change(obj):
     # ExplorationChange or QuestionSuggestionChange calls
     # validate method while initialization.
     if obj.get('cmd') is None:
-        raise base.BaseHandler.InternalErrorException(
+        raise base.BaseHandler.InvalidInputException(
             'Missing cmd key in change dict')
     elif obj['cmd'] in exp_domain.LIST_CMD_EXPLORATION_CHANGE:
         exp_domain.ExplorationChange(obj)
