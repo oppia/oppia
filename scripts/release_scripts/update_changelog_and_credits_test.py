@@ -615,7 +615,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_package_json_gets_called': False
         }
         expected_check_function_calls = {
-            'check_blocking_bug_issue_count_gets_called': True,
+            'check_blocking_bug_issue_count_gets_called': False,
             'check_prs_for_current_release_are_released_gets_called': True,
             'remove_updates_and_delete_branch_gets_called': True,
             'update_changelog_gets_called': True,
