@@ -113,6 +113,18 @@ handlers:
   secure: always
   expiration: "0"
 
+# PRODUCTION/DEVELOPMENT DYNAMIC
+# Note: Redirection is disabled (using 'secure: never') for requests that start
+#   with '/task/.*', mainly because Taskqueue API sends requests with HTTP and
+#   rejects them when we try to redirect them to HTTPS.
+- url: /task/.*
+  script: auto
+  secure: never
+- url: /.*
+  script: auto
+  secure: always
+  redirect_http_response_code: 301
+
 # This is an access connector that connects to the Google Cloud Redis instance
 # used for memory caching. Please replace PROJECT_ID with the correct project id
 # for oppia on the production server.

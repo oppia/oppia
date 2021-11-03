@@ -278,15 +278,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that match the given
-            query values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-            suggestions.
+            query values, up to a maximum of
+            feconf.DEFAULT_SUGGESTION_QUERY_LIMIT suggestions.
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:
             if field not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
                 raise Exception('Not allowed to query on field %s' % field)
             query = query.filter(getattr(cls, field) == value)
-        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return query.fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
@@ -303,14 +303,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             list(SuggestionModel). A list of translation suggestions in review
             with target_id of exp_id. The number of returned results is capped
-            by feconf.DEFAULT_QUERY_LIMIT.
+            by feconf.DEFAULT_SUGGESTION_QUERY_LIMIT.
         """
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.language_code == language_code,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.target_id == exp_id
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_multiple_suggestions_from_suggestion_ids(
@@ -374,7 +374,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset, more = (0, True)
         while more:
             results: Sequence[GeneralSuggestionModel] = (
-                query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset))
+                query.fetch(
+                    feconf.DEFAULT_SUGGESTION_QUERY_LIMIT, offset=offset))
             if len(results):
                 offset = offset + len(results)
                 suggestion_models.extend(results)
@@ -459,7 +460,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW,
             cls.score_category.IN(score_categories),
             cls.author_id != user_id
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_in_review_translation_suggestions(
@@ -482,7 +483,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
             cls.language_code.IN(language_codes)
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_in_review_question_suggestions(
@@ -503,7 +504,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
             cls.author_id != user_id
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(
@@ -567,7 +568,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return cls.get_all().filter(datastore_services.all_of(
             cls.suggestion_type == suggestion_type,
             cls.author_id == user_id
-        )).order(-cls.created_on).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).order(-cls.created_on).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_all_score_categories(cls) -> List[str]:
@@ -1032,7 +1033,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.contributor_user_id == user_id
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
