@@ -22,8 +22,7 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os

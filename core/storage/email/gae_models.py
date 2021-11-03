@@ -16,8 +16,7 @@
 
 """Models for the content of sent emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -214,10 +213,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_by_hash(
-            cls,
-            email_hash: str,
-            sent_datetime_lower_bound: Optional[datetime.datetime] = None
-    ) -> Sequence['SentEmailModel']:
+        cls,
+        email_hash: str,
+        sent_datetime_lower_bound: Optional[datetime.datetime] = None
+    ) -> Sequence[SentEmailModel]:
         """Returns all messages with a given email_hash.
 
         This also takes an optional sent_datetime_lower_bound argument,
