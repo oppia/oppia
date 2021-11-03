@@ -326,8 +326,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         query_string = base64.b64decode(q).decode('utf-8')
 
         search_offset = self.normalized_request.get('cursor')
-        if search_offset:
-            search_offset = int(search_offset)
+        search_offset = int(search_offset) if search_offset else None
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
