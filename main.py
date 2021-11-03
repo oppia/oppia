@@ -78,6 +78,7 @@ from core.controllers import voice_artist
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
+import google.cloud.logging
 from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
@@ -90,6 +91,15 @@ T = TypeVar('T')  # pylint: disable=invalid-name
 
 cache_services = models.Registry.import_cache_services()
 datastore_services = models.Registry.import_datastore_services()
+
+# Cloud Logging is disabled in emulator mode, since it is unnecessary and
+# creates a lot of noise.
+if not constants.EMULATOR_MODE:
+    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # environment you're running in and integrates the handler with the Python
+    # logging module.
+    client = google.cloud.logging.Client()
+    client.setup_logging()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
