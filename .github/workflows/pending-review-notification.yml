@@ -1,0 +1,30 @@
+name: Send pending review notifications to reviewer on github-discussion
+on:
+  schedule:
+    # Every Tuesday and Thursday at 00:00 UTC.
+    - cron: '0 0 * * 2,5'
+
+jobs:
+  send_notifications:
+    name: Send pending review notifications
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - uses: DubeySandeep/pending-review-notification@v1
+        with:
+          team-slug: oppia-codeowners
+          repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
+          review-turnaround-hours: 48
+      - name: Report if failed
+        if: ${{ failure() }}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A pending-review-notification workflow failed."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

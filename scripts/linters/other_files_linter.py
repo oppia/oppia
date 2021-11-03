@@ -48,7 +48,7 @@ WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
-    'backend_tests.yml',)
+    'backend_tests.yml', 'pending-review-notification.yml')
 
 THIRD_PARTY_LIBS = [
     {
