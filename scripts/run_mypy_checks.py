@@ -301,7 +301,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/user_domain_test.py',
     'core/domain/user_jobs_one_off.py',
     'core/domain/user_jobs_one_off_test.py',
-    'core/domain/user_query_domain_test.py',
     'core/domain/user_query_jobs_one_off.py',
     'core/domain/user_query_jobs_one_off_test.py',
     'core/domain/user_query_services.py',

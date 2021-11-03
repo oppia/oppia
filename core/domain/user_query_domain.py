@@ -35,7 +35,7 @@ attribute_names = [ # pylint: disable=invalid-name
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
 # ignore annotation for namedtuple type
-UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
+UserQueryParams = collections.namedtuple( # type: ignore[misc]
     'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names)) # type: ignore[misc]
 
 
