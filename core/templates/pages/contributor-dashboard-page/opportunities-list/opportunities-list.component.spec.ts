@@ -181,8 +181,9 @@ describe('Opportunities List Component', () => {
     inReviewCount: 20,
     totalCount: 100,
     translationsCount: 30
-  },
-  {
+  }];
+
+  const MoreExplorationOpportunityDict: ExplorationOpportunity[] = [{
     id: 'id17',
     labelText: 'text',
     labelColor: 'red',
@@ -217,6 +218,60 @@ describe('Opportunities List Component', () => {
     inReviewCount: 20,
     totalCount: 100,
     translationsCount: 50
+  },
+  {
+    id: 'id21',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id22',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id23',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id24',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id25',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
+  },
+  {
+    id: 'id26',
+    labelText: 'text',
+    labelColor: 'red',
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
   }];
 
   beforeEach(() => {
@@ -242,11 +297,11 @@ describe('Opportunities List Component', () => {
 
     component.loadOpportunities = () => Promise.resolve({
       opportunitiesDicts: ExplorationOpportunityDict,
-      more: false
+      more: true
     });
     component.loadMoreOpportunities = () => Promise.resolve({
-      opportunitiesDicts: ExplorationOpportunityDict,
-      more: true
+      opportunitiesDicts: MoreExplorationOpportunityDict,
+      more: false
     });
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
@@ -282,13 +337,13 @@ describe('Opportunities List Component', () => {
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
     expect(component.opportunities).toEqual(ExplorationOpportunityDict);
-    expect(component.opportunities.length).toEqual(20);
+    expect(component.opportunities.length).toEqual(16);
 
     // Removed opportunity with id as 'id2'.
     mockRemoveOpportunitiesEventEmitter.emit(['id2']);
     tick();
 
-    expect(component.opportunities.length).toEqual(19);
+    expect(component.opportunities.length).toEqual(15);
   }));
 
   describe('when clicking on page number ', () => {
