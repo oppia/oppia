@@ -315,7 +315,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # Letting mypy know that results[0] is a dict.
         assert isinstance(results[0], dict)
         self.assertEqual(results[0]['id'], 'doc_id1')
-        self.assertEqual(new_offset, '1')
+        self.assertEqual(new_offset, 1)
 
         results, new_offset = elastic_search_services.search(
             'hello', 'index', [], [], offset=1, size=1)
