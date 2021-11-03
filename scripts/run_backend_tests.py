@@ -46,8 +46,7 @@ imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import contextlib
@@ -103,15 +102,15 @@ _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=python_utils.UNICODE)
+    type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.UNICODE)
+    type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_shard',
     help='optional name of shard to run',
-    type=python_utils.UNICODE)
+    type=str)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
