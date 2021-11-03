@@ -155,7 +155,7 @@ def search(
         offset: Optional[int] = None,
         size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
         ids_only: bool = False
-) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[int]]:
+) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[str]]:
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
