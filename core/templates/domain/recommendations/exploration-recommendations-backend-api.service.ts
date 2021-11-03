@@ -25,11 +25,21 @@ import {
   LearnerExplorationSummaryBackendDict
 } from 'domain/summary/learner-exploration-summary.model';
 
+// The type below is used to create an object that is passed to a HTTP get
+// method. When using the interface style, TypeScript throws an error because
+// this type and the type of the method's expected argument don't match
+// exactly (even though they are compatible).
+// The solution is to either change this type definition so it exactly matches
+// the method's expected argument type, or use the type alias style instead of
+// interface (this requires us to explicitly allow the use of type alias).
+// The second solution has been used to preserve type safety.
+
 // This is the type used for params that are sent to the backend.
 // This type has optional properties because they may not be present in the URL.
 // If we send these params always, the request URL would have something like
 // '?collection_id=null' and the backend would start looking for a collection
 // with id "null" which is not correct.
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type RecommendationsUrlParams = {
   'stringified_author_recommended_ids': string;
