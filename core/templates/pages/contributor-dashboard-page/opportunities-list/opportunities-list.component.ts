@@ -97,7 +97,7 @@ export class OpportunitiesListComponent {
       // migration is complete.
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
-        this.more = more
+        this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
         this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
@@ -111,7 +111,7 @@ export class OpportunitiesListComponent {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
     // endIndex is used instead of startIndex to handle bug in backend where \
-    // intially fetched skills are dropped causing display issues.
+    // Intially fetched skills are dropped causing display issues.
     if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
