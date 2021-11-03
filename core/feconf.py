@@ -208,6 +208,10 @@ DEFAULT_CLASSIFIER_LABEL = '_default'
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
+# for suggestions.
+DEFAULT_SUGGESTION_QUERY_LIMIT = 100
+
+# The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
 NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 
