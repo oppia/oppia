@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for exploration publish modal
- * dismiss.
+ * @fileoverview Component for discarding exploration changes.
  */
 
 import { Component } from '@angular/core';

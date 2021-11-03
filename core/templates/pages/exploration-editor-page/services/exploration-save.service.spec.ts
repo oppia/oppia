@@ -22,6 +22,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditabilityService } from 'services/editability.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -30,7 +31,6 @@ import { ChangeListService } from './change-list.service';
 import { ExplorationDataService } from './exploration-data.service';
 import { ExplorationLanguageCodeService } from './exploration-language-code.service';
 import { ExplorationTagsService } from './exploration-tags.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
 
 describe('Exploration save service ' +
