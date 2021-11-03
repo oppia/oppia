@@ -75,7 +75,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
-                thumbnail_filename, strict=False)
+                thumbnail_filename)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
         self,
@@ -86,7 +86,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
-                thumbnail_filename, strict=True)
+                thumbnail_filename)
 
     def _assert_strict_valid_title_for_blog_post(
         self, expected_error_substring: str, title: str
@@ -305,7 +305,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
-                thumbnail_filename, strict=False)
+                thumbnail_filename)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
         self,
@@ -316,7 +316,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
-                thumbnail_filename, strict=True)
+                thumbnail_filename)
 
     def test_thumbnail_filename_validation_for_blog_post(self) -> None:
         self._assert_valid_thumbnail_filename_for_blog_post(
@@ -331,10 +331,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Image filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Thumbnail filename should not be empty', '')
-        self._assert_strict_valid_thumbnail_filename_for_blog_post(
-            'Expected thumbnail filename to be a string, received: ',
-            None
-        )
 
     def _assert_strict_valid_title_for_blog_post(
         self, expected_error_substring: str, title: str
