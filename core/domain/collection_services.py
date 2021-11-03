@@ -580,7 +580,7 @@ def get_collection_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Offset indicating where, in the list of
+        offset: int or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:

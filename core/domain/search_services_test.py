@@ -118,9 +118,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'
-        expected_offset = '0'
+        expected_offset = 0
         expected_size = 30
-        expected_result_offset = '30'
+        expected_result_offset = 30
         doc_ids = ['id1', 'id2']
 
         def mock_search(
@@ -148,9 +148,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     def test_search_collections(self):
         expected_query_string = 'a query string'
-        expected_offset = '0'
+        expected_offset = 0
         expected_size = 30
-        expected_result_offset = '30'
+        expected_result_offset = 30
         doc_ids = ['id1', 'id2']
 
         def mock_search(

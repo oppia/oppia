@@ -48,7 +48,7 @@ def get_matching_activity_dicts(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        search_offset: str or None. Offset indicating where, in the list of
+        search_offset: int or None. Offset indicating where, in the list of
             exploration search results, to start the search from. If None,
             collection search results are returned first before the
             explorations.
@@ -253,7 +253,7 @@ class SearchHandler(base.BaseHandler):
                 },
                 'default_value': ''
             },
-            'cursor': {
+            'offset': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -295,7 +295,9 @@ class SearchHandler(base.BaseHandler):
             if language_code_string else [])
 
         # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
-        search_offset = self.normalized_request.get('cursor')
+        search_offset = self.normalized_request.get('offset')
+        if search_offset:
+            search_offset = int(search_offset)
 
         activity_list, new_search_offset = get_matching_activity_dicts(
             query_string, categories, language_codes, search_offset)

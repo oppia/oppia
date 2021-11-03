@@ -214,7 +214,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
     Args:
         query_string: str. The search query for which the search is to be
             performed.
-        search_offset: str or None. The offset location to start the search
+        search_offset: int or None. The offset location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
         user: UserActionsInfo. Object having user_id, role and actions for
