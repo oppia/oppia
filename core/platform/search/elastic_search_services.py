@@ -155,7 +155,7 @@ def search(
         offset: Optional[int] = None,
         size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
         ids_only: bool = False
-) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[str]]:
+) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[int]]:
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
@@ -266,7 +266,7 @@ def search(
         # There is at least one more page of results to fetch. Trim the results
         # in this call to the desired size.
         matched_search_docs = matched_search_docs[:size]
-        resulting_offset = str(int(offset) + size)
+        resulting_offset = int(offset) + size
 
     if ids_only:
         result_docs = [doc['_id'] for doc in matched_search_docs]

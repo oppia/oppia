@@ -55,7 +55,7 @@ def get_matching_activity_dicts(
         tuple. A tuple consisting of two elements:
             - list(dict). Each element in this list is a collection or
                 exploration summary dict, representing a search result.
-            - str. The exploration index offset from which to start the
+            - int. The exploration index offset from which to start the
                 next search.
     """
     # We only populate collections in the initial load, since the current
@@ -293,7 +293,7 @@ class SearchHandler(base.BaseHandler):
             if language_code_string else [])
 
         # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
-        search_offset = self.normalized_request.get('offset')
+        search_offset = self.normalized_request.get('cursor')
         if search_offset:
             search_offset = int(search_offset)
 

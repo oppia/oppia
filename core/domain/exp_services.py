@@ -163,7 +163,7 @@ def get_exploration_ids_matching_query(
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_offset: str. Search offset for future fetches.
+            search_offset: int. Search offset for future fetches.
     """
     returned_exploration_ids = []
     search_offset = offset
