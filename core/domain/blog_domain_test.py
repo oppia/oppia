@@ -331,6 +331,10 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Image filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Thumbnail filename should not be empty', '')
+        self._assert_strict_valid_thumbnail_filename_for_blog_post(
+            'Expected thumbnail filename to be a string, received: ',
+            None
+        )
 
     def _assert_strict_valid_title_for_blog_post(
         self, expected_error_substring: str, title: str
