@@ -53,9 +53,9 @@ describe('Delete account page', () => {
     fakeAsync(() => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        }) as NgbModalRef;
       });
       component.deleteAccount();
       expect(modalSpy).toHaveBeenCalled();
@@ -64,9 +64,9 @@ describe('Delete account page', () => {
   it('should do nothing when cancel button is clicked', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>({
+      return ({
         result: Promise.reject('cancel')
-      });
+      }) as NgbModalRef;
     });
 
     component.deleteAccount();

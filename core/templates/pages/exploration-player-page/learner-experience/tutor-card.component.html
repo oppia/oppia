@@ -1,7 +1,7 @@
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card"
      [ngClass]="{'animate-card-width': startCardChangeAnimation}"
-     [ngStyle]="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
+     [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        [ngClass]="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
@@ -12,6 +12,7 @@
          rel="noopener">
         <img class="conversation-skin-oppia-avatar"
              [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
+             [ngStyle]="isLanguageRTL() ? {'right': '-87px'} : {'left': '-87px'}"
              *ngIf="avatarImageIsShown">
       </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
@@ -93,7 +94,8 @@
          class="conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction-container">
         <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">{{ interactionInstructions }}</span>
-        <i *ngIf="canWindowShowTwoCards()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i *ngIf="canWindowShowTwoCards() && !isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i *ngIf="canWindowShowTwoCards() && isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C4;</i>
         <i *ngIf="!canWindowShowTwoCards()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
     </div>
@@ -124,7 +126,6 @@
 
   .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 100px;
-    left: -87px;
     top: -20px;
     width: 100px;
   }

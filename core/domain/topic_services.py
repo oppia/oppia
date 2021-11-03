@@ -16,14 +16,12 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import caching_services
 from core.domain import feedback_services
@@ -109,7 +107,7 @@ def does_topic_with_name_exist(topic_name):
     Raises:
         Exception. Topic name is not a string.
     """
-    if not isinstance(topic_name, python_utils.BASESTRING):
+    if not isinstance(topic_name, str):
         raise utils.ValidationError('Name should be a string.')
     existing_topic = topic_fetchers.get_topic_by_name(topic_name)
     return existing_topic is not None
@@ -127,7 +125,7 @@ def does_topic_with_url_fragment_exist(url_fragment):
     Raises:
         Exception. Topic URL fragment is not a string.
     """
-    if not isinstance(url_fragment, python_utils.BASESTRING):
+    if not isinstance(url_fragment, str):
         raise utils.ValidationError('Topic URL fragment should be a string.')
     existing_topic = (
         topic_fetchers.get_topic_by_url_fragment(url_fragment))
@@ -435,7 +433,8 @@ def update_topic_and_subtopic_pages(
     Raises:
         ValueError. Current user does not have enough rights to edit a topic.
     """
-    if not commit_message:
+    topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
+    if topic_rights.topic_is_published and not commit_message:
         raise ValueError(
             'Expected a commit message, received none.')
 
