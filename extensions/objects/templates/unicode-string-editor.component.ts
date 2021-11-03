@@ -27,8 +27,8 @@ import { ExternalSaveService } from 'services/external-save.service';
 // The following properties are optional since there is a possibility that the
 // current and previous values have not yet been specified in the form.
 interface UnicodeStringEditorArguments {
-  currentValue?: { largeInput: string },
-  previousValue?: { largeInput: string }
+  currentValue?: { largeInput: string };
+  previousValue?: { largeInput: string };
 }
 
 @Component({

@@ -82,9 +82,9 @@ type PayloadType = (
 // The 'secret' and 'tagId' sent to the parent will be 'null' if the supported
 // hash version is not '0.0.0'. They are used to ensure backwards-compatibility.
 interface HashDict {
-  version: string,
-  secret: string | null,
-  tagid: string | null
+  version: string;
+  secret: string | null;
+  tagid: string | null;
 }
 
 @Injectable({
