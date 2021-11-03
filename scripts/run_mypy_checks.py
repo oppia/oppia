@@ -16,8 +16,7 @@
 
 """MyPy test runner script."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 
 import argparse
@@ -164,8 +163,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/learner_goals_services_test.py',
     'core/domain/learner_playlist_services.py',
     'core/domain/learner_playlist_services_test.py',
-    'core/domain/learner_progress_domain.py',
-    'core/domain/learner_progress_domain_test.py',
     'core/domain/learner_progress_services.py',
     'core/domain/learner_progress_services_test.py',
     'core/domain/moderator_services.py',

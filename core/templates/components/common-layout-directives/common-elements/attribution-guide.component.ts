@@ -24,6 +24,7 @@ import { BrowserCheckerService } from
 import { AttributionService } from 'services/attribution.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'attribution-guide',
@@ -40,6 +41,7 @@ export class AttributionGuideComponent implements OnInit {
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
     private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService
   ) {}
 
@@ -68,6 +70,10 @@ export class AttributionGuideComponent implements OnInit {
     this.maskIsShown = true;
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   hideAttributionModal(): void {
     this.attributionService.hideAttributionModal();
     this.maskIsShown = false;
@@ -92,8 +98,8 @@ export class AttributionGuideComponent implements OnInit {
   copyAttribution(className: string): void {
     const codeDiv = document.getElementsByClassName(className)[0];
     const range = document.createRange();
-    range.setStartBefore(<Node>(<HTMLDivElement>codeDiv).firstChild);
-    range.setEndAfter(<Node>(<HTMLDivElement>codeDiv).lastChild);
+    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
+    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
     // 'getSelection()' will not return 'null' since it is not called on an
     // undisplayed <iframe>. That is why we can use '?'.
     const selection = window.getSelection();
