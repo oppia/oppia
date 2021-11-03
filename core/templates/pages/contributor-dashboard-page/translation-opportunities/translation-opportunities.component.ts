@@ -21,21 +21,31 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 import { TranslateTextService } from '../services/translate-text.service';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
 export class TranslationOpportunitiesComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  // This constant is defined as null at AppConstants.
+  OPPIA_AVATAR_LINK_URL!: string | null;
+
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
   opportunityType = 'translation';
+  languageSelected = false;
   constructor(
     private readonly contextService: ContextService,
     private readonly contributionOpportunitiesService:
@@ -43,6 +53,7 @@ export class TranslationOpportunitiesComponent {
     private readonly modalService: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translationLanguageService: TranslationLanguageService,
+    private readonly translationTopicService: TranslationTopicService,
     private readonly translateTextService: TranslateTextService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
@@ -110,6 +121,16 @@ export class TranslationOpportunitiesComponent {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
+    this.translationLanguageService.onActiveLanguageChanged.subscribe(
+      () => this.languageSelected = true);
+    if (this.translationLanguageService.getActiveLanguageCode()) {
+      this.languageSelected = true;
+    } else {
+      this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
+      this.OPPIA_AVATAR_IMAGE_URL = (
+        this.urlInterpolationService.getStaticImageUrl(
+          '/avatar/oppia_avatar_100px.svg'));
+    }
   }
 
   async loadMoreOpportunitiesAsync(): Promise<{
@@ -118,7 +139,8 @@ export class TranslationOpportunitiesComponent {
   }> {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
-        this.translationLanguageService.getActiveLanguageCode())
+        this.translationLanguageService.getActiveLanguageCode(),
+        this.translationTopicService.getActiveTopicName())
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
@@ -128,7 +150,8 @@ export class TranslationOpportunitiesComponent {
   }> {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
-        this.translationLanguageService.getActiveLanguageCode())
+        this.translationLanguageService.getActiveLanguageCode(),
+        this.translationTopicService.getActiveTopicName())
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 }

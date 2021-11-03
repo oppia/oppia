@@ -14,8 +14,7 @@
 
 """Models for Oppia feedback reports from both Android and web."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -276,8 +275,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             submitted_on_datetime)
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
-                python_utils.UNICODE(
-                    utils.get_random_int(base_models.RAND_RANGE)),
+                str(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
                 platform, int(submitted_datetime_in_msec), random_hash)
@@ -289,7 +287,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unscrubbed_expiring_report_models(
-            cls) -> Sequence['AppFeedbackReportModel']:
+        cls
+    ) -> Sequence[AppFeedbackReportModel]:
         """Fetches the reports that are past their 90-days in storage and must
         be scrubbed.
 
@@ -303,9 +302,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
         # the latter throws "Cannot filter a non-Node argument; received False".
-        report_models: Sequence['AppFeedbackReportModel'] = cls.query(
+        report_models: Sequence[AppFeedbackReportModel] = cls.query(
             cls.created_on < datetime_before_which_to_scrub,
-            cls.scrubbed_by == None).fetch()  # pylint: disable=singleton-comparison
+            cls.scrubbed_by == None  # pylint: disable=singleton-comparison
+        ).fetch()
         return report_models
 
     @classmethod
@@ -546,8 +546,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             name_hash = utils.convert_to_hash(
                 ticket_name, base_models.ID_LENGTH)
             random_hash = utils.convert_to_hash(
-                python_utils.UNICODE(
-                    utils.get_random_int(base_models.RAND_RANGE)),
+                str(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
                 int(current_datetime_in_msec), name_hash, random_hash)
@@ -698,8 +697,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_stats_for_ticket(
-            cls, ticket_id: str
-    ) -> Sequence['AppFeedbackReportStatsModel']:
+        cls, ticket_id: str
+    ) -> Sequence[AppFeedbackReportStatsModel]:
         """Fetches the stats for a single ticket.
 
         Args:

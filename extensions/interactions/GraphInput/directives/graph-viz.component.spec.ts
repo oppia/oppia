@@ -25,6 +25,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('GraphVizComponent', () => {
   let component: GraphVizComponent;
@@ -33,13 +34,17 @@ describe('GraphVizComponent', () => {
   let playerPositionService: PlayerPositionService;
   let focusManagerService: FocusManagerService;
   let fixture: ComponentFixture<GraphVizComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let mockNewCardAvailableEmitter = new EventEmitter();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [GraphVizComponent, MockTranslatePipe],
-      providers: [GraphDetailService, DeviceInfoService],
+      providers: [
+        GraphDetailService,
+        DeviceInfoService
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -51,6 +56,10 @@ describe('GraphVizComponent', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     fixture = TestBed.createComponent(GraphVizComponent);
     component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
 
     // Graph visulization
     //      1
@@ -157,6 +166,10 @@ describe('GraphVizComponent', () => {
     mockNewCardAvailableEmitter.emit();
 
     expect(component.state.currentMode).toBeNull();
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should set graph properties after the view is initialized', () => {

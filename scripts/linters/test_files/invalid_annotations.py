@@ -15,13 +15,8 @@
 # limitations under the License.
 
 """Python file with invalid syntax, used by scripts/linters/
-python_linter_test. This file is using urlencode which is not allowed.
+python_linter_test. This file does not contain unicode literal future import.
 """
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-import urllib
 
 
 class FakeClass:
@@ -30,15 +25,13 @@ class FakeClass:
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg
 
-    def fake_method(self, source_url, doseq):
+    def fake_method(self, name):
         """This doesn't do anything.
 
         Args:
-            source_url: str. The URL.
-            doseq: bool. Boolean value.
+            name: str. Means nothing.
 
-        Returns:
-            urlencode(object): Returns urlencode object.
+        Yields:
+            tuple(str, str). The argument passed in but twice in a tuple.
         """
-        # Use of urlencode is not allowed.
-        return urllib.urlencode(source_url, doseq=doseq)
+        yield (name, name)

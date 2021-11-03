@@ -14,8 +14,7 @@
 
 """Tests for the image validation service."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
@@ -53,12 +52,12 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             large_image, 'image.svg', 'Image exceeds file size limit of 100 KB')
 
-        invalid_svg = '<badsvg></badsvg>'
+        invalid_svg = b'<badsvg></badsvg>'
         self._assert_validation_error(
             invalid_svg, 'image.svg',
             'Unsupported tags/attributes found in the SVG')
 
-        no_xmlns_attribute_svg = invalid_svg = '<svg></svg>'
+        no_xmlns_attribute_svg = invalid_svg = b'<svg></svg>'
         self._assert_validation_error(
             no_xmlns_attribute_svg, 'image.svg',
             'The svg tag does not contains the \'xmlns\' attribute.')

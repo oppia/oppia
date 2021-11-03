@@ -16,12 +16,10 @@
 
 """Unit tests for jobs.types.model_property."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import pickle
 
-from core import python_utils
 from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils
@@ -116,18 +114,14 @@ class ModelPropertyTests(test_utils.TestBase):
         self.assertEqual(self.ndb_repeated_property.property_name, 'values')
 
     def test_str_of_id_property(self):
-        self.assertEqual(
-            python_utils.UNICODE(self.id_property), 'SubclassOfBaseModel.id')
+        self.assertEqual(str(self.id_property), 'SubclassOfBaseModel.id')
 
     def test_str_of_ndb_property(self):
-        self.assertEqual(
-            python_utils.UNICODE(self.ndb_property),
-            'SubclassOfBaseModel.value')
+        self.assertEqual(str(self.ndb_property), 'SubclassOfBaseModel.value')
 
     def test_str_of_ndb_repeated_property(self):
         self.assertEqual(
-            python_utils.UNICODE(self.ndb_repeated_property),
-            'RepeatedValueModel.values')
+            str(self.ndb_repeated_property), 'RepeatedValueModel.values')
 
     def test_repr_of_id_property(self):
         self.assertEqual(
