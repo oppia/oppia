@@ -30,7 +30,7 @@ from core.tests import test_utils
 class UserQueryTests(test_utils.GenericTestBase):
     """Test for the UserQuery."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(UserQueryTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -48,14 +48,14 @@ class UserQueryTests(test_utils.GenericTestBase):
         )
         self.user_query.validate()
 
-    def test_validate_query_with_invalid_type_id_raises(self):
+    def test_validate_query_with_invalid_type_id_raises(self) -> None:
         self.user_query.id = 1
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected ID to be a string'
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_invalid_type_params_raises(self):
+    def test_validate_query_with_invalid_type_params_raises(self) -> None:
         self.user_query.params = 1
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -64,7 +64,7 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_submitter_id_raises(
-            self):
+            self) -> None:
         self.user_query.submitter_id = 1
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected submitter ID to be a string'
@@ -72,28 +72,28 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_user_id_submitter_id_raises(
-            self):
+            self) -> None:
         self.user_query.submitter_id = 'aaabbc'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected submitter ID to be a valid user ID'
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_invalid_type_status_raises(self):
+    def test_validate_query_with_invalid_type_status_raises(self) -> None:
         self.user_query.status = 1
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected status to be a string'
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_invalid_status_raises(self):
+    def test_validate_query_with_invalid_status_raises(self) -> None:
         self.user_query.status = 'a'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid status: a'
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_invalid_type_user_ids_raises(self):
+    def test_validate_query_with_invalid_type_user_ids_raises(self) -> None:
         self.user_query.user_ids = 'a'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected user_ids to be a list'
@@ -101,7 +101,7 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_of_values_in_user_ids_raises(
-            self):
+            self) -> None:
         self.user_query.user_ids = [1]
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -109,7 +109,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_non_user_id_values_in_user_ids_raises(self):
+    def test_validate_query_with_non_user_id_values_in_user_ids_raises(self) -> None:
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -118,7 +118,7 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_of_sent_email_model_id_raises(
-            self):
+            self) -> None:
         self.user_query.sent_email_model_id = 1
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -126,7 +126,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         ):
             self.user_query.validate()
 
-    def test_create_default_returns_correct_user_query(self):
+    def test_create_default_returns_correct_user_query(self) -> None:
         default_user_query = user_query_domain.UserQuery.create_default(
             'id', self.user_query_params, self.user_id)
         self.assertEqual(default_user_query.params, self.user_query_params)
@@ -135,7 +135,7 @@ class UserQueryTests(test_utils.GenericTestBase):
             default_user_query.status, feconf.USER_QUERY_STATUS_PROCESSING)
         self.assertEqual(default_user_query.user_ids, [])
 
-    def test_archive_returns_correct_dict(self):
+    def test_archive_returns_correct_dict(self) -> None:
         self.user_query.archive(sent_email_model_id='sent_email_model_id')
         self.assertEqual(
             self.user_query.sent_email_model_id, 'sent_email_model_id')

@@ -34,8 +34,9 @@ attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
+# ignore annotation for namedtuple type
 UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
-    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names)) # type: ignore
+    'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names)) # type: ignore[misc]
 
 
 class UserQuery:
@@ -47,9 +48,9 @@ class UserQuery:
         submitter_id: str,
         query_status: str,
         user_ids: List[str],
-        sent_email_model_id: Optional[str] =None,
-        created_on: Optional[datetime] =None,
-        deleted: bool =False
+        sent_email_model_id: Optional[str] = None,
+        created_on: Optional[datetime] = None,
+        deleted: bool = False
     ) -> None:
         """Create user query domain object.
 
@@ -74,7 +75,7 @@ class UserQuery:
         self.created_on = created_on
         self.deleted = deleted
 
-    def validate(self) ->None:
+    def validate(self) -> None:
         """Validates various properties of the UserQuery.
 
         Raises:
@@ -156,7 +157,7 @@ class UserQuery:
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id: Optional[str] =None) ->None:
+    def archive(self, sent_email_model_id: Optional[str] = None) -> None:
         """Archive the query.
 
         Args:
