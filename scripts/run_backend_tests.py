@@ -180,6 +180,8 @@ class TestingTaskSpec:
             data_file = '.coverage.%s.%s.%06d' % (
                 socket.gethostname(), os.getpid(), rand)
             env['COVERAGE_FILE'] = data_file
+            python_utils.PRINT('Coverage data for %s is in %s' % (
+                self.test_target, data_file))
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
@@ -263,13 +265,9 @@ def _check_shards_match_tests(include_load_tests=True):
         shards_spec = json.load(shards_file)
     shard_modules = sorted([
         module for shard in shards_spec.values() for module in shard])
-    test_classes = _get_all_test_targets_from_path(
+    test_modules = _get_all_test_targets_from_path(
         include_load_tests=include_load_tests)
-    test_modules_set = set()
-    for test_class in test_classes:
-        last_dot_index = test_class.rfind('.')
-        module_name = test_class[:last_dot_index]
-        test_modules_set.add(module_name)
+    test_modules_set = set(test_modules)
     test_modules = sorted(test_modules_set)
     if test_modules == shard_modules:
         return ''
@@ -412,6 +410,11 @@ def main(args=None):
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
+        elif task.exception and isinstance(
+                task.exception, subprocess.CalledProcessError):
+            python_utils.PRINT(
+                'ERROR     %s: Error raised by subprocess.')
+            python_utils.PRINT(task.exception)
         elif task.exception and 'No tests were run' in task.exception.args[0]:
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
@@ -478,9 +481,9 @@ def main(args=None):
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
 
-    python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
+    python_utils.PRINT('Ran %s test%s in %s test module%s.' % (
         total_count, '' if total_count == 1 else 's',
-        len(tasks), '' if len(tasks) == 1 else 'es'))
+        len(tasks), '' if len(tasks) == 1 else 's'))
 
     if total_errors or total_failures:
         python_utils.PRINT(
@@ -528,9 +531,15 @@ def _check_coverage(
         percentage.
     """
     if combine:
-        subprocess.run(
+        combine_process = subprocess.run(
             [sys.executable, COVERAGE_MODULE_PATH, 'combine'],
-            check=True)
+            capture_output=True, encoding='utf-8', check=False)
+        no_combine = combine_process.stdout.strip() == 'No data to combine'
+        if (combine_process.returncode and not no_combine):
+            raise RuntimeError(
+                'Failed to combine coverage because subprocess failed.'
+                '\n%s' % combine_process)
+
     cmd = [
         sys.executable, COVERAGE_MODULE_PATH, 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
@@ -543,17 +552,24 @@ def _check_coverage(
         env['COVERAGE_FILE'] = data_file
 
     process = subprocess.run(
-        cmd, capture_output=True, encoding='utf-8', env=env, check=True)
-    report_stdout = process.stdout
-
-    coverage_result = re.search(
-        r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
-    if coverage_result:
-        coverage = float(coverage_result.group('total'))
+        cmd, capture_output=True, encoding='utf-8', env=env,
+        check=False)
+    if process.stdout.strip() == 'No data to report.':
+        # File under test is exempt from coverage according to the
+        # --omit flag or .coveragerc.
+        coverage = 100
+    elif process.returncode:
+        raise RuntimeError(
+            'Failed to calculate coverage because subprocess failed. %s'
+            % process
+        )
     else:
-        # There was no coverage data to report.
-        coverage = 0
-    return report_stdout, coverage
+        coverage_result = re.search(
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+            process.stdout)
+        coverage = float(coverage_result.group('total'))
+
+    return process.stdout, coverage
 
 
 if __name__ == '__main__':
