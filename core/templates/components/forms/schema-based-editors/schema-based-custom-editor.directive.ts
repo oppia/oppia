@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -26,16 +26,23 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 export class SchemaBasedCustomEditorComponent implements OnInit {
   @Input() localValue;
+  someValue;
   @Output() localValueChange = new EventEmitter();
   @Input() schema;
   @Input() form;
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(e: unknown): void {
     this.localValueChange.emit(e);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Some random comment.
+    this.someValue = (
+      // eslint-disable-next-line max-len
+      typeof this.localValue === 'object' ? {...this.localValue} : this.localValue);
+    this.changeDetectorRef.detectChanges();
+  }
 }
 
 angular.module('oppia').directive(

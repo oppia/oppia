@@ -21,8 +21,8 @@
                            [obj-type]="'SetOfTranslatableHtmlContentIds'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
-                           [value]="$ctrl.rule.inputs[item.varName]"
-                           (value-change)="$ctrl.updateValue($event, item.varName)">
+                           ng-model="$ctrl.rule.inputs[item.varName]"
+                           ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
           </span>
           <span ng-if="item.type == 'dropdown'" class="text-dark">
@@ -30,8 +30,8 @@
                            [obj-type]="'ListOfSetsOfTranslatableHtmlContentIds'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
-                           [value]="$ctrl.rule.inputs[item.varName]"
-                           (value-change)="$ctrl.updateValue($event, item.varName)">
+                           ng-model="$ctrl.rule.inputs[item.varName]"
+                           ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
           </span>
           <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
@@ -39,8 +39,8 @@
                            [obj-type]="'TranslatableHtmlContentId'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
-                           [value]="$ctrl.rule.inputs[item.varName]"
-                           (value-change)="$ctrl.updateValue($event, item.varName)">
+                           ng-model="$ctrl.rule.inputs[item.varName]"
+                           ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
           </span>
           <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
@@ -48,8 +48,8 @@
                            [obj-type]="'DragAndDropPositiveInt'"
                            [init-args]="{choices: $ctrl.ruleDescriptionChoices}"
                            [form]="$ctrl.ruleEditForm.form"
-                           [value]="$ctrl.rule.inputs[item.varName]"
-                           (value-change)="$ctrl.updateValue($event, item.varName)">
+                           ng-model="$ctrl.rule.inputs[item.varName]"
+                           ng-change="$ctrl.updateValue($event, item.varName)">
             </object-editor>
           </span>
           <span ng-if="item.type != 'select' &&
@@ -63,8 +63,8 @@
                            [is-editable]="$ctrl.isEditable"
                            [always-editable]="true"
                            [form]="$ctrl.ruleEditForm.form"
-                           [value]="$ctrl.rule.inputs[item.varName]"
-                           (value-change)="$ctrl.updateValue($event, item.varName)"
+                           ng-model="$ctrl.rule.inputs[item.varName]"
+                           ng-change="$ctrl.updateValue($event, item.varName)"
                            class="text-dark">
             </object-editor>
           </span>

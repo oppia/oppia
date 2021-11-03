@@ -36,10 +36,10 @@
 </schema-based-unicode-editor>
 
 <schema-based-html-editor ng-if="$ctrl.schema().type === 'html' && !$ctrl.schema().choices"
-                          local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
-                          label-for-focus-target="$ctrl.labelForFocusTarget()"
-                          ui-config="$ctrl.schema().ui_config"
-                          headers-enabled="$ctrl.headersEnabled()">
+                          [local-value]="$ctrl.localValue" (local-value-change)="$ctrl.updateValue($event)"  [disabled]="$ctrl.isDisabled()"
+                          [label-for-focus-target]="$ctrl.labelForFocusTarget()"
+                          [ui-config]="$ctrl.schema().ui_config"
+                          [headers-enabled]="$ctrl.headersEnabled()">
 </schema-based-html-editor>
 
 <schema-based-list-editor ng-if="$ctrl.schema().type === 'list' && !$ctrl.schema().choices"

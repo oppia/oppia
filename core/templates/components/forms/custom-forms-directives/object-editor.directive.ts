@@ -18,7 +18,8 @@
 
 // Individual object editor directives are in extensions/objects/templates.
 
-import { Component, ComponentFactoryResolver, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
 import { CodeStringEditorComponent } from 'objects/templates/code-string-editor.component';
@@ -61,7 +62,7 @@ import { IntEditorComponent } from 'objects/templates/int-editor.component';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ComponentRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 const EDITORS = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
   'boolean': BooleanEditorComponent,
@@ -122,9 +123,17 @@ interface ObjectEditor {
 
 @Component({
   selector: 'object-editor',
-  template: ''
+  template: '',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => ObjectEditorComponent),
+    multi: true
+  }]
 })
-export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
+export class ObjectEditorComponent
+implements AfterViewInit, OnChanges, OnDestroy,
+ControlValueAccessor, Validator {
+  private _value;
   @Input() alwaysEditable: string;
   @Input() initArgs;
   @Input() isEditable: string;
@@ -132,23 +141,67 @@ export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
   @Input() objType: string;
   @Input() schema;
   @Input() form;
-  @Input() value;
+  get value(): unknown {
+    return this._value;
+  }
+  @Input() set value(val: unknown) {
+    if (this._value === val) {
+      return;
+    }
+    this._value = val;
+    this.ref.instance.value = this._value;
+    this.onChange(this._value);
+  }
   @Output() valueChange = new EventEmitter();
   ref: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
+  onChange: (_: unknown) => void = () => {};
+  onTouch: () => void;
+  onValidatorChange: () => void = () => {};
 
+  componentValidationState: Record<string, boolean> = {};
+
+  getComponentValidationState(): Record<string, boolean> {
+    return this.componentValidationState;
+  }
+
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouch = fn;
+  }
+
+  validate(control: AbstractControl): ValidationErrors {
+    this.onValidatorChange();
+    return {};
+  }
+
+  registerOnValidatorChange?(fn: () => void): void {
+    this.onValidatorChange = fn;
+  }
+
+  writeValue(obj: string | number): void {
+    this._updateValue(obj);
+    this.changeDetection.markForCheck();
+  }
+
+  registerOnChange(fn: (_: unknown) => void): void {
+    this.onChange = fn;
+  }
   constructor(
     private loggerService: LoggerService,
+    private changeDetection: ChangeDetectorRef,
     private componentFactoryResolver: ComponentFactoryResolver,
     private viewContainerRef: ViewContainerRef
   ) { }
 
   private _updateValue(e) {
-    this.value = e;
-    this.valueChange.emit(e);
+    if (this.value !== e) {
+      this.value = e;
+      this.valueChange.emit(e);
+    }
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     const editorName = this.objType.replace(
       /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     if (EDITORS[editorName]) {
@@ -180,9 +233,19 @@ export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
           ref.instance.validityChange.subscribe((e) => {
             if (this.form) {
               for (const key of Object.keys(e)) {
-                this.form.$setValidity(key, e[key]);
+                if (e[key] !== true) {
+                  if (this.componentValidationState[key] === undefined) {
+                    this.componentValidationState[key] = e[key];
+                  }
+                } else {
+                  if (this.componentValidationState[key] !== undefined) {
+                    delete this.componentValidationState[key];
+                  }
+                }
+                // this.form.$setValidity(key, e[key]);
               }
             }
+            this.onValidatorChange();
           })
         );
       }
