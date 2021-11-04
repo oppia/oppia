@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -102,53 +102,11 @@ jobs:
         with:
           name: backend_test_coverage_shard_4
           path: coverage/coverage_4
-      - name: Download coverage report for shard 5
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_5
-          path: coverage/coverage_5
-      - name: Download coverage report for shard 6
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_6
-          path: coverage/coverage_6
-      - name: Download coverage report for shard 7
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_7
-          path: coverage/coverage_7
-      - name: Download coverage report for shard 8
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_8
-          path: coverage/coverage_8
-      - name: Download coverage report for shard 9
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_9
-          path: coverage/coverage_9
-      - name: Download coverage report for shard 10
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_10
-          path: coverage/coverage_10
-      - name: Download coverage report for shard 11
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
-        with:
-          name: backend_test_coverage_shard_11
-          path: coverage/coverage_11
       - name: Move coverage reports from artifact folders to coverage folder
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
         run: |
-          for i in {1..11}; do cp coverage/coverage_$i/.coverage coverage/.coverage.$i; done
+          for i in {1..4}; do cp coverage/coverage_$i/.coverage coverage/.coverage.$i; done
       - name: Combine coverage reports
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
