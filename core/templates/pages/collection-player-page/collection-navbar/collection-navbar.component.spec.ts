@@ -23,7 +23,8 @@ import { CollectionNavbarComponent } from './collection-navbar.component';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 
-describe('Collection navbar component', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Collection navbar component', () => {
   let us: UrlService;
   let rocbas: ReadOnlyCollectionBackendApiService;
   let component: CollectionNavbarComponent;
@@ -57,27 +58,26 @@ describe('Collection navbar component', () => {
       jasmine.SpyObj<ReadOnlyCollectionBackendApiService>;
   });
 
-  it('should initialize the component properly', fakeAsync(() => {
-    const mockCollectionDetail = {
-      canEdit: true,
-      title: 'Mock title'
-    };
+  it('should load the component properly on playing a collection',
+    fakeAsync(() => {
+      const mockCollectionDetail = {
+        canEdit: true,
+        title: 'Mock title'
+      };
 
-    spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
-    spyOn(rocbas, 'getCollectionDetails').and.returnValue(mockCollectionDetail);
+      spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
+      spyOn(rocbas, 'getCollectionDetails').and.returnValue(
+        mockCollectionDetail);
 
-    component.ngOnInit();
-    tick(100);
-    rocbas.onCollectionLoad.emit();
-    tick(100);
+      component.ngOnInit();
+      tick(100);
+      rocbas.onCollectionLoad.emit();
+      tick(100);
 
-    fixture.whenStable()
-      .then(() => {
-        expect(us.getCollectionIdFromUrl).toHaveBeenCalled();
-        expect(rocbas.getCollectionDetails).toHaveBeenCalledWith('abcdef');
-        expect(component.collectionTitle).toBe('Mock title');
-      });
+      expect(us.getCollectionIdFromUrl).toHaveBeenCalled();
+      expect(rocbas.getCollectionDetails).toHaveBeenCalledWith('abcdef');
+      expect(component.collectionTitle).toBe('Mock title');
 
-    component.ngOnDestroy();
-  }));
+      component.ngOnDestroy();
+    }));
 });

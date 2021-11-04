@@ -24,7 +24,8 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionFooterComponent } from './collection-footer.component';
 
-describe('Collection footer component', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Collection footer component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let component: CollectionFooterComponent;
@@ -56,20 +57,19 @@ describe('Collection footer component', () => {
     urlService = (urlService as unknown) as jasmine.SpyObj<UrlService>;
   });
 
-  it('should initialize the component properly and change collection id',
-    () => {
-      spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('abcdef');
-      expect(component.collectionId).toBe('');
-      component.ngOnInit();
-      fixture.whenStable()
-        .then(() => {
-          expect(urlService.getCollectionIdFromUrl).toHaveBeenCalled();
-          expect(component.collectionId).toBe('abcdef');
-        });
-    });
+  it('should load the component properly on playing a collection', () => {
+    spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('abcdef');
+    expect(component.collectionId).toBe('');
+
+    component.ngOnInit();
+    expect(urlService.getCollectionIdFromUrl).toHaveBeenCalled();
+    expect(component.collectionId).toBe('abcdef');
+  });
 
   it('should get the static image url from the image path', () => {
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('abcdef');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+
     component.ngOnInit();
     fixture.whenStable()
       .then(() => {
