@@ -16,7 +16,8 @@
 
 """Classes relating to value generators."""
 
-from __future__ import annotations
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import importlib
@@ -26,15 +27,15 @@ import os
 from core import feconf
 from core import utils
 
+from typing import Any, Dict, Tuple
+
 
 class BaseValueGenerator:
     """Base value generator class.
-
     A value generator is a class containing a function that takes in
     customization args and uses them to generate a value. The generated values
     are not typed, so if the caller wants strongly-typed values it would need
     to normalize the output of each generator.
-
     Each value generator should define a template file and an AngularJS
     directive. The names of these two files should be [ClassName].html and
     [ClassName].js respectively, where [ClassName] is the name of the value
@@ -42,7 +43,7 @@ class BaseValueGenerator:
     """
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Returns the Class name as a string, i.e "BaseValueGenerator".
 
         Returns:
@@ -51,7 +52,7 @@ class BaseValueGenerator:
         return self.__class__.__name__
 
     @classmethod
-    def get_html_template(cls):
+    def get_html_template(cls) -> str:
         """Returns the HTML template for the class.
 
         Returns:
@@ -61,9 +62,15 @@ class BaseValueGenerator:
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
             '%s.html' % cls.__name__))
 
-    def generate_value(self, *args, **kwargs):
+    # The types for args and kwargs were found using the reveal_type
+    # method mentioned in the MyPy cheatsheet. The return type is
+    # Any as inferred from line 37.
+    def generate_value(
+        self,
+        *args: Tuple[Any],
+        **kwargs: Dict[str, Any]
+        ) -> Any:
         """Generates a new value, using the given customization args.
-
         The first arg should be context_params.
         """
         raise NotImplementedError(
@@ -72,16 +79,15 @@ class BaseValueGenerator:
 
 class Registry:
     """Maintains a registry of all the value generators.
-
     Attributes:
         value_generators_dict: dict(str : BaseValueGenerator). Dictionary
             mapping value generator class names to their classes.
     """
 
-    value_generators_dict = {}
+    value_generators_dict: Dict[str, BaseValueGenerator] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the dictionary mapping between generator_id and the
         corresponding generator classes.
         """
@@ -98,15 +104,15 @@ class Registry:
                 cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_generator_classes(cls):
+    def get_all_generator_classes(cls) -> Dict[str, BaseValueGenerator]:
+
         """Get the dict of all value generator classes."""
         cls._refresh_registry()
         return copy.deepcopy(cls.value_generators_dict)
 
     @classmethod
-    def get_generator_class_by_id(cls, generator_id):
+    def get_generator_class_by_id(cls, generator_id: str) -> BaseValueGenerator:
         """Gets a generator class by its id.
-
         Refreshes once if the generator is not found; subsequently, throws an
         error.
 
