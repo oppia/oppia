@@ -14,13 +14,11 @@
 
 """Models for storing the classification data models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -128,8 +126,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(
-                        utils.get_random_int(base_models.RAND_RANGE)),
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -195,7 +192,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def query_new_and_pending_training_jobs(
             cls, offset: int
-    ) -> Tuple[Sequence['ClassifierTrainingJobModel'], int]:
+    ) -> Tuple[Sequence[ClassifierTrainingJobModel], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -327,11 +324,8 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def get_models(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_names: List[str]
-    ) -> List[Optional['StateTrainingJobsMappingModel']]:
+        cls, exp_id: str, exp_version: int, state_names: List[str]
+    ) -> List[Optional[StateTrainingJobsMappingModel]]:
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
@@ -355,11 +349,8 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def get_model(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str
-    ) -> Optional['StateTrainingJobsMappingModel']:
+        cls, exp_id: str, exp_version: int, state_name: str
+    ) -> Optional[StateTrainingJobsMappingModel]:
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -421,7 +412,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     @classmethod
     def create_multi(
             cls,
-            state_training_jobs_mappings: List['StateTrainingJobsMappingModel']
+            state_training_jobs_mappings: List[StateTrainingJobsMappingModel]
     ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 

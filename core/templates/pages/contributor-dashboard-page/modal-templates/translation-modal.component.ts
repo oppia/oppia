@@ -456,8 +456,10 @@ export class TranslationModalComponent {
             this.activeWrittenTranslation = '';
             this.resetEditor();
           }
-        }, () => {
+        }, (errorReason: string) => {
           this.contextService.resetImageSaveDestination();
+          this.alertsService.clearWarnings();
+          this.alertsService.addWarning(errorReason);
           this.close();
         });
     }

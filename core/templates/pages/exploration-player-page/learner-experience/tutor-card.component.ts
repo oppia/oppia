@@ -40,6 +40,7 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -74,6 +75,7 @@ export class TutorCardComponent {
     private currentInteractionService: CurrentInteractionService,
     private deviceInfoService: DeviceInfoService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private playerPositionService: PlayerPositionService,
     private urlInterpolationService: UrlInterpolationService,
@@ -142,6 +144,10 @@ export class TutorCardComponent {
       this.deviceInfoService.isMobileDevice() &&
       this.audioBarStatusService.isAudioBarExpanded()
     );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   updateDisplayedCard(): void {

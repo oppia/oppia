@@ -28,8 +28,9 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import { GoalsTabComponent } from './goals-tab.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
@@ -47,8 +48,11 @@ describe('Goals tab Component', () => {
     LearnerDashboardActivityBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
   let ngbModal: NgbModal;
+  let windowDimensionsService: WindowDimensionsService;
+  let mockResizeEmitter: EventEmitter<void>;
 
   beforeEach(async(() => {
+    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
@@ -63,7 +67,14 @@ describe('Goals tab Component', () => {
       providers: [
         LearnerDashboardActivityBackendApiService,
         LearnerDashboardIdsBackendApiService,
-        UrlInterpolationService
+        UrlInterpolationService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => mockResizeEmitter,
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -76,6 +87,7 @@ describe('Goals tab Component', () => {
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -233,7 +245,17 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(component.MAX_CURRENT_GOALS_LENGTH).toEqual(5);
+    expect(component.windowIsNarrow).toBeTrue();
   }));
+
+  it('should check whether window is narrow on resizing the screen', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    expect(component.windowIsNarrow).toBeTrue();
+
+    mockResizeEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
+  });
 
   it('should check where the topicId belongs to current goal', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
@@ -271,13 +293,6 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
-  });
-
-  it('should detect when application is being used on a mobile', () => {
-    expect(component.checkMobileView()).toBe(false);
-
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-    expect(component.checkMobileView()).toBe(true);
   });
 
   it('should add topic to learner goals if not already present', () => {
