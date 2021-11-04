@@ -14,14 +14,14 @@
 
 """Python execution environent set up for all scripts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
 from core import python_utils
 
@@ -79,7 +79,7 @@ def download_and_install_package(url_to_retrieve, filename):
             downloaded.
         filename: string. The name of the tar file.
     """
-    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    urlrequest.urlretrieve(url_to_retrieve, filename=filename)
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
@@ -115,7 +115,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
+        urlrequest.urlretrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',

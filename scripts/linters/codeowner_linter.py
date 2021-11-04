@@ -16,8 +16,7 @@
 
 """Lint checks for codeowner file."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import glob
 import os
@@ -34,6 +33,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/access_validators*.py',
     '/core/controllers/acl_decorators*.py',
+    '/core/controllers/android_e2e_config*.py',
     '/core/controllers/base*.py',
     '/core/domain/html*.py',
     '/core/domain/rights_manager*.py',
