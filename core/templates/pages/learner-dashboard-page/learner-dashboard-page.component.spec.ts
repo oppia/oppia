@@ -1121,7 +1121,7 @@ describe('Learner dashboard page', () => {
       expect(component.communtiyLessonsDataLoaded).toEqual(true);
     }));
 
-    it('should show an alert warning when fails to get collections data' +
+    it('should show an alert warning when fails to get collections data ' +
       'in web view',
     fakeAsync(() => {
       const fetchDataSpy = spyOn(
@@ -1142,7 +1142,7 @@ describe('Learner dashboard page', () => {
       expect(fetchDataSpy).toHaveBeenCalled();
     }));
 
-    it('should show an alert warning when fails to get explorations data in' +
+    it('should show an alert warning when fails to get explorations data in ' +
     'web view',
     fakeAsync(() => {
       const fetchDataSpy = spyOn(
