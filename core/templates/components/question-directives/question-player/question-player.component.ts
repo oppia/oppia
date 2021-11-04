@@ -135,7 +135,7 @@ angular.module('oppia').component('questionPlayer', {
     '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
     '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
     'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-    'UrlInterpolationService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
+    'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
     'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
     'MAX_MASTERY_LOSS_PER_QUESTION', 'MAX_SCORE_PER_QUESTION',
     'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
@@ -145,7 +145,7 @@ angular.module('oppia').component('questionPlayer', {
         $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
         $window, ExplorationPlayerStateService, PlayerPositionService,
         QuestionPlayerStateService, SkillMasteryBackendApiService,
-        UrlInterpolationService, UserService, COLORS_FOR_PASS_FAIL_MODE,
+        UserService, COLORS_FOR_PASS_FAIL_MODE,
         HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
         MAX_MASTERY_LOSS_PER_QUESTION, MAX_SCORE_PER_QUESTION,
         QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
@@ -159,12 +159,10 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.totalQuestions = 0;
         ctrl.currentProgress = 0;
         ctrl.totalScore = 0.0;
-        ctrl.totalCorrect = 0.0;
+        ctrl.allQuestions = 0;
+        ctrl.finalCorrect = 0;
         ctrl.scorePerSkillMapping = {};
         ctrl.testIsPassed = true;
-      };
-      var getStaticImageUrl = function(url) {
-        return UrlInterpolationService.getStaticImageUrl(url);
       };
 
       ctrl.getActionButtonOuterClass = function(actionButtonType) {
@@ -186,20 +184,13 @@ angular.module('oppia').component('questionPlayer', {
       ctrl.getActionButtonIconHtml = function(actionButtonType) {
         var iconHtml = '';
         if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
-          iconHtml = `<picture>
-          <source type="image/webp"
-          srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
-          <source type="image/png"
-          srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
-          <img alt=""
-                class="action-button-icon"
-                src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
-          </picture>`;
+          iconHtml = '<i class="material-icons md-18 ' +
+          'action-button-icon">&#xe869</i>';
         } else if (actionButtonType === 'RETRY_SESSION') {
-          iconHtml = '<i class="material-icons md-36 ' +
+          iconHtml = '<i class="material-icons md-18 ' +
           'action-button-icon">&#xE5D5</i>';
         } else if (actionButtonType === 'DASHBOARD') {
-          iconHtml = '<i class="material-icons md-36 ' +
+          iconHtml = '<i class="material-icons md-18 ' +
           'action-button-icon">&#xE88A</i>';
         }
         return $sce.trustAsHtml($sanitize(iconHtml));
@@ -361,6 +352,7 @@ angular.module('oppia').component('questionPlayer', {
           if (questionData.answers) {
             wrongAnswerPenalty = (
               (questionData.answers.length - 1) * WRONG_ANSWER_PENALTY);
+            ctrl.finalCorrect += 1;
           }
           if (questionData.usedHints) {
             totalHintsPenalty = (
@@ -377,6 +369,9 @@ angular.module('oppia').component('questionPlayer', {
           // Calculate total score.
           ctrl.totalScore += questionScore;
 
+          // Increment number of questions.
+          ctrl.allQuestions += 1;
+
           // Calculate scores per skill.
           if (!(questionData.linkedSkillIds)) {
             continue;
@@ -390,7 +385,6 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].total += 1.0;
           }
         }
-        ctrl.totalCorrect = ctrl.totalScore;
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);
         $scope.resultsLoaded = true;

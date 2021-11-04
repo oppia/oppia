@@ -32,7 +32,7 @@
       <h3 class="oppia-question-result-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
     </div>
 
-    <div class="oppia-result-body d-md-flex justify-content-center">
+    <div class="oppia-result-body">
       <oppia-score-ring [score]="$ctrl.totalScore"
                         [test-is-passed]="$ctrl.testIsPassed">
       </oppia-score-ring>
@@ -49,14 +49,14 @@
               </div>
               <div class="score-outer">
                 <span class="score-recieved"><[scorePerSkill.score.toFixed(2)]></span>
-                <span class="score-total">/<[scorePerSkill.total]></span>
+                <span class="score-total">/ <[scorePerSkill.total]></span>
               </div>
             </div>
           </div>
           <div class="final-result">
             <span class="score-final-description">Answers Correct:</span>
-            <span class="score-final score-recieved"><[$ctrl.totalCorrect.toFixed(2)]></span>
-            <span class="score-final">/<[$ctrl.totalQuestions ]></span>
+            <span class="score-final score-recieved"><[$ctrl.finalCorrect]></span>
+            <span class="score-final">/ <[$ctrl.allQuestions]></span>
           </div>
         </div>
 
@@ -68,26 +68,21 @@
       </div>
     </div>
 
-    <!-- <div class="oppia-question-player-card question-player-results-footer"
-         ng-if="$ctrl.showActionButtonsFooter()">
+    <div class="question-player-results-footer" ng-if="$ctrl.showActionButtonsFooter()">
       <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
             ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
-        <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
-          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
-            <div ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></div>
-            <div class="action-button-text" translate="<[actionButton.i18nId]>"></div>
-          </div>
+        <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
+          <span ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></span>
+          <span class="action-button-text" translate="<[actionButton.i18nId]>"></span>
         </div>
       </span>
-      <span class="last-child"></span>
-    </div> -->
+    </div>
 
   </div>
   <!-- End of Results Page -->
 </div>
 
 <style>
-
   .score-final {
     font-size: 18px;
     font-weight: bold;
@@ -95,7 +90,7 @@
 
   .score-final-description {
     font-weight: 500;
-    margin-right: 25px;    
+    margin-right: 25px;
   }
 
   .final-result {
@@ -108,10 +103,11 @@
   }
 
   .score {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);    
-    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    padding-bottom: 8px;
     padding-left: 5px;
     padding-right: 5px;
+    padding-top: 10px;
   }
 
   .score-recieved {
@@ -128,13 +124,17 @@
   }
 
   .oppia-result-body {
-    padding-bottom: 25px;    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-bottom: 25px;
     padding-top: 25px;
   }
 
   .oppia-result-detail-header {
     font-size: 20px;
     font-weight: 500;
+    margin-bottom: 0;
     margin-top: 0;
   }
 
@@ -167,23 +167,22 @@
 
   .oppia-question-player-results {
     margin: auto;
+    max-width: 650px;
     padding-bottom: 10vh;
     padding-top: 6vh;
-    width: 650px;
   }
 
   .oppia-question-player-container .action-button-icon {
-    font-size: 36px;
-    height: 36px;
-    margin-top: 12px;
-    width: 36px;
+    font-size: 18px;
+    height: 18px;
+    margin: auto;
+    width: 18px;
   }
 
   .oppia-question-player-container .action-button-inner {
-    height: 85px;
+    color: #FFF;
     text-align: center;
     vertical-align: center;
-    width: 85px;
   }
 
   .oppia-question-player-container .action-button {
@@ -199,16 +198,20 @@
   }
 
   .oppia-question-player-container .action-button-text {
-    font-size: 12px;
+    font-size: 14px;
     margin: 0 auto;
-  }
-
-  .oppia-question-player-container .review-lowest-scored-skill-outer {
-    background-color: #D95C0C;
+    padding-left: 5px;
+    text-transform: uppercase;
   }
 
   .oppia-question-player-container .review-lowest-scored-skill-inner {
-    background-color: #F3EAE6;
+    background-color: rgb(32, 93, 134);
+    border-radius: 5px;
+    color: #FFF;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 10px 0;
+    padding: 5px 20px;
   }
 
   .oppia-question-player-container .last-child {
@@ -221,20 +224,24 @@
     margin-top: -15px;
   }
 
-  .oppia-question-player-container .my-dashboard-outer {
-    background-color: #009688;
-  }
-
   .oppia-question-player-container .my-dashboard-inner {
-    background-color: #E9F2F2;
-  }
-
-  .oppia-question-player-container .new-session-outer {
-    background-color: #0D48A1;
+    background-color: rgb(0, 100, 92);
+    border-radius: 5px;
+    color: #FFF;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 10px 0;
+    padding: 5px 20px;
   }
 
   .oppia-question-player-container .new-session-inner {
-    background-color: #E3ECF2;
+    background-color: rgb(197, 95, 69);
+    border-radius: 5px;
+    color: #FFF;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 10px 0;
+    padding: 5px 20px;
   }
 
   .oppia-question-player-container .oppia-question-player-card {
@@ -286,6 +293,14 @@
     height: 350px;
   }
 
+  .oppia-question-player-container .skill-score-table {
+    background: #FFF;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    height: 10px;
+    margin: 10px 25px 0;
+  }
+
   .oppia-question-player-container .question-player-skills-results {
     height: auto;
     padding-bottom: 16px;
@@ -317,16 +332,8 @@
     background-color: #FFF;
     border: 1px solid rgba(0, 0, 0, 0.25);
     border-radius: 20px;
-    width: 300px;
     height: 17px;
-  }
-
-  .oppia-question-player-container .skill-score-table {
-    background: #FFF;
-    border: 1px solid rgba(0, 0, 0, 0.25);
-    box-sizing: border-box;
-    height: 10px;
-    margin: 10px 25px 0;
+    width: 300px;
   }
 
   .list-item {
@@ -350,10 +357,9 @@
   .oppia-question-player-container .question-player-results-footer {
     display: flex;
     flex-wrap: wrap;
-    height: 130px;
-    justify-content: space-around;
-    margin-top: 16px;
-    padding: 2px 10px 0;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 2px;
   }
 
   .oppia-question-player-container .practice-questions-coming-soon-header {
@@ -373,4 +379,23 @@
   .oppia-question-player-container .oppia-col-width {
     width: 50%;
   }
+
+  @media screen and (max-width: 575px) {
+  .oppia-result-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .question-player-skills-results {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  .oppia-result-detail-header {
+    text-align: center;
+  }
+}
+
 </style>
