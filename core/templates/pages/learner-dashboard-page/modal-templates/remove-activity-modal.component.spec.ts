@@ -117,14 +117,14 @@ describe('Remove Activity Modal Component', function() {
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.removeActivityUrl = (
-      '/learnerplaylistactivityhandler/colleciton/0');
+      '/learnerplaylistactivityhandler/collection/0');
 
     component.remove();
     flushMicrotasks();
     fixture.detectChanges();
 
     expect(closeSpy).toHaveBeenCalledWith(
-      '/learnerplaylistactivityhandler/colleciton/0');
+      '/learnerplaylistactivityhandler/collection/0');
   }
   ));
 
@@ -137,7 +137,7 @@ describe('Remove Activity Modal Component', function() {
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.removeActivityUrl = (
-      '/learnerplaylistactivityhandler/colleciton/0');
+      '/learnerplaylistactivityhandler/collection/0');
 
     component.cancel();
     flushMicrotasks();
@@ -236,14 +236,14 @@ describe('Remove Activity Modal Component', function() {
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.removeActivityUrl = (
-      '/learnerincompleteactivityhandler/colleciton/0');
+      '/learnerincompleteactivityhandler/collection/0');
 
     component.remove();
     flushMicrotasks();
     fixture.detectChanges();
 
     expect(closeSpy).toHaveBeenCalledWith(
-      '/learnerincompleteactivityhandler/colleciton/0');
+      '/learnerincompleteactivityhandler/collection/0');
   }
   ));
 
@@ -256,7 +256,7 @@ describe('Remove Activity Modal Component', function() {
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.removeActivityUrl = (
-      '/learnerincompleteactivityhandler/colleciton/0');
+      '/learnerincompleteactivityhandler/collection/0');
 
     component.cancel();
     flushMicrotasks();
