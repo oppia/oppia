@@ -77,7 +77,7 @@ class EvaluationContext:
         self._server_mode = server_mode
 
     @property
-    def platform_type(self):
+    def platform_type(self) -> str:
         """Returns platform type.
 
         Returns:
@@ -86,7 +86,7 @@ class EvaluationContext:
         return self._platform_type
 
     @property
-    def browser_type(self):
+    def browser_type(self) -> str:
         """Returns client browser type.
 
         Returns:
@@ -96,7 +96,7 @@ class EvaluationContext:
         return self._browser_type
 
     @property
-    def app_version(self):
+    def app_version(self) -> str:
         # TODO(#11208): Update the documentation below to reflect the change
         # when the GAE app version is used for web & backend.
         """Returns client application version.
@@ -108,7 +108,7 @@ class EvaluationContext:
         return self._app_version
 
     @property
-    def server_mode(self):
+    def server_mode(self) -> str :
         """Returns the server mode of Oppia.
 
         Returns:
@@ -118,7 +118,7 @@ class EvaluationContext:
         return self._server_mode
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         """Returns whether this context object is valid for evaluating
         parameters. An invalid context object usually indicates that one of the
         object's required fields is missing or an unexpected value. Note that
@@ -134,7 +134,7 @@ class EvaluationContext:
             self._platform_type is not None and
             self._platform_type in ALLOWED_PLATFORM_TYPES)
 
-    def validate(self):
+    def validate(self) -> NoReturn:   # à ajouter dans les modules d'import 
         """Validates the EvaluationContext domain object, raising an exception
         if the object is in an irrecoverable error state.
         """
@@ -165,7 +165,7 @@ class EvaluationContext:
                     self._server_mode.value, ALLOWED_SERVER_MODES))
 
     @classmethod
-    def from_dict(cls, client_context_dict, server_context_dict):
+    def from_dict(cls, client_context_dict : dict, server_context_dict : dict) -> EvaluationContext :
         """Creates a new EvaluationContext object by combining both client side
         and server side context.
 
@@ -201,7 +201,7 @@ class PlatformParameterFilter:
         'app_version': ['=', '<', '<=', '>', '>='],
     }
 
-    def __init__(self, filter_type, conditions):
+    def __init__(self, filter_type : any , conditions : any):
         self._type = filter_type
         self._conditions = conditions
 
