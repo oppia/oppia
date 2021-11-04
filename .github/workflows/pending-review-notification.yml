@@ -3,6 +3,11 @@ on:
   schedule:
     # Every Tuesday and Thursday at 00:00 UTC.
     - cron: '0 0 * * 2,5'
+  # GitHub doesn't provide assurance that the scheduled jobs will run on time
+  # (see https://github.community/t/no-assurance-on-scheduled-jobs/133753).
+  # So, we add the workflow_dispatch event here to allow triggering this
+  # workflow manually if needed.
+  workflow_dispatch:
 
 jobs:
   send_notifications:
