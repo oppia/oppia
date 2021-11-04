@@ -19,9 +19,9 @@
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 
-"""Contains a list of handler class names that do not contain schema.
-"""
+"""Contains a list of handler class names that do not contain schema."""
 
+from __future__ import annotations
 from __future__ import unicode_literals
 
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
@@ -98,7 +98,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StateCompleteEventHandler',
     'StateHitEventHandler',
     'StatsEventsHandler',
-    'StorePlaythroughHandler',
     'StoryUrlFragmentHandler',
     'SubtopicPageDataHandler',
     'SubtopicViewerPage',
