@@ -294,8 +294,18 @@ def _check_shards_match_tests(include_load_tests=True):
 
 
 def _load_coverage_exclusion_list(path):
+    """Load modules excluded from per-file coverage checks.
+
+    Args:
+        path: str. Path to file with exclusion list. File should have
+            one dotted module name per line. Blank lines and lines
+            starting with `#` are ignored.
+
+    Returns:
+        list(str). Dotted names of excluded modules.
+    """
     exclusion_list = []
-    with open(path, 'r') as exclusion_file:
+    with open(path, 'r', encoding='utf-8') as exclusion_file:
         for line in exclusion_file:
             line = line.strip()
             if line.startswith('#') or not line:
