@@ -19,7 +19,7 @@ from __future__ import annotations
 import contextlib
 import importlib
 
-from core import feconf
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 import main
@@ -42,7 +42,7 @@ class CloudLoggingTests(test_utils.GenericTestBase):
     def test_cloud_logging_is_set_up_when_emulator_mode_is_disabled(
         self
     ) -> None:
-        emulator_mode_swap = self.swap(feconf, 'EMULATOR_MODE', False)
+        emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
         setup_logging_swap = self.swap_with_checks(
             google.cloud.logging.Client, 'setup_logging', lambda: None)
         with emulator_mode_swap, setup_logging_swap:
