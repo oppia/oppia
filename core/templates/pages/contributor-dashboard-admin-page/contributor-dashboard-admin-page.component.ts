@@ -90,9 +90,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               formResponse.category, formResponse.username,
               formResponse.languageCode
             ).then(() => {
-              ctrl.statusMessage = (
-                'Successfully added "' + formResponse.username + '" as ' +
-              formResponse.category + ' reviewer.');
+              ctrl.statusMessage = 'Success.';
               refreshFormData();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.

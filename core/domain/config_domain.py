@@ -477,11 +477,6 @@ CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
 
-CONTRIBUTOR_CAN_SUGGEST_QUESTIONS = ConfigProperty(
-    'contributor_can_suggest_questions', BOOL_SCHEMA,
-    'Whether the contributor can suggest questions for skill opportunities.',
-    False)
-
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
     (

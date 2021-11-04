@@ -93,7 +93,6 @@ export interface ConfigPropertyValues {
   'always_ask_learners_for_answer_details': boolean,
   'classroom_pages_data': ClassroomPageData,
   'classroom_promos_are_enabled': boolean,
-  'contributor_can_suggest_questions': boolean,
   'contributor_dashboard_is_enabled': boolean,
   'contributor_dashboard_reviewer_emails_is_enabled': boolean,
   'email_footer': string,

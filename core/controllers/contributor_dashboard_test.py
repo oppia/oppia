@@ -820,8 +820,6 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 
     def test_guest_user_check_contribution_rights(self):
         response = self.get_json('/usercontributionrightsdatahandler')
-        config_services.set_property(
-            'admin', 'contributor_can_suggest_questions', False)
 
         self.assertEqual(
             response, {
@@ -836,9 +834,6 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, 'user')
         user_id = self.get_user_id_from_email(user_email)
         self.login(user_email)
-
-        config_services.set_property(
-            'admin', 'contributor_can_suggest_questions', False)
 
         response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(
@@ -865,8 +860,6 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, 'user')
         user_id = self.get_user_id_from_email(user_email)
         self.login(user_email)
-        config_services.set_property(
-            'admin', 'contributor_can_suggest_questions', False)
 
         response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(
@@ -878,18 +871,6 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             })
 
         user_services.allow_user_to_submit_question(user_id)
-
-        response = self.get_json('/usercontributionrightsdatahandler')
-        self.assertEqual(
-            response, {
-                'can_review_translation_for_language_codes': [],
-                'can_review_voiceover_for_language_codes': [],
-                'can_review_questions': False,
-                'can_suggest_questions': False
-            })
-
-        config_services.set_property(
-            'admin', 'contributor_can_suggest_questions', True)
 
         response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(
