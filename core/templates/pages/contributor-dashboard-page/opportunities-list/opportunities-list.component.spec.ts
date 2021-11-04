@@ -38,7 +38,7 @@ describe('Opportunities List Component', () => {
   const mockReloadOpportunitiesEventEmitter = new EventEmitter();
   const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
 
-  const ExplorationOpportunityDict: ExplorationOpportunity[] = [{
+  const ExplorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
     id: 'id1',
     labelText: 'text',
     labelColor: 'red',
@@ -183,7 +183,7 @@ describe('Opportunities List Component', () => {
     translationsCount: 30
   }];
 
-  const MoreExplorationOpportunityDict: ExplorationOpportunity[] = [{
+  const ExplorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
     id: 'id17',
     labelText: 'text',
     labelColor: 'red',
@@ -296,11 +296,11 @@ describe('Opportunities List Component', () => {
       ContributionOpportunitiesService);
 
     component.loadOpportunities = () => Promise.resolve({
-      opportunitiesDicts: ExplorationOpportunityDict,
+      opportunitiesDicts: ExplorationOpportunitiesLoad1,
       more: true
     });
     component.loadMoreOpportunities = () => Promise.resolve({
-      opportunitiesDicts: MoreExplorationOpportunityDict,
+      opportunitiesDicts: ExplorationOpportunitiesLoad2,
       more: false
     });
 
@@ -336,12 +336,148 @@ describe('Opportunities List Component', () => {
     tick();
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
-    expect(component.opportunities).toEqual(ExplorationOpportunityDict);
+    expect(component.opportunities).toEqual(ExplorationOpportunitiesLoad1);
     expect(component.opportunities.length).toEqual(16);
 
     // Removed opportunity with id as 'id2'.
     mockRemoveOpportunitiesEventEmitter.emit(['id2']);
     tick();
+
+    expect(component.opportunities).toEqual([{
+      id: 'id1',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id3',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id4',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id5',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id6',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id7',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id8',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id9',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id10',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id11',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id12',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id13',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id14',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id15',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50
+    },
+    {
+      id: 'id16',
+      labelText: 'text',
+      labelColor: 'blue',
+      progressPercentage: 30,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 30
+    }]);
 
     expect(component.opportunities.length).toEqual(15);
   }));
@@ -357,6 +493,97 @@ describe('Opportunities List Component', () => {
       tick();
       component.gotoPage(1);
       tick();
+      expect(component.activePageNumber).toBe(1);
+      expect(component.visibleOpportunities).toEqual([{
+        id: 'id1',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id2',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id3',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id4',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id5',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id6',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id7',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id8',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id9',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      },
+      {
+        id: 'id10',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
+      }]);
       component.gotoPage(2);
       tick();
 
@@ -457,7 +684,7 @@ describe('Opportunities List Component', () => {
       'are less then page length', fakeAsync(() => {
       // Setting more option to be false.
       component.loadMoreOpportunities = () => Promise.resolve({
-        opportunitiesDicts: ExplorationOpportunityDict,
+        opportunitiesDicts: ExplorationOpportunitiesLoad1,
         more: false
       });
       expect(component.activePageNumber).toBe(1);
