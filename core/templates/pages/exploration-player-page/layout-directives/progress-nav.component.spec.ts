@@ -31,6 +31,7 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -44,6 +45,7 @@ describe('Progress nav component', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
   let explorationEngineService: ExplorationEngineService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
@@ -83,6 +85,10 @@ describe('Progress nav component', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
@@ -163,6 +169,10 @@ describe('Progress nav component', () => {
         .toBeFalse();
       expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
     });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
+  });
 
   it('should not resolve special case for interaction if in desktop mode',
     () => {

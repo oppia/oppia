@@ -16,8 +16,7 @@
 
 """Models for activity references."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core.platform import models
@@ -62,7 +61,7 @@ class ActivityReferencesModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_or_create(cls, list_name: str) -> 'ActivityReferencesModel':
+    def get_or_create(cls, list_name: str) -> ActivityReferencesModel:
         """This creates the relevant model instance, if it does not already
         exist.
         """
