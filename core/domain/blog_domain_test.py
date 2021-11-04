@@ -75,18 +75,25 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
-                thumbnail_filename)
+                thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-        self,
-        expected_error_substring: str,
-        thumbnail_filename: str
+        self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
-                thumbnail_filename)
+                self.blog_post.thumbnail_filename, strict=True)
+
+    def _assert_valid_url_fragment(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that blog post passes strict validation for url."""
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPost.require_valid_url_fragment(
+                self.blog_post.url_fragment)
 
     def _assert_strict_valid_title_for_blog_post(
         self, expected_error_substring: str, title: str
@@ -255,6 +262,41 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.content = '<p>Hello</p>'
         self.blog_post.validate(strict=True)
 
+    def test_thumbnail_passes_string_validation(self) -> None:
+        """Tests that thumbnail passes string validation."""
+        self.blog_post.title = 'Sample Title'
+        self.blog_post.thumbnail_filename = 123
+        self.blog_post.tags = ['tag']
+        self.blog_post.url_fragment = 'sample-title'
+        self.blog_post.content = '<p>Hello</p>'
+        self._assert_strict_validation_error(
+            'Expected Thumbnail filename should be a string,'
+            ' received 123')
+
+        self.blog_post.thumbnail_filename = 'thumbnail.svg'
+        self.blog_post.validate(strict=True)
+
+    def test_thumbnail_filename_strict_validation_for_blog_post(self) -> None:
+        self.blog_post.title = 'Sample Title'
+        self.blog_post.thumbnail_filename = 123
+        self.blog_post.tags = ['tag']
+        self.blog_post.url_fragment = 'sample-url-fragment'
+        self.blog_post.content = 'Sample content'
+        self._assert_strict_valid_thumbnail_filename_for_blog_post(
+            'Expected thumbnail filename to be a string, received: 123'
+        )
+
+    def test_blog_post_url_passes_strict_validation(self) -> None:
+        self.blog_post.title = 'Sample Title'
+        self.blog_post.thumbnail_filename = 'sample-thumbnail.png'
+        self.blog_post.tags = ['tag']
+        self.blog_post.url_fragment = 123
+        self.blog_post.content = '<p>Hello</p>'
+        self._assert_valid_url_fragment(
+            'Blog Post URL Fragment field must be a string. '
+            'Received 123.'
+        )
+
 
 class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 
@@ -305,18 +347,16 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
-                thumbnail_filename)
+                thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
-        self,
-        expected_error_substring: str,
-        thumbnail_filename: str
+        self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
-                thumbnail_filename)
+                self.blog_post_summary.thumbnail_filename, strict=True)
 
     def test_thumbnail_filename_validation_for_blog_post(self) -> None:
         self._assert_valid_thumbnail_filename_for_blog_post(
@@ -355,6 +395,33 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_url_fragment(url)
+
+    def _assert_url_fragment_passes_valid_url_fragment(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that blog post passes validation for url."""
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPostSummary.require_valid_url_fragment(
+                self.blog_post_summary.url_fragment)
+
+    def _assert_title_passes_valid_title(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that blog post passes validation for title."""
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPostSummary.require_valid_title(
+                self.blog_post_summary.title, False)
+
+    def _assert_valid_tag_elements(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that blog post passes validation for tags."""
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPostSummary.require_valid_tags(
+                self.blog_post_summary.tags, False)
 
     def _assert_valid_tags_for_blog_post(
         self, expected_error_substring: str, tags: List[str]
@@ -415,12 +482,57 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate()
 
+    def test_blog_post_url_fragment_passes_strict_validation(self) -> None:
+        """Tests validation for blog post url fragment."""
+        self.blog_post_summary.title = 'Sample Title'
+        self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
+        self.blog_post_summary.tags = ['tag']
+        self.blog_post_summary.url_fragment = 123
+        self.blog_post_summary.summary = 'Sample Summary'
+        self._assert_strict_validation_error(
+            'Expected url fragment to be a string, received: 123')
+
+        self.blog_post_summary.url_fragment = 'sample-url-fragment'
+        self.blog_post_summary.validate(strict=True)
+
+    def test_blog_post_thumbnail_passes_strict_validation(self) -> None:
+        """Tests validation for blog post thumbnail filename."""
+        self.blog_post_summary.title = 'Sample Title'
+        self.blog_post_summary.thumbnail_filename = 123
+        self.blog_post_summary.tags = ['tag']
+        self.blog_post_summary.url_fragment = 'sample-url-fragment'
+        self.blog_post_summary.summary = 'Sample Summary'
+        self._assert_strict_validation_error(
+            'Expected thumbnail filename to be a string, received: 123')
+
+        self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
+        self.blog_post_summary.validate(strict=True)
+
     def test_blog_post_summary_passes_validate(self) -> None:
         """Tests validation for blog post summary."""
         self.blog_post_summary.validate(strict=False)
         self.blog_post_summary.summary = 123
         self._assert_validation_error(
             'Expected summary to be a string, received: 123')
+
+    def test_blog_post_passes_valid_thumbnail_filename(self) -> None:
+        """Tests validation for blog post thumbnail."""
+        self.blog_post_summary.thumbnail_filename = 123
+        self._assert_strict_valid_thumbnail_filename_for_blog_post(
+            'Expected thumbnail filename to be a string, received: 123')
+
+    def test_blog_post_passes_valid_url_fragment(self) -> None:
+        """Tests validation for blog post url fragment."""
+        self.blog_post_summary.url_fragment = 123
+        self._assert_url_fragment_passes_valid_url_fragment(
+            'Blog Post URL Fragment field must be a string. '
+            'Received 123')
+
+    def test_blog_post_passes_valid_title(self) -> None:
+        """Tests validation for blog post title."""
+        self.blog_post_summary.title = 123
+        self._assert_title_passes_valid_title(
+            'Expected title to be a string, received: 123.')
 
     def test_blog_post_summary_passes_strict_validation(self) -> None:
         """Tests blog post summary passes validation in strict mode."""
@@ -456,3 +568,10 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
     def test_tags_validation_in_strict_mode(self) -> None:
         self._assert_strict_valid_tags_for_blog_post(
             'Atleast one tag should be selected', [])
+
+    def test_blog_post_tags_passes_validation(self) -> None:
+        """Tests validation for blog post tags."""
+        self.blog_post_summary.tags = ['tag', 123]
+        self._assert_valid_tag_elements(
+            'Expected each tag in \'tags\' to be a string, received: '
+            '\'123\'')
