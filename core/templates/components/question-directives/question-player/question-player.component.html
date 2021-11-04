@@ -26,47 +26,49 @@
   <!-- End of Question Player -->
 
   <!-- Results Page -->
-  <!-- <div class="oppia-question-player-results" ng-if="resultsLoaded">
-    <div class="oppia-question-player-card question-player-results-header">
-      <h3 class="oppia-question-player-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
-      <h3 class="oppia-question-player-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
+  <div class="oppia-question-player-results d-flex flex-column" ng-if="resultsLoaded">
+    <div class="oppia-result-header">
+      <h3 class="oppia-question-result-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
+      <h3 class="oppia-question-result-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
+    </div>
+
+    <div class="oppia-result-body d-md-flex justify-content-center">
       <oppia-score-ring [score]="$ctrl.totalScore"
                         [test-is-passed]="$ctrl.testIsPassed">
       </oppia-score-ring>
-    </div>
 
-    <div class="oppia-question-player-card question-player-skills-results">
-      <h3 class="oppia-question-player-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
-      <table class="skill-score-table">
-        <colgroup>
-          <col class="oppia-col-width">
-          <col class="oppia-col-width">
-        </colgroup>
-        <tr>
-          <th class="skill-score-table-headings" translate="I18N_QUESTION_PLAYER_SKILL_DESCRIPTIONS">
-          </th>
-          <th class="skill-score-table-headings" translate="I18N_QUESTION_PLAYER_SCORE">
-          </th>
-        </tr>
-        <tr ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping"
-            class="list-item"
-            ng-click="$ctrl.openSkillMasteryModal(skillId)">
-          <td class="skill-score-description"> <[scorePerSkill.description]> </td>
-          <td>
-            <div class="oppia-skill-score-container">
-              <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScore(scorePerSkill)}"></div>
+      <div class="question-player-skills-results">
+        <h3 class="oppia-result-detail-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
+
+        <div class="skill-score-body">
+          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping">
+            <div class="list-item" ng-click="$ctrl.openSkillMasteryModal(skillId)"><[scorePerSkill.description]></div>
+            <div class="score-outer d-flex justify-content-between align-items-center">
+              <div class="oppia-skill-score-container">
+                <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScoreBar(scorePerSkill)}"></div>
+              </div>
+              <div class="score-outer">
+                <span class="score-recieved"><[scorePerSkill.score.toFixed(2)]></span>
+                <span class="score-total">/<[scorePerSkill.total]></span>
+              </div>
             </div>
-          </td>
-        </tr>
-      </table>
-      <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text"
-              ng-if="!$ctrl.testIsPassed"
-              ng-click="$ctrl.reviewConceptCardAndRetryTest()">
-        Review and Retry
-      </button>
+          </div>
+          <div class="final-result">
+            <span class="score-final-description">Answers Correct:</span>
+            <span class="score-final score-recieved"><[$ctrl.totalCorrect.toFixed(2)]></span>
+            <span class="score-final">/<[$ctrl.totalQuestions ]></span>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text"
+                ng-if="!$ctrl.testIsPassed"
+                ng-click="$ctrl.reviewConceptCardAndRetryTest()">
+          Review and Retry
+        </button>
+      </div>
     </div>
 
-    <div class="oppia-question-player-card question-player-results-footer"
+    <!-- <div class="oppia-question-player-card question-player-results-footer"
          ng-if="$ctrl.showActionButtonsFooter()">
       <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
             ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
@@ -78,83 +80,61 @@
         </div>
       </span>
       <span class="last-child"></span>
-    </div>
-  </div> -->
+    </div> -->
 
-  <div class="oppia-question-player-results d-flex flex-column" ng-if="resultsLoaded">
-    <div class="oppia-result-header">
-      <h3 class="oppia-question-result-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
-      <h3 class="oppia-question-result-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
-    </div>
-    <div class="oppia-result-body d-md-flex justify-content-center">
-      <oppia-score-ring [score]="$ctrl.totalScore"
-                        [test-is-passed]="$ctrl.testIsPassed">
-      </oppia-score-ring>
-
-      <div class="question-player-skills-results">
-        <h3 class="oppia-result-detail-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
-
-        <table class="skill-score-table">
-          <colgroup>
-            <col class="oppia-col-width">
-            <col class="oppia-col-width">
-          </colgroup>
-          <tr>
-            <th class="skill-score-table-headings" translate="I18N_QUESTION_PLAYER_SKILL_DESCRIPTIONS">
-            </th>
-            <th class="skill-score-table-headings" translate="I18N_QUESTION_PLAYER_SCORE">
-            </th>
-          </tr>
-          <tr ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping"
-              class="list-item"
-              ng-click="$ctrl.openSkillMasteryModal(skillId)">
-            <td class="skill-score-description"> <[scorePerSkill.description]> </td>
-            <td>
-              <div class="oppia-skill-score-container">
-                <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScore(scorePerSkill)}"></div>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <div class="skill-score-body">
-          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping">
-            <div class="list-item" ng-click="$ctrl.openSkillMasteryModal(skillId)"><[scorePerSkill.description]></div>
-            <div class="score-outer d-flex justify-content-between">
-              <div class="oppia-skill-score-container"></div>
-              <div class="score-outer">
-                <span class="score"><[scorePerSkill.score]></span>
-                <span class="score">/<[scorePerSkill.total]></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text"
-                ng-if="!$ctrl.testIsPassed"
-                ng-click="$ctrl.reviewConceptCardAndRetryTest()">
-          Review and Retry
-        </button>
-      </div>
-    </div>
   </div>
-
-
   <!-- End of Results Page -->
 </div>
 
 <style>
+
+  .score-final {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .score-final-description {
+    font-weight: 500;
+    margin-right: 25px;    
+  }
+
+  .final-result {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .skill-score-body {
+    padding-left: 5px;
+  }
+
+  .score {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);    
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .score-recieved {
+    color: rgb(0, 100, 92);
+  }
+
+  .score-recieved, .score-total {
+    font-weight: bold;
+  }
+
   .question-player-skills-results {
     margin-left: 40px;
     width: 390px;
   }
 
   .oppia-result-body {
+    padding-bottom: 25px;    
     padding-top: 25px;
   }
 
   .oppia-result-detail-header {
     font-size: 20px;
+    font-weight: 500;
     margin-top: 0;
   }
 
@@ -335,16 +315,23 @@
 
   .oppia-skill-score-container {
     background-color: #FFF;
-    border: 1px solid rgba(0, 0, 0, 1);
-    width: 325px;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    width: 300px;
+    height: 17px;
   }
 
-  .oppia-question-player-container .skill-score-table .oppia-skill-score-container {
+  .oppia-question-player-container .skill-score-table {
     background: #FFF;
     border: 1px solid rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     height: 10px;
     margin: 10px 25px 0;
+  }
+
+  .list-item {
+    font-size: 18px;
+    margin-bottom: 5px;
   }
 
   .oppia-question-player-container .skill-score-table .list-item:not(:last-child) {
@@ -355,8 +342,9 @@
     background-color: #ededed;
   }
 
-  .oppia-skill-score-container .score-bar {
-    height: 8px;
+  .score-bar {
+    border-radius: 20px;
+    height: 15px;
   }
 
   .oppia-question-player-container .question-player-results-footer {

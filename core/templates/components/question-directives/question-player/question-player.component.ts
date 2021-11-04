@@ -159,6 +159,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.totalQuestions = 0;
         ctrl.currentProgress = 0;
         ctrl.totalScore = 0.0;
+        ctrl.totalCorrect = 0.0;
         ctrl.scorePerSkillMapping = {};
         ctrl.testIsPassed = true;
       };
@@ -389,6 +390,7 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].total += 1.0;
           }
         }
+        ctrl.totalCorrect = ctrl.totalScore;
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);
         $scope.resultsLoaded = true;
@@ -498,6 +500,19 @@ angular.module('oppia').component('questionPlayer', {
         if (correctionRate >=
           ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
           return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+        } else {
+          return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+        }
+      };
+
+      ctrl.getColorForScoreBar = function(scorePerSkill) {
+        if (!isInPassOrFailMode()) {
+          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
+        }
+        var correctionRate = scorePerSkill.score / scorePerSkill.total;
+        if (correctionRate >=
+          ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
         } else {
           return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
         }
