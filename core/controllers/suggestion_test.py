@@ -2253,6 +2253,15 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
+        self.translate_suggestion_change = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>new content html</p>',
+            'translation_html': '<p>new content html in Hindi</p>',
+            'data_format': 'html'
+        }
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
@@ -2260,17 +2269,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
-                'change': {
-                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                    'state_name': 'Introduction',
-                    'content_id': 'content',
-                    'language_code': 'hi',
-                    'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>',
-                    'data_format': 'html'
-                },
+                'change': self.translate_suggestion_change,
                 'description': 'Adds translation',
-            }, csrf_token=csrf_token)
+            }, csrf_token=csrf_token
+        )
 
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
@@ -2281,7 +2283,12 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'linked_skill_ids': [self.SKILL_ID],
             'inapplicable_skill_misconception_ids': ['skillid12345-1']
         }
-
+        self.translate_question_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': self.question_dict,
+            'skill_id': None,
+            'skill_difficulty': 0.3
+        }
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
@@ -2289,59 +2296,101 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
-                'change': {
-                    'cmd': (
-                        question_domain
-                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                    'question_dict': self.question_dict,
-                    'skill_id': None,
-                    'skill_difficulty': 0.3
-                },
+                'change': self.translate_question_change,
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
 
         self.logout()
-
-    def test_exploration_handler_returns_data(self):
         self.login(self.REVIEWER_EMAIL)
 
+    def test_exploration_handler_returns_data(self):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
         self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        suggestion = response['suggestions'][0]
+        self.assertDictEqual(
+            suggestion['change'], self.translate_suggestion_change)
+        self.assertEqual(
+            suggestion['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        )
+        self.assertEqual(
+            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(suggestion['target_id'], self.EXP_ID)
+        self.assertEqual(suggestion['language_code'], 'hi')
+        self.assertEqual(suggestion['author_name'], 'author')
+        self.assertEqual(suggestion['status'], 'review')
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'exp1': {
+                    'chapter_title': 'Node1',
+                    'content_count': 2,
+                    'id': 'exp1',
+                    'story_title': 'A story',
+                    'topic_name': 'topic',
+                    'translation_counts': {},
+                    'translation_in_review_counts': {}
+                }
+            }
+        )
+
+    def test_topic_translate_handler_returns_no_data(self):
         response = self.get_json(
             '/getreviewablesuggestions/topic/translate_content')
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
-        self.login(self.REVIEWER_EMAIL)
-
         response = self.get_json(
             '/getreviewablesuggestions/skill/add_question')
         self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        suggestion = response['suggestions'][0]
+        self.assertDictEqual(
+            suggestion['change'], self.translate_question_change)
+        self.assertEqual(
+            suggestion['suggestion_type'], feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertEqual(
+            suggestion['target_type'], feconf.ENTITY_TYPE_SKILL)
+        self.assertEqual(suggestion['target_id'], self.SKILL_ID)
+        self.assertEqual(suggestion['language_code'], 'en')
+        self.assertEqual(suggestion['author_name'], 'author')
+        self.assertEqual(suggestion['status'], 'review')
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'skill1234567': {
+                    'id': 'skill1234567',
+                    'question_count': 0,
+                    'skill_description': 'skill to link question to',
+                    'skill_rubrics': [
+                        {
+                            'difficulty': 'Easy',
+                            'explanations': ['Explanation 1']
+                        }, {
+                            'difficulty': 'Medium',
+                            'explanations': ['Explanation 2']
+                        }, {
+                            'difficulty': 'Hard',
+                            'explanations': ['Explanation 3']
+                        }
+                    ]
+                }
+            }
+        )
+
+    def test_topic_question_handler_returns_no_data(self):
         response = self.get_json(
             '/getreviewablesuggestions/topic/add_question')
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
-        self.login(self.REVIEWER_EMAIL)
-
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
-
         self.get_json(
             '/getreviewablesuggestions/exploration/invalid_suggestion_type',
-            expected_status_int=404)
+            expected_status_int=404
+        )
 
     def test_handler_with_invalid_target_type_raise_error(self):
-        self.login(self.REVIEWER_EMAIL)
-
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
-
         self.get_json(
-            '/getreviewablesuggestions/invalid_target_type'
-            '/translate_content', expected_status_int=400)
+            '/getreviewablesuggestions/invalid_target_type/translate_content',
+            expected_status_int=400
+        )

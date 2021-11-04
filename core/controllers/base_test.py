@@ -26,7 +26,6 @@ import json
 import logging
 import os
 import re
-import sys
 import types
 
 from core import feconf
@@ -41,6 +40,7 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -355,6 +355,28 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.get_html_response(
             'https://oppiaserver.appspot.com/cron/unknown',
             expected_status_int=404)
+
+    def test_no_redirection_for_tasks(self):
+        tasks_data = '{"fn_identifier": "%s", "args": [[]], "kwargs": {}}' % (
+            taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS
+        )
+
+        # Valid URL, where user now has permissions.
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.post_json(
+            'https://oppiaserver.appspot.com/task/deferredtaskshandler',
+            tasks_data,
+            use_payload=False,
+            expected_status_int=200
+        )
+        self.logout()
+
+        # Valid URL, but user does not have permissions.
+        self.post_json(
+            'https://oppiaserver.appspot.com/task/deferredtaskshandler',
+            tasks_data,
+            expected_status_int=401
+        )
 
     def test_splash_redirect(self):
         # Tests that the old '/splash' URL is redirected to '/'.
