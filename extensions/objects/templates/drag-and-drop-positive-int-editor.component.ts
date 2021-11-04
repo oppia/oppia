@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'drag-and-drop-positive-int-editor',

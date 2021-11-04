@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import isEqual from 'lodash/isEqual';

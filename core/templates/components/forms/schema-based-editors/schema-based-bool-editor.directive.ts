@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-bool-editor',
@@ -31,6 +31,14 @@ export class SchemaBasedBoolEditorComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void { }
+
+  updateValue(val: boolean): void {
+    if (this.localValue === val) {
+      return;
+    }
+    this.localValue = val;
+    this.localValueChange.emit(val);
+  }
 }
 
 angular.module('oppia').directive('schemaBasedBoolEditor', downgradeComponent({

@@ -16,7 +16,7 @@
  * @fileoverview Component for set of translatable html content id editor.
  */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 type Choice = { val: string };
 

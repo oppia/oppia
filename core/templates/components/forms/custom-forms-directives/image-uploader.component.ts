@@ -17,7 +17,7 @@
  */
 
 import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

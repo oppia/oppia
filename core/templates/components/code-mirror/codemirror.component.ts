@@ -17,7 +17,7 @@
  */
 
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
 interface CodeMirrorMergeViewOptions {

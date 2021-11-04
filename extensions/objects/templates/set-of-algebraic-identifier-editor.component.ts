@@ -22,7 +22,7 @@
 
 import { ChangeDetectorRef } from '@angular/core';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 

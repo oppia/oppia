@@ -18,7 +18,6 @@
 
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-// Import { downgradeComponent } from '@angular/upgrade/static';
 import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';

@@ -57,7 +57,7 @@
 </schema-based-dict-editor>
 
 <schema-based-custom-editor ng-if="$ctrl.schema().type === 'custom' && !$ctrl.schema().choices"
-                            (local-value-change)="$ctrl.updateValue($event)"
-                            [local-value]="$ctrl.localValue"
+                            ng-change="$ctrl.updateValue()"
+                            ng-model="$ctrl.localValue"
                             [schema]="$ctrl.schema()">
 </schema-based-custom-editor>

@@ -18,7 +18,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { Subscription } from 'rxjs';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';

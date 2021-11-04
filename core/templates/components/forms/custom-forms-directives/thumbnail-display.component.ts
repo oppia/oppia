@@ -18,7 +18,7 @@
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 

@@ -1,8 +1,7 @@
 <object-editor [objType]="schema.obj_type"
                [schema]="schema"
-               [value]="localValue"
-               [ngModel]="someValue"
-               (ngModelChange)="localValueChange.emit($event)"
+               [ngModel]="localValue"
+               (ngModelChange)="updateValue($event)"
                [alwaysEditable]="true"
                [form]="form">
 </object-editor>

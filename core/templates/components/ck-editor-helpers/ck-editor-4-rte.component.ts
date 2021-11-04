@@ -17,7 +17,7 @@
  */
 
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';

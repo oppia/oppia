@@ -31,7 +31,7 @@ import { Subscription } from 'rxjs';
 import { InteractiveMapRulesService } from './interactive-map-rules.service';
 import { icon, LatLng, latLng, LeafletMouseEvent, marker, TileLayer, tileLayer } from 'leaflet';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'oppia-interactive-interactive-map',

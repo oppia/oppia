@@ -21,7 +21,7 @@
 // in via initArgs.
 
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { Subscription } from 'rxjs';
 
 import { AlertsService } from 'services/alerts.service';

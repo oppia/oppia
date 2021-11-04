@@ -17,7 +17,7 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';

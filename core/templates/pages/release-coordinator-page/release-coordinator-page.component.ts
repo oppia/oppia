@@ -18,7 +18,7 @@
 
 import { Component, OnInit, } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 

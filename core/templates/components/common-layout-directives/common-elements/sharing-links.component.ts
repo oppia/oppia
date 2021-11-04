@@ -18,7 +18,7 @@
 import constants from 'assets/constants';
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { UrlInterpolationService } from

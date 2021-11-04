@@ -23,7 +23,7 @@ import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-dom
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'oppia-subtopic-summary-tile',

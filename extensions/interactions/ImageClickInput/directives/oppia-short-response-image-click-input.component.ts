@@ -21,7 +21,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 interface ClickRegion {
   clickPosition: number[],

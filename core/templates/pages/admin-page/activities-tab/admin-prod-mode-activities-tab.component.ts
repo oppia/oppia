@@ -17,7 +17,7 @@
  * is in production mode.
  */
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'oppia-admin-prod-mode-activities-tab',

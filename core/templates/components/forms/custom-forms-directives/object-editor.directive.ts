@@ -18,7 +18,7 @@
 
 // Individual object editor directives are in extensions/objects/templates.
 
-import { AfterViewInit, ChangeDetectorRef, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
@@ -119,6 +119,7 @@ interface ObjectEditor {
   value: unknown;
   valueChanged?: EventEmitter<unknown>;
   validityChange?: EventEmitter<Record<string, boolean>>;
+  ngOnChanges?: (changes: SimpleChanges) => void;
 }
 
 @Component({
@@ -149,8 +150,10 @@ ControlValueAccessor, Validator {
       return;
     }
     this._value = val;
-    this.ref.instance.value = this._value;
-    this.onChange(this._value);
+    if (this.ref) {
+      this.ref.instance.value = this._value;
+      this.onChange(this._value);
+    }
   }
   @Output() valueChange = new EventEmitter();
   ref: ComponentRef<ObjectEditor>;
@@ -181,7 +184,6 @@ ControlValueAccessor, Validator {
 
   writeValue(obj: string | number): void {
     this._updateValue(obj);
-    this.changeDetection.markForCheck();
   }
 
   registerOnChange(fn: (_: unknown) => void): void {
@@ -189,7 +191,6 @@ ControlValueAccessor, Validator {
   }
   constructor(
     private loggerService: LoggerService,
-    private changeDetection: ChangeDetectorRef,
     private componentFactoryResolver: ComponentFactoryResolver,
     private viewContainerRef: ViewContainerRef
   ) { }
@@ -242,7 +243,7 @@ ControlValueAccessor, Validator {
                     delete this.componentValidationState[key];
                   }
                 }
-                // this.form.$setValidity(key, e[key]);
+                // This.form.$setValidity(key, e[key]);
               }
             }
             this.onValidatorChange();
@@ -256,13 +257,6 @@ ControlValueAccessor, Validator {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.value &&
-      changes.value.previousValue !== changes.value.currentValue &&
-      this.ref
-    ) {
-      this.ref.instance.value = changes.value.currentValue;
-    }
   }
 
   ngOnDestroy(): void {

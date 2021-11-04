@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { Collection } from 'domain/collection/collection.model';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { CollectionEditorPageConstants } from '../collection-editor-page.constants';

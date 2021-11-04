@@ -20,7 +20,7 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { BehaviorSubject, combineLatest, interval, NEVER, Observable, of, Subscription, zip } from 'rxjs';
 import { catchError, distinctUntilChanged, first, map, startWith, switchMap } from 'rxjs/operators';
 

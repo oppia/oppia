@@ -16,7 +16,7 @@
  * @fileoverview Directive for translatable set of normalized string editor.
  */
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'translatable-set-of-normalized-string-editor',

@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 interface SanitizedUrlSchema {
   type: string;

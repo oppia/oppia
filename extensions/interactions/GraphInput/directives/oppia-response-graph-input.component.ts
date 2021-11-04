@@ -30,7 +30,7 @@ import { GraphAnswer } from 'interactions/answer-defs';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { EdgeCentre, GraphDetailService } from './graph-detail.service';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 @Component({
   selector: 'oppia-response-graph-input',
   templateUrl: './graph-input-response.component.html',

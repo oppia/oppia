@@ -16,7 +16,7 @@
  * @fileoverview Directive for the FractionInput short response.
  */
 import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { Fraction } from 'domain/objects/fraction.model';
 import { FractionAnswer } from 'interactions/answer-defs';
 import { HtmlEscaperService } from 'services/html-escaper.service';

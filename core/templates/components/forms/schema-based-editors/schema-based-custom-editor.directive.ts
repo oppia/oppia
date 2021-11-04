@@ -16,32 +16,68 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-custom-editor',
-  templateUrl: './schema-based-custom-editor.directive.html'
+  templateUrl: './schema-based-custom-editor.directive.html',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
+    multi: true
+  }]
 })
-
-export class SchemaBasedCustomEditorComponent implements OnInit {
+export class SchemaBasedCustomEditorComponent
+implements ControlValueAccessor, Validator {
   @Input() localValue;
-  someValue;
   @Output() localValueChange = new EventEmitter();
   @Input() schema;
   @Input() form;
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  onChange: (_: unknown) => void = () => {};
+  onTouch: () => void;
+  onValidatorChange: () => void = () => {};
 
-  updateValue(e: unknown): void {
-    this.localValueChange.emit(e);
+  componentValidationState: Record<string, boolean> = {};
+  constructor() { }
+
+  getComponentValidationState(): Record<string, boolean> {
+    return this.componentValidationState;
   }
 
-  ngOnInit(): void {
-    // Some random comment.
-    this.someValue = (
-      // eslint-disable-next-line max-len
-      typeof this.localValue === 'object' ? {...this.localValue} : this.localValue);
-    this.changeDetectorRef.detectChanges();
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouch = fn;
+  }
+
+  validate(control: AbstractControl): ValidationErrors {
+    this.onValidatorChange();
+    return {};
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.onValidatorChange = fn;
+  }
+
+  writeValue(obj: unknown): void {
+    if (this.localValue === obj) {
+      return;
+    }
+    this.localValue = obj;
+  }
+
+  registerOnChange(fn: (_: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  updateValue(e: unknown): void {
+    if (this.localValue === e) {
+      return;
+    }
+    this.localValueChange.emit(e);
+    this.localValue = e;
+    this.onChange(e);
   }
 }
 

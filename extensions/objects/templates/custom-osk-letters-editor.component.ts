@@ -21,7 +21,7 @@
 // in via initArgs.
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';

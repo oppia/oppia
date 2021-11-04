@@ -16,7 +16,7 @@
  * @fileoverview Component for the teach page.
  */
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 import splashConstants from 'assets/constants';
 import { UrlInterpolationService } from

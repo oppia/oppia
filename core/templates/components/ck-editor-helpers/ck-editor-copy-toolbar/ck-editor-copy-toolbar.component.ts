@@ -18,7 +18,7 @@
 
 import { Component, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content.service';

@@ -36,7 +36,7 @@
 
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';

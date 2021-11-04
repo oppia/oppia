@@ -18,7 +18,7 @@
  */
 
 import { Component, Output, OnInit, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';

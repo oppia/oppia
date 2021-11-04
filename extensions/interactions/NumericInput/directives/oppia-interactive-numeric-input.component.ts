@@ -21,7 +21,7 @@
  */
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';

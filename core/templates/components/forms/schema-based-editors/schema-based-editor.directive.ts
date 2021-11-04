@@ -85,7 +85,9 @@ angular.module('oppia').directive('schemaBasedEditor', [
           };
 
           ctrl.updateValue = function(value) {
-            ctrl.localValue = value;
+            if (value) {
+              ctrl.localValue = value;
+            }
             $rootScope.$applyAsync();
           };
         }]

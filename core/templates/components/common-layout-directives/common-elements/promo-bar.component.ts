@@ -19,7 +19,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';

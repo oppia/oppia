@@ -17,7 +17,7 @@
  */
 
 import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';

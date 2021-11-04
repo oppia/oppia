@@ -18,7 +18,7 @@
 
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { Fraction } from 'domain/objects/fraction.model';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { FractionAnswer } from 'interactions/answer-defs';

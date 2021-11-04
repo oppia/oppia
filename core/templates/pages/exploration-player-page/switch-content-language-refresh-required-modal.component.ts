@@ -18,7 +18,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { WindowRef } from 'services/contextual/window-ref.service';

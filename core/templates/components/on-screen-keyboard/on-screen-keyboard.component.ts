@@ -18,7 +18,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 import constants from 'assets/constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';

@@ -26,7 +26,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { icon, latLng, MapOptions, Marker, marker, tileLayer } from 'leaflet';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 @Component({
   selector: 'oppia-response-interactive-map',
