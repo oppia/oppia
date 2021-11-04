@@ -23,8 +23,7 @@ import { CollectionNavbarComponent } from './collection-navbar.component';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Collection navbar component', () => {
+describe('Collection navbar component', () => {
   let us: UrlService;
   let rocbas: ReadOnlyCollectionBackendApiService;
   let component: CollectionNavbarComponent;

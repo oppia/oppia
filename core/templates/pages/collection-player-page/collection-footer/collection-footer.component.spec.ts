@@ -24,8 +24,7 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionFooterComponent } from './collection-footer.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Collection footer component', () => {
+describe('Collection footer component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let component: CollectionFooterComponent;
