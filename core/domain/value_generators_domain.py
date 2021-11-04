@@ -16,9 +16,6 @@
 
 """Classes relating to value generators."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import copy
 import importlib
 import inspect
@@ -27,7 +24,7 @@ import os
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, Type
 
 
 class BaseValueGenerator:
@@ -52,7 +49,7 @@ class BaseValueGenerator:
         return self.__class__.__name__
 
     @classmethod
-    def get_html_template(cls) -> str:
+    def get_html_template(cls) -> bytes:
         """Returns the HTML template for the class.
 
         Returns:
@@ -69,7 +66,7 @@ class BaseValueGenerator:
         self,
         *args: Tuple[Any],
         **kwargs: Dict[str, Any]
-        ) -> Any:
+    ) -> Any:
         """Generates a new value, using the given customization args.
         The first arg should be context_params.
         """
@@ -84,7 +81,7 @@ class Registry:
             mapping value generator class names to their classes.
     """
 
-    value_generators_dict: Dict[str, BaseValueGenerator] = {}
+    value_generators_dict: Dict[str, Type[BaseValueGenerator]] = {}
 
     @classmethod
     def _refresh_registry(cls) -> None:
@@ -104,14 +101,13 @@ class Registry:
                 cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_generator_classes(cls) -> Dict[str, BaseValueGenerator]:
-
+    def get_all_generator_classes(cls) -> Dict[str, Type[BaseValueGenerator]]:
         """Get the dict of all value generator classes."""
         cls._refresh_registry()
         return copy.deepcopy(cls.value_generators_dict)
 
     @classmethod
-    def get_generator_class_by_id(cls, generator_id: str) -> BaseValueGenerator:
+    def get_generator_class_by_id(cls, generator_id: str) -> Type[BaseValueGenerator]:
         """Gets a generator class by its id.
         Refreshes once if the generator is not found; subsequently, throws an
         error.

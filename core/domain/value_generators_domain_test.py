@@ -16,9 +16,6 @@
 
 """Unit tests for core.domain.value_generators_domain."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import importlib
 import inspect
 import re
@@ -35,9 +32,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
         copier = value_generators_domain.Registry.get_generator_class_by_id(
             copier_id)
-        # Since base class generator is not callable hence copier
-        # function call was replaced.
-        self.assertEqual(copier.id, copier_id)
+        self.assertEqual(copier().id, copier_id)
 
         all_generator_classes = (
             value_generators_domain.Registry.get_all_generator_classes())
@@ -45,7 +40,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_generate_value_of_base_value_generator_raises_error(self) -> None:
         base_generator = value_generators_domain.BaseValueGenerator()
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
             re.escape(
                 'generate_value() method has not yet been implemented')):
@@ -58,7 +53,7 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
         """This function checks for duplicate value generators."""
 
         all_python_files = (
-            self.get_all_python_files())# type: ignore[no-untyped-call]
+            self.get_all_python_files()) # type: ignore[no-untyped-call]
         all_value_generators = []
 
         for file_name in all_python_files:
