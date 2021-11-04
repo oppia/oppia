@@ -1,3 +1,6 @@
+core.controllers.base_test
+core.controllers.editor_test
+core.controllers.resources_test
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
 extensions.rich_text_components.components_test
