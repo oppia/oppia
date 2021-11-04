@@ -110,8 +110,8 @@ export class OpportunitiesListComponent {
   gotoPage(pageNumber: number): void {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
-    // End index is used instead of startIndex to handle bug in backend where \
-    // intially fetched skills are dropped causing display issues.
+    // Load new opportunities based on endIndex as the backend can return
+    // opportunities greater than the page size. See issue #14004.
     if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
