@@ -54,6 +54,9 @@ angular.module('oppia').component('hintEditor', {
           ctrl.hintEditorIsOpen = true;
         }
       };
+      ctrl.isHintLengthExceeded = function() {
+        return (ctrl.hint.hintContent._html.length > 500);
+      };
 
       ctrl.saveThisHint = function() {
         ctrl.hintEditorIsOpen = false;

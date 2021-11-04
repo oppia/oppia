@@ -16,8 +16,7 @@
 
 """Tests for generic controller behavior."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import importlib
@@ -1608,6 +1607,8 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration/%s' % self.exp_id,
                     expected_status_int=400)
             error_msg = (
+                'At \'http://localhost/mock_play_exploration/exp_id\' '
+                'these errors are happening:\n'
                 'Schema validation for \'exploration_id\' failed: Could not '
                 'convert str to int: %s' % self.exp_id)
             self.assertEqual(response['error'], error_msg)
