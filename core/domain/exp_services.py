@@ -22,8 +22,7 @@ delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import datetime
@@ -555,7 +554,7 @@ def apply_change_list(exploration_id, change_list):
                 # migrate to is the latest version.
                 target_version_is_current_state_schema_version = (
                     change.to_version ==
-                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '

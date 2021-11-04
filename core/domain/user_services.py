@@ -16,8 +16,7 @@
 
 """Services for user data."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import hashlib
@@ -1141,7 +1140,7 @@ def update_subject_interests(user_id, subject_interests):
         raise utils.ValidationError('Expected subject_interests to be a list.')
     else:
         for interest in subject_interests:
-            if not isinstance(interest, python_utils.BASESTRING):
+            if not isinstance(interest, str):
                 raise utils.ValidationError(
                     'Expected each subject interest to be a string.')
             elif not interest:

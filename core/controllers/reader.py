@@ -14,8 +14,7 @@
 
 """Controllers for the Oppia exploration learner view."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 import logging
@@ -742,6 +741,32 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
     the user.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'activity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    constants.ACTIVITY_TYPE_EXPLORATION,
+                    constants.ACTIVITY_TYPE_COLLECTION,
+                    constants.ACTIVITY_TYPE_STORY,
+                    constants.ACTIVITY_TYPE_LEARN_TOPIC
+                ]
+            }
+        },
+        'activity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
+
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
         """Removes exploration, collection, story or topic from incomplete
@@ -775,6 +800,29 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'user_rating': {
+                'schema': {
+                    'type': 'int',
+                    'choices': [1, 2, 3, 4, 5]
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
@@ -795,7 +843,7 @@ class RatingHandler(base.BaseHandler):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
         """
-        user_rating = self.payload.get('user_rating')
+        user_rating = self.normalized_payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
             self.user_id, exploration_id, user_rating)
         self.render_json({})
@@ -868,6 +916,27 @@ class RecommendationsHandler(base.BaseHandler):
 class FlagExplorationHandler(base.BaseHandler):
     """Handles operations relating to learner flagging of explorations."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'report_text': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_flag_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -877,7 +946,7 @@ class FlagExplorationHandler(base.BaseHandler):
         """
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
-            self.payload.get('report_text'),
+            self.normalized_payload.get('report_text'),
             self.user_id)
         self.render_json(self.values)
 
