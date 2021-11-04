@@ -232,7 +232,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e)
 
 
-def yaml_from_dict(dictionary: Dict, width: int =80) -> str:
+def yaml_from_dict(dictionary: Dict[str, Any], width: int =80) -> str:
     """Gets the YAML representation of a dict.
 
     Args:
