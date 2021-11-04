@@ -46,7 +46,7 @@ describe('Translatable Texts model', () => {
           1: getTranslatableItem('text3')
         }
       },
-      version: '1'
+      version: 1
     };
     sampleTranslatableTexts = TranslatableTexts
       .createFromBackendDict(sampleBackendDict);
@@ -67,6 +67,6 @@ describe('Translatable Texts model', () => {
   });
 
   it('should get version number', () => {
-    expect(sampleTranslatableTexts.explorationVersion).toBe('1');
+    expect(sampleTranslatableTexts.explorationVersion).toBe(1);
   });
 });

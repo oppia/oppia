@@ -41,7 +41,7 @@ export class TranslateTextBackendApiService {
   }
 
   async suggestTranslatedTextAsync(
-      expId: string, expVersion: string, contentId: string, stateName: string,
+      expId: string, expVersion: number, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
       dataFormat: string): Promise<unknown> {

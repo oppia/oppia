@@ -35,14 +35,14 @@ export interface StateNamesToContentIdMapping {
 
 export interface TranslatableTextsBackendDict {
   'state_names_to_content_id_mapping': StateNamesToContentIdBackendDictMapping;
-  'version': string;
+  'version': number;
 }
 
 export class TranslatableTexts {
   constructor(
       private readonly stateNamesToContentIdMapping:
       StateNamesToContentIdMapping,
-      private readonly version: string) {}
+      private readonly version: number) {}
 
   static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {
@@ -68,7 +68,7 @@ export class TranslatableTexts {
     return this.stateNamesToContentIdMapping;
   }
 
-  get explorationVersion(): string {
+  get explorationVersion(): number {
     return this.version;
   }
 }

@@ -66,7 +66,7 @@ describe('TranslateTextBackendApiService', () => {
           },
           stateName2: {contentId3: getTranslatableItem('text3')}
         },
-        version: '1'
+        version: 1
       };
       translateTextBackendApiService.getTranslatableTextsAsync('1', 'en').then(
         successHandler, failHandler
@@ -133,7 +133,7 @@ describe('TranslateTextBackendApiService', () => {
 
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
-        'activeExpVersion',
+        1,
         'activeContentId',
         'activeStateName',
         'languageCode',
@@ -155,7 +155,7 @@ describe('TranslateTextBackendApiService', () => {
     it('should append image data to form data', fakeAsync(() => {
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
-        'activeExpVersion',
+        1,
         'activeContentId',
         'activeStateName',
         'languageCode',
@@ -203,7 +203,7 @@ describe('TranslateTextBackendApiService', () => {
       }];
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
-        'activeExpVersion',
+        1,
         'activeContentId',
         'activeStateName',
         'languageCode',
@@ -248,7 +248,7 @@ describe('TranslateTextBackendApiService', () => {
 
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
-        'activeExpVersion',
+        1,
         'activeContentId',
         'activeStateName',
         'languageCode',
@@ -273,7 +273,7 @@ describe('TranslateTextBackendApiService', () => {
       await expectAsync(
         translateTextBackendApiService.suggestTranslatedTextAsync(
           'activeExpId',
-          'activeExpVersion',
+          1,
           'activeContentId',
           'activeStateName',
           'languageCode',
