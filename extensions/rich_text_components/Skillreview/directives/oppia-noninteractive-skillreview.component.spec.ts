@@ -107,10 +107,10 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve()
-          });
+          }) as NgbModalRef;
     });
 
     component.openConceptCard(e);
@@ -133,10 +133,10 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject('cancel')
-          });
+          }) as NgbModalRef;
     });
 
     component.openConceptCard(e);
@@ -160,10 +160,10 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject('close')
-          });
+          }) as NgbModalRef;
     });
 
     let error;

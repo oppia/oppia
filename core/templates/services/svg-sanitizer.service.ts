@@ -134,12 +134,13 @@ export class SvgSanitizerService {
     let allowedTags = Object.keys(constants.SVG_ATTRS_ALLOWLIST);
     let nodeTagName: keyOfSvgAttrsAllowlist;
     svg.querySelectorAll('*').forEach((node) => {
-      nodeTagName = <keyOfSvgAttrsAllowlist> node.tagName.toLowerCase();
+      nodeTagName = node.tagName.toLowerCase() as keyOfSvgAttrsAllowlist;
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
           if (constants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
-            <nodeAttr> nodeAttrName) === -1) {
+            nodeAttrName as nodeAttr) === -1
+          ) {
             invalidAttrs.push(
               node.tagName + ':' + node.attributes[i].name);
           }

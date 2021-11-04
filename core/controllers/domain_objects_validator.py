@@ -145,3 +145,38 @@ def validate_task_entries(task_entries):
     status = task_entries.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
+
+
+def validate_aggregated_stats(aggregated_stats):
+    """Validates the attribute stats dict.
+
+    Args:
+        aggregated_stats: dict. Data that needs to be validated.
+
+    Raises:
+        InvalidInputException. Property not in aggregated stats dict.
+    """
+    exploration_stats_properties = [
+        'num_starts',
+        'num_actual_starts',
+        'num_completions'
+    ]
+    state_stats_properties = [
+        'total_answers_count',
+        'useful_feedback_count',
+        'total_hit_count',
+        'first_hit_count',
+        'num_times_solution_viewed',
+        'num_completions'
+    ]
+    for exp_stats_property in exploration_stats_properties:
+        if exp_stats_property not in aggregated_stats:
+            raise base.BaseHandler.InvalidInputException(
+                '%s not in aggregated stats dict.' % (exp_stats_property))
+    state_stats_mapping = aggregated_stats['state_stats_mapping']
+    for state_name in state_stats_mapping:
+        for state_stats_property in state_stats_properties:
+            if state_stats_property not in state_stats_mapping[state_name]:
+                raise base.BaseHandler.InvalidInputException(
+                    '%s not in state stats mapping of %s in aggregated '
+                    'stats dict.' % (state_stats_property, state_name))

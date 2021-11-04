@@ -66,10 +66,11 @@ export class StateSkillEditorComponent implements OnInit {
   }
 
   addSkill(): void {
-    let sortedSkillSummaries = <SkillSummaryBackendDict[]> (
-      this.storyEditorStateService.getSkillSummaries());
-    let allowSkillsFromOtherTopics = <boolean> true;
-    let skillsInSameTopicCount = <number> 0;
+    let sortedSkillSummaries = (
+      this.storyEditorStateService.getSkillSummaries()
+    ) as SkillSummaryBackendDict[];
+    let allowSkillsFromOtherTopics = true;
+    let skillsInSameTopicCount = 0;
     let modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent, {
         backdrop: 'static',
