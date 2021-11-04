@@ -180,7 +180,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/opportunity_services_test.py',
     'core/domain/opportunity_validators.py',
     'core/domain/opportunity_validators_test.py',
-    'core/domain/param_domain.py',
     'core/domain/param_domain_test.py',
     'core/domain/platform_feature_services.py',
     'core/domain/platform_feature_services_test.py',
