@@ -128,9 +128,9 @@ export class TranslateTextService {
     );
   }
 
+  // The following property is set to null
+  // when there is no text to translate.
   private _getUpdatedTextToTranslate(
-    // The following property is set to null
-    // when there is no text to translate.
       text: string | string[] | null,
       more: boolean,
       status: Status,
@@ -144,8 +144,8 @@ export class TranslateTextService {
     }: {
       dataFormat: string,
       contentType: string,
-    // The following two properties are set to null
-    // when they have no interaction.
+      // The following two properties are set to null
+      // when they have no interaction.
       interactionId: string | null,
       ruleType: string | null
     } = this.stateAndContent[this.activeIndex];
