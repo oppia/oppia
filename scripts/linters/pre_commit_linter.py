@@ -52,8 +52,7 @@ CUSTOMIZATION OPTIONS
 Note that the root folder MUST be named 'oppia'.
  """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import fnmatch
@@ -289,7 +288,7 @@ def _get_changed_filepaths():
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
     all_changed_filepaths = unstaged_files + staged_files
-    return all_changed_filepaths[:]
+    return [filepath.decode('utf-8') for filepath in all_changed_filepaths]
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):

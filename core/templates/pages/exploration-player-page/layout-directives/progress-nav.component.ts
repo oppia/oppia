@@ -30,6 +30,7 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -67,6 +68,7 @@ export class ProgressNavComponent {
     private explorationEngineService: ExplorationEngineService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private focusManagerService: FocusManagerService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
@@ -78,6 +80,10 @@ export class ProgressNavComponent {
       this.lastDisplayedCard = this.displayedCard;
       this.updateDisplayedCardInfo();
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {
