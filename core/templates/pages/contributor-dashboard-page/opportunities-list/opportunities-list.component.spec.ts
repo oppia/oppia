@@ -38,7 +38,7 @@ describe('Opportunities List Component', () => {
   const mockReloadOpportunitiesEventEmitter = new EventEmitter();
   const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
 
-  const ExplorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
+  const explorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
     id: 'id1',
     labelText: 'text',
     labelColor: 'red',
@@ -183,7 +183,7 @@ describe('Opportunities List Component', () => {
     translationsCount: 30
   }];
 
-  const ExplorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
+  const explorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
     id: 'id17',
     labelText: 'text',
     labelColor: 'red',
@@ -296,11 +296,11 @@ describe('Opportunities List Component', () => {
       ContributionOpportunitiesService);
 
     component.loadOpportunities = () => Promise.resolve({
-      opportunitiesDicts: ExplorationOpportunitiesLoad1,
+      opportunitiesDicts: explorationOpportunitiesLoad1,
       more: true
     });
     component.loadMoreOpportunities = () => Promise.resolve({
-      opportunitiesDicts: ExplorationOpportunitiesLoad2,
+      opportunitiesDicts: explorationOpportunitiesLoad2,
       more: false
     });
 
@@ -684,7 +684,7 @@ describe('Opportunities List Component', () => {
       'are less then page length', fakeAsync(() => {
       // Setting more option to be false.
       component.loadMoreOpportunities = () => Promise.resolve({
-        opportunitiesDicts: ExplorationOpportunitiesLoad1,
+        opportunitiesDicts: explorationOpportunitiesLoad1,
         more: false
       });
       expect(component.activePageNumber).toBe(1);
