@@ -16,6 +16,8 @@
 
 """Classes relating to value generators."""
 
+from __future__ import annotations
+
 import copy
 import importlib
 import inspect
@@ -107,7 +109,10 @@ class Registry:
         return copy.deepcopy(cls.value_generators_dict)
 
     @classmethod
-    def get_generator_class_by_id(cls, generator_id: str) -> Type[BaseValueGenerator]:
+    def get_generator_class_by_id(
+        cls,
+        generator_id: str
+    ) -> Type[BaseValueGenerator]:
         """Gets a generator class by its id.
         Refreshes once if the generator is not found; subsequently, throws an
         error.
