@@ -224,4 +224,7 @@ class BaseChange:
         return base_change_dict
 
     def __getattr__(self, name: str) -> str:
-        return self.__dict__[name]
+        try:
+            return self.__dict__[name]
+        except KeyError:
+            raise AttributeError(name)
