@@ -32,7 +32,6 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 COLLECTION_PROPERTY_TITLE = 'title'
