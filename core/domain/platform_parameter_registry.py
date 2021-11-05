@@ -158,7 +158,7 @@ class Registry:
             committer_id: str. ID of the committer.
             commit_message: str. The commit message.
             new_rules: list(PlatformParameterRule). A list of
-                PlatformParameterRule object.
+                PlatformParameterRule objects.
         """
         param = cls.get_platform_parameter(name)
 

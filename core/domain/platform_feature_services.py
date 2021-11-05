@@ -120,8 +120,8 @@ def update_feature_flag_rules(
         feature_name: str. The name of the feature to update.
         committer_id: str. ID of the committer.
         commit_message: str. The commit message.
-        new_rules: list(PlatformParameterRule). A list of dict of
-            PlatformParameterRule object.
+        new_rules: list(PlatformParameterRule). A list of PlatformParameterRule
+            objects to update.
 
     Raises:
         FeatureFlagNotFoundException. The feature_name is not registered in

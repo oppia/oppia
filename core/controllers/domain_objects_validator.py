@@ -54,10 +54,6 @@ def validate_new_config_property_values(new_config_property):
     Returns:
         dict(str, *). Returns a dict for new config properties.
     """
-    # The new_config_property values do not represent a domain class directly
-    # and in the handler these dict values are used to set config properties
-    # individually. Hence Conversion of dicts to domain objects is not required
-    # for new_config_properties.
     for (name, value) in new_config_property.items():
         if not isinstance(name, str):
             raise Exception(
@@ -68,6 +64,10 @@ def validate_new_config_property_values(new_config_property):
             raise Exception('%s do not have any schema.' % name)
 
         config_property.normalize(value)
+    # The new_config_property values do not represent a domain class directly
+    # and in the handler these dict values are used to set config properties
+    # individually. Hence conversion of dicts to domain objects is not required
+    # for new_config_properties.
     return new_config_property
 
 
@@ -80,10 +80,6 @@ def validate_change_dict_for_blog_post(change_dict):
     Returns:
         dict. Returns the change_dict after validation.
     """
-    # The method returns a dict containing blog post properties, they are used
-    # to update blog posts in the domain layer. This dict does not correspond
-    # to any domain class so we are validating the fields of change_dict
-    # as a part of schema validation.
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
             change_dict['title'], True)
@@ -100,6 +96,10 @@ def validate_change_dict_for_blog_post(change_dict):
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
+    # The method returns a dict containing blog post properties, they are used
+    # to update blog posts in the domain layer. This dict does not correspond
+    # to any domain class so we are validating the fields of change_dict
+    # as a part of schema validation.
     return change_dict
 
 
@@ -119,7 +119,6 @@ def validate_collection_change(collection_change_dict):
     # in many of the methods in the domain layer of the codebase and we are
     # planning to remove collections from our codebase hence modification is
     # not done here.
-
     collection_domain.CollectionChange(collection_change_dict)
     return collection_change_dict
 
@@ -153,10 +152,6 @@ def validate_email_dashboard_data(
     Returns:
         dict. Returns the dict after validation.
     """
-    # The method returns a dict containing fields of email dashboard
-    # query params. This dict represents the UserQueryParams class, which is a
-    # namedtuple. Hence the fields of the dict are being validated as a part of
-    # schema validation before saving new user queries in the handler.
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
@@ -166,6 +161,10 @@ def validate_email_dashboard_data(
         if key not in possible_keys:
             # Raise exception if key is not one of the allowed keys.
             raise Exception('400 Invalid input for query.')
+    # The method returns a dict containing fields of email dashboard
+    # query params. This dict represents the UserQueryParams class, which is a
+    # namedtuple. Hence the fields of the dict are being validated as a part of
+    # schema validation before saving new user queries in the handler.
     return data
 
 
@@ -178,11 +177,6 @@ def validate_task_entries(task_entries):
     Returns:
         dict. Returns the task entries dict after validation.
     """
-    # For creating the TaskEntry domain object, we have to include the
-    # exploration_id and the user_id which are not included in the
-    # task_entry_dict. Thus, it is not possible to create the full
-    # domain object at the payload validation stage. Hence, the key-value pairs
-    # of task_entry_dict are being validated as a part of schema validation.
     entity_version = task_entries.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(
@@ -196,6 +190,11 @@ def validate_task_entries(task_entries):
     status = task_entries.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
+    # For creating the TaskEntry domain object, we have to include the
+    # exploration_id and the user_id which are not included in the
+    # task_entry_dict. Thus, it is not possible to create the full
+    # domain object at the payload validation stage. Hence, the key-value pairs
+    # of task_entry_dict are being validated as a part of schema validation.
     return task_entries
 
 
@@ -211,8 +210,6 @@ def validate_aggregated_stats(aggregated_stats):
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
     """
-    # The aggregated_stats parameter do not represents any domain class, hence
-    # dict form of the data is returned from here.
     exploration_stats_properties = [
         'num_starts',
         'num_actual_starts',
@@ -237,4 +234,6 @@ def validate_aggregated_stats(aggregated_stats):
                 raise base.BaseHandler.InvalidInputException(
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
+    # The aggregated_stats parameter do not represents any domain class, hence
+    # dict form of the data is returned from here.
     return aggregated_stats
