@@ -1059,8 +1059,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6,
-                'files': {'file.svg': large_image}
-            }, csrf_token=csrf_token, expected_status_int=400,
+                'files': {'file.svg': large_image.encode('utf-8')}
+            },
+            csrf_token=csrf_token, expected_status_int=400,
         )
 
         self.assertIn(
@@ -1690,8 +1691,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill',
-                'files': {'file.svg': large_image}
-            }, csrf_token=csrf_token, expected_status_int=400)
+                'files': {'file.svg': large_image.encode('utf-8')}
+            },
+            csrf_token=csrf_token, expected_status_int=400
+        )
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
