@@ -789,6 +789,7 @@ def require_valid_filename(filename: str) -> None:
     else:
         raise ValidationError('No filename supplied')
 
+
 def require_valid_meta_tag_content(meta_tag_content: str) -> None:
     """Generic meta tag content validation.
 
