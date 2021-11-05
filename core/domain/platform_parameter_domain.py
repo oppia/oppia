@@ -87,7 +87,7 @@ class EvaluationContext:
         return self._platform_type
 
     @property
-    def browser_type(self) -> str:
+    def browser_type(self) -> Optional[str]:
         """Returns client browser type.
 
         Returns:
@@ -97,7 +97,7 @@ class EvaluationContext:
         return self._browser_type
 
     @property
-    def app_version(self) -> str:
+    def app_version(self) -> Optional[str]:
         # TODO(#11208): Update the documentation below to reflect the change
         # when the GAE app version is used for web & backend.
         """Returns client application version.
