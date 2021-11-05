@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import imghdr
-
+import base64
 from core import feconf
 from core import utils
 from core.domain import html_validation_service
@@ -39,7 +39,7 @@ def validate_image_and_filename(raw_image, filename):
     """
     hundred_kb_in_bytes = 100 * 1024
     if isinstance(raw_image, str):
-        raw_image = raw_image.encode('ISO-8859-1')
+       raw_image = utils.convert_image_str_to_data_binary(raw_image)
     if not raw_image:
         raise utils.ValidationError('No image supplied')
     if len(raw_image) > hundred_kb_in_bytes:
