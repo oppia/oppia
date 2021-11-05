@@ -61,9 +61,9 @@ class BaseValueGenerator:
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
             '%s.html' % cls.__name__))
 
-    # The types for args and kwargs were found using the reveal_type
-    # method mentioned in the MyPy cheatsheet. The return type is
-    # Any as inferred from line 37.
+    # Since child classes of BaseValueGenerator can use
+    # the generate_value functions with different types
+    # of arguments, args, kwargs and return type is Any.
     def generate_value(
         self,
         *args: Tuple[Any],
@@ -110,8 +110,7 @@ class Registry:
 
     @classmethod
     def get_generator_class_by_id(
-        cls,
-        generator_id: str
+        cls, generator_id: str
     ) -> Type[BaseValueGenerator]:
         """Gets a generator class by its id.
         Refreshes once if the generator is not found; subsequently, throws an
