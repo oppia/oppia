@@ -474,6 +474,39 @@ describe('QuestionPlayerComponent', () => {
     expect(ctrl.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
   });
 
+  it('should get color for score bar based on score per skill', () => {
+    let scorePerSkill = {
+      score: 5,
+      total: 7
+    };
+    ctrl.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'NOT_PASS_FAIL',
+        passCutoff: 1.5
+      }
+    };
+
+    expect(ctrl.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
+
+    ctrl.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 1.5
+      }
+    };
+
+    expect(ctrl.getColorForScoreBar(scorePerSkill)).toBe('rgb(217, 92, 12)');
+
+    ctrl.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 0.5
+      }
+    };
+
+    expect(ctrl.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
+  });
+
   it('should open skill mastery modal when user clicks on skill', () => {
     let masteryPerSkillMapping;
     let skillId;
