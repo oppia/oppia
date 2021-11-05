@@ -394,7 +394,7 @@ def set_url_query_parameter(
     query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
+    new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
     return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
         (scheme, netloc, path, new_query_string, fragment))
@@ -786,7 +786,8 @@ def require_valid_filename(filename: str) -> None:
         if '.' not in filename:
             raise ValidationError(
                 'File name should include an extension.')
-
+    else:
+        raise ValidationError('No filename supplied')
 
 def require_valid_meta_tag_content(meta_tag_content: str) -> None:
     """Generic meta tag content validation.

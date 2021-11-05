@@ -75,8 +75,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             'description': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default': None
+                }
             },
             'filename': {
                 'schema': {
@@ -84,8 +83,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_valid_file_name'
                     }]
-                },
-                'default': None
+                }
             },
             'thumbnailBgColor': {
                 'schema': {
@@ -321,8 +319,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
                     }]
-                },
-                'default_value': None
+                }
             },
             'topic_and_subtopic_page_change_dicts': {
                 'schema': {
@@ -566,8 +563,7 @@ class TopicPublishSendMailHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
                     }]
-                },
-                'default': 'UNKNOWN'
+                }
             },
         }
     }
@@ -585,8 +581,8 @@ class TopicPublishSendMailHandler(base.BaseHandler):
                     self.username,
                     self.normalized_payload.get('topic_name'),
                     topic_url
-                  )
                 )
+            )
 
         self.render_json(self.values)
 
@@ -610,8 +606,7 @@ class TopicPublishHandler(base.BaseHandler):
             'publish_status': {
                 'schema': {
                     'type': 'bool'
-                },
-                'default': False
+                }
             },
         }
     }
