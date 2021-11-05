@@ -543,8 +543,8 @@ def _upload_suggestion_images(files, suggestion, filenames):
     """Saves a suggestion's images to storage.
 
     Args:
-        files: dict. files containing a mapping of image
-           filename to image blob.
+        files: dict. Files containing a mapping of image
+            filename to image blob.
         suggestion: BaseSuggestion. The suggestion for which images are being
             uploaded.
         filenames: list(str). The image filenames.
