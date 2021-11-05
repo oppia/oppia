@@ -53,7 +53,7 @@ export class SearchService {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _lastQuery!: string;
-  private _searchCursor!: string;
+  private _searchCursor!: number;
   private _lastSelectedCategories: SelectionList = {};
   private _lastSelectedLanguageCodes: SelectionList = {};
   private _isCurrentlyFetchingResults = false;

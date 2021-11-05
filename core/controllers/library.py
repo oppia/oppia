@@ -253,7 +253,7 @@ class SearchHandler(base.BaseHandler):
             },
             'offset': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 },
                 'default_value': None
             }
@@ -294,7 +294,6 @@ class SearchHandler(base.BaseHandler):
 
         # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
         search_offset = self.normalized_request.get('offset')
-        search_offset = int(search_offset) if search_offset else None
 
         activity_list, new_search_offset = get_matching_activity_dicts(
             query_string, categories, language_codes, search_offset)
