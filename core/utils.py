@@ -328,6 +328,33 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
     else:
         raise Exception('The given string does not represent a PNG image.')
 
+def convert_image_binary_to_data_str(content: bytes) -> str:
+
+    """Converts a image byte object (represented by 'content') to a data str.
+
+    Args:
+        content: bytes. Image binary file content.
+
+    Returns:
+        str. Data created from the binary content of the image.
+
+    """
+    base64_encoded_data=base64.b64encode(content)
+    return base64_encoded_data.decode('utf-8')
+
+def convert_image_str_to_data_binary(content: str) -> bytes:
+
+    """Converts a image string (represented by 'content') to a data binary.
+
+    Args:
+        content: str. Image file content.
+
+    Returns:
+        binary. Data created from the str content of the image.
+
+    """
+    encoded_data = content.encode('utf-8')
+    return base64.decodebytes(encoded_data)
 
 def convert_png_to_data_url(filepath: str) -> str:
     """Converts the png file at filepath to a data URL.
