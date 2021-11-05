@@ -1,5 +1,6 @@
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div class="oppia-learner-dashboard-container position-relative overflow-auto" [ngStyle]="windowIsNarrow && {'min-height': '85.5vh'}">
+<div [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
+     class="oppia-learner-dashboard-container position-relative">
   <div class="row oppia-row"
        [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">

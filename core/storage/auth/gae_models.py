@@ -16,8 +16,7 @@
 
 """Models for managing user authentication."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core.platform import models
@@ -130,10 +129,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_auth_id(
-            cls,
-            provider_id: str,
-            auth_id: str
-    ) -> Optional['UserAuthDetailsModel']:
+        cls, provider_id: str, auth_id: str
+    ) -> Optional[UserAuthDetailsModel]:
         """Fetch a user entry by auth_id of a particular auth service.
 
         Args:
@@ -212,7 +209,7 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_gae_id(cls, gae_id: str) -> Optional['UserIdentifiersModel']:
+    def get_by_gae_id(cls, gae_id: str) -> Optional[UserIdentifiersModel]:
         """Fetch an entry by GAE ID.
 
         Args:
@@ -225,7 +222,7 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.get_by_id(gae_id)
 
     @classmethod
-    def get_by_user_id(cls, user_id: str) -> Optional['UserIdentifiersModel']:
+    def get_by_user_id(cls, user_id: str) -> Optional[UserIdentifiersModel]:
         """Fetch an entry by user ID.
 
         Args:
@@ -295,8 +292,8 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user_id(
-            cls, user_id: str
-    ) -> Optional['UserIdByFirebaseAuthIdModel']:
+        cls, user_id: str
+    ) -> Optional[UserIdByFirebaseAuthIdModel]:
         """Fetch an entry by user ID.
 
         Args:

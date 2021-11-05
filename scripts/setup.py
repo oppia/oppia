@@ -14,8 +14,7 @@
 
 """Python execution environent set up for all scripts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
@@ -83,15 +82,14 @@ def test_python_version():
 
     if not python2_is_available:
         print(
-            '\033[91m'  # Red text color.
+            '\033[91m'
             'The Oppia server needs Python 2 to be installed. '
             'Please follow the instructions at '
             'https://github.com/oppia/oppia/wiki/Troubleshooting#'
             'python-2-is-not-available to fix this.'
-            '\033[0m'  # Reset to default text color.
+            '\033[0m'
         )
         sys.exit(1)
-
 
 
 def download_and_install_package(url_to_retrieve, filename):
