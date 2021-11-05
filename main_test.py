@@ -42,13 +42,25 @@ class CloudLoggingTests(test_utils.GenericTestBase):
     def test_cloud_logging_is_set_up_when_emulator_mode_is_disabled(
         self
     ) -> None:
+        function_calls = {
+            'setup_logging': False,
+        }
+
+        class MockClient:
+            """Mock client for Google Cloud Logging."""
+
+            def setup_logging(self) -> None:
+                function_calls['setup_logging'] = True
+
         emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
-        setup_logging_swap = self.swap_with_checks(
-            google.cloud.logging.Client, 'setup_logging', lambda: None)
-        with emulator_mode_swap, setup_logging_swap:
+        logging_client_swap = self.swap_with_checks(
+            google.cloud.logging, 'Client', MockClient)
+        with emulator_mode_swap, logging_client_swap:
             # This reloads the main module so that all the checks in
             # the module are reexecuted.
             importlib.reload(main)  # pylint: disable-all
+
+        self.assertEqual(function_calls, {'setup_logging': True})
 
 
 class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
