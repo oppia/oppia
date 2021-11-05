@@ -51,12 +51,12 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
 
     def test_incorrect_exp_domain_object_raises_exception(self) -> None:
         incorrect_change_dict = {
-                    'state_name': 'State 3',
-                    'content_id': 'content',
-                    'language_code': 'hi',
-                    'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>',
-                    'data_format': 'html'
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
@@ -65,13 +65,13 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
 
     def test_correct_exp_domain_object_do_not_raises_exception(self) -> None:
         correct_change_dict = {
-                    'cmd': 'add_written_translation',
-                    'state_name': 'State 3',
-                    'content_id': 'content',
-                    'language_code': 'hi',
-                    'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>',
-                    'data_format': 'html'
+            'cmd': 'add_written_translation',
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
         }
         domain_objects_validator.validate_exploration_or_question_change(
             correct_change_dict)
