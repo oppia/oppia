@@ -16,6 +16,8 @@
 
 """Unit tests for core.domain.value_generators_domain."""
 
+from __future__ import annotations
+
 import importlib
 import inspect
 import re
