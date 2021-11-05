@@ -16,9 +16,7 @@
 
 """Common utilities for test classes."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
 import collections
 import contextlib
@@ -2328,9 +2326,11 @@ title: Title
             if 'files' in data:
                 # Bytes type data cannot be used as the json value
                 # json cannot serialize object of type bytes.
-                data['files'] = {k: v.decode('ISO-8859-1')
-                                if isinstance(v, bytes) else v
-                                for k, v in data['files'].items()}
+                data['files'] = {
+                    name: utils.convert_image_binary_to_data_str(file)
+                    if isinstance(file, bytes) else file
+                    for name, file in data['files'].items()
+                }
             data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
