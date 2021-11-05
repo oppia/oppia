@@ -111,12 +111,6 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
-# Possible allowed commands for exploration change.
-LIST_CMD_EXPLORATION_CHANGE = [
-    CMD_ADD_WRITTEN_TRANSLATION,
-    CMD_EDIT_STATE_PROPERTY
-]
-
 # These are categories to which answers may be classified. These values should
 # not be changed because they are persisted in the data store within answer
 # logs.
