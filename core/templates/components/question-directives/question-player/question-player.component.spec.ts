@@ -207,17 +207,6 @@ describe('QuestionPlayerComponent', () => {
     expect(ctrl.testIsPassed).toBe(true);
   });
 
-  it('should get the outer class name for action button', () => {
-    expect(ctrl.getActionButtonOuterClass('REVIEW_LOWEST_SCORED_SKILL'))
-      .toBe('review-lowest-scored-skill-outer');
-    expect(ctrl.getActionButtonOuterClass('RETRY_SESSION'))
-      .toBe('new-session-outer');
-    expect(ctrl.getActionButtonOuterClass('DASHBOARD'))
-      .toBe('my-dashboard-outer');
-    expect(ctrl.getActionButtonOuterClass('INVALID_TYPE'))
-      .toBe('');
-  });
-
   it('should get the inner class name for action button', () => {
     expect(ctrl.getActionButtonInnerClass('REVIEW_LOWEST_SCORED_SKILL'))
       .toBe('review-lowest-scored-skill-inner');

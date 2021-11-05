@@ -165,14 +165,6 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.testIsPassed = true;
       };
 
-      ctrl.getActionButtonOuterClass = function(actionButtonType) {
-        var className = getClassNameForType(actionButtonType);
-        if (className) {
-          return className + 'outer';
-        }
-        return '';
-      };
-
       ctrl.getActionButtonInnerClass = function(actionButtonType) {
         var className = getClassNameForType(actionButtonType);
         if (className) {
