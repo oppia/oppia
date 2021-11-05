@@ -88,7 +88,7 @@ class SuggestionHandler(base.BaseHandler):
                     'validation_method': (
                         domain_objects_validator.validate_suggestion_images
                     )
-                    },
+                },
                 'default_value': None
             }
         }
@@ -126,7 +126,7 @@ class SuggestionHandler(base.BaseHandler):
             return
 
         _upload_suggestion_images(
-            self.normalized_payload,
+            self.normalized_payload.get('files'),
             suggestion,
             suggestion.get_new_image_filenames_added_in_suggestion())
 
@@ -455,7 +455,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             )
         )
         _upload_suggestion_images(
-            self.payload, updated_suggestion, new_image_filenames)
+            self.payload.get('files',None), updated_suggestion, new_image_filenames)
 
         self.render_json(self.values)
 
@@ -537,12 +537,12 @@ def _construct_exploration_suggestions(suggestions):
     return suggestion_dicts
 
 
-def _upload_suggestion_images(request, suggestion, filenames):
+def _upload_suggestion_images(files, suggestion, filenames):
     """Saves a suggestion's images to storage.
 
     Args:
-        request: Payload. Payload containing a mapping of image
-            filename to image blob.
+        files: dict. files containing a mapping of image
+           filename to image blob.
         suggestion: BaseSuggestion. The suggestion for which images are being
             uploaded.
         filenames: list(str). The image filenames.
