@@ -18,10 +18,8 @@
 handler arguments.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -52,7 +50,7 @@ def validate_new_config_property_values(obj):
         obj: dict. Data that needs to be validated.
     """
     for (name, value) in obj.items():
-        if not isinstance(name, python_utils.BASESTRING):
+        if not isinstance(name, str):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
