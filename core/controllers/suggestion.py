@@ -455,7 +455,9 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             )
         )
         _upload_suggestion_images(
-            self.payload.get('files',None), updated_suggestion, new_image_filenames)
+            self.payload.get('files', None),
+            updated_suggestion, new_image_filenames
+        )
 
         self.render_json(self.values)
 

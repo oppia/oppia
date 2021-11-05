@@ -46,14 +46,14 @@ def validate_exploration_or_question_change(obj):
         raise base.BaseHandler.InvalidInputException(
             'Missing cmd key in change dict')
     else:
-        ExplorationChangeAllowedCommands = [command['name'] for command in
+        exp_change_commands = [command['name'] for command in
             exp_domain.ExplorationChange.ALLOWED_COMMANDS]
-        QuestionChangeAllowedCommands = [command['name'] for command in
+        question_change_commands = [command['name'] for command in
             question_domain.QuestionChange.ALLOWED_COMMANDS]
 
-        if obj['cmd'] in ExplorationChangeAllowedCommands:
+        if obj['cmd'] in exp_change_commands:
             exp_domain.ExplorationChange(obj)
-        elif obj['cmd'] in QuestionChangeAllowedCommands:
+        elif obj['cmd'] in question_change_commands:
             question_domain.QuestionSuggestionChange(obj)
         else:
             raise base.BaseHandler.InvalidInputException(
