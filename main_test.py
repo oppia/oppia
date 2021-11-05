@@ -17,10 +17,14 @@
 from __future__ import annotations
 
 import contextlib
+import importlib
 
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 import main
+
+import google.cloud.logging
 from typing import ContextManager, Dict, cast
 import webapp2
 import webtest
@@ -30,6 +34,33 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class CloudLoggingTests(test_utils.GenericTestBase):
+    """Test the Cloud Logging setup."""
+
+    def test_cloud_logging_is_set_up_when_emulator_mode_is_disabled(
+        self
+    ) -> None:
+        function_calls = {
+            'setup_logging': False,
+        }
+
+        class MockClient:
+            """Mock client for Google Cloud Logging."""
+
+            def setup_logging(self) -> None:
+                function_calls['setup_logging'] = True
+
+        emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
+        logging_client_swap = self.swap_with_checks(
+            google.cloud.logging, 'Client', MockClient)
+        with emulator_mode_swap, logging_client_swap:
+            # This reloads the main module so that all the checks in
+            # the module are reexecuted.
+            importlib.reload(main)  # pylint: disable-all
+
+        self.assertEqual(function_calls, {'setup_logging': True})
 
 
 class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
