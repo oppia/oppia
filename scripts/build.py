@@ -219,21 +219,26 @@ def modify_constants(
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"DEV_MODE": (true|false)',
-        dev_mode_variable)
+        dev_mode_variable,
+        expected_number_of_replacements=1
+    )
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
-        emulator_mode_variable
+        emulator_mode_variable,
+        expected_number_of_replacements=1
     )
 
     enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
+        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
     common.inplace_replace_file(
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
-        enable_maintenance_mode_variable)
+        enable_maintenance_mode_variable,
+        expected_number_of_replacements=1
+    )
 
 
 def set_constants_to_default():
@@ -274,7 +279,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(python_utils.UNICODE(content))
+    file_stream.write(str(content))
 
 
 def _join_files(source_paths, target_file_stream):
@@ -871,8 +876,7 @@ def save_hashes_to_file(file_hashes):
     ensure_directory_exists(HASHES_JSON_FILEPATH)
     with python_utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(
-            python_utils.UNICODE(
-                json.dumps(filtered_hashes, ensure_ascii=False)))
+            str(json.dumps(filtered_hashes, ensure_ascii=False)))
         hashes_json_file.write(u'\n')
 
 
