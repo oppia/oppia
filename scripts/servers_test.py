@@ -408,49 +408,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
-        self.assertEqual(
-            popen_calls[0].kwargs,
-            {
-                'shell': True,
-                'env': None,
-                'stdout': subprocess.PIPE,
-                'stderr': subprocess.PIPE
-            }
-        )
-
-    def test_managed_dev_appserver_with_python2_error(self):
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=(b'python2: command not found',)))
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                builtins,
-                'print',
-                lambda x: x,
-                expected_args=[(
-                    '\033[93mYou do not have Python 2 installed, please follow '
-                    'instructions at https://github.com/oppia/oppia/wiki/'
-                    'Troubleshooting#python-2-is-not-available to fix this.'
-                    '\033[0m',
-                )]
-            )
-        )
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'wait_for_port_to_be_in_use'))
-        self.exit_stack.enter_context(servers.managed_dev_appserver(
-            'app.yaml', env=None))
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('dev_appserver.py', popen_calls[0].program_args)
-        self.assertEqual(
-            popen_calls[0].kwargs,
-            {
-                'shell': True,
-                'env': None,
-                'stdout': subprocess.PIPE,
-                'stderr': subprocess.PIPE
-            }
-        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
 
     def test_managed_elasticsearch_dev_server(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
