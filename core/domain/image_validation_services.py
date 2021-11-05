@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import imghdr
-import base64
+
 from core import feconf
 from core import utils
 from core.domain import html_validation_service
