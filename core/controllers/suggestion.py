@@ -550,9 +550,8 @@ def _upload_suggestion_images(files, suggestion, filenames):
     suggestion_image_context = suggestion.image_context
     # TODO(#10513): Find a way to save the images before the suggestion is
     # created.
-    images = request.get('files')
     for filename in filenames:
-        image = images.get(filename).encode('ISO-8859-1') if images else None
+        image = files.get(filename) if files else None
         if not image:
             logging.exception(
                 'Image not provided for file with name %s when the '
@@ -562,6 +561,7 @@ def _upload_suggestion_images(files, suggestion, filenames):
                 'No image data provided for file with name %s.'
                 % (filename))
         try:
+            image = utils.convert_image_str_to_data_binary(image)
             file_format = (
                 image_validation_services.validate_image_and_filename(
                     image, filename))
