@@ -182,7 +182,7 @@ class TestingTaskSpec:
             data_file = '.coverage.%s.%s.%06d' % (
                 socket.gethostname(), os.getpid(), rand)
             env['COVERAGE_FILE'] = data_file
-            python_utils.PRINT('Coverage data for %s is in %s' % (
+            concurrent_task_utils.log('Coverage data for %s is in %s' % (
                 self.test_target, data_file))
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
@@ -440,7 +440,7 @@ def main(args=None):
                 task.exception, subprocess.CalledProcessError):
             python_utils.PRINT(
                 'ERROR     %s: Error raised by subprocess.')
-            python_utils.PRINT(task.exception)
+            raise task.exception
         elif task.exception and 'No tests were run' in task.exception.args[0]:
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
