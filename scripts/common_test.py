@@ -14,9 +14,9 @@
 
 """Unit tests for scripts/common.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import contextlib
 import errno
 import getpass
@@ -151,7 +151,7 @@ class CommonTests(test_utils.GenericTestBase):
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -180,7 +180,7 @@ class CommonTests(test_utils.GenericTestBase):
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -209,7 +209,7 @@ class CommonTests(test_utils.GenericTestBase):
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -479,7 +479,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_ask_user_to_confirm(self):
         def mock_input():
             return 'Y'
-        with self.swap(python_utils, 'INPUT', mock_input):
+        with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self):
@@ -653,12 +653,40 @@ class CommonTests(test_utils.GenericTestBase):
         )
         with remove_swap:
             common.inplace_replace_file(
-                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+                origin_file,
+                '"DEV_MODE": .*',
+                '"DEV_MODE": true,',
+                expected_number_of_replacements=1
+            )
         with python_utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         os.remove(origin_file)
         shutil.move(backup_file, origin_file)
+
+    def test_inplace_replace_file_with_expected_number_of_replacements_raises(
+            self
+    ):
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        with python_utils.open_file(origin_file, 'r') as f:
+            origin_content = f.readlines()
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
+        ):
+            common.inplace_replace_file(
+                origin_file,
+                '"DEV_MODEa": .*',
+                '"DEV_MODE": true,',
+                expected_number_of_replacements=1
+            )
+        self.assertFalse(os.path.isfile(backup_file))
+        with python_utils.open_file(origin_file, 'r') as f:
+            new_content = f.readlines()
+        self.assertEqual(origin_content, new_content)
 
     def test_inplace_replace_file_with_exception_raised(self):
         origin_file = os.path.join(

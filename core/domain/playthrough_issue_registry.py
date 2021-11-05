@@ -16,20 +16,18 @@
 
 """Registry for issues."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import importlib
 import os
 
 from core import feconf
-from core import python_utils
 from core.platform import models
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all issues."""
 
     # Dict mapping issue types to instances of the issues.

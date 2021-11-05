@@ -117,7 +117,7 @@ export class StateCard {
     return (
       Boolean(interactionId) &&
       InteractionSpecsConstants.INTERACTION_SPECS[
-        <InteractionSpecsKey>interactionId].is_terminal);
+        interactionId as InteractionSpecsKey].is_terminal);
   }
 
   getHints(): Hint[] {
@@ -135,9 +135,9 @@ export class StateCard {
     if (interactionId) {
       return (
         !InteractionSpecsConstants.INTERACTION_SPECS[
-          <InteractionSpecsKey>interactionId].is_terminal &&
+          interactionId as InteractionSpecsKey].is_terminal &&
         !InteractionSpecsConstants.INTERACTION_SPECS[
-          <InteractionSpecsKey>interactionId].is_linear
+          interactionId as InteractionSpecsKey].is_linear
       );
     }
     return false;
@@ -162,7 +162,7 @@ export class StateCard {
     if (interactionId) {
       return (
         InteractionSpecsConstants.INTERACTION_SPECS[
-          <InteractionSpecsKey>interactionId].instructions
+          interactionId as InteractionSpecsKey].instructions
       );
     }
     return null;
@@ -182,7 +182,7 @@ export class StateCard {
     if (interactionId) {
       var interactionDisplayMode: string | null = (
         InteractionSpecsConstants.INTERACTION_SPECS[
-          <InteractionSpecsKey>interactionId].display_mode);
+          interactionId as InteractionSpecsKey].display_mode);
     } else {
       var interactionDisplayMode: string | null = null;
     }

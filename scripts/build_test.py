@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/build.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import ast
 import collections
@@ -105,7 +104,7 @@ class BuildTests(test_utils.GenericTestBase):
         """
         # Prepare a file_stream object from python_utils.string_io().
         third_party_js_stream = python_utils.string_io()
-        # Get all filepaths from manifest.json.
+        # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
         build._join_files(dependency_filepaths['js'], third_party_js_stream)  # pylint: disable=protected-access
@@ -126,7 +125,7 @@ class BuildTests(test_utils.GenericTestBase):
         tasks matches the number of font files.
         """
         copy_tasks = collections.deque()
-        # Get all filepaths from manifest.json.
+        # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Setup a sandbox folder for copying fonts.
         test_target = os.path.join('target', 'fonts', '')
@@ -494,7 +493,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test generate_build_tasks_to_build_files_from_filepaths queues up a
         corresponding number of build tasks to the number of file changes.
         """
-        new_filename = 'manifest.json'
+        new_filename = 'dependencies.json'
         recently_changed_filenames = [
             os.path.join(MOCK_ASSETS_DEV_DIR, new_filename)]
         build_tasks = collections.deque()
@@ -764,9 +763,10 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": true,\n')
-            tmp.write(u'};')
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": true,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
@@ -781,6 +781,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -793,6 +794,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -811,9 +813,10 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": false,\n')
-            tmp.write(u'};')
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": false,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
         feconf_temp_file.name = mock_feconf_path
@@ -828,6 +831,7 @@ class BuildTests(test_utils.GenericTestBase):
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(

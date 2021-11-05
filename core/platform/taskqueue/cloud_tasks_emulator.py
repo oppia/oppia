@@ -21,19 +21,16 @@ This emulator is an extension of the emulator from this github page:
 https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime  # pylint: disable=unused-import
 import threading
 import time
 
-from core import python_utils
-
 from typing import Any, Callable, Dict, List, Optional
 
 
-class Task(python_utils.OBJECT):
+class Task:
     """A mock for a Google Cloud Tasks task that is handled by execution using
     the cloud tasks emulator.
     """
@@ -67,7 +64,7 @@ class Task(python_utils.OBJECT):
         self.task_name = task_name
 
 
-class Emulator(python_utils.OBJECT):
+class Emulator:
     """The emulator mocks the core.platform.taskqueue API. The queues in this
     emulator are priority queues: Elements are popped in the order of the time
     they are scheduled for and executed after the time for execution has

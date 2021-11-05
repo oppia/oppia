@@ -14,10 +14,8 @@
 
 """Domain objects for Wipeout."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -29,7 +27,7 @@ USER_VERIFICATION_SUCCESS = 'SUCCESS'
 USER_VERIFICATION_FAILURE = 'FAILURE'
 
 
-class PendingDeletionRequest(python_utils.OBJECT):
+class PendingDeletionRequest:
     """Domain object for a PendingDeletionRequest."""
 
     def __init__(

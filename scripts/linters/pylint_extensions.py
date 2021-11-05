@@ -18,8 +18,7 @@
 presubmit checks. Next message id would be C0041.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import linecache
 import os
@@ -27,7 +26,6 @@ import re
 import sys
 import tokenize
 
-from core import python_utils
 from core.controllers import payload_validator
 
 from .. import docstrings_checker
@@ -302,7 +300,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 line_length = len(line)
                 escape_character_found = False
                 in_string = False
-                for char_num in python_utils.RANGE(line_length):
+                for char_num in range(line_length):
                     char = line[char_num]
                     if in_string and (
                             char == escape_character_indicator or
@@ -2144,36 +2142,6 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
-class DisallowDunderMetaclassChecker(checkers.BaseChecker):
-    """Custom pylint checker prohibiting use of "__metaclass__" and
-    enforcing use of "python_utils.with_metaclass()" instead.
-    """
-
-    __implements__ = interfaces.IAstroidChecker
-
-    name = 'no-dunder-metaclass'
-    priority = -1
-    msgs = {
-        'C0034': (
-            'Please use python_utils.with_metaclass() instead of __metaclass__',
-            'no-dunder-metaclass',
-            'Enforce usage of python_utils.with_metaclass() '
-            'instead of __metaclass__'
-        )
-    }
-
-    def visit_classdef(self, node):
-        """Visit each class definition in a module and check if there is a
-        __metaclass__ present.
-
-        Args:
-            node: astroid.nodes.ClassDef. Node for a class definition
-                in the AST.
-        """
-        if '__metaclass__' in node.locals:
-            self.add_message('no-dunder-metaclass', node=node)
-
-
 class DisallowHandlerWithoutSchema(checkers.BaseChecker):
     """Custom pylint checker prohibiting handlers which do not have schema
     defined within the class.
@@ -2331,6 +2299,5 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    linter.register_checker(DisallowDunderMetaclassChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))

@@ -14,8 +14,7 @@
 
 """Unit tests for scripts/check_frontend_test_coverage.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import subprocess
@@ -41,7 +40,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         }
         self.printed_messages = []
 
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def __init__(self, lcov_items_list):
                 self.lcov_items_list = lcov_items_list
 

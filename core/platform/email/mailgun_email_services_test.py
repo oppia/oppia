@@ -16,8 +16,7 @@
 
 """Tests for the Mailgun API wrapper."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import ast
 
@@ -38,7 +37,7 @@ MailgunQueryType = Tuple[
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    class Response(python_utils.OBJECT):
+    class Response:
         """Class to mock python_utils.url_open responses."""
 
         def __init__(

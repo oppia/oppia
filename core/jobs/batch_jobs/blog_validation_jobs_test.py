@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.blog_validation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_validation_jobs
@@ -31,9 +30,9 @@ if MYPY: # pragma: no cover
 (blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 
-class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
+class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.BlogPostTitleUniquenessJob
+    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostTitlesJob
 
     def test_run_with_same_titles_for_blog_posts(self) -> None:
         blog_post_model_1 = self.create_model( # type: ignore[no-untyped-call]
@@ -78,9 +77,9 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
         )
 
 
-class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
+class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.BlogPostSummaryTitleUniquenessJob
+    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
 
     def test_run_with_same_titles_for_blog_posts(self) -> None:
         blog_post_summary_model_1 = self.create_model( # type: ignore[no-untyped-call]
@@ -123,9 +122,9 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
             ])
 
 
-class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
+class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.BlogPostUrlUniquenessJob
+    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostUrlsJob
 
     def test_run_with_same_url_for_blog_posts(self) -> None:
         blog_post_model_1 = self.create_model( # type: ignore[no-untyped-call]
@@ -168,9 +167,9 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
             ])
 
 
-class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
+class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.BlogPostSummaryUrlUniquenessJob
+    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
 
     def test_run_with_same_url_for_blog_posts(self) -> None:
         blog_post_summary_model_1 = self.create_model( # type: ignore[no-untyped-call]

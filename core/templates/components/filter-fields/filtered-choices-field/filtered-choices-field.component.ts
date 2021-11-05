@@ -28,7 +28,7 @@ export class FilteredChoicesFieldComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() choices!: string[];
   @Input() selection!: string;
-  @Input() placeholder: string;
+  @Input() placeholder!: string;
   @Input() searchLabel: string = 'search';
   @Input() noEntriesFoundLabel: string = 'No matches found';
   @Output() selectionChange: EventEmitter<string> = (

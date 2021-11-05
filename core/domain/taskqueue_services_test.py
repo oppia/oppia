@@ -16,8 +16,7 @@
 
 """Tests for the domain taskqueue services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core import python_utils
@@ -29,7 +28,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     """Tests for domain taskqueue services."""
 
     def test_exception_raised_when_deferred_payload_is_not_serializable(self):
-        class NonSerializableArgs(python_utils.OBJECT):
+        class NonSerializableArgs:
             """Object that is not JSON serializable."""
 
             def __init__(self):

@@ -22,8 +22,7 @@ delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import datetime
@@ -162,7 +161,7 @@ def get_exploration_ids_matching_query(
     returned_exploration_ids = []
     search_offset = offset
 
-    for _ in python_utils.RANGE(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -376,8 +375,7 @@ def apply_change_list(exploration_id, change_list):
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(
-                        list(python_utils.MAP(
+                    state.update_param_changes(list(map(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     content = (
@@ -536,7 +534,7 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(list(
-                        python_utils.MAP(to_param_domain, change.new_value)))
+                        map(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -555,7 +553,7 @@ def apply_change_list(exploration_id, change_list):
                 # migrate to is the latest version.
                 target_version_is_current_state_schema_version = (
                     change.to_version ==
-                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '
@@ -570,7 +568,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -945,7 +943,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = list(python_utils.RANGE(1, current_version + 1))
+    version_nums = list(range(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)
@@ -1741,7 +1739,7 @@ def get_composite_change_list(exp_id, from_version, to_version):
             'of exploration to version %s.'
             % (from_version, to_version))
 
-    version_nums = list(python_utils.RANGE(from_version + 1, to_version + 1))
+    version_nums = list(range(from_version + 1, to_version + 1))
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
         exp_id, version_nums, allow_deleted=False)
 

@@ -16,8 +16,7 @@
 
 """Unit tests for 'scripts/install_backend_python_libs.py'."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import itertools
 import json
@@ -36,7 +35,7 @@ from scripts import scripts_test_utils
 import pkg_resources
 
 
-class Distribution(python_utils.OBJECT):
+class Distribution:
     """Mock distribution object containing python library information."""
 
     def __init__(self, library_name, version_string, metadata_dict):
@@ -101,7 +100,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_write(msg):
             self.file_arr.append(msg)
 
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def seek(self, start, stop): # pylint: disable=missing-docstring
                 pass
             def read(self): # pylint: disable=missing-docstring
@@ -109,7 +108,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             def write(self, buf): # pylint: disable=missing-docstring
                 mock_write(buf)
 
-        class MockOpenFile(python_utils.OBJECT):
+        class MockOpenFile:
             def __init__(self, path=None, mode=None):
                 self.path = path
                 self.mode = mode
@@ -131,7 +130,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen = self.swap(
             subprocess, 'Popen', mock_check_call)
 
-        class MockErrorProcess(python_utils.OBJECT):
+        class MockErrorProcess:
 
             def __init__(self):
                 self.returncode = 1
@@ -271,7 +270,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -313,7 +312,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install',
                     '%s#egg=git-dep1' % (
@@ -380,7 +379,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -400,7 +399,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         }
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -450,7 +449,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         }
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
+            class Ret:
                 """Return object with required attributes."""
 
                 def __init__(self):
@@ -543,7 +542,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -594,8 +593,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency-5-0.5.3-py2.7.egg-info',
-                'dependency_6-0.5.3-py2.7.egg-info',
+                'dependency-5-0.5.3-py3.7.egg-info',
+                'dependency_6-0.5.3-py3.7.egg-info',
             ]
 
         def mock_is_dir(unused_path):
