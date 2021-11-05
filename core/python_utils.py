@@ -34,7 +34,6 @@ _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.5.30')
 sys.path.insert(0, _CERTIFI_PATH)
 
-import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -391,6 +390,7 @@ def _recursively_convert_to_str(value):
         return value.decode('utf-8')
     else:
         return value
+
 
 def create_enum(*sequential):
     """Creates a enumerated constant.
