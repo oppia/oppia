@@ -99,7 +99,7 @@ class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 
 
 class GenerateExplorationOpportunitySummariesJobTests(
-        job_test_utils.JobTestBase):
+    job_test_utils.JobTestBase):
 
     JOB_CLASS = (
         opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob)
@@ -295,6 +295,84 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
             opportunity_model.language_codes_needing_voice_artists, ['en'])
+
+    def test_job_returns_one_opportunity_for_multiple_topics_with_same_exp(
+        self
+    ) -> None:
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_2_ID,
+            name='topic 2 title',
+            canonical_name='topic 2 title',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic',
+            canonical_story_references=[{
+                'story_id': self.STORY_2_ID,
+                'story_is_published': False
+            }])
+        topic_model.update_timestamps()
+        topic_rights_model = self.create_model(
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
+        topic_rights_model.update_timestamps()
+
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_2_ID,
+            title='story 2 title',
+            language_code='cs',
+            story_contents_schema_version=1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node 2 title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.EXP_1_ID,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
+        story_model.update_timestamps()
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS')
+        ])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 1)
+
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.EXP_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunity_model is not None
+        self.assertEqual(opportunity_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(opportunity_model.topic_name, 'topic title')
+        self.assertEqual(opportunity_model.story_id, self.STORY_1_ID)
+        self.assertEqual(opportunity_model.story_title, 'story title')
+        self.assertEqual(opportunity_model.chapter_title, 'node title')
+        self.assertEqual(opportunity_model.content_count, 1)
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+            opportunity_model.incomplete_translation_language_codes,
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
+        self.assertEqual(opportunity_model.translation_counts, {})
+        self.assertEqual(
+            opportunity_model.language_codes_needing_voice_artists, ['cs'])
 
     def test_generation_job_fails_when_story_id_is_not_available(self) -> None:
         self.topic_model.canonical_story_references.append({

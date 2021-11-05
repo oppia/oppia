@@ -38,6 +38,7 @@ from typing import Dict, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import story_models
@@ -50,6 +51,7 @@ if MYPY: # pragma: no cover
     models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.story,
     models.NAMES.topic
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
@@ -150,24 +152,34 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                             topic, story, exps_dict[exp_id]))
 
             exploration_opportunity_summary_model_list = []
-            for opportunity in exploration_opportunity_summary_list:
-                model = opportunity_models.ExplorationOpportunitySummaryModel(
-                    id=opportunity.id,
-                    topic_id=opportunity.topic_id,
-                    topic_name=opportunity.topic_name,
-                    story_id=opportunity.story_id,
-                    story_title=opportunity.story_title,
-                    chapter_title=opportunity.chapter_title,
-                    content_count=opportunity.content_count,
-                    incomplete_translation_language_codes=(
-                        opportunity.incomplete_translation_language_codes),
-                    translation_counts=opportunity.translation_counts,
-                    language_codes_needing_voice_artists=(
-                        opportunity.language_codes_needing_voice_artists),
-                    language_codes_with_assigned_voice_artists=(
-                        opportunity.language_codes_with_assigned_voice_artists))
-                model.update_timestamps()
-                exploration_opportunity_summary_model_list.append(model)
+            with datastore_services.get_ndb_context():
+                for opportunity in exploration_opportunity_summary_list:
+                    model = (
+                        opportunity_models.ExplorationOpportunitySummaryModel(
+                            id=opportunity.id,
+                            topic_id=opportunity.topic_id,
+                            topic_name=opportunity.topic_name,
+                            story_id=opportunity.story_id,
+                            story_title=opportunity.story_title,
+                            chapter_title=opportunity.chapter_title,
+                            content_count=opportunity.content_count,
+                            incomplete_translation_language_codes=(
+                                opportunity
+                                .incomplete_translation_language_codes
+                            ),
+                            translation_counts=opportunity.translation_counts,
+                            language_codes_needing_voice_artists=(
+                                opportunity
+                                .language_codes_needing_voice_artists
+                            ),
+                            language_codes_with_assigned_voice_artists=(
+                                opportunity
+                                .language_codes_with_assigned_voice_artists
+                            )
+                        )
+                    )
+                    model.update_timestamps()
+                    exploration_opportunity_summary_model_list.append(model)
 
             return {
                 'status': 'SUCCESS',
@@ -237,6 +249,11 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                 lambda result: result['status'] == 'SUCCESS')
             | 'Fetch the models to be put' >> beam.FlatMap(
                 lambda result: result['models'])
+            | 'Add ID as a key' >> beam.WithKeys(lambda model: model.id)  # pylint: disable=no-value-for-parameter
+            | 'Allow only one item per key' >> (
+                beam.combiners.Sample.FixedSizePerKey(1))
+            | 'Remove the IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Flatten the list of lists of models' >> beam.FlatMap(lambda x: x)
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 

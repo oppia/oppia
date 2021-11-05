@@ -527,30 +527,6 @@ def get_personal_access_token():
     return personal_access_token
 
 
-def check_blocking_bug_issue_count(repo):
-    """Checks the number of unresolved blocking bugs.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Raises:
-        Exception. Number of unresolved blocking bugs is not zero.
-        Exception. The blocking bug milestone is closed.
-    """
-    blocking_bugs_milestone = repo.get_milestone(
-        number=constants.release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
-    if blocking_bugs_milestone.state == 'closed':
-        raise Exception('The blocking bug milestone is closed.')
-    if blocking_bugs_milestone.open_issues:
-        open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
-            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
-        raise Exception(
-            'There are %s unresolved blocking bugs. Please ensure '
-            'that they are resolved before release summary generation.' % (
-                blocking_bugs_milestone.open_issues))
-
-
 def check_prs_for_current_release_are_released(repo):
     """Checks that all pull requests for current release have a
     'PR: released' label.
