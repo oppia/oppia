@@ -25,7 +25,7 @@ class TakeoutData:
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(
-        self, 
+        self,
         user_data: Dict[str, Dict[str, Any]],
         user_images: List[TakeoutImage]
     ) -> None:
