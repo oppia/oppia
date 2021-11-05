@@ -293,7 +293,7 @@ class SearchHandler(base.BaseHandler):
             if language_code_string else [])
 
         # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
-        search_offset = self.normalized_request.get('cursor')
+        search_offset = self.normalized_request.get('offset')
         search_offset = int(search_offset) if search_offset else None
 
         activity_list, new_search_offset = get_matching_activity_dicts(

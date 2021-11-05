@@ -253,7 +253,7 @@ export class SearchService {
     let queryUrl = this.getQueryUrl(this.getCurrentUrlQueryString());
 
     if (this._searchCursor) {
-      queryUrl += '&cursor=' + this._searchCursor;
+      queryUrl += '&offset=' + this._searchCursor;
     }
 
     this._isCurrentlyFetchingResults = true;
