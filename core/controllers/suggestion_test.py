@@ -742,8 +742,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 },
                 'description': 'test',
                 'files': {'translation_image.png': raw_image},
-            }, csrf_token=csrf_token
-            )
+            },
+            csrf_token=csrf_token
+        )
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -976,9 +977,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
-                'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, upload_files=(
-                ('img.png', 'img.png', raw_image),))
+                'skill_difficulty': 0.6,
+                'files': {'img.png': raw_image}
+            },
+            csrf_token=csrf_token,
+            )
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -1635,7 +1638,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            },
+            csrf_token=csrf_token, expected_status_int=400
+        )
 
         self.assertIn(
             'No image data provided for file with name file.svg.',
