@@ -203,18 +203,9 @@ class SetupTests(test_utils.GenericTestBase):
                 'pythonpath-in-windows-7'])
 
     def test_python_version_testing_with_python2_wrong_code(self):
-        check_call_swap = (
-            self.swap_to_always_return(subprocess, 'check_call', 1))
+        check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
         with self.python2_print_swap, self.version_info_py37_swap:
-            with check_call_swap, self.assertRaisesRegexp(SystemExit, '1'):
-                setup.test_python_version()
-
-    def test_python_version_testing_without_python2(self):
-        check_call_swap = (
-            self.swap_to_always_raise(subprocess, 'check_call', Exception))
-
-        with self.version_info_py37_swap, self.python2_print_swap:
             with check_call_swap, self.assertRaisesRegexp(SystemExit, '1'):
                 setup.test_python_version()
 

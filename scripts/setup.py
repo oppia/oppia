@@ -73,14 +73,8 @@ def test_python_version():
     # Verify that Python 2 is available. Python 2 is needed for the
     # app_devserver. See the Google Cloud docs:
     # https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
-    try:
-        return_code = subprocess.check_call(
-            ['python2', '-V'], stderr=subprocess.DEVNULL)
-        python2_is_available = return_code == 0
-    except Exception:
-        python2_is_available = False
-
-    if not python2_is_available:
+    return_code = subprocess.call(['python2', '-V'], stderr=subprocess.DEVNULL)
+    if return_code != 0:
         print(
             '\033[91m'
             'The Oppia server needs Python 2 to be installed. '
