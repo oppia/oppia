@@ -64,11 +64,6 @@ CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
 CMD_CREATE_NEW = 'create_new'
 
-# Possible allowed commands for question change.
-LIST_CMD_QUESTION_CHANGE = [
-    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION
-]
-
 
 class QuestionChange(change_domain.BaseChange):
     """Domain object for changes made to question object.
