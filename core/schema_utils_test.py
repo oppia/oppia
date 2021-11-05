@@ -16,8 +16,7 @@
 
 """Tests for object schema definitions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import inspect
 import re
@@ -1360,7 +1359,7 @@ class ValidateClassForTesting:
         self.arg_b = arg_b
 
     @classmethod
-    def from_dict(cls, obj: Dict[str, str]) -> 'ValidateClassForTesting':
+    def from_dict(cls, obj: Dict[str, str]) -> ValidateClassForTesting:
         """Return the ValidateClassForTesting object from a dict.
 
         Args:

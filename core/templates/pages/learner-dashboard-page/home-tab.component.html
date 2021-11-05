@@ -60,7 +60,9 @@
       </div>
     </div>
   </div>
-  <div class="empty-suggested-for-you" *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
+  <div [ngStyle]="isLanguageRTL() ? {'padding': '32px 32px 0 113px'} : {'padding': '32px 113px 0 32px'}"
+       class="empty-suggested-for-you"
+       *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="empty-suggested-for-you-section">
@@ -74,7 +76,6 @@
     color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
-    text-align: left;
   }
   .home-tab .continue-where-you-left-off {
     background-color: #fff;
@@ -109,13 +110,11 @@
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 24px;
     margin: 0;
-    text-align: left;
   }
   .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
     color: #333;
     font-size: 18px;
     padding-top: 32px;
-    text-align: left;
   }
   .home-tab .suggested-for-you .classroom-card {
     background-color: #EEE ;
@@ -148,8 +147,6 @@
   .home-tab .empty-suggested-for-you-section {
     color: #333;
     font-size: 18px;
-    padding: 32px 113px 0 0;
-    text-align: left;
   }
   .home-tab .suggested-for-you,
   .home-tab .empty-suggested-for-you {
@@ -224,7 +221,7 @@
       font-size: 15px;
     }
     .home-tab .empty-suggested-for-you-section {
-      padding: 32px 32px 0 0;
+      padding: 32px 32px 32px 0;
     }
     .home-tab .suggested-for-you .topic-summary-tile-scroll {
       overflow: scroll;
@@ -255,7 +252,7 @@
       overflow: scroll;
     }
     .home-tab .empty-suggested-for-you-section {
-      padding: 17px 32px 0 0;
+      padding: 17px 32px 17px 0;
     }
   }
 
