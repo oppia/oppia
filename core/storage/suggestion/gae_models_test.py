@@ -460,7 +460,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
-        with self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1):
+        with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
             suggestions = (
                 suggestion_models.GeneralSuggestionModel
                 .get_translation_suggestions_in_review_with_exp_id(
@@ -588,7 +588,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_10', self.translation_language_code)
 
-        with self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1):
+        with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
             suggestion_model_results = (
                 suggestion_models
                 .GeneralSuggestionModel
