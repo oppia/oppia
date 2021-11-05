@@ -245,9 +245,7 @@ def yaml_from_dict(dictionary: Dict, width: int =80) -> str:
         str. Converted yaml of the passed dictionary.
     """
     return yaml.dump(
-            dictionary,
-            allow_unicode=True,
-            width=width
+            dictionary, allow_unicode=True, width=width
     )
 
 

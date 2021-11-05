@@ -2694,7 +2694,7 @@ class State(python_utils.OBJECT):
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             python_utils.reraise_exception()
 
-        return utils.yaml_from_dict(state.to_dict())
+        return utils.yaml_from_dict(state.to_dict(), width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a

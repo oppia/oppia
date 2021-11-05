@@ -63,7 +63,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
-
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user

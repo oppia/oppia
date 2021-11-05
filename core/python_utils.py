@@ -527,16 +527,6 @@ def _recursively_convert_to_str(value):
     else:
         return value
 
-def reraise_exception():
-    """Reraise exception with complete stacktrace."""
-    # TODO(#11547): This method can be replace by 'raise e' after we migrate
-    # to Python 3.
-    # This code is needed in order to reraise the error properly with
-    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-    exec_info = sys.exc_info()
-    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
-
-
 def create_enum(*sequential):
     """Creates a enumerated constant.
 
