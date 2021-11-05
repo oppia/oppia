@@ -224,6 +224,8 @@ class BaseChange:
         return base_change_dict
 
     def __getattr__(self, name: str) -> str:
+        # AttributeError needs to be thrown in order to make 
+        # instances of this class picklable.
         try:
             return self.__dict__[name]
         except KeyError:
