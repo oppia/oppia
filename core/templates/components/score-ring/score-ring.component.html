@@ -1,31 +1,32 @@
 <svg class="score-ring"
-     width="96"
-     height="96">
-  <text x="29" y="54" fill="#015C53"> {{ score }}%</text>
+     width="300"
+     height="300">
+  <text x="100" y="160" fill="#015C53"> {{ score }}%</text>
   <circle class="score-outer-ring-circle"
           [attr.stroke]="getScoreOuterRingColor()"
-          stroke-width="5"
+          stroke-width="13"
           fill="transparent"
-          r="43"
-          cx="50"
-          cy="50">
+          r="125"
+          cx="150"
+          cy="150">
   </circle>
   <circle class="score-ring-circle"
           [attr.stroke]="getScoreRingColor()"
-          stroke-width="5"
+          stroke-width="13"
           fill="transparent"
-          r="43"
-          cx="47"
-          cy="50">
+          r="125"
+          cx="150"
+          cy="150">
   </circle>
 </svg>
 <style>
   .score-ring {
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 18px;
+    font-size: 48px;
     font-style: normal;
     font-weight: normal;
-    line-height: 40px;
+    line-height: 60px;
+    margin: 0;
     text-align: center;
   }
 

@@ -160,7 +160,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.currentProgress = 0;
         ctrl.totalScore = 0.0;
         ctrl.allQuestions = 0;
-        ctrl.finalCorrect = 0;
+        ctrl.finalCorrect = 0.0;
         ctrl.scorePerSkillMapping = {};
         ctrl.testIsPassed = true;
       };
@@ -352,7 +352,6 @@ angular.module('oppia').component('questionPlayer', {
           if (questionData.answers) {
             wrongAnswerPenalty = (
               (questionData.answers.length - 1) * WRONG_ANSWER_PENALTY);
-            ctrl.finalCorrect += 1;
           }
           if (questionData.usedHints) {
             totalHintsPenalty = (
@@ -385,6 +384,7 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].total += 1.0;
           }
         }
+        ctrl.finalCorrect = ctrl.totalScore;
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);
         $scope.resultsLoaded = true;

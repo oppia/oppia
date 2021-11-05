@@ -33,9 +33,13 @@
     </div>
 
     <div class="oppia-result-body">
-      <oppia-score-ring [score]="$ctrl.totalScore"
-                        [test-is-passed]="$ctrl.testIsPassed">
-      </oppia-score-ring>
+      <div class="score-ring-outer">
+        <div class="score-ring-inner">
+          <oppia-score-ring [score]="$ctrl.totalScore"
+                            [test-is-passed]="$ctrl.testIsPassed">
+          </oppia-score-ring>
+        </div>
+      </div>
 
       <div class="question-player-skills-results">
         <h3 class="oppia-result-detail-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
@@ -55,7 +59,7 @@
           </div>
           <div class="final-result">
             <span class="score-final-description">Answers Correct:</span>
-            <span class="score-final score-recieved"><[$ctrl.finalCorrect]></span>
+            <span class="score-final score-recieved"><[$ctrl.finalCorrect.toFixed(2)]></span>
             <span class="score-final">/ <[$ctrl.allQuestions]></span>
           </div>
         </div>
@@ -83,6 +87,20 @@
 </div>
 
 <style>
+  .score-ring-outer {
+    height: 96px;
+    width: 96px;
+  }
+
+  .score-ring-inner {
+    -webkit-transform: scale(0.384);
+    -moz-transform: scale(0.384);
+    -o-transform: scale(0.384);
+    transform: scale(0.384);
+    -webkit-transform-origin: left top;
+    transform-origin: left top;
+  }
+
   .score-final {
     font-size: 18px;
     font-weight: bold;

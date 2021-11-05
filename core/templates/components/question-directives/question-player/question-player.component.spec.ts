@@ -232,15 +232,11 @@ describe('QuestionPlayerComponent', () => {
   it('should get html for action button icon', () => {
     expect(ctrl.getActionButtonIconHtml(
       'REVIEW_LOWEST_SCORED_SKILL').toString())
-      .toBe(
-        '&#10;          &#10;          &#10;          <img alt="" ' +
-        'class="action-button-icon" src="/assets/images/icons/' +
-        'rocket@2x.png">&#10;          '
-      );
+      .toBe('<i class="material-icons md-18 action-button-icon">&#59497;</i>');
     expect(ctrl.getActionButtonIconHtml('RETRY_SESSION').toString())
-      .toBe('<i class="material-icons md-36 action-button-icon">&#58837;</i>');
+      .toBe('<i class="material-icons md-18 action-button-icon">&#58837;</i>');
     expect(ctrl.getActionButtonIconHtml('DASHBOARD').toString())
-      .toBe('<i class="material-icons md-36 action-button-icon">&#59530;</i>');
+      .toBe('<i class="material-icons md-18 action-button-icon">&#59530;</i>');
   });
 
   it('should open review lowest scored skill modal when use clicks ' +
