@@ -1,5 +1,5 @@
 <div class="oppia-topic-viewer-container position-relative">
-  <div class="oppia-topic-viewer-tabs-container" headroom>
+  <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
     <div class="topic-viewer-tabs-list">
       <ul class="topic-viewer-tabs">
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}">
@@ -109,8 +109,17 @@
     z-index: 1000;
   }
 
+  .oppia-topic-viewer-container /deep/ .oppia-background-banner {
+    margin-top: -50px;
+  }
+
   .oppia-topic-viewer-container .headroom--unpinned {
     transform: translateY(-150%);
+  }
+
+  .oppia-topic-viewer-container .headroom {
+    transition: transform 200ms linear;
+    will-change: transform;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
