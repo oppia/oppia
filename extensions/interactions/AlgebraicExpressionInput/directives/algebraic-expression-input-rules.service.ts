@@ -27,6 +27,9 @@ import {
   AlgebraicExpressionRuleInputsWithPlaceholder,
   AlgebraicExpressionRuleInputsWithoutPlaceholder
 } from 'interactions/rule-input-defs';
+import {
+  NumericExpressionInputRulesService
+} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service'
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +39,15 @@ export class AlgebraicExpressionInputRulesService {
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
+
+    // If the answer and the inputs are both purely numeric, we use the numeric
+    // expression input's rule functions.
+    if (!mis.containsVariables(answer) && !mis.containsVariables(inputs.x)) {
+      let numericExpressionRuleService = (
+        new NumericExpressionInputRulesService());
+      return numericExpressionRuleService.MatchesExactlyWith(answer, inputs);
+    }
+
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
@@ -51,6 +63,15 @@ export class AlgebraicExpressionInputRulesService {
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
+
+    // If the answer and the inputs are both purely numeric, we use the numeric
+    // expression input's rule functions.
+    if (!mis.containsVariables(answer) && !mis.containsVariables(inputs.x)) {
+      let numericExpressionRuleService = (
+        new NumericExpressionInputRulesService());
+      return numericExpressionRuleService.IsEquivalentTo(answer, inputs);
+    }
+
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
@@ -75,6 +96,15 @@ export class AlgebraicExpressionInputRulesService {
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     // At least one term should match between answer and input.
     let mis = new MathInteractionsService();
+
+    // If the answer and the inputs are both purely numeric, we use the numeric
+    // expression input's rule functions.
+    if (!mis.containsVariables(answer) && !mis.containsVariables(inputs.x)) {
+      let numericExpressionRuleService = (
+        new NumericExpressionInputRulesService());
+      return numericExpressionRuleService.ContainsSomeOf(answer, inputs);
+    }
+
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
@@ -99,6 +129,15 @@ export class AlgebraicExpressionInputRulesService {
     // There must be at least one term in the input that is not present in the
     // answer.
     let mis = new MathInteractionsService();
+
+    // If the answer and the inputs are both purely numeric, we use the numeric
+    // expression input's rule functions.
+    if (!mis.containsVariables(answer) && !mis.containsVariables(inputs.x)) {
+      let numericExpressionRuleService = (
+        new NumericExpressionInputRulesService());
+      return numericExpressionRuleService.OmitsSomeOf(answer, inputs);
+    }
+
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);

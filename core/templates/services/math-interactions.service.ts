@@ -160,12 +160,8 @@ export class MathInteractionsService {
         variablesList[i] = greekNameToSymbolMap[variablesList[i]];
       }
     }
-    if (variablesList.length === 0) {
-      this.warningText = 'It looks like you have entered only ' +
-      'numbers. Make sure to include the necessary variables' +
-      ' mentioned in the question.';
-      return false;
-    } else if (validVariablesList.length !== 0) {
+
+    if (validVariablesList.length !== 0) {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
           this.warningText = (
@@ -494,6 +490,11 @@ export class MathInteractionsService {
 
     // Checks if all terms have matched.
     return termsWithPlaceholders.length + inputTerms.length === 0;
+  }
+
+  containsVariables(expressionString: string): boolean {
+    let variablesList = nerdamer(expressionString).variables();
+    return variablesList.length > 0;
   }
 }
 

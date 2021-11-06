@@ -544,11 +544,11 @@ class _Validators:
         if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
             return False
 
-        expression_is_algebraic = expression_parser.is_algebraic(obj) # type: ignore[no-untyped-call]
-        # If the algebraic flag is true, expression_is_algebraic should
-        # also be true, otherwise both should be false which would imply
-        # that the expression is numeric.
-        return not algebraic ^ expression_is_algebraic
+        expression_contains_variables = (
+            expression_parser.contains_variables(obj)) # type: ignore[no-untyped-call]
+        # This validates the check that ensures that
+        # numeric expressions don't contain variables.
+        return algebraic or not expression_contains_variables
 
     @staticmethod
     def is_valid_algebraic_expression(obj: str) -> bool:

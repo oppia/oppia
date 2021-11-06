@@ -23,7 +23,7 @@ from core.tests import test_utils
 
 
 class HelperFunctionsUnitTests(test_utils.GenericTestBase):
-    """Test the 'contains_balanced_brackets' and 'is_algebraic' helper
+    """Test the 'contains_balanced_brackets' and 'contains_variables' helper
     functions.
     """
 
@@ -53,32 +53,32 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.contains_balanced_brackets('4/{0/]'))
         self.assertFalse(expression_parser.contains_balanced_brackets('(a/2]'))
 
-    def test_is_algebraic(self):
-        """Tests for is_algebraic method."""
-        self.assertTrue(expression_parser.is_algebraic('a^2.3'))
-        self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
-        self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
-        self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
+    def test_contains_variables(self):
+        """Tests for contains_variables method."""
+        self.assertTrue(expression_parser.contains_variables('a^2.3'))
+        self.assertTrue(expression_parser.contains_variables('abs(alpha)'))
+        self.assertTrue(expression_parser.contains_variables('alpha/gamma'))
+        self.assertTrue(expression_parser.contains_variables('A + 2/3'))
         # The following tests might seem as invalid but the individual letters
         # will be joined via '*' during tokenization which makes them valid.
-        self.assertTrue(expression_parser.is_algebraic('Alpha'))
-        self.assertTrue(expression_parser.is_algebraic('invalid + 2'))
-        self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
+        self.assertTrue(expression_parser.contains_variables('Alpha'))
+        self.assertTrue(expression_parser.contains_variables('invalid + 2'))
+        self.assertTrue(expression_parser.contains_variables('alpha + bet/22'))
 
-        self.assertFalse(expression_parser.is_algebraic('1 + 2'))
-        self.assertFalse(expression_parser.is_algebraic('1^2^3/4'))
-        self.assertFalse(expression_parser.is_algebraic('1'))
-        self.assertFalse(expression_parser.is_algebraic('sqrt(4/4)'))
-        self.assertFalse(expression_parser.is_algebraic('tan(30)'))
+        self.assertFalse(expression_parser.contains_variables('1 + 2'))
+        self.assertFalse(expression_parser.contains_variables('1^2^3/4'))
+        self.assertFalse(expression_parser.contains_variables('1'))
+        self.assertFalse(expression_parser.contains_variables('sqrt(4/4)'))
+        self.assertFalse(expression_parser.contains_variables('tan(30)'))
 
         with self.assertRaisesRegexp(Exception, 'Invalid bracket pairing.'):
-            expression_parser.is_algebraic('1 +2)')
+            expression_parser.contains_variables('1 +2)')
         with self.assertRaisesRegexp(Exception, 'Invalid character: ~.'):
-            expression_parser.is_algebraic('a~2')
+            expression_parser.contains_variables('a~2')
         with self.assertRaisesRegexp(Exception, 'Invalid character: !.'):
-            expression_parser.is_algebraic('4! 2')
+            expression_parser.contains_variables('4! 2')
         with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
-            expression_parser.is_algebraic('alpha + bet/22.3.4')
+            expression_parser.contains_variables('alpha + bet/22.3.4')
 
     def test_tokenize(self):
         """Tests for tokenize method."""
