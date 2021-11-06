@@ -51,7 +51,7 @@
               <div class="oppia-skill-score-container">
                 <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScoreBar(scorePerSkill)}"></div>
               </div>
-              <div class="score-outer">
+              <div class="score-text-outer">
                 <span class="score-recieved"><[scorePerSkill.score.toFixed(2)]></span>
                 <span class="score-total">/ <[scorePerSkill.total]></span>
               </div>
@@ -138,7 +138,8 @@
 
   .question-player-skills-results {
     margin-left: 40px;
-    width: 390px;
+    max-width: 390px;
+    width: 60%;
   }
 
   .oppia-result-body {
@@ -351,7 +352,7 @@
     border: 1px solid rgba(0, 0, 0, 0.25);
     border-radius: 20px;
     height: 17px;
-    width: 300px;
+    width: 80%;
   }
 
   .list-item {
@@ -412,7 +413,18 @@
   }
 
   .oppia-result-detail-header {
+    padding-top: 10px;
     text-align: center;
+  }
+
+  .score-text-outer {
+    font-size: 12px;
+    margin-left: 5px;
+    text-align: right;
+  }
+
+  .score-final {
+    font-size: 16px;
   }
 }
 
