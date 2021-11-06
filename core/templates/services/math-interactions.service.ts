@@ -147,7 +147,7 @@ export class MathInteractionsService {
 
     if (expressionString.match(/\w\^((\w+\^)|(\(.*\^.*\)))/g)) {
       this.warningText = 'Your expression contains an exponent in an exponent.';
-      return false
+      return false;
     }
 
     let exponents = expressionString.match(/\^((\([^\(]*\))|(\w+))/g);
