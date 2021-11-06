@@ -67,6 +67,10 @@ angular.module('oppia').controller(
         }
       };
       $scope.canEditTranslation = false;
+      // The 'html' value is passed as an object as it is required for
+      // schema-based-editor. Otherwise the corrrectly updated value for
+      // the translation is not recieved from the editor when the translation
+      // is edited by the reviewer.
       $scope.editedContent = {
         html: $scope.translationHtml
       }
