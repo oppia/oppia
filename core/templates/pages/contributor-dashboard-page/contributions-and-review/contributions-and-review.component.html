@@ -93,12 +93,18 @@
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
     color: white;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: bold;
     margin-right: 20%;
     padding-left: 20%;
     text-align: left;
     width: 80%;
+  }
+
+  @media only screen and (max-width: 1500px){
+    contributions-and-review .oppia-contributions-navbar-button{
+      font-size: 1.6vw;
+    }
   }
 
   contributions-and-review .oppia-contributions-active-navbar,
@@ -111,11 +117,17 @@
     bottom: 110%;
     color: #fff;
     content: attr(navbar-label);
-    font-size: 20px;
+    font-size: 30px;
     font-weight: bold;
     margin-left: 10%;
     position: absolute;
     width: 90%;
+  }
+
+  @media only screen and (max-width: 1500px){
+    contributions-and-review .oppia-contributions-navbar-items-list::before{
+      font-size: 2vw;
+    }
   }
 
   contributions-and-review .oppia-login-required {
