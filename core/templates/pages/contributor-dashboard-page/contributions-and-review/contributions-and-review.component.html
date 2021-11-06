@@ -101,12 +101,6 @@
     width: 80%;
   }
 
-  @media only screen and (max-width: 1500px){
-    contributions-and-review .oppia-contributions-navbar-button{
-      font-size: 1.6vw;
-    }
-  }
-
   contributions-and-review .oppia-contributions-active-navbar,
   contributions-and-review .oppia-contributions-navbar-button:hover {
     background-color: #0b6c63;
@@ -124,14 +118,17 @@
     width: 90%;
   }
 
-  @media only screen and (max-width: 1500px){
-    contributions-and-review .oppia-contributions-navbar-items-list::before{
-      font-size: 2vw;
-    }
-  }
-
   contributions-and-review .oppia-login-required {
     height: 100%;
     width: 100%;
+  }
+
+  @media only screen and (max-width: 1500px){
+    contributions-and-review .oppia-contributions-navbar-button{
+      font-size: 1.6vw;
+    }
+    contributions-and-review .oppia-contributions-navbar-items-list::before{
+      font-size: 2vw;
+    }
   }
 </style>
