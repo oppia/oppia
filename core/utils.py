@@ -337,6 +337,7 @@ def convert_image_binary_to_data_str(content: bytes) -> str:
 
     Returns:
         str. Data created from the binary content of the image.
+
     """
     base64_encoded_data = base64.b64encode(content)
     return base64_encoded_data.decode('utf-8')
@@ -350,6 +351,7 @@ def convert_image_str_to_data_binary(content: str) -> bytes:
 
     Returns:
         binary. Data created from the str content of the image.
+
     """
     encoded_data = content.encode('utf-8')
     return base64.decodebytes(encoded_data)
