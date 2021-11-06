@@ -39,13 +39,16 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
+  // The thumbnail and URL fragment might not be set,
+  // then they will be 'null'.
   _thumbnailFilename: string | null;
   _thumbnailBgColor: string | null;
   _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string | null, thumbnailBgColor: string | null,
+      thumbnailFilename: string | null,
+      thumbnailBgColor: string | null,
       urlFragment: string | null) {
     this._id = subtopicId;
     this._title = title;
@@ -81,6 +84,7 @@ export class Subtopic {
     this._title = title;
   }
 
+  // Returns 'null' if there is no url fragment.
   getUrlFragment(): string | null {
     return this._urlFragment;
   }
@@ -93,10 +97,11 @@ export class Subtopic {
     let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
       constants.VALID_URL_FRAGMENT_REGEX);
-    if (this._urlFragment !== null) {
-      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
-        issues.push('Subtopic url fragment is invalid.');
-      }
+    if (
+      this._urlFragment &&
+      !VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)
+    ) {
+      issues.push('Subtopic url fragment is invalid.');
     }
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
@@ -162,6 +167,7 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
+  // Returns 'null' if there is no thumbnail file.
   getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
@@ -170,6 +176,7 @@ export class Subtopic {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
+  // Returns 'null' if there is no thumbnail background color.
   getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }

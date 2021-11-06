@@ -14,8 +14,7 @@
 
 """Utility functions for managing server processes required by Oppia."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import logging
@@ -246,8 +245,12 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--project', feconf.OPPIA_PROJECT_ID,
         '--data-dir', common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
         '--host-port', emulator_hostport,
-        '--no-store-on-disk', '--consistency=1.0', '--quiet',
+        '--consistency=1.0',
+        '--quiet'
     ]
+
+    if clear_datastore:
+        emulator_args.append('--no-store-on-disk')
 
     with contextlib.ExitStack() as stack:
         data_dir_exists = os.path.exists(
