@@ -144,6 +144,24 @@ export class MathInteractionsService {
       }
       return false;
     }
+
+    if (expressionString.match(/\w\^((\w+\^)|(\(.*\^.*\)))/g)) {
+      this.warningText = 'Your expression contains an exponent in an exponent.';
+      return false
+    }
+
+    let exponents = expressionString.match(/\^((\([^\(]*\))|(\w+))/g);
+    if (exponents !== null) {
+      for (let exponent of exponents) {
+        exponent = exponent.replace(/^\^/g, '');
+        if (nerdamer(exponent).gt('5')) {
+          this.warningText = (
+            'Your expression contains an exponent with value greater than 5.');
+          return false;
+        }
+      }
+    }
+
     this.warningText = '';
     return true;
   }

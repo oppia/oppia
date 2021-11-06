@@ -211,6 +211,41 @@ describe('MathInteractionsService', () => {
       'Your answer contains invalid variable multiplication: a*4. ' +
       'The variable should come after the number: 4*a.');
 
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^y^z', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '3^4^5', ['a', 'x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^(y^z)', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^(y*a^z)', ['a', 'x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^6', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^(3+4)', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5.');
+
+    expect(mathInteractionsService.validateNumericExpression(
+      '5^100')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5.');
+
     expect(mathInteractionsService.validateNumericExpression(
       'a/2')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
