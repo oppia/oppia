@@ -67,9 +67,12 @@ angular.module('oppia').controller(
         }
       };
       $scope.canEditTranslation = false;
+      $scope.editedContent = {
+        html: $scope.translationHtml
+      }
 
       $scope.updateSuggestion = function() {
-        const updatedTranslation = $scope.editedContent;
+        const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
@@ -157,7 +160,6 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.change.data_format ===
             'set_of_unicode_string'
         );
-        $scope.editedContent = $scope.translationHtml;
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
@@ -259,11 +261,12 @@ angular.module('oppia').controller(
 
       $scope.editSuggestion = function() {
         $scope.startedEditing = true;
+        $scope.editedContent.html = $scope.translationHtml;
       };
 
       $scope.cancelEdit = function() {
         $scope.startedEditing = false;
-        $scope.editedContent = $scope.translationHtml;
+        $scope.editedContent.html = $scope.translationHtml;
       };
 
       $scope.cancel = function() {
