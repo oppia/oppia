@@ -73,7 +73,7 @@ angular.module('oppia').controller(
       // is edited by the reviewer.
       $scope.editedContent = {
         html: $scope.translationHtml
-      }
+      };
 
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
