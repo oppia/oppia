@@ -595,10 +595,22 @@ export class SvgEditorComponent implements OnInit {
             this.canvas.add(new fabric.Group(objs));
             this.groupCount += 1;
           });
+          this.centerContent();
         }) as unknown as (results: Object[], options) => void
       );
       this.changeDetectorRef.detectChanges();
     });
+  }
+
+  centerContent(): void {
+    let temporarySelection = new fabric.ActiveSelection(
+      this.canvas.getObjects(),
+      { canvas: this.canvas }
+    );
+    temporarySelection.scaleToWidth(this.canvas.getWidth());
+    temporarySelection.center();
+    this.canvas.setActiveObject(temporarySelection);
+    this.canvas.discardActiveObject();
   }
 
   validate(): boolean {
@@ -1593,8 +1605,10 @@ export class SvgEditorComponent implements OnInit {
   }
 
   setCanvasDimensions(): void {
-    this.canvas.setHeight(this.CANVAS_HEIGHT);
-    this.canvas.setWidth(this.CANVAS_WIDTH);
+    let dimensions = this.value && (
+      this.imagePreloaderService.getDimensionsOfImage(this.value));
+    this.canvas.setHeight(dimensions?.height || this.CANVAS_HEIGHT);
+    this.canvas.setWidth(dimensions?.width || this.CANVAS_WIDTH);
     this.canvas.renderAll();
   }
 
