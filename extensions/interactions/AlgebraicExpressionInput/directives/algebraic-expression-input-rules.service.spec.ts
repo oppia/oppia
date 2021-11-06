@@ -20,7 +20,7 @@ import { AlgebraicExpressionInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 
-describe('Algebraic expression input rules service', () => {
+fdescribe('Algebraic expression input rules service', () => {
   let algebraicRulesService: AlgebraicExpressionInputRulesService;
   let inputString;
 
@@ -117,6 +117,11 @@ describe('Algebraic expression input rules service', () => {
       '((3*x-1))^(2)', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith(
       '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
+
+    inputString = '6-(-4)';
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '6-(-4)', {x: inputString})).toBeTrue();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {
@@ -213,6 +218,11 @@ describe('Algebraic expression input rules service', () => {
       '9*(x)^(2)-6*x-1', {x: inputString})).toBeFalse();
     expect(algebraicRulesService.IsEquivalentTo(
       '((3*x-1))^(4)', {x: inputString})).toBeFalse();
+
+    inputString = '6-(-4)';
+
+    expect(algebraicRulesService.IsEquivalentTo(
+      '10', {x: inputString})).toBeTrue();
   });
 
   it('should have a correct ContainsSomeOf rule', () => {
