@@ -157,12 +157,6 @@ describe('MathInteractionsService', () => {
       'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '12+sqrt(4)', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered only numbers. Make sure to include' +
-      ' the necessary variables mentioned in the question.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
       'x-y=0', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
@@ -204,6 +198,18 @@ describe('MathInteractionsService', () => {
       '3.4.5 + 45/a', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer contains an invalid term: 3.4.5');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a4', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your answer contains invalid variable multiplication: a4. ' +
+      'The variable should come after the number: 4a.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a * 4', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your answer contains invalid variable multiplication: a*4. ' +
+      'The variable should come after the number: 4*a.');
 
     expect(mathInteractionsService.validateNumericExpression(
       'a/2')).toBeFalse();

@@ -122,6 +122,18 @@ export class MathInteractionsService {
         'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
+    let invalidMultiTerms = expressionString.match(
+      /([a-zA-Z]\d)|([a-zA-Z]\*\d)/g);
+    if (invalidMultiTerms !== null) {
+      this.warningText = (
+        'Your answer contains invalid variable multiplication: ' +
+        invalidMultiTerms[0] +
+        '. The variable should come after the number: ' +
+        [...invalidMultiTerms[0]].reverse().join('') + '.'
+      );
+      return false;
+    }
+
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
