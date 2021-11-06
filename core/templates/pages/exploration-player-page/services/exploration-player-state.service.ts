@@ -182,8 +182,7 @@ export class ExplorationPlayerStateService {
       function(questionDict) {
         return this.questionObjectFactory.createFromBackendDict(
           questionDict);
-      }
-    );
+      }, this);
     this.questionPlayerEngineService.init(
       questionObjects, successCallback, errorCallback);
   }

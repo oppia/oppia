@@ -357,7 +357,8 @@ describe('Exploration Player State Service', () => {
   it('should initialize question player services', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
-    let questions = [];
+    let questions = [questionBackendDict];
+    let questionObjects = [questionObject];
     let successCallback = () => {};
     let errorCallback = () => {};
 
@@ -367,7 +368,7 @@ describe('Exploration Player State Service', () => {
     expect(playerCorrectnessFeedbackEnabledService.init)
       .toHaveBeenCalledWith(true);
     expect(questionPlayerEngineService.init).toHaveBeenCalledWith(
-      questions, successCallback, errorCallback);
+      questionObjects, successCallback, errorCallback);
   });
 
   it('should set exploration mode', () => {
