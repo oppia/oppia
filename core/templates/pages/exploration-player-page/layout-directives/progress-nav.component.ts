@@ -107,7 +107,6 @@ export class ProgressNavComponent {
     this.directiveSubscriptions.add(
       this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
         () => {
-          console.error('sss');
           this.submit.emit();
         }
       )
