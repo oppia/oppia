@@ -191,8 +191,6 @@ def search_explorations(query, categories, language_codes, size, offset=None):
               fetch, None otherwise. If an offset is returned, it will be a
               web-safe string that can be used in URLs.
     """
-    # TODO(#11314): Change the offset to an int once the underlying search
-    # service is fully migrated to elasticsearch.
     return platform_search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, categories, language_codes,
         offset=offset, size=size, ids_only=True)
@@ -242,8 +240,6 @@ def search_collections(query, categories, language_codes, size, offset=None):
               otherwise. If an offset is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    # TODO(#11314): Change the offset to be an int instead once the underlying
-    # search service is migrated over to elasticsearch.
     return platform_search_services.search(
         query, SEARCH_INDEX_COLLECTIONS, categories, language_codes,
         offset=offset, size=size, ids_only=True)

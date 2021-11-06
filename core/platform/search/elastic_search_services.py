@@ -163,9 +163,6 @@ def search(
 
     This function also creates the index if it does not exist yet.
 
-    TODO(#11314): Change the offset argument to an int once the dependency
-    on gae_search_services.py is removed from the codebase.
-
     Args:
         query_string: str. The terms that the user is searching for.
         index_name: str. The name of the index. Use '_all' or empty string to
@@ -259,8 +256,6 @@ def search(
 
     matched_search_docs = response['hits']['hits']
 
-    # TODO(#11314): Convert all offsets in this function to ints once the
-    # elasticsearch migration is fully complete.
     resulting_offset = None
     if len(matched_search_docs) == num_docs_to_fetch:
         # There is at least one more page of results to fetch. Trim the results
