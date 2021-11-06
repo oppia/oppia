@@ -319,8 +319,6 @@
     "core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts",
     "core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.ts",
     "core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts",
-    "core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts",
-    "core/templates/pages/contributor-dashboard-page/services/translate-text.service.spec.ts",
     "core/templates/pages/creator-dashboard-page/modal-templates/create-activity-modal.component.ts",
     "core/templates/pages/creator-dashboard-page/modal-templates/create-activity-modal.component.spec.ts",
     "core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.component.ts",
