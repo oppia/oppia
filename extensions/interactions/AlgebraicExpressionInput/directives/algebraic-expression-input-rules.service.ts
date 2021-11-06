@@ -27,9 +27,7 @@ import {
   AlgebraicExpressionRuleInputsWithPlaceholder,
   AlgebraicExpressionRuleInputsWithoutPlaceholder
 } from 'interactions/rule-input-defs';
-import {
-  NumericExpressionInputRulesService
-} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
 @Injectable({
   providedIn: 'root'
