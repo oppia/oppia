@@ -443,7 +443,7 @@ describe('Exploration Player State Service', () => {
   it('should init question player', fakeAsync(() => {
     spyOn(explorationPlayerStateService, 'setQuestionPlayerMode');
     spyOn(questionBackendApiService, 'fetchQuestionsAsync')
-      .and.returnValue(Promise.resolve([questionObject]));
+      .and.returnValue(Promise.resolve([questionBackendDict]));
     spyOn(explorationPlayerStateService.onTotalQuestionsReceived, 'emit');
     spyOn(explorationPlayerStateService, 'initializeQuestionPlayerServices');
 

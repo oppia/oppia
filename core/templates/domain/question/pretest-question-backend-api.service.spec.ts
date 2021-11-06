@@ -147,7 +147,10 @@ describe('Pretest question backend API service', function() {
         }
       },
       language_code: 'en',
-      version: 1
+      version: 1,
+      question_state_data_schema_version: 0,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: []
     }]
   };
 
