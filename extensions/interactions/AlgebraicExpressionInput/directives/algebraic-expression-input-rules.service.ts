@@ -52,9 +52,7 @@ export class AlgebraicExpressionInputRulesService {
 
     // TODO(#13083): Remove the 'as unknown as boolean' part after the library
     // typing is fixed.
-    return nerdamer(
-      nerdamer(answer).text()
-    ).eq(nerdamer(inputs.x).text()) as unknown as boolean;
+    return answer === inputs.x;
   }
 
   IsEquivalentTo(

@@ -32,9 +32,10 @@ describe('Numeric expression input rules service', () => {
     inputString = '6-(-4)';
 
     expect(neirs.MatchesExactlyWith('6-(-4)', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith('-(-4)+6', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith('6+4', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesExactlyWith('6 - (-4)', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith('-(-4)+6', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesExactlyWith('6+4', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('10', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('3*2-(-4)', {x: inputString})).toBeFalse();
 
@@ -42,10 +43,10 @@ describe('Numeric expression input rules service', () => {
     inputString = '3*10^(-5)';
 
     expect(neirs.MatchesExactlyWith('3*10^(-5)', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith('3/10^5', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith(
-      '(10^(-5))*3', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith('3/10^5', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesExactlyWith(
+      '(10^(-5))*3', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith(
       '30*10^(-6)', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('0.00003', {x: inputString})).toBeFalse();
@@ -57,9 +58,9 @@ describe('Numeric expression input rules service', () => {
 
     expect(neirs.MatchesExactlyWith(
       '1000 + 200 + 30 + 4 + 0.5 + 0.06', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith(
-      '0.06 + 0.5 + 4 + 30 + 200 + 1000', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith(
+      '0.06 + 0.5 + 4 + 30 + 200 + 1000', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('1234.56', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith(
       '1234 + 56/10', {x: inputString})).toBeFalse();
@@ -69,11 +70,9 @@ describe('Numeric expression input rules service', () => {
 
     inputString = '2*2*3*3';
 
-    expect(neirs.MatchesExactlyWith(
-      '2*2*3*3', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith(
-      '2*3*2*3', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesExactlyWith('2*2*3*3', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith('2*3*2*3', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('2*2*3*2*1', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('2*2*9', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('4*3^2', {x: inputString})).toBeFalse();
