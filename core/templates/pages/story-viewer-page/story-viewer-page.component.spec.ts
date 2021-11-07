@@ -31,6 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 
 class MockAssetsBackendApiService {
@@ -47,6 +48,7 @@ describe('Story Viewer Page component', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let urlService: UrlService = null;
   let userService: UserService = null;
+  let windowDimensionsService: WindowDimensionsService;
   let pageTitleService = null;
   let windowRef: WindowRef;
   let _samplePlaythroughObject = null;
@@ -70,7 +72,8 @@ describe('Story Viewer Page component', () => {
       providers: [
         {
           provide: assetsBackendApiService,
-          useClass: MockAssetsBackendApiService
+          useClass: MockAssetsBackendApiService,
+          WindowDimensionsService,
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -79,6 +82,7 @@ describe('Story Viewer Page component', () => {
     pageTitleService = TestBed.get(PageTitleService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     urlService = TestBed.get(UrlService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     userService = TestBed.get(UserService);
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
@@ -213,6 +217,16 @@ describe('Story Viewer Page component', () => {
         '/explore/null?topic_url_fragment=topic&' +
         'classroom_url_fragment=math&story_url_fragment=story&' +
         'node_id=1');
+    });
+
+  it('should return true if the window size is less than equal to 1024px',
+    function() {
+      let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+      widthSpy.and.returnValue(400);
+      expect(component.checkMobileView()).toBe(true);
+
+      widthSpy.and.returnValue(1025);
+      expect(component.checkMobileView()).toBe(false);
     });
 
   it('should get complete image path corresponding to a given' +

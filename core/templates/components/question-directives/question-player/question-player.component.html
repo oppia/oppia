@@ -15,7 +15,7 @@
     </div>
     <div class="oppia-question-player-body">
       <conversation-skin question-player-config="$ctrl.questionPlayerConfig"></conversation-skin>
-      <attribution-guide></attribution-guide>
+      <attribution-guide ng-if="!$ctrl.checkMobileView()"></attribution-guide>
     </div>
   </div>
   <!-- End of Question Player -->

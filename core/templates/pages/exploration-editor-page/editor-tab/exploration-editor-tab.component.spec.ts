@@ -66,6 +66,7 @@ describe('Exploration editor tab component', function() {
   var $rootScope = null;
   var $uibModal = null;
   var $timeout = null;
+  var $window = null;
   var answerGroupObjectFactory = null;
   var editabilityService = null;
   var explorationFeaturesService = null;
@@ -149,6 +150,7 @@ describe('Exploration editor tab component', function() {
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
+    $window = $injector.get('$window');
     stateEditorService = $injector.get('StateEditorService');
     stateCardIsCheckpointService = $injector.get(
       'StateCardIsCheckpointService');
@@ -168,6 +170,10 @@ describe('Exploration editor tab component', function() {
     spyOnProperty(
       stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
       mockRefreshStateEditorEventEmitter);
+    Object.defineProperty($window, 'innerWidth', {
+      get: () => undefined,
+      set: () => {}
+    });
 
     explorationStatesService.init({
       'First State': {
@@ -978,5 +984,19 @@ describe('Exploration editor tab component', function() {
       $scope.$apply();
       expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).not.toBe('Save');
     });
+
+    it('should return true if the window size is less than equal to 1024px',
+      () => {
+        var innerWidthSpy = spyOnProperty($window, 'innerWidth');
+        innerWidthSpy.and.callFake(() => 480);
+        $rootScope.$apply();
+        angular.element($window).triggerHandler('resize');
+        expect(ctrl.checkMobileView()).toBe(true);
+
+        innerWidthSpy.and.callFake(() => 1025);
+        $rootScope.$apply();
+        angular.element($window).triggerHandler('resize');
+        expect(ctrl.checkMobileView()).toBe(false);
+      });
   });
 });

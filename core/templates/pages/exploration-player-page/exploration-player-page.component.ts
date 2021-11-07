@@ -37,10 +37,10 @@ require('services/keyboard-shortcut.service.ts');
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
-    '$rootScope', 'ContextService', 'KeyboardShortcutService',
+    '$rootScope', '$window', 'ContextService', 'KeyboardShortcutService',
     'PageTitleService', 'ReadOnlyExplorationBackendApiService',
     function(
-        $rootScope, ContextService, KeyboardShortcutService,
+        $rootScope, $window, ContextService, KeyboardShortcutService,
         PageTitleService, ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
       ctrl.$onInit = function() {
@@ -61,6 +61,10 @@ angular.module('oppia').component('explorationPlayerPage', {
             $rootScope.$applyAsync();
           });
         KeyboardShortcutService.bindExplorationPlayerShortcuts();
+      };
+
+      ctrl.checkMobileView = function() {
+        return ($window.innerWidth <= 1024);
       };
     }
   ]

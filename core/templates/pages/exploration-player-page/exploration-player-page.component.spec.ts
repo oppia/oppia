@@ -31,6 +31,8 @@ require('pages/exploration-player-page/exploration-player-page.component.ts');
 describe('Exploration player page', function() {
   var ctrl = null;
   var $q = null;
+  var $window = null;
+  var $rootScope = null;
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
@@ -52,7 +54,8 @@ describe('Exploration player page', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
+    $window = $injector.get('$window');
     ContextService = $injector.get('ContextService');
     PageTitleService = $injector.get('PageTitleService');
     ReadOnlyExplorationBackendApiService = $injector.get(
@@ -61,6 +64,10 @@ describe('Exploration player page', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationPlayerPage', {
       $scope: $scope
+    });
+    Object.defineProperty($window, 'innerWidth', {
+      get: () => undefined,
+      set: () => {}
     });
   }));
 
@@ -106,4 +113,18 @@ describe('Exploration player page', function() {
     expect(elementDescriptionProperty.attr('content')).toBe(
       exploration.objective);
   });
+
+  it('should return true if the window size is less than equal to 1024px',
+    () => {
+      var innerWidthSpy = spyOnProperty($window, 'innerWidth');
+      innerWidthSpy.and.callFake(() => 480);
+      $rootScope.$apply();
+      angular.element($window).triggerHandler('resize');
+      expect(ctrl.checkMobileView()).toBe(true);
+
+      innerWidthSpy.and.callFake(() => 1025);
+      $rootScope.$apply();
+      angular.element($window).triggerHandler('resize');
+      expect(ctrl.checkMobileView()).toBe(false);
+    });
 });

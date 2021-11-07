@@ -39,6 +39,7 @@ describe('Collection player page directive', function() {
   let $rootScope = null;
   let $http = null;
   let $httpBackend = null;
+  var $window = null;
   let directive = null;
   let alertsService: AlertsService = null;
   let guestCollectionProgressService:
@@ -75,6 +76,7 @@ describe('Collection player page directive', function() {
     $rootScope = $injector.get('$rootScope');
     $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
+    $window = $injector.get('$window');
     $scope = $rootScope.$new();
     alertsService = $injector.get('AlertsService');
     userService = $injector.get('UserService');
@@ -84,6 +86,10 @@ describe('Collection player page directive', function() {
       'GuestCollectionProgressService');
     readOnlyCollectionBackendApiService = $injector.get(
       'ReadOnlyCollectionBackendApiService');
+    Object.defineProperty($window, 'innerWidth', {
+      get: () => undefined,
+      set: () => {}
+    });
 
     collectionNodeBackendObject = {
       exploration_id: 'exp_id',
@@ -555,4 +561,18 @@ describe('Collection player page directive', function() {
     let result = ctrl.getNonRecommendedCollectionNodeCount();
     expect(result).toEqual(5);
   }));
+
+  it('should return true if the window size is less than equal to 1024px',
+    () => {
+      var innerWidthSpy = spyOnProperty($window, 'innerWidth');
+      innerWidthSpy.and.callFake(() => 480);
+      $rootScope.$apply();
+      angular.element($window).triggerHandler('resize');
+      expect(ctrl.checkMobileView()).toBe(true);
+
+      innerWidthSpy.and.callFake(() => 1025);
+      $rootScope.$apply();
+      angular.element($window).triggerHandler('resize');
+      expect(ctrl.checkMobileView()).toBe(false);
+    });
 });

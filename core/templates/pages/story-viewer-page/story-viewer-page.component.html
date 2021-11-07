@@ -129,7 +129,7 @@
         </div>
       </div>
     </div>
-    <attribution-guide></attribution-guide>
+    <attribution-guide ng-if="!checkMobileView()"></attribution-guide>
     <div *ngIf="!isLoggedIn"  class="story-viewer-login-container">
       <h2>Learn More about {{ storyPlaythroughObject.topicName }}</h2>
       <div class="mt-2">
