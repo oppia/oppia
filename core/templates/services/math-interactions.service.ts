@@ -135,7 +135,7 @@ export class MathInteractionsService {
   }
 
   containsRedundantParens(expressionString: string): [boolean, string] {
-    let stack = [];
+    let stack: number[] = [];
 
     for (let i = 0; i < expressionString.length; i++) {
       let char = expressionString[i];
@@ -147,7 +147,7 @@ export class MathInteractionsService {
         }
         stack.push(i);
       } else if (char === ')') {
-        let openingInd = stack.pop();
+        let openingInd = stack.pop() || 0;
         if (this.isParenRedundant(expressionString, openingInd, i)) {
           return [true, expressionString.slice(openingInd, i + 1)];
         }
