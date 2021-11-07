@@ -190,7 +190,7 @@ export class StateObjectFactory {
   }
 
   createFromBackendDict(
-    stateName: string, stateDict: StateBackendDict
+      stateName: string, stateDict: StateBackendDict
   ): State {
     return new State(
       stateName,

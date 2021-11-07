@@ -139,7 +139,7 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(
-    misconceptionsBySkill: Record<string, Misconception[]>
+      misconceptionsBySkill: Record<string, Misconception[]>
   ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds: Record<string, boolean> = {};
