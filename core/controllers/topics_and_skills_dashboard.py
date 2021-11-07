@@ -280,7 +280,11 @@ class NewTopicHandler(base.BaseHandler):
             },
             'thumbnailBgColor': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                    }]
                 }
             },
             'image': {
