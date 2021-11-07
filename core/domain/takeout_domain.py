@@ -18,11 +18,17 @@
 
 from __future__ import annotations
 
+from typing import Any, Dict, List, Tuple
+
 
 class TakeoutData:
     """Domain object for all information exported as part of Takeout."""
 
-    def __init__(self, user_data, user_images):
+    def __init__(
+        self,
+        user_data: Dict[str, Dict[str, Any]],
+        user_images: List[TakeoutImage]
+    ) -> None:
         """Constructs a TakeoutData domain object.
 
         Args:
@@ -41,7 +47,9 @@ class TakeoutImage:
     for a single image.
     """
 
-    def __init__(self, b64_image_data, image_export_path):
+    def __init__(
+        self, b64_image_data: str, image_export_path: str
+    ) -> None:
         """Constructs a TakeoutImage domain object.
 
         Args:
@@ -58,7 +66,9 @@ class TakeoutImageReplacementInstruction:
     with a path corresponding to a file in the final zip.
     """
 
-    def __init__(self, dictionary_path, export_filename, new_key):
+    def __init__(
+        self, dictionary_path: Tuple[str], export_filename: str, new_key: str
+    ) -> None:
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:
