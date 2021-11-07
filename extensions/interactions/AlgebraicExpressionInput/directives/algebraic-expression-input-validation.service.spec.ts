@@ -85,7 +85,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x * x'
+        x: 'x^2'
       }
     }, 'AlgebraicExpressionInput');
 
@@ -145,7 +145,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: '-1 + x*x'
+        x: 'x^2 - 1'
       }
     }, 'AlgebraicExpressionInput');
 
