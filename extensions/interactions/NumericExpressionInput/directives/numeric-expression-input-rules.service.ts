@@ -29,11 +29,9 @@ import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class NumericExpressionInputRulesService {
-
   MatchesExactlyWith(
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
-
     answer = answer.replace(/\s/g, '');
     inputs.x = inputs.x.replace(/\s/g, '');
 

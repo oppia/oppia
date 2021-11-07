@@ -131,12 +131,12 @@ export class MathInteractionsService {
       ['+', '-', ')'].includes(expressionString[closingInd + 1])
     );
 
-    return condA || (condB && condC && condD); 
+    return condA || (condB && condC && condD);
   }
-  
+
   containsRedundantParens(expressionString: string): [boolean, string] {
     let stack = [];
-  
+
     for (let i = 0; i < expressionString.length; i++) {
       let char = expressionString[i];
       if (char === '(') {
