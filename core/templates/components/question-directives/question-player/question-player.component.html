@@ -64,7 +64,7 @@
           </div>
         </div>
 
-        <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text"
+        <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text mt-4"
                 ng-if="!$ctrl.testIsPassed"
                 ng-click="$ctrl.reviewConceptCardAndRetryTest()">
           Review and Retry
@@ -72,14 +72,25 @@
       </div>
     </div>
 
-    <div class="question-player-results-footer" ng-if="$ctrl.showActionButtonsFooter()">
-      <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
-            ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
-        <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
-          <span ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></span>
-          <span class="action-button-text" translate="<[actionButton.i18nId]>"></span>
-        </div>
-      </span>
+    <div class="results-footer">
+      <div class="question-player-results-footer" ng-if="$ctrl.showActionButtonsFooter()">
+        <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
+              ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
+          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
+            <span ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></span>
+            <span class="action-button-text" translate="<[actionButton.i18nId]>"></span>
+          </div>
+        </span>
+      </div>
+      <div class="question-player-results-footer" ng-if="$ctrl.showActionButtonsFooter()">
+        <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
+              ng-click="$ctrl.performAction(actionButton)" ng-if="actionButton.type === 'RETRY_SESSION'">
+          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
+            <span ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></span>
+            <span class="action-button-text" translate="<[actionButton.i18nId]>"></span>
+          </div>
+        </span>
+      </div>
     </div>
 
   </div>
@@ -87,6 +98,10 @@
 </div>
 
 <style>
+  .results-footer {
+    margin-top: 30px;
+  }
+
   .score-ring-outer {
     height: 96px;
     width: 96px;
@@ -102,11 +117,15 @@
   }
 
   .score-final {
-    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-style: italic;
     font-weight: bold;
   }
 
   .score-final-description {
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
     font-weight: 500;
     margin-right: 25px;
   }
@@ -133,6 +152,8 @@
   }
 
   .score-recieved, .score-total {
+    font-family: 'Roboto', sans-serif;
+    font-style: italic;
     font-weight: bold;
   }
 
@@ -356,6 +377,7 @@
   }
 
   .list-item {
+    font-family: 'Roboto', sans-serif;
     font-size: 18px;
     margin-bottom: 5px;
   }
@@ -377,7 +399,6 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-top: 30px;
     padding-top: 2px;
   }
 
