@@ -336,7 +336,7 @@ describe('Opportunities List Component', () => {
     tick();
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
-    expect(component.opportunities).toEqual(ExplorationOpportunitiesLoad1);
+    expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
     expect(component.opportunities.length).toEqual(16);
 
     // Removed opportunity with id as 'id2'.
