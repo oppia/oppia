@@ -331,7 +331,6 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { RatioExpressionInputRulesService } from
@@ -1033,6 +1032,10 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['PretestQuestionBackendApiService'] =
+      new PretestQuestionBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient']);
     upgradedServices['ProfilePageBackendApiService'] =
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
@@ -1237,8 +1240,6 @@ export class UpgradedServices {
     // Topological level: 9.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
-    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
-      upgradedServices['StateObjectFactory']);
 
     // Topological level: 10.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
@@ -1247,11 +1248,6 @@ export class UpgradedServices {
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']);
-    upgradedServices['PretestQuestionBackendApiService'] =
-      new PretestQuestionBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['QuestionObjectFactory']);
 
     /* eslint-enable dot-notation */
     return upgradedServices;
