@@ -96,6 +96,65 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
+  isParenRedundant (
+      expressionString: string,
+      openingInd: number,
+      closingInd: number): boolean {
+    /*
+    Assumes that expressionString is syntactically valid.
+  
+    a. The brackets enclose a single variable without a negation.
+    b. The opening bracket is preceded by '+' OR '(' OR 'start of expression'.
+    c. The opening bracket isn't (preceded by '+' AND followed by '-').
+    d. The closing bracket is followed by '+' OR '-' OR ')' OR 'end of expression'.
+  
+    Any given bracket pair is redundant iff: a OR (b AND c AND d)
+    */
+    let enclosedExpression = expressionString.slice(openingInd + 1, closingInd);
+  
+    let condA = enclosedExpression.length === 1;
+    
+    let condB = (
+      openingInd === 0 ||
+      ['+', '('].includes(expressionString[openingInd - 1])
+    );
+  
+    let condC = !(
+      openingInd > 0 &&
+      expressionString[openingInd - 1] === '+' &&
+      expressionString[openingInd + 1] === '-'
+    );
+  
+    let condD = (
+      closingInd === expressionString.length - 1 ||
+      ['+', '-', ')'].includes(expressionString[closingInd + 1])
+    );
+  
+    return condA || (condB && condC && condD); 
+  }
+  
+  containsRedundantParens(expressionString: string): [boolean, string] {
+    let stack = [];
+  
+    for (let i = 0; i < expressionString.length; i++) {
+      let char = expressionString[i];
+      if (char === '(') {
+        // Hack to identify if this is the opening paren of a function call
+        // like sqrt(...). If so, we ignore that paren.
+        if (i > 0 && expressionString[i - 1].match(/[a-zA-Z]/)) {
+          continue;
+        }
+        stack.push(i);
+      } else if (char === ')') {
+        let openingInd = stack.pop();
+        if(this.isParenRedundant(expressionString, openingInd, i)) {
+          return [true, expressionString.slice(openingInd, i + 1)];
+        }
+      }
+    }
+    return [false, ''];
+  };
+
   _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
@@ -160,6 +219,14 @@ export class MathInteractionsService {
           return false;
         }
       }
+    }
+
+    let [expressionContainsRedundantParens, errorString] = (
+      this.containsRedundantParens(expressionString));
+    if (expressionContainsRedundantParens) {
+      this.warningText = (
+        `Your expression contains redundant parentheses: ${errorString}.`);
+      return false;
     }
 
     this.warningText = '';

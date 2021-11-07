@@ -58,6 +58,21 @@ describe('MathInteractionsService', () => {
       'a/b/c/d/e/f/g', ['a', 'b', 'c', 'd', 'e', 'f', 'g'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^(b-c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+(-b+c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a-(b+c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a*(b-c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+(b-c)/d', ['a', 'b', 'c', 'd', 'e'])).toBeTrue();
+
     // Numeric Expressions.
     expect(mathInteractionsService.validateNumericExpression(
       '1/2')).toBeTrue();
@@ -245,6 +260,30 @@ describe('MathInteractionsService', () => {
       '5^100')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your expression contains an exponent with value greater than 5.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+((b-c)+(d+e))', ['a', 'b', 'c', 'd', 'e'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains redundant parentheses: (b-c).'
+    );
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '-(a + b) + (a + (-b))', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains redundant parentheses: (a+(-b)).'
+    );
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+(b-c)-d', ['a', 'b', 'c', 'd'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains redundant parentheses: (b-c).'
+    );
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a*(-(c))', ['a', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains redundant parentheses: (c).'
+    );
 
     expect(mathInteractionsService.validateNumericExpression(
       'a/2')).toBeFalse();
