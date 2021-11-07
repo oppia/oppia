@@ -78,11 +78,11 @@ angular.module('oppia').controller(
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
+        $scope.translationHtml = updatedTranslation;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
           updatedTranslation,
           () => {
-            $scope.translationHtml = updatedTranslation;
             $scope.translationUpdated = true;
             ContributionOpportunitiesService.
               reloadOpportunitiesEventEmitter.emit();
