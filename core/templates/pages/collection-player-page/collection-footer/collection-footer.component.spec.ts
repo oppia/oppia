@@ -56,26 +56,22 @@ describe('Collection footer component', () => {
     urlService = (urlService as unknown) as jasmine.SpyObj<UrlService>;
   });
 
-  it('should load the component properly on playing a collection', () => {
+  beforeEach(() => {
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('abcdef');
-    expect(component.collectionId).toBe('');
-
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      '/assets/images/general/apple.svg');
     component.ngOnInit();
+  });
+
+  it('should load the component properly on playing a collection', () => {
     expect(urlService.getCollectionIdFromUrl).toHaveBeenCalled();
     expect(component.collectionId).toBe('abcdef');
   });
 
   it('should get the static image url from the image path', () => {
-    spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('abcdef');
-    spyOn(urlInterpolationService, 'getStaticImageUrl');
-
-    component.ngOnInit();
-    fixture.whenStable()
-      .then(() => {
-        expect(component.getStaticImageUrl('/test.png'))
-          .toBe('/assets/images/test.png');
-        expect(urlInterpolationService.getStaticImageUrl)
-          .toHaveBeenCalledWith('/test.png');
-      });
+    expect(component.getStaticImageUrl('/general/apple.svg'))
+      .toBe('/assets/images/general/apple.svg');
+    expect(urlInterpolationService.getStaticImageUrl)
+      .toHaveBeenCalledWith('/general/apple.svg');
   });
 });

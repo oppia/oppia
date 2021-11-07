@@ -93,37 +93,27 @@ describe('Collection editor navbar breadcrumb component', () => {
       collectionData.nodes);
   });
 
-  it('should load the component on opening collection editor page by clicking' +
-    'on create collection', () => {
-    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
-      mockCollection);
-    spyOn(collectionEditorRoutingService, 'getActiveTabName').and.returnValue(
-      activeTab);
-
-    component.ngOnInit();
-    expect(component.collection).toBe(mockCollection);
-    expect(component.activeTabName).toBe(activeTab);
-  });
-
-  it('should get the current tab name in readable form', () => {
-    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
-      mockCollection);
-    spyOn(collectionEditorRoutingService, 'getActiveTabName').and.returnValue(
-      activeTab);
-
-    component.ngOnInit();
-    expect(component.getCurrentTabName()).toBe('Edit');
-  });
-
-  it('should change the active tab to settings when clicked on' +
-    'collection title if the title is empty', fakeAsync(() => {
+  beforeEach(() => {
     spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
       mockCollection);
     spyOn(collectionEditorRoutingService, 'getActiveTabName').and.returnValue(
       activeTab);
     spyOn(focusManagerService, 'setFocus');
-
     component.ngOnInit();
+  });
+
+  it('should load the component on opening collection editor page by clicking' +
+    'on create collection', () => {
+    expect(component.collection).toBe(mockCollection);
+    expect(component.activeTabName).toBe(activeTab);
+  });
+
+  it('should get the current tab name in readable form', () => {
+    expect(component.getCurrentTabName()).toBe('Edit');
+  });
+
+  it('should change the active tab to settings when clicked on' +
+    'collection title if the title is empty', fakeAsync(() => {
     expect(component.activeTabName).toBe(activeTab);
     component.editCollectionTitle();
     expect(component.activeTabName).toBe('Settings');
