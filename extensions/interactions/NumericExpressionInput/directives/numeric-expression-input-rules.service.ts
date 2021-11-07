@@ -29,6 +29,7 @@ import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class NumericExpressionInputRulesService {
+
   MatchesExactlyWith(
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
