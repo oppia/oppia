@@ -28,7 +28,7 @@ describe('Math equation input rules service', () => {
     meirs = new MathEquationInputRulesService();
   });
 
-  fit('should have a correct MatchesExactlyWith rule', () => {
+  it('should have a correct MatchesExactlyWith rule', () => {
     inputString = 'y=m*x+c';
 
     positionOfTerms = 'lhs';
