@@ -25,9 +25,9 @@ export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  'thumbnail_filename': string | null;
-  'thumbnail_bg_color': string | null;
-  'url_fragment': string | null;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+  'url_fragment': string;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -41,15 +41,15 @@ export class Subtopic {
   _skillIds: string[];
   // The thumbnail and URL fragment might not be set,
   // then they will be 'null'.
-  _thumbnailFilename: string | null;
-  _thumbnailBgColor: string | null;
-  _urlFragment: string | null;
+  _thumbnailFilename: string;
+  _thumbnailBgColor: string;
+  _urlFragment: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string | null,
-      thumbnailBgColor: string | null,
-      urlFragment: string | null) {
+      thumbnailFilename: string,
+      thumbnailBgColor: string,
+      urlFragment: string) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -85,7 +85,7 @@ export class Subtopic {
   }
 
   // Returns 'null' if there is no url fragment.
-  getUrlFragment(): string | null {
+  getUrlFragment(): string {
     return this._urlFragment;
   }
 
@@ -197,9 +197,9 @@ export class Subtopic {
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: null,
-      thumbnail_bg_color: null,
-      url_fragment: null
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      url_fragment: ''
     }, {});
   }
 }

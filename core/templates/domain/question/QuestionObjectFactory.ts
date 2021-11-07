@@ -24,11 +24,10 @@ import { State, StateBackendDict, StateObjectFactory }
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
-
-type InteractionId = keyof typeof INTERACTION_SPECS;
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface QuestionBackendDict {
-  'id': string | null;
+  'id': string;
   'question_state_data': StateBackendDict,
   'question_state_data_schema_version': number;
   'language_code': string;
@@ -100,9 +99,9 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getValidationErrorMessage(): string | null {
+  getValidationErrorMessage(): string {
     var interaction = this._stateData.interaction;
-    var interactionId = interaction.id as InteractionId;
+    var interactionId = interaction.id as InteractionSpecsKey;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
       return 'Please enter a question.';
@@ -110,10 +109,11 @@ export class Question {
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
-    if (interaction.defaultOutcome !== null) {
-      if (interaction.defaultOutcome.feedback._html.length === 0) {
-        return 'Please enter a feedback for the default outcome.';
-      }
+    if (
+      interaction.defaultOutcome !== null &&
+      interaction.defaultOutcome.feedback._html.length === 0
+    ) {
+      return 'Please enter a feedback for the default outcome.';
     }
 
     if (interaction.hints.length === 0) {
@@ -135,22 +135,22 @@ export class Question {
     if (!atLeastOneAnswerCorrect) {
       return 'At least one answer should be marked correct';
     }
-    return null;
+    return '';
   }
 
   getUnaddressedMisconceptionNames(
-      misconceptionsBySkill: Record<string, Misconception[]>
+    misconceptionsBySkill: Record<string, Misconception[]>
   ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
         answerGroups[i].taggedSkillMisconceptionId !== null) {
-          type InteractionhId = keyof typeof taggedSkillMisconceptionIds;
-          var interactionhId = (
-            answerGroups[i].taggedSkillMisconceptionId as InteractionhId
+          type MisconceptionId = keyof typeof taggedSkillMisconceptionIds;
+          var misconceptionId = (
+            answerGroups[i].taggedSkillMisconceptionId as MisconceptionId
           );
-          taggedSkillMisconceptionIds[interactionhId] = true;
+          taggedSkillMisconceptionIds[misconceptionId] = true;
       }
     }
     var unaddressedMisconceptionNames: string[] = [];
@@ -184,7 +184,7 @@ export class Question {
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict: QuestionBackendDict = {
-      id: null,
+      id: '',
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
       language_code: this._languageCode,
@@ -194,7 +194,7 @@ export class Question {
       version: 0,
     };
     if (!isNewQuestion) {
-      questionBackendDict.id = this._id;
+      questionBackendDict.id = this._id !== null ? this._id : '';
       questionBackendDict.version = this._version;
     }
     return questionBackendDict;

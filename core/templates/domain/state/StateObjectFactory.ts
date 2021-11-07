@@ -61,7 +61,7 @@ export interface StateBackendDict {
 }
 
 export class State {
-  name: string | null;
+  name: string;
   classifierModelId: string | null;
   linkedSkillId: string | null;
   content: SubtitledHtml;
@@ -74,7 +74,7 @@ export class State {
   nextContentIdIndex: number;
 
   constructor(
-      name: string | null, classifierModelId: string | null,
+      name: string, classifierModelId: string | null,
       linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
@@ -169,18 +169,19 @@ export class StateObjectFactory {
 
   createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
-    var newState = this.createFromBackendDict(newStateName, {
-      classifier_model_id: newStateTemplate.classifier_model_id,
-      linked_skill_id: newStateTemplate.linked_skill_id,
-      content: newStateTemplate.content,
-      interaction: newStateTemplate.interaction,
-      param_changes: newStateTemplate.param_changes,
-      recorded_voiceovers: newStateTemplate.recorded_voiceovers,
-      solicit_answer_details: newStateTemplate.solicit_answer_details,
-      card_is_checkpoint: newStateTemplate.card_is_checkpoint,
-      written_translations: newStateTemplate.written_translations,
-      next_content_id_index: newStateTemplate.next_content_id_index
-    });
+    var newState = this.createFromBackendDict(
+      newStateName !== null ? newStateName : '', {
+        classifier_model_id: newStateTemplate.classifier_model_id,
+        linked_skill_id: newStateTemplate.linked_skill_id,
+        content: newStateTemplate.content,
+        interaction: newStateTemplate.interaction,
+        param_changes: newStateTemplate.param_changes,
+        recorded_voiceovers: newStateTemplate.recorded_voiceovers,
+        solicit_answer_details: newStateTemplate.solicit_answer_details,
+        card_is_checkpoint: newStateTemplate.card_is_checkpoint,
+        written_translations: newStateTemplate.written_translations,
+        next_content_id_index: newStateTemplate.next_content_id_index
+      });
     if (newState.interaction.defaultOutcome !== null) {
       let defaultOutcome = newState.interaction.defaultOutcome;
       defaultOutcome.dest = newStateName as string;
@@ -189,7 +190,7 @@ export class StateObjectFactory {
   }
 
   createFromBackendDict(
-      stateName: string | null, stateDict: StateBackendDict
+    stateName: string, stateDict: StateBackendDict
   ): State {
     return new State(
       stateName,

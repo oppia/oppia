@@ -58,7 +58,7 @@ export interface TopicBackendDict {
 import constants from 'assets/constants';
 
 export class Topic {
-  _id: string | null;
+  _id: string;
   _name: string;
   _abbreviatedName: string;
   _description: string;
@@ -77,7 +77,7 @@ export class Topic {
   _pageTitleFragmentForWeb: string;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string | null, name: string, abbreviatedName: string,
+      id: string, name: string, abbreviatedName: string,
       urlFragment: string, description: string, languageCode: string,
       canonicalStoryReferences: StoryReference[],
       additionalStoryReferences: StoryReference[],
@@ -114,7 +114,7 @@ export class Topic {
   }
 
   // ---- Instance methods ----
-  getId(): string | null {
+  getId(): string {
     return this._id;
   }
 
@@ -433,8 +433,7 @@ export class Topic {
       subtopicId: number, fromIndex: number, toIndex: number): void {
     const subtopic = this.getSubtopicById(subtopicId);
     if (subtopic !== null) {
-      const skillToMove = cloneDeep(
-        subtopic.getSkillSummaries()[fromIndex]);
+      const skillToMove = cloneDeep(subtopic.getSkillSummaries()[fromIndex]);
       subtopic._skillSummaries.splice(fromIndex, 1);
       subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
     }
@@ -615,7 +614,7 @@ export class TopicObjectFactory {
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
-      null, 'Topic name loading', 'Abbrev. name loading',
+      '', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], null, '', {},
       this.storyReferenceObjectFactory, false, '', ''

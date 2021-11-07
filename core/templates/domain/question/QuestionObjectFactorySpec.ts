@@ -228,7 +228,7 @@ describe('Question object factory', function() {
 
   it('should correctly get backend dict', function() {
     var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
-    expect(newQuestionBackendDict.id).toEqual(null);
+    expect(newQuestionBackendDict.id).toEqual('');
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
     expect(newQuestionBackendDict.inapplicable_skill_misconception_ids).toEqual(
       ['a-1', 'b-2']);
@@ -257,7 +257,7 @@ describe('Question object factory', function() {
   it('should correctly validate question', function() {
     var interaction = sampleQuestion.getStateData().interaction;
 
-    expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual('');
 
     interaction.defaultOutcome.feedback.html = '';
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(
