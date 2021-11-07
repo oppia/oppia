@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, waitForAsync} from '@angular/core/testing';
 import { SettingTabBackendApiService } from './setting-tab-backend-api.service';
 
 describe('History Tab Backend Api Service', () => {
@@ -27,14 +27,14 @@ describe('History Tab Backend Api Service', () => {
   let successHandler = jasmine.createSpy('success');
   let failHandler = jasmine.createSpy('fail');
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [SettingTabBackendApiService]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    service = TestBed.get(SettingTabBackendApiService);
-  });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    service = TestBed.inject(SettingTabBackendApiService);
+  }));
 
   afterEach(() => {
     httpTestingController.verify();
