@@ -32,6 +32,7 @@ import { HelpCardEventResponse, PlayerPositionService } from '../services/player
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -46,7 +47,7 @@ describe('Progress nav component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let explorationEngineService: ExplorationEngineService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-
+  let schemaFormSubmittedService: SchemaFormSubmittedService;
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
 
@@ -67,7 +68,8 @@ describe('Progress nav component', () => {
         PlayerPositionService,
         PlayerTranscriptService,
         UrlService,
-        WindowDimensionsService
+        WindowDimensionsService,
+        SchemaFormSubmittedService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -86,6 +88,7 @@ describe('Progress nav component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -100,26 +103,32 @@ describe('Progress nav component', () => {
     let mockDisplayedCardIndexChangedEventEmitter = new EventEmitter<void>();
     let mockOnHelpCardAvailableEventEmitter = (
       new EventEmitter<HelpCardEventResponse>());
+    let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(componentInstance, 'updateDisplayedCardInfo');
+    spyOn(componentInstance.submit, 'emit');
     spyOnProperty(
       playerPositionService, 'displayedCardIndexChangedEventEmitter')
       .and.returnValue(mockDisplayedCardIndexChangedEventEmitter);
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockOnHelpCardAvailableEventEmitter);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOnProperty(schemaFormSubmittedService, 'onSubmittedSchemaBasedForm')
+      .and.returnValue(mockSchemaFormSubmittedEventEmitter);
 
     componentInstance.ngOnInit();
     mockDisplayedCardIndexChangedEventEmitter.emit();
     mockOnHelpCardAvailableEventEmitter.emit({
       hasContinueButton: true
     } as HelpCardEventResponse);
+    mockSchemaFormSubmittedEventEmitter.emit();
     tick();
 
     expect(componentInstance.isIframed).toEqual(isIframed);
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
     expect(componentInstance.helpCardHasContinueButton).toBeTrue();
+    expect(componentInstance.submit.emit).toHaveBeenCalled();
   }));
 
   it('should update displayed card info', fakeAsync(() => {
