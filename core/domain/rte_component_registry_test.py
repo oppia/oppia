@@ -16,8 +16,7 @@
 
 """Unit tests for core.domain.rte_component_registry."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import inspect
 import os
@@ -43,12 +42,12 @@ RTE_THUMBNAIL_HEIGHT_PX = 16
 RTE_THUMBNAIL_WIDTH_PX = 16
 
 _COMPONENT_CONFIG_SCHEMA = [
-    ('backend_id', python_utils.BASESTRING),
-    ('category', python_utils.BASESTRING),
-    ('description', python_utils.BASESTRING),
-    ('frontend_id', python_utils.BASESTRING),
-    ('tooltip', python_utils.BASESTRING),
-    ('icon_data_url', python_utils.BASESTRING),
+    ('backend_id', str),
+    ('category', str),
+    ('description', str),
+    ('frontend_id', str),
+    ('tooltip', str),
+    ('icon_data_url', str),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 
@@ -71,10 +70,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'name', 'description', 'schema', 'default_value']))
 
             self.assertTrue(
-                isinstance(ca_spec['name'], python_utils.BASESTRING))
+                isinstance(ca_spec['name'], str))
             self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
             self.assertTrue(
-                isinstance(ca_spec['description'], python_utils.BASESTRING))
+                isinstance(ca_spec['description'], str))
             self.assertGreater(len(ca_spec['description']), 0)
 
             # The default value might not pass validation checks (e.g. the
@@ -186,7 +185,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(
                     component_specs[item], item_type))
                 # The string attributes should be non-empty.
-                if item_type == python_utils.BASESTRING:
+                if item_type == str:
                     self.assertTrue(component_specs[item])
 
             self._validate_customization_arg_specs(

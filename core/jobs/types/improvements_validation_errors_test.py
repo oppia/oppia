@@ -16,8 +16,7 @@
 
 """Unit tests for improvements model validator errors."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs.types import base_validation_errors_test
 from core.jobs.types import improvements_validation_errors

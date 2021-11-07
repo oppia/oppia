@@ -1290,6 +1290,10 @@ angular.module('oppia').directive('conversationSkin', [
             CurrentInteractionService.submitAnswer();
           };
 
+          $scope.isLanguageRTL = function() {
+            return I18nLanguageCodeService.isCurrentLanguageRTL();
+          };
+
           ctrl.$onInit = function() {
             $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
             ctrl.directiveSubscriptions.add(

@@ -14,8 +14,7 @@
 
 """Controllers for the release coordinator page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core.controllers import acl_decorators
@@ -25,6 +24,12 @@ from core.domain import caching_services
 
 class MemoryCacheHandler(base.BaseHandler):
     """Handler for memory cache profile."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'DELETE': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

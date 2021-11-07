@@ -611,7 +611,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       };
       const img = new Image();
       img.onload = function() {
-        setHeightAndWidth((<HTMLCanvasElement> this));
+        setHeightAndWidth(this as HTMLCanvasElement);
       };
       img.src = this.getPreviewUrl(newVal);
     }

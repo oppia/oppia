@@ -42,26 +42,26 @@ export class KeyboardShortcutService {
 
   bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', () => {
-      var skipButton = <HTMLElement>document.querySelector(
-        '.oppia-skip-to-content');
+      var skipButton = document.querySelector(
+        '.oppia-skip-to-content') as HTMLElement;
       if (skipButton !== null) {
         skipButton.focus();
       }
     });
 
     Mousetrap.bind('k', () => {
-      var previousButton = <HTMLElement>document.querySelector(
-        '.oppia-back-button');
+      var previousButton = document.querySelector(
+        '.oppia-back-button') as HTMLElement;
       if (previousButton !== null) {
         previousButton.focus();
       }
     });
 
     Mousetrap.bind('j', () => {
-      var nextButton = <HTMLElement>document.querySelector(
-        '.oppia-next-button');
-      var continueButton = <HTMLElement>document.querySelector(
-        '.oppia-learner-confirm-button');
+      var nextButton = document.querySelector(
+        '.oppia-next-button') as HTMLElement;
+      var continueButton = document.querySelector(
+        '.oppia-learner-confirm-button') as HTMLElement;
       if (nextButton !== null) {
         nextButton.focus();
       }
@@ -77,21 +77,21 @@ export class KeyboardShortcutService {
 
   bindLibraryPageShortcuts(): void {
     Mousetrap.bind('/', () => {
-      var searchBar = <HTMLElement>document.querySelector(
-        '.oppia-search-bar-text-input');
+      var searchBar = document.querySelector(
+        '.oppia-search-bar-text-input') as HTMLElement;
       searchBar.focus();
       return false;
     });
 
     Mousetrap.bind('c', () => {
-      var categoryBar = <HTMLElement>document.querySelector(
-        '.oppia-search-bar-dropdown-toggle');
+      var categoryBar = document.querySelector(
+        '.oppia-search-bar-dropdown-toggle') as HTMLElement;
       categoryBar.focus();
     });
 
     Mousetrap.bind('s', () => {
-      var skipButton = <HTMLElement>document.querySelector(
-        '.oppia-skip-to-content');
+      var skipButton = document.querySelector(
+        '.oppia-skip-to-content') as HTMLElement;
       if (skipButton !== null) {
         skipButton.focus();
       }

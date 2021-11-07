@@ -16,8 +16,7 @@
 
 """Getter commands for for skill models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
@@ -66,7 +65,7 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         Skill or None. The domain object representing a skill with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.UNICODE(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_skill = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_SKILL,
         sub_namespace,

@@ -18,8 +18,7 @@
 using release_summary.md.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import datetime
@@ -45,6 +44,7 @@ AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
+SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
 LIST_OF_FILEPATHS_TO_MODIFY = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
@@ -353,7 +353,7 @@ def update_developer_names(release_summary_lines):
     with python_utils.open_file(
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
-            about_page_file.write(python_utils.UNICODE(line))
+            about_page_file.write(str(line))
     python_utils.PRINT('Updated about-page file!')
 
 
@@ -481,7 +481,7 @@ def get_release_summary_lines():
     return release_summary_lines
 
 
-def update_package_json():
+def update_version_in_config_files():
     """Updates version param in package json file to match the current
     release version.
     """
@@ -489,8 +489,17 @@ def update_package_json():
         common.get_current_branch_name())
 
     common.inplace_replace_file(
-        PACKAGE_JSON_FILEPATH, '"version": ".*"',
-        '"version": "%s"' % release_version)
+        PACKAGE_JSON_FILEPATH,
+        '"version": ".*"',
+        '"version": "%s"' % release_version,
+        expected_number_of_replacements=1
+    )
+    common.inplace_replace_file(
+        common.FECONF_PATH,
+        'OPPIA_VERSION = \'.*\'',
+        'OPPIA_VERSION = \'%s\'' % release_version,
+        expected_number_of_replacements=1
+    )
 
 
 def main():
@@ -514,7 +523,6 @@ def main():
     repo = g.get_organization('oppia').get_repo('oppia')
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    common.check_blocking_bug_issue_count(repo)
     common.check_prs_for_current_release_are_released(repo)
 
     if not os.path.exists(constants.release_constants.RELEASE_SUMMARY_FILEPATH):
@@ -576,7 +584,7 @@ def main():
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
-    update_package_json()
+    update_version_in_config_files()
 
     list_of_numbered_files = []
     for i, filepath in enumerate(LIST_OF_FILEPATHS_TO_MODIFY, start=1):
