@@ -887,7 +887,8 @@ class ExplorationIssue:
         return False
 
     def __hash__(self):
-        return hash((self.issue_type, self.issue_customization_args,
+        return hash((
+            self.issue_type, self.issue_customization_args,
             self.playthrough_ids, self.schema_version, self.is_valid))
 
     def to_dict(self):
