@@ -283,7 +283,7 @@ class NewTopicHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                        'regex_pattern': '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
                     }]
                 }
             },
