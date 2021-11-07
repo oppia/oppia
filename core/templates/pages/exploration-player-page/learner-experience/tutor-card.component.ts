@@ -23,6 +23,7 @@ import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { Subscription } from 'rxjs';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioPlayerService } from 'services/audio-player.service';
@@ -140,7 +141,11 @@ export class TutorCardComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.displayedCard) {
+    if (
+      changes.displayedCard &&
+      !isEqual(
+        changes.displayedCard.previousValue,
+        changes.displayedCard.currentValue)) {
       this.updateDisplayedCard();
     }
   }
