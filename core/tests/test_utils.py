@@ -2322,7 +2322,7 @@ title: Title
         Returns:
             dict. The JSON response for the request in dict form.
         """
-        if use_payload: 
+        if use_payload:
             data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token

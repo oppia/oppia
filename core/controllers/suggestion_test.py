@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-import os
 import base64
+import os
 
 from core import feconf
 from core import python_utils

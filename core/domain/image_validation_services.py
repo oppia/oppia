@@ -16,8 +16,8 @@
 
 from __future__ import annotations
 
-import imghdr
 import base64
+import imghdr
 
 from core import feconf
 from core import utils
