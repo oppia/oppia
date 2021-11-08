@@ -89,7 +89,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   labelForClearingFocus!: string;
   sidebarIsShown!: boolean;
   windowIsNarrow: boolean = false;
-  I18nCompleteTest: boolean = false;
 
   // The 'username', 'profilePageUrl' and 'profilePictureDataUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -380,10 +379,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     if (this.windowDimensionsService?.isWindowNarrow()) {
       return;
     }
-
+    let that = this;
     // If i18n hasn't completed, retry after 100ms.
-    if (this.I18nCompleteTest || !this.checkIfI18NCompleted) {
-      setTimeout(this.truncateNavbar, 100);
+    if (!this.checkIfI18NCompleted()) {
+      setTimeout(function() {
+        that.truncateNavbar();
+      }, 100);
       return;
     }
 
@@ -404,7 +405,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           // Force a digest cycle to hide element immediately.
           // Otherwise it would be hidden after the next call.
           // This is due to setTimeout use in debounce.
-          setTimeout(this.truncateNavbar, 50);
+          setTimeout(function() {
+            that.truncateNavbar();
+          }, 50);
           return;
         }
       }
