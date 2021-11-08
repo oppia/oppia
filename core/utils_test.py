@@ -754,7 +754,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_is_base64_encoded(self) -> None:
         image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 1000)
-        with python_utils.open_file(
+        with python_utils.open_file( # type: ignore[arg-type]
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
