@@ -358,8 +358,7 @@ def convert_image_str_to_data_binary(content: str) -> bytes:
 
 
 def is_base64(content: str) -> bool:
-    """Checks if an image object (represented by 'content') has been base64
-    encoded or not.
+    """Checks if an image object (represented by 'content') is base64 encoded.
 
     Args:
         content: str. Image file content.
