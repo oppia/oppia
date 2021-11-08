@@ -365,7 +365,7 @@ def is_base64_encoded(content: str) -> bool:
 
     Returns:
         bool. Returns True if an image data is base64 encoded,
-             False otherwise.
+        False otherwise.
     """
     try:
         base64.b64decode(content, validate=True)
