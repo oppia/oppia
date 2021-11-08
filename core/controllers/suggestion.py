@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+import base64
 
 from core import feconf
 from core import utils
@@ -563,8 +564,11 @@ def _upload_suggestion_images(files, suggestion, filenames):
                 'No image data provided for file with name %s.'
                 % (filename))
         try:
-            if utils.is_base64_encoded(image):
-                image = utils.convert_image_str_to_data_binary(image)
+            image = (
+                base64.decodebytes(image.encode('utf-8'))
+                if utils.is_base64_encoded(image)
+                else image
+            )
             file_format = (
                 image_validation_services.validate_image_and_filename(
                     image, filename))

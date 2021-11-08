@@ -330,42 +330,14 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         raise Exception('The given string does not represent a PNG image.')
 
 
-def convert_image_binary_to_data_str(content: bytes) -> str:
-    """Converts a image byte object (represented by 'content') to a data str.
-
-    Args:
-        content: bytes. Image binary file content.
-
-    Returns:
-        str. Data created from the binary content of the image.
-    """
-    base64_encoded_data = base64.b64encode(content)
-    return base64_encoded_data.decode('utf-8')
-
-
-def convert_image_str_to_data_binary(content: str) -> bytes:
-    """Converts an image string object (represented by 'content') to a
-    data binary.
-
-    Args:
-        content: str. Image file content.
-
-    Returns:
-        binary. Data created from the str content of the image.
-    """
-    encoded_data = content.encode('utf-8')
-    return base64.decodebytes(encoded_data)
-
-
 def is_base64_encoded(content: str) -> bool:
-    """Checks if an image object (represented by 'content') is base64 encoded.
+    """Checks if a string is base64 encoded.
 
     Args:
-        content: str. Image file content.
+        content: str. String to check.
 
     Returns:
-        bool. Returns True if an image data is base64 encoded,
-        False otherwise.
+        bool. True if a string is base64 encoded, False otherwise.
     """
     try:
         base64.b64decode(content, validate=True)

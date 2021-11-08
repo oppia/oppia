@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import os
+import base64
 
 from core import feconf
 from core import python_utils
@@ -741,7 +742,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'data_format': 'html'
                 },
                 'description': 'test',
-                'files': {'translation_image.png': raw_image},
+                'files': {'translation_image.png':
+                    base64.b64encode(raw_image).decode('utf-8')
+                 },
             },
             csrf_token=csrf_token
         )
@@ -978,7 +981,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6,
-                'files': {'img.png': raw_image}
+                'files': {'img.png':
+                    base64.b64encode(raw_image).decode('utf-8')
+                 }
             },
             csrf_token=csrf_token,
             )
@@ -1595,7 +1600,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill',
-                'files': {'file.svg': raw_image}
+                'files': {'file.svg':
+                    base64.b64encode(raw_image).decode('utf-8')
+                }
             }, csrf_token=csrf_token,)
         self.logout()
 

@@ -47,7 +47,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
 
 class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
+    """Tests to validate domain objects coming from frontend."""
 
     def test_incorrect_exp_domain_object_raises_exception(self) -> None:
         incorrect_change_dict = {

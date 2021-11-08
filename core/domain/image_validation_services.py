@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import imghdr
+import base64
 
 from core import feconf
 from core import utils
@@ -45,8 +46,11 @@ def validate_image_and_filename(raw_image, filename):
             'Image exceeds file size limit of 100 KB.')
     allowed_formats = ', '.join(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-    if utils.is_base64_encoded(raw_image):
-        raw_image = utils.convert_image_str_to_data_binary(raw_image)
+    raw_image = (
+                base64.decodebytes(raw_image.encode('utf-8'))
+                if utils.is_base64_encoded(raw_image)
+                else raw_image
+            )
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
         invalid_tags, invalid_attrs = (

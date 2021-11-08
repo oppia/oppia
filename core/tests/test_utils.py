@@ -2322,15 +2322,7 @@ title: Title
         Returns:
             dict. The JSON response for the request in dict form.
         """
-        if use_payload:
-            if 'files' in data:
-                # Bytes type data cannot be used as the json value
-                # json cannot serialize object of type bytes.
-                data['files'] = {
-                    name: utils.convert_image_binary_to_data_str(file)
-                    if isinstance(file, bytes) else file
-                    for name, file in data['files'].items()
-                }
+        if use_payload: 
             data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
