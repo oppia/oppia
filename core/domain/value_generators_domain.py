@@ -31,10 +31,12 @@ from typing import Any, Dict, Tuple, Type
 
 class BaseValueGenerator:
     """Base value generator class.
+
     A value generator is a class containing a function that takes in
     customization args and uses them to generate a value. The generated values
     are not typed, so if the caller wants strongly-typed values it would need
     to normalize the output of each generator.
+
     Each value generator should define a template file and an AngularJS
     directive. The names of these two files should be [ClassName].html and
     [ClassName].js respectively, where [ClassName] is the name of the value
@@ -62,14 +64,16 @@ class BaseValueGenerator:
             '%s.html' % cls.__name__))
 
     # Since child classes of BaseValueGenerator can use
-    # the generate_value functions with different types
-    # of arguments, args, kwargs and return type is Any.
+    # the 'generate_value' function with different types
+    # of arguments, 'args', 'kwargs' and return type
+    # are set to 'Any'.
     def generate_value(
         self,
         *args: Tuple[Any],
         **kwargs: Dict[str, Any]
     ) -> Any:
         """Generates a new value, using the given customization args.
+
         The first arg should be context_params.
         """
         raise NotImplementedError(
@@ -78,6 +82,7 @@ class BaseValueGenerator:
 
 class Registry:
     """Maintains a registry of all the value generators.
+
     Attributes:
         value_generators_dict: dict(str : BaseValueGenerator). Dictionary
             mapping value generator class names to their classes.
@@ -113,6 +118,7 @@ class Registry:
         cls, generator_id: str
     ) -> Type[BaseValueGenerator]:
         """Gets a generator class by its id.
+
         Refreshes once if the generator is not found; subsequently, throws an
         error.
 
