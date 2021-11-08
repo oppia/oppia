@@ -343,6 +343,20 @@ def convert_image_binary_to_data_str(content: bytes) -> str:
     return base64_encoded_data.decode('utf-8')
 
 
+def convert_image_str_to_data_binary(content: str) -> bytes:
+    """Converts an image string object (represented by 'content') to a
+    data binary.
+
+    Args:
+        content: str. Image file content.
+
+    Returns:
+        binary. Data created from the str content of the image.
+    """
+    encoded_data = content.encode('utf-8')
+    return base64.decodebytes(encoded_data)
+
+
 def is_base64(content: str) -> bool:
     """Checks if an image object (represented by 'content') has been base64
     encoded or not.
@@ -359,20 +373,6 @@ def is_base64(content: str) -> bool:
         return True
     except binascii.Error:
         return False
-
-
-def convert_image_str_to_data_binary(content: str) -> bytes:
-    """Converts an image string object (represented by 'content') to a
-    data binary.
-
-    Args:
-        content: str. Image file content.
-
-    Returns:
-        binary. Data created from the str content of the image.
-    """
-    encoded_data = content.encode('utf-8')
-    return base64.decodebytes(encoded_data)
 
 
 def convert_png_to_data_url(filepath: str) -> str:
