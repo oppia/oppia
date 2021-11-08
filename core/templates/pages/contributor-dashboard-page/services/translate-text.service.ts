@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
-import { StateNamesToContentIdMapping, TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
@@ -31,12 +31,12 @@ import {
 export interface TranslatableItem {
   translation: string | string[],
   status: Status,
-  text: string | string[] | null,
+  text: string | string[],
   more: boolean
   dataFormat: string,
   contentType: string,
-  interactionId?: string | null,
-  ruleType?: string | null
+  interactionId?: string,
+  ruleType?: string
 }
 
 export type Status = 'pending' | 'submitted';
@@ -50,8 +50,8 @@ export class StateAndContent {
     public translation: string | string[],
     public dataFormat: string,
     public contentType: string,
-    public interactionId?: string | null,
-    public ruleType?: string | null
+    public interactionId?: string,
+    public ruleType?: string
   ) {}
 }
 
@@ -62,24 +62,24 @@ export class TranslateTextService {
   STARTING_INDEX = -1;
   PENDING = 'pending';
   SUBMITTED = 'submitted';
-  stateWiseContents: StateNamesToContentIdMapping = {};
-  stateWiseContentIds: { [stateName: string]: string[] } = {};
-  stateNamesList: string[] = [];
-  stateAndContent: StateAndContent[] = [];
+  stateWiseContents = {};
+  stateWiseContentIds = {};
+  stateNamesList = [];
+  stateAndContent = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId: string = '';
-  activeExpVersion: string = '';
-  activeContentId: string = '';
-  activeStateName: string = '';
-  activeContentText: string | string[] | null = null;
-  activeContentStatus: Status | null = null;
+  activeExpId;
+  activeExpVersion;
+  activeContentId;
+  activeStateName: string;
+  activeContentText: string;
+  activeContentStatus: Status;
 
   constructor(
     private translateTextBackedApiService:
       TranslateTextBackendApiService
   ) { }
 
-  private _getNextText(): string | string[] | null {
+  private _getNextText(): string | string[] {
     if (this.stateAndContent.length === 0) {
       return null;
     }
@@ -91,7 +91,7 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] | null {
+  private _getPreviousText(): string | string[] {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
       return null;
     }
@@ -121,10 +121,10 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-      text: string | string[] | null,
+      text: string | string[],
       more: boolean,
       status: Status,
-      translation: string | string[]
+      translation: string
   ): TranslatableItem {
     const {
       dataFormat,
@@ -134,8 +134,8 @@ export class TranslateTextService {
     }: {
       dataFormat?: string,
       contentType?: string,
-      interactionId?: string | null,
-      ruleType?: string | null
+      interactionId?: string,
+      ruleType?: string
     } = this.stateAndContent[this.activeIndex] || {};
     return {
       text: text,
@@ -154,8 +154,8 @@ export class TranslateTextService {
     this.stateNamesList = [];
     this.stateAndContent = [];
     this.activeIndex = this.STARTING_INDEX;
-    this.activeContentId = '';
-    this.activeStateName = '';
+    this.activeContentId = null;
+    this.activeStateName = null;
     this.activeContentText = null;
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
@@ -165,7 +165,7 @@ export class TranslateTextService {
       this.activeExpVersion = translatableTexts.explorationVersion;
       for (const stateName in this.stateWiseContents) {
         let stateHasText: boolean = false;
-        const contentIds: string[] = [];
+        const contentIds = [];
         const contentIdToContentMapping = this.stateWiseContents[stateName];
         for (const contentId in contentIdToContentMapping) {
           const translatableItem = contentIdToContentMapping[contentId];
@@ -204,7 +204,7 @@ export class TranslateTextService {
   getTextToTranslate(): TranslatableItem {
     const text = this._getNextText();
     const {
-      status = this.PENDING as Status,
+      status = this.PENDING,
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return this._getUpdatedTextToTranslate(
@@ -214,7 +214,7 @@ export class TranslateTextService {
   getPreviousTextToTranslate(): TranslatableItem {
     const text = this._getPreviousText();
     const {
-      status = this.PENDING as Status,
+      status = this.PENDING,
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return this._getUpdatedTextToTranslate(
@@ -237,7 +237,7 @@ export class TranslateTextService {
       imagesData,
       dataFormat
     ).then(() => {
-      this.stateAndContent[this.activeIndex].status = this.SUBMITTED as Status;
+      this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
       this.stateAndContent[this.activeIndex].translation = (
         translation);
       successCallback();
