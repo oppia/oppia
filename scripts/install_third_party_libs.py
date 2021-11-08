@@ -173,12 +173,20 @@ def compile_protobuf_files(proto_files_paths):
     # generate Python files we need to manually fix the imports.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     compiled_protobuf_dir = (
-        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
-    for p in compiled_protobuf_dir.iterdir():
+        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files'))
+            .glob('**/*.py'))
+    for p in compiled_protobuf_dir:
         if p.suffix == '.py':
-            common.inplace_replace_file(
-                p.absolute(),
-                r'^import (\w*_pb2 as)', r'from proto_files import \1')
+            if p.parent.name == 'proto_files':
+                common.inplace_replace_file(
+                    p.absolute(),
+                    r'^import (\w*_pb2 as)',
+                    r'from proto_files import \1')
+            else:
+                common.inplace_replace_file(
+                    p.absolute(),
+                    r'from ([^\s]+) import (\w*_pb2 as) (\w*__pb2)',
+                    r'from proto_files.\1 import \2 proto__files_\3')
 
 
 def ensure_pip_library_is_installed(package, version, path):
