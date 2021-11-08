@@ -76,7 +76,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'release-coordinator-page.component.ts',
     'rule-type-selector.directive.ts',
     'schema-based-custom-viewer.directive.ts',
-    'schema-based-html-viewer.directive.ts',
     'schema-based-list-viewer.directive.ts',
     'select2-dropdown.directive.ts',
     'state-card.model.ts',
