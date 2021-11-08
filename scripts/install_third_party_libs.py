@@ -185,7 +185,7 @@ def compile_protobuf_files(proto_files_paths):
             else:
                 common.inplace_replace_file(
                     p.absolute(),
-                    r'from ([^\s]+) import (?!descriptor_pb2)(\w*_pb2 as) (\w*__pb2)',
+                    r'from ([^\s]+) import (?!descriptor_pb2)(\w*_pb2 as) (\w*__pb2)', # pylint: disable=line-too-long
                     r'from proto_files.\1 import \2 proto__files_\3')
 
 
