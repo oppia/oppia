@@ -14,8 +14,7 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import errno
@@ -528,30 +527,6 @@ def get_personal_access_token():
     return personal_access_token
 
 
-def check_blocking_bug_issue_count(repo):
-    """Checks the number of unresolved blocking bugs.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Raises:
-        Exception. Number of unresolved blocking bugs is not zero.
-        Exception. The blocking bug milestone is closed.
-    """
-    blocking_bugs_milestone = repo.get_milestone(
-        number=constants.release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
-    if blocking_bugs_milestone.state == 'closed':
-        raise Exception('The blocking bug milestone is closed.')
-    if blocking_bugs_milestone.open_issues:
-        open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
-            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
-        raise Exception(
-            'There are %s unresolved blocking bugs. Please ensure '
-            'that they are resolved before release summary generation.' % (
-                blocking_bugs_milestone.open_issues))
-
-
 def check_prs_for_current_release_are_released(repo):
     """Checks that all pull requests for current release have a
     'PR: released' label.
@@ -608,7 +583,12 @@ def create_readme(dir_path, readme_content):
         f.write(readme_content)
 
 
-def inplace_replace_file(filename, regex_pattern, replacement_string):
+def inplace_replace_file(
+    filename,
+    regex_pattern,
+    replacement_string,
+    expected_number_of_replacements=None
+):
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
@@ -620,20 +600,39 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         filename: str. The name of the file to be changed.
         regex_pattern: str. The pattern to check.
         replacement_string: str. The content to be replaced.
+        expected_number_of_replacements: optional(int). The number of
+            replacements that should be made. When None no check is done.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
     new_contents = []
+    total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
         with python_utils.open_file(backup_filename, 'r') as f:
             for line in f:
-                new_contents.append(regex.sub(replacement_string, line))
+                new_line, number_of_replacements = regex.subn(
+                    replacement_string, line)
+                new_contents.append(new_line)
+                total_number_of_replacements += number_of_replacements
 
         with python_utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
+
+        if (
+                expected_number_of_replacements is not None and
+                total_number_of_replacements != expected_number_of_replacements
+        ):
+            raise ValueError(
+                'Wrong number of replacements. Expected %s. Performed %s.' % (
+                    expected_number_of_replacements,
+                    total_number_of_replacements
+                )
+            )
+
         os.remove(backup_filename)
+
     except Exception:
         # Restore the content if there was en error.
         os.remove(filename)

@@ -16,8 +16,7 @@
 
 """Domain object for changes made to domain objects of storage models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
@@ -223,3 +222,11 @@ class BaseChange:
                     self, attribute_name)
 
         return base_change_dict
+
+    def __getattr__(self, name: str) -> str:
+        # AttributeError needs to be thrown in order to make
+        # instances of this class picklable.
+        try:
+            return self.__dict__[name]
+        except KeyError:
+            raise AttributeError(name)

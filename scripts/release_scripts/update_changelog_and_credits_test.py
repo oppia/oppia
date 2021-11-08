@@ -16,10 +16,10 @@
 
 """Unit tests for scripts/release_scripts/update_changelog_and_credits.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import builtins
+import contextlib
 import getpass
 import os
 import re
@@ -45,6 +45,7 @@ MOCK_AUTHORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
 MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
 MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH = 'about_temp_file.ts'
 MOCK_PACKAGE_JSON_PATH = os.path.join(RELEASE_TEST_DIR, 'mock_package.json')
+MOCK_FECONF_PATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
@@ -279,7 +280,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
         ) as f:
             for line in about_page_lines:
-                f.write(python_utils.UNICODE(line))
+                f.write(str(line))
 
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         new_developer_names = update_changelog_and_credits.get_new_contributors(
@@ -414,8 +415,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_get_organization(unused_self, unused_name):
             return github.Organization.Organization(
                 requester='', headers='', attributes={}, completed='')
-        def mock_check_blocking_bug_issue_count(unused_repo):
-            pass
         def mock_check_prs_for_current_release_are_released(unused_repo):
             pass
         def mock_get_repo(unused_self, unused_repo_name):
@@ -426,9 +425,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
         get_org_repo_swap = self.swap(
             github.Organization.Organization, 'get_repo', mock_get_repo)
-        blocking_bug_swap = self.swap(
-            common, 'check_blocking_bug_issue_count',
-            mock_check_blocking_bug_issue_count)
         check_prs_swap = self.swap(
             common, 'check_prs_for_current_release_are_released',
             mock_check_prs_for_current_release_are_released)
@@ -436,7 +432,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             constants.release_constants, 'RELEASE_SUMMARY_FILEPATH',
             'invalid.md')
         with self.branch_name_swap, release_summary_swap:
-            with self.args_swap, self.getpass_swap, blocking_bug_swap:
+            with self.args_swap, self.getpass_swap:
                 with get_org_swap, get_repo_swap, get_org_repo_swap:
                     with check_prs_swap, self.assertRaisesRegexp(
                         Exception, (
@@ -564,28 +560,43 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.LIST_OF_FILEPATHS_TO_MODIFY
         )
 
-    def test_update_package_json(self):
+    def test_update_version_in_config_files_updates_version(self):
         package_json_swap = self.swap(
-            update_changelog_and_credits, 'PACKAGE_JSON_FILEPATH',
-            MOCK_PACKAGE_JSON_PATH)
+            update_changelog_and_credits,
+            'PACKAGE_JSON_FILEPATH',
+            MOCK_PACKAGE_JSON_PATH
+        )
         package_json_content = python_utils.open_file(
             MOCK_PACKAGE_JSON_PATH, 'r').read()
-        regex = re.compile('"version": ".*"')
-        expected_package_json_content = regex.sub(
+        package_json_regex = re.compile('"version": ".*"')
+        expected_package_json_content = package_json_regex.sub(
             '"version": "1.2.3"', package_json_content)
+
+        feconf_swap = self.swap(common, 'FECONF_PATH', MOCK_FECONF_PATH)
+        feconf_content = python_utils.open_file(MOCK_FECONF_PATH, 'r').read()
+        feconf_regex = re.compile('OPPIA_VERSION = \'.*\'')
+        expected_feconf_content = feconf_regex.sub(
+            'OPPIA_VERSION = \'1.2.3\'', feconf_content)
+
         try:
-            with self.branch_name_swap, package_json_swap:
-                update_changelog_and_credits.update_package_json()
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(self.branch_name_swap)
+                stack.enter_context(feconf_swap)
+                stack.enter_context(package_json_swap)
+                update_changelog_and_credits.update_version_in_config_files()
             updated_package_json_content = python_utils.open_file(
                 MOCK_PACKAGE_JSON_PATH, 'r').read()
+            updated_feconf_content = python_utils.open_file(
+                MOCK_FECONF_PATH, 'r').read()
             self.assertEqual(
                 updated_package_json_content, expected_package_json_content)
+            self.assertEqual(updated_feconf_content, expected_feconf_content)
         finally:
             write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
+            write_to_file(MOCK_FECONF_PATH, feconf_content)
 
     def test_function_calls(self):
         check_function_calls = {
-            'check_blocking_bug_issue_count_gets_called': False,
             'check_prs_for_current_release_are_released_gets_called': False,
             'remove_updates_and_delete_branch_gets_called': False,
             'update_changelog_gets_called': False,
@@ -598,7 +609,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_package_json_gets_called': False
         }
         expected_check_function_calls = {
-            'check_blocking_bug_issue_count_gets_called': True,
             'check_prs_for_current_release_are_released_gets_called': True,
             'remove_updates_and_delete_branch_gets_called': True,
             'update_changelog_gets_called': True,
@@ -613,9 +623,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_get_organization(unused_self, unused_name):
             return github.Organization.Organization(
                 requester='', headers='', attributes={}, completed='')
-        def mock_check_blocking_bug_issue_count(unused_repo):
-            check_function_calls[
-                'check_blocking_bug_issue_count_gets_called'] = True
         def mock_check_prs_for_current_release_are_released(unused_repo):
             check_function_calls[
                 'check_prs_for_current_release_are_released_gets_called'] = True
@@ -646,14 +653,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
-        def mock_update_package_json():
+        def mock_update_version_in_config_files():
             check_function_calls['update_package_json_gets_called'] = True
 
         get_org_swap = self.swap(
             github.Github, 'get_organization', mock_get_organization)
-        blocking_bug_swap = self.swap(
-            common, 'check_blocking_bug_issue_count',
-            mock_check_blocking_bug_issue_count)
         check_prs_swap = self.swap(
             common, 'check_prs_for_current_release_are_released',
             mock_check_prs_for_current_release_are_released)
@@ -684,17 +688,16 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         update_swap = self.swap(
-            update_changelog_and_credits, 'update_package_json',
-            mock_update_package_json)
+            update_changelog_and_credits, 'update_version_in_config_files',
+            mock_update_version_in_config_files)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
             with self.getpass_swap, input_swap, check_prs_swap:
                 with remove_updates_swap, update_authors_swap, open_tab_swap:
                     with update_changelog_swap, update_contributors_swap:
                         with update_developer_names_swap, get_lines_swap:
-                            with create_branch_swap, get_repo_swap:
-                                with blocking_bug_swap, get_org_swap:
-                                    with get_org_repo_swap, update_swap:
-                                        update_changelog_and_credits.main()
+                            with create_branch_swap, get_repo_swap, update_swap:
+                                with get_org_swap, get_org_repo_swap:
+                                    update_changelog_and_credits.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

@@ -22,6 +22,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditabilityService } from 'services/editability.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -42,6 +43,7 @@ describe('Exploration save service ' +
   let changeListService: ChangeListService = null;
   let ExplorationRightsService = null;
   let ExplorationTitleService = null;
+  let ngbModal: NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -72,6 +74,14 @@ describe('Exploration save service ' +
         reload() {}
       }
     });
+
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -82,6 +92,7 @@ describe('Exploration save service ' +
     changeListService = $injector.get('ChangeListService');
     ExplorationRightsService = $injector.get('ExplorationRightsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    ngbModal = $injector.get('NgbModal');
   }));
 
   it('should open version mismatch modal', fakeAsync(function() {
@@ -133,10 +144,11 @@ describe('Exploration save service ' +
 
   it('should open confirm discard changes modal when clicked ' +
     'on discard changes button', fakeAsync(function() {
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
         result: Promise.resolve()
-      });
+      } as NgbModalRef);
+    });
     spyOn(changeListService, 'discardAllChanges')
       .and.returnValue(Promise.resolve(null));
 
@@ -175,6 +187,7 @@ describe('Exploration save service ' +
   let ExplorationRightsService = null;
   let explorationTagsService: ExplorationTagsService = null;
   let ExplorationTitleService = null;
+  let NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -195,6 +208,16 @@ describe('Exploration save service ' +
     });
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
@@ -209,6 +232,7 @@ describe('Exploration save service ' +
     ExplorationRightsService = $injector.get('ExplorationRightsService');
     explorationTagsService = $injector.get('ExplorationTagsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    NgbModal = $injector.get('NgbModal');
   }));
 
   it('should not open version mismatch modal', fakeAsync(function() {
@@ -268,7 +292,7 @@ describe('Exploration save service ' +
 
   it('should not publish exploration in case of backend ' +
     'error', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(NgbModal, 'open').and.returnValue({
       result: Promise.reject('failure')
     });
     let publishSpy = spyOn(ExplorationRightsService, 'publish')
@@ -371,6 +395,16 @@ describe('Exploration save service ' +
       ]
     });
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
@@ -605,6 +639,16 @@ describe('Exploration save service ' +
       ]
     });
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');

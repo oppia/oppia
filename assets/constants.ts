@@ -75,6 +75,8 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  "RTL_LANGUAGE_CODES": ["ar"],
+
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
     "topic": ["#C6DCDA"],
@@ -4956,23 +4958,12 @@ export default {
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
-  // languages are in alphabetical order.
+  // languages are roughly in order of how much support we have for them in
+  // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
-    "id": "id",
-    "text": "Bahasa Indonesia",
-    "direction": "ltr"
-  }, {
     "id": "en",
     "text": "English",
-    "direction": "ltr"
-  }, {
-    "id": "es",
-    "text": "Español",
-    "direction": "ltr"
-  }, {
-    "id": "fr",
-    "text": "français (French)",
     "direction": "ltr"
   }, {
     "id": "pt-br",
@@ -4982,6 +4973,38 @@ export default {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl"
+  }, {
+    "id": "hi",
+    "text": "हिन्दी",
+    "direction": "ltr"
+  }, {
+    "id": "es",
+    "text": "Español",
+    "direction": "ltr"
+  }, {
+    "id": "bn",
+    "text": "বাংলা",
+    "direction": "ltr"
+  }, {
+    "id": "fr",
+    "text": "français (French)",
+    "direction": "ltr"
+  }, {
+    "id": "id",
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
+  }, {
+    "id": "uk",
+    "text": "украї́нська мо́ва (Ukrainian)",
+    "direction": "ltr"
+  }, {
+    "id": "sk",
+    "text": "slovenčina (Slovak)",
+    "direction": "ltr"
+  }, {
+    "id": "nl",
+    "text": "Nederlands (Dutch)",
+    "direction": "ltr"
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
@@ -4993,14 +5016,6 @@ export default {
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
-  }, {
-    "id": "hi",
-    "text": "हिन्दी",
-    "direction": "ltr"
-  }, {
-    "id": "bn",
-    "text": "বাংলা",
     "direction": "ltr"
   }, {
     "id": "zh-hans",

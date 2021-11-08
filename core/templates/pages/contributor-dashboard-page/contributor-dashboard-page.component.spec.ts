@@ -104,10 +104,6 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should set specific properties after $onInit is called', function() {
-      expect(ctrl.languageCode).toBe('hi');
-      expect(TranslationLanguageService.setActiveLanguageCode)
-        .toHaveBeenCalledWith('hi');
-
       expect(ctrl.topicName).toBe('Topic 1');
       expect(TranslationTopicService.setActiveTopicName)
         .toHaveBeenCalledWith('Topic 1');
