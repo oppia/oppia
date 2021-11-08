@@ -208,8 +208,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/recommendations_services_test.py',
     'core/domain/recommendations_validators.py',
     'core/domain/recommendations_validators_test.py',
-    'core/domain/rights_domain.py',
-    'core/domain/rights_domain_test.py',
     'core/domain/rights_manager.py',
     'core/domain/rights_manager_test.py',
     'core/domain/role_services.py',

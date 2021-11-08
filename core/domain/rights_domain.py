@@ -23,6 +23,9 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import user_services
 
+from typing import List, Optional
+from typing_extensions import TypedDict
+
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
 # Do not modify the definitions of CMD keys that already exist.
@@ -50,16 +53,37 @@ DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
 DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
 
 
+class ActivityRightsDict(TypedDict):
+    """A dict version of ActivityRights suitable for use by the frontend."""
+
+    cloned_from: Optional[str]
+    status: str
+    community_owned: bool
+    owner_names: List[str]
+    editor_names: List[str]
+    voice_artist_names: List[str]
+    viewer_names: List[str]
+    viewable_if_private: bool
+
+
 class ActivityRights:
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """
 
     def __init__(
-            self, exploration_id, owner_ids, editor_ids, voice_artist_ids,
-            viewer_ids, community_owned=False, cloned_from=None,
-            status=ACTIVITY_STATUS_PRIVATE, viewable_if_private=False,
-            first_published_msec=None):
+        self,
+        exploration_id: str,
+        owner_ids: List[str],
+        editor_ids: List[str],
+        voice_artist_ids: List[str],
+        viewer_ids: List[str],
+        community_owned: bool = False,
+        cloned_from: Optional[str] = None,
+        status: str = ACTIVITY_STATUS_PRIVATE,
+        viewable_if_private: bool = False,
+        first_published_msec: Optional[str] = None
+    ) -> None:
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -71,7 +95,7 @@ class ActivityRights:
         self.viewable_if_private = viewable_if_private
         self.first_published_msec = first_published_msec
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates an ActivityRights object.
 
         Raises:
@@ -129,7 +153,7 @@ class ActivityRights:
             raise utils.ValidationError(
                 'Activity should have atleast one owner.')
 
-    def to_dict(self):
+    def to_dict(self) -> ActivityRightsDict:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
@@ -152,18 +176,18 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(
+                'owner_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
                     self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(
+                'editor_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
                     self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(
+                'voice_artist_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
                     self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(
+                'viewer_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }
 
-    def is_owner(self, user_id):
+    def is_owner(self, user_id: str) -> bool:
         """Checks whether given user is owner of activity.
 
         Args:
@@ -174,7 +198,7 @@ class ActivityRights:
         """
         return bool(user_id in self.owner_ids)
 
-    def is_editor(self, user_id):
+    def is_editor(self, user_id: str) -> bool:
         """Checks whether given user is editor of activity.
 
         Args:
@@ -185,7 +209,7 @@ class ActivityRights:
         """
         return bool(user_id in self.editor_ids)
 
-    def is_voice_artist(self, user_id):
+    def is_voice_artist(self, user_id: str) -> bool:
         """Checks whether given user is voice artist of activity.
 
         Args:
@@ -196,7 +220,7 @@ class ActivityRights:
         """
         return bool(user_id in self.voice_artist_ids)
 
-    def is_viewer(self, user_id):
+    def is_viewer(self, user_id: str) -> bool:
         """Checks whether given user is viewer of activity.
 
         Args:
@@ -207,7 +231,7 @@ class ActivityRights:
         """
         return bool(user_id in self.viewer_ids)
 
-    def is_published(self):
+    def is_published(self) -> bool:
         """Checks whether activity is published.
 
         Returns:
@@ -215,7 +239,7 @@ class ActivityRights:
         """
         return bool(self.status == ACTIVITY_STATUS_PUBLIC)
 
-    def is_private(self):
+    def is_private(self) -> bool:
         """Checks whether activity is private.
 
         Returns:
@@ -223,7 +247,7 @@ class ActivityRights:
         """
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
 
-    def is_solely_owned_by_user(self, user_id):
+    def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the activity is solely owned by the user.
 
         Args:
@@ -234,7 +258,7 @@ class ActivityRights:
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
-    def assign_new_role(self, user_id, new_role):
+    def assign_new_role(self, user_id: str, new_role: str) -> str:
         """Assigns new role to user and removes previous role if present.
 
         Args:
