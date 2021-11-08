@@ -18,8 +18,7 @@
 presubmit checks. Next message id would be C0041.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import linecache
 import os
@@ -1369,7 +1368,12 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     }
 
     # If import from any of these is made, it may not be a module.
-    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing', 'mypy_imports']
+    EXCLUDED_IMPORT_MODULES = [
+        '__future__',
+        'typing',
+        'mypy_imports',
+        'typing_extensions'
+    ]
 
     @checker_utils.check_messages('import-only-modules')
     def visit_importfrom(self, node):

@@ -46,10 +46,10 @@ export class ExplorationFeaturesBackendApiService {
   async fetchExplorationFeaturesAsync(
       explorationId: string): Promise<ExplorationFeatures> {
     return this.http.get<ExplorationFeaturesBackendDict>(
-      <string> this.urlInterpolationService.interpolateUrl(
+      this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,
         {exploration_id: explorationId}
-      )
+      ) as string
     ).toPromise().then(response => ({
       isExplorationWhitelisted: response.is_exploration_whitelisted,
       alwaysAskLearnersForAnswerDetails: (

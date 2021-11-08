@@ -207,41 +207,42 @@ export class ExplorationDiffService {
       let changeList = changeListDatum.changeList;
       let directionForwards = changeListDatum.directionForwards;
       changeList.forEach(change => {
+        let explorationChangeAddState = change as ExplorationChangeAddState;
+
         if ((directionForwards && change.cmd === 'add_state') ||
             (!directionForwards && change.cmd === 'delete_state')) {
-          if (!stateIds.hasOwnProperty(
-            (<ExplorationChangeAddState> change).state_name)) {
+          if (!stateIds.hasOwnProperty(explorationChangeAddState.state_name)) {
             let newId = this._generateNewId();
-            stateIds[(<ExplorationChangeAddState> change).state_name] = newId;
+            stateIds[(change as ExplorationChangeAddState).state_name] = newId;
           }
           let currentStateId = (
-            stateIds[(<ExplorationChangeAddState> change).state_name]);
+            stateIds[explorationChangeAddState.state_name]);
           if (stateData.hasOwnProperty(currentStateId) &&
               stateData[currentStateId].stateProperty ===
               this.STATE_PROPERTY_DELETED) {
             stateData[currentStateId].stateProperty =
                 this.STATE_PROPERTY_CHANGED;
             stateData[currentStateId].newestStateName = (
-              <ExplorationChangeAddState> change).state_name;
+              explorationChangeAddState).state_name;
           } else {
             stateData[currentStateId] = {
-              newestStateName: (<ExplorationChangeAddState> change).state_name,
+              newestStateName: (change as ExplorationChangeAddState).state_name,
               originalStateName: (
-                <ExplorationChangeAddState> change).state_name,
+                explorationChangeAddState).state_name,
               stateProperty: this.STATE_PROPERTY_ADDED
             };
           }
         } else if ((directionForwards && change.cmd === 'delete_state') ||
             (!directionForwards && change.cmd === 'add_state')) {
           if (stateData[stateIds[(
-            <ExplorationChangeAddState> change).state_name]].stateProperty ===
+            explorationChangeAddState).state_name]].stateProperty ===
               this.STATE_PROPERTY_ADDED) {
             stateData[stateIds[(
-              <ExplorationChangeAddState> change).state_name]].stateProperty = (
+              explorationChangeAddState).state_name]].stateProperty = (
               this.STATE_PROPERTY_CHANGED);
           } else {
             stateData[stateIds[(
-              <ExplorationChangeAddState> change).state_name]].stateProperty = (
+              explorationChangeAddState).state_name]].stateProperty = (
               this.STATE_PROPERTY_DELETED);
           }
         } else if (change.cmd === 'rename_state') {
@@ -249,25 +250,25 @@ export class ExplorationDiffService {
           let oldStateName = null;
           if (directionForwards) {
             newStateName = (
-              <ExplorationChangeRenameState> change).new_state_name;
+              change as ExplorationChangeRenameState).new_state_name;
             oldStateName = (
-              <ExplorationChangeRenameState> change).old_state_name;
+              change as ExplorationChangeRenameState).old_state_name;
           } else {
             newStateName = (
-              <ExplorationChangeRenameState> change).old_state_name;
+              change as ExplorationChangeRenameState).old_state_name;
             oldStateName = (
-              <ExplorationChangeRenameState> change).new_state_name;
+              change as ExplorationChangeRenameState).new_state_name;
           }
           stateIds[newStateName] = stateIds[oldStateName];
           delete stateIds[oldStateName];
           stateData[stateIds[newStateName]].newestStateName = newStateName;
         } else if (change.cmd === 'edit_state_property') {
           if (stateData[stateIds[(
-            <ExplorationChangeEditStateProperty> change).state_name]]
+            change as ExplorationChangeEditStateProperty).state_name]]
             .stateProperty ===
               this.STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[(
-              <ExplorationChangeEditStateProperty> change).state_name]]
+              change as ExplorationChangeEditStateProperty).state_name]]
               .stateProperty = (
                 this.STATE_PROPERTY_CHANGED);
           }

@@ -34,6 +34,7 @@ import { AudioTranslationManagerService } from '../services/audio-translation-ma
 import { AppConstants } from 'app.constants';
 import { AudioPlayerService } from 'services/audio-player.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('InputResponsePairComponent', () => {
   let component: InputResponsePairComponent;
@@ -45,6 +46,7 @@ describe('InputResponsePairComponent', () => {
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let audioTranslationManagerService: AudioTranslationManagerService;
   let audioPlayerService: AudioPlayerService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -53,7 +55,9 @@ describe('InputResponsePairComponent', () => {
         InputResponsePairComponent,
         MockTranslatePipe
       ],
-      providers: [BackgroundMaskService],
+      providers: [
+        BackgroundMaskService
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -69,8 +73,12 @@ describe('InputResponsePairComponent', () => {
       AudioTranslationManagerService);
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);
+    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
     fixture = TestBed.createComponent(InputResponsePairComponent);
     component = fixture.componentInstance;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
 
     spyOn(playerTranscriptService, 'getCard')
       .and.returnValue(StateCard.createNewCard(
@@ -149,6 +157,10 @@ describe('InputResponsePairComponent', () => {
     };
 
     expect(component.isVideoRteElementPresentInResponse()).toBe(true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should get answer html for the displayed card', () => {

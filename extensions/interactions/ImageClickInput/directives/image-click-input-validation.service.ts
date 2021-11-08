@@ -128,7 +128,7 @@ export class ImageClickInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         if (rules[j].type === 'IsInRegion') {
-          var label = <string> rules[j].inputs.x;
+          var label = rules[j].inputs.x as string;
           if (seenRegionStrings.indexOf(label) === -1) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,

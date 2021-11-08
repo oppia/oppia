@@ -16,8 +16,7 @@
 
 """Beam DoFns and PTransforms to provide validation of topic models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import topic_domain
 from core.jobs import job_utils

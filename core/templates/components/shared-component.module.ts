@@ -85,6 +85,9 @@ import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
+import { ConceptCardComponent } from './concept-card/concept-card.component';
+import { ScoreRingComponent } from './score-ring/score-ring.component';
+import { CompletionGraphComponent } from './statistics-directives/completion-graph.component';
 import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
@@ -139,7 +142,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig
-    },
+    }
   ],
 
   declarations: [
@@ -147,6 +150,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CompletionGraphComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
@@ -181,6 +185,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
     RubricsEditorComponent,
+    ScoreRingComponent,
     SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
@@ -212,8 +217,10 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     AudioBarComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CompletionGraphComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
     CreateNewSkillModalComponent,
@@ -252,6 +259,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
     RubricsEditorComponent,
+    ScoreRingComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
@@ -286,6 +294,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     AudioBarComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CompletionGraphComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
@@ -320,6 +329,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     ProgressNavComponent,
     SearchBarComponent,
     QuestionDifficultySelectorComponent,
+    ScoreRingComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
