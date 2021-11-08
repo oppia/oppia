@@ -217,13 +217,6 @@
         "ignoreConsecutiveComments": true
       }
     ],
-    "comma-spacing": [
-      "error",
-      {
-        "before": false,
-        "after": true
-      }
-    ],
     "curly": [
       "error",
       "all"
@@ -264,13 +257,6 @@
       }
     ],
     "key-spacing": "error",
-    "keyword-spacing": [
-      "error",
-      {
-        "before": true,
-        "after": true
-      }
-    ],
     "max-len": [
       "error",
       {
@@ -369,14 +355,6 @@
       "error",
       "always"
     ],
-    "space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "never",
-        "asyncArrow": "never",
-        "named": "never"
-      }
-    ],
     "spaced-comment": [
       "error",
       "always"
@@ -454,6 +432,28 @@
       "error",
       "any"
     ],
-    "@typescript-eslint/method-signature-style": ["error"]
+    "@typescript-eslint/method-signature-style": ["error"],
+    "@typescript-eslint/space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "asyncArrow": "never",
+        "named": "never"
+      }
+    ],
+    "@typescript-eslint/keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "@typescript-eslint/comma-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ]
   }
 }
