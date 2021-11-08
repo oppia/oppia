@@ -563,7 +563,8 @@ def _upload_suggestion_images(files, suggestion, filenames):
                 'No image data provided for file with name %s.'
                 % (filename))
         try:
-            image = utils.convert_image_str_to_data_binary(image)
+            if utils.isBase64(image):
+                image = utils.convert_image_str_to_data_binary(image)
             file_format = (
                 image_validation_services.validate_image_and_filename(
                     image, filename))
