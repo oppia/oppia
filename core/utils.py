@@ -357,7 +357,7 @@ def convert_image_str_to_data_binary(content: str) -> bytes:
     return base64.decodebytes(encoded_data)
 
 
-def is_base64(content: str) -> bool:
+def is_base64_encoded(content: str) -> bool:
     """Checks if an image object (represented by 'content') is base64 encoded.
 
     Args:
