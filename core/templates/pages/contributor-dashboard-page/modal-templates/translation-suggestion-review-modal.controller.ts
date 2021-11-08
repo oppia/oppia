@@ -85,11 +85,11 @@ angular.module('oppia').controller(
           updatedTranslation,
           () => {
             $scope.translationUpdated = true;
+            $scope.startedEditing = false;
             ContributionOpportunitiesService.
               reloadOpportunitiesEventEmitter.emit();
           },
           $scope.showTranslationSuggestionUpdateError);
-        $scope.startedEditing = false;
       };
 
       delete suggestionIdToContribution[initialSuggestionId];
@@ -144,6 +144,8 @@ angular.module('oppia').controller(
                 author_name
             );
           });
+        $scope.errorMessage = '';
+        $scope.startedEditing = false;
         $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingContributions.length <= 0;
         $scope.translationHtml = (
@@ -270,7 +272,9 @@ angular.module('oppia').controller(
       };
 
       $scope.cancelEdit = function() {
+        $scope.errorMessage = '';
         $scope.startedEditing = false;
+        $scope.errorFound = false;
         $scope.editedContent.html = $scope.translationHtml;
       };
 
@@ -279,8 +283,9 @@ angular.module('oppia').controller(
       };
 
       $scope.showTranslationSuggestionUpdateError = function(error) {
-        AlertsService.clearWarnings();
-        AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+        $scope.errorMessage = 'Invalid Suggestion:' + error.data.error;
+        $scope.errorFound = true;
+        $scope.startedEditing = true;
         $scope.translationHtml = $scope.tmpTranslationHtml;
       };
     }
