@@ -183,7 +183,7 @@ describe('Rubrics Editor Component', () => {
       .toBeFalse();
   });
 
-  it('should return true when explanation length is below 300', () => {
-    expect(componentInstance.isExplanationLengthValid('abcd')).toBeTrue();
+  it('should check if explanation length is at most 300 characters', () => {
+    expect(componentInstance.isExplanationLengthValid()).toBeTrue();
   });
 });

@@ -55,9 +55,9 @@
           <div>
             <button type="button"
                     class="btn btn-danger protractor-test-delete-rubric-explanation-button"
-                    [disabled]="!this.isMediumLevelExplanationValid(this.rubric.getDifficulty(), this.editableExplanations[this.rubric.getDifficulty()][idx])
-                      || this.ismediumLevelExplanationLengthEqualsOne(this.rubric.getDifficulty())"
-                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)">
+                    [disabled]="this.ismediumLevelExplanationLengthEqualsOne(this.rubric.getDifficulty())"
+                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)"
+                    title="There should be at least one explanation for the Medium level rubric.">
               Delete
             </button>
             <button type="button"
@@ -68,18 +68,18 @@
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
                     [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), idx)
-                      || !this.isExplanationLengthValid(this.editableExplanations[this.rubric.getDifficulty()][idx])"
+                      || !this.isExplanationLengthValid()"
                     (click)="this.saveExplanation(this.rubric.getDifficulty(), idx)">
               Save
             </button>
           </div>
           <br>
-          <div *ngIf="!this.isMediumLevelExplanationValid(this.rubric.getDifficulty(), this.editableExplanations[this.rubric.getDifficulty()][idx])"
+          <div *ngIf="!this.isMediumLevelExplanationValid()"
                class="rubric-error-message">
             There should be at least one explanation for the Medium level rubric.
           </div>
-          <div *ngIf="!this.isExplanationLengthValid(this.editableExplanations[this.rubric.getDifficulty()][idx])" class="rubric-error-message">
-            Explanation length should be below 300 characters.
+          <div *ngIf="!this.isExplanationLengthValid()" class="rubric-error-message">
+            Explanations should have at most 300 characters.
           </div>
           <div class="oppia-card-content-limit-error" *ngIf="this.isTotalExplanationsLengthReached()">
             There can be total of 10 explanations considering all levels.
