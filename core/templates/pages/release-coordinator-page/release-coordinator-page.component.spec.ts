@@ -1,0 +1,128 @@
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for release coordinator page component.
+ */
+
+import { TestBed, waitForAsync, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormBuilder } from '@angular/forms';
+import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
+import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
+import { ReleaseCoordinatorPageComponent } from './release-coordinator-page.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { PromoBar } from 'domain/promo_bar/promo-bar.model';
+
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Release coordinator page', () => {
+  let component: ReleaseCoordinatorPageComponent;
+  let fixture: ComponentFixture<ReleaseCoordinatorPageComponent>;
+  let pbbas: PromoBarBackendApiService;
+  let rcbas: ReleaseCoordinatorBackendApiService;
+  let fb: FormBuilder;
+  let mockPromoBarData = new PromoBar(true, 'Hello');
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+      ],
+      declarations: [
+        ReleaseCoordinatorPageComponent
+      ],
+      providers: [
+        PromoBarBackendApiService,
+        ReleaseCoordinatorBackendApiService,
+        FormBuilder
+      ],
+      schemas: [
+        NO_ERRORS_SCHEMA
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ReleaseCoordinatorPageComponent);
+    component = fixture.componentInstance;
+    pbbas = TestBed.inject(PromoBarBackendApiService);
+    pbbas = (pbbas as unknown) as jasmine.SpyObj<PromoBarBackendApiService>;
+    rcbas = TestBed.inject(ReleaseCoordinatorBackendApiService);
+    rcbas = (rcbas as unknown) as
+      jasmine.SpyObj<ReleaseCoordinatorBackendApiService>;
+    fb = TestBed.inject(FormBuilder);
+    fb = (fb as unknown) as jasmine.SpyObj<FormBuilder>;
+  });
+
+  beforeEach(() => {
+    spyOn(pbbas, 'getPromoBarDataAsync').and.returnValue(
+      Promise.resolve(mockPromoBarData));
+
+    component.ngOnInit();
+  });
+
+  it('should load the component with the correct properties', () => {
+    expect(component.statusMessage).toEqual('');
+    expect(component.submitButtonDisabled).toBeTrue();
+    expect(component.memoryCacheDataFetched).toBeFalse();
+    expect(component.activeTab).toEqual(
+      ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
+  });
+
+  it('should set success status message when' +
+      'update promo bar config executes successfully', fakeAsync(() => {
+    spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(Promise.resolve());
+
+    component.updatePromoBarConfig();
+    expect(component.statusMessage).toEqual('Updating promo-bar config...');
+    tick();
+    expect(component.statusMessage).toEqual('Success!');
+  }));
+
+  it('should set error status message when' +
+      'update promo bar config fails', fakeAsync(() => {
+    spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(
+      Promise.reject('failed to update'));
+
+    component.updatePromoBarConfig();
+    expect(component.statusMessage).toEqual('Updating promo-bar config...');
+    tick();
+    expect(component.statusMessage).toEqual('Server error: failed to update');
+  }));
+
+  it('should flush memory cache and set success status' +
+      'when completed successfully', fakeAsync(() => {
+    spyOn(rcbas, 'flushMemoryCacheAsync').and.returnValue(Promise.resolve());
+
+    component.flushMemoryCache();
+    tick();
+
+    expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
+    expect(component.statusMessage).toEqual('Success! Memory Cache Flushed.');
+    expect(component.memoryCacheDataFetched).toBeFalse();
+  }));
+
+  it('should set error status when failed to flush memory cache',
+    fakeAsync(() => {
+      spyOn(rcbas, 'flushMemoryCacheAsync').and.returnValue(
+        Promise.reject('failed to flush'));
+
+      component.flushMemoryCache();
+      tick();
+
+      expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
+      expect(component.statusMessage).toEqual('Server error: failed to flush');
+    }));
+});
