@@ -38,8 +38,9 @@ from core import feconf
 from core import python_utils
 from core.constants import constants
 
-from typing import ( Any, Callable, Dict, Iterable, Iterator, List, Optional,
-                    Tuple, TypeVar, Union)
+from typing import (
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
+    Union)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
@@ -361,7 +362,8 @@ def is_base64(content: str) -> bool:
 
 
 def convert_image_str_to_data_binary(content: str) -> bytes:
-    """Converts a image object (represented by 'content') to a data binary.
+    """Converts an image string object (represented by 'content') to a
+    data binary.
 
     Args:
         content: str. Image file content.
