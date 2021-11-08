@@ -16,7 +16,8 @@
 
 from __future__ import annotations
 
-import base64, binascii
+import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -37,9 +38,8 @@ from core import feconf
 from core import python_utils
 from core.constants import constants
 
-from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union)
+from typing import (Any, Callable, Dict, Iterable, Iterator, List, Optional,
+                    Tuple, TypeVar, Union)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
@@ -341,8 +341,10 @@ def convert_image_binary_to_data_str(content: bytes) -> str:
     base64_encoded_data = base64.b64encode(content)
     return base64_encoded_data.decode('utf-8')
 
-def isBase64(img: str) -> bool:
-    """Checks if an image data has been base64 encoded or not.
+
+def is_base64(content: str) -> bool:
+    """Checks if an image object (represented by 'content') has been base64
+        encoded or not.
 
     Args:
         content: str. Image file content.
@@ -352,13 +354,14 @@ def isBase64(img: str) -> bool:
               False otherwise.
     """
     try:
-        base64.b64decode(img, validate=True)
+        base64.b64decode(content, validate=True)
         return True
     except binascii.Error:
         return False
 
+
 def convert_image_str_to_data_binary(content: str) -> bytes:
-    """Converts a image string (represented by 'content') to a data binary.
+    """Converts a image object (represented by 'content') to a data binary.
 
     Args:
         content: str. Image file content.

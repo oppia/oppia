@@ -45,7 +45,7 @@ def validate_image_and_filename(raw_image, filename):
             'Image exceeds file size limit of 100 KB.')
     allowed_formats = ', '.join(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-    if utils.isBase64(raw_image):
+    if utils.is_base64(raw_image):
         raw_image = utils.convert_image_str_to_data_binary(raw_image)
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
