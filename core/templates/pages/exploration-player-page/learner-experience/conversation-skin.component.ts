@@ -422,6 +422,10 @@ export class ConversationSkinComponent {
     }, 100);
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   getExplorationLink(): string {
     if (this.recommendedExplorationSummaries &&
         this.recommendedExplorationSummaries[0]) {

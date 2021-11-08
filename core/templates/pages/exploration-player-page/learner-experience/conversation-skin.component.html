@@ -66,6 +66,7 @@
                   type="submit"
                   class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                   (click)="submitAnswerFromProgressNav()"
+                  [ngStyle]="isLanguageRTL() ? {'left': '8px', 'right': 'auto'} : {'right': '8px', 'left': 'auto'}"
                   [disabled]="isSubmitButtonDisabled()"
                   translate="I18N_INTERACTIONS_SUBMIT">
           </button>
