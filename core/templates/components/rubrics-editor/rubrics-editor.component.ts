@@ -106,7 +106,7 @@ export class RubricsEditorComponent {
     if (this.rubrics[1]._explanations.length > 1) {
       return true;
     }
-    return this.editableExplanations[this.skillDifficultyMedium][0].length > 0
+    return this.editableExplanations[this.skillDifficultyMedium][0].length > 0;
   }
 
   isTotalExplanationsLengthReached(): boolean {
@@ -125,8 +125,7 @@ export class RubricsEditorComponent {
   }
 
   isExplanationLengthValid(): boolean {
-    return this.editableExplanations[this.rubric.getDifficulty()][0].length
-      < 300;
+    return this.editableExplanations[this.rubric.getDifficulty()][0].length < 300;
   }
 
   updateExplanation($event: string, idx: number): void {
