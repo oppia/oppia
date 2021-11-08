@@ -156,13 +156,14 @@ def get_exploration_ids_matching_query(
             the query are returned.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_offset). Where:
-            returned_collection_ids : list(str). A list with all collection ids
-                matching the given search query string, as well as a search
-                offset for future fetches. The list contains exactly
-                feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
-                that many, otherwise it contains all remaining results. (If this
-                behaviour does not occur, an error will be logged.)
+        2-tuple of (returned_exploration_ids, search_offset). Where:
+            returned_exploration_ids : list(str). A list with all
+                exploration ids matching the given search query string,
+                as well as a search offset for future fetches.
+                The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE
+                results if there are at least that many, otherwise it
+                contains all remaining results. (If this behaviour does
+                not occur, an error will be logged.)
             search_offset: int. Search offset for future fetches.
     """
     returned_exploration_ids = []
