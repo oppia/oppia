@@ -115,7 +115,9 @@ describe('Collection editor navbar breadcrumb component', () => {
   it('should change the active tab to settings when clicked on' +
     'collection title if the title is empty', fakeAsync(() => {
     expect(component.activeTabName).toBe(activeTab);
+
     component.editCollectionTitle();
+
     expect(component.activeTabName).toBe('Settings');
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
