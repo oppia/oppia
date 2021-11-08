@@ -455,6 +455,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 suggestion.get_new_image_filenames_added_in_suggestion()
             )
         )
+        # TODO(14204): Refactor this to use the normalized_request files.
         _upload_suggestion_images(
             self.payload.get('files', None),
             updated_suggestion, new_image_filenames
@@ -564,6 +565,7 @@ def _upload_suggestion_images(files, suggestion, filenames):
                 'No image data provided for file with name %s.'
                 % (filename))
         try:
+            # TODO(14204): Refactor this to use the normalized_request files.
             image = (
                 base64.decodebytes(image.encode('utf-8'))
                 if utils.is_base64_encoded(image)
