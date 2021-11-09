@@ -173,20 +173,13 @@ def compile_protobuf_files(proto_files_paths):
     # generate Python files we need to manually fix the imports.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     compiled_protobuf_dir = (
-        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files'))
-            .glob('**/*.py'))
-    for p in compiled_protobuf_dir:
+        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
+    for p in compiled_protobuf_dir.iterdir():
         if p.suffix == '.py':
-            if p.parent.name == 'proto_files':
-                common.inplace_replace_file(
-                    p.absolute(),
-                    r'^import (\w*_pb2 as)',
-                    r'from proto_files import \1')
-            else:
-                common.inplace_replace_file(
-                    p.absolute(),
-                    r'from ([^\s]+) import (?!descriptor_pb2)(\w*_pb2 as) (\w*__pb2)', # pylint: disable=line-too-long
-                    r'from proto_files.\1 import \2 proto__files_\3')
+            common.inplace_replace_file(
+                p.absolute(),
+                r'^import (\w*_pb2 as)',
+                r'from proto_files import \1')
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -220,6 +213,51 @@ def ensure_system_python_libraries_are_installed(package, version):
         'Checking if %s is installed.' % (package))
     install_backend_python_libs.pip_install_to_system(package, version)
 
+def rewrite_android_proto_files():
+    # Since there is no simple configuration for imports when using protobuf to
+    # generate Python files we need to manually fix the imports.
+    # See: https://github.com/protocolbuffers/protobuf/issues/1491
+    protobuf_dir = (
+        pathlib.Path(os.path.join(common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1'))
+            .glob('**/*.proto'))
+    for p in protobuf_dir:
+        if p.suffix == '.proto':
+            # remove package statement
+            common.inplace_replace_file(
+                p.absolute(),
+                r'^package ([^\s]+)',
+                r'')
+            common.inplace_replace_file(
+                p.absolute(),
+                r'^option java_.+',
+                r'')
+            common.inplace_replace_file(
+                p.absolute(),
+                r'^import (?!\"google)([^\s]+)[\\/]([^\s]+)',
+                r'import "\2')
+            common.inplace_replace_file(
+                p.absolute(),
+                r"org.oppia.*\.",
+                r'')
+
+def move_all_proto_files_to_third_party():
+    protobuf_dir = (
+        pathlib.Path(os.path.join(common.THIRD_PARTY_DIR,
+            'oppia-proto-api-introduce-proto-api-v1'))
+            .glob('**/*.proto'))
+    for p in protobuf_dir:
+        if p.suffix == ".proto":
+            source = p.absolute()
+            destination = (
+                os.path.join(common.THIRD_PARTY_DIR,
+                    'oppia-proto-api-introduce-proto-api-v1/'))
+            filename = os.path.basename(source)
+            dest = os.path.join(destination, filename)
+            shutil.move(str(source), str(dest))
+    if os.path.exists(os.path.join(common.THIRD_PARTY_DIR,
+        'oppia-proto-api-introduce-proto-api-v1/org')):
+            shutil.rmtree(os.path.join(common.THIRD_PARTY_DIR,
+        'oppia-proto-api-introduce-proto-api-v1/org'))
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
@@ -318,6 +356,8 @@ def main() -> None:
     # Compile protobuf files.
     python_utils.PRINT('Installing buf and protoc binary.')
     install_buf_and_protoc()
+    rewrite_android_proto_files()
+    move_all_proto_files_to_third_party()
     python_utils.PRINT('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
 
