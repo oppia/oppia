@@ -123,7 +123,6 @@ class PromoBarHandler(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': False
             },
             'promo_bar_message': {
                 'schema': {
