@@ -305,8 +305,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/user_services_test.py',
     'core/domain/user_validators.py',
     'core/domain/user_validators_test.py',
-    'core/domain/value_generators_domain.py',
-    'core/domain/value_generators_domain_test.py',
     'core/domain/visualization_registry.py',
     'core/domain/visualization_registry_test.py',
     'core/domain/voiceover_services.py',
