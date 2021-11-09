@@ -106,9 +106,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             rubrics=[],
             skill_contents={},
             next_misconception_id=0,
-            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf
+                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf
+                .CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf
+                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             superseding_skill_id='blah',
             all_questions_merged=False,
             prerequisite_skill_ids=[]
@@ -123,9 +126,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             rubrics=[],
             skill_contents={},
             next_misconception_id=0,
-            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf
+                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf
+                .CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf
+                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             superseding_skill_id='blah',
             all_questions_merged=False,
             prerequisite_skill_ids=[]
