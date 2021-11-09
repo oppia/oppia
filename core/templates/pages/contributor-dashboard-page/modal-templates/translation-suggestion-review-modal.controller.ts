@@ -283,7 +283,7 @@ angular.module('oppia').controller(
       };
 
       $scope.showTranslationSuggestionUpdateError = function(error) {
-        $scope.errorMessage = 'Invalid Suggestion:' + error.data.error;
+        $scope.errorMessage = 'Invalid Suggestion: ' + error.data.error;
         $scope.errorFound = true;
         $scope.startedEditing = true;
         $scope.translationHtml = $scope.tmpTranslationHtml;
