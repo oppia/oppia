@@ -154,8 +154,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
           error: 'Error'
         }
       };
-      $scope.errorMessage = '';
-      $scope.startedEditing = false;
 
       expect($scope.errorFound).toBeFalse();
       expect($scope.errorMessage).toBe('');

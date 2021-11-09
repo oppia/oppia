@@ -75,7 +75,7 @@ angular.module('oppia').controller(
         html: $scope.translationHtml
       };
       $scope.errorMessage = '';
-      $scope.startedEditing = false;
+      $scope.errorFound = false;
 
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
@@ -147,6 +147,7 @@ angular.module('oppia').controller(
             );
           });
         $scope.errorMessage = '';
+        $scope.errorFound = false;
         $scope.startedEditing = false;
         $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingContributions.length <= 0;
