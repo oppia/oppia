@@ -26,8 +26,7 @@ import { ReleaseCoordinatorPageComponent } from './release-coordinator-page.comp
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { PromoBar } from 'domain/promo_bar/promo-bar.model';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Release coordinator page', () => {
+describe('Release coordinator page', () => {
   let component: ReleaseCoordinatorPageComponent;
   let fixture: ComponentFixture<ReleaseCoordinatorPageComponent>;
   let pbbas: PromoBarBackendApiService;
