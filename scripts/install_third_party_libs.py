@@ -213,51 +213,73 @@ def ensure_system_python_libraries_are_installed(package, version):
         'Checking if %s is installed.' % (package))
     install_backend_python_libs.pip_install_to_system(package, version)
 
+
 def rewrite_android_proto_files():
+    """Edit all android proto files as protobuf not
+    support config imports.
+    """
     # Since there is no simple configuration for imports when using protobuf to
     # generate Python files we need to manually fix the imports.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     protobuf_dir = (
-        pathlib.Path(os.path.join(common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1'))
+        pathlib.Path(
+            os.path.join(
+                common.THIRD_PARTY_DIR,
+                'oppia-proto-api-introduce-proto-api-v1'))
             .glob('**/*.proto'))
     for p in protobuf_dir:
         if p.suffix == '.proto':
-            # remove package statement
+            # Remove package statement.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^package ([^\s]+)',
                 r'')
+            # Remove option statement.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^option java_.+',
                 r'')
+            # Update import statement.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^import (?!\"google)([^\s]+)[\\/]([^\s]+)',
                 r'import "\2')
+            # Remove all subpackage directories.
             common.inplace_replace_file(
                 p.absolute(),
-                r"org.oppia.*\.",
+                r'org.oppia.*\.',
                 r'')
 
+
 def move_all_proto_files_to_third_party():
+    """Move all proto files from subdirectories to the
+    third_party folder.
+    """
     protobuf_dir = (
-        pathlib.Path(os.path.join(common.THIRD_PARTY_DIR,
-            'oppia-proto-api-introduce-proto-api-v1'))
+        pathlib.Path(
+            os.path.join(
+                common.THIRD_PARTY_DIR,
+                'oppia-proto-api-introduce-proto-api-v1'))
             .glob('**/*.proto'))
     for p in protobuf_dir:
-        if p.suffix == ".proto":
+        if p.suffix == '.proto':
             source = p.absolute()
             destination = (
-                os.path.join(common.THIRD_PARTY_DIR,
+                os.path.join(
+                    common.THIRD_PARTY_DIR,
                     'oppia-proto-api-introduce-proto-api-v1/'))
             filename = os.path.basename(source)
             dest = os.path.join(destination, filename)
             shutil.move(str(source), str(dest))
-    if os.path.exists(os.path.join(common.THIRD_PARTY_DIR,
-        'oppia-proto-api-introduce-proto-api-v1/org')):
-            shutil.rmtree(os.path.join(common.THIRD_PARTY_DIR,
-        'oppia-proto-api-introduce-proto-api-v1/org'))
+    if os.path.exists(
+        os.path.join(
+            common.THIRD_PARTY_DIR,
+            'oppia-proto-api-introduce-proto-api-v1/org')):
+        shutil.rmtree(
+            os.path.join(
+                common.THIRD_PARTY_DIR,
+                'oppia-proto-api-introduce-proto-api-v1/org'))
+
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
