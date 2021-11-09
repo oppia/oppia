@@ -66,7 +66,7 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
             Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_exploration_or_question_change(
                 incorrect_change_dict)
-        
+
         incorrect_change_dict = {
             'cmd': 'add_subtopic',
             'state_name': 'State 3',
