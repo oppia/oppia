@@ -1523,7 +1523,8 @@ class InteractionInstance:
         """Creates a IsInclusivelyBetweenSpec proto object.
 
         Args:
-            x: list. The list of range.
+            a: int|double. The lower range.
+            b: int|double. The upper range.
 
         Returns:
             Proto Object. The IsInclusivelyBetweenSpec proto object.
