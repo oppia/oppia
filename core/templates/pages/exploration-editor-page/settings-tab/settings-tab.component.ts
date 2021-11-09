@@ -88,7 +88,10 @@ require('services/exploration-features.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/context.service');
 require('pages/exploration-editor-page/services/router.service.ts');
-
+require(
+  'pages/exploration-editor-page/services/' +
+  'setting-tab-backend-api.service.ts'
+);
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
@@ -99,7 +102,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'ContextService', 'EditabilityService',
     'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
@@ -110,12 +113,13 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'RouterService', 'UserEmailPreferencesService',
+    'RouterService', 'SettingTabBackendApiService',
+    'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService', 'WindowRef',
     'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
-        $http, $rootScope, $uibModal, AlertsService, ChangeListService,
+        $rootScope, $uibModal, AlertsService, ChangeListService,
         ContextService, EditabilityService,
         EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
@@ -126,7 +130,8 @@ angular.module('oppia').component('settingsTab', {
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        RouterService, UserEmailPreferencesService,
+        RouterService, SettingTabBackendApiService,
+        UserEmailPreferencesService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService, WindowRef,
         ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
@@ -467,36 +472,37 @@ angular.module('oppia').component('settingsTab', {
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
-        $http.get(moderatorEmailDraftUrl).then(function(response) {
-          // If the draft email body is empty, email functionality will not
-          // be exposed to the mdoerator.
-          var draftEmailBody = response.data.draft_email_body;
+        SettingTabBackendApiService
+          .getData(moderatorEmailDraftUrl).then(function(response) {
+            // If the draft email body is empty, email functionality will not
+            // be exposed to the mdoerator.
+            var draftEmailBody = response.draft_email_body;
 
-          $uibModal.open({
-            template: require(
-              'pages/exploration-editor-page/settings-tab/templates/' +
-              'moderator-unpublish-exploration-modal.template.html'),
-            backdrop: true,
-            resolve: {
-              draftEmailBody: () => draftEmailBody
-            },
-            controller: 'ModeratorUnpublishExplorationModalController'
-          }).result.then(function(emailBody) {
-            ExplorationRightsService.saveModeratorChangeToBackendAsync(
-              emailBody).then(function() {
-              UserExplorationPermissionsService.fetchPermissionsAsync()
-                .then(function(permissions) {
-                  ctrl.canUnpublish = permissions.canUnpublish;
-                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the controller is migrated to angular.
-                  $rootScope.$applyAsync();
-                });
+            $uibModal.open({
+              template: require(
+                'pages/exploration-editor-page/settings-tab/templates/' +
+                'moderator-unpublish-exploration-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                draftEmailBody: () => draftEmailBody
+              },
+              controller: 'ModeratorUnpublishExplorationModalController'
+            }).result.then(function(emailBody) {
+              ExplorationRightsService.saveModeratorChangeToBackendAsync(
+                emailBody).then(function() {
+                UserExplorationPermissionsService.fetchPermissionsAsync()
+                  .then(function(permissions) {
+                    ctrl.canUnpublish = permissions.canUnpublish;
+                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$applyAsync();
+                  });
+              });
+            }, function() {
+              AlertsService.clearWarnings();
             });
-          }, function() {
-            AlertsService.clearWarnings();
           });
-        });
       };
 
       ctrl.isExplorationLockedForEditing = function() {
