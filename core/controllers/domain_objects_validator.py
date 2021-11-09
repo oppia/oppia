@@ -179,11 +179,12 @@ def validate_aggregated_stats(aggregated_stats):
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
 
+
 def validate_params(params):
     """Validate the attribute params dict.
 
     Args:
-        params: dict. Data that needs to be validated
+        params: dict. Data that needs to be validated.
 
     Raises:
         InvalidInputException. Property not in params dict.

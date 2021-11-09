@@ -19,12 +19,15 @@ from __future__ import annotations
 import json
 import logging
 import random
-from core import feconf, schema_utils
+
+from core import feconf
+from core import schema_utils
 from core import utils
 from core.constants import constants
-from core.controllers import acl_decorators, editor
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
+from core.controllers import editor
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
@@ -642,7 +645,8 @@ class SolutionHitEventHandler(base.BaseHandler):
         """Handles POST requests."""
         event_services.SolutionHitEventHandler.record(
             exploration_id, self.normalized_payload.get('exploration_version'),
-            self.normalized_payload.get('state_name'), self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
             self.normalized_payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
