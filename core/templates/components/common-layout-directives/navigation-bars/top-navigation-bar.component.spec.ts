@@ -451,11 +451,11 @@ describe('TopNavigationBarComponent', () => {
     spyOn(i18nLanguageCodeService, 'getCurrentI18nLanguageCode')
       .and.returnValue('en');
 
-    expect(component.isModerator).toBe(undefined);
-    expect(component.isCurriculumAdmin).toBe(undefined);
-    expect(component.isTopicManager).toBe(undefined);
-    expect(component.isSuperAdmin).toBe(undefined);
-    expect(component.userIsLoggedIn).toBe(undefined);
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
     expect(component.username).toBe(undefined);
     expect(component.profilePageUrl).toBe(undefined);
 

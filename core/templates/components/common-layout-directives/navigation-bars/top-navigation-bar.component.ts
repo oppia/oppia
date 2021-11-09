@@ -58,18 +58,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
-  isModerator!: boolean;
-  isCurriculumAdmin!: boolean;
-  isTopicManager!: boolean;
-  isSuperAdmin!: boolean;
-  isBlogAdmin!: boolean;
-  isBlogPostEditor!: boolean;
-  userIsLoggedIn!: boolean;
+  isModerator: boolean = false;
+  isCurriculumAdmin: boolean = false;
+  isTopicManager: boolean = false;
+  isSuperAdmin: boolean = false;
+  isBlogAdmin: boolean = false;
+  isBlogPostEditor: boolean = false;
+  userIsLoggedIn: boolean = false;
   currentUrl!: string;
-  userMenuIsShown!: boolean;
-  inClassroomPage!: boolean;
-  showLanguageSelector!: boolean;
-  standardNavIsShown!: boolean;
+  userMenuIsShown: boolean = false;
+  inClassroomPage: boolean = false;
+  showLanguageSelector: boolean = false;
+  standardNavIsShown: boolean = false;
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
@@ -87,7 +87,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       };
     };
   labelForClearingFocus!: string;
-  sidebarIsShown!: boolean;
+  sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
 
   // The 'username', 'profilePageUrl' and 'profilePictureDataUrl' properties
