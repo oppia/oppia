@@ -148,21 +148,20 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith('Translation');
     });
 
-    it('should notify user on failed suggestion activities', function() {
+    it('should notify user on failed suggestion update', function() {
       const error = {
         data: {
           error: 'Error'
         }
       };
-      spyOn(AlertsService, 'clearWarnings');
-      spyOn(AlertsService, 'addWarning');
+
+      expect($scope.errorFound).toBeFalse();
+      expect($scope.errorMessage).toBe('');
 
       $scope.showTranslationSuggestionUpdateError(error);
 
-      expect(AlertsService.clearWarnings).toHaveBeenCalled();
-      expect(
-        AlertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error');
+      expect($scope.errorFound).toBeTrue();
+      expect($scope.errorMessage).toBe('Invalid Suggestion: Error');
     });
 
     it('should accept suggestion in suggestion modal service when clicking' +
@@ -335,7 +334,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
       'should update translation when the update button is clicked',
       function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
-        $scope.editedContent = '<p>In Hindi</p>';
+        $scope.editedContent = {
+          html: '<p>In Hindi</p>'
+        };
         $scope.activeSuggestion.change = {
           cmd: 'add_written_translation',
           state_name: 'State 3',
@@ -355,7 +356,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
         expect(contributionAndReviewService.updateTranslationSuggestionAsync)
           .toHaveBeenCalledWith(
-            'suggestion_1', $scope.editedContent,
+            'suggestion_1', $scope.editedContent.html,
             jasmine.any(Function),
             jasmine.any(Function));
       });
