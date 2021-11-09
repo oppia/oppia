@@ -2229,7 +2229,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """Model contains data corresponding to a user: id field, but it isn't
         deleted because it is needed for auditing purposes.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:

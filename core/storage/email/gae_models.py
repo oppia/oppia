@@ -97,7 +97,7 @@ class SentEmailModel(base_models.BaseModel):
         recipient_email, sender_id, and sender_email, but this isn't deleted
         because this model is needed for auditing purposes.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
@@ -124,6 +124,19 @@ class SentEmailModel(base_models.BaseModel):
             'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'email_hash': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of SentEmailModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        keys = cls.query(datastore_services.any_of(
+            cls.recipient_id == user_id,
+            cls.sender_id == user_id,
+        )).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -358,7 +371,7 @@ class BulkEmailModel(base_models.BaseModel):
         sender_id, and sender_email, but this isn't deleted because this model
         is needed for auditing purposes.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
@@ -385,10 +398,22 @@ class BulkEmailModel(base_models.BaseModel):
         })
 
     @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of SentEmailModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        keys = cls.query(datastore_services.any_of(
+            cls.sender_id == user_id,
+        )).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether BulkEmailModel exists for user. Since recipient_ids
         can't be indexed it also can't be checked by this method, we can allow
-        this because the deletion policy for this model is keep , thus even the
+        this because the deletion policy for this model is keep, thus even the
         deleted user's id will remain here.
 
         Args:
@@ -398,7 +423,8 @@ class BulkEmailModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None)
+            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None
+        )
 
     @classmethod
     def create(
