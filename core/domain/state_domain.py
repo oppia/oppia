@@ -1421,7 +1421,7 @@ class InteractionInstance:
             if rule_type == 'IsInclusivelyBetween':
                 is_inclusively_between_proto = (
                     cls._to_numeric_is_inclusively_between_proto(
-                        rule_spec.inputs['x']))
+                        rule_spec.inputs['a'], rule_spec.inputs['b']))
                 rules_specs_proto = (
                     state_pb2.NumericInputInstance.RuleSpec(
                         is_inclusively_between=is_inclusively_between_proto))
@@ -1519,7 +1519,7 @@ class InteractionInstance:
         return is_greater_than_or_equal_to_proto
 
     @classmethod
-    def _to_numeric_is_inclusively_between_proto(cls, x):
+    def _to_numeric_is_inclusively_between_proto(cls, a, b):
         """Creates a IsInclusivelyBetweenSpec proto object.
 
         Args:
@@ -1531,8 +1531,8 @@ class InteractionInstance:
         is_inclusively_between_proto = (
             state_pb2.NumericInputInstance
             .RuleSpec.IsInclusivelyBetweenSpec(
-                inputLowerInclusive=x[0],
-                inputUpperInclusive=x[1]))
+                inputLowerInclusive=a,
+                inputUpperInclusive=b))
 
         return is_inclusively_between_proto
 
