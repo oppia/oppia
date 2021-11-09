@@ -340,8 +340,6 @@ class BulkEmailModel(base_models.BaseModel):
     length 12.
     """
 
-    # The user IDs of the email recipients.
-    recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
     sender_id = datastore_services.StringProperty(required=True, indexed=True)

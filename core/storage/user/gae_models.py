@@ -2243,6 +2243,15 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of UserBulkEmailsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        return cls.delete_by_id(user_id)
+
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
