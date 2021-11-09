@@ -263,7 +263,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.validate(strict=True)
 
     def test_thumbnail_passes_string_validation(self) -> None:
-        """Tests that thumbnail passes string validation."""
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 123
         self.blog_post.tags = ['tag']
@@ -483,7 +482,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             self.blog_post_summary.validate()
 
     def test_blog_post_url_fragment_passes_strict_validation(self) -> None:
-        """Tests validation for blog post url fragment."""
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
         self.blog_post_summary.tags = ['tag']
@@ -496,7 +494,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.validate(strict=True)
 
     def test_blog_post_thumbnail_passes_strict_validation(self) -> None:
-        """Tests validation for blog post thumbnail filename."""
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 123
         self.blog_post_summary.tags = ['tag']
@@ -522,14 +519,12 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Expected thumbnail filename to be a string, received: 123')
 
     def test_blog_post_passes_valid_url_fragment(self) -> None:
-        """Tests validation for blog post url fragment."""
         self.blog_post_summary.url_fragment = 123
         self._assert_url_fragment_passes_valid_url_fragment(
             'Blog Post URL Fragment field must be a string. '
             'Received 123')
 
     def test_blog_post_passes_valid_title(self) -> None:
-        """Tests validation for blog post title."""
         self.blog_post_summary.title = 123
         self._assert_title_passes_valid_title(
             'Expected title to be a string, received: 123.')
@@ -570,7 +565,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Atleast one tag should be selected', [])
 
     def test_blog_post_tags_passes_validation(self) -> None:
-        """Tests validation for blog post tags."""
         self.blog_post_summary.tags = ['tag', 123]
         self._assert_valid_tag_elements(
             'Expected each tag in \'tags\' to be a string, received: '

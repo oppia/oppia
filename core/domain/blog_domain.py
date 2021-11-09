@@ -295,9 +295,7 @@ class BlogPost:
         }
 
     @classmethod
-    def from_dict(
-        cls, blog_post_dict: BlogPostDict
-    ) -> 'BlogPost':
+    def from_dict(cls, blog_post_dict: BlogPostDict) -> "BlogPost":
         """Returns a blog post domain object from a dictionary.
 
         Args:

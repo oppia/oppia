@@ -119,12 +119,12 @@ class UserAuthDetails:
     """
 
     def __init__(
-            self,
-            user_id: str,
-            gae_id: str,
-            firebase_auth_id: str,
-            parent_user_id: str,
-            deleted: bool = False
+        self,
+        user_id: str,
+        gae_id: str,
+        firebase_auth_id: str,
+        parent_user_id: str,
+        deleted: bool = False
     ) -> None:
         self.user_id = user_id
         self.gae_id = gae_id
