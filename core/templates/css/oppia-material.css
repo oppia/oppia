@@ -2205,9 +2205,6 @@ th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
 .mat-radio-button.mat-radio-disabled .mat-radio-label-content {
   color: rgba(0, 0, 0, 0.38); }
 
-.mat-radio-button .mat-radio-label {
-  align-items: flex-start; }
-
 .mat-radio-button .mat-ripple-element {
   background-color: black; }
 
