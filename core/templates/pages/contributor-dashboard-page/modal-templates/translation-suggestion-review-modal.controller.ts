@@ -80,7 +80,7 @@ angular.module('oppia').controller(
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
-        $scope. preEditTranslationHtml = $scope.translationHtml;
+        $scope.preEditTranslationHtml = $scope.translationHtml;
         $scope.translationHtml = updatedTranslation;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
@@ -289,7 +289,7 @@ angular.module('oppia').controller(
         $scope.errorMessage = 'Invalid Suggestion: ' + error.data.error;
         $scope.errorFound = true;
         $scope.startedEditing = true;
-        $scope.translationHtml = $scope. preEditTranslationHtml;
+        $scope.translationHtml = $scope.preEditTranslationHtml;
       };
     }
   ]);
