@@ -14,8 +14,7 @@
 
 """Python execution environent set up for all scripts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
@@ -70,6 +69,23 @@ def test_python_version():
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
         raise Exception('No suitable python version found.')
+
+    # Verify that Python 2 is available. Python 2 is needed for the
+    # app_devserver. See the Google Cloud docs:
+    # https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
+    return_code = subprocess.call(
+        'python2 -V', stderr=subprocess.DEVNULL, shell=True
+    )
+    if return_code != 0:
+        print(
+            '\033[91m'
+            'The Oppia server needs Python 2 to be installed. '
+            'Please follow the instructions at '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#'
+            'python-2-is-not-available to fix this.'
+            '\033[0m'
+        )
+        sys.exit(1)
 
 
 def download_and_install_package(url_to_retrieve, filename):

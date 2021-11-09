@@ -47,6 +47,15 @@ describe('I18nLanguageCodeService', () => {
     expect(latestCode).toBe('es');
   });
 
+  it('should get whether the current language is RTL correctly', () => {
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+    expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(true);
+  });
+
   it('should get event emitter for loading of preferred language codes', () => {
     let mockPreferredLanguageCodesLoadedEventEmitter = new EventEmitter();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded).toEqual(

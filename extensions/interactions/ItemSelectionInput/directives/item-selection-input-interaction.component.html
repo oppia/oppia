@@ -16,10 +16,10 @@
     </small>
     <div class="item-selection-input-container" ng-repeat="choice in $ctrl.choices track by $index">
       <div ng-if="$ctrl.displayCheckboxes">
-        <label class="item-selection-input-item protractor-test-item-selection-input-item">
+        <label dir="auto" class="item-selection-input-item protractor-test-item-selection-input-item">
           <md-checkbox class="item-selection-input-checkbox protractor-test-item-selection-input-checkbox" ng-model="$ctrl.userSelections[choice]" ng-checked="$ctrl.userSelections[choice]"
                        ng-change="$ctrl.onToggleCheckbox()" ng-disabled="$ctrl.preventAdditionalSelections && !$ctrl.userSelections[choice]" tabindex="0">
-            <span>
+            <span dir="auto">
               <angular-html-bind class="protractor-test-item-selection-option" html-data="choice">
               </angular-html-bind>
             </span>
@@ -27,7 +27,7 @@
         </label>
       </div>
 
-      <div ng-if="!$ctrl.displayCheckboxes">
+      <div dir="auto" ng-if="!$ctrl.displayCheckboxes">
         <button class="multiple-choice-option" ng-click="$ctrl.submitMultipleChoiceAnswer($event, $index)">
           <div class="multiple-choice-radio-button-container">
             <span class="multiple-choice-outer-radio-button">

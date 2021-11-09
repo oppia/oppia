@@ -18,8 +18,7 @@
 using release_summary.md.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import datetime
@@ -524,7 +523,6 @@ def main():
     repo = g.get_organization('oppia').get_repo('oppia')
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    common.check_blocking_bug_issue_count(repo)
     common.check_prs_for_current_release_are_released(repo)
 
     if not os.path.exists(constants.release_constants.RELEASE_SUMMARY_FILEPATH):
