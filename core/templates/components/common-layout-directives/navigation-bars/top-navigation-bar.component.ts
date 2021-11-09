@@ -379,7 +379,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     if (this.windowDimensionsService?.isWindowNarrow()) {
       return;
     }
+
+    // Inside a setTimeout function call, 'this' points to the global object.
+    // To access the context in which the setTimeout call is made, we need to
+    // first save a reference to that context in a variable, and then use that
+    // variable in place of the 'this' keyword.
     let that = this;
+
     // If i18n hasn't completed, retry after 100ms.
     if (!this.checkIfI18NCompleted()) {
       setTimeout(function() {
