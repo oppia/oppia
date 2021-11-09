@@ -40,6 +40,7 @@ export class CreateNewSubtopicModalComponent
   classroomUrlFragment: string;
   topic: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
+  htmlData: string;
   schemaEditorIsShown: boolean;
   editableThumbnailFilename: string;
   editableThumbnailBgColor: string;
@@ -74,6 +75,7 @@ export class CreateNewSubtopicModalComponent
         rows: 100
       }
     };
+    this.htmlData = '';
     this.schemaEditorIsShown = false;
     this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
@@ -118,6 +120,7 @@ export class CreateNewSubtopicModalComponent
     return Boolean(
       this.editableThumbnailFilename &&
       this.subtopicTitle &&
+      this.htmlData &&
       this.editableUrlFragment &&
       this.isUrlFragmentValid());
   }
@@ -166,5 +169,9 @@ export class CreateNewSubtopicModalComponent
     this.topicUpdateService.setSubtopicTitle(
       this.topic, this.subtopicId, this.subtopicTitle);
     this.ngbActiveModal.close(this.subtopicId);
+  }
+
+  localValueChange(event: string): void {
+    this.htmlData = event;
   }
 }

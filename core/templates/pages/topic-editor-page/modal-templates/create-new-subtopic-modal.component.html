@@ -48,7 +48,8 @@
           <div class="oppia-editor-card-body" >
             <schema-based-editor [schema]="getSchema.bind(this)"
                                  class="protractor-test-create-subtopic-page-content"
-                                 [localValue]="htmlData">
+                                 [localValue]="htmlData"
+                                 (localValueChange)="localValueChange($event)">
             </schema-based-editor>
           </div>
         </div>
