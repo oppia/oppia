@@ -69,7 +69,7 @@ angular.module('oppia').controller(
       $scope.canEditTranslation = false;
       // The 'html' value is passed as an object as it is required for
       // schema-based-editor. Otherwise the corrrectly updated value for
-      // the translation is not recieved from the editor when the translation
+      // the translation is not received from the editor when the translation
       // is edited by the reviewer.
       $scope.editedContent = {
         html: $scope.translationHtml
@@ -80,7 +80,7 @@ angular.module('oppia').controller(
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
-        $scope.tmpTranslationHtml = $scope.translationHtml;
+        $scope. preEditTranslationHtml = $scope.translationHtml;
         $scope.translationHtml = updatedTranslation;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
@@ -289,7 +289,7 @@ angular.module('oppia').controller(
         $scope.errorMessage = 'Invalid Suggestion: ' + error.data.error;
         $scope.errorFound = true;
         $scope.startedEditing = true;
-        $scope.translationHtml = $scope.tmpTranslationHtml;
+        $scope.translationHtml = $scope. preEditTranslationHtml;
       };
     }
   ]);
