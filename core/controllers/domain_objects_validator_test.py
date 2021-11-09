@@ -16,7 +16,11 @@
 
 from __future__ import annotations
 
+import os
+
 from core import utils
+from core import python_utils
+from core import feconf
 from core.controllers import domain_objects_validator
 from core.tests import test_utils
 
@@ -254,3 +258,22 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegexp(Exception, 'content'): # type: ignore[no-untyped-call]
             domain_objects_validator.validate_state_dict(invalid_state_dict)
+
+
+class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
+    """Tests to validate suggestion images coming from frontend."""
+
+    def test_invalid_images_raises_exception(self) -> None:
+        files = {'file.svg': None}
+        with self.assertRaisesRegexp( #type : ignore[no-untyped-call]
+            Exception, 'No image supplied'):
+            domain_objects_validator.validate_suggestion_images(files)
+    
+    def test_valid_images_do_not_raises_exception(self) -> None:
+        files = {'img.png': None, 'test2_svg.svg': None}
+        for filename in files:
+            with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, filename),
+                'rb', encoding=None) as f:
+                 files[filename] = f.read()
+        domain_objects_validator.validate_suggestion_images(files)
