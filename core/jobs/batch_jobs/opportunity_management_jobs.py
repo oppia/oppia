@@ -173,7 +173,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             count = (
                 question_skill_link_models
                 | 'Map to question IDs' >> beam.Map(lambda n: n.question_id)
-                | 'Get the number of distinct question IDs' >> beam.Distinct()
+                | 'Get the number of distinct question IDs' >> beam.Distinct() # pylint: disable=no-value-for-parameter
                 | 'Get the total number' >> beam.combiners.Count.Globally()
 
             )
