@@ -292,7 +292,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
             | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
         )
 
-        new_user_stats_models = (
+        contributions_stats = (
             {
                 'suggestion': suggestions_grouped_by_target,
                 'opportunity': exp_opportunities
@@ -305,6 +305,12 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None
                 ))
+        )
+
+        new_user_stats_models = (
+            contributions_stats
+            | 'Filter only valid stats' >> beam.Filter(
+                lambda key_and_stat: isinstance(key_and_stat[1], dict))
             | 'Combine the stats' >> beam.CombinePerKey(CombineStats())
             | 'Generate models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
@@ -315,7 +321,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
+        success_run_results = (
             new_user_stats_models
             | 'Count all new models' >> (
                 beam.combiners.Count.Globally().without_defaults())
@@ -327,11 +333,29 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                 )
         )
 
+        failure_run_results = (
+            contributions_stats
+            | 'Filter only invalid stats' >> beam.Filter(
+                lambda key_and_stat: isinstance(key_and_stat[1], str))
+            | 'Create result for failed stats' >> beam.MapTuple(
+                lambda key, error: job_run_result.JobRunResult(
+                    stderr='FAILURE %s: %s' % (key, error))
+                )
+        )
+
+        return (
+            (success_run_results, failure_run_results)
+            | 'Merge success and failure results' >> beam.Flatten()
+        )
+
     @staticmethod
     def _generate_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
-    ) -> Iterable[Tuple[str, Dict[str, Union[bool, int, str]]]]:
+    ) -> Iterable[Union[
+        Tuple[str, Dict[str, Union[bool, int, str]]],
+        Tuple[str, str]
+    ]]:
         """Generates translation contribution stats for each suggestion.
 
         Args:
@@ -356,22 +380,26 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            # Count the number of words in the original content, ignoring any
-            # HTML tags and attributes.
-            content_plain_text = html_cleaner.strip_html_tags( # type: ignore[no-untyped-call]
-                suggestion.change.content_html) # type: ignore[attr-defined]
-            content_word_count = len(content_plain_text.split())
-
             key = (
                 suggestion_models.TranslationContributionStatsModel.generate_id(
                     suggestion.language_code, suggestion.author_id, topic_id))
-            translation_contribution_stats_dict = {
-                'suggestion_status': suggestion.status,
-                'edited_by_reviewer': suggestion.edited_by_reviewer,
-                'content_word_count': content_word_count,
-                'last_updated_date': suggestion.last_updated.date().isoformat()
-            }
-            yield (key, translation_contribution_stats_dict)
+
+            try:
+                # Count the number of words in the original content, ignoring
+                # any HTML tags and attributes.
+                content_plain_text = html_cleaner.strip_html_tags( # type: ignore[no-untyped-call]
+                    suggestion.change.content_html) # type: ignore[attr-defined]
+                content_word_count = len(content_plain_text.split())
+                translation_contribution_stats_dict = {
+                    'suggestion_status': suggestion.status,
+                    'edited_by_reviewer': suggestion.edited_by_reviewer,
+                    'content_word_count': content_word_count,
+                    'last_updated_date': (
+                        suggestion.last_updated.date().isoformat())
+                }
+                yield (key, translation_contribution_stats_dict)
+            except Exception as e:
+                yield (key, '%s' % e)
 
     @staticmethod
     def _generate_translation_contribution_model(
