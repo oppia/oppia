@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -143,8 +142,7 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
+        pass
 
 
 class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
