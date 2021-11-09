@@ -74,6 +74,8 @@ angular.module('oppia').controller(
       $scope.editedContent = {
         html: $scope.translationHtml
       };
+      $scope.errorMessage = '';
+      $scope.startedEditing = false;
 
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
