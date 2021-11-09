@@ -977,8 +977,7 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
-        r'%s' % feconf.TASK_URL_DEFERRED,
-        tasks.DeferredTasksHandler),
+        r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).
