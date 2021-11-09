@@ -33,7 +33,13 @@ fdescribe('Release coordinator page', () => {
   let pbbas: PromoBarBackendApiService;
   let rcbas: ReleaseCoordinatorBackendApiService;
   let fb: FormBuilder;
+
   let mockPromoBarData = new PromoBar(true, 'Hello');
+  let mockMemoryCacheProfile = {
+    peak_allocation: '1430120',
+    total_allocation: '1014112',
+    total_keys_stored: '2'
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -69,50 +75,58 @@ fdescribe('Release coordinator page', () => {
   beforeEach(() => {
     spyOn(pbbas, 'getPromoBarDataAsync').and.returnValue(
       Promise.resolve(mockPromoBarData));
-
     component.ngOnInit();
   });
 
-  it('should load the component with the correct properties', () => {
+  it('should load the component with the correct properties' +
+  'when user navigates to release coordinator page', fakeAsync(() => {
     expect(component.statusMessage).toEqual('');
     expect(component.submitButtonDisabled).toBeTrue();
     expect(component.memoryCacheDataFetched).toBeFalse();
     expect(component.activeTab).toEqual(
       ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
-  });
 
-  it('should set success status message when' +
-      'update promo bar config executes successfully', fakeAsync(() => {
-    spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(Promise.resolve());
-
-    component.updatePromoBarConfig();
-    expect(component.statusMessage).toEqual('Updating promo-bar config...');
-    tick();
-    expect(component.statusMessage).toEqual('Success!');
-  }));
-
-  it('should set error status message when' +
-      'update promo bar config fails', fakeAsync(() => {
-    spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(
-      Promise.reject('failed to update'));
-
-    component.updatePromoBarConfig();
-    expect(component.statusMessage).toEqual('Updating promo-bar config...');
-    tick();
-    expect(component.statusMessage).toEqual('Server error: failed to update');
-  }));
-
-  it('should flush memory cache and set success status' +
-      'when completed successfully', fakeAsync(() => {
-    spyOn(rcbas, 'flushMemoryCacheAsync').and.returnValue(Promise.resolve());
-
-    component.flushMemoryCache();
     tick();
 
-    expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
-    expect(component.statusMessage).toEqual('Success! Memory Cache Flushed.');
-    expect(component.memoryCacheDataFetched).toBeFalse();
+    expect(pbbas.getPromoBarDataAsync).toHaveBeenCalled();
+    expect(component.promoBarConfigForm.enabled).toBeTrue();
   }));
+
+  it('should update promo bar config and set success status',
+    fakeAsync(() => {
+      spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(
+        Promise.resolve());
+
+      component.updatePromoBarConfig();
+      expect(component.statusMessage).toEqual('Updating promo-bar config...');
+      tick();
+      expect(pbbas.updatePromoBarDataAsync).toHaveBeenCalled();
+      expect(component.statusMessage).toEqual('Success!');
+    }));
+
+  it('should set error status when update promo bar config fails',
+    fakeAsync(() => {
+      spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(
+        Promise.reject('failed to update'));
+
+      component.updatePromoBarConfig();
+      expect(component.statusMessage).toEqual('Updating promo-bar config...');
+      tick();
+      expect(pbbas.updatePromoBarDataAsync).toHaveBeenCalled();
+      expect(component.statusMessage).toEqual('Server error: failed to update');
+    }));
+
+  it('should flush memory cache and set success status',
+    fakeAsync(() => {
+      spyOn(rcbas, 'flushMemoryCacheAsync').and.returnValue(Promise.resolve());
+
+      component.flushMemoryCache();
+      tick();
+
+      expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
+      expect(component.statusMessage).toEqual('Success! Memory Cache Flushed.');
+      expect(component.memoryCacheDataFetched).toBeFalse();
+    }));
 
   it('should set error status when failed to flush memory cache',
     fakeAsync(() => {
@@ -124,5 +138,36 @@ fdescribe('Release coordinator page', () => {
 
       expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
       expect(component.statusMessage).toEqual('Server error: failed to flush');
+    }));
+
+  it('should fetch memory cache profile and set success status',
+    fakeAsync(() => {
+      spyOn(rcbas, 'getMemoryCacheProfileAsync').and.returnValue(
+        Promise.resolve(mockMemoryCacheProfile));
+
+      component.getMemoryCacheProfile();
+      tick();
+
+      expect(rcbas.getMemoryCacheProfileAsync).toHaveBeenCalled();
+      expect(component.memoryCacheProfile.totalAllocatedInBytes)
+        .toEqual(mockMemoryCacheProfile.total_allocation);
+      expect(component.memoryCacheProfile.peakAllocatedInBytes)
+        .toEqual(mockMemoryCacheProfile.peak_allocation);
+      expect(component.memoryCacheProfile.totalKeysStored)
+        .toEqual(mockMemoryCacheProfile.total_keys_stored);
+      expect(component.memoryCacheDataFetched).toBeTrue();
+      expect(component.statusMessage).toBe('Success!');
+    }));
+
+  it('should set error status when fetching memory cache profile fails',
+    fakeAsync(() => {
+      spyOn(rcbas, 'getMemoryCacheProfileAsync').and.returnValue(
+        Promise.reject('failed to fetch'));
+
+      component.getMemoryCacheProfile();
+      tick();
+
+      expect(rcbas.getMemoryCacheProfileAsync).toHaveBeenCalled();
+      expect(component.statusMessage).toBe('Server error: failed to fetch');
     }));
 });
