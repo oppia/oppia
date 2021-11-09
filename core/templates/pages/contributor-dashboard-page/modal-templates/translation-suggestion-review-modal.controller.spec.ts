@@ -148,7 +148,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith('Translation');
     });
 
-    it('should notify user on failed suggestion activities', function() {
+    it('should notify user on failed suggestion update', function() {
       const error = {
         data: {
           error: 'Error'
@@ -157,7 +157,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
       $scope.showTranslationSuggestionUpdateError(error);
 
-      expect(AlertsService.clearWarnings).toHaveBeenCalled();
       expect($scope.errorFound).toBeTrue();
       expect($scope.errorMessage).toBe('Invalid Suggestion: Error');
     });
