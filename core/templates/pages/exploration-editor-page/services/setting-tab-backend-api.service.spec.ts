@@ -40,7 +40,7 @@ describe('History Tab Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should get setting tab data when getData called',
+  it('should get setting tab data when getData is called',
     fakeAsync(() => {
       let moderatorEmailDraftUrl = 'check';
       service.getData(
