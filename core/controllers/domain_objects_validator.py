@@ -178,3 +178,25 @@ def validate_aggregated_stats(aggregated_stats):
                 raise base.BaseHandler.InvalidInputException(
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
+
+def validate_params(params):
+    """Validate the attribute params dict.
+
+    Args:
+        params: dict. Data that needs to be validated
+
+    Raises:
+        InvalidInputException. Property not in params dict.
+    """
+    exploration_params_properties = [
+        'parent',
+        'iframed',
+        'v',
+        'collection_id',
+        'include_system_recommendations',
+        'stringified_author_recommended_ids'
+    ]
+    for exp_param_property in params:
+        if exp_param_property not in exploration_params_properties:
+            raise base.BaseHandler.InvalidInputException(
+                '%s not in params dict.' % (exp_param_property))
