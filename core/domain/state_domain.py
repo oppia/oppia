@@ -37,9 +37,9 @@ from core.domain import param_domain
 from core.domain import rules_registry
 from core.domain import translatable_object_registry
 from extensions.objects.models import objects
-from proto_files.org.oppia.proto.v1.structure import languages_pb2
-from proto_files.org.oppia.proto.v1.structure import objects_pb2
-from proto_files.org.oppia.proto.v1.structure import state_pb2
+from proto_files import languages_pb2
+from proto_files import objects_pb2
+from proto_files import state_pb2
 
 
 class AnswerGroup:
