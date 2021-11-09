@@ -32,14 +32,10 @@ interface SettingTabResponse {
   providedIn: 'root'
 })
 export class SettingTabBackendApiService {
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   getData(url: string): Promise<SettingTabResponse> {
-    return this.http.get<SettingTabBackendDict>(
-      url
-    ).toPromise();
+    return this.http.get<SettingTabBackendDict>(url).toPromise();
   }
 }
 
