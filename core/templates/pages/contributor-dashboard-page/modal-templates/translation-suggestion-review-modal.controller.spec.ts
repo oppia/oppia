@@ -293,7 +293,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
             errorCallback(dummyErrorResponse);
           }
         });
-      spyOn(AlertsService, 'addWarning');
 
       $scope.reviewMessage = 'Review message example';
       $scope.acceptAndReviewNext();
@@ -306,8 +305,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
           '1', 'suggestion_1', 'accept', 'Review message example',
           'hint section of "StateName" card', $scope.showNextItemToReview,
           jasmine.any(Function));
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error!');
+      expect($scope.errorFound).toBeTrue();
     });
 
     it(
