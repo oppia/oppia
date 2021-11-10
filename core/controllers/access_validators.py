@@ -142,7 +142,6 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET requests."""
-        pass
 
 
 class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
