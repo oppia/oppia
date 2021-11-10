@@ -167,13 +167,15 @@ export class SvgSanitizerService {
   }
 
   /**
-   * 
+   *
    * @param dataURI: encoded data component for Svg file.
    * @param widthToHeight: ratio of desired width to height for the
    * updated output dataURI.
    * @returns updated dataURI
    */
-  updateAspectRatioOfSvgDataUri(dataURI: string, widthToHeight: number): string {
+  updateAspectRatioOfSvgDataUri(
+    dataURI: string, widthToHeight: number
+  ): string {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     let svgString = atob(dataURI.split(',')[1]);
@@ -184,7 +186,7 @@ export class SvgSanitizerService {
       val => parseInt(val));
     const width = viewBoxAttrs[2];
     const height = viewBoxAttrs[3];
-    
+
     let newViewBoxAttrs;
     // Increase the height if the image is too wide.
     if (width / height > widthToHeight) {
