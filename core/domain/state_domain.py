@@ -125,7 +125,7 @@ class AnswerGroup:
         minsconception_proto = None
         if answer_group.tagged_skill_misconception_id is not None:
             minsconception_proto = cls._to_misconception_proto(
-                answer_group.skill_id,
+                answer_group.tagged_skill_misconception_id,
                 answer_group.tagged_skill_misconception_id)
 
         base_answer_proto = state_pb2.BaseAnswerGroup(
@@ -342,28 +342,23 @@ class Hint:
         return cls(hint_content)
 
     @classmethod
-    def to_proto(cls, hints):
+    def to_proto(cls, hint):
         """Creates a Hint proto object.
 
         Args:
-            hints: Hint. The hint domain object.
+            hint: Hint. The hint domain object.
 
         Returns:
-            Proto Object. The Hint proto object list.
+            Proto Object. The Hint proto object.
         """
-        hints_list_proto = []
+        hint_content_proto = (
+            SubtitledHtml.to_proto(
+                hint.hint_content.content_id,
+                hint.hint_content.html))
+        hint_proto = state_pb2.Hint(
+            hint_content=hint_content_proto)
 
-        for hint in hints:
-            hint_content_proto = (
-                SubtitledHtml.to_proto(
-                    hint.hint_content.content_id,
-                    hint.hint_content.html))
-            hint_proto = state_pb2.Hint(
-                hint_content=hint_content_proto
-            )
-            hints_list_proto.append(hint_proto)
-
-        return hints_list_proto
+        return hint_proto
 
     def validate(self):
         """Validates all properties of Hint."""
@@ -1165,7 +1160,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         answer_groups_proto = (
             cls._to_item_selection_single_answer_groups_proto(
@@ -1175,7 +1173,7 @@ class InteractionInstance:
             state_pb2.ItemSelectionInputInstance(
                 customization_args=customization_arg_proto,
                 default_outcome=outcome_proto,
-                hints=hints_proto,
+                hints=hints_proto_list,
                 answer_groups=answer_groups_proto))
 
         return item_selection_single_interaction_proto
@@ -1255,7 +1253,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         answer_groups_proto = cls._to_multiple_choice_answer_groups_proto(
             interaction.answer_groups)
@@ -1264,7 +1265,7 @@ class InteractionInstance:
             state_pb2.MultipleChoiceInputInstance(
                 customization_args=customization_args_proto,
                 default_outcome=outcome_proto,
-                hints=hints_proto,
+                hints=hints_proto_list,
                 answer_groups=answer_groups_proto))
 
         return multiple_choice_interaction_proto
@@ -1337,7 +1338,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_numeric_solution(
             interaction.solution)
@@ -1347,7 +1351,7 @@ class InteractionInstance:
 
         numeric_interaction_proto = state_pb2.NumericInputInstance(
             default_outcome=outcome_proto,
-            hints=hints_proto,
+            hints=hints_proto_list,
             solution=solution_proto,
             answer_groups=answer_groups_proto)
 
@@ -1607,7 +1611,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_text_input_solution(interaction.solution)
 
@@ -1617,7 +1624,7 @@ class InteractionInstance:
         text_input_interaction_proto = state_pb2.TextInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
-            hints=hints_proto,
+            hints=hints_proto_list,
             solution=solution_proto,
             answer_groups=answer_groups_proto)
 
@@ -1708,7 +1715,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_ratio_expression_solution_proto(
             interaction.solution)
@@ -1721,7 +1731,7 @@ class InteractionInstance:
                 customization_args=customization_args_proto,
                 default_outcome=outcome_proto,
                 solution=solution_proto,
-                hints=hints_proto,
+                hints=hints_proto_list,
                 answer_groups=answer_groups_proto))
 
         return ratio_expression_interaction_proto
@@ -1931,7 +1941,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         answer_groups_proto = cls._to_image_click_answer_groups_proto(
             interaction.answer_groups)
@@ -1939,7 +1952,7 @@ class InteractionInstance:
         image_click_interaction_proto = state_pb2.ImageClickInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
-            hints=hints_proto,
+            hints=hints_proto_list,
             answer_groups=answer_groups_proto)
 
         return image_click_interaction_proto
@@ -2166,7 +2179,10 @@ class InteractionInstance:
             interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = Hint.to_proto(interaction.hints)
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = Hint.to_proto(hint)
+            hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_drag_and_drop_solution_proto(
             interaction.solution)
@@ -2178,7 +2194,7 @@ class InteractionInstance:
         drag_and_drop_interaction_proto = (
             state_pb2.DragAndDropSortInputInstance(
                 customization_args=customization_args_proto,
-                hints=hints_proto,
+                hints=hints_proto_list,
                 default_outcome=outcome_proto,
                 solution=solution_proto,
                 answer_groups=answer_groups_proto))

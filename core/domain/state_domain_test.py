@@ -5276,3 +5276,64 @@ class OutcomeDomainTests(test_utils.GenericTestBase):
         self.assertEqual(outcome_proto.destination_state, 'Second')
         self.assertEqual(outcome_proto.feedback.content_id, 'content_id')
         self.assertEqual(outcome_proto.feedback.text, '<p>html</p>')
+
+
+class AnswerGroupDomainTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Second', state_domain.SubtitledHtml(
+                    'feedback_0', '<p>Feedback</p>'),
+                False, [], None, None),
+            [],
+            [],
+            'skill_id-1')
+        base_answer_proto = state_domain.AnswerGroup.to_proto(
+            answer_group)
+        self.assertEqual(
+            base_answer_proto.outcome.destination_state,
+            'Second')
+        self.assertEqual(
+            base_answer_proto.outcome.feedback.content_id,
+            'feedback_0')
+        self.assertEqual(
+            base_answer_proto.outcome.feedback.text,
+            '<p>Feedback</p>')
+        self.assertEqual(
+            base_answer_proto.outcome.feedback.text,
+            '<p>Feedback</p>')
+        self.assertEqual(
+            base_answer_proto.tagged_skill_misconception.misconception_id,
+            'skill_id-1')
+        self.assertEqual(
+            base_answer_proto.tagged_skill_misconception.misconception_id,
+            'skill_id-1')
+
+
+class HintDomainTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        hint_1 = state_domain.Hint(
+            state_domain.SubtitledHtml(
+                    'hint_id_1', '<p>Hint 1</p>'))
+        hint_proto = state_domain.Hint.to_proto(hint_1)
+        self.assertEqual(
+            hint_proto.hint_content.content_id, 'hint_id_1')
+        self.assertEqual(
+            hint_proto.hint_content.text, '<p>Hint 1</p>')
+
+
+class SolutionDomainTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        explanation = state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>')
+        solution_proto = state_domain.Solution.to_proto(
+            explanation)
+        self.assertEqual(
+            solution_proto.explanation.content_id,
+            'solution')
+        self.assertEqual(
+            solution_proto.explanation.text,
+            '<p>This is a solution.</p>')
