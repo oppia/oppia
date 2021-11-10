@@ -67,7 +67,6 @@ import { RatingsAndRecommendationsComponent } from './learner-experience/ratings
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
-    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
@@ -78,7 +77,6 @@ import { RatingsAndRecommendationsComponent } from './learner-experience/ratings
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
-    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
