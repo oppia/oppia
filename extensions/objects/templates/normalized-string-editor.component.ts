@@ -25,10 +25,10 @@ import { ExternalSaveService } from 'services/external-save.service';
 
 // The following properties are optional since there is a possibility that the
 // current and previous values have not yet been specified in the form.
-type NormalizedStringEditorComponentArgs = {
-  currentValue?: { largeInput: string },
-  previousValue?: { largeInput: string }
-};
+interface NormalizedStringEditorComponentArgs {
+  currentValue?: { largeInput: string };
+  previousValue?: { largeInput: string };
+}
 
 @Component({
   selector: 'normalized-string-editor',

@@ -18,7 +18,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-type Choice = { val: string };
+interface Choice {
+  val: string;
+}
 
 @Component({
   selector: 'set-of-translatable-html-content-ids-editor',
