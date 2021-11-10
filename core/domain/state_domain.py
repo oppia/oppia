@@ -355,7 +355,7 @@ class Hint:
 
         for hint in hints:
             hint_content_proto = (
-                SubtitledHtml.to_subtitled_text_proto(
+                SubtitledHtml.to_proto(
                     hint.hint_content.content_id,
                     hint.hint_content.html))
             hint_proto = state_pb2.Hint(
@@ -465,7 +465,7 @@ class Solution:
             Proto Object. The BaseSolution proto object.
         """
         base_solution_proto = state_pb2.BaseSolution(
-            explanation=SubtitledHtml.to_subtitled_text_proto(
+            explanation=SubtitledHtml.to_proto(
                 explanation.content_id,
                 explanation.html))
 
@@ -735,7 +735,7 @@ class InteractionInstance:
         """
         customization_arg_proto = (
             state_pb2.ContinueInstance.CustomizationArgs(
-                button_text=SubtitledUnicode.to_subtitled_text_proto(
+                button_text=SubtitledUnicode.to_proto(
                     customization_args['buttonText'].value.content_id,
                     customization_args['buttonText'].value.unicode_str)))
 
@@ -1221,7 +1221,7 @@ class InteractionInstance:
         """
         choices_list_proto = []
         for value in customization_args['choices'].value:
-            value_proto = SubtitledHtml.to_subtitled_text_proto(
+            value_proto = SubtitledHtml.to_proto(
                 value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
@@ -1311,7 +1311,7 @@ class InteractionInstance:
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = SubtitledHtml.to_subtitled_text_proto(
+            value_proto = SubtitledHtml.to_proto(
                 value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
@@ -2321,7 +2321,7 @@ class InteractionInstance:
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = SubtitledHtml.to_subtitled_text_proto(
+            value_proto = SubtitledHtml.to_proto(
                 value.content_id, value.html)
             choices_list_proto.append(value_proto)
 
@@ -3060,7 +3060,7 @@ class Outcome:
         Returns:
             Proto Object. The Outcome proto object.
         """
-        feedback_proto = SubtitledHtml.to_subtitled_text_proto(
+        feedback_proto = SubtitledHtml.to_proto(
             feedback.content_id,
             feedback.html)
         outcome_proto = state_pb2.Outcome(
@@ -5419,7 +5419,7 @@ class State:
         state_protos = {}
         for (state_name, state) in states.items():
             state_proto = state_pb2.State(
-                content=SubtitledHtml.to_subtitled_text_proto(
+                content=SubtitledHtml.to_proto(
                     state.content.content_id,
                     state.content.html),
                 recorded_voiceovers=(
