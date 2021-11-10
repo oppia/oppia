@@ -312,7 +312,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.url_fragment = 123
         self.blog_post.content = '<p>Hello</p>'
         self._assert_valid_thumbnail_update(
-            'Expected Thumbnail filename should be a string, received 123'
+            'Expected Thumbnail filename to be a string, received: 123'
         )
 
 
