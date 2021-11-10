@@ -88,8 +88,8 @@
 
 
 # App Feedback Reporting project
-/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
-/core/controllers/incoming_app_feedback_report*.py @BenHenning @vinitamurthi
+/core/domain/app_feedback_report_*.py @BenHenning
+/core/controllers/incoming_app_feedback_report*.py @BenHenning
 
 
 # Audio and Translation team.
@@ -644,13 +644,13 @@
 
 
 # Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
-/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
-/core/platform_feature*.py @BenHenning @vinitamurthi
-/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
-/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning
+/core/domain/platform_feature_services*.py @BenHenning
+/core/domain/platform_parameter*.py @BenHenning
+/core/platform_feature*.py @BenHenning
+/core/templates/domain/platform_feature/ @BenHenning
+/core/templates/pages/admin-page/features-tab/ @BenHenning
+/core/templates/services/platform-feature*.ts @BenHenning
 
 
 # Frontend unit tests
