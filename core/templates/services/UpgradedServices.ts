@@ -1033,10 +1033,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['PretestQuestionBackendApiService'] =
-      new PretestQuestionBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
     upgradedServices['ProfilePageBackendApiService'] =
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
