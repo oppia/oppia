@@ -28,13 +28,13 @@ import { InteractionRulesService } from 'pages/exploration-player-page/services/
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { TextInputRulesService } from './text-input-rules.service';
 
-type TextInputSchema = {
+interface TextInputSchema {
   type: string;
   'ui_config': {
     placeholder?: string;
     rows?: number;
   };
-};
+}
 
 @Component({
   selector: 'oppia-interactive-text-input',
