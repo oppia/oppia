@@ -45,7 +45,6 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { ToastrModule } from 'ngx-toastr';
-import { OffScreenPreviewComponent } from './learner-experience/off-screen-preview.component';
 import { RatingsAndRecommendationsComponent } from './learner-experience/ratings-and-recommendations.component';
 
 @NgModule({
@@ -71,7 +70,6 @@ import { RatingsAndRecommendationsComponent } from './learner-experience/ratings
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerViewInfoComponent,
-    OffScreenPreviewComponent,
     RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
@@ -84,7 +82,6 @@ import { RatingsAndRecommendationsComponent } from './learner-experience/ratings
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
-    OffScreenPreviewComponent,
     RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],

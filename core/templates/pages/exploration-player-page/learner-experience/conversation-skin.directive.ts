@@ -215,48 +215,6 @@ angular.module('oppia').animation(
   });
 
 angular.module('oppia').animation(
-  '.conversation-skin-animate-tutor-card-content', function() {
-    var animateCardChange = function(element, className, done) {
-      if (className !== 'animate-card-change') {
-        return;
-      }
-
-      var currentHeight = element.height();
-      var expectedNextHeight = $(
-        '.conversation-skin-future-tutor-card ' +
-        '.oppia-learner-view-card-content'
-      ).height();
-
-      // Fix the current card height, so that it does not change during the
-      // animation, even though its contents might.
-      element.css('height', currentHeight);
-
-      jQuery(element).animate({
-        opacity: 0
-      }, TIME_FADEOUT_MSEC).animate({
-        height: expectedNextHeight
-      }, TIME_HEIGHT_CHANGE_MSEC).animate({
-        opacity: 1
-      }, TIME_FADEIN_MSEC, function() {
-        element.css('height', '');
-        done();
-      });
-
-      return function(cancel) {
-        if (cancel) {
-          element.css('opacity', '1.0');
-          element.css('height', '');
-          element.stop();
-        }
-      };
-    };
-
-    return {
-      addClass: animateCardChange
-    };
-  });
-
-angular.module('oppia').animation(
   '.conversation-skin-animate-cards', function() {
     // This removes the newly-added class once the animation is finished.
     var animateCards = function(element, className, done) {
