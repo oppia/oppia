@@ -75,8 +75,7 @@ angular.module('oppia').component('explorationEditorTab', {
   },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$timeout', '$uibModal',
-    'EditabilityService',
+    '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
@@ -86,8 +85,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $timeout, $uibModal,
-        EditabilityService,
+        $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService, GraphDataService,
