@@ -673,7 +673,8 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
                 'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id, self.normalized_payload.get('exploration_version'),
-            self.normalized_payload.get('state_name'), self.normalized_payload.get('session_id'))
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'))
         self.render_json({})
 
 
