@@ -231,10 +231,6 @@ angular.module('oppia').component('questionPlayer', {
         return worstSkillIds.sort().slice(0, 3).map(info => info[1]);
       };
 
-      ctrl.checkMobileView = function() {
-        return ($window.innerWidth <= 1024);
-      };
-
       ctrl.openConceptCardModal = function(skillIds) {
         var skills = [];
         skillIds.forEach(function(skillId) {

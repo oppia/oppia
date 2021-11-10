@@ -30,7 +30,6 @@ import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 interface IconParametersArray {
   thumbnailIconUrl: string,
@@ -68,8 +67,7 @@ export class StoryViewerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
-    private alertsService: AlertsService,
-    private windowDimensionsService: WindowDimensionsService
+    private alertsService: AlertsService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -106,10 +104,6 @@ export class StoryViewerPageComponent implements OnInit {
       });
     }
     return iconParametersArray;
-  }
-
-  checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
   }
 
   signIn(): void {

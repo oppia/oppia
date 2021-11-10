@@ -64,8 +64,6 @@ describe('Translation tab component', function() {
   var $q = null;
   var $scope = null;
   var $uibModal = null;
-  var $rootScope = null;
-  var $window = null;
   var contextService = null;
   var editabilityService = null;
   var explorationStatesService = null;
@@ -127,9 +125,8 @@ describe('Translation tab component', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
+    var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    $window = $injector.get('$window');
     editabilityService = $injector.get('EditabilityService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
@@ -145,11 +142,6 @@ describe('Translation tab component', function() {
       .and.returnValue(enterTranslationForTheFirstTimeEmitter);
     spyOnProperty(routerService, 'onRefreshTranslationTab')
       .and.returnValue(refreshTranslationTabEmitter);
-
-    Object.defineProperty($window, 'innerWidth', {
-      get: () => undefined,
-      set: () => {}
-    });
 
     explorationStatesService.init({
       Introduction: {
@@ -634,19 +626,5 @@ describe('Translation tab component', function() {
         scrollTop: 20
       }, 1000);
     });
-
-    it('should return true if the window size is less than equal to 1024px',
-      () => {
-        var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-        innerWidthSpy.and.callFake(() => 480);
-        $rootScope.$apply();
-        angular.element($window).triggerHandler('resize');
-        expect($scope.checkMobileView()).toBe(true);
-
-        innerWidthSpy.and.callFake(() => 1025);
-        $rootScope.$apply();
-        angular.element($window).triggerHandler('resize');
-        expect($scope.checkMobileView()).toBe(false);
-      });
   });
 });

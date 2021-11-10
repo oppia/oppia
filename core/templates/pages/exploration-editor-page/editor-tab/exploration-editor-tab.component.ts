@@ -75,7 +75,7 @@ angular.module('oppia').component('explorationEditorTab', {
   },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$timeout', '$uibModal', '$window',
+    '$scope', '$templateCache', '$timeout', '$uibModal',
     'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
@@ -86,7 +86,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $timeout, $uibModal, $window,
+        $scope, $templateCache, $timeout, $uibModal,
         EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
@@ -177,10 +177,6 @@ angular.module('oppia').component('explorationEditorTab', {
         if (EditabilityService.inTutorialMode()) {
           ctrl.startTutorial();
         }
-      };
-
-      ctrl.checkMobileView = function() {
-        return ($window.innerWidth <= 1024);
       };
 
       ctrl.windowOnload = function() {

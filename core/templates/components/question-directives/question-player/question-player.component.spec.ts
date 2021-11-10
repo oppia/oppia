@@ -26,7 +26,6 @@ describe('QuestionPlayerComponent', () => {
   let $location = null;
   let $q = null;
   let $uibModal = null;
-  var $window = null;
 
   let PlayerPositionService = null;
   let ExplorationPlayerStateService = null;
@@ -74,7 +73,6 @@ describe('QuestionPlayerComponent', () => {
       $location = $injector.get('$location');
       $q = $injector.get('$q');
       $uibModal = $injector.get('$uibModal');
-      $window = $injector.get('$window');
 
       PlayerPositionService = $injector.get('PlayerPositionService');
       ExplorationPlayerStateService = $injector.get(
@@ -87,10 +85,6 @@ describe('QuestionPlayerComponent', () => {
         $scope: $scope
       }, {
         getQuestionPlayerConfig: () => {}
-      });
-      Object.defineProperty($window, 'innerWidth', {
-        get: () => undefined,
-        set: () => {}
       });
     }));
 
@@ -541,18 +535,4 @@ describe('QuestionPlayerComponent', () => {
 
     expect($uibModal.open).toHaveBeenCalled();
   });
-
-  it('should return true if the window size is less than equal to 1024px',
-    () => {
-      var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-      innerWidthSpy.and.callFake(() => 480);
-      $rootScope.$apply();
-      angular.element($window).triggerHandler('resize');
-      expect(ctrl.checkMobileView()).toBe(true);
-
-      innerWidthSpy.and.callFake(() => 1025);
-      $rootScope.$apply();
-      angular.element($window).triggerHandler('resize');
-      expect(ctrl.checkMobileView()).toBe(false);
-    });
 });

@@ -56,14 +56,14 @@ angular.module('oppia').directive('collectionPlayerPage', [
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
-        '$window', 'AlertsService', 'GuestCollectionProgressService',
+        'AlertsService', 'GuestCollectionProgressService',
         'LoaderService', 'PageTitleService',
         'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
         'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $anchorScroll, $http, $location, $rootScope, $scope,
-            $window, AlertsService, GuestCollectionProgressService,
+            AlertsService, GuestCollectionProgressService,
             LoaderService, PageTitleService,
             ReadOnlyCollectionBackendApiService, UrlInterpolationService,
             UrlService, UserService,
@@ -116,10 +116,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
             ctrl.currentExplorationId = explorationId;
             ctrl.summaryToPreview = ctrl.getCollectionNodeForExplorationId(
               explorationId).getExplorationSummaryObject();
-          };
-
-          ctrl.checkMobileView = function() {
-            return ($window.innerWidth <= 1024);
           };
 
           // Calculates the SVG parameters required to draw the curved path.
