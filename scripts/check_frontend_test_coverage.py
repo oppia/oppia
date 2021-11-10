@@ -68,7 +68,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-pencil-code-editor.directive.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
-    'player-transcript.service.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
     'refresher-exploration-confirmation-modal.service.ts',
