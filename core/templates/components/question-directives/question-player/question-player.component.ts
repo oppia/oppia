@@ -585,7 +585,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
         PreventPageUnloadEventService.addListener(
           () => {
-            return (getCurrentQuestion() > 1)
+            return (getCurrentQuestion() > 1);
           }
         );
       };
