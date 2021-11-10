@@ -26,10 +26,10 @@ import { ExternalSaveService } from 'services/external-save.service';
 
 // The following properties are optional since there is a possibility that the
 // current and previous values have not yet been specified in the form.
-type UnicodeStringEditorArguments = {
-  currentValue?: { largeInput: string },
-  previousValue?: { largeInput: string }
-};
+interface UnicodeStringEditorArguments {
+  currentValue?: { largeInput: string };
+  previousValue?: { largeInput: string };
+}
 
 @Component({
   selector: 'unicode-string-editor',

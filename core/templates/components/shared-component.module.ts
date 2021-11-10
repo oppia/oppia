@@ -92,7 +92,7 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
-
+import { SmoothHeightComponent } from './smooth-height/smooth-height.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -189,6 +189,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
+    SmoothHeightComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateSkillEditorComponent,
@@ -265,6 +266,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    SmoothHeightComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -338,6 +340,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    SmoothHeightComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,

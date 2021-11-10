@@ -1,12 +1,3 @@
-<!--
-  Off-screen preview of the next card in order to pre-determine the target
-  height for the card content transition animation.
--->
-<oppia-off-screen-preview *ngIf="nextCard"
-                          [nextCardContentHtml]="nextCard.getContentHtml()"
-                          [upcomingInlineInteractionHtml]="upcomingInlineInteractionHtml">
-</oppia-off-screen-preview>
-
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" *ngIf="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
