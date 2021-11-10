@@ -21,7 +21,6 @@ import logging
 import random
 
 from core import feconf
-from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
