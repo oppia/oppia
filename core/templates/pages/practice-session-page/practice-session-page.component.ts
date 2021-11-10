@@ -32,18 +32,17 @@ require('services/contextual/url.service.ts');
 require('services/page-title.service.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
-require('services/prevent-page-unload-event.service.ts');
 
 angular.module('oppia').component('practiceSessionPage', {
   template: require('./practice-session-page.component.html'),
   controller: [
-    '$http', 'PageTitleService', 'PreventPageUnloadEventService',
-    'UrlInterpolationService', 'UrlService', 'PRACTICE_SESSIONS_DATA_URL',
-    'PRACTICE_SESSIONS_URL', 'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
+    '$http', 'PageTitleService', 'UrlInterpolationService', 'UrlService',
+    'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
+    'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
     function(
-        $http, PageTitleService, PreventPageUnloadEventService,
-        UrlInterpolationService, UrlService, PRACTICE_SESSIONS_DATA_URL,
-        PRACTICE_SESSIONS_URL, TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
+        $http, PageTitleService, UrlInterpolationService, UrlService,
+        PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
+        TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
       var ctrl = this;
       var _fetchSkillDetails = function() {
         var topicUrlFragment = (
@@ -105,13 +104,11 @@ angular.module('oppia').component('practiceSessionPage', {
             'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
-
       ctrl.$onInit = function() {
         ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
         ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
-        PreventPageUnloadEventService.addListener();
       };
     }
   ]
