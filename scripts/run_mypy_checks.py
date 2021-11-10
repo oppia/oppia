@@ -309,8 +309,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/visualization_registry_test.py',
     'core/domain/voiceover_services.py',
     'core/domain/voiceover_services_test.py',
-    'core/domain/wipeout_domain.py',
-    'core/domain/wipeout_domain_test.py',
     'core/domain/wipeout_jobs_one_off.py',
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',
