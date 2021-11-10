@@ -37,6 +37,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 
 @Component({
@@ -67,6 +68,7 @@ export class TopicViewerPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef,
   ) {}
 
   ngOnInit(): void {
@@ -127,6 +129,13 @@ export class TopicViewerPageComponent implements OnInit {
 
   setActiveTab(newActiveTabName: string): void {
     this.activeTab = newActiveTabName;
+    if (newActiveTabName === 'story') {
+      this.windowRef.nativeWindow.location.hash = 'lessons';
+    } else if (newActiveTabName === 'practice') {
+      this.windowRef.nativeWindow.location.hash = 'practice';
+    } else {
+      this.windowRef.nativeWindow.location.hash = 'revision';
+    }
   }
 }
 
