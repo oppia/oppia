@@ -115,6 +115,23 @@ class AssetDevHandler(base.BaseHandler):
 class PromoBarHandler(base.BaseHandler):
     """Handler for the promo-bar."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'promo_bar_enabled': {
+                'schema': {
+                    'type': 'bool'
+                },
+            },
+            'promo_bar_message': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     # This prevents partially logged in user from being logged out
     # during user registration.
@@ -129,8 +146,10 @@ class PromoBarHandler(base.BaseHandler):
 
     @acl_decorators.can_access_release_coordinator_page
     def put(self):
-        promo_bar_enabled_value = self.payload.get('promo_bar_enabled')
-        promo_bar_message_value = self.payload.get('promo_bar_message')
+        promo_bar_enabled_value = self.normalized_payload.get(
+            'promo_bar_enabled')
+        promo_bar_message_value = self.normalized_payload.get(
+            'promo_bar_message')
 
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
