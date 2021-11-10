@@ -14,8 +14,7 @@
 
 """Tests for the library page and associated handlers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 import logging

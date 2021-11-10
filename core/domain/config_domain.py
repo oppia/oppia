@@ -16,8 +16,7 @@
 
 """Domain objects for configuration properties."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
 from core import schema_utils
@@ -477,11 +476,6 @@ LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
-
-CONTRIBUTOR_CAN_SUGGEST_QUESTIONS = ConfigProperty(
-    'contributor_can_suggest_questions', BOOL_SCHEMA,
-    'Whether the contributor can suggest questions for skill opportunities.',
-    False)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,

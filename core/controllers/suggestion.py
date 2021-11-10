@@ -16,13 +16,11 @@
 
 """Controllers for suggestions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -334,13 +332,8 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
             )
 
         if (
-                not isinstance(
-                    self.payload.get('translation_html'),
-                    python_utils.BASESTRING)
-                and
-                not isinstance(
-                    self.payload.get('translation_html'),
-                    list)
+                not isinstance(self.payload.get('translation_html'), str)
+                and not isinstance(self.payload.get('translation_html'), list)
         ):
             raise self.InvalidInputException(
                 'The parameter \'translation_html\' should be a string or a' +
@@ -477,11 +470,12 @@ def _construct_exploration_suggestions(suggestions):
         exploration_content_html field representing the target
         exploration's current content.
     """
+    exp_ids = {suggestion.target_id for suggestion in suggestions}
+    exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
+
     suggestion_dicts = []
     for suggestion in suggestions:
-        exploration = exp_fetchers.get_exploration_by_id(
-            suggestion.target_id)
-        content_html = exploration.get_content_html(
+        content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
             suggestion.change.state_name, suggestion.change.content_id)
         suggestion_dict = suggestion.to_dict()
         suggestion_dict['exploration_content_html'] = content_html
@@ -500,7 +494,7 @@ def _upload_suggestion_images(request, suggestion, filenames):
         filenames: list(str). The image filenames.
     """
     suggestion_image_context = suggestion.image_context
-    # TODO(#10513) : Find a way to save the images before the suggestion is
+    # TODO(#10513): Find a way to save the images before the suggestion is
     # created.
     for filename in filenames:
         image = request.get(filename)

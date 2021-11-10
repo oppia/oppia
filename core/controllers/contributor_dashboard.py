@@ -14,8 +14,7 @@
 
 """Controllers for the contributor dashboard page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 
@@ -483,7 +482,6 @@ class UserContributionRightsDataHandler(base.BaseHandler):
                 contribution_rights.can_review_questions
                 if contribution_rights else False),
             'can_suggest_questions': (
-                config_domain.CONTRIBUTOR_CAN_SUGGEST_QUESTIONS.value and
                 (contribution_rights.can_submit_questions
                  if contribution_rights else False))
         })
