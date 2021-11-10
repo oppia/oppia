@@ -10,7 +10,7 @@
         <div class="alert alert-warning">
           <span>Here are some guidelines to follow:</span>
           <ul>
-            <li>Uploaded image should have an aspect ratio of {{ aspectRatio }}.</li>
+            <li>Uploaded image should have an aspect ratio of {{ aspectRatios.join(", ") }}.</li>
             <li>Uploaded image should have a transparent background.</li>
             <li>Please ensure that the uploaded image is less than 100 KB.</li>
           </ul>
@@ -43,32 +43,40 @@
           </div>
           <div [hidden]="!(allowedBgColors.length === 1)" class="alert alert-warning">
             <span>
-              Please check that the thumbnail below has the following background color:
+              Please check that the thumbnails below have the following background color:
               <i class="fa fa-square" [ngStyle]="{'color': allowedBgColors[0]}"></i>.
               If not, please ensure that you are uploading an image with transparent background. Thanks!
             </span>
           </div>
+          <div [hidden]="aspectRatios.length === 1" class="alert alert-warning">
+            <span>
+              Please check that all of the thumbnails below look correct.
+            </span>
+          </div>
         </div>
-        <div @fade class="oppia-thumbnail-container protractor-test-thumbnail-container" *ngIf="uploadedImage"
-             [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
-          <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button protractor-test-thumbnail-reset-button" (click)="reset()">
-            <i class="material-icons oppia-vcenter">&#xE14C;</i>
-          </button>
-          <div>
-            <oppia-thumbnail-display *ngIf="uploadedImage"
-                                     [classes]="['oppia-thumbnail-image']"
-                                     [imgSrc]="uploadedImage"
-                                     [aspectRatio]="'16:9'"
-                                     [background]="bgColor">
-            </oppia-thumbnail-display>
-            <div class="oppia-thumbnail-preview-title">
-              {{ previewTitle }}
-            </div>
-            <div class="oppia-thumbnail-preview-description">
-              {{ previewDescription }}
-            </div>
-            <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
-              {{ previewFooter }}
+        <div *ngFor="let aspectRatio of aspectRatios">
+          <p>Aspect ratio: {{ aspectRatio }}</p>
+          <div @fade class="oppia-thumbnail-container protractor-test-thumbnail-container" *ngIf="uploadedImage"
+              [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
+            <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button protractor-test-thumbnail-reset-button" (click)="reset()">
+              <i class="material-icons oppia-vcenter">&#xE14C;</i>
+            </button>
+            <div>
+              <oppia-thumbnail-display *ngIf="uploadedImage"
+                                      [classes]="['oppia-thumbnail-image']"
+                                      [imgSrc]="uploadedImage"
+                                      [aspectRatio]="aspectRatio"
+                                      [background]="bgColor">
+              </oppia-thumbnail-display>
+              <div class="oppia-thumbnail-preview-title">
+                {{ previewTitle }}
+              </div>
+              <div class="oppia-thumbnail-preview-description">
+                {{ previewDescription }}
+              </div>
+              <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
+                {{ previewFooter }}
+              </div>
             </div>
           </div>
         </div>

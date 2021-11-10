@@ -37,7 +37,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Input() disabled: boolean;
   @Input() useLocalStorage: boolean;
   @Input() allowedBgColors: string[];
-  @Input() aspectRatio: string;
+  @Input() aspectRatios: string[] = ['4:3', '16:9'];
   @Input() bgColor: string;
   @Input() filename: string;
   @Input() previewDescription: string;
@@ -182,7 +182,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       {backdrop: 'static'});
     modalRef.componentInstance.bgColor = this.tempBgColor;
     modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
-    modalRef.componentInstance.aspectRatio = this.aspectRatio;
+    modalRef.componentInstance.aspectRatios = this.aspectRatios;
     modalRef.componentInstance.dimensions = this.dimensions;
     modalRef.componentInstance.previewDescription =
      this.previewDescription;

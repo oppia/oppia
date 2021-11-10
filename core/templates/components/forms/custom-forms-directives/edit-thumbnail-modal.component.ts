@@ -52,7 +52,7 @@ export class EditThumbnailModalComponent implements OnInit {
   // 'uploadedImage' will be null when an invalid image has
   // been uploaded.
   @Input() uploadedImage!: string | null;
-  @Input() aspectRatio!: string;
+  @Input() aspectRatios!: string[];
   @Input() previewDescription!: string;
   @Input() previewDescriptionBgColor!: string;
   @Input() previewFooter!: string;
@@ -114,7 +114,14 @@ export class EditThumbnailModalComponent implements OnInit {
           img.naturalHeight || 150,
           img.naturalWidth || 300);
       };
-      this.imgSrc = reader.result as string;
+      // Update the SVG to have the exact aspect ratio of the first
+      // allowed aspect ratio.
+      const baseAspectRatio = this.aspectRatios[0];
+      const widthAndHeight = baseAspectRatio.split(':').map(
+        val => parseInt(val));
+      const widthToHeight = widthAndHeight[0] / widthAndHeight[1];
+      this.imgSrc = this.svgSanitizerService.updateAspectRatioOfSvgDataUri(
+        reader.result as string, widthToHeight);
       this.updateBackgroundColor(this.tempBgColor);
       img.src = this.imgSrc;
       this.uploadedImage = this.imgSrc;

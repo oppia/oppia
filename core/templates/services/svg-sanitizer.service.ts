@@ -167,6 +167,48 @@ export class SvgSanitizerService {
   }
 
   /**
+   * 
+   * @param dataURI: encoded data component for Svg file.
+   * @param widthToHeight: ratio of desired width to height for the
+   * updated output dataURI.
+   * @returns updated dataURI
+   */
+  updateAspectRatioOfSvgDataUri(dataURI: string, widthToHeight: number): string {
+    // Convert base64/URLEncoded data component to raw binary data
+    // held in a string.
+    let svgString = atob(dataURI.split(',')[1]);
+    let domParser = new DOMParser();
+    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    const viewBoxAttrs = svg.getAttribute('viewBox').split(' ').map(
+      val => parseInt(val));
+    const width = viewBoxAttrs[2];
+    const height = viewBoxAttrs[3];
+    
+    let newViewBoxAttrs;
+    // Increase the height if the image is too wide.
+    if (width / height > widthToHeight) {
+      const idealHeight = Math.floor(width / widthToHeight);
+      const heightDiff = idealHeight - height;
+      newViewBoxAttrs = [0, -Math.floor(heightDiff / 2), width, idealHeight];
+    }
+    // Increase the width if the image is too tall.
+    if (width / height < widthToHeight) {
+      const idealWidth = Math.floor(height * widthToHeight);
+      const widthDiff = idealWidth - width;
+      newViewBoxAttrs = [-Math.floor(widthDiff / 2), 0, height, idealWidth];
+    }
+    // Update the viewBox for the Svg.
+    if (newViewBoxAttrs) {
+      svg.setAttribute('viewBox', newViewBoxAttrs.join(' '));
+    }
+    // Return the new encoded URI.
+    return (
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(svg.outerHTML))));
+  }
+
+  /**
    * Checks the input for malicious or invalid SVG code.
    * The checks:
    * 1. Is base64 encoded.
