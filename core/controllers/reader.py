@@ -622,17 +622,17 @@ class SolutionHitEventHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_BASESTRING
+                    'type': 'basestring'
                 }
             },
             'session_id': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_BASESTRING
+                    'type': 'basestring'
                 }
             },
             'time_spent_in_state_secs': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_FLOAT
+                    'type': 'float'
                 }
             }
         }
@@ -644,7 +644,8 @@ class SolutionHitEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests."""
         event_services.SolutionHitEventHandler.record(
-            exploration_id, self.normalized_payload.get('exploration_version'),
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
             self.normalized_payload.get('state_name'),
             self.normalized_payload.get('session_id'),
             self.normalized_payload.get('time_spent_in_state_secs'))
@@ -675,17 +676,17 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_BASESTRING
+                    'type': 'basestring'
                 }
             },
             'session_id': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_BASESTRING
+                    'type': 'basestring'
                 }
             },
             'client_time_spent_in_secs': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_FLOAT
+                    'type': 'float'
                 }
             },
             'params': {
@@ -761,7 +762,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_BASESTRING
+                    'type': 'basestring'
                 }
             },
             'collection_id': {
@@ -772,12 +773,12 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'session_id': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_BASESTRING
+                    'type': 'basestring'
                 }
             },
             'client_time_spent_in_secs': {
                 'schema': {
-                    'type': schema_utils.SCHEMA_TYPE_FLOAT
+                    'type': 'float'
                 }
             },
             'params': {
