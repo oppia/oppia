@@ -45,16 +45,16 @@
 
       <div class="conversation-skin-tutor-card-middle-section"
           [@expandInOut]="(arePreviousResponsesShown && !conceptCardIsBeingShown) ? 'in' : 'out'">
-          <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
-            <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
-              <oppia-input-response-pair [data]="responsePair"
-                                         [profilePicture]="profilePicture"
-                                         [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
-                                         [inputResponsePairId]="getInputResponsePairId($index)"
-                                         [isLastPair]="false">
-              </oppia-input-response-pair>
-            </div>
+        <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
+          <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
+            <oppia-input-response-pair [data]="responsePair"
+                                        [profilePicture]="profilePicture"
+                                        [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
+                                        [inputResponsePairId]="getInputResponsePairId($index)"
+                                        [isLastPair]="false">
+            </oppia-input-response-pair>
           </div>
+        </div>
       </div>
 
       <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
