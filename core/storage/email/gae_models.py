@@ -24,7 +24,7 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -94,8 +94,7 @@ class SentEmailModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: recipient_id,
-        recipient_email, sender_id, and sender_email, but this isn't deleted
-        because this model is needed for auditing purposes.
+        recipient_email, sender_id, and sender_email.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -365,9 +364,8 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: recipient_ids,
-        sender_id, and sender_email, but this isn't deleted because this model
-        is needed for auditing purposes.
+        """Model contains data corresponding to a user: sender_id, and
+        sender_email.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -386,7 +384,6 @@ class BulkEmailModel(base_models.BaseModel):
         (since emails were sent to them).
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -409,10 +406,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether BulkEmailModel exists for user. Since recipient_ids
-        can't be indexed it also can't be checked by this method, we can allow
-        this because the deletion policy for this model is keep, thus even the
-        deleted user's id will remain here.
+        """Check whether BulkEmailModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -428,7 +422,6 @@ class BulkEmailModel(base_models.BaseModel):
     def create(
             cls,
             instance_id: str,
-            recipient_ids: List[str],
             sender_id: str,
             sender_email: str,
             intent: str,
@@ -440,7 +433,6 @@ class BulkEmailModel(base_models.BaseModel):
 
         Args:
             instance_id: str. The ID of the instance.
-            recipient_ids: list(str). The user IDs of the email recipients.
             sender_id: str. The user ID of the email sender.
             sender_email: str. The email address used to send the notification.
             intent: str. The intent string, i.e. the purpose of the email.
@@ -450,7 +442,7 @@ class BulkEmailModel(base_models.BaseModel):
                 was sent, in UTC.
         """
         email_model_instance = cls(
-            id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
+            id=instance_id, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
         email_model_instance.update_timestamps()

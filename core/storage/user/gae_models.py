@@ -2226,9 +2226,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: id field, but it isn't
-        deleted because it is needed for auditing purposes.
-        """
+        """Model contains data corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -2250,7 +2248,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        return cls.delete_by_id(user_id)
+        cls.delete_by_id(user_id)
 
     @staticmethod
     def get_model_association_to_user(

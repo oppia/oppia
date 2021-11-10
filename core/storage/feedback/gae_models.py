@@ -864,9 +864,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: id field but it isn't
-        deleted because it is needed for auditing purposes.
-        """
+        """Model contains data corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
