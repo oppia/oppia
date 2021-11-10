@@ -290,7 +290,8 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
         files = {'img.png': None, 'test2_svg.svg': None}
         for filename in files:
             with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb'
+                os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb',
+                encoding=None
             ) as f:
                 files[filename] = f.read()
         domain_objects_validator.validate_suggestion_images(files)
