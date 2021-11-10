@@ -4823,6 +4823,80 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_that_are_correctly_translated(
                 'hi'), [])
 
+    def test_to_proto(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    }
+                }
+            }
+        }
+        written_translations = (
+            state_domain.WrittenTranslations.from_dict(
+            written_translations_dict))
+        written_translations_proto = (
+            state_domain.WrittenTranslations.to_proto(
+                written_translations))
+        # Language at zero item should be English.
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[0].language,
+            1)
+        # Language at zero item should be Hindi.
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[1].language,
+            3)
+
+
+class WrittenTranslationDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        written_translation_proto = (
+            state_domain.WrittenTranslation.to_proto(
+                'html', 'Test'))
+        self.assertEqual(
+            written_translation_proto.translatable_text.translation,
+            'Test')
+
+
+class TranslatableItemDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_to_written_translatable_text_proto(self):
+        written_translatable_text_proto = (
+            state_domain.TranslatableItem.to_written_translatable_text_proto(
+                'Test'))
+        self.assertEqual(
+            written_translatable_text_proto.translation,
+            'Test')
+
+    def test_to_written_translatable_set_proto(self):
+        written_translatable_text_proto = (
+            state_domain.TranslatableItem.to_written_translatable_set_proto(
+                ['Test1', 'Test2']))
+        self.assertEqual(
+            written_translatable_text_proto.translations,
+            ['Test1', 'Test2'])
+
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on recorded voiceovers."""
@@ -5190,3 +5264,15 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         self.assertEqual(voiceover_proto.filename, 'filename.mp3')
         self.assertEqual(voiceover_proto.file_size_bytes, 10)
         self.assertEqual(voiceover_proto.duration_secs, 15.0)
+
+
+class OutcomeDomainTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        subtitled_html_feedback = state_domain.SubtitledHtml(
+            'content_id', '<p>html</p>')
+        outcome_proto = state_domain.Outcome.to_proto(
+            'Second', subtitled_html_feedback, True)
+        self.assertEqual(outcome_proto.destination_state, 'Second')
+        self.assertEqual(outcome_proto.feedback.content_id, 'content_id')
+        self.assertEqual(outcome_proto.feedback.text, '<p>html</p>')
