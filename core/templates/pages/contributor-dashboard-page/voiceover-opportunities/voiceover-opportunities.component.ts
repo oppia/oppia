@@ -27,70 +27,93 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
 
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { Subscription } from 'rxjs';
+import { TranslationOpportunity } from '../modal-templates/translation-modal.component';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 
-angular.module('oppia').component('voiceoverOpportunities', {
-  template: require(
-    './../translation-opportunities/' +
-    'translation-opportunities.component.html'),
-  controller: [
-    '$rootScope', 'ContributionOpportunitiesService',
-    'TranslationLanguageService', function(
-        $rootScope, ContributionOpportunitiesService,
-        TranslationLanguageService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      var updateWithNewOpportunities = function(opportunities, more) {
-        for (var index in opportunities) {
-          var opportunity = opportunities[index];
-          var subheading = opportunity.getOpportunitySubheading();
-          var heading = opportunity.getOpportunityHeading();
+@Component({
+  selector: 'voiceover-opportunities',
+  templateUrl: './voiceover-opportunities.component.html'
+})
+export class VoiceoverOpportunitiesComponent implements OnInit, OnDestroy {
+  progressBarRequired: boolean;
+  constructor(
+    private contributionOpportunitiesService:
+      ContributionOpportunitiesService,
+    private translationLanguageService: TranslationLanguageService
+  ) {}
 
-          ctrl.opportunities.push({
-            heading: heading,
-            subheading: subheading,
-            actionButtonTitle: 'Request to Voiceover'
-          });
-        }
-        ctrl.moreOpportunitiesAvailable = more;
-        ctrl.opportunitiesAreLoading = false;
-        // TODO(#8521): Remove the use of $rootScope.$apply().
-        $rootScope.$apply();
-      };
+  directiveSubscriptions = new Subscription();
+  opportunities: TranslationOpportunity[];
+  moreOpportunitiesAvailable: boolean;
+  opportunitiesAreLoading: boolean;
 
-      ctrl.onLoadMoreOpportunities = function() {
-        if (
-          !ctrl.opportunitiesAreLoading &&
-          ctrl.moreOpportunitiesAvailable) {
-          ctrl.opportunitiesAreLoading = true;
-          ContributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
-        }
-      };
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          TranslationLanguageService.onActiveLanguageChanged.subscribe(
-            () => {
-              ctrl.opportunities = [];
-              ctrl.opportunitiesAreLoading = true;
-              ContributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
-                TranslationLanguageService.getActiveLanguageCode(),
-                updateWithNewOpportunities);
-            }
-          )
-        );
-        ctrl.opportunities = [];
-        ctrl.opportunitiesAreLoading = true;
-        ctrl.moreOpportunitiesAvailable = true;
-        ctrl.progressBarRequired = false;
-        ContributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
-          TranslationLanguageService.getActiveLanguageCode(),
-          updateWithNewOpportunities);
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  updateWithNewOpportunities(
+      opportunities: ExplorationOpportunitySummary[], more: boolean): void {
+    for (let index in opportunities) {
+      let opportunity = opportunities[index];
+
+      this.opportunities.push({
+        heading: opportunity.getOpportunityHeading(),
+        subheading: opportunity.getOpportunitySubheading(),
+        actionButtonTitle: 'Request to Voiceover',
+        // These are not used in the code, but needed as the type expects it.
+        id: opportunity.getExplorationId(),
+        progressPercentage: '',
+        inReviewCount: 0,
+        totalCount: 0,
+        translationsCount: 0
+      });
     }
-  ]
-});
+    this.moreOpportunitiesAvailable = more;
+    this.opportunitiesAreLoading = false;
+  }
+
+  onLoadMoreOpportunities(): void {
+    if (
+      !this.opportunitiesAreLoading &&
+      this.moreOpportunitiesAvailable) {
+      this.opportunitiesAreLoading = true;
+      this.contributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync(
+        this.translationLanguageService.getActiveLanguageCode()).then(
+        (value) => this.updateWithNewOpportunities(
+          value.opportunities, value.more));
+    }
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.translationLanguageService.onActiveLanguageChanged.subscribe(
+        () => {
+          this.opportunities = [];
+          this.opportunitiesAreLoading = true;
+          this.contributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
+            this.translationLanguageService.getActiveLanguageCode()).then(
+            (value) => this.updateWithNewOpportunities(
+              value.opportunities, value.more));
+        }
+      )
+    );
+    this.opportunities = [];
+    this.opportunitiesAreLoading = true;
+    this.moreOpportunitiesAvailable = true;
+    this.progressBarRequired = false;
+    this.contributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
+      this.translationLanguageService.getActiveLanguageCode()).then(
+      (value) => this.updateWithNewOpportunities(
+        value.opportunities, value.more));
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('voiceoverOpportunities',
+  downgradeComponent({
+    component: VoiceoverOpportunitiesComponent
+  }) as angular.IDirectiveFactory);

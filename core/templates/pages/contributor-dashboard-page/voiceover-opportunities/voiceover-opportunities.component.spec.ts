@@ -17,137 +17,129 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ContributionOpportunitiesBackendApiService } from
-  // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { VoiceoverOpportunitiesComponent } from './voiceover-opportunities.component';
 
-describe('Voiceover opportunities component', function() {
-  var ctrl = null;
-  var $rootScope = null;
-  var $scope = null;
-  var contributionOpportunitiesService = null;
-  var translationLanguageService = null;
+describe('Voiceover opportunities component', () => {
+  let contributionOpportunitiesService: ContributionOpportunitiesService;
+  let translationLanguageService: TranslationLanguageService;
 
-  var activeLanguageChangedEmitter = new EventEmitter();
+  let activeLanguageChangedEmitter = new EventEmitter();
+  let component: VoiceoverOpportunitiesComponent;
 
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ContributionOpportunitiesBackendApiService',
-      TestBed.get(ContributionOpportunitiesBackendApiService));
-    $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
-  }));
-
-  beforeEach(function() {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
       ],
     });
-  });
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    contributionOpportunitiesService = $injector.get(
-      'ContributionOpportunitiesService');
-    translationLanguageService = $injector.get('TranslationLanguageService');
-
+    contributionOpportunitiesService = TestBed.inject(
+      ContributionOpportunitiesService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
     spyOn(
       contributionOpportunitiesService, 'getVoiceoverOpportunitiesAsync').and
-      .callFake((languageCode, callback) => callback([
-        ExplorationOpportunitySummary.createFromBackendDict({
-          id: '1',
-          topic_name: 'topic_1',
-          story_title: 'Story title 1',
-          chapter_title: 'Chapter title 1',
-          content_count: 2,
-          translation_counts: {
-            en: 1
-          },
-          translation_in_review_counts: {
-            hi: 20
-          }
-        }),
-        ExplorationOpportunitySummary.createFromBackendDict({
-          id: '2',
-          topic_name: 'topic_2',
-          story_title: 'Story title 2',
-          chapter_title: 'Chapter title 2',
-          content_count: 4,
-          translation_counts: {
-            en: 2
-          },
-          translation_in_review_counts: {
-            hi: 20
-          }
-        }),
-      ], true));
+      .callFake((languageCode: string) => {
+        return new Promise((resolve) => {
+          resolve({
+            opportunities: [
+              ExplorationOpportunitySummary.createFromBackendDict({
+                id: '1',
+                topic_name: 'topic_1',
+                story_title: 'Story title 1',
+                chapter_title: 'Chapter title 1',
+                content_count: 2,
+                translation_counts: {
+                  en: 1
+                },
+                translation_in_review_counts: {
+                  hi: 20
+                }
+              }),
+              ExplorationOpportunitySummary.createFromBackendDict({
+                id: '2',
+                topic_name: 'topic_2',
+                story_title: 'Story title 2',
+                chapter_title: 'Chapter title 2',
+                content_count: 4,
+                translation_counts: {
+                  en: 2
+                },
+                translation_in_review_counts: {
+                  hi: 20
+                }
+              })
+            ],
+            more: false
+          });
+        });
+      });
     spyOn(
       contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync')
-      .and.callFake((languageCode, callback) => callback([
-        ExplorationOpportunitySummary.createFromBackendDict({
-          id: '3',
-          topic_name: 'topic_3',
-          story_title: 'Story title 3',
-          chapter_title: 'Chapter title 3',
-          content_count: 3,
-          translation_counts: {
-            en: 3
-          },
-          translation_in_review_counts: {
-            hi: 20
-          }
-        }),
-      ], true));
+      .and.callFake((languageCode) => {
+        return new Promise((resolve) => {
+          resolve({
+            opportunities: [
+              ExplorationOpportunitySummary.createFromBackendDict({
+                id: '3',
+                topic_name: 'topic_3',
+                story_title: 'Story title 3',
+                chapter_title: 'Chapter title 3',
+                content_count: 3,
+                translation_counts: {
+                  en: 3
+                },
+                translation_in_review_counts: {
+                  hi: 20
+                }
+              })
+            ],
+            more: false
+          });
+        });
+      });
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('voiceoverOpportunities', {
-      $scope: $scope,
-    });
-    ctrl.$onInit();
-  }));
-
-  afterEach(function() {
-    ctrl.$onDestroy();
+    let fixture = TestBed.createComponent(VoiceoverOpportunitiesComponent);
+    component = fixture.componentInstance;
+    component.ngOnInit();
   });
 
-  it('should initialize controller properties after its initialization',
-    function() {
-      expect(ctrl.opportunities.length).toBe(2);
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
-      expect(ctrl.moreOpportunitiesAvailable).toBe(true);
-      expect(ctrl.progressBarRequired).toBe(false);
-    });
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
 
-  it('should load more opportunities when opportunities are available',
-    function() {
-      ctrl.onLoadMoreOpportunities();
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
-      expect(ctrl.opportunities.length).toBe(3);
+  it('should initialize controller properties after its initialization', () => {
+    expect(component.opportunities.length).toBe(2);
+    expect(component.opportunitiesAreLoading).toBe(false);
+    expect(component.moreOpportunitiesAvailable).toBe(true);
+    expect(component.progressBarRequired).toBe(false);
+  });
 
-      activeLanguageChangedEmitter.emit();
-
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
-      expect(ctrl.opportunities.length).toBe(2);
-    });
-
-  it('should get opportunities from new language when active language is' +
-    ' changed', function() {
-    ctrl.onLoadMoreOpportunities();
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-    expect(ctrl.opportunities.length).toBe(3);
+  it('should load more opportunities when opportunities are available', () => {
+    component.onLoadMoreOpportunities();
+    expect(component.opportunitiesAreLoading).toBe(false);
+    expect(component.opportunities.length).toBe(3);
 
     activeLanguageChangedEmitter.emit();
 
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-    expect(ctrl.opportunities.length).toBe(2);
+    expect(component.opportunitiesAreLoading).toBe(false);
+    expect(component.opportunities.length).toBe(2);
+  });
+
+  it('should get opportunities from new language when active language is' +
+    ' changed', () => {
+    component.onLoadMoreOpportunities();
+    expect(component.opportunitiesAreLoading).toBe(false);
+    expect(component.opportunities.length).toBe(3);
+
+    activeLanguageChangedEmitter.emit();
+
+    expect(component.opportunitiesAreLoading).toBe(false);
+    expect(component.opportunities.length).toBe(2);
   });
 });

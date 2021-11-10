@@ -139,7 +139,10 @@ export class ContributionOpportunitiesService {
   }
 
   async getMoreVoiceoverOpportunitiesAsync(languageCode: string):
-  Promise<ExplorationOpportunitiesDict> {
+  Promise<{
+    opportunities: ExplorationOpportunitySummary[];
+    more: boolean;
+  }> {
     if (this._moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunitiesAsync(
         languageCode, this._voiceoverOpportunitiesCursor);
