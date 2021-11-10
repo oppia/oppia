@@ -126,6 +126,16 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_blog_post_id(blog_id)
 
+    def _assert_valid_thumbnail_update(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that blog post passes validation for thumbnail update."""
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            self.blog_post.update_thumbnail_filename(
+                self.blog_post.thumbnail_filename
+            )
+
     def test_blog_post_id_validation_for_blog_post(self) -> None:
         self._assert_valid_blog_post_id_for_blog_post(
             'Blog ID abcdef is invalid', 'abcdef')
@@ -293,6 +303,16 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment(
             'Blog Post URL Fragment field must be a string. '
             'Received 123.'
+        )
+
+    def test_valid_thumbnail_update(self) -> None:
+        self.blog_post.title = 'Sample Title'
+        self.blog_post.thumbnail_filename = 123
+        self.blog_post.tags = ['tag']
+        self.blog_post.url_fragment = 123
+        self.blog_post.content = '<p>Hello</p>'
+        self._assert_valid_thumbnail_update(
+            'Expected Thumbnail filename should be a string, received 123'
         )
 
 
