@@ -2912,6 +2912,21 @@ title: Title
         notdemo2 = exp_domain.Exploration.create_default_exploration('abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
+    def test_to_proto(self):
+        """Test for to_proto."""
+        demo_exp = exp_domain.Exploration.create_default_exploration(
+            '0', 'Audio Test')
+        exp_proto = exp_domain.Exploration.to_proto(
+            '0', 'Audio Test', 1, None, None)
+        self.assertEqual(
+            demo_exp.to_proto('0', 'Audio Test', 1, None, None), exp_proto)
+
+    def test_calculate_size_of_proto(self):
+        """Test for calculate_size_of_proto."""
+        exp_proto = exp_domain.Exploration.to_proto(
+            '0', 'Audio Test', 1, None, None)
+        self.assertEqual(exp_proto.ByteSize(), 17)
+
     def test_has_state_name(self):
         """Test for has_state_name."""
         demo = exp_domain.Exploration.create_default_exploration('0')

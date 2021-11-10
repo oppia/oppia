@@ -2522,8 +2522,8 @@ class Exploration:
             exploration_id: str. The id of the exploration.
             title: str. The exploration title.
             version: int. The version of the exploration.
-            init_state_name: str. The name of the initial state.
-            states: list. The list of state
+            init_state_name: str|None. The name of the initial state.
+            states: list|None. The list of state
                 domain objects.
 
         Returns:
@@ -2532,7 +2532,7 @@ class Exploration:
         state_protos = {}
         exploration_proto = {}
         if states is not None:
-            state_protos = state_domain.State.to_state_proto(states)
+            state_protos = state_domain.State.to_proto(states)
 
         if isinstance(title, str):
             exploration_proto = exploration_pb2.Exploration(

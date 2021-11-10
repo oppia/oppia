@@ -4433,6 +4433,18 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
         self.assertEqual(html, ['<p>testing</p>'])
 
 
+class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
+    """Test SubtitledHtml domain object methods."""
+
+    def test_to_proto(self):
+        """Test for to_proto."""
+        # Test html type content.
+        subtitled_text_proto = state_domain.SubtitledHtml.to_proto(
+                'ca_placeholder_0', '<p>html</p>')
+        self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
+        self.assertEqual(subtitled_text_proto.text, '<p>html</p>')
+
+
 class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledUnicode domain object methods."""
 
@@ -4454,6 +4466,13 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'id',
             'unicode_str': ''
         })
+
+    def test_to_proto(self):
+        """Test for to_proto."""
+        subtitled_text_proto = state_domain.SubtitledUnicode.to_proto(
+                'ca_placeholder_0', '😍😍😍😍')
+        self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
+        self.assertEqual(subtitled_text_proto.text, '😍😍😍😍')
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
@@ -5048,6 +5067,50 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                 'content ids [\'invalid_content\']')):
             recorded_voiceovers.validate(['invalid_content'])
 
+    def test_to_proto(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'hi': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+        recorded_voiceovers_proto = state_domain.RecordedVoiceovers.to_proto(
+            recorded_voiceovers)
+        # Language at zero item should be English.
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0].language, 1)
+        # Language at zero item should be Hindi.
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1].language, 3)
+
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
@@ -5120,3 +5183,10 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected duration_secs to be positive number, '
             'or zero if not yet specified'):
             self.voiceover.validate()
+
+    def test_to_proto(self):
+        voiceover_proto = state_domain.Voiceover.to_proto(
+            'filename.mp3', 10, 15.0)
+        self.assertEqual(voiceover_proto.filename, 'filename.mp3')
+        self.assertEqual(voiceover_proto.file_size_bytes, 10)
+        self.assertEqual(voiceover_proto.duration_secs, 15.0)
