@@ -63,7 +63,8 @@ class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Missing cmd key in change dict'):
+            Exception, 'Missing cmd key in change dict'
+        ):
             domain_objects_validator.validate_exploration_or_question_change(
                 incorrect_change_dict)
 
@@ -280,16 +281,16 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
 
     def test_invalid_images_raises_exception(self) -> None:
         files = {'file.svg': None}
-        with self.assertRaisesRegexp(
-            # Type : ignore[no-untyped-call]
-            Exception, 'No image supplied'):
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'No image supplied'
+        ):
             domain_objects_validator.validate_suggestion_images(files)
 
     def test_valid_images_do_not_raises_exception(self) -> None:
         files = {'img.png': None, 'test2_svg.svg': None}
         for filename in files:
             with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, filename),
-                'rb', encoding=None) as f:
+                os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb'
+            ) as f:
                 files[filename] = f.read()
         domain_objects_validator.validate_suggestion_images(files)
