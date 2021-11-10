@@ -174,7 +174,7 @@ export class SvgSanitizerService {
    * @returns updated dataURI
    */
   updateAspectRatioOfSvgDataUri(
-    dataURI: string, widthToHeight: number
+      dataURI: string, widthToHeight: number
   ): string {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
