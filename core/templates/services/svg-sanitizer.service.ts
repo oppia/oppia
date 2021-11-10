@@ -182,32 +182,33 @@ export class SvgSanitizerService {
     let domParser = new DOMParser();
     let doc = domParser.parseFromString(svgString, 'image/svg+xml');
     const svg = doc.querySelector('svg');
-    const viewBoxAttrs = svg.getAttribute('viewBox').split(' ').map(
+    // Unable to properly convert the Svg to the aspect ratio.
+    if (!(svg.getAttribute('viewBox'))) {
+      return dataURI;
+    }
+    const viewBoxAttrs = (svg.getAttribute('viewBox') as string).split(' ').map(
       val => parseInt(val));
     const width = viewBoxAttrs[2];
     const height = viewBoxAttrs[3];
 
-    let newViewBoxAttrs;
     // Increase the height if the image is too wide.
     if (width / height > widthToHeight) {
       const idealHeight = Math.floor(width / widthToHeight);
       const heightDiff = idealHeight - height;
-      newViewBoxAttrs = [0, -Math.floor(heightDiff / 2), width, idealHeight];
+      const newViewBoxAttrs = [0, -Math.floor(heightDiff / 2), width, idealHeight];
+      svg.setAttribute('viewBox', newViewBoxAttrs.join(' '));
     }
     // Increase the width if the image is too tall.
-    if (width / height < widthToHeight) {
+    else if (width / height < widthToHeight) {
       const idealWidth = Math.floor(height * widthToHeight);
       const widthDiff = idealWidth - width;
-      newViewBoxAttrs = [-Math.floor(widthDiff / 2), 0, height, idealWidth];
-    }
-    // Update the viewBox for the Svg.
-    if (newViewBoxAttrs) {
+      const newViewBoxAttrs = [-Math.floor(widthDiff / 2), 0, height, idealWidth];
       svg.setAttribute('viewBox', newViewBoxAttrs.join(' '));
     }
     // Return the new encoded URI.
     return (
       'data:image/svg+xml;base64,' +
-      btoa(unescape(encodeURIComponent(svg.outerHTML))));
+      btoa(unescape(encodeURIComponent(svg.outerHTML as string))));
   }
 
   /**
