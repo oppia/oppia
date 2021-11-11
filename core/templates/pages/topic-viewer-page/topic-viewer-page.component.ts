@@ -130,6 +130,7 @@ export class TopicViewerPageComponent implements OnInit {
   setActiveTab(newActiveTabName: string): void {
     this.activeTab = newActiveTabName;
     if (newActiveTabName === 'story') {
+      console.error('me me');
       this.windowRef.nativeWindow.location.hash = 'lessons';
     } else if (newActiveTabName === 'practice') {
       this.windowRef.nativeWindow.location.hash = 'practice';

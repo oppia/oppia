@@ -86,6 +86,11 @@ describe('QuestionPlayerComponent', () => {
       }, {
         getQuestionPlayerConfig: () => {}
       });
+
+      spyOnProperty(
+        QuestionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
+        .and.returnValue(new EventEmitter<boolean>());
+      spyOn(QuestionPlayerStateService.resultsPageIsLoadedEventEmitter, 'emit');
     }));
 
   afterEach(() => {
@@ -108,6 +113,8 @@ describe('QuestionPlayerComponent', () => {
     expect(ctrl.totalScore).toBe(0.0);
     expect(ctrl.scorePerSkillMapping).toEqual({});
     expect(ctrl.testIsPassed).toBe(true);
+    expect(QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
+      .toHaveBeenCalledWith(false);
   });
 
   it('should add subscriptions on initialization', () => {
@@ -385,6 +392,8 @@ describe('QuestionPlayerComponent', () => {
     ctrl.calculateScores(questionStateData);
 
     expect(ctrl.totalScore).toBe(50);
+    expect(QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
+      .toHaveBeenCalledWith(true);
   });
 
   it('should calculate mastery degrees', () => {
