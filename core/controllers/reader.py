@@ -615,9 +615,6 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        if self.normalized_payload.get('version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Exploration start')
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.normalized_payload.get('version'),
             self.normalized_payload.get('state_name'),
@@ -649,7 +646,11 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
         'POST': {
             'exploration_version': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
                 }
             },
             'state_name': {
@@ -668,9 +669,6 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.normalized_payload.get('exploration_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id, self.normalized_payload.get('exploration_version'),
             self.normalized_payload.get('state_name'),
