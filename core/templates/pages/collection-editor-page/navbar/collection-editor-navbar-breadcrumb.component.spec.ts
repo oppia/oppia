@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for collection editor navbar breadcrumb component.
+ * @fileoverview Unit tests for collection editor navbar breadcrumb component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -72,16 +72,9 @@ describe('Collection editor navbar breadcrumb component', () => {
       CollectionEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
     collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
-    collectionEditorStateService = (collectionEditorStateService as unknown) as
-      jasmine.SpyObj<CollectionEditorStateService>;
     collectionEditorRoutingService = TestBed.inject(
       CollectionEditorRoutingService);
-    collectionEditorRoutingService = (
-      (collectionEditorRoutingService as unknown) as
-        jasmine.SpyObj<CollectionEditorRoutingService>);
     focusManagerService = TestBed.inject(FocusManagerService);
-    focusManagerService = (focusManagerService as unknown) as
-      jasmine.SpyObj<FocusManagerService>;
   });
 
   beforeEach(() => {

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,10 +51,7 @@ describe('Collection navbar component', () => {
     fixture = TestBed.createComponent(CollectionNavbarComponent);
     component = fixture.componentInstance;
     us = TestBed.inject(UrlService);
-    us = (us as unknown) as jasmine.SpyObj<UrlService>;
     rocbas = TestBed.inject(ReadOnlyCollectionBackendApiService);
-    rocbas = (rocbas as unknown) as
-      jasmine.SpyObj<ReadOnlyCollectionBackendApiService>;
   });
 
   beforeEach(() => {

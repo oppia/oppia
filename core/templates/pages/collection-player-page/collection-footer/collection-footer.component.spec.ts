@@ -50,10 +50,7 @@ describe('Collection footer component', () => {
     fixture = TestBed.createComponent(CollectionFooterComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    urlInterpolationService = (urlInterpolationService as unknown) as
-      jasmine.SpyObj<UrlInterpolationService>;
     urlService = TestBed.inject(UrlService);
-    urlService = (urlService as unknown) as jasmine.SpyObj<UrlService>;
   });
 
   beforeEach(() => {
