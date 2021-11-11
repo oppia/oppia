@@ -26,7 +26,7 @@ import re
 import sys
 import tokenize
 
-from core.controllers import handler_schema_constants
+from core import handler_schema_constants
 
 from .. import docstrings_checker
 
