@@ -32,7 +32,7 @@ describe('Collection editor navbar breadcrumb component', () => {
   let focusManagerService: FocusManagerService;
   let component: CollectionEditorNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<CollectionEditorNavbarBreadcrumbComponent>;
-  let mockCollection: Collection;
+  let expectedCollection: Collection;
 
   let activeTab = 'edit';
   let collectionData = {
@@ -40,7 +40,7 @@ describe('Collection editor navbar breadcrumb component', () => {
     title: 'collection title',
     objective: 'collection objective',
     languageCode: 'en',
-    tags: ['mock tag'],
+    tags: ['test tag'],
     playthrough: null,
     category: 'Collection Category',
     version: 0,
@@ -78,7 +78,7 @@ describe('Collection editor navbar breadcrumb component', () => {
   });
 
   beforeEach(() => {
-    mockCollection = new Collection(
+    expectedCollection = new Collection(
       collectionData.id, collectionData.title, collectionData.objective,
       collectionData.languageCode, collectionData.tags,
       collectionData.playthrough, collectionData.category,
@@ -88,7 +88,7 @@ describe('Collection editor navbar breadcrumb component', () => {
 
   beforeEach(() => {
     spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
-      mockCollection);
+      expectedCollection);
     spyOn(collectionEditorRoutingService, 'getActiveTabName').and.returnValue(
       activeTab);
     spyOn(focusManagerService, 'setFocus');
@@ -97,7 +97,7 @@ describe('Collection editor navbar breadcrumb component', () => {
 
   it('should load the component on opening collection editor page by clicking' +
     'on create collection', () => {
-    expect(component.collection).toBe(mockCollection);
+    expect(component.collection).toBe(expectedCollection);
     expect(component.activeTabName).toBe(activeTab);
   });
 
