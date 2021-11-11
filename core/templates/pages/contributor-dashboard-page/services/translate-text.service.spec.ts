@@ -16,8 +16,7 @@
  * @fileoverview Tests for translate-text service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateAndContent, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
