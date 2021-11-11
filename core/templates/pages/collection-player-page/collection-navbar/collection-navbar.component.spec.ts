@@ -55,13 +55,13 @@ describe('Collection navbar component', () => {
   });
 
   beforeEach(() => {
-    const mockCollectionDetail = {
+    const expectedCollectionDetail = {
       canEdit: true,
-      title: 'Mock title'
+      title: 'Test title'
     };
     spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
     spyOn(rocbas, 'getCollectionDetails').and.returnValue(
-      mockCollectionDetail);
+      expectedCollectionDetail);
   });
 
   it('should load the component properly on playing a collection', () => {
@@ -69,7 +69,7 @@ describe('Collection navbar component', () => {
     rocbas.onCollectionLoad.emit();
     expect(us.getCollectionIdFromUrl).toHaveBeenCalled();
     expect(rocbas.getCollectionDetails).toHaveBeenCalledWith('abcdef');
-    expect(component.collectionTitle).toBe('Mock title');
+    expect(component.collectionTitle).toBe('Test title');
     component.ngOnDestroy();
   });
 });
