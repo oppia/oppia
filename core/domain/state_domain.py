@@ -624,12 +624,12 @@ class InteractionInstance:
             solution_dict)
 
     @classmethod
-    def to_interaction_proto(cls, interaction):
+    def to_proto(cls, interaction):
         """Creates a InteractionInstance proto object.
 
         Args:
             interaction: InteractionInstance. The interaction instance
-                associated with this state.
+                domain object.
 
         Returns:
             Proto Object. The InteractionInstance proto object.
@@ -5444,7 +5444,7 @@ class State:
                 written_translations=(
                     WrittenTranslations.to_proto(
                     state.written_translations)),
-                interaction=InteractionInstance.to_interaction_proto(
+                interaction=InteractionInstance.to_proto(
                     state.interaction))
             state_protos[state_name] = state_proto
 

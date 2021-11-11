@@ -4433,6 +4433,43 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
         self.assertEqual(html, ['<p>testing</p>'])
 
 
+class InteractionInstanceDomainTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        subtitled_html = state_domain.SubtitledHtml(
+            'default_outcome', '')
+        default_outcome = state_domain.Outcome(
+            'end_state_name', subtitled_html, False, [], None, None)
+        customization_args = (
+            state_domain.InteractionInstance.convert_customization_args_dict_to_customization_args( # pylint: disable=line-too-long
+                'Continue',
+                {
+                    'buttonText': {
+                        'value': {
+                            'content_id': 'ca_buttonText_1',
+                            'unicode_str': 'Click Me!'
+                        }
+                    }
+                }
+            ))
+        continue_interaction = state_domain.InteractionInstance(
+            'Continue',
+            customization_args,
+            [], default_outcome, [], [], None)
+        continue_interaction_proto = (
+            state_domain.InteractionInstance.to_proto(
+                continue_interaction))
+        self.assertEqual(
+            continue_interaction_proto.continue_instance.customization_args.button_text.text, # pylint: disable=line-too-long
+            'Click Me!')
+        self.assertEqual(
+            continue_interaction_proto.continue_instance.customization_args.button_text.content_id, # pylint: disable=line-too-long
+            'ca_buttonText_1')
+        self.assertEqual(
+            continue_interaction_proto.continue_instance.default_outcome.destination_state, # pylint: disable=line-too-long
+            'end_state_name')
+
+
 class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledHtml domain object methods."""
 
