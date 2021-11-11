@@ -67,14 +67,14 @@ export class MusicNotesInputRulesService {
   // TODO(wxy): Validate that inputs.a <= inputs.b.
   HasLengthInclusivelyBetween(
       answer: MusicNotesAnswer[],
-      inputs: {a: number, b: number}): boolean {
+      inputs: { a: number; b: number }): boolean {
     var answerLength: number = (
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
     return answerLength >= inputs.a && answerLength <= inputs.b;
   }
   IsEqualToExceptFor(
       answer: MusicNotesAnswer[],
-      inputs: {x: MusicNotesAnswer[], k: number}): boolean {
+      inputs: { x: MusicNotesAnswer[]; k: number }): boolean {
     var targetSequence: number[] = (
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
     var userSequence: number[] = (
@@ -93,7 +93,7 @@ export class MusicNotesInputRulesService {
   }
   IsTranspositionOf(
       answer: MusicNotesAnswer[],
-      inputs: {x: MusicNotesAnswer[], y: number}): boolean {
+      inputs: { x: MusicNotesAnswer[]; y: number }): boolean {
     var targetSequence: number[] = (
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
     var userSequence: number[] = (
@@ -107,7 +107,7 @@ export class MusicNotesInputRulesService {
   }
   IsTranspositionOfExceptFor(
       answer: MusicNotesAnswer[],
-      inputs: {x: MusicNotesAnswer[], y: number, k: number}): boolean {
+      inputs: { x: MusicNotesAnswer[]; y: number; k: number }): boolean {
     var targetSequence: number[] = (
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
     var userSequence: number[] = (

@@ -41,7 +41,7 @@ export class InteractiveNumericInput implements OnInit {
   errorString = '';
   requireNonnegativeInput: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
+  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {} };
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -84,7 +84,7 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {}; } {
+  getSchema(): { type: string; 'ui_config': {} } {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 
