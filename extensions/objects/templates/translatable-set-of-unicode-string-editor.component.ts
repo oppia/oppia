@@ -31,8 +31,8 @@ export class TranslatableSetOfUnicodeStringEditorComponent {
   @Output() valueChanged = new EventEmitter();
   schema: {
     type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
+    items: { type: string };
+    validators: { id: string }[];
   } = {
     type: 'list',
     items: {
@@ -56,8 +56,8 @@ export class TranslatableSetOfUnicodeStringEditorComponent {
 
   getSchema(): {
     type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
+    items: { type: string };
+    validators: { id: string }[];
     } {
     return this.schema;
   }

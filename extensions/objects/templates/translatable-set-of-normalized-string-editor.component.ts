@@ -30,8 +30,8 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
   @Output() valueChanged = new EventEmitter();
   schema: {
     type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
+    items: { type: string };
+    validators: { id: string }[];
   } = {
     type: 'list',
     items: {
@@ -55,8 +55,8 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
 
   getSchema(): {
     type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
+    items: { type: string };
+    validators: { id: string }[];
     } {
     return this.schema;
   }
