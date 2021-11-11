@@ -72,9 +72,9 @@ export class TopicViewerPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.urlService.getPathname().endsWith('revision')) {
+    if (this.urlService.getHash() === 'revision') {
       this.setActiveTab('subtopics');
-    } else if (this.urlService.getPathname().endsWith('practice')) {
+    } else if (this.urlService.getHash() === 'practice') {
       this.setActiveTab('practice');
     } else {
       this.setActiveTab('story');
@@ -130,7 +130,6 @@ export class TopicViewerPageComponent implements OnInit {
   setActiveTab(newActiveTabName: string): void {
     this.activeTab = newActiveTabName;
     if (newActiveTabName === 'story') {
-      console.error('me me');
       this.windowRef.nativeWindow.location.hash = 'lessons';
     } else if (newActiveTabName === 'practice') {
       this.windowRef.nativeWindow.location.hash = 'practice';

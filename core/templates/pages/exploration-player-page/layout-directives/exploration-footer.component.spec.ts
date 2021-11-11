@@ -40,6 +40,7 @@ describe('ExplorationFooterComponent', () => {
   let questionPlayerStateService: QuestionPlayerStateService;
   let mockResizeEventEmitter = new EventEmitter();
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -126,15 +127,16 @@ describe('ExplorationFooterComponent', () => {
       'contributor_2', 'contributor_3', 'contributor_1']);
   }));
 
-  it('should add subscription on initialization', () => {
-    spyOn(
-      questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
+  it('should set resultsLoaded when user finishes practice session', () => {
+    expect(component.resultsLoaded).toBeFalse();
+
+    spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
+      .and.returnValue(mockResultsLoadedEventEmitter);
 
     component.ngOnInit();
+    mockResultsLoadedEventEmitter.emit(true);
 
-    expect(
-      questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe)
-      .toHaveBeenCalled();
+    expect(component.resultsLoaded).toBeTrue();
   });
 
   it('should check if window is narrow when user resizes window', () => {

@@ -157,8 +157,7 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(urlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicUrlFragment}/story`);
+    spyOn(urlService, 'getHash').and.returnValue('story');
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -172,8 +171,7 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(urlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicUrlFragment}/revision`);
+    spyOn(urlService, 'getHash').and.returnValue('revision');
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -186,8 +184,7 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(urlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicUrlFragment}/practice`);
+    spyOn(urlService, 'getHash').and.returnValue('practice');
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -253,7 +250,7 @@ describe('Topic viewer page', () => {
   ' revision tab', () => {
     expect(windowRef.nativeWindow.location.hash).toBe('');
 
-    topicViewerPageComponent.setActiveTab('revision');
+    topicViewerPageComponent.setActiveTab('subtopics');
 
     expect(windowRef.nativeWindow.location.hash).toBe('revision');
   });
