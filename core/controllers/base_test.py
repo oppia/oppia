@@ -29,12 +29,12 @@ import re
 import types
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core import handler_schema_constants
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import classifier_domain
