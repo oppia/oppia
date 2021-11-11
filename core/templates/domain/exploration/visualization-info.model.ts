@@ -40,7 +40,7 @@ export interface VisualizationInfoBackendDict {
     'data': AnswerStatsBackendDict[];
     'id': string;
     'options': {
-      [name: string]: Option
+      [name: string]: Option;
   };
 }
 
@@ -54,7 +54,7 @@ export class VisualizationInfo {
 
   constructor(
       addressedInfoIsSupported: boolean, data: AnswerStats[], id: string,
-      options: { [name: string]: Object; }) {
+      options: { [name: string]: Object }) {
     this.addressedInfoIsSupported = addressedInfoIsSupported;
     this.data = data;
     this.id = id;

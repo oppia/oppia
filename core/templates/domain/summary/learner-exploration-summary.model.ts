@@ -27,7 +27,7 @@ export interface ExplorationRatings {
 export interface HumanReadableContributorsSummary {
   [username: string]: {
     'num_commits': number;
-  }
+  };
 }
 
 export interface LearnerExplorationSummaryBackendDict {

@@ -47,8 +47,8 @@ export interface ExplorationSummaryDict {
 
 interface HumanReadableContributorSummaryBackendDict {
   [username: string]: {
-    'num_commits': number
-  }
+    'num_commits': number;
+  };
 }
 
 @Injectable({
