@@ -114,8 +114,7 @@ describe('Contributor dashboard admin page ', function() {
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
-      expect(ctrl.statusMessage).toBe(
-        'Successfully added "user1" as translation reviewer.');
+      expect(ctrl.statusMessage).toBe('Success.');
     }));
 
     it('should not send request to backend if a task ' +
