@@ -22,7 +22,6 @@ import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/crea
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { CreatorDashboardConstants } from './creator-dashboard-page.constants';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import { SuggestionModalForCreatorDashboardService } from './suggestion-modal-for-creator-view/suggestion-modal-for-creator-view.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
@@ -75,8 +74,6 @@ export class CreatorDashboardPageComponent {
     private creatorDashboardBackendApiService:
       CreatorDashboardBackendApiService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
-    private suggestionModalForCreatorDashboardService:
-      SuggestionModalForCreatorDashboardService,
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
@@ -113,7 +110,6 @@ export class CreatorDashboardPageComponent {
     this.myExplorationsView = newViewType;
     this.creatorDashboardBackendApiService.postExplorationViewAsync(
       newViewType).then(() => {});
-    this.userDashboardDisplayPreference = newViewType;
   }
 
   checkMobileView(): boolean {
@@ -216,20 +212,8 @@ export class CreatorDashboardPageComponent {
     }
   }
 
-  showSuggestionModal(): void {
-    this.suggestionModalForCreatorDashboardService.showSuggestionModal(
-      this.activeThread.suggestion.suggestionType,
-      {
-        activeThread: this.activeThread,
-        suggestionsToReviewList: this.suggestionsToReviewList,
-        clearActiveThread: this.clearActiveThread,
-        canReviewActiveThread: this.canReviewActiveThread
-      }
-    );
-  }
-
   sortByFunction(
-      entity
+      entity: { [x: string]: any; status: string; }
   ): string | number {
     // This function is passed as a custom comparator function to
     // `orderBy`, so that special cases can be handled while sorting

@@ -1,7 +1,7 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
   <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
-       *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0 || mySuggestionsList?.length > 0  || suggestionsToReviewList?.length > 0"
+       *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0"
        [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row">
       <div class="average-ratings stats-card">
@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <div *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0 || mySuggestionsList?.length > 0 || suggestionsToReviewList?.length > 0">
+  <div *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0">
     <ul class="oppia-dashboard-tabs">
       <li *ngIf="explorationsList?.length > 0"
           [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
@@ -93,13 +93,6 @@
            [innerHTML]="'I18N_DASHBOARD_SUBSCRIBERS' | translate">
         </a>
       </li>
-      <li *ngIf="mySuggestionsList?.length > 0 || suggestionsToReviewList?.length > 0"
-          [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'suggestions'}">
-        <a class="oppia-dashboard-tabs-text"
-           (click)="setActiveTab('suggestions')"
-           [innerHTML]="'I18N_DASHBOARD_SUGGESTIONS' | translate">
-        </a>
-      </li>
 
       <li class="list-card-view-toggle dashboard-hide-mobile"
           *ngIf="activeTab === 'myExplorations' && explorationsList?.length > 0">
@@ -119,12 +112,12 @@
     </ul>
   </div>
 
-  <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0 && mySuggestionsList?.length === 0 && suggestionsToReviewList?.length === 0">
+  <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0">
     <h2 class="oppia-dashboard-title" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h2>
   </div>
 
   <div *ngIf="activeTab === 'myExplorations'">
-    <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0 && mySuggestionsList?.length === 0 && suggestionsToReviewList?.length === 0" class="oppia-dashboard-empty-text">
+    <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0">
       <mat-card layout="row"
                class="oppia-page-card oppia-dashboard-intro-card mt-0">
         <div>
@@ -397,87 +390,6 @@
         </oppia-collection-summary-tile>
       </span>
     </ul>
-  </div>
-
-  <div *ngIf="activeTab === 'suggestions'">
-    <mat-card class="oppia-suggestion-table">
-      <div *ngIf="!activeThread">
-        <div *ngIf="mySuggestionsList?.length > 0">
-          <h2>Suggestions created</h2>
-          <oppia-thread-table *ngIf="mySuggestionsList"
-                              [threads]="mySuggestionsList"
-                              (rowClick)="setActiveThread($event)">
-          </oppia-thread-table>
-          <br>
-        </div>
-
-        <div *ngIf="suggestionsToReviewList?.length > 0">
-          <h2>Suggestions to review</h2>
-          <oppia-thread-table *ngIf="suggestionsToReviewList"
-                              [threads]="suggestionsToReviewList"
-                              (rowClick)="setActiveThread($event)">
-          </oppia-thread-table>
-          <br>
-        </div>
-      </div>
-
-      <div *ngIf="activeThread">
-        <div class="row">
-          <div class="col-lg-7 col-md-7 col-sm-7">
-            <span class="oppia-back-arrow">
-              <button type="button" class="btn btn-secondary btn-sm" (click)="clearActiveThread()">
-                <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
-              </button>
-            </span>
-            <span class="oppia-suggestion-text" [hidden]="!activeThread.isSuggestionThread()">Suggestion: {{ activeThread.subject }}</span>
-          </div>
-        </div>
-
-        <div class="row" *ngIf="activeThread.messages">
-          <div class="col-lg-12 col-md-12 col-sm-12 oppia-table-container">
-            <table class="table">
-              <tr *ngFor="let m of activeThread.messages | sortBy:'messageId'">
-                <td>
-                  <div class="row">
-                    <div class="col-lg-5 col-md-5 col-sm-5">
-                      <span *ngIf="$index !== 0">#{{ m.messageId }}</span>
-                      <span *ngIf="m.authorUsername">by <strong>{{ m.authorUsername }}</strong></span>
-                      <span *ngIf="!m.authorUsername">(anonymously submitted)</span>
-                    </div>
-
-                    <div class="col-lg-4 col-md-4 col-sm-4">
-                      <span *ngIf="m.messageId !== 0">
-                        <span *ngIf="m.updatedStatus">
-                          <em>Status changed to '{{ getHumanReadableStatus(m.updatedStatus) }}'</em>
-                        </span>
-                        <span *ngIf="m.updatedSubject">
-                          <em>Subject changed to '{{ m.updatedSubject }}'</em>
-                        </span>
-                      </span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-3 col-sm-3">
-                      <span>{{ getLocaleAbbreviatedDatetimeString(m.createdOnMsecs) }}</span>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-12">
-                      <div class="oppia-m-text">{{ m.text }}</div>
-                      <div *ngIf="activeThread.isSuggestionThread() && $index == 0">
-                        <button class="btn btn-primary oppia-view-suggestion-text" (click)="showSuggestionModal()">
-                          View Suggestion
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </mat-card>
   </div>
 </div>
 <style>
@@ -780,10 +692,6 @@
     padding-left: 0;
   }
 
-  .oppia-suggestion-table {
-    background: white;
-  }
-
   creator-dashboard-page .oppia-dashboard-tab-panel-container {
     padding-bottom: 46px;
     padding-top: 13px;
@@ -824,18 +732,11 @@
   creator-dashboard-page .oppia-impact-text {
     font-size: 14.5px;
   }
-  creator-dashboard-page .oppia-suggestion-text {
-    font-size: larger;
-  }
   creator-dashboard-page .oppia-table-container {
     margin-top: 10px;
   }
   creator-dashboard-page .oppia-m-text {
     white-space: pre-wrap;
-  }
-  creator-dashboard-page .oppia-view-suggestion-text {
-    margin-bottom: 6px;
-    margin-top: 6px;
   }
   creator-dashboard-page .oppia-sort-options {
     width: 160px;
