@@ -213,7 +213,7 @@ export class CreatorDashboardPageComponent {
   }
 
   sortByFunction(
-      entity: { [x: string]: any; status: string; }
+      entity: { [x: string]: number | string; status: string; }
   ): string | number {
     // This function is passed as a custom comparator function to
     // `orderBy`, so that special cases can be handled while sorting
@@ -349,4 +349,3 @@ angular.module('oppia').directive('oppiaCreatorDashboardPage',
   downgradeComponent({
     component: CreatorDashboardPageComponent
   }) as angular.IDirectiveFactory);
-

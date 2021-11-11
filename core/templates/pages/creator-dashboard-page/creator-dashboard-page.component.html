@@ -119,7 +119,7 @@
   <div *ngIf="activeTab === 'myExplorations'">
     <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0">
       <mat-card layout="row"
-               class="oppia-page-card oppia-dashboard-intro-card mt-0">
+                class="oppia-page-card oppia-dashboard-intro-card mt-0">
         <div>
           <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
           <button type="button"
@@ -164,7 +164,7 @@
 
     <div *ngIf="myExplorationsView === 'list' && explorationsList?.length > 0">
       <mat-card layout="row"
-               class="oppia-dashboard-list-view-item">
+                class="oppia-dashboard-list-view-item">
         <table class="oppia-dashboard-table">
           <colgroup>
             <col class="oppia-colgroup-col-1">
@@ -232,8 +232,8 @@
     <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
          class="oppia-card-view-wrap">
       <mat-card *ngFor="let exploration of explorationsList"
-               class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
-               is-private="exploration.status === 'private'">
+                class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
+                is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
           <div class="title-section"
                ng-style="{'background-color': exploration.thumbnailBgColor}">
@@ -343,7 +343,7 @@
         <select [(ngModel)]="currentSubscribersSortType"
                 class="sort-options oppia-sort-options"
                 (change)="setSubscriptionSortingOptions(currentSubscribersSortType)">
-                <option *ngFor="let key of HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS">{{ SUBSCRIPTION_SORT_BY_KEYS[key] }}</option>
+          <option *ngFor="let key of HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS">{{ SUBSCRIPTION_SORT_BY_KEYS[key] }}</option>
         </select>
         <span class="sort-order fas"
               (click)="setSubscriptionSortingOptions(currentSubscribersSortType)"
