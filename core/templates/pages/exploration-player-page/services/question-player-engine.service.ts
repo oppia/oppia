@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
@@ -140,24 +140,23 @@ export class QuestionPlayerEngineService {
   }
 
   init(
-      questionDicts: QuestionBackendDict[],
+      questionObjects: Question[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
-    let currentIndex = questionDicts.length;
+    let currentIndex = questionObjects.length;
     let randomIndex;
 
     while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex--;
 
-      [questionDicts[currentIndex], questionDicts[randomIndex]] = [
-        questionDicts[randomIndex], questionDicts[currentIndex]];
+      [questionObjects[currentIndex], questionObjects[randomIndex]] = [
+        questionObjects[randomIndex], questionObjects[currentIndex]];
     }
-    for (let i = 0; i < questionDicts.length; i++) {
-      this.addQuestion(
-        this.questionObjectFactory.createFromBackendDict(questionDicts[i]));
+    for (let i = 0; i < questionObjects.length; i++) {
+      this.addQuestion(questionObjects[i]);
     }
     if (!this.questions || this.questions.length === 0) {
       this.alertsService.addWarning('There are no questions to display.');
