@@ -36,6 +36,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   styleUrls: []
 })
 export class PracticeTabComponent implements OnInit {
+  // Using ViewEncapsulation.None to override style of mat-spinner.
   @Input() topicName: string;
   @Input() startButtonIsDisabled: boolean = false;
   @Input() subtopicsList: Subtopic[];
