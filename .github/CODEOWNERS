@@ -666,7 +666,7 @@
 # Data stability.
 /core/controllers/domain_objects_validator*.py @vojtechjelinek
 /core/controllers/payload_validator*.py @vojtechjelinek
-/core/controllers/handler_schema_constants.py @vojtechjelinek
+/core/handler_schema_constants.py @vojtechjelinek
 
 
 # QA team.
