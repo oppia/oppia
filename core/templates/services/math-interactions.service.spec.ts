@@ -217,34 +217,32 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a4', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer contains invalid variable multiplication: a4. ' +
-      'The variable should come after the number: 4a.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      'a * 4', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer contains invalid variable multiplication: a*4. ' +
-      'The variable should come after the number: 4*a.');
+      'When multiplying, the variable should come after the number: 4a. ' +
+      'Please update your answer and try again.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'x^y^z', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent in an exponent.');
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '3^4^5', ['a', 'x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent in an exponent.');
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'x^(y^z)', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent in an exponent.');
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'x^(y*a^z)', ['a', 'x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent in an exponent.');
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a^6', ['a'])).toBeFalse();
@@ -262,27 +260,15 @@ describe('MathInteractionsService', () => {
       'Your expression contains an exponent with value greater than 5.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'a+((b-c)+(d+e))', ['a', 'b', 'c', 'd', 'e'])).toBeFalse();
+      'a+((b-c))', ['a', 'b', 'c'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains redundant parentheses: (b-c).'
+      'Your expression contains redundant parentheses: ((b-c)).'
     );
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '-(a + b) + (a + (-b))', ['a', 'b'])).toBeFalse();
+      '(((a + b))) + c', ['a', 'b', 'c'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains redundant parentheses: (a+(-b)).'
-    );
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      'a+(b-c)-d', ['a', 'b', 'c', 'd'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains redundant parentheses: (b-c).'
-    );
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      'a*(-(c))', ['a', 'c'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains redundant parentheses: (c).'
+      'Your expression contains redundant parentheses: ((a+b)).'
     );
 
     expect(mathInteractionsService.validateNumericExpression(

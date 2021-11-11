@@ -78,9 +78,9 @@ def contains_balanced_brackets(expression):
     return len(stack) == 0
 
 
-def contains_variables(expression):
-    """Checks if the given expression contains at least
-    one valid identifier (latin letter or greek symbol name).
+def contains_at_least_one_variable(expression):
+    """Checks if the given expression contains at least one valid identifier
+    (latin letter or greek symbol name).
 
     Args:
         expression: str. A math expression.

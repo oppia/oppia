@@ -40,7 +40,9 @@ export class AlgebraicExpressionInputRulesService {
 
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
-    if (!mis.containsVariables(answer) && !mis.containsVariables(inputs.x)) {
+    if (
+      !mis.containsAtLeastOneVariable(answer) &&
+      !mis.containsAtLeastOneVariable(inputs.x)) {
       let numericExpressionRuleService = (
         new NumericExpressionInputRulesService());
       return numericExpressionRuleService.MatchesExactlyWith(answer, inputs);
@@ -62,7 +64,9 @@ export class AlgebraicExpressionInputRulesService {
 
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
-    if (!mis.containsVariables(answer) && !mis.containsVariables(inputs.x)) {
+    if (
+      !mis.containsAtLeastOneVariable(answer) &&
+      !mis.containsAtLeastOneVariable(inputs.x)) {
       let numericExpressionRuleService = (
         new NumericExpressionInputRulesService());
       return numericExpressionRuleService.IsEquivalentTo(answer, inputs);

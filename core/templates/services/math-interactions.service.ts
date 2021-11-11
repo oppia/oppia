@@ -103,35 +103,15 @@ export class MathInteractionsService {
     /*
     Assumes that expressionString is syntactically valid.
 
-    a. The brackets enclose a single variable without a negation.
-    b. The opening bracket is preceded by '+' OR '(' OR 'start of expression'.
-    c. The opening bracket isn't (preceded by '+' AND followed by '-').
-    d. The closing bracket is followed by '+' OR '-' OR ')' OR
-    'end of expression'.
-
-    Any given bracket pair is redundant iff: a OR (b AND c AND d)
+    Multiple consecutive parens are considered redundant. eg: for ((a - b))
+    the outer pair of parens are considered as redundant.
     */
-    let enclosedExpression = expressionString.slice(openingInd + 1, closingInd);
-
-    let condA = enclosedExpression.length === 1;
-
-    let condB = (
-      openingInd === 0 ||
-      ['+', '('].includes(expressionString[openingInd - 1])
-    );
-
-    let condC = !(
-      openingInd > 0 &&
-      expressionString[openingInd - 1] === '+' &&
-      expressionString[openingInd + 1] === '-'
-    );
-
-    let condD = (
-      closingInd === expressionString.length - 1 ||
-      ['+', '-', ')'].includes(expressionString[closingInd + 1])
-    );
-
-    return condA || (condB && condC && condD);
+    let leftParenIsRedundant = (
+      openingInd - 1 >= 0 && expressionString[openingInd - 1] === '(');
+    let rightParenIsRedundant = (
+      closingInd + 1 < expressionString.length &&
+      expressionString[closingInd + 1] === ')');
+    return leftParenIsRedundant && rightParenIsRedundant;
   }
 
   containsRedundantParens(expressionString: string): [boolean, string] {
@@ -149,7 +129,7 @@ export class MathInteractionsService {
       } else if (char === ')') {
         let openingInd = stack.pop() || 0;
         if (this.isParenRedundant(expressionString, openingInd, i)) {
-          return [true, expressionString.slice(openingInd, i + 1)];
+          return [true, expressionString.slice(openingInd - 1, i + 2)];
         }
       }
     }
@@ -183,13 +163,12 @@ export class MathInteractionsService {
       return false;
     }
     let invalidMultiTerms = expressionString.match(
-      /([a-zA-Z]\d)|([a-zA-Z]\*\d)/g);
+      /([a-zA-Z]\d)/g);
     if (invalidMultiTerms !== null) {
       this.warningText = (
-        'Your answer contains invalid variable multiplication: ' +
-        invalidMultiTerms[0] +
-        '. The variable should come after the number: ' +
-        [...invalidMultiTerms[0]].reverse().join('') + '.'
+        'When multiplying, the variable should come after the number: ' +
+        [...invalidMultiTerms[0]].reverse().join('') +
+        '. Please update your answer and try again.'
       );
       return false;
     }
@@ -206,7 +185,9 @@ export class MathInteractionsService {
     }
 
     if (expressionString.match(/\w\^((\w+\^)|(\(.*\^.*\)))/g)) {
-      this.warningText = 'Your expression contains an exponent in an exponent.';
+      this.warningText = (
+        'Your expression contains an exponent in an exponent ' +
+        'which is not supported.');
       return false;
     }
 
@@ -590,7 +571,7 @@ export class MathInteractionsService {
     return termsWithPlaceholders.length + inputTerms.length === 0;
   }
 
-  containsVariables(expressionString: string): boolean {
+  containsAtLeastOneVariable(expressionString: string): boolean {
     let variablesList = nerdamer(expressionString).variables();
     return variablesList.length > 0;
   }
