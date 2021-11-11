@@ -43,6 +43,7 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
+import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 
 @NgModule({
   imports: [
@@ -66,6 +67,7 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
+    ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent
   ],
@@ -81,6 +83,7 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
+    ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent
   ],
