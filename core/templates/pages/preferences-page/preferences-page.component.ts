@@ -70,12 +70,10 @@ export class PreferencesPageComponent {
   canReceiveEditorRoleEmail: boolean = false;
   canReceiveSubscriptionEmail: boolean = false;
   canReceiveFeedbackMessageEmail: boolean = false;
-  userCanDeleteAccount: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
-  userCanExportAccount: boolean = false;
 
   constructor(
     private ngbModal: NgbModal,
@@ -245,8 +243,6 @@ export class PreferencesPageComponent {
       this.loaderService.hideLoadingScreen();
     });
 
-    this.userCanDeleteAccount = true;
-    this.userCanExportAccount = true;
     this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();
