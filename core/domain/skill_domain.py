@@ -27,7 +27,7 @@ from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
-from proto_files.org.oppia.proto.v1.structure import topic_summary_pb2
+from proto_files import topic_summary_pb2
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -1633,21 +1633,19 @@ class SkillSummary:
         }
 
     @classmethod
-    def to_proto(cls, skill_id, skill_description, skill_version):
+    def to_proto(cls, skill):
         """Returns a Skill proto object from its respective items.
 
         Args:
-            skill_id: str. The unique id of the skill.
-            skill_description: str. The short description of the skill.
-            skill_version: int. The version of the skill.
+            skill: Skill. The skill domain object.
 
         Returns:
             Proto Object. The skill summary proto object.
         """
         skill_summary_proto = topic_summary_pb2.SkillSummary(
-            id=skill_id,
-            name=skill_description,
-            content_version=skill_version)
+            id=skill.id,
+            name=skill.description,
+            content_version=skill.version)
 
         return skill_summary_proto
 

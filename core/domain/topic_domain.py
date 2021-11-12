@@ -30,9 +30,13 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import skill_domain
+from core.domain import skill_fetchers
+from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import user_services
-from proto_files.org.oppia.proto.v1.structure import topic_summary_pb2
+from proto_files import topic_summary_pb2
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -390,6 +394,30 @@ class Subtopic:
             subtopic_dict['thumbnail_size_in_bytes'],
             subtopic_dict['url_fragment'])
         return subtopic
+
+    @classmethod
+    def to_proto(cls, subtopic):
+        """Returns a Subtopic proto object from its respective items.
+
+        Args:
+            subtopic: Subtopic. The subtopic domain object.
+
+        Returns:
+            Proto Object. The subtopic summary proto object.
+        """
+        skill_summaries_list = []
+
+        for skill_id in subtopic.skill_ids:
+            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            skill_summary_proto = skill_domain.SkillSummary.to_proto(skill)
+            skill_summaries_list.append(skill_summary_proto)
+
+        subtopic_proto = topic_summary_pb2.SubtopicSummary(
+            index=subtopic.subtopic_id,
+            skill_summaries=skill_summaries_list,
+            content_version=1)
+
+        return subtopic_proto
 
     @classmethod
     def create_default_subtopic(cls, subtopic_id, title):
@@ -1192,8 +1220,20 @@ class Topic:
         Returns:
             Proto Object. The topic proto object.
         """
-        story_summaries_proto_list = canonical_story_references
-        subtopic_summaries_proto_list = subtopics
+        story_summaries_proto_list = []
+        subtopic_summaries_proto_list = []
+
+        if canonical_story_references is not None:
+            for reference in canonical_story_references:
+                story = story_fetchers.get_story_by_id(
+                    reference.story_id, strict=False)
+                story_proto = story_domain.Story.to_proto(story)
+                story_summaries_proto_list.append(story_proto)
+
+        if subtopics is not None:
+            for subtopic in subtopics:
+                subtopic_proto = Subtopic.to_proto(subtopic)
+                subtopic_summaries_proto_list.append(subtopic_proto)
 
         topic_proto = topic_summary_pb2.DownloadableTopicSummary(
             id=topic_id,

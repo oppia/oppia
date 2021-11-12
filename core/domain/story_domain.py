@@ -30,6 +30,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
+from proto_files import topic_summary_pb2
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -330,6 +331,23 @@ class StoryNode:
             node_dict['outline_is_finalized'], node_dict['exploration_id'])
 
         return node
+
+    @classmethod
+    def to_proto(cls, story_node):
+        """Returns a StoryNode proto object from its respective items.
+
+        Args:
+            story_node: StoryNode. The StoryNode domain object.
+
+        Returns:
+            Proto Object. The chapter summary proto object.
+        """
+        story_node_proto = topic_summary_pb2.ChapterSummary(
+            title=story_node.title,
+            exploration_id=story_node.exploration_id,
+            content_version=story_node.version)
+
+        return story_node_proto
 
     @classmethod
     def create_default_story_node(cls, node_id, title):
@@ -973,6 +991,30 @@ class Story:
             story_created_on, story_last_updated)
 
         return story
+
+    @classmethod
+    def to_proto(cls, story_domain):
+        """Returns a Story proto object from its respective items.
+
+        Args:
+            story_domain: Story. The Story domain object.
+
+        Returns:
+            Proto Object. The story summary proto object.
+        """
+        chapters_list = []
+        for node in story_domain.story_contents.nodes:
+            story_node_proto = StoryNode.to_proto(node)
+            chapters_list.append(story_node_proto)
+
+        story_proto = topic_summary_pb2.StorySummary(
+            id=story_domain.id,
+            title=story_domain.title,
+            description=story_domain.description,
+            chapters=chapters_list,
+            content_version=story_domain.version)
+
+        return story_proto
 
     @classmethod
     def create_default_story(
