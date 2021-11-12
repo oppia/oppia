@@ -114,6 +114,15 @@ export class MathInteractionsService {
     return leftParenIsRedundant && rightParenIsRedundant;
   }
 
+  /**
+  * This function checks if an expression contains redundant params. It assumes
+  * that the expression will be syntactically valid.
+  * @param expressionString The math expression to be validated.
+  *
+  * @returns [boolean, string]. The boolean represents if the given expression
+  * contains any redundant params, and the string is the substring of the
+  * expression that contains redundant params.
+  */
   containsRedundantParens(expressionString: string): [boolean, string] {
     let stack: number[] = [];
 
@@ -162,13 +171,13 @@ export class MathInteractionsService {
         'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
-    let invalidMultiTerms = expressionString.match(
-      /([a-zA-Z]\d)/g);
+    let invalidMultiTerms = expressionString.match(/([a-zA-Zα-ωΑ-Ω]\d+)/g);
     if (invalidMultiTerms !== null) {
+      let correctString = (
+        invalidMultiTerms[0].slice(1) + invalidMultiTerms[0][0]);
       this.warningText = (
         'When multiplying, the variable should come after the number: ' +
-        [...invalidMultiTerms[0]].reverse().join('') +
-        '. Please update your answer and try again.'
+        correctString + '. Please update your answer and try again.'
       );
       return false;
     }
@@ -197,7 +206,8 @@ export class MathInteractionsService {
         exponent = exponent.replace(/^\^/g, '');
         if (nerdamer(exponent).gt('5')) {
           this.warningText = (
-            'Your expression contains an exponent with value greater than 5.');
+            'Your expression contains an exponent with value greater than 5 ' +
+            'which is not supported.');
           return false;
         }
       }

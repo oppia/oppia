@@ -221,6 +221,18 @@ describe('MathInteractionsService', () => {
       'Please update your answer and try again.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
+      'a45', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'When multiplying, the variable should come after the number: 45a. ' +
+      'Please update your answer and try again.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a * Ω34', ['a', 'Ω'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'When multiplying, the variable should come after the number: 34Ω. ' +
+      'Please update your answer and try again.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
       'x^y^z', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your expression contains an exponent in an exponent which is not ' +
@@ -247,17 +259,20 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a^6', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent with value greater than 5.');
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a^(3+4)', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent with value greater than 5.');
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
 
     expect(mathInteractionsService.validateNumericExpression(
       '5^100')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your expression contains an exponent with value greater than 5.');
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a+((b-c))', ['a', 'b', 'c'])).toBeFalse();

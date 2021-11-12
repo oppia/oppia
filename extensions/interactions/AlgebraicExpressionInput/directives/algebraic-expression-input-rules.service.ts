@@ -42,7 +42,8 @@ export class AlgebraicExpressionInputRulesService {
     // expression input's rule functions.
     if (
       !mis.containsAtLeastOneVariable(answer) &&
-      !mis.containsAtLeastOneVariable(inputs.x)) {
+      !mis.containsAtLeastOneVariable(inputs.x)
+    ) {
       let numericExpressionRuleService = (
         new NumericExpressionInputRulesService());
       return numericExpressionRuleService.MatchesExactlyWith(answer, inputs);
@@ -52,8 +53,6 @@ export class AlgebraicExpressionInputRulesService {
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
-    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
-    // typing is fixed.
     return answer === inputs.x;
   }
 
@@ -66,7 +65,8 @@ export class AlgebraicExpressionInputRulesService {
     // expression input's rule functions.
     if (
       !mis.containsAtLeastOneVariable(answer) &&
-      !mis.containsAtLeastOneVariable(inputs.x)) {
+      !mis.containsAtLeastOneVariable(inputs.x)
+    ) {
       let numericExpressionRuleService = (
         new NumericExpressionInputRulesService());
       return numericExpressionRuleService.IsEquivalentTo(answer, inputs);
