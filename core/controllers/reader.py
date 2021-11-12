@@ -691,8 +691,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             'params': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params),
+                    'object_class': stats_domain.SubmittedAnswer
                 }
             }
         }
@@ -783,8 +782,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             'params': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params),
+                    'object_class': stats_domain.SubmittedAnswer
                 }
             }
         }
