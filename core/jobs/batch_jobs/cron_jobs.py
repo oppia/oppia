@@ -339,7 +339,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                 lambda key_and_stat: isinstance(key_and_stat[1], str))
             | 'Create result for failed stats' >> beam.MapTuple(
                 lambda key, error: job_run_result.JobRunResult(
-                    stderr='FAILURE %s: %s' % (key, error))
+                    stderr='FAILURE %s' % error)
                 )
         )
 
@@ -399,7 +399,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                 }
                 yield (key, translation_contribution_stats_dict)
             except Exception as e:
-                yield (key, '%s' % e)
+                yield (key, '%s: %s' % (suggestion.suggestion_id, e))
 
     @staticmethod
     def _generate_translation_contribution_model(

@@ -652,10 +652,8 @@ class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'FAILURE %s.%s.: argument cannot be of \'list\' '
-                    'type, must be of text type' % (
-                        self.LANG_1, self.VALID_USER_ID_1
-                    )
+                    'FAILURE %s: argument cannot be of \'list\' '
+                    'type, must be of text type' % suggestion_model.id
                 )
             )
         ])
