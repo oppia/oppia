@@ -31,7 +31,7 @@ _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
 _CERTIFI_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.5.30')
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
