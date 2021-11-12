@@ -14,8 +14,7 @@
 
 """Utility functions for managing server processes required by Oppia."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import logging
@@ -158,13 +157,16 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
-    # OK to use shell=True here because we are not passing anything that came
-    # from an untrusted user, only other callers of the script, so there's no
-    # risk of shell-injection attacks.
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
+        # OK to use shell=True here because we are not passing anything that
+        # came from an untrusted user, only other callers of the script,
+        # so there's no risk of shell-injection attacks.
         proc = stack.enter_context(managed_process(
-            dev_appserver_args, human_readable_name='GAE Development Server',
-            shell=True, env=env))
+            dev_appserver_args,
+            human_readable_name='GAE Development Server',
+            shell=True,
+            env=env
+        ))
         common.wait_for_port_to_be_in_use(port)
         yield proc
 
@@ -246,10 +248,14 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--project', feconf.OPPIA_PROJECT_ID,
         '--data-dir', common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
         '--host-port', emulator_hostport,
-        '--no-store-on-disk', '--consistency=1.0', '--quiet',
+        '--consistency=1.0',
+        '--quiet'
     ]
 
-    with python_utils.ExitStack() as stack:
+    if clear_datastore:
+        emulator_args.append('--no-store-on-disk')
+
+    with contextlib.ExitStack() as stack:
         data_dir_exists = os.path.exists(
             common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
         if clear_datastore and data_dir_exists:
@@ -385,7 +391,7 @@ def managed_webpack_compiler(
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
 
-    with python_utils.ExitStack() as exit_stack:
+    with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
@@ -516,10 +522,10 @@ def managed_webdriver_server(chrome_version=None):
             raise Exception(
                 'Failed to execute "%s --version" command. This is used to '
                 'determine the chromedriver version to use. Please set the '
-                'chromedriver version manually using --chrome_driver_version '
-                'flag. To determine the chromedriver version to be used, '
-                'please follow the instructions mentioned in the following '
-                'URL:\n'
+                'chromedriver version manually using the '
+                '--chrome_driver_version flag. To determine the '
+                'chromedriver version to be used, please follow the '
+                'instructions mentioned in the following URL:\n'
                 'https://chromedriver.chromium.org/downloads/version-selection'
                 % chrome_command.replace(' ', r'\ '))
 
@@ -537,7 +543,7 @@ def managed_webdriver_server(chrome_version=None):
         '--versions.chrome', chrome_version,
     ])
 
-    with python_utils.ExitStack() as exit_stack:
+    with contextlib.ExitStack() as exit_stack:
         if common.is_windows_os():
             # NOTE: webdriver-manager (version 13.0.0) uses `os.arch()` to
             # determine the architecture of the operating system, however, this

@@ -16,8 +16,7 @@
 
 """Provides a seam for datastore services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 
@@ -91,8 +90,8 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
 
 
 def update_timestamps_multi(
-        entities: Sequence['base_models.BaseModel'],
-        update_last_updated_time: bool = True
+    entities: Sequence[base_models.BaseModel],
+    update_last_updated_time: bool = True
 ) -> None:
     """Update the created_on and last_updated fields of all given entities.
 
@@ -220,12 +219,18 @@ def fetch_multiple_entities_by_ids_and_models(
         ids_and_models: list(tuple(str, list(str))). The ids and their
             corresponding model names for which we have to fetch entities.
 
+    Raises:
+        Exception. Model names should not be duplicated in input list.
+
     Returns:
         list(list(datastore_services.Model)). The model instances corresponding
         to the ids and models. The models corresponding to the same tuple in the
         input are grouped together.
     """
     entity_keys: List[Key] = []
+    model_names = [model_name for (model_name, _) in ids_and_models]
+    if len(model_names) != len(list(set(model_names))):
+        raise Exception('Model names should not be duplicated in input list.')
     for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
         entity_keys = (

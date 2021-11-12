@@ -22,8 +22,7 @@ in start, then adding the same import statement in a test function
 (as done in this file) creates a conflict.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import subprocess
@@ -71,7 +70,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 'third_party/python_libs',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'six==1.15.0', '--target',
+                'six==1.16.0', '--target',
                 'third_party/python_libs',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',

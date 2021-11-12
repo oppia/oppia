@@ -16,8 +16,7 @@
 
 """Commands for feedback thread and message operations."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import itertools
@@ -728,8 +727,7 @@ def get_exp_thread_summaries(user_id, thread_ids):
                 t.get_last_two_message_ids() for t in threads)))
     last_two_message_models_of_threads = [
         flattened_last_two_message_models_of_threads[i:i + 2]
-        for i in python_utils.RANGE(
-            0, len(flattened_last_two_message_models_of_threads), 2)
+        for i in range(0, len(flattened_last_two_message_models_of_threads), 2)
     ]
 
     thread_summaries = []

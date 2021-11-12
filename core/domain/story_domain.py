@@ -14,8 +14,7 @@
 
 """Domain objects relating to stories."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import functools
@@ -24,7 +23,6 @@ import re
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -172,7 +170,7 @@ class StoryChange(change_domain.BaseChange):
     }]
 
 
-class StoryNode(python_utils.OBJECT):
+class StoryNode:
     """Domain object describing a node in the exploration graph of a
     story.
     """
@@ -246,8 +244,7 @@ class StoryNode(python_utils.OBJECT):
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + python_utils.UNICODE(
-            current_number + 1)
+        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
         return incremented_node_id
 
     @classmethod
@@ -257,7 +254,7 @@ class StoryNode(python_utils.OBJECT):
         Args:
             node_id: str. The node id to be validated.
         """
-        if not isinstance(node_id, python_utils.BASESTRING):
+        if not isinstance(node_id, str):
             raise utils.ValidationError(
                 'Expected node ID to be a string, received %s' %
                 node_id)
@@ -358,7 +355,7 @@ class StoryNode(python_utils.OBJECT):
                 invalid.
         """
         if self.exploration_id:
-            if not isinstance(self.exploration_id, python_utils.BASESTRING):
+            if not isinstance(self.exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
@@ -383,17 +380,17 @@ class StoryNode(python_utils.OBJECT):
                 'Expected exploration ID to not be an empty string, '
                 'received %s' % self.exploration_id)
 
-        if not isinstance(self.outline, python_utils.BASESTRING):
+        if not isinstance(self.outline, str):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s' %
                 self.description)
@@ -424,7 +421,7 @@ class StoryNode(python_utils.OBJECT):
                 'Expected prerequisite skill ids to be a list, received %s' %
                 self.prerequisite_skill_ids)
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each prerequisite skill id to be a string, '
                     'received %s' % skill_id)
@@ -439,7 +436,7 @@ class StoryNode(python_utils.OBJECT):
                 'Expected acquired skill ids to be a list, received %s' %
                 self.acquired_skill_ids)
         for skill_id in self.acquired_skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each acquired skill id to be a string, '
                     'received %s' % skill_id)
@@ -468,7 +465,7 @@ class StoryNode(python_utils.OBJECT):
                     'The story node with ID %s points to itself.' % node_id)
 
 
-class StoryContents(python_utils.OBJECT):
+class StoryContents:
     """Domain object representing the story_contents dict."""
 
     def __init__(self, story_nodes, initial_node_id, next_node_id):
@@ -511,7 +508,7 @@ class StoryContents(python_utils.OBJECT):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if python_utils.NEXT((
+                if next((
                         node for node in self.nodes
                         if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
@@ -637,7 +634,7 @@ class StoryContents(python_utils.OBJECT):
         return story_contents
 
 
-class Story(python_utils.OBJECT):
+class Story:
     """Domain object for an Oppia Story."""
 
     def __init__(
@@ -726,7 +723,7 @@ class Story(python_utils.OBJECT):
         """
         self.require_valid_title(self.title)
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -748,7 +745,7 @@ class Story(python_utils.OBJECT):
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Story thumbnail background color is not specified.')
-        if not isinstance(self.notes, python_utils.BASESTRING):
+        if not isinstance(self.notes, str):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
 
@@ -765,7 +762,7 @@ class Story(python_utils.OBJECT):
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                     self.story_contents_schema_version))
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -774,8 +771,7 @@ class Story(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if not isinstance(
-                self.corresponding_topic_id, python_utils.BASESTRING):
+        if not isinstance(self.corresponding_topic_id, str):
             raise utils.ValidationError(
                 'Expected corresponding_topic_id should be a string, received: '
                 '%s' % self.corresponding_topic_id)
@@ -789,11 +785,11 @@ class Story(python_utils.OBJECT):
         Args:
             story_id: str. The story id to validate.
         """
-        if not isinstance(story_id, python_utils.BASESTRING):
+        if not isinstance(story_id, str):
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
-        if len(story_id) != 12:
+        if len(story_id) != constants.STORY_ID_LENGTH:
             raise utils.ValidationError('Invalid story id.')
 
     @classmethod
@@ -804,7 +800,7 @@ class Story(python_utils.OBJECT):
             title: str. The title to validate.
         """
 
-        if not isinstance(title, python_utils.BASESTRING):
+        if not isinstance(title, str):
             raise utils.ValidationError('Title should be a string.')
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
@@ -1020,7 +1016,7 @@ class Story(python_utils.OBJECT):
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+        for index in range(len(story_contents_dict['nodes'])):
             story_contents_dict['nodes'][index]['thumbnail_filename'] = None
             story_contents_dict['nodes'][index]['thumbnail_bg_color'] = None
         return story_contents_dict
@@ -1076,7 +1072,7 @@ class Story(python_utils.OBJECT):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_STORY, story_id))
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+        for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
                 constants.ASSET_TYPE_THUMBNAIL,
                 story_contents_dict['nodes'][index]['thumbnail_filename'])
@@ -1524,7 +1520,7 @@ class Story(python_utils.OBJECT):
         self.story_contents.initial_node_id = new_initial_node_id
 
 
-class StorySummary(python_utils.OBJECT):
+class StorySummary:
     """Domain object for Story Summary."""
 
     def __init__(
@@ -1573,14 +1569,14 @@ class StorySummary(python_utils.OBJECT):
                 self.url_fragment, 'Story Url Fragment',
                 constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
 
-        if not isinstance(self.title, python_utils.BASESTRING):
+        if not isinstance(self.title, str):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
 
         if self.title == '':
             raise utils.ValidationError('Title field should not be empty')
 
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -1591,7 +1587,7 @@ class StorySummary(python_utils.OBJECT):
                     self.node_titles))
 
         for title in self.node_titles:
-            if not isinstance(title, python_utils.BASESTRING):
+            if not isinstance(title, str):
                 raise utils.ValidationError(
                     'Expected each chapter title to be a string, received %s'
                     % title)
@@ -1611,7 +1607,7 @@ class StorySummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Story thumbnail background color is not specified.')
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

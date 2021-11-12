@@ -14,14 +14,14 @@
 
 """Python execution environent set up for all scripts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
 from core import python_utils
 
@@ -70,6 +70,23 @@ def test_python_version():
         # Exit when no suitable Python environment can be found.
         raise Exception('No suitable python version found.')
 
+    # Verify that Python 2 is available. Python 2 is needed for the
+    # app_devserver. See the Google Cloud docs:
+    # https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
+    return_code = subprocess.call(
+        'python2 -V', stderr=subprocess.DEVNULL, shell=True
+    )
+    if return_code != 0:
+        print(
+            '\033[91m'
+            'The Oppia server needs Python 2 to be installed. '
+            'Please follow the instructions at '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#'
+            'python-2-is-not-available to fix this.'
+            '\033[0m'
+        )
+        sys.exit(1)
+
 
 def download_and_install_package(url_to_retrieve, filename):
     """Downloads and installs package in Oppia tools directory.
@@ -79,7 +96,7 @@ def download_and_install_package(url_to_retrieve, filename):
             downloaded.
         filename: string. The name of the tar file.
     """
-    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    urlrequest.urlretrieve(url_to_retrieve, filename=filename)
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
@@ -115,7 +132,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
+        urlrequest.urlretrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',
@@ -213,6 +230,9 @@ def main(args=None):
     elif os.path.isfile('/usr/bin/chromium-browser'):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
+    elif os.path.isfile('/usr/bin/brave'):
+        # Arch Linux.
+        chrome_bin = '/usr/bin/brave'
     elif os.path.isfile('/usr/bin/chromium'):
         # Arch Linux.
         chrome_bin = '/usr/bin/chromium'

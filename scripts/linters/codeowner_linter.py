@@ -16,14 +16,12 @@
 
 """Lint checks for codeowner file."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import glob
 import os
 import subprocess
 
-from core import python_utils
 from .. import concurrent_task_utils
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
@@ -35,13 +33,14 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/access_validators*.py',
     '/core/controllers/acl_decorators*.py',
+    '/core/controllers/android_e2e_config*.py',
     '/core/controllers/base*.py',
     '/core/domain/html*.py',
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
     '/core/storage/',
-    '/manifest.json',
+    '/dependencies.json',
     '/package.json',
     '/requirements.txt',
     '/requirements.in',
@@ -50,10 +49,12 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/',
     '/.github/CODEOWNERS',
     '/.github/stale.yml',
-    '/.github/workflows/']
+    '/.github/workflows/',
+    '/core/android_validation_constants*.py',
+    '/extensions/interactions/rule_templates.json']
 
 
-class CodeownerLintChecksManager(python_utils.OBJECT):
+class CodeownerLintChecksManager:
     """Manages codeowner checks."""
 
     def __init__(self, file_cache):

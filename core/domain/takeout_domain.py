@@ -16,16 +16,19 @@
 
 """Domain objects for Takeout."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
+from typing import Any, Dict, List, Tuple
 
 
-class TakeoutData(python_utils.OBJECT):
+class TakeoutData:
     """Domain object for all information exported as part of Takeout."""
 
-    def __init__(self, user_data, user_images):
+    def __init__(
+        self,
+        user_data: Dict[str, Dict[str, Any]],
+        user_images: List[TakeoutImage]
+    ) -> None:
         """Constructs a TakeoutData domain object.
 
         Args:
@@ -39,12 +42,14 @@ class TakeoutData(python_utils.OBJECT):
         self.user_images = user_images
 
 
-class TakeoutImage(python_utils.OBJECT):
+class TakeoutImage:
     """Domain object for storing Base64 image data and the Takeout export path
     for a single image.
     """
 
-    def __init__(self, b64_image_data, image_export_path):
+    def __init__(
+        self, b64_image_data: str, image_export_path: str
+    ) -> None:
         """Constructs a TakeoutImage domain object.
 
         Args:
@@ -56,12 +61,14 @@ class TakeoutImage(python_utils.OBJECT):
         self.image_export_path = image_export_path
 
 
-class TakeoutImageReplacementInstruction(python_utils.OBJECT):
+class TakeoutImageReplacementInstruction:
     """Domain object for storing the instructions for replacing a user image
     with a path corresponding to a file in the final zip.
     """
 
-    def __init__(self, dictionary_path, export_filename, new_key):
+    def __init__(
+        self, dictionary_path: Tuple[str], export_filename: str, new_key: str
+    ) -> None:
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:

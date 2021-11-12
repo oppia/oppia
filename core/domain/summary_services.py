@@ -16,8 +16,7 @@
 
 """Commands that can be used to operate on activity summaries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import python_utils
 from core import utils
@@ -91,7 +90,7 @@ def get_human_readable_contributors_summary(contributors_summary):
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in python_utils.RANGE(len(contributor_ids))
+        for ind in range(len(contributor_ids))
     }
 
 
