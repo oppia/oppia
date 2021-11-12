@@ -600,6 +600,7 @@
   .oppia-navbar-dropdown-item {
     display: flex;
     flex-direction: column;
+    gap: 2px;
     padding: 30px;
   }
   .oppia-navbar-tab-content-heading {
@@ -607,20 +608,31 @@
     font-size: 16px;
     font-weight: 500;
     padding: 0;
-    text-decoration: underline;
+  }
+  .oppia-navbar-tab-content-heading:after {
+    border-style: solid;
+    border-width: 0 0 1.59px;
+    bottom: 1px;
+    content: '';
+    left: 28px;
+    position: absolute;
+    width: 50.5px;
   }
   .oppia-navbar-dropdown-heart-icon {
     color: #EB5757;
-    font-size: 20px;
-    padding-right: 5px;
+    font-size: 22px;
+    padding-right: 6px;
   }
   .oppia-navbar-tab-content-desc {
     color: #767676;
-    margin-left: 25px;
+    line-height: 20px;
+    margin-left: 28px;
+    opacity: 0.9;
   }
   .oppia-navbar-dropdown-right {
     left: 0;
-    min-width: 280px;
+    min-width: 285px;
+    padding: 0;
     right: auto;
   }
   .oppia-navbar-profile .profile-dropdown:hover {
