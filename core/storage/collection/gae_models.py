@@ -269,15 +269,20 @@ class CollectionModel(base_models.VersionedModel):
             **CollectionModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        return {
+            'rights_model': CollectionRightsModel.get_by_id(self.id)
+        }
+
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
     # remove Any from type-annotation below.
-    def _trusted_commit(
+    def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: str,
+        commit_type: Optional[str],
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
+        additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -295,24 +300,13 @@ class CollectionModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        models_to_put = super()._trusted_commit(
+        models_to_put = super().compute_models_to_commit(
             committer_id,
             commit_type,
             commit_message,
             commit_cmds,
             additional_models
         )
-
-        if (
-                isinstance(additional_models, dict) and
-                'rights_model' in additional_models
-        ):
-            collection_rights = cast(
-                CollectionRightsModel,
-                additional_models['collection_rights_model']
-            )
-        else:
-            collection_rights = CollectionRightsModel.get_by_id(self.id)
 
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id,
@@ -321,8 +315,8 @@ class CollectionModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            collection_rights.status,
-            collection_rights.community_owned
+            additional_models['rights_model'].status,
+            additional_models['rights_model'].community_owned
         )
         collection_commit_log.collection_id = self.id
         return {
@@ -622,13 +616,13 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
     # remove Any from type-annotation below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]],
-            additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: Optional[str],
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -646,7 +640,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        models_to_put = super()._trusted_commit(
+        models_to_put = super().compute_models_to_commit(
             committer_id,
             commit_type,
             commit_message,

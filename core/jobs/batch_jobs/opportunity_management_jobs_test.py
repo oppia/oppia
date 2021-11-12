@@ -349,7 +349,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         all_opportunity_models = list(

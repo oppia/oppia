@@ -183,13 +183,13 @@ class QuestionModel(base_models.VersionedModel):
 
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
-    def _trusted_commit(
+    def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: str,
+        commit_type: Optional[str],
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
+        additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -207,7 +207,7 @@ class QuestionModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        models_to_put = super()._trusted_commit(
+        models_to_put = super().compute_models_to_commit(
             committer_id,
             commit_type,
             commit_message,

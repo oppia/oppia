@@ -130,7 +130,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(all_models.count(), 0)
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            'Entity for class BaseModel with id 4 not found'
+            'Entity for class BaseModel with id %s not found' % model_id
         ):
             model.get(model_id)
 

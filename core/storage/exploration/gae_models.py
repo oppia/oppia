@@ -267,15 +267,20 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
+    def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        return {
+            'rights_model': ExplorationRightsModel.get_by_id(self.id)
+        }
+
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
-    def _trusted_commit(
+    def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
+        additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -293,7 +298,8 @@ class ExplorationModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        models_to_put = super()._trusted_commit(
+        print('A')
+        models_to_put = super().compute_models_to_commit(
             committer_id,
             commit_type,
             commit_message,
@@ -301,20 +307,14 @@ class ExplorationModel(base_models.VersionedModel):
             additional_models
         )
 
-        if (
-                isinstance(additional_models, dict) and
-                'rights_model' in additional_models
-        ):
-            exp_rights = cast(
-                ExplorationRightsModel,
-                additional_models['exploration_rights_model']
-            )
-        else:
-            exp_rights = ExplorationRightsModel.get_by_id(self.id)
-
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
-            commit_cmds, exp_rights.status, exp_rights.community_owned
+            self.id, self.version,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models['rights_model'].status,
+            additional_models['rights_model'].community_owned
         )
         exploration_commit_log.exploration_id = self.id
         return {
@@ -611,10 +611,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
     def save(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]]
     ) -> None:
         """Saves a new version of the exploration, updating the Exploration
         datastore model.
@@ -633,8 +633,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 {'cmd': 'AUTO_revert_version_number',
                  'version_number': 4}
         """
-        super(ExplorationRightsModel, self).commit(
-            committer_id, commit_message, commit_cmds)
+        super().commit(committer_id, commit_message, commit_cmds)
 
     # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
     # to remove Any used below.
@@ -714,13 +713,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
-    def _trusted_commit(
+    def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: str,
+        commit_type: Optional[str],
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Optional[Mapping[str, base_models.BaseModel]] = None
+        additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -738,7 +737,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
-        models_to_put = super()._trusted_commit(
+        models_to_put = super().compute_models_to_commit(
             committer_id,
             commit_type,
             commit_message,
@@ -782,6 +781,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             )
+
             return {
                 'versioned_model': models_to_put['versioned_model'],
                 'snapshot_metadata_model': (

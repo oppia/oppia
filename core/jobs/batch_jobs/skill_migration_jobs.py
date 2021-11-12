@@ -121,7 +121,9 @@ class MigrateSkillJob(base_jobs.JobBase):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION
         )
         change_dicts = [change.to_dict() for change in skill_changes]
-        return [updated_skill_model]
+        return updated_skill_model.compute_models_to_commit(
+            feconf.MIGRATION_BOT_USERNAME, commit_message, change_dicts
+        ).values()
 
     @staticmethod
     def _update_skill_summary(
@@ -169,7 +171,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         migrated_skill_job_run_results = (
             migrated_skill_results
             | 'Generate results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults('SKILL MIGRATION'))
+                job_result_transforms.ResultsToJobRunResults('SKILL PROCESSED'))
         )
 
         skill_changes = (
@@ -195,6 +197,13 @@ class MigrateSkillJob(base_jobs.JobBase):
                     'skill': objects['skill'][0],
                     'skill_changes': objects['skill_changes']
                 })
+        )
+
+        skill_objects_list_job_run_results = (
+            skill_objects_list
+            | 'Transform skill objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
@@ -231,6 +240,10 @@ class MigrateSkillJob(base_jobs.JobBase):
         )
 
         return (
-            (cache_deletion_job_run_results, migrated_skill_job_run_results)
+            (
+                cache_deletion_job_run_results,
+                migrated_skill_job_run_results,
+                skill_objects_list_job_run_results
+            )
             | beam.Flatten()
         )

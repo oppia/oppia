@@ -109,6 +109,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         skill_summary_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SKILL MIGRATION SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
         ])
