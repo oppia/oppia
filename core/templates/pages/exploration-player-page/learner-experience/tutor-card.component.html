@@ -2,7 +2,7 @@
 <div class="oppia-learner-view-card"
      [ngClass]="{'animate-card-width': startCardChangeAnimation}"
      [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
-  <oppia-smooth-height [trigger]="displayedCard">
+  <oppia-smooth-height [trigger]="displayedCard.getContentHtml()">
     <div class="oppia-learner-view-card-content">
       <div class="oppia-learner-view-card-top-section">
         <oppia-content-language-selector></oppia-content-language-selector>

@@ -1230,7 +1230,9 @@ textarea {
 }
 
 .oppia-exp-summary-tiles-container {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100%;
   margin-left: auto;
   margin-right: auto;
