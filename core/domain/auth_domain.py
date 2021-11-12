@@ -16,12 +16,10 @@
 
 """Domain objects for authentication."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 
-from core import python_utils
 from core import utils
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
@@ -82,12 +80,6 @@ class AuthClaims:
             (self.auth_id, self.email, self.role_is_super_admin) ==
             (other.auth_id, other.email, other.role_is_super_admin))
 
-    def __ne__(self, other):
-        # TODO(#11474): Delete this method once we've moved to Python 3 and rely
-        # on auto-generated method. In Python 2, we need to write this method
-        # ourselves: https://stackoverflow.com/a/30676267/4859885.
-        return not self == other
-
 
 class UserAuthDetails:
     """Domain object representing a user's authentication details.
@@ -140,7 +132,7 @@ class UserAuthDetails:
         if not self.user_id:
             raise utils.ValidationError('No user_id specified')
 
-        if not isinstance(self.user_id, python_utils.BASESTRING):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'user_id must be a string, but got %r' % self.user_id)
 
@@ -149,12 +141,12 @@ class UserAuthDetails:
                 'user_id=%r has the wrong format' % self.user_id)
 
         if (self.gae_id is not None and
-                not isinstance(self.gae_id, python_utils.BASESTRING)):
+                not isinstance(self.gae_id, str)):
             raise utils.ValidationError(
                 'gae_id must be a string, but got %r' % self.gae_id)
 
         if (self.firebase_auth_id is not None and
-                not isinstance(self.firebase_auth_id, python_utils.BASESTRING)):
+                not isinstance(self.firebase_auth_id, str)):
             raise utils.ValidationError(
                 'firebase_auth_id must be a string, but got %r' %
                 self.firebase_auth_id)

@@ -16,8 +16,7 @@
 
 """Unit tests for 'scripts/install_backend_python_libs.py'."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import itertools
 import json
@@ -271,7 +270,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -313,7 +312,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install',
                     '%s#egg=git-dep1' % (
@@ -380,7 +379,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -543,7 +542,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements'],
+                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -594,8 +593,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency-5-0.5.3-py2.7.egg-info',
-                'dependency_6-0.5.3-py2.7.egg-info',
+                'dependency-5-0.5.3-py3.7.egg-info',
+                'dependency_6-0.5.3-py3.7.egg-info',
             ]
 
         def mock_is_dir(unused_path):

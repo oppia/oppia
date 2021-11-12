@@ -117,9 +117,12 @@ angular.module('oppia').directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
-          if ((<Element>evt.target).classList.contains(
-            'oppia-drop-area-message') && scope.dropAreaIsAccessible) {
-            var files = (<DragEvent>evt.originalEvent).dataTransfer.files;
+          if (
+            (evt.target as Element).classList.contains(
+              'oppia-drop-area-message'
+            ) && scope.dropAreaIsAccessible
+          ) {
+            var files = (evt.originalEvent as DragEvent).dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
           scope.dropAreaIsAccessible = false;

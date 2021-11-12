@@ -14,10 +14,10 @@
 
 """Python execution for running e2e tests."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
@@ -105,18 +105,17 @@ RERUN_POLICY_ALWAYS = 'always'
 
 RERUN_POLICIES = {
     'accessibility': RERUN_POLICY_NEVER,
-    'additionaleditorfeatures': RERUN_POLICY_ALWAYS,
+    'additionaleditorfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
-    'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
+    'additionalplayerfeatures': RERUN_POLICY_NEVER,
     'adminpage': RERUN_POLICY_NEVER,
     'blogdashboard': RERUN_POLICY_NEVER,
-    'classroompage': RERUN_POLICY_KNOWN_FLAKES,
+    'classroompage': RERUN_POLICY_NEVER,
     'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
     'collections': RERUN_POLICY_NEVER,
     'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
     'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'emaildashboard': RERUN_POLICY_ALWAYS,
     'embedding': RERUN_POLICY_KNOWN_FLAKES,
     'explorationfeedbacktab': RERUN_POLICY_NEVER,
     'explorationhistorytab': RERUN_POLICY_KNOWN_FLAKES,
@@ -127,9 +126,9 @@ RERUN_POLICIES = {
     'featuregating': RERUN_POLICY_ALWAYS,
     'fileuploadextensions': RERUN_POLICY_NEVER,
     'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'learner': RERUN_POLICY_KNOWN_FLAKES,
-    'learnerdashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'library': RERUN_POLICY_KNOWN_FLAKES,
+    'learner': RERUN_POLICY_NEVER,
+    'learnerdashboard': RERUN_POLICY_NEVER,
+    'library': RERUN_POLICY_NEVER,
     'navigation': RERUN_POLICY_KNOWN_FLAKES,
     'playvoiceovers': RERUN_POLICY_NEVER,
     'preferences': RERUN_POLICY_NEVER,
@@ -139,11 +138,11 @@ RERUN_POLICIES = {
     'releasecoordinatorpagefeatures': RERUN_POLICY_NEVER,
     'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
     'subscriptions': RERUN_POLICY_NEVER,
-    'topicandstoryeditor': RERUN_POLICY_KNOWN_FLAKES,
-    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'topicandstoryviewer': RERUN_POLICY_KNOWN_FLAKES,
-    'topicsandskillsdashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'users': RERUN_POLICY_KNOWN_FLAKES,
+    'topicandstoryeditor': RERUN_POLICY_NEVER,
+    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_NEVER,
+    'topicandstoryviewer': RERUN_POLICY_NEVER,
+    'topicsandskillsdashboard': RERUN_POLICY_NEVER,
+    'users': RERUN_POLICY_NEVER,
     'wipeout': RERUN_POLICY_NEVER,
     # The suite name is `full` when no --suite argument is passed. This
     # indicates that all the tests should be run.
@@ -234,7 +233,7 @@ def run_tests(args):
 
     install_third_party_libraries(args.skip_install)
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:

@@ -16,8 +16,7 @@
 
 """Lint checks used by all the linters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
@@ -119,8 +118,8 @@ MANDATORY_PATTERNS_REGEXP = [
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
-        'regexp': re.compile('from __future__ import unicode_literals'),
-        'message': 'Please ensure this file should contain unicode_literals '
+        'regexp': re.compile('from __future__ import annotations'),
+        'message': 'Please ensure this file should contain annotations '
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
@@ -207,24 +206,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*quote\('),
-        'message': 'Please use python_utils.url_quote().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*urlencode\('),
-        'message': 'Please use python_utils.url_encode().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*urlretrieve\('),
-        'message': 'Please use python_utils.url_retrieve().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
     {

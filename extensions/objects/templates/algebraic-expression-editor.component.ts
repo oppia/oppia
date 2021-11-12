@@ -30,7 +30,9 @@ import { GuppyConfigurationService } from 'services/guppy-configuration.service'
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-type FocusObj = { focused: boolean; };
+interface FocusObj {
+  focused: boolean;
+}
 
 @Component({
   selector: 'algebraic-expression-editor',

@@ -208,8 +208,8 @@ describe('QuestionPlayerComponent', () => {
   });
 
   it('should get the outer class name for action button', () => {
-    expect(ctrl.getActionButtonOuterClass('BOOST_SCORE'))
-      .toBe('boost-score-outer');
+    expect(ctrl.getActionButtonOuterClass('REVIEW_LOWEST_SCORED_SKILL'))
+      .toBe('review-lowest-scored-skill-outer');
     expect(ctrl.getActionButtonOuterClass('RETRY_SESSION'))
       .toBe('new-session-outer');
     expect(ctrl.getActionButtonOuterClass('DASHBOARD'))
@@ -219,8 +219,8 @@ describe('QuestionPlayerComponent', () => {
   });
 
   it('should get the inner class name for action button', () => {
-    expect(ctrl.getActionButtonInnerClass('BOOST_SCORE'))
-      .toBe('boost-score-inner');
+    expect(ctrl.getActionButtonInnerClass('REVIEW_LOWEST_SCORED_SKILL'))
+      .toBe('review-lowest-scored-skill-inner');
     expect(ctrl.getActionButtonInnerClass('RETRY_SESSION'))
       .toBe('new-session-inner');
     expect(ctrl.getActionButtonInnerClass('DASHBOARD'))
@@ -230,7 +230,8 @@ describe('QuestionPlayerComponent', () => {
   });
 
   it('should get html for action button icon', () => {
-    expect(ctrl.getActionButtonIconHtml('BOOST_SCORE').toString())
+    expect(ctrl.getActionButtonIconHtml(
+      'REVIEW_LOWEST_SCORED_SKILL').toString())
       .toBe(
         '&#10;          &#10;          &#10;          <img alt="" ' +
         'class="action-button-icon" src="/assets/images/icons/' +
@@ -242,8 +243,8 @@ describe('QuestionPlayerComponent', () => {
       .toBe('<i class="material-icons md-36 action-button-icon">&#59530;</i>');
   });
 
-  it('should open boost score modal when use clicks on action button with' +
-    ' type BOOST_SCORE', () => {
+  it('should open review lowest scored skill modal when use clicks ' +
+    'on action button with type REVIEW_LOWEST_SCORED_SKILL', () => {
     let skills, skillIds;
     spyOn($uibModal, 'open').and.callFake((options) => {
       skills = options.resolve.skills();
@@ -266,7 +267,7 @@ describe('QuestionPlayerComponent', () => {
     };
 
     ctrl.performAction({
-      type: 'BOOST_SCORE'
+      type: 'REVIEW_LOWEST_SCORED_SKILL'
     });
     $scope.$apply();
 
@@ -274,7 +275,7 @@ describe('QuestionPlayerComponent', () => {
     expect(skillIds).toEqual(['skill1']);
   });
 
-  it('should close boost score modal', () => {
+  it('should close review lowest scored skill modal', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -290,7 +291,7 @@ describe('QuestionPlayerComponent', () => {
     };
 
     ctrl.performAction({
-      type: 'BOOST_SCORE'
+      type: 'REVIEW_LOWEST_SCORED_SKILL'
     });
     $scope.$apply();
 

@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.batch_jobs.user_stats_computation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 

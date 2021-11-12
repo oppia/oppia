@@ -93,7 +93,7 @@ export class FeatureStatusSummary {
    */
   static createDefault(): FeatureStatusSummary {
     const defaultDict: FeatureStatusSummaryBackendDict = {};
-    const featureNamesKeys = <FeatureNamesKeys> Object.keys(FeatureNames);
+    const featureNamesKeys = Object.keys(FeatureNames) as FeatureNamesKeys;
     featureNamesKeys.forEach(
       name => defaultDict[FeatureNames[name]] = false);
     return this.createFromBackendDict(defaultDict);
@@ -119,8 +119,8 @@ export class FeatureStatusSummary {
    * @returns {FeatureStatusChecker} - The feature status checker.
    */
   toStatusChecker(): FeatureStatusChecker {
-    const checker = <FeatureStatusChecker>{};
-    const featureNamesKeys = <FeatureNamesKeys> Object.keys(FeatureNames);
+    const checker = {} as FeatureStatusChecker;
+    const featureNamesKeys = Object.keys(FeatureNames) as FeatureNamesKeys;
     featureNamesKeys.forEach(name => {
       Object.defineProperty(checker, name, {
         value: new FeatureStatusCheckerItem(

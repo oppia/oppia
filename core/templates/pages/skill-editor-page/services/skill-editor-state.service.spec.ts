@@ -59,6 +59,12 @@ const skillDict: SkillBackendDict = {
   rubrics: [{
     difficulty: 'Easy',
     explanations: ['explanation'],
+  }, {
+    difficulty: 'Medium',
+    explanations: ['explanation'],
+  }, {
+    difficulty: 'Hard',
+    explanations: ['explanation'],
   }],
   skill_contents: skillContentsDict,
   language_code: 'en',
@@ -406,7 +412,6 @@ describe('Skill editor state service', () => {
     ).toHaveBeenCalled();
   });
 
-
   it('should be able to set a new skill rights with an in-place copy', () => {
     skillEditorStateService.setSkillRights(SkillRights.createFromBackendDict({
       skill_id: 'skill_id',
@@ -426,6 +431,14 @@ describe('Skill editor state service', () => {
     expect(actualSkillRights).toBe(previousSkillRights);
     expect(actualSkillRights).not.toBe(expectedSkillRights);
   });
+
+  it('should get validation issues for the skill', fakeAsync(() => {
+    skillEditorStateService.loadSkill('skill_id_1');
+
+    tick(1000);
+
+    expect(skillEditorStateService.getSkillValidationIssues()).toEqual([]);
+  }));
 
   it('should update the skill description when calling ' +
     '\'updateExistenceOfSkillDescription\'', fakeAsync(() => {

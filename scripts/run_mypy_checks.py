@@ -16,8 +16,7 @@
 
 """MyPy test runner script."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 
 import argparse
@@ -42,8 +41,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/',
     'core/domain/action_registry.py',
     'core/domain/action_registry_test.py',
-    'core/domain/activity_domain.py',
-    'core/domain/activity_domain_test.py',
     'core/domain/activity_jobs_one_off.py',
     'core/domain/activity_jobs_one_off_test.py',
     'core/domain/activity_services.py',
@@ -166,8 +163,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/learner_goals_services_test.py',
     'core/domain/learner_playlist_services.py',
     'core/domain/learner_playlist_services_test.py',
-    'core/domain/learner_progress_domain.py',
-    'core/domain/learner_progress_domain_test.py',
     'core/domain/learner_progress_services.py',
     'core/domain/learner_progress_services_test.py',
     'core/domain/moderator_services.py',
@@ -213,8 +208,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/recommendations_services_test.py',
     'core/domain/recommendations_validators.py',
     'core/domain/recommendations_validators_test.py',
-    'core/domain/rights_domain.py',
-    'core/domain/rights_domain_test.py',
     'core/domain/rights_manager.py',
     'core/domain/rights_manager_test.py',
     'core/domain/role_services.py',
@@ -276,7 +269,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/suggestion_validators_test.py',
     'core/domain/summary_services.py',
     'core/domain/summary_services_test.py',
-    'core/domain/takeout_domain.py',
     'core/domain/takeout_service.py',
     'core/domain/takeout_service_test.py',
     'core/domain/taskqueue_services.py',
@@ -293,8 +285,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/topic_validators_test.py',
     'core/domain/translatable_object_registry.py',
     'core/domain/translatable_object_registry_test.py',
-    'core/domain/translation_domain.py',
-    'core/domain/translation_domain_test.py',
     'core/domain/translation_fetchers.py',
     'core/domain/translation_fetchers_test.py',
     'core/domain/translation_services.py',
@@ -315,14 +305,10 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/user_services_test.py',
     'core/domain/user_validators.py',
     'core/domain/user_validators_test.py',
-    'core/domain/value_generators_domain.py',
-    'core/domain/value_generators_domain_test.py',
     'core/domain/visualization_registry.py',
     'core/domain/visualization_registry_test.py',
     'core/domain/voiceover_services.py',
     'core/domain/voiceover_services_test.py',
-    'core/domain/wipeout_domain.py',
-    'core/domain/wipeout_domain_test.py',
     'core/domain/wipeout_jobs_one_off.py',
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',

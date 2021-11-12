@@ -174,8 +174,8 @@ export class SpeechSynthesisChunkerService {
   }
 
   _convertToSpeakableText(html: string): string {
-    const rteCompSpecsKeys = <RTEComponentSpecsKey[]> Object.keys(
-      ServicesConstants.RTE_COMPONENT_SPECS);
+    const rteCompSpecsKeys = Object.keys(
+      ServicesConstants.RTE_COMPONENT_SPECS) as RTEComponentSpecsKey[];
     rteCompSpecsKeys.forEach(
       (componentSpec) => {
         this.RTE_COMPONENT_NAMES[componentSpec] =
@@ -189,9 +189,9 @@ export class SpeechSynthesisChunkerService {
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
       .replaceWith(function() {
-        var element = <HTMLElement> this;
+        var element = this as HTMLElement;
         const _newTextAttr = element.attributes[
-          <keyof NamedNodeMap> 'text-with-value'] as Attr;
+          'text-with-value' as keyof NamedNodeMap] as Attr;
         // 'Node.textContent' only returns 'null' if the Node is a
         // 'document' or a 'DocType'. '_newTextAttr' is neither.
         const newTextContent = _newTextAttr.textContent?.replace(
@@ -208,14 +208,14 @@ export class SpeechSynthesisChunkerService {
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
-        var element = <HTMLElement> this;
+        var element = this as HTMLElement;
         const _mathContentAttr = element.attributes[
-          <keyof NamedNodeMap> 'math_content-with-value'] as Attr;
+          'math_content-with-value' as keyof NamedNodeMap] as Attr;
         var mathContent = (
-          <MathExpressionContent>(_this.htmlEscaper.escapedJsonToObj(
+          (_this.htmlEscaper.escapedJsonToObj(
             // 'Node.textContent' only returns 'null' if the Node is a
             // 'document' or a 'DocType'. '_mathContentAttr' is neither.
-            <string> _mathContentAttr.textContent)));
+             _mathContentAttr.textContent as string) as MathExpressionContent));
         const latexSpeakableText = _this._formatLatexToSpeakableText(
           mathContent.raw_latex);
         return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';

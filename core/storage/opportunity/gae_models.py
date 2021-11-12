@@ -16,8 +16,7 @@
 
 """Models for Oppia users."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform import models
 
@@ -93,9 +92,10 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls,
             page_size: int,
             urlsafe_start_cursor: Optional[str],
-            language_code: str
+            language_code: str,
+            topic_name: str
     ) -> Tuple[
-        Sequence['ExplorationOpportunitySummaryModel'], Optional[str], bool
+        Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
         """Returns a list of opportunities available for translation in a
         specific language.
@@ -108,6 +108,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 of the full list of entities.
             language_code: str. The language for which translation opportunities
                 are to be fetched.
+            topic_name: str or None. The topic for which translation
+                opportunities should be fetched. If topic_name is None or empty,
+                fetch translation opportunities from all topics.
 
         Returns:
             3-tuple of (results, cursor, more). As described in fetch_page() at:
@@ -132,18 +135,23 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.incomplete_translation_language_codes == language_code
         ).order(cls.topic_name)
 
+        if topic_name:
+            language_query = language_query.filter(cls.topic_name == topic_name)
+
         fetch_result: Tuple[
             Sequence[ExplorationOpportunitySummaryModel],
             datastore_services.Cursor,
             bool
         ] = language_query.fetch_page(page_size, start_cursor=start_cursor)
         results, cursor, _ = fetch_result
+
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
         fetch_result = (
             language_query.fetch_page(page_size + 1, start_cursor=start_cursor))
         plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
+
         # The urlsafe returns bytes and we need to decode them to string.
         return (
             results,
@@ -155,12 +163,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_voiceover_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            language_code: str
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        language_code: str
     ) -> Tuple[
-        Sequence['ExplorationOpportunitySummaryModel'], Optional[str], bool
+        Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
         """Returns a list of opportunities available for voiceover in a
         specific language.
@@ -216,9 +224,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_by_topic(
-            cls,
-            topic_id: str
-    ) -> Sequence['ExplorationOpportunitySummaryModel']:
+        cls, topic_id: str
+    ) -> Sequence[ExplorationOpportunitySummaryModel]:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
@@ -274,10 +281,8 @@ class SkillOpportunityModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_skill_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[Sequence['SkillOpportunityModel'], Optional[str], bool]:
+        cls, page_size: int, urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:

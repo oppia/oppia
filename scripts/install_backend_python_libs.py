@@ -14,8 +14,7 @@
 
 """Installation script for Oppia python backend libraries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import json
@@ -298,21 +297,12 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.UNICODE(requirements_version)
-            )
+            _install_library(normalized_library_name, str(requirements_version))
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.UNICODE(requirements_version)
-            )
-            _remove_metadata(
-                normalized_library_name,
-                python_utils.UNICODE(directory_version)
-            )
+            _install_library(normalized_library_name, str(requirements_version))
+            _remove_metadata(normalized_library_name, str(directory_version))
 
 
 def _is_git_url_mismatch(mismatch_item):
@@ -395,8 +385,6 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
-    # TODO(#11474): The '-py2.7' suffix might be used in some metadata directory
-    # names, this will need to be changed after the Python 3 migration.
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
@@ -412,12 +400,7 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s-py3.7.egg-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s-py3.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
-        normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (library_name, version_string)),
-        normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
+                library_name.replace('-', '_'), version_string))
     }
 
 
@@ -677,8 +660,16 @@ def main():
     # callstack to exit.
     # Therefore, in order to allow continued execution after the requirements
     # file is generated, we must call it as a separate process.
+    # The option --no-emit-index-url is specified to prevent pip compile from
+    # generating an index configuration line(s) in requirements.txt when the
+    # local pip configuration uses one or more custom index servers.
     subprocess.check_call(
-        ['python', '-m', 'scripts.regenerate_requirements'],
+        [
+            'python',
+            '-m',
+            'scripts.regenerate_requirements',
+            '--no-emit-index-url',
+        ],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     # Adds a note to the beginning of the 'requirements.txt' file to make sure

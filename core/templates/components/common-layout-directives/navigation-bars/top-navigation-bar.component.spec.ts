@@ -26,27 +26,34 @@ import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
-import { UserBackendApiService } from 'services/user-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nService } from 'i18n/i18n.service';
+import { CookieService } from 'ngx-cookie';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {}
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
-    gtag: () => {}
+    gtag: () => {},
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
   };
 }
 
@@ -62,9 +69,9 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
-  let userBackendApiService: UserBackendApiService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let i18nService: I18nService;
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -81,7 +88,12 @@ describe('TopNavigationBarComponent', () => {
       ],
       providers: [
         NavigationService,
+        CookieService,
         UserService,
+        {
+          provide: I18nService,
+          useClass: MockI18nService
+        },
         {
           provide: WindowRef,
           useValue: mockWindowRef
@@ -110,7 +122,7 @@ describe('TopNavigationBarComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    userBackendApiService = TestBed.inject(UserBackendApiService);
+    i18nService = TestBed.inject(I18nService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
@@ -393,23 +405,13 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it('should change the language when user clicks on new language' +
-    ' from dropdown', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync').and.resolveTo({
-      isLoggedIn: () => true
-    } as UserInfo);
-    spyOn(userBackendApiService, 'updatePreferredSiteLanguageAsync').and.stub();
-
-    component.currentLanguageCode = 'en';
-    component.currentLanguageText = 'English';
-
-    component.changeLanguage('hi', 'अंग्रेज़ी');
-    tick();
-
-    expect(component.currentLanguageCode).toBe('hi');
-    expect(component.currentLanguageText).toBe('अंग्रेज़ी');
-    expect(userBackendApiService.updatePreferredSiteLanguageAsync)
-      .toHaveBeenCalled();
-  }));
+    ' from dropdown', () => {
+    let langCode = 'hi';
+    spyOn(i18nService, 'updateUserPreferredLanguage');
+    component.changeLanguage(langCode);
+    expect(i18nService.updateUserPreferredLanguage).toHaveBeenCalledWith(
+      langCode);
+  });
 
   it('should check if classroom promos are enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();

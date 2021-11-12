@@ -18,10 +18,8 @@
 Also contains a list of handler class names which does not contain the schema.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
 from core import schema_utils
 
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -73,7 +71,7 @@ def validate(
         if (
                 allow_string_to_bool_conversion and
                 arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
-                and isinstance(handler_args[arg_key], python_utils.BASESTRING)
+                and isinstance(handler_args[arg_key], str)
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
@@ -138,17 +136,12 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'FeedbackThreadStatusChangeEmailHandler',
     'FetchSkillsHandler',
     'FlagExplorationEmailHandler',
-    'FlagExplorationHandler',
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
-    'JobOutputHandler',
-    'JobsHandler',
     'LearnerAnswerDetailsSubmissionHandler',
     'LearnerGoalsHandler',
-    'LearnerIncompleteActivityHandler',
     'LeaveForRefresherExpEventHandler',
     'MemoryCacheAdminHandler',
-    'MemoryCacheHandler',
     'MergeSkillHandler',
     'NewSkillHandler',
     'NewTopicHandler',
@@ -160,19 +153,15 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PendingAccountDeletionPage',
     'PreferenceHandler',
     'PreferencesHandler',
-    'PretestHandler',
     'ProfileHandler',
     'ProfilePage',
-    'PromoBarHandler',
     'QuebstionsListHandler',
     'QuestionCreationHandler',
     'QuestionPlayerHandler',
     'QuestionSkillLinkHandler',
-    'RatingHandler',
     'ReaderFeedbackHandler',
     'RecentCommitsHandler',
     'RecommendationsHandler',
-    'ReleaseCoordinatorPage',
     'ResubmitSuggestionHandler',
     'ReviewableSuggestionsHandler',
     'SignupHandler',
@@ -188,8 +177,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StartedTranslationTutorialEventHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
-    'StatsEventsHandler',
-    'StorePlaythroughHandler',
     'StoryUrlFragmentHandler',
     'SubtopicPageDataHandler',
     'SubtopicViewerPage',
