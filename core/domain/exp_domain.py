@@ -2239,15 +2239,16 @@ class Exploration:
 
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
-        """Converts a v54 exploration dict into a v55 exploration dict.
+        """Converts a v54 exploration dict into a v54 exploration dict.
         Version 55 contains exploration size.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with the proto_size_in_bytes.
+                with schema version v55.
 
         Returns:
-            dict. The converted dict.
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
         """
 
         exploration_dict['proto_size_in_bytes'] = 0
@@ -2288,6 +2289,11 @@ class Exploration:
                 'at present.' % (
                     cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                     cls.CURRENT_EXP_SCHEMA_VERSION))
+
+        if exploration_schema_version == 41:
+            exploration_dict = cls._convert_v42_dict_to_v43_dict(
+                exploration_dict)
+            exploration_schema_version = 42
 
         if exploration_schema_version == 46:
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
