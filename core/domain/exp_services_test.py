@@ -5677,8 +5677,9 @@ title: Old Title
                     'state_name': 'State 3',
                 })], 'changes')
 
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.proto_size_in_bytes, 0)
+        updated_exploration = exp_fetchers.get_exploration_by_id(
+            self.NEW_EXP_ID)
+        self.assertEqual(updated_exploration.proto_size_in_bytes, 242)
 
         # Check that the property can be changed when working
         # on old version.
