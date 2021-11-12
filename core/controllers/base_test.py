@@ -2011,13 +2011,11 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
             if not isinstance(mock_list, list):
                 raise self.InvalidInputException(
                         'Expected arg mock_list to be a list. Was type %s' %
-                        type(mock_list)
-                        )
+                        type(mock_list))
             if not isinstance(mock_int, int):
                 raise self.InvalidInputException(
                         'Expected arg mock_int to be a int. Was type %s' %
-                        type(mock_int)
-                        )
+                        type(mock_int))
             self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
 
     def setUp(self):
