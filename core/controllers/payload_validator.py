@@ -80,7 +80,7 @@ def validate_arguments_against_schema(
     # Collect all errors and present them at once.
     errors = []
     # Dictionary to hold normalized values of arguments after validation.
-    normalized_value = {}
+    normalized_values = {}
 
     for arg_key, arg_schema in handler_args_schemas.items():
 
@@ -105,18 +105,15 @@ def validate_arguments_against_schema(
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
 
-        # Modification of argument name if new_key_for_argument field is present
-        # in the schema.
-        if 'new_key_for_argument' in arg_schema['schema']:
-            old_arg_key = arg_key
-            arg_key = get_corresponding_key_for_object(arg_schema)
-            handler_args[arg_key] = handler_args.pop(old_arg_key)
-            handler_args_schemas[arg_key] = (
-                handler_args_schemas.pop(old_arg_key))
-
         try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema(
+            normalized_value = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
+
+            # Modification of argument name if new_key_for_argument
+            # field is present in the schema.
+            if 'new_key_for_argument' in arg_schema['schema']:
+                arg_key = get_corresponding_key_for_object(arg_schema)
+            normalized_values[arg_key] = normalized_value
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
@@ -126,7 +123,7 @@ def validate_arguments_against_schema(
     if not allowed_extra_args and extra_args:
         errors.append('Found extra args: %s.' % (list(extra_args)))
 
-    return normalized_value, errors
+    return normalized_values, errors
 
 
 def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
