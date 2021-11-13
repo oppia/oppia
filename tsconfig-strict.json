@@ -669,6 +669,8 @@
     "extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service.spec.ts",
     "extensions/interactions/MusicNotesInput/directives/music-notes-input-validation.service.ts",
     "extensions/interactions/MusicNotesInput/directives/music-notes-input-validation.service.spec.ts",
+    "extensions/interactions/MusicNotesInput/directives/music-phrase-player.service.ts",
+    "extensions/interactions/MusicNotesInput/directives/music-phrase-player.service.spec.ts",
     "extensions/interactions/NumberWithUnits/directives/number-with-units-rules.service.ts",
     "extensions/interactions/NumberWithUnits/directives/number-with-units-rules.service.spec.ts",
     "extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.ts",
