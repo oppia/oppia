@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
@@ -38,6 +39,33 @@ class AudioUploadHandler(base.BaseHandler):
     to the local datastore in dev).
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'raw_audio_file': {
+                'schema': {
+                    'type': 'basestring'
+                 }
+             },
+             'filename': {
+                 'schema': {
+                    'type': 'basestring'
+                 }
+             }
+        }
+    }
+
     # The string to prefix to the filename (before tacking the whole thing on
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'audio'
@@ -45,8 +73,8 @@ class AudioUploadHandler(base.BaseHandler):
     @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
-        raw_audio_file = self.request.get('raw_audio_file')
-        filename = self.payload.get('filename')
+        raw_audio_file = self.normalized_request.get('raw_audio_file')
+        filename = self.normalized_payload.get('filename')
         allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
         if not raw_audio_file:
@@ -124,6 +152,22 @@ class AudioUploadHandler(base.BaseHandler):
 
 class StartedTranslationTutorialEventHandler(base.BaseHandler):
     """Records that this user has started the state translation tutorial."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
