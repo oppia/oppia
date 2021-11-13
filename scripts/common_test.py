@@ -499,50 +499,6 @@ class CommonTests(test_utils.GenericTestBase):
             'the script'):
             common.get_personal_access_token()
 
-    def test_closed_blocking_bugs_milestone_results_in_exception(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'state': 'closed'}, completed='')
-        get_milestone_swap = self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone)
-        with get_milestone_swap, self.assertRaisesRegexp(
-            Exception, 'The blocking bug milestone is closed.'):
-            common.check_blocking_bug_issue_count(mock_repo)
-
-    def test_non_zero_blocking_bug_issue_count_results_in_exception(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_open_tab(unused_url):
-            pass
-        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        get_milestone_swap = self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with get_milestone_swap, open_tab_swap, self.assertRaisesRegexp(
-            Exception, (
-                'There are 10 unresolved blocking bugs. Please '
-                'ensure that they are resolved before release '
-                'summary generation.')):
-            common.check_blocking_bug_issue_count(mock_repo)
-
-    def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'open_issues': 0, 'state': 'open'}, completed='')
-        with self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone):
-            common.check_blocking_bug_issue_count(mock_repo)
-
     def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
             self):
         mock_repo = github.Repository.Repository(

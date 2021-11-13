@@ -67,21 +67,31 @@ angular.module('oppia').controller(
         }
       };
       $scope.canEditTranslation = false;
+      // The 'html' value is passed as an object as it is required for
+      // schema-based-editor. Otherwise the corrrectly updated value for
+      // the translation is not received from the editor when the translation
+      // is edited by the reviewer.
+      $scope.editedContent = {
+        html: $scope.translationHtml
+      };
+      $scope.errorMessage = '';
+      $scope.errorFound = false;
 
       $scope.updateSuggestion = function() {
-        const updatedTranslation = $scope.editedContent;
+        const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
+        $scope.preEditTranslationHtml = $scope.translationHtml;
+        $scope.translationHtml = updatedTranslation;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
           updatedTranslation,
           () => {
-            $scope.translationHtml = updatedTranslation;
             $scope.translationUpdated = true;
+            $scope.startedEditing = false;
             ContributionOpportunitiesService.
               reloadOpportunitiesEventEmitter.emit();
           },
           $scope.showTranslationSuggestionUpdateError);
-        $scope.startedEditing = false;
       };
 
       delete suggestionIdToContribution[initialSuggestionId];
@@ -136,6 +146,9 @@ angular.module('oppia').controller(
                 author_name
             );
           });
+        $scope.errorMessage = '';
+        $scope.errorFound = false;
+        $scope.startedEditing = false;
         $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingContributions.length <= 0;
         $scope.translationHtml = (
@@ -157,7 +170,6 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.change.data_format ===
             'set_of_unicode_string'
         );
-        $scope.editedContent = $scope.translationHtml;
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
@@ -259,11 +271,14 @@ angular.module('oppia').controller(
 
       $scope.editSuggestion = function() {
         $scope.startedEditing = true;
+        $scope.editedContent.html = $scope.translationHtml;
       };
 
       $scope.cancelEdit = function() {
+        $scope.errorMessage = '';
         $scope.startedEditing = false;
-        $scope.editedContent = $scope.translationHtml;
+        $scope.errorFound = false;
+        $scope.editedContent.html = $scope.translationHtml;
       };
 
       $scope.cancel = function() {
@@ -271,8 +286,10 @@ angular.module('oppia').controller(
       };
 
       $scope.showTranslationSuggestionUpdateError = function(error) {
-        AlertsService.clearWarnings();
-        AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+        $scope.errorMessage = 'Invalid Suggestion: ' + error.data.error;
+        $scope.errorFound = true;
+        $scope.startedEditing = true;
+        $scope.translationHtml = $scope.preEditTranslationHtml;
       };
     }
   ]);
