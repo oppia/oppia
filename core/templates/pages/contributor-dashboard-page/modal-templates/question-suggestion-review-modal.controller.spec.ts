@@ -27,7 +27,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 describe('Question Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $http = null;
-  let $httpBackend = null;
   var $q = null;
   var $uibModal = null;
   let $uibModalInstance = null;
@@ -415,9 +414,15 @@ describe('Question Suggestion Review Modal Controller', function() {
 
   describe('when a suggestion is rejected', function() {
     let $rootScope = null;
+    var $q = null;
+    var ThreadDataBackendApiService = null;
+
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
-      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+      ThreadDataBackendApiService = $injector.get(
+        'ThreadDataBackendApiService');
+
       const skillRubrics = [{
         explanations: ['explanation'],
         difficulty: 'Easy'
@@ -520,8 +525,13 @@ describe('Question Suggestion Review Modal Controller', function() {
         ]
       };
 
-      $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
-      $httpBackend.flush();
+      var spyObj = spyOn(
+        ThreadDataBackendApiService, 'fetchMessagesAsync')
+        .and.returnValue($q.resolve(responseDict));
+
+      $scope.init();
+      $rootScope.$apply();
+      expect(spyObj).toHaveBeenCalled();
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });
