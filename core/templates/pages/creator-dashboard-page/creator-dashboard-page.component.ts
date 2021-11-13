@@ -19,9 +19,7 @@
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { CreatorDashboardConstants } from './creator-dashboard-page.constants';
-import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
@@ -34,6 +32,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { forkJoin } from 'rxjs';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -47,21 +48,12 @@ export class CreatorDashboardPageComponent {
   isCurrentSortDescending: boolean;
   currentSubscribersSortType: string;
   isCurrentSubscriptionSortDescending: boolean;
-  activeThread: { suggestion: { suggestionType: string; }; };
-  mySuggestionsList;
   canReviewActiveThread: boolean;
-  suggestionsToReviewList;
-  DEFAULT_EMPTY_TITLE: string;
   EXPLORATION_DROPDOWN_STATS;
-  EXPLORATIONS_SORT_BY_KEYS;
-  HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS;
-  SUBSCRIPTION_SORT_BY_KEYS;
-  HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS;
-  DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD;
   canCreateCollections: boolean;
-  explorationsList;
-  collectionsList;
-  subscribersList;
+  explorationsList: CreatorExplorationSummary[];
+  collectionsList: CollectionSummary[];
+  subscribersList: ProfileSummary[];
   lastWeekStats: { totalPlays: number; };
   dashboardStats: { totalPlays: number; };
   relativeChangeInTotalPlays: number;
@@ -69,11 +61,21 @@ export class CreatorDashboardPageComponent {
   getHumanReadableStatus: (status: string) => string;
   emptyDashboardImgUrl: string;
   getAverageRating;
+  SUBSCRIPTION_SORT_BY_KEYS =
+    CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS;
+  EXPLORATIONS_SORT_BY_KEYS =
+    CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS;
+  DEFAULT_EMPTY_TITLE = 'Untitled';
+  HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS =
+    CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS;
+  HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS =
+    CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS;
+  DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD =
+    AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
   constructor(
     private creatorDashboardBackendApiService:
       CreatorDashboardBackendApiService,
-    private threadDataBackendApiService: ThreadDataBackendApiService,
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
@@ -127,6 +129,7 @@ export class CreatorDashboardPageComponent {
     }
   }
 
+  // @HostListener('window:resize', [])
   updatesGivenScreenWidth(): void {
     if (this.checkMobileView()) {
       // For mobile users, the view of the creators
@@ -161,55 +164,17 @@ export class CreatorDashboardPageComponent {
     }
   }
 
-  sortSubscriptionFunction(entity: { [x: string]: number; }): number {
+  sortSubscriptionFunction(
+      entity: { [x: string]: number }): number {
     // This function is passed as a custom comparator function to
     // `orderBy`, so that special cases can be handled while sorting
     // subscriptions.
     let value = entity[this.currentSubscribersSortType];
     if (this.currentSubscribersSortType ===
-      CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
+          this.SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
       value = (value || 0);
     }
     return value;
-  }
-
-  _fetchMessages(threadId: string): void {
-    this.threadDataBackendApiService.fetchMessagesAsync(
-      threadId).then((response) => {
-      let allThreads = this.mySuggestionsList.concat(
-        this.suggestionsToReviewList);
-      for (let i = 0; i < allThreads.length; i++) {
-        if (allThreads[i].threadId === threadId) {
-          allThreads[i].setMessages(response.messages.map(
-            m => ThreadMessage.createFromBackendDict(m)));
-          break;
-        }
-      }
-    });
-  }
-
-  clearActiveThread(): void {
-    this.activeThread = null;
-  }
-
-  setActiveThread(threadId: string): void {
-    this._fetchMessages(threadId);
-    for (let i = 0; i < this.mySuggestionsList.length; i++) {
-      if (this.mySuggestionsList[i].threadId === threadId) {
-        this.activeThread = this.mySuggestionsList[i];
-        this.canReviewActiveThread = false;
-        break;
-      }
-    }
-    if (!this.activeThread) {
-      for (let i = 0; i < this.suggestionsToReviewList.length; i++) {
-        if (this.suggestionsToReviewList[i].threadId === threadId) {
-          this.activeThread = this.suggestionsToReviewList[i];
-          this.canReviewActiveThread = true;
-          break;
-        }
-      }
-    }
   }
 
   sortByFunction(
@@ -242,20 +207,6 @@ export class CreatorDashboardPageComponent {
   }
 
   ngOnInit(): void {
-    this.DEFAULT_EMPTY_TITLE = 'Untitled';
-    this.EXPLORATION_DROPDOWN_STATS = (
-      CreatorDashboardConstants.EXPLORATION_DROPDOWN_STATS);
-    this.EXPLORATIONS_SORT_BY_KEYS = (
-      CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS);
-    this.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
-      CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
-    this.SUBSCRIPTION_SORT_BY_KEYS = (
-      CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS);
-    this.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
-      CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
-    this.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
-      AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-
     this.canCreateCollections = null;
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
@@ -290,9 +241,6 @@ export class CreatorDashboardPageComponent {
         this.dashboardStats = responseData.dashboardStats;
         this.lastWeekStats = responseData.lastWeekStats;
         this.myExplorationsView = responseData.displayPreference;
-        this.mySuggestionsList = responseData.createdSuggestionThreadsList;
-        this.suggestionsToReviewList = (
-          responseData.suggestionThreadsToReviewList);
 
         if (this.dashboardStats && this.lastWeekStats) {
           this.relativeChangeInTotalPlays = (
@@ -304,10 +252,6 @@ export class CreatorDashboardPageComponent {
         if (this.explorationsList.length === 0 &&
           this.collectionsList.length > 0) {
           this.activeTab = 'myCollections';
-        } else if (this.explorationsList.length === 0 && (
-          this.mySuggestionsList.length > 0 ||
-          this.suggestionsToReviewList.length > 0)) {
-          this.activeTab = 'suggestions';
         } else {
           this.activeTab = 'myExplorations';
         }
