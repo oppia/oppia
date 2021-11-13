@@ -20,13 +20,16 @@
       </div>
     </div>
   </form>
+  <div ng-if="isEditorContentLengthExceeded()" class="oppia-length-validation-error">
+    The content length is too long. Please use at most 1000 characters.
+  </div>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
   <button class="btn btn-success protractor-test-save-worked-example-button"
           ng-click="saveWorkedExample()"
-          ng-disabled="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleExplanationHtml)">
+          ng-disabled="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleExplanationHtml) || isEditorContentLengthExceeded()">
     Save
   </button>
 </div>

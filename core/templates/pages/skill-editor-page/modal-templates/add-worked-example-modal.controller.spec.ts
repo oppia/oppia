@@ -47,4 +47,26 @@ describe('Add Worked Example Modal Controller', function() {
       workedExampleExplanationHtml: ''
     });
   });
+
+  it('should check content length in example questions within 1000 chars',
+    function() {
+      var contentText = 'This is just a sample text.';
+
+      $scope.tmpWorkedExampleQuestionHtml = contentText;
+      expect($scope.isEditorContentLengthExceeded()).toBe(false);
+
+      $scope.tmpWorkedExampleQuestionHtml = contentText.repeat(50);
+      expect($scope.isEditorContentLengthExceeded()).toBe(true);
+    });
+
+  it('should check content length in example explanation within 1000 chars',
+    function() {
+      var contentText = 'This is just a sample text.';
+
+      $scope.tmpWorkedExampleExplanationHtml = contentText;
+      expect($scope.isEditorContentLengthExceeded()).toBe(false);
+
+      $scope.tmpWorkedExampleExplanationHtml = contentText.repeat(50);
+      expect($scope.isEditorContentLengthExceeded()).toBe(true);
+    });
 });

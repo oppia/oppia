@@ -61,6 +61,13 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.misconceptionMustBeAddressed = true;
     $scope.misconceptionNameIsDuplicate = false;
 
+    $scope.isEditorContentLengthExceeded = function() {
+      return (
+        $scope.misconceptionNotes.length > 1000 ||
+        $scope.misconceptionFeedback.length > 1000
+      );
+    };
+
     $scope.saveMisconception = function() {
       if ($scope.misconceptionNameIsDuplicate) {
         return;

@@ -121,4 +121,26 @@ describe('Add Misconception Modal Controller', function() {
     $scope.saveMisconception();
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
+
+  it('should check content length in misconception notes within 1000 chars',
+    function() {
+      var contentText = 'This is just a sample text.';
+
+      $scope.misconceptionNotes = contentText;
+      expect($scope.isEditorContentLengthExceeded()).toBe(false);
+
+      $scope.misconceptionNotes = contentText.repeat(50);
+      expect($scope.isEditorContentLengthExceeded()).toBe(true);
+    });
+
+  it('should check content length in misconception feedback within 1000 chars',
+    function() {
+      var contentText = 'This is just a sample text.';
+
+      $scope.misconceptionFeedback = contentText;
+      expect($scope.isEditorContentLengthExceeded()).toBe(false);
+
+      $scope.misconceptionFeedback = contentText.repeat(50);
+      expect($scope.isEditorContentLengthExceeded()).toBe(true);
+    });
 });

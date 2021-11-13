@@ -36,6 +36,13 @@ angular.module('oppia').controller('AddWorkedExampleModalController', [
     $scope.tmpWorkedExampleQuestionHtml = '';
     $scope.tmpWorkedExampleExplanationHtml = '';
 
+    $scope.isEditorContentLengthExceeded = function() {
+      return (
+        $scope.tmpWorkedExampleQuestionHtml.length > 1000 ||
+        $scope.tmpWorkedExampleExplanationHtml.length > 1000
+      );
+    };
+
     $scope.saveWorkedExample = function() {
       $uibModalInstance.close({
         workedExampleQuestionHtml:
