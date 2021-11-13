@@ -28,6 +28,7 @@ require(
   'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require(
@@ -50,9 +51,6 @@ angular.module('oppia').factory('EntityCreationService', [
     var createSubtopic = function(topic) {
       NgbModal.open(CreateNewSubtopicModalComponent, {
         backdrop: 'static',
-        resolve: {
-          topic: () => topic
-        },
         windowClass: 'create-new-subtopic'
       }).result.then(function(subtopicId) {
         TopicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
