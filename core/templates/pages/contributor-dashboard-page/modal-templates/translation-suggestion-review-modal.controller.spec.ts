@@ -363,8 +363,10 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   describe('when viewing suggestion', function() {
     const reviewable = false;
-    let $httpBackend = null;
+    var $q = null;
+    var $rootScope = null;
     const subheading = 'subheading_title';
+    var ThreadDataBackendApiService = null;
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -411,10 +413,12 @@ describe('Translation Suggestion Review Modal Controller', function() {
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      const $rootScope = $injector.get('$rootScope');
+      $rootScope = $injector.get('$rootScope');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+      ThreadDataBackendApiService = $injector.get(
+        'ThreadDataBackendApiService');
 
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
@@ -448,11 +452,16 @@ describe('Translation Suggestion Review Modal Controller', function() {
           updated_status: '',
           updated_subject: '',
         }];
-        $httpBackend.expect('GET', '/threadhandler/' + 'suggestion_1').respond({
-          messages: messages
-        });
-        $httpBackend.flush();
 
+        var spyObj = spyOn(
+          ThreadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue($q.resolve({
+            messages: messages
+          }));
+
+        $scope.init();
+        $rootScope.$apply();
+        expect(spyObj).toHaveBeenCalled();
         expect($scope.reviewMessage).toBe('');
       });
   });
