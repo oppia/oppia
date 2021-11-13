@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the Tutor Card Component.
  */
 
+import { SimpleChanges } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -181,6 +182,21 @@ describe('Tutor card component', () => {
     expect(audioBarStatusService.isAudioBarExpanded).toHaveBeenCalled();
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
+  }));
+
+  it('should refresh displayed card on changes', fakeAsync(() => {
+    let updateDisplayedCardSpy = spyOn(
+      componentInstance, 'updateDisplayedCard');
+    const changes: SimpleChanges = {
+      displayedCard: {
+        previousValue: false,
+        currentValue: true,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    };
+    componentInstance.ngOnChanges(changes);
+    expect(updateDisplayedCardSpy).toHaveBeenCalled();
   }));
 
   it('should update displayed card', fakeAsync(() => {

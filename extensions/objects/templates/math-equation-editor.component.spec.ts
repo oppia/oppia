@@ -21,6 +21,13 @@ import { GuppyInitializationService, GuppyObject } from 'services/guppy-initiali
 import { MathEquationEditorComponent } from './math-equation-editor.component';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateService } from '@ngx-translate/core';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('MathEquationEditor', () => {
   let component: MathEquationEditorComponent;
@@ -55,7 +62,11 @@ describe('MathEquationEditor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [MathEquationEditorComponent]
+      declarations: [MathEquationEditorComponent],
+      providers: [{
+        provide: TranslateService,
+        useClass: MockTranslateService
+      }]
     }).compileComponents();
   }));
   beforeEach(() => {
