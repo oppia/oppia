@@ -114,15 +114,21 @@ describe('Attribution Guide Component', function() {
       true);
   });
 
-  it('should return true if the window size is less than equal to 1024px',
-    function() {
-      let widthSpy = spyOn(windowDimensionsService, 'getWidth');
-      widthSpy.and.returnValue(400);
-      expect(component.checkMobileView()).toBe(true);
+  it('should switch to mobile view if the window size is less than or equal' +
+    'to 1024px',
+  function() {
+    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(400);
+    expect(component.checkMobileView()).toBe(true);
+  });
 
-      widthSpy.and.returnValue(1025);
-      expect(component.checkMobileView()).toBe(false);
-    });
+  it('should not switch to mobile view if the window size is less than or' +
+    ' equal to 1024px',
+  function() {
+    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(1025);
+    expect(component.checkMobileView()).toBe(false);
+  });
 
   it('should initialize component properties correctly', () => {
     expect(component.deviceUsedIsMobile).toBeFalse();
