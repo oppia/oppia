@@ -56,6 +56,18 @@ def _require_valid_version(version_from_payload, skill_version):
 class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
+
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
@@ -89,6 +101,18 @@ def check_can_edit_skill_description(user):
 
 class SkillRightsHandler(base.BaseHandler):
     """A handler for returning skill rights."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
