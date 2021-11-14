@@ -41,7 +41,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   resizeSubscription!: Subscription;
   contributorNames: string[] = [];
-  resultsLoaded: boolean = false;
+  hintsAndSolutionsAreShown: boolean = true;
 
   constructor(
     private contextService: ContextService,
@@ -99,10 +99,12 @@ export class ExplorationFooterComponent {
       }
     } catch (err) { }
 
-    this.questionPlayerStateService.resultsPageIsLoadedEventEmitter
-      .subscribe((resultsLoaded: boolean) => {
-        this.resultsLoaded = resultsLoaded;
-      });
+    if (this.contextService.isInQuestionPlayerMode()) {
+      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter
+        .subscribe((resultsLoaded: boolean) => {
+          this.hintsAndSolutionsAreShown = !resultsLoaded;
+        });
+    }
   }
 
   ngOnDestroy(): void {

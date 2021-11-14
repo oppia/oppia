@@ -36,13 +36,13 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       _hash: '',
-      get hash(): string {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
+      toString() {
+        return 'http://localhost/test_path';
       }
     },
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
   };
 
   get nativeWindow() {
@@ -110,7 +110,6 @@ describe('Topic viewer page', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
-    windowRef.nativeWindow.location.hash = '';
   });
 
   afterEach(() => {
@@ -122,14 +121,15 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-
     spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
+    spyOn(windowRef.nativeWindow.history, 'pushState');
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
     expect(topicViewerPageComponent.activeTab).toBe('story');
-
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/story');
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
     req.flush(topicDict);
@@ -157,7 +157,8 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(urlService, 'getHash').and.returnValue('story');
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/story`);
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -171,7 +172,8 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(urlService, 'getHash').and.returnValue('revision');
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/revision`);
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -184,7 +186,8 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(urlService, 'getHash').and.returnValue('practice');
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/practice`);
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -228,30 +231,45 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.checkMobileView()).toBe(false);
   });
 
-  it('should set url hash accordingly when user changes active tab to' +
+  it('should set url accordingly when user changes active tab to' +
   ' story tab', () => {
-    expect(windowRef.nativeWindow.location.hash).toBe('');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeTab = 'subtopics';
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/revision');
 
     topicViewerPageComponent.setActiveTab('story');
 
-    expect(windowRef.nativeWindow.location.hash).toBe('lessons');
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/story');
+    expect(topicViewerPageComponent.activeTab).toBe('story');
   });
 
   it('should set url hash accordingly when user changes active tab to' +
   ' practice tab', () => {
-    expect(windowRef.nativeWindow.location.hash).toBe('');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeTab = 'subtopics';
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/revision');
 
     topicViewerPageComponent.setActiveTab('practice');
 
-    expect(windowRef.nativeWindow.location.hash).toBe('practice');
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/practice');
+    expect(topicViewerPageComponent.activeTab).toBe('practice');
   });
 
   it('should set url hash accordingly when user changes active tab to' +
-  ' revision tab', () => {
-    expect(windowRef.nativeWindow.location.hash).toBe('');
+  ' subtopics tab', () => {
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeTab = 'story';
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/story');
 
     topicViewerPageComponent.setActiveTab('subtopics');
 
-    expect(windowRef.nativeWindow.location.hash).toBe('revision');
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/revision');
+    expect(topicViewerPageComponent.activeTab).toBe('subtopics');
   });
 });

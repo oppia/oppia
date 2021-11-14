@@ -127,8 +127,10 @@ describe('ExplorationFooterComponent', () => {
       'contributor_2', 'contributor_3', 'contributor_1']);
   }));
 
-  it('should set resultsLoaded when user finishes practice session', () => {
-    expect(component.resultsLoaded).toBeFalse();
+  it('should not show hints after user finishes practice session' +
+  ' and results are loadeed.', () => {
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    expect(component.hintsAndSolutionsAreShown).toBeTrue();
 
     spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
       .and.returnValue(mockResultsLoadedEventEmitter);
@@ -136,7 +138,20 @@ describe('ExplorationFooterComponent', () => {
     component.ngOnInit();
     mockResultsLoadedEventEmitter.emit(true);
 
-    expect(component.resultsLoaded).toBeTrue();
+    expect(component.hintsAndSolutionsAreShown).toBeFalse();
+  });
+
+  it('should show hints when initialized in question player when user is' +
+  ' going through the practice session and should add subscription.', () => {
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(
+      questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
+
+    component.ngOnInit();
+
+    expect(component.hintsAndSolutionsAreShown).toBeTrue();
+    expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe)
+      .toHaveBeenCalled();
   });
 
   it('should check if window is narrow when user resizes window', () => {

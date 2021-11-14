@@ -72,12 +72,15 @@ export class TopicViewerPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.urlService.getHash() === 'revision') {
-      this.setActiveTab('subtopics');
-    } else if (this.urlService.getHash() === 'practice') {
-      this.setActiveTab('practice');
+    if (this.urlService.getPathname().endsWith('revision')) {
+      this.activeTab = 'subtopics';
+    } else if (this.urlService.getPathname().endsWith('practice')) {
+      this.activeTab = 'practice';
     } else {
-      this.setActiveTab('story');
+      if (!this.urlService.getPathname().endsWith('story')) {
+        this.setUrlAccordingToActiveTab('story');
+      }
+      this.activeTab = 'story';
     }
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
@@ -128,13 +131,27 @@ export class TopicViewerPageComponent implements OnInit {
   }
 
   setActiveTab(newActiveTabName: string): void {
-    this.activeTab = newActiveTabName;
     if (newActiveTabName === 'story') {
-      this.windowRef.nativeWindow.location.hash = 'lessons';
+      this.setUrlAccordingToActiveTab('story');
     } else if (newActiveTabName === 'practice') {
-      this.windowRef.nativeWindow.location.hash = 'practice';
+      this.setUrlAccordingToActiveTab('practice');
     } else {
-      this.windowRef.nativeWindow.location.hash = 'revision';
+      this.setUrlAccordingToActiveTab('revision');
+    }
+    this.activeTab = newActiveTabName;
+  }
+
+  setUrlAccordingToActiveTab(newTabName: string): void {
+    let getCurrentLocation = this.windowRef.nativeWindow.location.toString();
+    if (this.activeTab === '') {
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', getCurrentLocation + '/' + newTabName);
+    } else if (this.activeTab === 'subtopics') {
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', getCurrentLocation.replace('revision', newTabName));
+    } else {
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', getCurrentLocation.replace(this.activeTab, newTabName));
     }
   }
 }
