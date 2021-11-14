@@ -380,13 +380,17 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
-                'num_skills_to_fetch': '1',
+                'num_skills_to_fetch': 'string',
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'num_skills_to_fetch\' '
+            'failed: Could not convert str to int: string')
+
         self.assertEqual(
             json_response['error'],
-            'Number of skills to fetch should be a number.')
+            expected_error)
 
     def test_fetch_filtered_skills_with_invalid_cursor_type(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -402,8 +406,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'next_cursor\' failed: '
+            'Expected string, received 40')
+
         self.assertEqual(
-            json_response['error'], 'Next Cursor should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_cursor_value(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -430,8 +438,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'classroom_name\' failed: '
+            'Expected string, received 20')
+
         self.assertEqual(
-            json_response['error'], 'Classroom name should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_keywords(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -444,8 +456,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'keywords\' failed: '
+            'Expected list, received 20')
+
         self.assertEqual(
-            json_response['error'], 'Keywords should be a list of strings.')
+            json_response['error'], expected_error)
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
@@ -454,8 +470,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'keywords\' failed: '
+            'Expected string, received 20')
+
         self.assertEqual(
-            json_response['error'], 'Keywords should be a list of strings.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_status(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -468,8 +488,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'status\' failed: '
+            'Expected string, received 20')
+
         self.assertEqual(
-            json_response['error'], 'Status should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_sort(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -482,8 +506,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'sort\' failed: '
+            'Expected string, received 20')
+
         self.assertEqual(
-            json_response['error'], 'The value of sort_by should be a string.')
+            json_response['error'], expected_error)
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
