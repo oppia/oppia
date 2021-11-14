@@ -17,8 +17,7 @@ missing third-party dependencies and starts up a local GAE development
 server.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import contextlib
@@ -134,7 +133,7 @@ def main(args=None):
     # NOTE: The ordering of alert_on_exit() is important because we want the
     # alert to be printed _before_ the ExitStack unwinds, hence its placement as
     # the "latter" context (context managers exit in reverse-order).
-    with python_utils.ExitStack() as stack, alert_on_exit():
+    with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
 

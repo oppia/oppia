@@ -16,13 +16,11 @@
 subclasses for each type of suggestion.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import config_domain
@@ -42,7 +40,7 @@ from core.platform import models
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(python_utils.OBJECT):
+class BaseSuggestion:
     """Base class for a suggestion.
 
     Attributes:
@@ -168,7 +166,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -183,7 +181,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -195,7 +193,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'received %s' % self.author_id)
 
         if self.final_reviewer_id is not None:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
@@ -208,7 +206,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be in a valid user ID '
                     'format, received %s' % self.final_reviewer_id)
 
-        if not isinstance(self.score_category, python_utils.BASESTRING):
+        if not isinstance(self.score_category, str):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))
@@ -986,7 +984,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
 
 
-class BaseVoiceoverApplication(python_utils.OBJECT):
+class BaseVoiceoverApplication:
     """Base class for a voiceover application."""
 
     def __init__(self):
@@ -1044,7 +1042,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -1054,7 +1052,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -1064,13 +1062,12 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                     'Expected final_reviewer_id to be None as the '
                     'voiceover application is not yet handled.')
         else:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' % (
                         type(self.final_reviewer_id)))
             if self.status == suggestion_models.STATUS_REJECTED:
-                if not isinstance(
-                        self.rejection_message, python_utils.BASESTRING):
+                if not isinstance(self.rejection_message, str):
                     raise utils.ValidationError(
                         'Expected rejection_message to be a string for a '
                         'rejected application, received %s' % type(
@@ -1082,7 +1079,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                         'accepted voiceover application, received %s' % (
                             self.rejection_message))
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -1090,12 +1087,12 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.filename, python_utils.BASESTRING):
+        if not isinstance(self.filename, str):
             raise utils.ValidationError(
                 'Expected filename to be a string, received %s' % type(
                     self.filename))
 
-        if not isinstance(self.content, python_utils.BASESTRING):
+        if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected content to be a string, received %s' % type(
                     self.content))
@@ -1199,7 +1196,7 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
 }
 
 
-class CommunityContributionStats(python_utils.OBJECT):
+class CommunityContributionStats:
     """Domain object for the CommunityContributionStatsModel.
 
     Attributes:
@@ -1400,7 +1397,7 @@ class CommunityContributionStats(python_utils.OBJECT):
                     self.question_reviewer_count)))
 
 
-class TranslationContributionStats(python_utils.OBJECT):
+class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
     def __init__(
@@ -1427,7 +1424,7 @@ class TranslationContributionStats(python_utils.OBJECT):
     @classmethod
     def create_default(
         cls, language_code=None, contributor_user_id=None, topic_id=None
-    ) -> 'TranslationContributionStats':
+    ) -> TranslationContributionStats:
         """Create default translation contribution stats.
 
         Args:
@@ -1474,7 +1471,7 @@ class TranslationContributionStats(python_utils.OBJECT):
         }
 
 
-class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
+class ReviewableSuggestionEmailInfo:
     """Stores key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.

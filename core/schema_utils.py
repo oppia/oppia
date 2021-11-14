@@ -24,11 +24,11 @@ The objects that can be described by these schemas must be composable from the
 following Python types: bool, dict, float, int, list, unicode.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import numbers
 import re
+import urllib
 
 from core import feconf
 from core import python_utils
@@ -154,13 +154,14 @@ def normalize_against_schema(
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
-        assert isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert isinstance(obj, (str, bytes)), (
             'Expected unicode HTML string, received %s' % obj)
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.UNICODE(obj)
-        assert isinstance(obj, python_utils.UNICODE), (
+            obj = str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -176,28 +177,31 @@ def normalize_against_schema(
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
-        assert isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert isinstance(obj, (str, bytes)), (
             'Expected string, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
-        assert isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert isinstance(obj, (str, bytes)), (
             'Expected unicode string, received %s' % obj)
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.UNICODE(obj)
-        assert isinstance(obj, python_utils.UNICODE), (
+            obj = str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
-        assert obj is None or isinstance(obj, python_utils.BASESTRING), (
+        # TODO(#14028): Use just one type.
+        assert obj is None or isinstance(obj, (str, bytes)), (
             'Expected unicode string or None, received %s' % obj)
         if obj is not None:
             if isinstance(obj, bytes):
                 obj = obj.decode('utf-8')
             else:
-                obj = python_utils.UNICODE(obj)
-            assert isinstance(obj, python_utils.UNICODE), (
+                obj = str(obj)
+            assert isinstance(obj, str), (
                 'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
@@ -274,7 +278,7 @@ def get_validator(validator_id: str) -> Callable[..., bool]:
     return _Validators.get(validator_id)
 
 
-class Normalizers(python_utils.OBJECT):
+class Normalizers:
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -329,9 +333,9 @@ class Normalizers(python_utils.OBJECT):
         """
         if obj == '':
             return obj
-        url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
+        url_components = urllib.parse.urlsplit(obj)
         quoted_url_components = (
-            python_utils.url_quote(component) for component in url_components) # type: ignore[no-untyped-call]
+            urllib.parse.quote(component) for component in url_components)
         raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
 
         acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
@@ -356,7 +360,7 @@ class Normalizers(python_utils.OBJECT):
         return ' '.join(obj.split())
 
 
-class _Validators(python_utils.OBJECT):
+class _Validators:
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is
@@ -415,6 +419,21 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object has at most `max_value` elements.
         """
         return len(obj) <= max_value
+
+    @staticmethod
+    def has_length(obj: List[str], value: int) -> bool:
+        """Returns True iff the given object (a list) has exact
+        `value` elements.
+
+        Args:
+            obj: list(str). A list of strings.
+            value: int. The number of elements that `obj` should
+                contain.
+
+        Returns:
+            bool. Whether the given object has exact `value` elements.
+        """
+        return len(obj) == value
 
     @staticmethod
     def is_nonempty(obj: str) -> bool:
@@ -489,8 +508,7 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
-        string_types = (python_utils.BASESTRING, python_utils.UNICODE)
-        if isinstance(obj, string_types):
+        if isinstance(obj, str):
             return not bool(re.search(EMAIL_REGEX, obj))
         return True
 

@@ -18,12 +18,9 @@
 python_linter_test. This file's use of ndb which is not allowed.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
-
-from core import python_utils
 
 from google.appengine.ext import ndb
 

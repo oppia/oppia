@@ -18,15 +18,12 @@
 python_linter_test. This file use __author__ tag which is not allowed.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-from core import python_utils
+from __future__ import annotations
 
 __author__ = 'Author Name' # The __author__ tag is not allowed to use.
 
 
-class FakeClass(python_utils.OBJECT):
+class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):

@@ -15,10 +15,10 @@
 Any callers must pass in a flag, either --accessibility or --performance.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
@@ -100,7 +100,7 @@ def run_webpack_compilation():
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
-    for _ in python_utils.RANGE(max_tries):
+    for _ in range(max_tries):
         try:
             with servers.managed_webpack_compiler() as proc:
                 proc.wait()
@@ -196,7 +196,7 @@ def main(args=None):
         build.main(args=[])
         run_webpack_compilation()
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         stack.enter_context(common.inplace_replace_file_context(
             common.CONSTANTS_FILE_PATH,
             '"ENABLE_ACCOUNT_DELETION": .*',

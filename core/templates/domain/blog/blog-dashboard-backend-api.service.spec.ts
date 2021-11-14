@@ -32,8 +32,8 @@ describe('Blog Dashboard backend api service', () => {
     profile_picture_data_url: 'image',
     no_of_published_blog_posts: 0,
     no_of_draft_blog_posts: 0,
-    published_blog_post_summary_dicts: <BlogPostSummaryBackendDict[]>[],
-    draft_blog_post_summary_dicts: <BlogPostSummaryBackendDict[]>[]
+    published_blog_post_summary_dicts: [] as BlogPostSummaryBackendDict[],
+    draft_blog_post_summary_dicts: [] as BlogPostSummaryBackendDict[]
   };
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
@@ -53,8 +53,8 @@ describe('Blog Dashboard backend api service', () => {
     numOfDraftBlogPosts: blogDashboardBackendResponse.no_of_draft_blog_posts,
     numOfPublishedBlogPosts: (
       blogDashboardBackendResponse.no_of_published_blog_posts),
-    publishedBlogPostSummaryDicts: <BlogPostSummary[]>[],
-    draftBlogPostSummaryDicts: <BlogPostSummary[]>[],
+    publishedBlogPostSummaryDicts: [] as BlogPostSummary[],
+    draftBlogPostSummaryDicts: [] as BlogPostSummary[],
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
     blogPostSummary);

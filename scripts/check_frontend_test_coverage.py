@@ -14,8 +14,7 @@
 
 """Check for decrease in coverage from 100% of frontend files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import fnmatch
 import logging
@@ -44,7 +43,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'App.ts',
     'audio-preloader.service.ts',
     'Base.ts',
-    'change-list.service.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
     'collection-editor-navbar-breadcrumb.component.ts',
@@ -54,19 +52,15 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-player-page.component.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
-    'contributions-and-review.component.ts',
-    'contributor-dashboard-admin-page.component.ts',
     'conversation-skin.directive.ts',
     'current-interaction.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
-    'focus-on.directive.ts',
     'google-analytics.initializer.ts',
     'language-util.service.ts',
     'learner-answer-info.service.ts',
-    'learner-view-rating.service.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
@@ -86,13 +80,9 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-html-viewer.directive.ts',
     'schema-based-list-viewer.directive.ts',
     'select2-dropdown.directive.ts',
-    'skill-editor-state.service.ts',
-    'skill-questions-tab.directive.ts',
     'state-card.model.ts',
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'story-editor.directive.ts',
-    'story-node-editor.directive.ts',
     'story-node.model.ts',
     'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
@@ -100,15 +90,13 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
-    'tutor-card.directive.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
-    'worked-example-editor.directive.ts',
 ]
 
 
-class LcovStanzaRelevantLines(python_utils.OBJECT):
+class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
     def __init__(self, stanza):
