@@ -110,7 +110,8 @@ export class EditableTopicBackendApiService {
   private _fetchTopic(
       topicId: string,
       successCallback: (
-        value: FetchTopicResponse | PromiseLike<FetchTopicResponse>) => void,
+        value: FetchTopicResponse | PromiseLike<FetchTopicResponse>
+      ) => void,
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -145,8 +146,10 @@ export class EditableTopicBackendApiService {
   private _fetchStories(
       topicId: string,
       successCallback: (
-        value: StorySummaryBackendDict[] |
-         PromiseLike<StorySummaryBackendDict[]>) => void,
+        value:
+          StorySummaryBackendDict[] |
+          PromiseLike<StorySummaryBackendDict[]>
+      ) => void,
       errorCallback: (reason?: string) => void): void {
     let storiesDataUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
@@ -168,8 +171,8 @@ export class EditableTopicBackendApiService {
       topicId: string,
       subtopicId: number,
       successCallback: (
-        value: SubtopicPageBackendDict |
-         PromiseLike<SubtopicPageBackendDict>) => void,
+        value: SubtopicPageBackendDict | PromiseLike<SubtopicPageBackendDict>
+      ) => void,
       errorCallback: (reason?: string) => void): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
@@ -212,7 +215,8 @@ export class EditableTopicBackendApiService {
       commitMessage: string,
       changeList: BackendChangeObject[],
       successCallback: (
-        value: UpdateTopicResponse | PromiseLike<UpdateTopicResponse>) => void,
+        value: UpdateTopicResponse | PromiseLike<UpdateTopicResponse>
+      ) => void,
       errorCallback: (reason?: string) => void): void {
     let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {

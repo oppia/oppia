@@ -33,11 +33,7 @@ import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
 export interface GroupedSkillSummaries {
-  current: {
-    id: string,
-    description: string,
-  }[],
-  others: SkillSummaryBackendDict[]
+  [topicName: string]: SkillSummaryBackendDict[]
 }
 @Injectable({
   providedIn: 'root'
@@ -59,13 +55,12 @@ export class SkillEditorStateService {
   private _skill!: Skill;
   private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
-  private assignedSkillTopicData = null;
+  private assignedSkillTopicData!: {
+    [topicName: string]: string
+  } ;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
-  private _groupedSkillSummaries: GroupedSkillSummaries = {
-    current: [],
-    others: []
-  };
+  private _groupedSkillSummaries!: GroupedSkillSummaries;
   private _skillChangedEventEmitter = new EventEmitter();
 
   private _setSkill = (skill: Skill) => {
@@ -86,8 +81,10 @@ export class SkillEditorStateService {
     this._setSkill(skill);
   };
 
-  private _updateGroupedSkillSummaries = (groupedSkillSummaries) => {
-    let topicName = '';
+  private _updateGroupedSkillSummaries = (
+      groupedSkillSummaries: GroupedSkillSummaries
+  ) => {
+    let topicName: string | null = '';
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
@@ -171,7 +168,7 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
-  getAssignedSkillTopicData(): string {
+  getAssignedSkillTopicData(): {[topicName: string]: string} {
     return this.assignedSkillTopicData;
   }
 

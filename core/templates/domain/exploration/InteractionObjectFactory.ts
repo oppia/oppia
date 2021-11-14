@@ -96,7 +96,7 @@ export class Interaction {
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
-      defaultOutcome: Outcome,
+      defaultOutcome: Outcome | null,
       hints: Hint[], id: string | null, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;

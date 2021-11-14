@@ -37,6 +37,9 @@ export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() sortedSkillSummaries!: GroupedSkillSummaries;
   @Input() selectedSkillId!: string;
   @Input() countOfSkillsToPrioritize!: number;

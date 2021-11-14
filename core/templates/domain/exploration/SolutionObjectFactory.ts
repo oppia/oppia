@@ -23,18 +23,14 @@ import { Injectable } from '@angular/core';
 import {
   CapitalizePipe
 } from 'filters/string-utility-filters/capitalize.pipe';
-import { ConvertToPlainTextPipe } from
-  'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { Fraction } from 'domain/objects/fraction.model';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
+import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import {
   DragAndDropAnswer,

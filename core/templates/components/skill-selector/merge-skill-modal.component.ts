@@ -28,12 +28,15 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
   templateUrl: './merge-skill-modal.component.html'
 })
 export class MergeSkillModalComponent extends ConfirmOrCancelModal {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   categorizedSkills!: SkillsCategorizedByTopics;
   skill!: AugmentedSkillSummary;
   skillSummaries!: AugmentedSkillSummary[];
   untriagedSkillSummaries!: SkillSummary[];
-  allowSkillsFromOtherTopics: boolean = true;
   selectedSkillId!: string;
+  allowSkillsFromOtherTopics: boolean = true;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

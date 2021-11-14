@@ -32,7 +32,7 @@ import { Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
-import { Interaction} from './InteractionObjectFactory';
+import { Interaction } from './InteractionObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {

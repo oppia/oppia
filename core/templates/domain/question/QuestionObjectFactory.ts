@@ -23,6 +23,7 @@ import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 
 export interface QuestionBackendDict {
   'id': string;
@@ -97,7 +98,7 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getValidationErrorMessage(): string {
+  getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
@@ -107,8 +108,10 @@ export class Question {
       return 'An interaction must be specified';
     }
 
-    if (interaction.defaultOutcome &&
-      interaction.defaultOutcome.feedback._html.length === 0) {
+    if (
+      interaction.defaultOutcome &&
+      interaction.defaultOutcome.feedback._html.length === 0
+    ) {
       return 'Please enter a feedback for the default outcome.';
     }
 
@@ -131,23 +134,25 @@ export class Question {
     if (!atLeastOneAnswerCorrect) {
       return 'At least one answer should be marked correct';
     }
-    return '';
+    return null;
   }
 
-  getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
+  getUnaddressedMisconceptionNames(
+      misconceptionsBySkill: Misconception[]): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
-    var taggedSkillMisconceptionIds = {};
+    var taggedSkillMisconceptionIds: string[] = [];
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-        answerGroups[i].taggedSkillMisconceptionId !== null) {
+        answerGroups[i].taggedSkillMisconceptionId !== null
+      ) {
         taggedSkillMisconceptionIds[
-          answerGroups[i].taggedSkillMisconceptionId] = true;
+          answerGroups[i].taggedSkillMisconceptionId || 'null'] = true;
       }
     }
     var unaddressedMisconceptionNames!: string[];
     var self = this;
     Object.keys(misconceptionsBySkill).forEach(function(skillId) {
-      for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
+      for (var i = 0; i < misconceptionsBySkill[skillId].length(); i++) {
         var skillMisconceptionIdIsNotApplicable = (
           self._inapplicableSkillMisconceptionIds.includes(
             `${skillId}-${misconceptionsBySkill[skillId][i].getId()}`));
