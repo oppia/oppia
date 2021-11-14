@@ -1984,3 +1984,53 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             )
             filename = response_dict['filename']
         self.logout()
+
+
+class UrlPathNormalizationTest(test_utils.GenericTestBase):
+    """Tests that ensure url path arguments are normalized"""
+
+    class MockHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'mock_list': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'mock_int': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        def get(self, mock_list, mock_int):
+            if not isinstance(mock_list, list):
+                raise self.InvalidInputException(
+                    'Expected arg mock_list to be a list. Was type %s' %
+                    type(mock_list))
+            if not isinstance(mock_int, int):
+                raise self.InvalidInputException(
+                    'Expected arg mock_int to be a int. Was type %s' %
+                    type(mock_int))
+            self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
+
+    def setUp(self):
+        super(UrlPathNormalizationTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_normalization/<mock_int>/<mock_list>',
+            self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_url_path_arg_normalization_is_successful(self):
+        list_string = '["id1", "id2", "id3"]'
+        int_string = '1'
+
+        with self.swap(self, 'testapp', self.testapp):
+            self.get_json(
+                '/mock_normalization/%s/%s' % (int_string, list_string),
+                expected_status_int=200)
