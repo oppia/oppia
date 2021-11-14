@@ -149,10 +149,10 @@
                 class="sort-options"
                 aria-label="Sort Type"
                 (change)="setExplorationsSortingOptions(currentSortType)">
-                <option *ngFor="let item of HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS | keyvalue"
-                        [value]="EXPLORATIONS_SORT_BY_KEYS[item.key]"
-                        [innerHTML]="item.value | translate">
-                </option>
+          <option *ngFor="let item of HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS | keyvalue"
+                  [value]="EXPLORATIONS_SORT_BY_KEYS[item.key]"
+                  [innerHTML]="item.value | translate">
+          </option>
         </select>
         <span class="sort-order fas"
               (click)="setExplorationsSortingOptions(currentSortType)"
@@ -281,8 +281,9 @@
                       ngbTooltip="{{ 'I18N_DASHBOARD_OPEN_FEEDBACK' | translate }}"
                       placement="top">
                 </span>
-                <a *ngIf="exploration.numOpenThreads != 0" [href]="'/create/' + exploration.id + '#/feedback'"
-                  class="oppia-dashboard-card-statistic-value">
+                <a *ngIf="exploration.numOpenThreads != 0"
+                   [href]="'/create/' + exploration.id + '#/feedback'"
+                   class="oppia-dashboard-card-statistic-value">
                   {{ exploration.numOpenThreads }}
                 </a>
                 <span *ngIf="exploration.numOpenThreads === 0"
@@ -401,14 +402,14 @@
 <style>
   hr {
     border-top: 1px solid #000;
-    width: 384%;
     display: flex;
+    width: 384%;
   }
   .rowOne, .rowTwo {
     display: flex;
     justify-content: space-between;
-    padding-right: 10px;
     padding-left: 10px;
+    padding-right: 10px;
     padding-top: 7px;
   }
   .oppia-mat-card {
@@ -455,8 +456,8 @@
     display: -webkit-flex;
     display: flex;
     flex-wrap: wrap;
-    margin-top: 50px;
     margin-bottom: 0;
+    margin-top: 50px;
     padding-left: 0;
     text-align: center;
   }
@@ -531,10 +532,10 @@
   }
 
   .oppia-dashboard-card-view-item {
-    padding: 0px;
     height: 260px;
     margin-left: 7.5px;
     margin-right: 7.5px;
+    padding: 0;
     position: static;
     width: 184px;
   }
