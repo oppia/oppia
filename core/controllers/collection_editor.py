@@ -306,9 +306,9 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'cursor': {
+            'offset': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 },
                 'default_value': None
             }
@@ -325,7 +325,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         q = self.normalized_request.get('q').encode('utf-8')
         query_string = base64.b64decode(q).decode('utf-8')
 
-        search_offset = self.normalized_request.get('cursor')
+        search_offset = self.normalized_request.get('offset')
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(

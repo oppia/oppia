@@ -213,7 +213,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
     Args:
         query_string: str. The search query for which the search is to be
             performed.
-        search_offset: str or None. The offset location to start the search
+        search_offset: int or None. The offset location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -223,7 +223,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
         2-tuple of (exploration_list, new_search_offset). Where:
             - exploration_list list(dict). A list of metadata dicts for
                 explorations matching the query.
-            - new_search_offset (str). New search offset location.
+            - new_search_offset (int). New search offset location.
     """
     exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(

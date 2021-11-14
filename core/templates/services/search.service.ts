@@ -53,7 +53,7 @@ export class SearchService {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _lastQuery!: string;
-  private _searchCursor!: string;
+  private _searchOffset!: number;
   private _lastSelectedCategories: SelectionList = {};
   private _lastSelectedLanguageCodes: SelectionList = {};
   private _isCurrentlyFetchingResults = false;
@@ -101,7 +101,7 @@ export class SearchService {
   }
 
   hasReachedEndOfPage(): boolean {
-    return this._searchCursor === null;
+    return this._searchOffset === null;
   }
 
   updateSearchFields(
@@ -164,7 +164,7 @@ export class SearchService {
         this._lastQuery = searchQuery;
         this._lastSelectedCategories = cloneDeep(selectedCategories);
         this._lastSelectedLanguageCodes = cloneDeep(selectedLanguageCodes);
-        this._searchCursor = response.search_cursor;
+        this._searchOffset = response.search_offset;
         this.numSearchesInProgress--;
 
         this._initialSearchResultsLoadedEventEmitter.emit(
@@ -252,14 +252,14 @@ export class SearchService {
 
     let queryUrl = this.getQueryUrl(this.getCurrentUrlQueryString());
 
-    if (this._searchCursor) {
-      queryUrl += '&cursor=' + this._searchCursor;
+    if (this._searchOffset) {
+      queryUrl += '&offset=' + this._searchOffset;
     }
 
     this._isCurrentlyFetchingResults = true;
     this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
       .then((response) => {
-        this._searchCursor = response.search_cursor;
+        this._searchOffset = response.search_offset;
         this._isCurrentlyFetchingResults = false;
 
         if (successCallback) {
