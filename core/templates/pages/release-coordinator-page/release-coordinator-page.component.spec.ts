@@ -31,10 +31,9 @@ describe('Release coordinator page', () => {
   let fixture: ComponentFixture<ReleaseCoordinatorPageComponent>;
   let pbbas: PromoBarBackendApiService;
   let rcbas: ReleaseCoordinatorBackendApiService;
-  let fb: FormBuilder;
 
-  let mockPromoBarData = new PromoBar(true, 'Hello');
-  let mockMemoryCacheProfile = {
+  let testPromoBarData = new PromoBar(true, 'Hello');
+  let testMemoryCacheProfile = {
     peak_allocation: '1430120',
     total_allocation: '1014112',
     total_keys_stored: '2'
@@ -63,17 +62,12 @@ describe('Release coordinator page', () => {
     fixture = TestBed.createComponent(ReleaseCoordinatorPageComponent);
     component = fixture.componentInstance;
     pbbas = TestBed.inject(PromoBarBackendApiService);
-    pbbas = (pbbas as unknown) as jasmine.SpyObj<PromoBarBackendApiService>;
     rcbas = TestBed.inject(ReleaseCoordinatorBackendApiService);
-    rcbas = (rcbas as unknown) as
-      jasmine.SpyObj<ReleaseCoordinatorBackendApiService>;
-    fb = TestBed.inject(FormBuilder);
-    fb = (fb as unknown) as jasmine.SpyObj<FormBuilder>;
   });
 
   beforeEach(() => {
     spyOn(pbbas, 'getPromoBarDataAsync').and.returnValue(
-      Promise.resolve(mockPromoBarData));
+      Promise.resolve(testPromoBarData));
     component.ngOnInit();
   });
 
@@ -142,18 +136,18 @@ describe('Release coordinator page', () => {
   it('should fetch memory cache profile and set success status',
     fakeAsync(() => {
       spyOn(rcbas, 'getMemoryCacheProfileAsync').and.returnValue(
-        Promise.resolve(mockMemoryCacheProfile));
+        Promise.resolve(testMemoryCacheProfile));
 
       component.getMemoryCacheProfile();
       tick();
 
       expect(rcbas.getMemoryCacheProfileAsync).toHaveBeenCalled();
       expect(component.memoryCacheProfile.totalAllocatedInBytes)
-        .toEqual(mockMemoryCacheProfile.total_allocation);
+        .toEqual(testMemoryCacheProfile.total_allocation);
       expect(component.memoryCacheProfile.peakAllocatedInBytes)
-        .toEqual(mockMemoryCacheProfile.peak_allocation);
+        .toEqual(testMemoryCacheProfile.peak_allocation);
       expect(component.memoryCacheProfile.totalKeysStored)
-        .toEqual(mockMemoryCacheProfile.total_keys_stored);
+        .toEqual(testMemoryCacheProfile.total_keys_stored);
       expect(component.memoryCacheDataFetched).toBeTrue();
       expect(component.statusMessage).toBe('Success!');
     }));
