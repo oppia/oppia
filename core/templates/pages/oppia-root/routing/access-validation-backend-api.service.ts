@@ -64,10 +64,6 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
-  accountDeletionIsEnabled(): Promise<void> {
-    return this.http.get<void>(this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
-  }
-
   validateAccessToReleaseCoordinatorPage():
   Promise<void> {
     return this.http.get<void>(

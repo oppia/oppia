@@ -91,15 +91,6 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
-class AccountDeletionIsEnabledValidationHandlerTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self) -> None:
-        super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp()
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
-
-
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
