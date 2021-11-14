@@ -655,7 +655,7 @@ class FirebaseAdminSdkStub:
             uids_to_delete, uids_to_fail = cast(
                 UidsZipPartitionTupleType,
                 utils.partition(
-                    python_utils.ZIP(uids, updated_individual_error_pattern),
+                    ZIP(uids, updated_individual_error_pattern),
                     predicate=lambda uid_and_error: uid_and_error[1] is None,
                     enumerated=True))
 
@@ -713,7 +713,7 @@ class FirebaseAdminSdkStub:
             records_to_import, records_to_fail = cast(
                 RecordsPartitionTupleType,
                 utils.partition(
-                    python_utils.ZIP(records, updated_individual_error_pattern),
+                    ZIP(records, updated_individual_error_pattern),
                     predicate=(
                         lambda record_and_error: record_and_error[1] is None),
                     enumerated=True))

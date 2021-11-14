@@ -595,7 +595,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test3@email.com', 'test4@email.com']
 
         user_ids = []
-        for auth_id, email, name in python_utils.ZIP(
+        for auth_id, email, name in ZIP(
                 auth_ids, user_emails, usernames):
             user_id = user_services.create_new_user(auth_id, email).user_id
             user_ids.append(user_id)
@@ -623,7 +623,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test3@email.com', 'test4@email.com']
 
         user_ids = []
-        for uid, email, name in python_utils.ZIP(
+        for uid, email, name in ZIP(
                 auth_ids, user_emails, usernames):
             user_id = user_services.create_new_user(uid, email).user_id
             user_ids.append(user_id)

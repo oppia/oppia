@@ -161,7 +161,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         user_ids, include_deleted=include_marked_deleted)
 
     if strict:
-        for user_id, user_settings_model in python_utils.ZIP(
+        for user_id, user_settings_model in ZIP(
                 user_ids, user_settings_models):
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
@@ -857,7 +857,7 @@ def update_multiple_users_data(modifiable_user_data_list):
     user_ids = [user.user_id for user in modifiable_user_data_list]
     user_settings_list = get_users_settings(user_ids)
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings in python_utils.ZIP(
+    for modifiable_user_data, user_settings in ZIP(
             modifiable_user_data_list, user_settings_list):
         user_id = modifiable_user_data.user_id
         if user_id is None:
@@ -880,7 +880,7 @@ def _save_existing_users_settings(user_settings_list):
     user_ids = [user.user_id for user in user_settings_list]
     user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_model, user_settings in python_utils.ZIP(
+    for user_model, user_settings in ZIP(
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
@@ -900,7 +900,7 @@ def _save_existing_users_auth_details(user_auth_details_list):
     user_ids = [user.user_id for user in user_auth_details_list]
     user_auth_models = auth_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_auth_details_model, user_auth_details in python_utils.ZIP(
+    for user_auth_details_model, user_auth_details in ZIP(
             user_auth_models, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_model.populate(**user_auth_details.to_dict())

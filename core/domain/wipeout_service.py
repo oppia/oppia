@@ -102,7 +102,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
             user_ids, include_deleted=True)
     )
     final_pending_deletion_request_models = []
-    for deletion_request_model, deletion_request in python_utils.ZIP(
+    for deletion_request_model, deletion_request in ZIP(
             pending_deletion_request_models, pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
