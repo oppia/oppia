@@ -387,4 +387,4 @@ export class CollectionPlayerPageComponent implements OnInit {
 angular.module('oppia').directive('oppiaCollectionPlayerPage',
   downgradeComponent({
     component: CollectionPlayerPageComponent
-  })as angular.IDirectiveFactory);
+  }) as angular.IDirectiveFactory);
