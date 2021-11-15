@@ -666,7 +666,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         'POST': {
             'collection_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 },
                 'default_value': None
             },
@@ -690,8 +694,8 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'object_class': stats_domain.SubmittedAnswer
+                    'type': 'dict',
+                    'properties': []
                 }
             }
         }
@@ -781,8 +785,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'object_class': stats_domain.SubmittedAnswer
+                    'type': 'dict',
+                    'properties': []
                 }
             }
         }
