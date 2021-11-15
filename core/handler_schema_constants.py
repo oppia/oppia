@@ -19,7 +19,11 @@
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 
-"""Contains a list of handler class names that do not contain schema."""
+"""Contains a list of handler class names that do not contain schema.
+This is a temporary file which will be removed once all of the handlers
+mentioned in the list have a schema. This file resides in this folder as
+it will be used by both scripts and cores and hence would be easier to
+import from this location."""
 
 from __future__ import annotations
 
