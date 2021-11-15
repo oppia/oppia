@@ -16,8 +16,7 @@
 
 """Definition of platform parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import python_utils
 from core.domain import platform_parameter_domain

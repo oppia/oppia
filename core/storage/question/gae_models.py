@@ -14,8 +14,7 @@
 
 """Models for storing the question data models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import math
 import random
@@ -222,13 +221,13 @@ class QuestionModel(base_models.VersionedModel):
     # to remove Any used below.
     @classmethod
     def create(
-            cls,
-            question_state_data: Dict[str, Any],
-            language_code: str,
-            version: int,
-            linked_skill_ids: List[str],
-            inapplicable_skill_misconception_ids: List[str]
-    ) -> 'QuestionModel':
+        cls,
+        question_state_data: Dict[str, Any],
+        language_code: str,
+        version: int,
+        linked_skill_ids: List[str],
+        inapplicable_skill_misconception_ids: List[str]
+    ) -> QuestionModel:
         """Creates a new QuestionModel entry.
 
         Args:
@@ -261,7 +260,7 @@ class QuestionModel(base_models.VersionedModel):
         return question_model_instance
 
     @classmethod
-    def put_multi_questions(cls, questions: List['QuestionModel']) -> None:
+    def put_multi_questions(cls, questions: List[QuestionModel]) -> None:
         """Puts multiple question models into the datastore.
 
         Args:
@@ -326,7 +325,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_id: str,
             skill_id: str,
             skill_difficulty: float
-    ) -> 'QuestionSkillLinkModel':
+    ) -> QuestionSkillLinkModel:
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
@@ -374,11 +373,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_by_skill_ids(
-            cls,
-            question_count: int,
-            skill_ids: List[str],
-            offset: int
-    ) -> Sequence['QuestionSkillLinkModel']:
+        cls, question_count: int, skill_ids: List[str], offset: int
+    ) -> Sequence[QuestionSkillLinkModel]:
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
 
@@ -402,11 +398,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
-            cls,
-            total_question_count: int,
-            skill_ids: List[str],
-            difficulty_requested: float
-    ) -> List['QuestionSkillLinkModel']:
+        cls,
+        total_question_count: int,
+        skill_ids: List[str],
+        difficulty_requested: float
+    ) -> List[QuestionSkillLinkModel]:
         """Fetches the list of constant number of random QuestionSkillLinkModels
         linked to the skills, sorted by the absolute value of the difference
         between skill difficulty and the requested difficulty.
@@ -550,10 +546,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(
-            cls,
-            total_question_count: int,
-            skill_ids: List[str]
-    ) -> List['QuestionSkillLinkModel']:
+        cls, total_question_count: int, skill_ids: List[str]
+    ) -> List[QuestionSkillLinkModel]:
         """Fetches the list of constant number of random
         QuestionSkillLinkModels linked to the skills.
 
@@ -649,8 +643,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_models_by_skill_id(
-            cls, skill_id: str
-    ) -> Sequence['QuestionSkillLinkModel']:
+        cls, skill_id: str
+    ) -> Sequence[QuestionSkillLinkModel]:
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
@@ -665,8 +659,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_models_by_question_id(
-            cls, question_id: str
-    ) -> Sequence['QuestionSkillLinkModel']:
+        cls, question_id: str
+    ) -> Sequence[QuestionSkillLinkModel]:
         """Returns a list of QuestionSkillLinkModels of a particular
         question ID.
 
@@ -682,7 +676,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def put_multi_question_skill_links(
-            cls, question_skill_links: List['QuestionSkillLinkModel']
+        cls, question_skill_links: List[QuestionSkillLinkModel]
     ) -> None:
         """Puts multiple question skill link models into the datastore.
 
@@ -695,7 +689,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def delete_multi_question_skill_links(
-            cls, question_skill_links: List['QuestionSkillLinkModel']
+        cls, question_skill_links: List[QuestionSkillLinkModel]
     ) -> None:
         """Deletes multiple question skill links from the datastore.
 
