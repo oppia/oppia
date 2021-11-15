@@ -349,8 +349,7 @@ class BlogPost:
                 for the blog post.
         """
         if new_thumbnail_filename is not None:
-            if not isinstance(new_thumbnail_filename, str):
-                self.require_valid_thumbnail_filename(new_thumbnail_filename)
+            self.require_valid_thumbnail_filename(new_thumbnail_filename)
         self.thumbnail_filename = new_thumbnail_filename
 
     def update_content(self, content: str) -> None:
