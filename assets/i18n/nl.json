@@ -195,7 +195,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "Wijzigingen aan openbare verkenningen en verzamelingen met een andere eigenaar",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "Commits voor onderwerpen, verhalen, vaardigheden en vragen",
 	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "Om de verwijdering te bevestigen, voer je je  <strong>gebruikersnaam</strong> in het onderstaande veld in en druk je op de knop 'Mijn account verwijderen'. <strong>Deze handeling kan niet ongedaan worden gemaakt.</strong>",
-	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "Deze handeling verwijdert dit gebruikersaccount en ook alle privégegevens die aan dit account zijn gekoppeld. Gegevens die al openbaar zijn, worden geanonimiseerd zodat ze niet aan dit account kunnen worden gekoppeld. Sommige van de onderstaande categorieën zijn mogelijk niet van toepassing op je account.",
+	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "Hiermee wordt dit gebruikersaccount verwijderd en ook alle privégegevens die aan dit account zijn gekoppeld. Gegevens die al openbaar zijn, worden geanonimiseerd zodat ze niet aan dit account kunnen worden gekoppeld, met uitzondering van back-upgegevens (die 6 maanden worden bewaard). Sommige van de onderstaande categorieën zijn mogelijk niet van toepassing op uw account.",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Overzicht",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "Hier zijn alle typen gegevens die worden verwijderd:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3": "Hier zijn alle typen gegevens die worden geanonimiseerd:",
