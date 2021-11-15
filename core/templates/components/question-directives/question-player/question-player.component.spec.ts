@@ -28,6 +28,7 @@ describe('QuestionPlayerComponent', () => {
   let $uibModal = null;
 
   let PlayerPositionService = null;
+  let PreventPageUnloadEventService = null;
   let ExplorationPlayerStateService = null;
   let QuestionPlayerStateService = null;
   let UserService = null;
@@ -75,6 +76,8 @@ describe('QuestionPlayerComponent', () => {
       $uibModal = $injector.get('$uibModal');
 
       PlayerPositionService = $injector.get('PlayerPositionService');
+      PreventPageUnloadEventService = $injector.get(
+        'PreventPageUnloadEventService');
       ExplorationPlayerStateService = $injector.get(
         'ExplorationPlayerStateService');
       QuestionPlayerStateService = $injector.get('QuestionPlayerStateService');
@@ -534,5 +537,16 @@ describe('QuestionPlayerComponent', () => {
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should prevent page reload or exit in between' +
+  'practice session', function() {
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 });
