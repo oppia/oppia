@@ -252,8 +252,8 @@ export class SvgEditorComponent implements OnInit {
   }
 
   private getTrustedResourceUrlForSvgFileName(
-      svgFileName: string): {
-        safeUrl: SafeResourceUrl | string; unsafeUrl: string; } {
+      svgFileName: string
+  ): { safeUrl: SafeResourceUrl | string; unsafeUrl: string } {
     if (
       this.imageSaveDestination ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
