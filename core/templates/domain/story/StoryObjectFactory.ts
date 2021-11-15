@@ -44,6 +44,9 @@ export interface StoryBackendDict {
 }
 
 export class Story {
+  // Assigning union type of "string | null" to some fields,
+  // Because we are assigning null to those fields when we create
+  // interstitial story.
   _id: string | null;
   _title: string;
   _description: string;
@@ -57,8 +60,8 @@ export class Story {
   _urlFragment: string | null;
   _metaTagContent: string;
   constructor(
-      id: string | null, title: string, description: string, notes: string,
-      storyContents: StoryContents | null, languageCode: string,
+      id: string | null, title: string, description: string,
+      notes: string, storyContents: StoryContents | null, languageCode: string,
       version: number, correspondingTopicId: string | null,
       thumbnailBgColor: string | null, thumbnailFilename: string | null,
       urlFragment: string | null, metaTagContent: string) {
@@ -76,6 +79,9 @@ export class Story {
     this._metaTagContent = metaTagContent;
   }
 
+  // Some methods have either string or null return value,
+  // because when we create interstitial story object
+  // their fields get null value.
   getId(): string | null {
     return this._id;
   }
@@ -240,6 +246,10 @@ export class StoryObjectFactory {
     );
   }
 
+  /**
+ * TODO(#14169): Remove the interstitial story so that full story can be
+ * created from start.
+ */
   // Create an interstitial story that would be displayed in the editor until
   // the actual story is fetched from the backend.
   createInterstitialStory(): Story {

@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,34 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for executing searches.
+ * @fileoverview Backend api service for Setting tab;
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { ServicesConstants } from './services.constants';
 
-export class SearchResponseBackendDict {
-  'search_offset': number;
-  'activity_list': ExplorationSummaryDict[];
+interface SettingTabBackendDict {
+  'draftEmailBody': string;
 }
 
+interface SettingTabResponse {
+  draftEmailBody: string
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class SearchBackendApiService {
+export class SettingTabBackendApiService {
   constructor(private http: HttpClient) {}
 
-  async fetchExplorationSearchResultAsync(
-      searchQuery: string): Promise<SearchResponseBackendDict> {
-    return this.http.get<SearchResponseBackendDict>(
-      ServicesConstants.SEARCH_DATA_URL + searchQuery).toPromise();
+  getData(url: string): Promise<SettingTabResponse> {
+    return this.http.get<SettingTabBackendDict>(url).toPromise();
   }
 }
 
 angular.module('oppia').factory(
-  'SearchBackendApiService',
-  downgradeInjectable(SearchBackendApiService));
+  'SettingTabBackendApiService',
+  downgradeInjectable(SettingTabBackendApiService));
