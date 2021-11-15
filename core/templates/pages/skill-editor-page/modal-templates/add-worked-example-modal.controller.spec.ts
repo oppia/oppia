@@ -53,10 +53,10 @@ describe('Add Worked Example Modal Controller', function() {
       var contentText = 'This is just a sample text.';
 
       $scope.tmpWorkedExampleQuestionHtml = contentText;
-      expect($scope.isEditorContentLengthExceeded()).toBe(false);
+      expect($scope.isWorkedExampleQuestionHtmlLengthExceeded()).toBe(false);
 
       $scope.tmpWorkedExampleQuestionHtml = contentText.repeat(50);
-      expect($scope.isEditorContentLengthExceeded()).toBe(true);
+      expect($scope.isWorkedExampleQuestionHtmlLengthExceeded()).toBe(true);
     });
 
   it('should check content length in example explanation within 1000 chars',
@@ -64,9 +64,9 @@ describe('Add Worked Example Modal Controller', function() {
       var contentText = 'This is just a sample text.';
 
       $scope.tmpWorkedExampleExplanationHtml = contentText;
-      expect($scope.isEditorContentLengthExceeded()).toBe(false);
+      expect($scope.isWorkedExampleExplanationHtmlLengthExceeded()).toBe(false);
 
       $scope.tmpWorkedExampleExplanationHtml = contentText.repeat(50);
-      expect($scope.isEditorContentLengthExceeded()).toBe(true);
+      expect($scope.isWorkedExampleExplanationHtmlLengthExceeded()).toBe(true);
     });
 });

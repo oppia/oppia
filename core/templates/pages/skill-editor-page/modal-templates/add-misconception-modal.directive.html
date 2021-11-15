@@ -38,6 +38,9 @@
         </div>
         <schema-based-editor class="protractor-test-notes-textarea" schema="MISCONCEPTION_PROPERTY_FORM_SCHEMA" local-value="misconceptionNotes">
         </schema-based-editor>
+        <div ng-if="isMisconceptionNotesHtmlLengthExceeded()" class="oppia-length-validation-error mt-2">
+           Please shorten the content (images, tabs, and other special items take up the most storage).
+        </div>
       </div>
       <div class="oppia-misconception-editor-section">
         <strong>Default Feedback</strong>
@@ -46,13 +49,13 @@
         </div>
         <schema-based-editor class="protractor-test-feedback-textarea" schema="MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA" local-value="misconceptionFeedback">
         </schema-based-editor>
+        <div ng-if="isMisconceptionFeedbackHtmlLengthExceeded()" class="oppia-length-validation-error mt-2">
+           Please shorten the content (images, tabs, and other special items take up the most storage).
+        </div>
       </div>
       <div class="oppia-misconception-editor-section">
         <strong>Should a response to this misconception be enforced on every question linked to this skill?</strong>
         <input type="checkbox" ng-model="misconceptionMustBeAddressed">
-      </div>
-      <div ng-if="isEditorContentLengthExceeded()" class="oppia-length-validation-error">
-        The content length is too long. Please use at most 1000 characters.
       </div>
     </div>
   </div>
@@ -61,7 +64,7 @@
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-add-misconception-button"
             ng-click="saveMisconception()"
-            ng-disabled="!misconceptionName || misconceptionNameIsDuplicate || isEditorContentLengthExceeded() || misconceptionFeedback.length === 0"
+            ng-disabled="!misconceptionName || misconceptionNameIsDuplicate || misconceptionFeedback.length === 0 || isMisconceptionNotesHtmlLengthExceeded() || isMisconceptionFeedbackHtmlLengthExceeded() "
     >Save</button>
   </div>
 </div>
