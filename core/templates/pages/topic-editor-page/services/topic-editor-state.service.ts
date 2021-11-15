@@ -95,7 +95,9 @@ export class TopicEditorStateService {
 
   private _updateGroupedSkillSummaries(
       groupedSkillSummaries: {
-        [topicName: string]: SkillSummaryBackendDict[]; }): void {
+        [topicName: string]: SkillSummaryBackendDict[];
+      }
+  ): void {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
