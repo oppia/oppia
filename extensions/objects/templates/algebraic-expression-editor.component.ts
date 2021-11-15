@@ -29,6 +29,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
+import { TranslateService } from '@ngx-translate/core';
 
 interface FocusObj {
   focused: boolean;
@@ -56,7 +57,8 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private mathInteractionsService: MathInteractionsService,
-    private eventBusService: EventBusService
+    private eventBusService: EventBusService,
+    private translateService: TranslateService
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
@@ -68,10 +70,10 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     }
     this.currentValue = this.value;
     this.guppyConfigurationService.init();
+    let translatedPlaceholder = this.translateService.instant(
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
     this.guppyInitializationService.init(
-      'guppy-div-creator',
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
-      this.value);
+      'guppy-div-creator', translatedPlaceholder, this.value);
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
