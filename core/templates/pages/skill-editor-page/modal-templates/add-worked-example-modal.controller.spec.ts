@@ -50,7 +50,7 @@ describe('Add Worked Example Modal Controller', function() {
 
   it('should check content length in example questions within 1000 chars',
     function() {
-      var contentText = 'This is just a sample text.';
+      var contentText = 'This is just a random text.';
 
       $scope.tmpWorkedExampleQuestionHtml = contentText;
       expect($scope.isWorkedExampleQuestionHtmlLengthExceeded()).toBe(false);
@@ -61,7 +61,7 @@ describe('Add Worked Example Modal Controller', function() {
 
   it('should check content length in example explanation within 1000 chars',
     function() {
-      var contentText = 'This is just a sample text.';
+      var contentText = 'This is just a random text.';
 
       $scope.tmpWorkedExampleExplanationHtml = contentText;
       expect($scope.isWorkedExampleExplanationHtmlLengthExceeded()).toBe(false);
