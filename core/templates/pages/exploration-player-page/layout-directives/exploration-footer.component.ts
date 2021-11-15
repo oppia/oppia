@@ -41,7 +41,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   resizeSubscription!: Subscription;
   contributorNames: string[] = [];
-  hintsAndSolutionsAreShown: boolean = true;
+  hintsAndSolutionsAreSupported: boolean = true;
 
   constructor(
     private contextService: ContextService,
@@ -102,7 +102,7 @@ export class ExplorationFooterComponent {
     if (this.contextService.isInQuestionPlayerMode()) {
       this.questionPlayerStateService.resultsPageIsLoadedEventEmitter
         .subscribe((resultsLoaded: boolean) => {
-          this.hintsAndSolutionsAreShown = !resultsLoaded;
+          this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
     }
   }

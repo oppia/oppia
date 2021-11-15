@@ -130,7 +130,7 @@ describe('ExplorationFooterComponent', () => {
   it('should not show hints after user finishes practice session' +
   ' and results are loadeed.', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    expect(component.hintsAndSolutionsAreShown).toBeTrue();
+    expect(component.hintsAndSolutionsAreSupported).toBeTrue();
 
     spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
       .and.returnValue(mockResultsLoadedEventEmitter);
@@ -138,7 +138,7 @@ describe('ExplorationFooterComponent', () => {
     component.ngOnInit();
     mockResultsLoadedEventEmitter.emit(true);
 
-    expect(component.hintsAndSolutionsAreShown).toBeFalse();
+    expect(component.hintsAndSolutionsAreSupported).toBeFalse();
   });
 
   it('should show hints when initialized in question player when user is' +
@@ -149,7 +149,7 @@ describe('ExplorationFooterComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.hintsAndSolutionsAreShown).toBeTrue();
+    expect(component.hintsAndSolutionsAreSupported).toBeTrue();
     expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe)
       .toHaveBeenCalled();
   });
