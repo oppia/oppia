@@ -589,7 +589,8 @@ class Exploration:
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
-            proto_size_in_bytes: int. Size of exploration.
+            proto_size_in_bytes: int. The byte size of the exploration
+                proto object.
         """
         self.id = exploration_id
         self.title = title
@@ -662,10 +663,7 @@ class Exploration:
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
-        exp_android_proto = cls.to_proto(
-            exploration_id, title, 0, init_state_name, exploration.states)
-        exp_android_proto_size = cls.calculate_size_of_proto(
-            exp_android_proto)
+        exp_android_proto_size = exploration.get_proto_size()
         cls.update_proto_size_in_bytes(cls, exp_android_proto_size)
         return exploration
 
@@ -1454,7 +1452,8 @@ class Exploration:
         """Update exploration's size in proto.
 
         Args:
-            proto_size_in_bytes: int. Size of exploration.
+            proto_size_in_bytes: int. The byte size of the exploration
+                proto object.
         """
         self.proto_size_in_bytes = proto_size_in_bytes
 
@@ -2250,8 +2249,9 @@ class Exploration:
             dict. The dict representation of the Exploration domain object,
             following schema version v55.
         """
-
-        exploration_dict['proto_size_in_bytes'] = 0
+        exploration = cls.from_dict(exploration_dict)
+        exploration_dict['proto_size_in_bytes'] = (
+            exploration.get_proto_size())
         return exploration_dict
 
     @classmethod
@@ -2513,46 +2513,34 @@ class Exploration:
 
         return html_list
 
-    @classmethod
-    def to_proto(
-            cls, exploration_id, title, version, init_state_name, states):
-        """Calculate the exploration size by setting exploration proto.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-            title: str. The exploration title.
-            version: int. The version of the exploration.
-            init_state_name: str|None. The name of the initial state.
-            states: list|None. The list of state
-                domain objects.
+    def to_proto(self):
+        """Returns a proto representation of the exploration object.
 
         Returns:
-            Proto Object. The exploration proto object.
+            Exploration. The exploration proto object.
         """
         state_protos = {}
         exploration_proto = {}
-        if states is not None:
-            state_protos = state_domain.State.to_proto(states)
+        for (state_name, state) in self.states.items():
+            state_proto = state.to_proto()
+            state_protos[state_name] = state_proto
 
-        if isinstance(title, str):
+        if isinstance(self.title, str):
             exploration_proto = exploration_pb2.Exploration(
-                id=exploration_id,
-                content_version=version,
-                init_state_name=init_state_name,
-                title=title,
+                id=self.id,
+                content_version=self.version,
+                init_state_name=self.init_state_name,
+                title=self.title,
                 states=state_protos)
         return exploration_proto
 
-    @classmethod
-    def calculate_size_of_proto(cls, proto):
+    def get_proto_size(self):
         """Calculate the byte size of the proto object.
-
-        Args:
-            proto: proto object. The proto object.
 
         Returns:
             Int. The byte size of the proto object.
         """
+        proto = self.to_proto()
         return int(proto.ByteSize())
 
 

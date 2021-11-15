@@ -107,26 +107,19 @@ class AnswerGroup:
             answer_group_dict['tagged_skill_misconception_id']
         )
 
-    @classmethod
-    def to_proto(cls, answer_group):
-        """Creates a BaseAnswerGroup proto object.
-
-        Args:
-            answer_group: AnswerGroup. The domain object of
-                an AnswerGroup class.
+    def to_proto(self):
+        """Returns a proto representation of the answer group object.
 
         Returns:
-            Proto Object. The BaseAnswerGroup proto object.
+            BaseAnswerGroup. The BaseAnswerGroup proto object.
         """
-        outcome_proto = Outcome.to_proto(
-            answer_group.outcome.dest, answer_group.outcome.feedback,
-            answer_group.outcome.labelled_as_correct)
+        outcome_proto = self.outcome.to_proto()
 
         minsconception_proto = None
-        if answer_group.tagged_skill_misconception_id is not None:
-            minsconception_proto = cls._to_misconception_proto(
-                answer_group.tagged_skill_misconception_id,
-                answer_group.tagged_skill_misconception_id)
+        if self.tagged_skill_misconception_id is not None:
+            minsconception_proto = self._to_misconception_proto(
+                self.tagged_skill_misconception_id,
+                self.tagged_skill_misconception_id)
 
         base_answer_proto = state_pb2.BaseAnswerGroup(
             outcome=outcome_proto,
@@ -143,7 +136,7 @@ class AnswerGroup:
             misconception_id: int. The misconception id to be validated.
 
         Returns:
-            Proto Object. The Misconception proto object.
+            Misconception. The Misconception proto object.
         """
         misconception_proto = state_pb2.Misconception(
             skill_id=skill_id,
@@ -341,20 +334,14 @@ class Hint:
         hint_content.validate()
         return cls(hint_content)
 
-    @classmethod
-    def to_proto(cls, hint):
-        """Creates a Hint proto object.
-
-        Args:
-            hint: Hint. The hint domain object.
+    def to_proto(self):
+        """Returns a proto representation of the hint object.
 
         Returns:
-            Proto Object. The Hint proto object.
+            Hint. The Hint proto object.
         """
         hint_content_proto = (
-            SubtitledHtml.to_proto(
-                hint.hint_content.content_id,
-                hint.hint_content.html))
+            self.hint_content.to_proto())
         hint_proto = state_pb2.Hint(
             hint_content=hint_content_proto)
 
@@ -449,20 +436,14 @@ class Solution:
                     solution_dict['correct_answer']),
             explanation)
 
-    @classmethod
-    def to_proto(cls, explanation):
-        """Creates a BaseSolution proto object.
-
-        Args:
-            explanation: Explanation. The explanation of a solution.
+    def to_proto(self):
+        """Returns a proto representation of the solution object.
 
         Returns:
-            Proto Object. The BaseSolution proto object.
+            BaseSolution. The BaseSolution proto object.
         """
         base_solution_proto = state_pb2.BaseSolution(
-            explanation=SubtitledHtml.to_proto(
-                explanation.content_id,
-                explanation.html))
+            explanation=self.explanation.to_proto())
 
         return base_solution_proto
 
@@ -623,70 +604,65 @@ class InteractionInstance:
             [Hint.from_dict(h) for h in interaction_dict['hints']],
             solution_dict)
 
-    @classmethod
-    def to_proto(cls, interaction):
-        """Creates a InteractionInstance proto object.
-
-        Args:
-            interaction: InteractionInstance. The interaction instance
-                domain object.
+    def to_proto(self):
+        """Returns a proto representation of the interaction object.
 
         Returns:
-            Proto Object. The InteractionInstance proto object.
+            InteractionInstance. The InteractionInstance proto object.
         """
         interaction_proto = None
-        if interaction.id == 'Continue':
+        if self.id == 'Continue':
             interaction_proto = state_pb2.InteractionInstance(
-                continue_instance=cls._to_continue_proto(interaction))
+                continue_instance=self._to_continue_proto(self))
 
-        if interaction.id == 'FractionInput':
+        if self.id == 'FractionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                fraction_input=cls._to_fraction_interaction_proto(
-                    interaction))
+                fraction_input=self._to_fraction_interaction_proto(
+                    self))
 
-        if interaction.id == 'ItemSelectionInput':
+        if self.id == 'ItemSelectionInput':
             interaction_proto = state_pb2.InteractionInstance(
                 item_selection_input=(
-                    cls._to_item_selection_single_interaction_proto(
-                        interaction)))
+                    self._to_item_selection_single_interaction_proto(
+                        self)))
 
-        if interaction.id == 'MultipleChoiceInput':
+        if self.id == 'MultipleChoiceInput':
             interaction_proto = state_pb2.InteractionInstance(
                 multiple_choice_input=(
-                    cls._to_multiple_choice_interaction_proto(
-                        interaction)))
+                    self._to_multiple_choice_interaction_proto(
+                        self)))
 
-        if interaction.id == 'NumericInput':
+        if self.id == 'NumericInput':
             interaction_proto = state_pb2.InteractionInstance(
-                numeric_input=cls._to_numeric_interaction_proto(
-                    interaction))
+                numeric_input=self._to_numeric_interaction_proto(
+                    self))
 
-        if interaction.id == 'TextInput':
+        if self.id == 'TextInput':
             interaction_proto = state_pb2.InteractionInstance(
-                text_input=cls._to_text_input_interaction_proto(
-                    interaction))
+                text_input=self._to_text_input_interaction_proto(
+                    self))
 
-        if interaction.id == 'RatioExpressionInput':
+        if self.id == 'RatioExpressionInput':
             interaction_proto = state_pb2.InteractionInstance(
                 ratio_expression_input=(
-                    cls._to_ratio_expression_interaction_proto(
-                        interaction)))
+                    self._to_ratio_expression_interaction_proto(
+                        self)))
 
-        if interaction.id == 'ImageClickInput':
+        if self.id == 'ImageClickInput':
             interaction_proto = state_pb2.InteractionInstance(
                 image_click_input=(
-                    cls._to_image_click_interaction_proto(
-                        interaction)))
+                    self._to_image_click_interaction_proto(
+                        self)))
 
-        if interaction.id == 'DragAndDropSortInput':
+        if self.id == 'DragAndDropSortInput':
             interaction_proto = state_pb2.InteractionInstance(
                 drag_and_drop_sort_input=(
-                    cls._to_drag_and_drop_interaction_proto(
-                        interaction)))
+                    self._to_drag_and_drop_interaction_proto(
+                        self)))
 
-        if interaction.id == 'EndExploration':
+        if self.id == 'EndExploration':
             interaction_proto = state_pb2.InteractionInstance(
-                end_exploration=cls._to_end_exploration_proto())
+                end_exploration=self._to_end_exploration_proto())
 
         return interaction_proto
 
@@ -699,12 +675,9 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The ContinueInstance proto object.
+            ContinueInstance. The ContinueInstance proto object.
         """
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
         customization_args_proto = (
             cls._to_continue_customization_args_proto(
                 interaction.customization_args))
@@ -726,13 +699,11 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
         customization_arg_proto = (
             state_pb2.ContinueInstance.CustomizationArgs(
-                button_text=SubtitledUnicode.to_proto(
-                    customization_args['buttonText'].value.content_id,
-                    customization_args['buttonText'].value.unicode_str)))
+                button_text=customization_args['buttonText'].value.to_proto()))
 
         return customization_arg_proto
 
@@ -745,16 +716,13 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The FractionInputInstance proto object.
+            FractionInputInstance. The FractionInputInstance proto object.
         """
         customization_args_proto = (
             cls._to_fraction_customization_args_proto(
                 interaction.customization_args))
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         solution_proto = cls._to_fraction_solution_proto(
             interaction.solution)
@@ -782,7 +750,7 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
         customization_arg_proto = (
             state_pb2.FractionInputInstance.CustomizationArgs(
@@ -805,15 +773,13 @@ class InteractionInstance:
                 for the question asked in this interaction.
 
         Returns:
-            Proto Object. The Solution proto object.
+            Solution. The Solution proto object.
         """
         solution_proto = None
         if solution is not None:
             solution_proto = (
                 state_pb2.FractionInputInstance.Solution(
-                base_solution=(
-                    Solution.to_proto(
-                        solution.explanation)),
+                base_solution=solution.to_proto(),
                 correct_answer=(
                     cls._to_fraction_proto(
                         solution.correct_answer))))
@@ -830,13 +796,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_fraction_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_proto = (
@@ -855,7 +820,7 @@ class InteractionInstance:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            Proto Object. The RuleSpec proto object list.
+            list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
         rules_specs_proto = {}
@@ -956,7 +921,7 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The IsExactlyEqualToSpec
+            IsExactlyEqualToSpec. The IsExactlyEqualToSpec
             proto object.
         """
         is_exactly_equal_to_proto = (
@@ -973,7 +938,7 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The IsEquivalentToSpec
+            IsEquivalentToSpec. The IsEquivalentToSpec
             proto object.
         """
         equivalent_to_proto = (
@@ -990,8 +955,8 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The IsEquivalentToAndInSimplestFormSpec
-            proto object.
+            IsEquivalentToAndInSimplestFormSpec. The
+            IsEquivalentToAndInSimplestFormSpec proto object.
         """
         is_equivalent_to_and_in_simplest_form_proto = (
             state_pb2.FractionInputInstance
@@ -1008,7 +973,7 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The IsLessThanSpec
+            IsLessThanSpec. The IsLessThanSpec
             proto object.
         """
         is_less_than_proto = (
@@ -1025,7 +990,7 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The IsGreaterThanSpec
+            IsGreaterThanSpec. The IsGreaterThanSpec
             proto object.
         """
         is_greater_than_proto = (
@@ -1042,7 +1007,7 @@ class InteractionInstance:
             f: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The HasNumeratorEqualToSpec
+            HasNumeratorEqualToSpec. The HasNumeratorEqualToSpec
             proto object.
         """
         has_numerator_equal_to_proto = (
@@ -1060,7 +1025,7 @@ class InteractionInstance:
             f: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The HasDenominatorEqualToSpec
+            HasDenominatorEqualToSpec. The HasDenominatorEqualToSpec
             proto object.
         """
         has_denominator_equal_to_proto = (
@@ -1078,7 +1043,7 @@ class InteractionInstance:
             f: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The HasIntegerPartEqualToSpec
+            HasIntegerPartEqualToSpec. The HasIntegerPartEqualToSpec
             proto object.
         """
         has_integer_part_equal_to_proto = (
@@ -1093,7 +1058,7 @@ class InteractionInstance:
         """Creates a proto object for HasNoFractionalPartSpec.
 
         Returns:
-            Proto Object. The HasNoFractionalPartSpec
+            HasNoFractionalPartSpec. The HasNoFractionalPartSpec
             proto object.
         """
         has_no_fractional_part_proto = (
@@ -1111,8 +1076,8 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The HasFractionalPartExactlyEqualToSpec
-            proto object.
+            HasFractionalPartExactlyEqualToSpec. The
+            HasFractionalPartExactlyEqualToSpec proto object.
         """
         has_fractional_part_exactly_equal_to_proto = (
             state_pb2.FractionInputInstance
@@ -1129,7 +1094,7 @@ class InteractionInstance:
             fraction: Fraction. The fraction domain object.
 
         Returns:
-            Proto Object. The Fraction proto object.
+            Fraction. The Fraction proto object.
         """
         fraction_proto = objects_pb2.Fraction(
             is_negative=fraction['isNegative'],
@@ -1149,20 +1114,18 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The ItemSelectionInputInstance proto object.
+            ItemSelectionInputInstance. The
+            ItemSelectionInputInstance proto object.
         """
         customization_arg_proto = (
             cls._to_item_selection_single_customization_args_proto(
                 interaction.customization_args))
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         answer_groups_proto = (
@@ -1188,13 +1151,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = (
                 state_pb2.ItemSelectionInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto))
@@ -1215,12 +1177,11 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
         choices_list_proto = []
         for value in customization_args['choices'].value:
-            value_proto = SubtitledHtml.to_proto(
-                value.content_id, value.html)
+            value_proto = value.to_proto()
             choices_list_proto.append(value_proto)
 
         customization_arg_proto = (
@@ -1242,20 +1203,18 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The MultipleChoiceInputInstance proto object.
+            MultipleChoiceInputInstance. The
+            MultipleChoiceInputInstance proto object.
         """
         customization_args_proto = (
             cls._to_multiple_choice_customization_args_proto(
                 interaction.customization_args))
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         answer_groups_proto = cls._to_multiple_choice_answer_groups_proto(
@@ -1280,13 +1239,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = (
                 state_pb2.MultipleChoiceInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto))
@@ -1307,13 +1265,12 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = SubtitledHtml.to_proto(
-                value.content_id, value.html)
+            value_proto = value.to_proto()
             choices_list_proto.append(value_proto)
 
         customization_arg_proto = (
@@ -1331,16 +1288,13 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The NumericInputInstance proto object.
+            NumericInputInstance. The NumericInputInstance proto object.
         """
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_numeric_solution(
@@ -1367,13 +1321,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_numeric_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_proto = state_pb2.NumericInputInstance.AnswerGroup(
@@ -1391,7 +1344,7 @@ class InteractionInstance:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            Proto Object. The RuleSpec proto object list.
+            list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
         rules_specs_proto = {}
@@ -1461,7 +1414,7 @@ class InteractionInstance:
             x: Int. The number to check equality.
 
         Returns:
-            Proto Object. The EqualsSpec proto object.
+            EqualsSpec. The EqualsSpec proto object.
         """
         equals_to_proto = state_pb2.NumericInputInstance.RuleSpec.EqualsSpec(
             input=x)
@@ -1476,7 +1429,7 @@ class InteractionInstance:
             x: Int. The number to check less than.
 
         Returns:
-            Proto Object. The IsLessThanSpec proto object.
+            IsLessThanSpec. The IsLessThanSpec proto object.
         """
         is_less_than_proto = (
             state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
@@ -1492,7 +1445,7 @@ class InteractionInstance:
             x: Int. The number to check greater than.
 
         Returns:
-            Proto Object. The IsGreaterThanSpec proto object.
+            IsGreaterThanSpec. The IsGreaterThanSpec proto object.
         """
         is_greater_than_proto = (
             state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
@@ -1508,7 +1461,8 @@ class InteractionInstance:
             x: Int. The number to check less than or equal to.
 
         Returns:
-            Proto Object. The IsLessThanOrEqualToSpec proto object.
+            IsLessThanOrEqualToSpec. The
+            IsLessThanOrEqualToSpec proto object.
         """
         is_less_than_or_equal_to_proto = (
             state_pb2.NumericInputInstance
@@ -1525,7 +1479,8 @@ class InteractionInstance:
             x: Int. The number to check greater than or equal to.
 
         Returns:
-            Proto Object. The IsGreaterThanOrEqualToSpec proto object.
+            IsGreaterThanOrEqualToSpec. The
+            IsGreaterThanOrEqualToSpec proto object.
         """
         is_greater_than_or_equal_to_proto = (
             state_pb2.NumericInputInstance
@@ -1543,7 +1498,8 @@ class InteractionInstance:
             b: int|double. The upper range.
 
         Returns:
-            Proto Object. The IsInclusivelyBetweenSpec proto object.
+            IsInclusivelyBetweenSpec. The
+            IsInclusivelyBetweenSpec proto object.
         """
         is_inclusively_between_proto = (
             state_pb2.NumericInputInstance
@@ -1561,7 +1517,8 @@ class InteractionInstance:
             x: list. The list of range.
 
         Returns:
-            Proto Object. The IsWithinToleranceSpec proto object.
+            IsWithinToleranceSpec. The
+            IsWithinToleranceSpec proto object.
         """
         is_within_tolerance_proto = (
             state_pb2.NumericInputInstance
@@ -1581,13 +1538,12 @@ class InteractionInstance:
                 for the question asked in this interaction.
 
         Returns:
-            Proto Object. The Solution proto object.
+            Solution. The Solution proto object.
         """
         solution_proto = None
         if solution is not None:
             solution_proto = state_pb2.NumericInputInstance.Solution(
-                base_solution=Solution.to_proto(
-                    solution.explanation),
+                base_solution=solution.explanation.to_proto(),
                 correct_answer=solution.correct_answer)
 
         return solution_proto
@@ -1601,19 +1557,16 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The TextInputInstance proto object.
+            TextInputInstance. The TextInputInstance proto object.
         """
         customization_args_proto = cls._to_text_input_customization_args_proto(
             interaction.customization_args)
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_text_input_solution(interaction.solution)
@@ -1640,17 +1593,15 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = state_pb2.TextInputInstance.AnswerGroup(
                 base_answer_group=base_answer_group_proto)
             answer_group_list_proto.append(answer_group_proto)
-
         return answer_group_list_proto
 
     @classmethod
@@ -1663,14 +1614,12 @@ class InteractionInstance:
                 for the question asked in this interaction.
 
         Returns:
-            Proto Object. The Solution proto object.
+            Solution. The Solution proto object.
         """
         solution_proto = None
         if solution is not None:
             solution_proto = state_pb2.TextInputInstance.Solution(
-                base_solution=(
-                    Solution.to_proto(
-                        solution.explanation)),
+                base_solution=solution.to_proto(),
                 correct_answer=solution.correct_answer)
 
         return solution_proto
@@ -1687,7 +1636,7 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
 
         customization_arg_proto = state_pb2.TextInputInstance.CustomizationArgs(
@@ -1704,20 +1653,18 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The RatioExpressionInputInstance proto object.
+            RatioExpressionInputInstance. The
+            RatioExpressionInputInstance proto object.
         """
         customization_args_proto = (
             cls._to_ratio_expression_customization_args_proto(
                 interaction.customization_args))
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_ratio_expression_solution_proto(
@@ -1746,13 +1693,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_ratio_expression_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_proto = (
@@ -1771,7 +1717,7 @@ class InteractionInstance:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            Proto Object. The RuleSpec proto object list.
+            list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
         rules_specs_proto = {}
@@ -1813,7 +1759,7 @@ class InteractionInstance:
             ratio: Ratio. The Ratio domain object.
 
         Returns:
-            Proto Object. The EqualsSpec proto object.
+            EqualsSpec. The EqualsSpec proto object.
         """
         equals_to_proto = (
             state_pb2.RatioExpressionInputInstance.RuleSpec.EqualsSpec(
@@ -1829,7 +1775,7 @@ class InteractionInstance:
             ratio: Ratio. The Ratio domain object.
 
         Returns:
-            Proto Object. The IsEquivalentSpec proto object.
+            IsEquivalentSpec. The IsEquivalentSpec proto object.
         """
         is_equivalent_proto = (
             state_pb2.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec(
@@ -1845,7 +1791,8 @@ class InteractionInstance:
             input_term_count: int. The number of terms.
 
         Returns:
-            Proto Object. The HasNumberOfTermsEqualToSpec proto object.
+            HasNumberOfTermsEqualToSpec. The
+            HasNumberOfTermsEqualToSpec proto object.
         """
         has_numer_of_terms_equal_to_proto = (
             state_pb2.RatioExpressionInputInstance
@@ -1864,15 +1811,13 @@ class InteractionInstance:
                 for the question asked in this interaction.
 
         Returns:
-            Proto Object. The Solution proto object.
+            Solution. The Solution proto object.
         """
         solution_proto = None
         if solution is not None:
             solution_proto = (
                 state_pb2.RatioExpressionInputInstance.Solution(
-                    base_solution=(
-                        Solution.to_proto(
-                            solution.explanation)),
+                    base_solution=solution.explanation.to_proto(),
                     correct_answer=(
                         cls._to_ratio_expression_proto(
                             solution.correct_answer))))
@@ -1887,7 +1832,7 @@ class InteractionInstance:
             ratio_list: list. The list of ratios.
 
         Returns:
-            Proto Object. The RatioExpression proto object.
+            RatioExpression. The RatioExpression proto object.
         """
         ratio_list_proto = []
 
@@ -1912,7 +1857,7 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
 
         customization_arg_proto = (
@@ -1930,20 +1875,18 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The ImageClickInputInstance proto object.
+            ImageClickInputInstance. The
+            ImageClickInputInstance proto object.
         """
         customization_args_proto = (
             cls._to_image_click_customization_args_proto(
                 interaction.customization_args))
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         answer_groups_proto = cls._to_image_click_answer_groups_proto(
@@ -1967,13 +1910,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = AnswerGroup.to_proto(
-                answer_group)
+            base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_image_click_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_proto = state_pb2.ImageClickInputInstance.AnswerGroup(
@@ -1991,7 +1933,7 @@ class InteractionInstance:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            Proto Object. The RuleSpec proto object list.
+            list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
         rules_specs_proto = {}
@@ -2016,7 +1958,7 @@ class InteractionInstance:
             is_in_region: str. The input region name.
 
         Returns:
-            Proto Object. The IsInRegionSpec proto object.
+            IsInRegionSpec. The IsInRegionSpec proto object.
         """
         is_in_region_proto = (
             state_pb2.ImageClickInputInstance.RuleSpec.IsInRegionSpec(
@@ -2036,7 +1978,7 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
         image_and_regions_proto = cls._to_image_and_regions_proto(
             customization_args['imageAndRegions'])
@@ -2056,7 +1998,7 @@ class InteractionInstance:
                 image and regions.
 
         Returns:
-            Proto Object. The ImageWithRegions proto object.
+            ImageWithRegions. The ImageWithRegions proto object.
         """
         image_file_path = imageAndRegionsList.value['imagePath']
 
@@ -2078,7 +2020,7 @@ class InteractionInstance:
                 lable regions.
 
         Returns:
-            Proto Object. The LabeledRegion proto object list.
+            list. The LabeledRegion proto object list.
         """
         labeled_regions_list_proto = []
 
@@ -2101,7 +2043,7 @@ class InteractionInstance:
                 of x,y points.
 
         Returns:
-            Proto Object. The LabeledRegion proto object.
+            LabeledRegion. The LabeledRegion proto object.
         """
         normalized_rectangle_2d_proto = (
             cls._to_normalized_rectangle_2d_proto(area))
@@ -2122,7 +2064,7 @@ class InteractionInstance:
                 of x,y points.
 
         Returns:
-            Proto Object. The NormalizedRectangle2d proto object.
+            NormalizedRectangle2d. The NormalizedRectangle2d proto object.
         """
         normalized_rectangle_2d_proto = (
             objects_pb2.ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
@@ -2140,7 +2082,7 @@ class InteractionInstance:
                 of x,y points.
 
         Returns:
-            Proto Object. The Point2d proto object.
+            Point2d. The Point2d proto object.
         """
         points_proto = objects_pb2.NormalizedPoint2d(
             x=area[0],
@@ -2153,7 +2095,7 @@ class InteractionInstance:
         """Creates a EndExplorationInstance proto object.
 
         Returns:
-            Proto Object. The EndExplorationInstance proto object.
+            EndExplorationInstance. The EndExplorationInstance proto object.
         """
         end_exploration_proto = state_pb2.EndExplorationInstance()
 
@@ -2168,20 +2110,18 @@ class InteractionInstance:
                 associated with this state.
 
         Returns:
-            Proto Object. The DragAndDropSortInputInstance proto object.
+            DragAndDropSortInputInstance. The
+            DragAndDropSortInputInstance proto object.
         """
         customization_args_proto = (
             cls._to_drag_and_drop_customization_args_proto(
                 interaction.customization_args))
 
-        outcome_proto = Outcome.to_proto(
-            interaction.default_outcome.dest,
-            interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct)
+        outcome_proto = interaction.default_outcome.to_proto()
 
         hints_proto_list = []
         for hint in interaction.hints:
-            hint_proto = Hint.to_proto(hint)
+            hint_proto = hint.to_proto()
             hints_proto_list.append(hint_proto)
 
         solution_proto = cls._to_drag_and_drop_solution_proto(
@@ -2211,13 +2151,12 @@ class InteractionInstance:
                 interaction instance.
 
         Returns:
-            Proto Object. The AnswerGroup proto object list.
+            list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = (
-                AnswerGroup.to_proto(answer_group))
+            base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = (
                 state_pb2.DragAndDropSortInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto))
@@ -2235,14 +2174,13 @@ class InteractionInstance:
                 for the question asked in this interaction.
 
         Returns:
-            Proto Object. The Solution proto object.
+            Solution. The Solution proto object.
         """
         solution_proto = None
         if solution is not None:
             solution_proto = (
                 state_pb2.DragAndDropSortInputInstance.Solution(
-                    base_solution=Solution.to_proto(
-                        solution.explanation),
+                    base_solution=solution.explanation.to_proto(),
                     correct_answer=(
                         cls._to_list_of_set_of_translatable_html_content_ids(
                             solution.correct_answer))))
@@ -2259,8 +2197,8 @@ class InteractionInstance:
                 TranslatableHtmlContentId.
 
         Returns:
-            Proto Object. The ListOfSetsOfTranslatableHtmlContentIds
-            proto object.
+            ListOfSetsOfTranslatableHtmlContentIds. The
+            ListOfSetsOfTranslatableHtmlContentIds proto object.
         """
         content_id_lists_proto = []
 
@@ -2285,8 +2223,8 @@ class InteractionInstance:
                 TranslatableHtmlContentId.
 
         Returns:
-            Proto Object. The SetOfTranslatableHtmlContentIds
-            proto object.
+            SetOfTranslatableHtmlContentIds. The
+            SetOfTranslatableHtmlContentIds proto object.
         """
         content_id_lists_proto = []
 
@@ -2312,7 +2250,8 @@ class InteractionInstance:
                 TranslatableHtml content id.
 
         Returns:
-            Proto Object. The TranslatableHtmlContentId proto object.
+            TranslatableHtmlContentId. The
+            TranslatableHtmlContentId proto object.
         """
         translatable_html_content_id_proto = (
             objects_pb2.TranslatableHtmlContentId(
@@ -2332,13 +2271,12 @@ class InteractionInstance:
                 the customization arg.
 
         Returns:
-            Proto Object. The CustomizationArgs proto object.
+            CustomizationArgs. The CustomizationArgs proto object.
         """
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto = SubtitledHtml.to_proto(
-                value.content_id, value.html)
+            value_proto = value.to_proto()
             choices_list_proto.append(value_proto)
 
         customization_arg_proto = (
@@ -3061,28 +2999,17 @@ class Outcome:
             outcome_dict['missing_prerequisite_skill_id']
         )
 
-    @classmethod
-    def to_proto(
-            cls, destination_state, feedback, labelled_as_correct):
-        """Creates a Outcome proto object.
-
-        Args:
-            destination_state: str. The name of the destination state.
-            feedback: SubtitledHtml. Feedback to give to the user if this rule
-                is triggered.
-            labelled_as_correct: bool. Whether this outcome has been labelled
-                by the creator as corresponding to a "correct" answer.
+    def to_proto(self):
+        """Returns a proto representation of the outcome object.
 
         Returns:
-            Proto Object. The Outcome proto object.
+            Outcome. The Outcome proto object.
         """
-        feedback_proto = SubtitledHtml.to_proto(
-            feedback.content_id,
-            feedback.html)
+        feedback_proto = self.feedback.to_proto()
         outcome_proto = state_pb2.Outcome(
-            destination_state=destination_state,
+            destination_state=self.dest,
             feedback=feedback_proto,
-            labelled_as_correct=labelled_as_correct)
+            labelled_as_correct=self.labelled_as_correct)
 
         return outcome_proto
 
@@ -3210,25 +3137,16 @@ class Voiceover:
             voiceover_dict['needs_update'],
             voiceover_dict['duration_secs'])
 
-    @classmethod
-    def to_proto(cls, filename, file_size_bytes, duration_secs):
-        """Creates a Voiceover proto object.
-
-        Args:
-            filename: str. The corresponding voiceover file path.
-            file_size_bytes: int. The file size, in bytes. Used to display
-                potential bandwidth usage to the learner before they download
-                the file.
-            duration_secs: float. The duration in seconds for the voiceover
-                recording.
+    def to_proto(self):
+        """Returns a proto representation of the voiceover object.
 
         Returns:
-            Proto Object. The voiceover proto object.
+            Voiceover. The voiceover proto object.
         """
         voiceover_proto = languages_pb2.VoiceoverFile(
-            filename=filename,
-            file_size_bytes=file_size_bytes,
-            duration_secs=duration_secs)
+            filename=self.filename,
+            file_size_bytes=self.file_size_bytes,
+            duration_secs=self.duration_secs)
 
         return voiceover_proto
 
@@ -3369,32 +3287,27 @@ class WrittenTranslation:
             written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
-    @classmethod
-    def to_proto(cls, data_format, translation):
-        """Creates a WrittenTranslationContentMapping proto object.
-
-        Args:
-            data_format: str. The data format of the translated content.
-            translation: str|list(str). The translated content.
+    def to_proto(self):
+        """Returns a proto representation of the written translation object.
 
         Returns:
-            Proto Object. The written translation proto object.
+            WrittenTranslation. The written translation proto object.
         """
         written_translation_proto = None
-        if data_format == (
-            WrittenTranslation.DATA_FORMAT_HTML) or data_format == (
+        if self.data_format == (
+            WrittenTranslation.DATA_FORMAT_HTML) or self.data_format == (
                 WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
                     translatable_text=(
                         TranslatableItem.to_written_translatable_text_proto(
-                            translation))))
+                            self.translation))))
         else:
             written_translation_proto = (
                 languages_pb2.WrittenTranslation(
                     set_of_translatable_text=(
                         TranslatableItem.to_written_translatable_set_proto(
-                            translation))))
+                            self.translation))))
 
         return written_translation_proto
 
@@ -3484,20 +3397,15 @@ class WrittenTranslations:
 
         return cls(translations_mapping)
 
-    @classmethod
-    def to_proto(cls, written_translations):
-        """Creates a WrittenTranslations proto object.
-
-        Args:
-            written_translations: WrittenTranslations. The written translations
-                for the state contents.
+    def to_proto(self):
+        """Returns a proto representation of the written translations object.
 
         Returns:
-            Proto Object. The written translations proto object.
+            WrittenTranslations. The written translations proto object.
         """
         translation_language_mapping_protos = (
-            cls._to_translation_language_mapping_proto(
-                written_translations.translations_mapping))
+            self._to_translation_language_mapping_proto(
+                self.translations_mapping))
 
         written_translations_proto = languages_pb2.WrittenTranslations(
             translation_language_mapping=translation_language_mapping_protos)
@@ -3514,17 +3422,16 @@ class WrittenTranslations:
                 languages to WrittenTranslation objects.
 
         Returns:
-            Proto Object. The written translations proto object.
+            WrittenTranslations. The written translations proto object.
         """
         language_to_content_id_written_translation_map = (
             collections.defaultdict(dict))
         for (content_id, language_code_to_written_translation) in (
             translations_mapping.items()):
-            for (language_code, written_transaltion) in (
+            for (language_code, written_translation) in (
                 language_code_to_written_translation.items()):
-                written_translation_proto = WrittenTranslation.to_proto(
-                    written_transaltion.data_format,
-                    written_transaltion.translation)
+                written_translation_proto = (
+                    written_translation.to_proto())
                 language_to_content_id_written_translation_map[language_code][content_id] = written_translation_proto # pylint: disable=line-too-long
 
         language_code_to_enum_map = {
@@ -3844,20 +3751,15 @@ class RecordedVoiceovers:
 
         return cls(voiceovers_mapping)
 
-    @classmethod
-    def to_proto(cls, recorded_voiceovers):
-        """Creates a RecordedVoiceovers proto object.
-
-        Args:
-            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
-                the state contents and translations.
+    def to_proto(self):
+        """Returns a proto representation of the recorded voiceovers object.
 
         Returns:
-            Proto Object. The recorded voiceovers proto object.
+            RecordedVoicovers. The recorded voiceovers proto object.
         """
         voiceover_content_mapping_protos = (
-            cls._to_voiceovers_content_mapping_protos(
-                recorded_voiceovers.voiceovers_mapping))
+            self._to_voiceovers_content_mapping_protos(
+                self.voiceovers_mapping))
 
         recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
             voiceover_content_mapping=voiceover_content_mapping_protos)
@@ -3874,7 +3776,7 @@ class RecordedVoiceovers:
                 languages to the Voiceover objects.
 
         Returns:
-            Proto Object. The recorded voiceovers proto object.
+            RecordedVoiceovers. The recorded voiceovers proto object.
         """
         language_to_content_id_voiceover_file_map = (
             collections.defaultdict(dict))
@@ -3882,10 +3784,7 @@ class RecordedVoiceovers:
             voiceovers_mapping.items()):
             for (language_code, voiceover) in (
                 language_code_to_voiceover.items()):
-                voiceover_proto = Voiceover.to_proto(
-                    voiceover.filename,
-                    voiceover.file_size_bytes,
-                    voiceover.duration_secs)
+                voiceover_proto = voiceover.to_proto()
                 language_to_content_id_voiceover_file_map[language_code][content_id] = voiceover_proto # pylint: disable=line-too-long
 
         language_code_to_enum_map = {
@@ -4257,20 +4156,15 @@ class SubtitledHtml:
         return cls(
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
-    @classmethod
-    def to_proto(cls, content_id, text):
-        """Creates a SubtitledText proto object.
-
-        Args:
-            content_id: str. The id of the content.
-            text: str. The text of the content.
+    def to_proto(self):
+        """Returns a proto representation of the subtitled html object.
 
         Returns:
-            Proto object. The subtitled text proto object.
+            SubtitledText. The subtitled text proto object.
         """
         subtitled_text_proto = languages_pb2.SubtitledText(
-            content_id=content_id,
-            text=text)
+            content_id=self.content_id,
+            text=self.html)
 
         return subtitled_text_proto
 
@@ -4348,20 +4242,15 @@ class SubtitledUnicode:
             subtitled_unicode_dict['unicode_str']
         )
 
-    @classmethod
-    def to_proto(cls, content_id, text):
-        """Creates a SubtitledText proto object.
-
-        Args:
-            content_id: str. The id of the content.
-            text: str. The text of the content.
+    def to_proto(self):
+        """Returns a proto representation of the subtitled unicode object.
 
         Returns:
-            Proto object. The subtitled text proto object.
+            SubtitledText. The subtitled text proto object.
         """
         subtitled_text_proto = languages_pb2.SubtitledText(
-            content_id=content_id,
-            text=text)
+            content_id=self.content_id,
+            text=self.unicode_str)
 
         return subtitled_text_proto
 
@@ -4451,7 +4340,7 @@ class TranslatableItem:
             translation: str. The translated content.
 
         Returns:
-            Proto Object. The written translatable text proto object.
+            WrittenTranslatableText. The written translatable text proto object.
         """
         written_translatable_text_proto = (
             languages_pb2.WrittenTranslatableText(
@@ -4467,7 +4356,7 @@ class TranslatableItem:
             translation: list(str). The translated content.
 
         Returns:
-            Proto Object. The written translatable set proto object.
+            WrittenTranslatableSet. The written translatable set proto object.
         """
         written_translatable_set_proto = (
             languages_pb2.SetOfWrittenTranslatableText(
@@ -5421,34 +5310,21 @@ class State:
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
             False, is_initial_state, 0)
 
-    @classmethod
-    def to_proto(cls, states):
-        """Creates a State proto object.
-
-        Args:
-            states: list. The list of state
-                domain objects.
+    def to_proto(self):
+        """Returns a proto representation of the state object.
 
         Returns:
-            Proto Object. The state proto object.
+            State. The state proto object.
         """
-        state_protos = {}
-        for (state_name, state) in states.items():
-            state_proto = state_pb2.State(
-                content=SubtitledHtml.to_proto(
-                    state.content.content_id,
-                    state.content.html),
-                recorded_voiceovers=(
-                    RecordedVoiceovers.to_proto(
-                    state.recorded_voiceovers)),
-                written_translations=(
-                    WrittenTranslations.to_proto(
-                    state.written_translations)),
-                interaction=InteractionInstance.to_proto(
-                    state.interaction))
-            state_protos[state_name] = state_proto
+        state_proto = state_pb2.State(
+            content=self.content.to_proto(),
+            recorded_voiceovers=(
+                self.recorded_voiceovers.to_proto()),
+            written_translations=(
+                self.written_translations.to_proto()),
+            interaction=self.interaction.to_proto())
 
-        return state_protos
+        return state_proto
 
     @classmethod
     def convert_html_fields_in_state(

@@ -4457,8 +4457,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             customization_args,
             [], default_outcome, [], [], None)
         continue_interaction_proto = (
-            state_domain.InteractionInstance.to_proto(
-                continue_interaction))
+            continue_interaction.to_proto())
         self.assertEqual(
             continue_interaction_proto.continue_instance.customization_args.button_text.text, # pylint: disable=line-too-long
             'Click Me!')
@@ -4476,8 +4475,9 @@ class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
     def test_to_proto(self):
         """Test for to_proto."""
         # Test html type content.
-        subtitled_text_proto = state_domain.SubtitledHtml.to_proto(
-                'ca_placeholder_0', '<p>html</p>')
+
+        subtitled_text_proto = state_domain.SubtitledHtml(
+            'ca_placeholder_0', '<p>html</p>').to_proto()
         self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
         self.assertEqual(subtitled_text_proto.text, '<p>html</p>')
 
@@ -4506,8 +4506,8 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
         """Test for to_proto."""
-        subtitled_text_proto = state_domain.SubtitledUnicode.to_proto(
-                'ca_placeholder_0', '😍😍😍😍')
+        subtitled_text_proto = state_domain.SubtitledUnicode(
+            'ca_placeholder_0', '😍😍😍😍').to_proto()
         self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
         self.assertEqual(subtitled_text_proto.text, '😍😍😍😍')
 
@@ -4893,13 +4893,14 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             state_domain.WrittenTranslations.from_dict(
             written_translations_dict))
         written_translations_proto = (
-            state_domain.WrittenTranslations.to_proto(
-                written_translations))
-        # Language at zero item should be English.
+            written_translations.to_proto())
+        # Language at position zero should be same as item
+        # zero of LangaugeType enum.
         self.assertEqual(
             written_translations_proto.translation_language_mapping[0].language,
             1)
-        # Language at zero item should be Hindi.
+        # Language at position one should be same as item
+        # one of LangaugeType enum.
         self.assertEqual(
             written_translations_proto.translation_language_mapping[1].language,
             3)
@@ -4908,9 +4909,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
+
         written_translation_proto = (
-            state_domain.WrittenTranslation.to_proto(
-                'html', 'Test'))
+            state_domain.WrittenTranslation('html', 'Test', False).to_proto())
         self.assertEqual(
             written_translation_proto.translatable_text.translation,
             'Test')
@@ -5213,12 +5214,13 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         }
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
             recorded_voiceovers_dict)
-        recorded_voiceovers_proto = state_domain.RecordedVoiceovers.to_proto(
-            recorded_voiceovers)
-        # Language at zero item should be English.
+        recorded_voiceovers_proto = recorded_voiceovers.to_proto()
+        # Language at position zero should be same as item
+        # zero of LangaugeType enum.
         self.assertEqual(
             recorded_voiceovers_proto.voiceover_content_mapping[0].language, 1)
-        # Language at zero item should be Hindi.
+        # Language at position one should be same as item
+        # one of LangaugeType enum.
         self.assertEqual(
             recorded_voiceovers_proto.voiceover_content_mapping[1].language, 3)
 
@@ -5227,7 +5229,8 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(VoiceoverDomainTests, self).setUp()
-        self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
+        self.voiceover = state_domain.Voiceover(
+            'filename.mp3', 10, False, 15.0)
 
     def test_validate_non_str_filename(self):
         self.voiceover.validate()
@@ -5296,8 +5299,8 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             self.voiceover.validate()
 
     def test_to_proto(self):
-        voiceover_proto = state_domain.Voiceover.to_proto(
-            'filename.mp3', 10, 15.0)
+        voiceover_proto = state_domain.Voiceover(
+            'filename.mp3', 10, False, 15.0).to_proto()
         self.assertEqual(voiceover_proto.filename, 'filename.mp3')
         self.assertEqual(voiceover_proto.file_size_bytes, 10)
         self.assertEqual(voiceover_proto.duration_secs, 15.0)
@@ -5308,8 +5311,9 @@ class OutcomeDomainTests(test_utils.GenericTestBase):
     def test_to_proto(self):
         subtitled_html_feedback = state_domain.SubtitledHtml(
             'content_id', '<p>html</p>')
-        outcome_proto = state_domain.Outcome.to_proto(
-            'Second', subtitled_html_feedback, True)
+        outcome_proto = state_domain.Outcome(
+            'Second',
+            subtitled_html_feedback, True, [], None, None).to_proto()
         self.assertEqual(outcome_proto.destination_state, 'Second')
         self.assertEqual(outcome_proto.feedback.content_id, 'content_id')
         self.assertEqual(outcome_proto.feedback.text, '<p>html</p>')
@@ -5326,8 +5330,7 @@ class AnswerGroupDomainTests(test_utils.GenericTestBase):
             [],
             [],
             'skill_id-1')
-        base_answer_proto = state_domain.AnswerGroup.to_proto(
-            answer_group)
+        base_answer_proto = answer_group.to_proto()
         self.assertEqual(
             base_answer_proto.outcome.destination_state,
             'Second')
@@ -5354,7 +5357,7 @@ class HintDomainTests(test_utils.GenericTestBase):
         hint_1 = state_domain.Hint(
             state_domain.SubtitledHtml(
                     'hint_id_1', '<p>Hint 1</p>'))
-        hint_proto = state_domain.Hint.to_proto(hint_1)
+        hint_proto = hint_1.to_proto()
         self.assertEqual(
             hint_proto.hint_content.content_id, 'hint_id_1')
         self.assertEqual(
@@ -5366,8 +5369,7 @@ class SolutionDomainTests(test_utils.GenericTestBase):
     def test_to_proto(self):
         explanation = state_domain.SubtitledHtml(
                 'solution', '<p>This is a solution.</p>')
-        solution_proto = state_domain.Solution.to_proto(
-            explanation)
+        solution_proto = explanation.to_proto()
         self.assertEqual(
             solution_proto.explanation.content_id,
             'solution')

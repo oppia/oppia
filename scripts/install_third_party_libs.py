@@ -215,9 +215,7 @@ def ensure_system_python_libraries_are_installed(package, version):
 
 
 def rewrite_android_proto_files():
-    """Edit all android proto files as protobuf not
-    support config imports.
-    """
+    """Edit all android proto files."""
     # Since there is no simple configuration for imports when using protobuf to
     # generate Python files we need to manually fix the imports.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
@@ -255,30 +253,22 @@ def move_all_proto_files_to_third_party():
     """Move all proto files from subdirectories to the
     third_party folder.
     """
+    oppia_proto_api_path = (
+        os.path.join(
+            common.THIRD_PARTY_DIR,
+            'oppia-proto-api-introduce-proto-api-v1'))
     protobuf_dir = (
         pathlib.Path(
-            os.path.join(
-                common.THIRD_PARTY_DIR,
-                'oppia-proto-api-introduce-proto-api-v1'))
-            .glob('**/*.proto'))
+            oppia_proto_api_path).glob('**/*.proto'))
     for p in protobuf_dir:
         if p.suffix == '.proto':
             source = p.absolute()
-            destination = (
-                os.path.join(
-                    common.THIRD_PARTY_DIR,
-                    'oppia-proto-api-introduce-proto-api-v1/'))
+            destination = oppia_proto_api_path
             filename = os.path.basename(source)
             dest = os.path.join(destination, filename)
             shutil.move(str(source), str(dest))
-    if os.path.exists(
-        os.path.join(
-            common.THIRD_PARTY_DIR,
-            'oppia-proto-api-introduce-proto-api-v1/org')):
-        shutil.rmtree(
-            os.path.join(
-                common.THIRD_PARTY_DIR,
-                'oppia-proto-api-introduce-proto-api-v1/org'))
+    if os.path.exists(oppia_proto_api_path + '/org'):
+        shutil.rmtree(oppia_proto_api_path + '/org')
 
 
 def main() -> None:

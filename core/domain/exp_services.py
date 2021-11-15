@@ -562,13 +562,6 @@ def apply_change_list(exploration_id, change_list):
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
 
-        exp_android_proto = exploration.to_proto(
-            exploration.id, exploration.title, exploration.version,
-            exploration.init_state_name, exploration.states)
-        exp_android_proto_size = 0
-        if exp_android_proto != {}:
-            exp_android_proto_size = int(exp_android_proto.ByteSize())
-        exploration.update_proto_size_in_bytes(exp_android_proto_size)
         return exploration
 
     except Exception as e:
@@ -1149,6 +1142,9 @@ def update_exploration(
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
+
+    updated_exploration.update_proto_size_in_bytes(
+        updated_exploration.get_proto_size())
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
