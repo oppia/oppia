@@ -83,7 +83,8 @@ export class ExplorationHtmlFormatterService {
     const interactionInitTag = '<oppia-interactive-' + htmlInteractionId + '>';
     let directiveOuterHtml = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        interactionInitTag, interactionCustomizationArgs));
+        interactionInitTag, interactionCustomizationArgs)
+    ).replace('>', '');
     let spaceToBeAdded = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';

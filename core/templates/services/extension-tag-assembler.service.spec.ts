@@ -85,7 +85,7 @@ describe('Extension Tag Assembler Service', () => {
     };
     const expectedElement = '<p ' +
       'choices-with-value="&amp;quot;sampleChoice&amp;quot;" ' +
-      'test-with-value=&amp;quot;sampleValue&amp;quot;"' +
+      'test-with-value="&amp;quot;sampleValue&amp;quot;"' +
       '></p>';
 
     expect(
