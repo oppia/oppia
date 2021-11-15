@@ -32,7 +32,8 @@ export class SideNavigationBarComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @Input() display!: boolean;
    currentUrl!: string;
-   classroomSubmenuIsShown: boolean = false;
+   classroomSubmenuIsShownLEARN: boolean = true;
+   classroomSubmenuIsShownINVOLVED: boolean = false;
    PAGES_REGISTERED_WITH_FRONTEND = (
      AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -49,8 +50,28 @@ export class SideNavigationBarComponent {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
    }
 
-   toggleClassroomSubmenu(): void {
-     this.classroomSubmenuIsShown = !this.classroomSubmenuIsShown;
+   toggleClassroomSubmenuLearn(): void {
+     this.classroomSubmenuIsShownLEARN = !this.classroomSubmenuIsShownLEARN;
+     var expandicon = document.querySelector('.expand-icon-learn');
+     var bordertoggleEle = document.querySelector('.bordertoggle-learn');
+     expandicon.classList.toggle('oppia-sidebar-menu-icon-transition');
+     bordertoggleEle.classList.toggle('oppia-sidebar-submenu-toggle');
+   }
+
+   toggleClassroomSubmenuINVOLVED(): void {
+     this.classroomSubmenuIsShownINVOLVED =
+     !this.classroomSubmenuIsShownINVOLVED;
+     this.classroomSubmenuIsShownLEARN = false;
+     var expandicon = document.querySelector('.expand-icon-involved');
+     var bordertoggleEle = document.querySelector('.bordertoggle-involved');
+     expandicon.classList.toggle('oppia-sidebar-menu-icon-transition');
+     bordertoggleEle.classList.toggle('oppia-sidebar-submenu-toggle');
+
+
+     var expandiconLEARN = document.querySelector('.expand-icon-learn');
+     var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
+     expandiconLEARN.classList.remove('oppia-sidebar-menu-icon-transition');
+     bordertoggleEleLEARN.classList.remove('oppia-sidebar-submenu-toggle');
    }
 }
 
