@@ -29,6 +29,7 @@ redis==3.5.3
 requests==2.26.0
 requests-mock==1.9.3
 requests-toolbelt==0.9.1
+result==0.6.0
 rsa==4.7.2
 simplejson==3.17.5
 six==1.16.0

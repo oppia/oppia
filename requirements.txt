@@ -305,6 +305,8 @@ requests==2.26.0
     #   mailchimp3
     #   requests-mock
     #   requests-toolbelt
+result==0.6.0
+    # via -r requirements.in
 rsa==4.7.2
     # via
     #   -r requirements.in

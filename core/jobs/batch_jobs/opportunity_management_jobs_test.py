@@ -90,7 +90,7 @@ class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
         self.assertEqual(len(all_opportunity_models), 2)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 2')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         all_opportunity_models = list(
@@ -190,7 +190,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         opportunity_model = (
@@ -271,7 +271,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         all_opportunity_models = list(
@@ -349,7 +349,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         all_opportunity_models = list(
@@ -388,9 +388,9 @@ class GenerateExplorationOpportunitySummariesJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stderr=(
-                'FAILURE: Failed to regenerate opportunities for topic id: '
+                'ERROR: "Failed to regenerate opportunities for topic id: '
                 'topic_1_id, missing_exp_with_ids: [], '
-                'missing_story_with_ids: [\'missing_id\']'
+                'missing_story_with_ids: [\'missing_id\']": 1'
             ))
         ])
 
@@ -439,9 +439,9 @@ class GenerateExplorationOpportunitySummariesJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stderr=(
-                'FAILURE: Failed to regenerate opportunities for topic id: '
+                'ERROR: "Failed to regenerate opportunities for topic id: '
                 'topic_1_id, missing_exp_with_ids: [\'missing_id\'], '
-                'missing_story_with_ids: []'
+                'missing_story_with_ids: []": 1'
             ))
         ])
 
@@ -524,8 +524,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS'),
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         all_opportunity_models = list(
