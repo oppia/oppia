@@ -40,7 +40,8 @@ interface RteHelperService {
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
     customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-    onDismissCallback) => void;
+    onDismissCallback
+  ) => void;
 }
 
 import { Injectable } from '@angular/core';

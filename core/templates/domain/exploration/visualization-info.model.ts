@@ -36,11 +36,11 @@ export interface AnswerStatsBackendDict {
 export type Option = string | string[];
 
 export interface VisualizationInfoBackendDict {
-    'addressed_info_is_supported': boolean;
-    'data': AnswerStatsBackendDict[];
-    'id': string;
-    'options': {
-      [name: string]: Option;
+  'addressed_info_is_supported': boolean;
+  'data': AnswerStatsBackendDict[];
+  'id': string;
+  'options': {
+    [name: string]: Option;
   };
 }
 
