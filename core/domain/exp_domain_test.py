@@ -2912,21 +2912,6 @@ title: Title
         notdemo2 = exp_domain.Exploration.create_default_exploration('abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
-    def test_to_proto(self):
-        """Test for to_proto."""
-        demo_exp = exp_domain.Exploration.create_default_exploration(
-            '0', 'Audio Test')
-        exp_proto = exp_domain.Exploration.to_proto(
-            '0', 'Audio Test', 1, None, None)
-        self.assertEqual(
-            demo_exp.to_proto('0', 'Audio Test', 1, None, None), exp_proto)
-
-    def test_calculate_size_of_proto(self):
-        """Test for calculate_size_of_proto."""
-        exp_proto = exp_domain.Exploration.to_proto(
-            '0', 'Audio Test', 1, None, None)
-        self.assertEqual(exp_proto.ByteSize(), 17)
-
     def test_has_state_name(self):
         """Test for has_state_name."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -3320,12 +3305,8 @@ title: Title
         """Test proto size calculation function."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp_id', self.sample_yaml_content_for_proto)
-        exploration_proto = exp_domain.Exploration.to_proto(
-            exploration.id, exploration.title, exploration.version,
-            exploration.init_state_name, exploration.states)
 
-        exploration_proto_size = exp_domain.Exploration.calculate_size_of_proto(
-            exploration_proto)
+        exploration_proto_size = exploration.get_proto_size()
         self.assertEqual(exploration_proto_size, 4456)
 
 
