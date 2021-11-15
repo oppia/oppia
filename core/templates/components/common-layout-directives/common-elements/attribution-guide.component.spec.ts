@@ -119,6 +119,7 @@ describe('Attribution Guide Component', function() {
   function() {
     let widthSpy = spyOn(windowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(400);
+
     expect(component.checkMobileView()).toBe(true);
   });
 
@@ -127,6 +128,7 @@ describe('Attribution Guide Component', function() {
   function() {
     let widthSpy = spyOn(windowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(1025);
+
     expect(component.checkMobileView()).toBe(false);
   });
 
