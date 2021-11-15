@@ -29,6 +29,7 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
