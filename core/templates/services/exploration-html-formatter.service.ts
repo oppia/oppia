@@ -79,14 +79,11 @@ export class ExplorationHtmlFormatterService {
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
       savedSolution: string | null): string {
-    var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
-    var element = $('<oppia-interactive-' + htmlInteractionId + '>');
-
-    element = (
+    const htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
+    const interactionInitTag = '<oppia-interactive-' + htmlInteractionId + '>';
+    let directiveOuterHtml = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        element, interactionCustomizationArgs));
-    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
-    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
+        interactionInitTag, interactionCustomizationArgs));
     let spaceToBeAdded = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
@@ -121,6 +118,7 @@ export class ExplorationHtmlFormatterService {
     if (spaceToBeAdded) {
       directiveOuterHtml += ' ';
     }
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
     directiveOuterHtml += getLastAnswer() + tagEnd;
     return directiveOuterHtml;
   }

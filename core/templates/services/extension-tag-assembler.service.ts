@@ -81,19 +81,26 @@ export class ExtensionTagAssemblerService {
   }
 
   formatCustomizationArgAttrs(
-      element: JQuery,
-      customizationArgs: InteractionCustomizationArgs
-  ): JQuery {
+      interactionHtml: string, customizationArgs: InteractionCustomizationArgs
+  ): string {
     const caBackendDict = (
       this._convertCustomizationArgsToBackendDict(customizationArgs)
     ) as Record<string, Record<string, Object>>;
     for (const caName in customizationArgs) {
       const caBackendDictValue = caBackendDict[caName].value;
-      element.attr(
-        this.camelCaseToHyphens.transform(caName) + '-with-value',
-        this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
+      const angleBracketIndex = interactionHtml.indexOf('>');
+      const hyphenatedCaName = this.camelCaseToHyphens.transform(caName);
+      const escapedJson = this.htmlEscaperService.unescapedStrToEscapedStr(
+        this.htmlEscaperService.objToEscapedJson(caBackendDictValue)
+      );
+      const attr = ` ${hyphenatedCaName}-with-value="${escapedJson}"`;
+      interactionHtml = (
+        interactionHtml.substring(0, angleBracketIndex) +
+        attr +
+        interactionHtml.substring(angleBracketIndex)
+      );
     }
-    return element;
+    return interactionHtml;
   }
 }
 
