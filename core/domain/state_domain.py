@@ -1411,13 +1411,16 @@ class InteractionInstance:
         """Creates a EqualsSpec proto object.
 
         Args:
-            x: Int. The number to check equality.
+            x: int|float. The number to check equality.
 
         Returns:
             EqualsSpec. The EqualsSpec proto object.
         """
-        equals_to_proto = state_pb2.NumericInputInstance.RuleSpec.EqualsSpec(
-            input=x)
+        equals_to_proto = {}
+        if isinstance(x, (int, float)):
+            equals_to_proto = (
+                state_pb2.NumericInputInstance.RuleSpec.EqualsSpec(
+                    input=x))
 
         return equals_to_proto
 
@@ -1426,14 +1429,16 @@ class InteractionInstance:
         """Creates a IsLessThanSpec proto object.
 
         Args:
-            x: Int. The number to check less than.
+            x: int|float. The number to check less than.
 
         Returns:
             IsLessThanSpec. The IsLessThanSpec proto object.
         """
-        is_less_than_proto = (
-            state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
-                input=x))
+        is_less_than_proto = {}
+        if isinstance(x, (int, float)):
+            is_less_than_proto = (
+                state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
+                    input=x))
 
         return is_less_than_proto
 
@@ -1442,14 +1447,16 @@ class InteractionInstance:
         """Creates a IsGreaterThanSpec proto object.
 
         Args:
-            x: Int. The number to check greater than.
+            x: int|float. The number to check greater than.
 
         Returns:
             IsGreaterThanSpec. The IsGreaterThanSpec proto object.
         """
-        is_greater_than_proto = (
-            state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
-                input=x))
+        is_greater_than_proto = {}
+        if isinstance(x, (int, float)):
+            is_greater_than_proto = (
+                state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
+                    input=x))
 
         return is_greater_than_proto
 
@@ -1458,16 +1465,18 @@ class InteractionInstance:
         """Creates a IsLessThanOrEqualToSpec proto object.
 
         Args:
-            x: Int. The number to check less than or equal to.
+            x: int|float. The number to check less than or equal to.
 
         Returns:
             IsLessThanOrEqualToSpec. The
             IsLessThanOrEqualToSpec proto object.
         """
-        is_less_than_or_equal_to_proto = (
-            state_pb2.NumericInputInstance
-            .RuleSpec.IsLessThanOrEqualToSpec(
-                input=x))
+        is_less_than_or_equal_to_proto = {}
+        if isinstance(x, (int, float)):
+            is_less_than_or_equal_to_proto = (
+                state_pb2.NumericInputInstance
+                .RuleSpec.IsLessThanOrEqualToSpec(
+                    input=x))
 
         return is_less_than_or_equal_to_proto
 
@@ -1476,16 +1485,18 @@ class InteractionInstance:
         """Creates a IsGreaterThanOrEqualToSpec proto object.
 
         Args:
-            x: Int. The number to check greater than or equal to.
+            x: int|float. The number to check greater than or equal to.
 
         Returns:
             IsGreaterThanOrEqualToSpec. The
             IsGreaterThanOrEqualToSpec proto object.
         """
-        is_greater_than_or_equal_to_proto = (
-            state_pb2.NumericInputInstance
-            .RuleSpec.IsGreaterThanOrEqualToSpec(
-                input=x))
+        is_greater_than_or_equal_to_proto = {}
+        if isinstance(x, (int, float)):
+            is_greater_than_or_equal_to_proto = (
+                state_pb2.NumericInputInstance
+                .RuleSpec.IsGreaterThanOrEqualToSpec(
+                    input=x))
 
         return is_greater_than_or_equal_to_proto
 
@@ -1494,18 +1505,20 @@ class InteractionInstance:
         """Creates a IsInclusivelyBetweenSpec proto object.
 
         Args:
-            a: int|double. The lower range.
-            b: int|double. The upper range.
+            a: int|float. The lower range.
+            b: int|float. The upper range.
 
         Returns:
             IsInclusivelyBetweenSpec. The
             IsInclusivelyBetweenSpec proto object.
         """
-        is_inclusively_between_proto = (
-            state_pb2.NumericInputInstance
-            .RuleSpec.IsInclusivelyBetweenSpec(
-                inputLowerInclusive=a,
-                inputUpperInclusive=b))
+        is_inclusively_between_proto = {}
+        if (isinstance(a, (int, float))) and (isinstance(b, (int, float))):
+            is_inclusively_between_proto = (
+                state_pb2.NumericInputInstance
+                .RuleSpec.IsInclusivelyBetweenSpec(
+                    inputLowerInclusive=a,
+                    inputUpperInclusive=b))
 
         return is_inclusively_between_proto
 
