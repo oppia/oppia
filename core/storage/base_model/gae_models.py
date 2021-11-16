@@ -959,9 +959,9 @@ class VersionedModel(BaseModel):
         )
 
         return {
-            'versioned_model': self,
             'snapshot_metadata_model': snapshot_metadata_instance,
-            'snapshot_content_model': snapshot_content_instance
+            'snapshot_content_model': snapshot_content_instance,
+            'versioned_model': self,
         }
 
     # We have ignored [override] here because the signature of this method
@@ -1215,13 +1215,9 @@ class VersionedModel(BaseModel):
             commit_message,
             commit_cmds,
             self._prepare_additional_models()
-        )
-        print(models_to_put)
-        m = [models_to_put['versioned_model'], models_to_put['snapshot_metadata_model']]
-        if 'commit_log_model' in models_to_put:
-            m.append(models_to_put['commit_log_model'])
-        BaseModel.update_timestamps_multi(m)
-        BaseModel.put_multi_transactional(m)
+        ).values()
+        BaseModel.update_timestamps_multi(list(models_to_put))
+        BaseModel.put_multi_transactional(list(models_to_put))
 
     @classmethod
     def revert(
@@ -1275,7 +1271,7 @@ class VersionedModel(BaseModel):
             List[BaseModel],
             new_model.compute_models_to_commit(
                 committer_id,
-                None,
+                cls._COMMIT_TYPE_REVERT,
                 commit_message,
                 commit_cmds,
                 new_model._prepare_additional_models()

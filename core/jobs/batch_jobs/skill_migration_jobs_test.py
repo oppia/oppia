@@ -54,7 +54,7 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             description='description',
             misconceptions_schema_version=(
                 feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
-            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
                 'explanations': 'a'
@@ -110,5 +110,9 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='SKILL MIGRATED SUCCESS: 1'),
             job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
         ])
+
+        migrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
+        self.assertEqual(migrated_skill_model.version, 2)

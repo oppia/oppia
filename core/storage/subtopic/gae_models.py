@@ -162,11 +162,14 @@ class SubtopicPageModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
+        # The order is important here, as the 'versioned_model' needs to be
+        # after 'snapshot_content_model' otherwise it leads to problems with
+        # putting the models into the datastore.
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': subtopic_page_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     @classmethod

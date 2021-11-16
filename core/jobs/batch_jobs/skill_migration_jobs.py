@@ -20,6 +20,8 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+import traceback
+
 from core import feconf
 from core.domain import caching_services
 from core.domain import skill_domain
@@ -38,10 +40,15 @@ from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import base_models
     from mypy_imports import skill_models
+    from mypy_imports import datastore_services
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(base_models, skill_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.skill
+])
 
+datastore_services = models.Registry.import_datastore_services()
 
 class MigrateSkillJob(base_jobs.JobBase):
     """"""
@@ -54,6 +61,7 @@ class MigrateSkillJob(base_jobs.JobBase):
             skill = skill_fetchers.get_skill_from_model(skill_model)
             skill.validate()
         except Exception as e:
+            traceback.print_exc()
             return result.Err((skill_id, e))
 
         return result.Ok((skill_id, skill))
@@ -108,7 +116,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         skill_model: skill_models.SkillModel,
         skill: skill_domain.Skill,
         skill_changes: Sequence[skill_domain.SkillChange]
-    ):
+    ) -> Sequence[base_models.BaseModel]:
         updated_skill_model = (
             skill_services.populate_skill_model_with_skill(skill_model, skill))
         commit_message = (
@@ -121,9 +129,15 @@ class MigrateSkillJob(base_jobs.JobBase):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION
         )
         change_dicts = [change.to_dict() for change in skill_changes]
-        return updated_skill_model.compute_models_to_commit(
-            feconf.MIGRATION_BOT_USERNAME, commit_message, change_dicts
+        models_to_put = updated_skill_model.compute_models_to_commit(
+            feconf.MIGRATION_BOT_USERNAME,
+            updated_skill_model._COMMIT_TYPE_EDIT,
+            commit_message,
+            change_dicts,
+            additional_models={}
         ).values()
+        datastore_services.update_timestamps_multi(list(models_to_put))
+        return models_to_put
 
     @staticmethod
     def _update_skill_summary(
@@ -190,7 +204,7 @@ class MigrateSkillJob(base_jobs.JobBase):
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Remove unmigrated skills' >> beam.Filter(
-                lambda x: len(x['skill_changes']) > 0)
+                lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
             | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
                     'skill_model': objects['skill_model'][0],
                     'skill_summary_model': objects['skill_summary_model'][0],

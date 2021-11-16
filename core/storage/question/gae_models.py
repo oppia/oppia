@@ -221,10 +221,10 @@ class QuestionModel(base_models.VersionedModel):
         )
         question_commit_log.question_id = self.id
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': question_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     # TODO(#13523): Change 'question_state_data' to TypedDict/Domain Object

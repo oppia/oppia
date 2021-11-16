@@ -320,10 +320,10 @@ class CollectionModel(base_models.VersionedModel):
         )
         collection_commit_log.collection_id = self.id
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
-            'commit_log_model': collection_commit_log
+            'commit_log_model': collection_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     # We have ignored [override] here because the signature of this method
@@ -685,12 +685,12 @@ class CollectionRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             )
             return {
-                'versioned_model': models_to_put['versioned_model'],
                 'snapshot_metadata_model': (
                     models_to_put['snapshot_metadata_model']),
                 'snapshot_content_model': (
                     models_to_put['snapshot_content_model']),
                 'commit_log_model': collection_commit_log,
+                'versioned_model': models_to_put['versioned_model'],
             }
 
         return models_to_put

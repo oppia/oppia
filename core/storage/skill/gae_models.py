@@ -199,10 +199,10 @@ class SkillModel(base_models.VersionedModel):
         )
         skill_commit_log_entry.skill_id = self.id
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': skill_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     @staticmethod

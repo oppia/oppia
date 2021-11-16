@@ -318,10 +318,10 @@ class ExplorationModel(base_models.VersionedModel):
         )
         exploration_commit_log.exploration_id = self.id
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
-            'commit_log_model': exploration_commit_log
+            'commit_log_model': exploration_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     # We have ignored [override] here because the signature of this method
@@ -783,12 +783,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
             )
 
             return {
-                'versioned_model': models_to_put['versioned_model'],
                 'snapshot_metadata_model': (
                     models_to_put['snapshot_metadata_model']),
                 'snapshot_content_model': (
                     models_to_put['snapshot_content_model']),
                 'commit_log_model': exploration_commit_log,
+                'versioned_model': models_to_put['versioned_model'],
             }
 
         return models_to_put

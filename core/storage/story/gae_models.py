@@ -181,10 +181,10 @@ class StoryModel(base_models.VersionedModel):
         )
         story_commit_log_entry.story_id = self.id
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': story_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     @staticmethod

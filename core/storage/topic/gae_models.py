@@ -228,10 +228,10 @@ class TopicModel(base_models.VersionedModel):
         )
         topic_commit_log_entry.topic_id = self.id
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
-            'commit_log_model': topic_commit_log_entry
+            'commit_log_model': topic_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
     @classmethod
@@ -560,10 +560,10 @@ class TopicRightsModel(base_models.VersionedModel):
             sorted(commit_cmds_user_ids))
 
         return {
-            'versioned_model': models_to_put['versioned_model'],
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': topic_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
         }
 
 
