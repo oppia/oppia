@@ -621,7 +621,11 @@ class SolutionHitEventHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
                 }
             },
             'session_id': {
@@ -631,7 +635,11 @@ class SolutionHitEventHandler(base.BaseHandler):
             },
             'time_spent_in_state_secs': {
                 'schema': {
-                    'type': 'float'
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             }
         }
@@ -679,7 +687,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
                 }
             },
             'session_id': {
@@ -689,7 +701,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'client_time_spent_in_secs': {
                 'schema': {
-                    'type': 'float'
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             },
             'params': {
@@ -764,12 +780,20 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
                 }
             },
             'collection_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 },
                 'default_value': None
             },
@@ -780,7 +804,11 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'client_time_spent_in_secs': {
                 'schema': {
-                    'type': 'float'
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             },
             'params': {
