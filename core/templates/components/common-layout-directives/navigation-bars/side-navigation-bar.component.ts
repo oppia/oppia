@@ -52,21 +52,22 @@ export class SideNavigationBarComponent {
 
    toggleClassroomSubmenuLearn(): void {
      this.classroomSubmenuIsShownLEARN = !this.classroomSubmenuIsShownLEARN;
-     var expandicon = document.querySelector('.expand-icon-learn');
-     var bordertoggleEle = document.querySelector('.bordertoggle-learn');
-     expandicon.classList.toggle('oppia-sidebar-menu-icon-transition');
-     bordertoggleEle.classList.toggle('oppia-sidebar-submenu-toggle');
+     var expandiconLEARN = document.querySelector('.expand-icon-learn');
+     var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
+     expandiconLEARN.classList.toggle('oppia-sidebar-menu-icon-transition');
+     bordertoggleEleLEARN.classList.toggle('oppia-sidebar-submenu-toggle');
    }
 
    toggleClassroomSubmenuINVOLVED(): void {
      this.classroomSubmenuIsShownINVOLVED =
      !this.classroomSubmenuIsShownINVOLVED;
      this.classroomSubmenuIsShownLEARN = false;
-     var expandicon = document.querySelector('.expand-icon-involved');
-     var bordertoggleEle = document.querySelector('.bordertoggle-involved');
-     expandicon.classList.toggle('oppia-sidebar-menu-icon-transition');
-     bordertoggleEle.classList.toggle('oppia-sidebar-submenu-toggle');
-
+     var expandiconINVOLVED = document.querySelector('.expand-icon-involved');
+     var bordertoggleEleINVOLVED = (
+       document.querySelector(
+         '.bordertoggle-involved'));
+     expandiconINVOLVED.classList.toggle('oppia-sidebar-menu-icon-transition');
+     bordertoggleEleINVOLVED.classList.toggle('oppia-sidebar-submenu-toggle');
 
      var expandiconLEARN = document.querySelector('.expand-icon-learn');
      var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
