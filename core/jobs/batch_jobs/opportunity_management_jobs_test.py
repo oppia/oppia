@@ -34,6 +34,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import story_models
     from mypy_imports import topic_models
+    from mypy_imports import skill_models
+    from mypy_imports import question_models
 
 (
     exp_models, opportunity_models, story_models,
@@ -94,9 +96,54 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
     SKILL_1_DESCRIPTION = 'skill 1'
     SKILL_2_ID = 'skill_2'
     SKILL_2_DESCRIPTION = 'skill 2'
+    QUESTION_1_ID = 'question_1'
+    QUESTION_2_ID = 'question_2'
 
     def setUp(self) -> None:
         super().setUp()
+        
+        # Create Question models
+        question_1_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_1_ID,
+            question_state_data={},
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            version=0,
+            linked_skill_ids=[self.SKILL_1_ID],
+            inapplicable_skill_misconception_ids=[],
+            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION
+        )
+        
+        question_2_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_2_ID,
+            question_state_data={},
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            version=0,
+            linked_skill_ids=[self.SKILL_2_ID],
+            inapplicable_skill_misconception_ids=[],
+            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION
+        )
+        question_1_model.update_timestamps()
+        question_2_model.update_timestamps()
+        
+        # Create QuestionSkillLinkModels
+        question_1_skilllinkmodel = self.create_model(
+            question_models.QuestionSkillLinkModel,
+            question_id=self.QUESTION_1_ID,
+            skill_id=self.SKILL_1_ID,
+            skill_difficulty=1
+        )
+
+        question_2_skilllinkmodel = self.create_model(
+            question_models.QuestionSkillLinkModel,
+            question_id=self.QUESTION_2_ID,
+            skill_id=self.SKILL_2_ID,
+            skill_difficulty=1
+        )
+        question_1_skilllinkmodel.update_timestamps()
+        question_2_skilllinkmodel.update_timestamps()
+        
         skill_1_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
@@ -104,7 +151,22 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
-            skill_contents={},
+            skill_contents={
+                'explanation': {
+                    'html': 'test explanation',
+                    'content_id': 'explanation',
+                },
+                'worked_examples': [],
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {}
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
+                }
+            },
             next_misconception_id=0,
             misconceptions_schema_version=feconf
                 .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -124,7 +186,22 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
-            skill_contents={},
+            skill_contents={
+                'explanation': {
+                    'html': 'test explanation',
+                    'content_id': 'explanation',
+                },
+                'worked_examples': [],
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {}
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
+                }
+            },
             next_misconception_id=0,
             misconceptions_schema_version=feconf
                 .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -139,7 +216,9 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         skill_1_model.update_timestamps()
         skill_2_model.update_timestamps()
 
-        datastore_services.put_multi([skill_1_model, skill_2_model])
+        datastore_services.put_multi([skill_1_model, skill_2_model, 
+                                      question_1_model, question_2_model, 
+                                      question_1_skilllinkmodel, question_2_skilllinkmodel])
 
     def test_generation_job_creates_new_models(self) -> None:
         all_opportunity_models = list(
@@ -160,7 +239,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             opportunity_model_1.skill_description,
             self.SKILL_1_DESCRIPTION)
-        self.assertEqual(opportunity_model_1.question_count, 0)
+        self.assertEqual(opportunity_model_1.question_count, 1)
 
         opportunity_model_2 = (
             opportunity_models.SkillOpportunityModel.get(
@@ -170,7 +249,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             opportunity_model_2.skill_description,
             self.SKILL_2_DESCRIPTION)
-        self.assertEqual(opportunity_model_2.question_count, 0)
+        self.assertEqual(opportunity_model_2.question_count, 1)
 
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
