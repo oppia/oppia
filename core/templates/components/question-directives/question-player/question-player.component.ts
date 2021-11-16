@@ -125,6 +125,7 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 angular.module('oppia').component('questionPlayer', {
   bindings: {
@@ -134,9 +135,9 @@ angular.module('oppia').component('questionPlayer', {
   controller: [
     '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
     '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
-    'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-    'UrlInterpolationService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
-    'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
+    'PreventPageUnloadEventService', 'QuestionPlayerStateService',
+    'SkillMasteryBackendApiService', 'UrlInterpolationService', 'UserService',
+    'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
     'MAX_MASTERY_LOSS_PER_QUESTION', 'MAX_SCORE_PER_QUESTION',
     'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
     'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
@@ -144,9 +145,9 @@ angular.module('oppia').component('questionPlayer', {
     function(
         $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
         $window, ExplorationPlayerStateService, PlayerPositionService,
-        QuestionPlayerStateService, SkillMasteryBackendApiService,
-        UrlInterpolationService, UserService, COLORS_FOR_PASS_FAIL_MODE,
-        HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
+        PreventPageUnloadEventService, QuestionPlayerStateService,
+        SkillMasteryBackendApiService, UrlInterpolationService, UserService,
+        COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
         MAX_MASTERY_LOSS_PER_QUESTION, MAX_SCORE_PER_QUESTION,
         QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
         VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
@@ -582,6 +583,11 @@ angular.module('oppia').component('questionPlayer', {
         // called in $scope.$on when some external events are triggered.
         initResults();
         ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+        PreventPageUnloadEventService.addListener(
+          () => {
+            return (getCurrentQuestion() > 1);
+          }
+        );
       };
 
       ctrl.$onDestroy = function() {

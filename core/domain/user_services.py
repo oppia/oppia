@@ -174,7 +174,9 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
-                    feconf.ROLE_ID_MODERATOR],
+                    feconf.ROLE_ID_MODERATOR,
+                    feconf.ROLE_ID_VOICEOVER_ADMIN
+                ],
                 banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()

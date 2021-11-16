@@ -16,8 +16,7 @@
 
 """Provides an Apache Beam API for operating on NDB models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.jobs.types import job_run_result
 
@@ -112,7 +111,9 @@ class ResultsToJobRunResults(beam.PTransform):
 
 
 class CountObjectsToJobRunResult(beam.PTransform):
-    """Count sequence of any object into job_run_result.JobRunResult."""
+    """Transform that counts number of objects in a sequence and puts
+    the count into job_run_result.JobRunResult.
+    """
 
     def __init__(
         self, prefix: Optional[str] = None, label: Optional[str] = None
@@ -129,7 +130,7 @@ class CountObjectsToJobRunResult(beam.PTransform):
     def expand(
         self, objects: beam.PCollection[Any]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Counts items in collection into a job run result.
+        """Counts items in collection and puts the count into a job run result.
 
         Args:
             objects: PCollection. Sequence of any objects.
