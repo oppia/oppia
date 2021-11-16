@@ -54,25 +54,28 @@ export class SideNavigationBarComponent {
      this.classroomSubmenuIsShownLEARN = !this.classroomSubmenuIsShownLEARN;
      var expandiconLEARN = document.querySelector('.expand-icon-learn');
      var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
-     expandiconLEARN.classList.toggle('oppia-sidebar-menu-icon-transition');
-     bordertoggleEleLEARN.classList.toggle('oppia-sidebar-submenu-toggle');
+     if (expandiconLEARN !== null && bordertoggleEleLEARN !== null) {
+       expandiconLEARN.classList.toggle('oppia-sidebar-menu-icon-transition');
+       bordertoggleEleLEARN.classList.toggle('oppia-sidebar-submenu-toggle');
+     }
    }
 
    toggleClassroomSubmenuINVOLVED(): void {
      this.classroomSubmenuIsShownINVOLVED =
      !this.classroomSubmenuIsShownINVOLVED;
      this.classroomSubmenuIsShownLEARN = false;
+
+     var expandiconLEARN = document.querySelector('.expand-icon-learn');
+     var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
      var expandiconINVOLVED = document.querySelector('.expand-icon-involved');
      var bordertoggleEleINVOLVED = (
        document.querySelector(
          '.bordertoggle-involved'));
-     expandiconINVOLVED.classList.toggle('oppia-sidebar-menu-icon-transition');
-     bordertoggleEleINVOLVED.classList.toggle('oppia-sidebar-submenu-toggle');
 
-     var expandiconLEARN = document.querySelector('.expand-icon-learn');
-     var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
-     expandiconLEARN.classList.remove('oppia-sidebar-menu-icon-transition');
-     bordertoggleEleLEARN.classList.remove('oppia-sidebar-submenu-toggle');
+     expandiconINVOLVED?.classList.toggle('oppia-sidebar-menu-icon-transition');
+     bordertoggleEleINVOLVED?.classList.toggle('oppia-sidebar-submenu-toggle');
+     expandiconLEARN?.classList.remove('oppia-sidebar-menu-icon-transition');
+     bordertoggleEleLEARN?.classList.remove('oppia-sidebar-submenu-toggle');
    }
 }
 
