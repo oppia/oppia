@@ -56,26 +56,11 @@ describe('Collection player page directive', function() {
   let collectionNodesList = null;
   let collectionNodeBackendObject = null;
 
-  const userInfoForCollectionCreator = {
-    _isModerator: true,
-    _isAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: false,
-    isModerator: () => true,
-    isAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => false
-  } as UserInfo;
+  const userInfoForCollectionCreator = new UserInfo(
+    ['USER_ROLE'], true, false, false, false, true,
+    'en', 'username1', 'tester@example.com', true
+  );
+
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -194,8 +179,6 @@ describe('Collection player page directive', function() {
       sampleCollectionBackendObject);
 
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
 
     directive = $injector.get('collectionPlayerPageDirective')[0];
@@ -209,6 +192,8 @@ describe('Collection player page directive', function() {
   }));
 
   it('should set properties when initialized', fakeAsync(function() {
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     spyOn(guestCollectionProgressService, 'hasCompletedSomeExploration')
@@ -253,6 +238,8 @@ describe('Collection player page directive', function() {
     'is fetched from backend', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.rejectWith();
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     ctrl.$onInit();
     $scope.$apply();
@@ -267,6 +254,8 @@ describe('Collection player page directive', function() {
     ctrl.collection = sampleCollection;
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     $httpBackend.expect('GET', '/collection_handler/data/collectionId')
       .respond({
         data: {
@@ -337,6 +326,8 @@ describe('Collection player page directive', function() {
   it('should generate path icon parameters', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     // Loading collections.
     ctrl.$onInit();
@@ -349,6 +340,8 @@ describe('Collection player page directive', function() {
   it('should check whether the exploration is completed', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     // Loading collections.
     ctrl.$onInit();
@@ -366,6 +359,8 @@ describe('Collection player page directive', function() {
       sampleCollectionBackendObject);
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     // Loading collections.
     ctrl.$onInit();
@@ -383,6 +378,8 @@ describe('Collection player page directive', function() {
       sampleCollectionBackendObject);
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     // Loading collections.
     ctrl.$onInit();
@@ -402,6 +399,8 @@ describe('Collection player page directive', function() {
       sampleCollectionBackendObject);
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     // Loading collections.
     ctrl.$onInit();
@@ -443,6 +442,8 @@ describe('Collection player page directive', function() {
       sampleCollectionBackendObject);
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
     // Loading collections.
     ctrl.$onInit();
@@ -539,12 +540,19 @@ describe('Collection player page directive', function() {
     'count', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(new UserInfo(
+        ['USER_ROLE'], true, false, false, false, true,
+        'en', 'username1', 'tester@example.com', false
+      )));
+    spyOn(guestCollectionProgressService, 'hasCompletedSomeExploration')
+      .and.returnValue(true);
 
     // Loading collections.
     ctrl.$onInit();
     tick();
 
     let result = ctrl.getNonRecommendedCollectionNodeCount();
-    expect(result).toEqual(4);
+    expect(result).toEqual(5);
   }));
 });

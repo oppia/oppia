@@ -16,17 +16,16 @@
 
 """Service functions related to Oppia improvement tasks."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import collections
 import itertools
 import operator
 
+from core import feconf
+from core import python_utils
 from core.domain import improvements_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
@@ -143,10 +142,12 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
         .order(-improvements_models.TaskEntryModel.resolved_on)
         .fetch_page(
             feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor))
+    # The urlsafe returns bytes and we need to decode them to string.
     return (
         [get_task_entry_from_model(model) for model in results],
-        cursor and cursor.urlsafe(),
-        more)
+        cursor and cursor.urlsafe().decode('utf-8'),
+        more
+    )
 
 
 def put_tasks(tasks, update_last_updated_time=True):

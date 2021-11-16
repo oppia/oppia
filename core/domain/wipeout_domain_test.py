@@ -16,13 +16,11 @@
 
 """Tests for topic domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from core.domain import user_services
+from core import utils
 from core.domain import wipeout_domain
 from core.tests import test_utils
-import utils
 
 
 class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
@@ -33,16 +31,14 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.role = user_services.get_user_settings(self.user_id_a).role
 
     def test_create_default_pending_deletion_request(self):
         """Tests the create_default_topic() function."""
         default_pending_deletion = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_id_a, 'a@example.com', self.role))
+                self.user_id_a, 'a@example.com'))
         self.assertEqual(default_pending_deletion.user_id, self.user_id_a)
         self.assertEqual(default_pending_deletion.email, 'a@example.com')
-        self.assertEqual(default_pending_deletion.role, self.role)
         self.assertIsNone(
             default_pending_deletion.normalized_long_term_username)
         self.assertEqual(default_pending_deletion.deletion_complete, False)
@@ -53,7 +49,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         """Tests the create_default_topic() function."""
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_id_a, 'a@example.com', self.role))
+                self.user_id_a, 'a@example.com'))
         pending_deletion_request.pseudonymizable_entity_mappings = {
             'wrong_key': {}
         }

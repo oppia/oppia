@@ -16,23 +16,20 @@
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 import os
 import re
+from unittest import mock
 
-from constants import constants
-from core import jobs
+from core import python_utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
-from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
-import mock
 import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
@@ -99,7 +96,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -118,7 +115,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             str_attr = 'foo'
 
             @classmethod
@@ -136,7 +133,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num
@@ -315,7 +312,7 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         self.assertEqual(wrapped_function.times_called, 0)
 
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             self.assertEqual(wrapped_function(i), i ** 2)
             self.assertEqual(wrapped_function.times_called, i + 1)
 
@@ -332,7 +329,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             function, MockError('Dummy Exception'),
             test_utils.FailingFunction.INFINITY)
 
-        for i in python_utils.RANGE(20):
+        for i in range(20):
             with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
@@ -349,31 +346,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             test_utils.FailingFunction(function, MockError, -1)
 
 
-class FailingMapReduceJobManager(jobs.BaseMapReduceJobManager):
-    """Test job that fails because map is a classmethod."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return []
-
-    @classmethod
-    def map(cls):
-        pass
-
-
 class TestUtilsTests(test_utils.GenericTestBase):
-
-    def test_failing_job(self):
-        self.assertIsNone(FailingMapReduceJobManager.map())
-
-        job_id = FailingMapReduceJobManager.create_new()
-        FailingMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(None), 1)
-        self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task failed: Task<.*>',
-            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -475,7 +448,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 obj.func()
             except Exception as e:
                 self.assertIs(type(e), Exception)
-                self.assertEqual(python_utils.UNICODE(e), '')
+                self.assertEqual(str(e), '')
             else:
                 self.fail(msg='obj.func() did not raise an Exception')
 
@@ -483,11 +456,14 @@ class TestUtilsTests(test_utils.GenericTestBase):
         obj = mock.Mock()
         obj.func = lambda: python_utils.divide(1, 0)
 
-        self.assertRaisesRegexp(
-            ZeroDivisionError, 'integer division or modulo by zero', obj.func)
+        with self.assertRaisesRegexp(
+            ZeroDivisionError, 'integer division or modulo by zero'
+        ):
+            obj.func()
 
         with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
-            self.assertRaisesRegexp(ValueError, 'abc', obj.func)
+            with self.assertRaisesRegexp(ValueError, 'abc'):
+                obj.func()
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
@@ -528,40 +504,48 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_expected_args(self):
         def mock_getenv(unused_env):
             return
-        def mock_join(*unused_args):
+        def mock_samefile(*unused_args):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
-        join_swap = self.swap_with_checks(
-            os.path, 'join', mock_join, expected_args=[('first', 'second')])
-        with getenv_swap, join_swap:
+        samefile_swap = self.swap_with_checks(
+            os.path,
+            'samefile',
+            mock_samefile,
+            expected_args=[('first', 'second')]
+        )
+        with getenv_swap, samefile_swap:
             SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_args_failed_on_run_sequence(self):
         def mock_getenv(unused_env):
             return
-        def mock_join(*unused_args):
+        def mock_samefile(*unused_args):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('456',), ('123',)])
-        join_swap = self.swap_with_checks(
-            os.path, 'join', mock_join, expected_args=[('first', 'second')])
+        samefile_swap = self.swap_with_checks(
+            os.path,
+            'samefile',
+            mock_samefile,
+            expected_args=[('first', 'second')]
+        )
         with self.assertRaisesRegexp(AssertionError, r'os\.getenv'):
-            with getenv_swap, join_swap:
+            with getenv_swap, samefile_swap:
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_args_failed_on_wrong_args_number(self):
         def mock_getenv(unused_env):
             return
-        def mock_join(*unused_args):
+        def mock_samefile(*unused_args):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
-        join_swap = self.swap_with_checks(
-            os.path, 'join', mock_join, expected_args=[
+        samefile_swap = self.swap_with_checks(
+            os.path, 'samefile', mock_samefile, expected_args=[
                 ('first', 'second'), ('third', 'forth')])
-        with self.assertRaisesRegexp(AssertionError, r'join'):
-            with getenv_swap, join_swap:
+        with self.assertRaisesRegexp(AssertionError, r'samefile'):
+            with getenv_swap, samefile_swap:
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self):
@@ -609,7 +593,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.'):
+            'self.assertRaisesRegexp instead.'
+        ):
             self.assertRaises(Exception, mock_exception_func)
 
     def test_assert_raises_regexp_with_empty_string(self):
@@ -619,8 +604,15 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Please provide a sufficiently strong regexp string to '
-            'validate that the correct error is being raised.'):
+            'validate that the correct error is being raised.'
+        ):
             self.assertRaisesRegexp(Exception, '', mock_exception_func)
+
+    def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self):
+        with self.assertRaisesRegexp(
+                Exception, 'mocked_now must be datetime, got: 123'):
+            with self.mock_datetime_utcnow(123):
+                pass
 
 
 class EmailMockTests(test_utils.EmailTestBase):
@@ -670,7 +662,7 @@ class EmailMockTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
-class SwapWithCheckTestClass(python_utils.OBJECT):
+class SwapWithCheckTestClass:
     """Dummy class for testing check_with_swap. This class stores a few dummy
     functions.
     """
@@ -690,7 +682,7 @@ class SwapWithCheckTestClass(python_utils.OBJECT):
         """Run a few functions with args."""
         os.getenv('123')
         os.getenv('456')
-        os.path.join('first', 'second')
+        os.path.samefile('first', 'second')
 
     @classmethod
     def functions_with_kwargs(cls):

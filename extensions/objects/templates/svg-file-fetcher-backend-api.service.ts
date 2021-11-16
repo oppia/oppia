@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Dimensions } from './svg-filename-editor.component';
+import { Dimensions } from './svg-editor.component';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 

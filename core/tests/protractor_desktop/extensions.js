@@ -52,7 +52,7 @@ describe('rich-text components', function() {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText(' ');
       // TODO(Jacob): Add test for image RTE component.
-      await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
+      await richTextEditor.addRteComponent('Link', 'https://google.com/', true);
       await richTextEditor.addRteComponent(
         'Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
@@ -74,7 +74,7 @@ describe('rich-text components', function() {
         await richTextChecker.readBoldText('bold');
         await richTextChecker.readPlainText(' ');
         await richTextChecker.readRteComponent(
-          'Link', 'http://google.com/', true);
+          'Link', 'https://google.com/', true);
         await richTextChecker.readRteComponent(
           'Video', 'M7lc1UVf-VE', 10, 100, false);
         await richTextChecker.readRteComponent(

@@ -39,7 +39,7 @@
                     [classroomUrlFragment]="classroomUrlFragment"
                     [topicUrlFragment]="topicUrlFragment">
       </stories-list>
-      <mat-card *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
+      <mat-card dir="auto" *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="coming-soon-title">Coming Soon!</h2>
         <div class="coming-soon-text">Come back later when lessons are available for this topic.</div>
       </mat-card>
@@ -49,7 +49,7 @@
                     [subtopicsList]="subtopics"
                     [topicName]="topicName">
       </practice-tab>
-      <mat-card *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
+      <mat-card dir="auto" *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="coming-soon-title">Coming Soon!</h2>
         <div class="coming-soon-text">Come back later when practice questions are available for this topic.</div>
       </mat-card>

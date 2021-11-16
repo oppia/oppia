@@ -30,12 +30,16 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './edit-profile-picture-modal.component.html'
 })
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
-  uploadedImage: SafeResourceUrl;
+  // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
+  uploadedImage: SafeResourceUrl | null = null;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
+  // 'cropper' is initialized before it is to be used, hence we need to do
+  // non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  cropper!: Cropper;
+  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -46,12 +50,14 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   initializeCropper(): void {
-    let profilePicture = this.croppableImageRef.nativeElement;
-    this.cropper = new Cropper(profilePicture, {
-      minContainerWidth: 500,
-      minContainerHeight: 350,
-      aspectRatio: 1
-    });
+    if (this.croppableImageRef) {
+      let profilePicture = this.croppableImageRef.nativeElement;
+      this.cropper = new Cropper(profilePicture, {
+        minContainerWidth: 500,
+        minContainerHeight: 350,
+        aspectRatio: 1
+      });
+    }
   }
 
   onFileChanged(file: Blob): void {
@@ -59,12 +65,19 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     let reader = new FileReader();
     reader.onload = (e) => {
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (<FileReader>e.target).result as string);
+        (e.target as FileReader).result as string);
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
-          (<FileReader>e.target).result as string);
+          (e.target as FileReader).result as string);
       }
-      this.changeDetectorRef.detectChanges();
+      try {
+        this.changeDetectorRef.detectChanges();
+      } catch (viewDestroyedError) {
+        // This try catch block handles the following error in FE tests:
+        // ViewDestroyedError:
+        //   Attempt to use a destroyed view: detectChanges thrown.
+        // No further action is needed.
+      }
       this.initializeCropper();
     };
 
@@ -82,6 +95,9 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
+    if (this.cropper === undefined) {
+      throw new Error('Cropper has not been initialized');
+    }
     this.cropppedImageDataUrl = (
       this.cropper.getCroppedCanvas({
         height: 150,

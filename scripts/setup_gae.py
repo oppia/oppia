@@ -14,16 +14,16 @@
 
 """Python execution environment setup for scripts that require GAE."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
-import python_utils
+from core import python_utils
 
 from . import common
 
@@ -38,13 +38,10 @@ GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 def main(args=None):
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    coverage_home = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'coverage-%s' % common.COVERAGE_VERSION)
 
     sys.path.append('.')
-    sys.path.append(coverage_home)
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
+    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.35'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -62,9 +59,9 @@ def main(args=None):
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding
-            # lines (GAE_DIR and GCLOUD_PATH) in release_constants.json should
-            # also be updated.
-            python_utils.url_retrieve(
+            # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
+            # should also be updated.
+            urlrequest.urlretrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')

@@ -218,7 +218,6 @@ describe('AnswerGroupEditorComponent', () => {
     expect(ctrl.getDefaultInputValue('Html')).toBe('');
     expect(ctrl.getDefaultInputValue('SanitizedUrl')).toBe('');
     expect(ctrl.getDefaultInputValue('Filepath')).toBe('');
-    expect(ctrl.getDefaultInputValue('LogicErrorCategory')).toBe('');
     expect(ctrl.getDefaultInputValue('CodeEvaluation')).toEqual({
       code: '',
       error: '',
@@ -234,12 +233,6 @@ describe('AnswerGroupEditorComponent', () => {
       correct: false,
       proof_string: '',
       target_string: ''
-    });
-    expect(ctrl.getDefaultInputValue('LogicQuestion')).toEqual({
-      arguments: [],
-      dummies: [],
-      top_kind_name: '',
-      top_operator_name: ''
     });
     expect(ctrl.getDefaultInputValue('Graph')).toEqual({
       edges: [],

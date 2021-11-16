@@ -33,7 +33,7 @@ const generateContent = (html: string): HTMLElement => {
     container.content.firstChild.firstChild === null) {
     throw new Error('First Child is null');
   }
-  return <HTMLElement>(container.content.firstChild.firstChild);
+  return (container.content.firstChild.firstChild) as HTMLElement;
 };
 
 describe('Ck editor copy content service', () => {
@@ -41,18 +41,18 @@ describe('Ck editor copy content service', () => {
   let htmlEscaperService = new HtmlEscaperService(loggerService);
 
   let service: CkEditorCopyContentService;
-  let ckEditorStub: Partial<CKEDITOR.editor>;
+  let ckEditorStub: CKEDITOR.editor;
   let insertHtmlSpy: jasmine.Spy<(
     html: string, mode?: string,
     range?: CKEDITOR.dom.range) => void>;
-  let execCommandSpy;
+  let execCommandSpy: jasmine.Spy<(commandName: string) => boolean>;
 
   beforeEach(() => {
     ckEditorStub = {
       id: 'editor1',
       insertHtml: (html: string) => {},
       execCommand: (commandName: string): boolean => true,
-    };
+    } as CKEDITOR.editor;
     insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
     execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
@@ -167,7 +167,7 @@ describe('Ck editor copy content service', () => {
       throw new Error('First Child is null');
     }
     const nestedMathWidgetElement = (
-      <HTMLElement>mathWidgetElement.firstChild.firstChild);
+      mathWidgetElement.firstChild.firstChild) as HTMLElement;
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(nestedMathWidgetElement);
@@ -218,7 +218,7 @@ describe('Ck editor copy content service', () => {
 
     const pElement = generateContent('<p>Hello</p>');
 
-    ckEditorStub = { ...ckEditorStub, status: 'destroyed' };
+    ckEditorStub = { ...ckEditorStub, status: 'destroyed' } as CKEDITOR.editor;
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
     expect(insertHtmlSpy).not.toHaveBeenCalled();

@@ -14,13 +14,15 @@
 
 """Tests the methods defined in story services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -33,10 +35,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
-import python_utils
-import utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -56,11 +54,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         super(StoryServicesUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -96,8 +95,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Added node.')
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(
@@ -251,11 +251,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'chapter'][0]
             })
         ]
+
+        # Save a dummy image on filesystem, to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.STORY_ID))
+        fs.commit(
+            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            story.story_contents.nodes[1].thumbnail_size_in_bytes,
+            len(raw_image))
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
@@ -323,6 +339,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2', 'node_3'],
@@ -337,6 +354,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': [],
@@ -351,6 +369,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': [],
@@ -382,6 +401,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -396,6 +416,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_3'],
@@ -410,6 +431,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': ['node_2'],
@@ -493,6 +515,39 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'additional stories of the topic.' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
+
+    def test_update_story_schema(self):
+        topic_id = topic_fetchers.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='A New Topic',
+            abbreviated_name='new-topic', url_fragment='new-topic',
+            description='A new topic description.',
+            canonical_story_ids=[story_id], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
+        self.save_new_story(story_id, self.USER_ID, topic_id)
+
+        orig_story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+                'from_version': 1,
+                'to_version': 2,
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, story_id, changelist, 'Update schema.')
+
+        new_story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
+
+        # Check version is updated.
+        self.assertEqual(new_story_dict['version'], 2)
+
+        # Delete version and check that the two dicts are the same.
+        del orig_story_dict['version']
+        del new_story_dict['version']
+        self.assertEqual(orig_story_dict, new_story_dict)
 
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
@@ -1245,7 +1300,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='LogicProof', correctness_feedback_enabled=True)
+            interaction_id='GraphInput', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1263,10 +1318,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Invalid interaction LogicProof in exploration with ID: '
+                'Invalid interaction GraphInput in exploration with ID: '
                 'exp_id_1.'])
         with self.assertRaisesRegexp(
-            Exception, 'Invalid interaction LogicProof in exploration with '
+            Exception, 'Invalid interaction GraphInput in exploration with '
             'ID: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
@@ -1406,7 +1461,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Category 1',
-            interaction_id='LogicProof', correctness_feedback_enabled=True)
+            interaction_id='GraphInput', correctness_feedback_enabled=True)
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -1864,6 +1919,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -1878,6 +1934,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_3'],
@@ -1892,6 +1949,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': ['node_4'],
@@ -1906,6 +1964,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 4',
             'description': 'Description 4',
             'destination_node_ids': [],
@@ -2102,11 +2161,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         )
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 4)
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
-        self.assertEqual(story.story_contents_schema_version, 4)
+        self.assertEqual(story.story_contents_schema_version, 5)
         self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_4_STORY_CONTENTS_DICT)
+            story.story_contents.to_dict(), self.VERSION_5_STORY_CONTENTS_DICT)

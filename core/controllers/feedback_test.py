@@ -16,9 +16,9 @@
 
 """Tests for the feedback controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -29,8 +29,6 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
@@ -64,7 +62,6 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
         ), {
-            'state_name': self._get_unicode_test_string('statename'),
             'subject': self._get_unicode_test_string('subject'),
             'text': self._get_unicode_test_string('text'),
         }, csrf_token=self.csrf_token)
@@ -171,11 +168,11 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                'state_name': None,
                 'text': u'Thread Text ¡unicode!',
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response_dict['error'], 'A thread subject must be specified.')
+            response_dict['error'],
+            'Missing key in handler args: subject.')
         self.logout()
 
     def test_missing_thread_text_raises_400_error(self):
@@ -184,12 +181,10 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
             {
-                'state_name': None,
                 'subject': u'New Thread ¡unicode!',
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response_dict['error'],
-            'Text for the first message in the thread must be specified.')
+            response_dict['error'], 'Missing key in handler args: text.')
         self.logout()
 
     def test_post_message_to_existing_thread(self):
@@ -200,7 +195,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/%s' % (
                 feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                    'state_name': None,
                     'subject': u'New Thread ¡unicode!',
                     'text': u'Message 0 ¡unicode!',
                 }, csrf_token=csrf_token)
@@ -276,7 +270,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': 'Message 0',
             }, csrf_token=csrf_token)
@@ -312,13 +305,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Generate 10 users.
         num_users = 10
-        for num in python_utils.RANGE(num_users):
+        for num in range(num_users):
             username = _get_username(num)
             email = _get_email(num)
             self.signup(email, username)
 
         # Each of these users posts a new message to the same thread.
-        for num in python_utils.RANGE(num_users):
+        for num in range(num_users):
             self.login(_get_email(num))
             csrf_token = self.get_new_csrf_token()
             self.post_json(
@@ -340,7 +333,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.EDITOR_USERNAME)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
-        for num in python_utils.RANGE(num_users):
+        for num in range(num_users):
             self.assertEqual(
                 response_dict['messages'][num + 1]['author_username'],
                 _get_username(num))
@@ -412,7 +405,6 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
         ), {
-            'state_name': 'statename',
             'subject': 'subject',
             'text': 'a sample message',
         }, csrf_token=csrf_token)
@@ -565,7 +557,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
-            response['error'], 'Text for the message must be specified.')
+            response['error'], 'Missing key in handler args: text.')
 
         self.logout()
 
@@ -612,7 +604,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         super(ThreadListHandlerForTopicsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -653,66 +645,16 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(RecentFeedbackMessagesHandlerTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.exp_id = 'exp_id'
-
-    def test_get_recently_posted_feedback_messages(self):
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_json(
-            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
-
-        self.assertEqual(response['results'], [])
-        self.assertFalse(response['more'])
-
-        self.save_new_valid_exploration(
-            self.exp_id, self.owner_id, title='Exploration title',
-            category='Architecture', language_code='en')
-        feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
-            'a subject', 'some text')
-
-        feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
-            'new subject', 'new text')
-
-        response = self.get_json(
-            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
-        results = response['results']
-
-        self.assertEqual(len(results), 2)
-
-        self.assertFalse(response['more'])
-        self.assertEqual(results[0]['text'], 'new text')
-        self.assertEqual(results[0]['updated_subject'], 'new subject')
-        self.assertEqual(results[0]['entity_type'], 'exploration')
-        self.assertEqual(results[0]['entity_id'], self.exp_id)
-
-        self.assertEqual(results[1]['text'], 'some text')
-        self.assertEqual(results[1]['updated_subject'], 'a subject')
-        self.assertEqual(results[1]['entity_type'], 'exploration')
-        self.assertEqual(results[1]['entity_id'], self.exp_id)
-
-        self.logout()
-
-
 class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'exp_id'
 
     def test_get_num_threads_after_creating_feedback_analytics(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id),
@@ -724,7 +666,6 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
-
         self.assertEqual(response['num_total_threads'], 0)
         self.assertEqual(response['num_open_threads'], 0)
 
@@ -733,8 +674,54 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
-
         self.assertEqual(response['num_total_threads'], 1)
         self.assertEqual(response['num_open_threads'], 1)
+
+        self.logout()
+
+
+class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(RecentFeedbackMessagesHandlerTests, self).setUp()
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.exp_id = 'exp_id'
+
+    def test_get_recently_posted_feedback_messages(self):
+        self.login(self.MODERATOR_EMAIL)
+
+        response = self.get_json(
+            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+
+        self.assertEqual(response['results'], [])
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.moderator_id, title='Exploration title',
+            category='Architecture', language_code='en')
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.moderator_id,
+            'a subject', 'some text')
+
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.moderator_id,
+            'new subject', 'new text')
+
+        response = self.get_json(
+            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+        results = response['results']
+
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0]['text'], 'new text')
+        self.assertEqual(results[0]['updated_subject'], 'new subject')
+        self.assertEqual(results[0]['entity_type'], 'exploration')
+        self.assertEqual(results[0]['entity_id'], self.exp_id)
+
+        self.assertEqual(results[1]['text'], 'some text')
+        self.assertEqual(results[1]['updated_subject'], 'a subject')
+        self.assertEqual(results[1]['entity_type'], 'exploration')
+        self.assertEqual(results[1]['entity_id'], self.exp_id)
 
         self.logout()

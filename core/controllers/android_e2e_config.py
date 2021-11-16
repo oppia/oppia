@@ -14,12 +14,13 @@
 
 """Controller for initializing android specific structures."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
@@ -41,8 +42,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-import feconf
-import python_utils
 
 
 class InitializeAndroidTestDataHandler(base.BaseHandler):
@@ -173,14 +172,6 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
             exp_id
         )
-        story.update_node_thumbnail_filename(
-            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
-            'test_svg.svg')
-        story.update_node_thumbnail_bg_color(
-            '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
-
-        # Update and validate the story.
-        story.update_meta_tag_content('tag')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
         with python_utils.open_file(
@@ -194,6 +185,14 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
 
+        story.update_node_thumbnail_filename(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+            'test_svg.svg')
+        story.update_node_thumbnail_bg_color(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
+
+        # Update and validate the story.
+        story.update_meta_tag_content('tag')
         story.update_thumbnail_filename('test_svg.svg')
         story.update_thumbnail_bg_color(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])

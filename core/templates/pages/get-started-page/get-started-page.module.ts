@@ -16,46 +16,20 @@
  * @fileoverview Module for the get started page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { GetStartedPageRootComponent } from './get-started-page-root.component';
-
+import { CommonModule } from '@angular/common';
+import { GetStartedPageRoutingModule } from './get-started-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    GetStartedPageRoutingModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     GetStartedPageRootComponent
-  ],
-  entryComponents: [
-    OppiaAngularRootComponent,
-    GetStartedPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [GetStartedPageRootComponent]
+  ]
 })
 export class GetStartedPageModule {}

@@ -16,17 +16,15 @@
 
 """Tests for topic domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -67,17 +65,19 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             description='Description 3')
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(
@@ -192,10 +192,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topics), 2)
 
     def test_get_all_topic_rights_of_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
         topic_rights = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
 
         self.assertEqual(len(topic_rights), 1)
@@ -297,6 +293,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_rights), 2)
         self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
-        self.assertEqual(topic_rights[0].manager_ids, [])
+        self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
         self.assertFalse(topic_rights[0].topic_is_published)
         self.assertIsNone(topic_rights[1])

@@ -19,16 +19,15 @@ version of Chrome for our CI tests and checks that the correct version
 was installed.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import re
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 
-CHROME_VERSION = '88.0.4324.96-1'
+CHROME_VERSION = '89.0.4389.90-1'
 URL_TEMPLATE = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
     'google-chrome-stable_{}_amd64.deb'
@@ -65,7 +64,7 @@ def get_chrome_version():
     Returns:
         str. The version of Chrome we found.
     """
-    output = common.run_cmd(['google-chrome', '--version'])
+    output = str(common.run_cmd(['google-chrome', '--version']))
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     return chrome_version
 

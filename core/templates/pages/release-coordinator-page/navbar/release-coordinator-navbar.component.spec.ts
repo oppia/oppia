@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
@@ -37,7 +38,10 @@ describe('Release coordinator navbar component', () => {
   let fixture: ComponentFixture<ReleaseCoordinatorNavbarComponent>;
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockRouterModule
+      ],
       declarations: [ReleaseCoordinatorNavbarComponent]
     }).compileComponents();
 
@@ -61,12 +65,12 @@ describe('Release coordinator navbar component', () => {
     expect(component.logoutUrl).toEqual('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
     expect(component.activeTab).toBe(
-      ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
+      ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
   });
 
   it('should allow switching tabs correctly', () => {
     expect(component.activeTab).toBe(
-      ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
+      ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
 
     component.switchTab(ReleaseCoordinatorPageConstants.TAB_ID_MISC);
     component.activeTabChange.subscribe(
@@ -95,9 +99,5 @@ describe('Release coordinator navbar component', () => {
     component.deactivateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(false);
-  });
-
-  it('should disable the Beam Jobs tab by default', () => {
-    expect(component.BEAM_JOBS_TAB_IS_ENABLED).toBe(false);
   });
 });

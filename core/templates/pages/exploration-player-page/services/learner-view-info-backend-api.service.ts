@@ -19,13 +19,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
 interface LearnerViewBackendDict {
-  'summaries': string[];
-}
-
-interface LearnerViewResposne {
-  summaries: string[];
+  'summaries': LearnerExplorationSummaryBackendDict[];
 }
 
 @Injectable({
@@ -38,7 +35,7 @@ export class LearnerViewInfoBackendApiService {
 
   async fetchLearnerInfoAsync(
       stringifiedExpIds: string,
-      includePrivateExplorations: string): Promise<LearnerViewResposne> {
+      includePrivateExplorations: string): Promise<LearnerViewBackendDict> {
     return this.http.get<LearnerViewBackendDict>(
       AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
         params: {

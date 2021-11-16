@@ -79,7 +79,10 @@ export class MathInteractionsService {
         '" and "' + symbol2 + '".');
     }
     if (
-      errorMessage === 'Cannot read property \'column\' of undefined.') {
+      errorMessage === 'Cannot read property \'column\' of undefined.' ||
+      errorMessage === 'Cannot read properties of undefined ' +
+        '(reading \'column\').'
+    ) {
       let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {
@@ -122,8 +125,11 @@ export class MathInteractionsService {
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
-    } catch (err) {
-      this.warningText = this.cleanErrorMessage(err.message, expressionString);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.warningText = (
+          this.cleanErrorMessage(err.message, expressionString));
+      }
       return false;
     }
     this.warningText = '';
@@ -307,13 +313,12 @@ export class MathInteractionsService {
     // Note: We don't wanna insert signs before opening parens that are part of
     // functions, for eg., we want to convert a(b) to a*(b) but not sqrt(4) to
     // sqrt*(4).
-    let removeExtraMultiSymbol = expressionString[0] === '(';
+    expressionString = expressionString.replace(
+      /([^\*|\+|\/|\-|\^|\(])\(/g, '$1*(');
+    // Removing the '*' added before math function parens.
     expressionString = expressionString.replace(new RegExp(
-      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + this.mathFunctionNames.join(
-        '|') + ')\\(', 'g'), '*(');
-    if (removeExtraMultiSymbol) {
-      expressionString = expressionString.slice(1);
-    }
+      '(' + this.mathFunctionNames.join('|') + ')\\*\\(', 'g'), '$1(');
+
     return expressionString;
   }
 

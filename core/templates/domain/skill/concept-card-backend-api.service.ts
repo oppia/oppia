@@ -44,7 +44,7 @@ export class ConceptCardBackendApiService {
     private urlInterpolation: UrlInterpolationService) {}
 
   // Maps previously loaded concept cards to their IDs.
-  private _conceptCardCache = [];
+  private _conceptCardCache: Record<string, ConceptCard> = {};
 
   private _fetchConceptCards(
       skillIds: string[],
@@ -55,7 +55,7 @@ export class ConceptCardBackendApiService {
         comma_separated_skill_ids: skillIds.join(',')
       });
 
-    var conceptCardObjects = [];
+    const conceptCardObjects: ConceptCard[] = [];
 
     this.http.get<ConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
       .then(response => {
@@ -80,7 +80,7 @@ export class ConceptCardBackendApiService {
   }
 
   private _getUncachedSkillIds(skillIds: string[]): string[] {
-    var uncachedSkillIds = [];
+    const uncachedSkillIds: string[] = [];
     skillIds.forEach(skillId => {
       if (!this._isCached(skillId)) {
         uncachedSkillIds.push(skillId);
@@ -92,7 +92,7 @@ export class ConceptCardBackendApiService {
   async loadConceptCardsAsync(skillIds: string[]): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
       var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
-      var conceptCards = [];
+      const conceptCards: ConceptCard[] = [];
 
       if (uncachedSkillIds.length !== 0) {
         // Case where only part (or none) of the concept cards are cached

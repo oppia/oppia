@@ -72,7 +72,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
-        'MAX_CHARS_IN_CHAPTER_TITLE', function(
+        'MAX_CHARS_IN_EXPLORATION_TITLE', function(
             $rootScope, $scope, $timeout,
             AlertsService,
             ExplorationIdValidationService, FocusManagerService, NgbModal,
@@ -80,10 +80,11 @@ angular.module('oppia').directive('storyNodeEditor', [
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
-            MAX_CHARS_IN_CHAPTER_TITLE) {
+            MAX_CHARS_IN_EXPLORATION_TITLE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+          $scope.MAX_CHARS_IN_EXPLORATION_TITLE = (
+            MAX_CHARS_IN_EXPLORATION_TITLE);
           $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
             MAX_CHARS_IN_CHAPTER_DESCRIPTION);
           var _recalculateAvailableNodes = function() {
@@ -137,7 +138,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
-            PageTitleService.setPageSubtitleForMobileView($scope.currentTitle);
+            PageTitleService.setNavbarSubtitleForMobileView(
+              $scope.currentTitle);
             $scope.editableTitle = $scope.currentTitle;
             $scope.currentDescription = $scope.getDescription();
             $scope.editableDescription = $scope.currentDescription;
@@ -421,7 +423,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.explorationInputButtonsAreShown = false;
             $scope.chapterOutlineButtonsAreShown = false;
             $scope.skillIdToSummaryMap = {};
-            PageTitleService.setPageTitleForMobileView('Chapter Editor');
+            PageTitleService.setNavbarTitleForMobileView('Chapter Editor');
             $scope.chapterOutlineIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.chapterTodoCardIsShown = (

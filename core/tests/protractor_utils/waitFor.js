@@ -25,6 +25,7 @@ var Constants = require('./ProtractorConstants');
 // server since the mobile tests are run on a real
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
+var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
@@ -130,7 +131,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
     var url = await browser.getCurrentUrl();
     await browser.waitForAngularEnabled(true);
     return await url.match(urlToMatch);
-  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+  }, DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB, errorMessage);
 };
 
 /**
@@ -180,6 +181,32 @@ var fileToBeDownloaded = async function(filename) {
   }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
 };
 
+var clientSideRedirection = async function(
+    action, check, waitForCallerSpecifiedConditions) {
+  // Client side redirection is known to cause "both angularJS testability
+  // and angular testability are undefined" flake.
+  // As suggested by protractor devs here (http://git.io/v4gXM), waiting for
+  // angular is disabled during client side redirects.
+  await browser.waitForAngularEnabled(false);
+
+  // Action triggering redirection.
+  await action();
+
+  // The action only triggers the redirection but does not wait for it to
+  // complete. Manually waiting for redirection here.
+  await browser.driver.wait(async() => {
+    var url = await browser.driver.getCurrentUrl();
+    // Condition to wait on.
+    return check(decodeURIComponent(url));
+  }, DEFAULT_WAIT_TIME_MSECS);
+
+  // Waiting for caller specified conditions.
+  await waitForCallerSpecifiedConditions();
+
+  // Client side redirection is complete, enabling wait for angular here.
+  await browser.waitForAngularEnabled(true);
+};
+
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
@@ -198,3 +225,4 @@ exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
+exports.clientSideRedirection = clientSideRedirection;

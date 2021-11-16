@@ -18,13 +18,10 @@
 python_linter_test.py. This file does not have period at the end of docstring.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
-import python_utils
+from __future__ import annotations
 
 
-class FakeClass(python_utils.OBJECT):
+class FakeClass():
     """This is a fake docstring for valid syntax purposes"""
 
     def __init__(self, fake_arg):

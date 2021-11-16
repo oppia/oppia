@@ -16,12 +16,16 @@
 
 """Tests for core.storage.activity.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import activity_models
+    from mypy_imports import base_models
 
 (base_models, activity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.activity])
@@ -30,24 +34,24 @@ from core.tests import test_utils
 class ActivityListModelTest(test_utils.GenericTestBase):
     """Tests the ActivityListModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             activity_models.ActivityReferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_featured_activity_list_always_exists(self):
+    def test_featured_activity_list_always_exists(self) -> None:
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertIsNotNone(featured_model_instance)
         self.assertEqual(featured_model_instance.id, 'featured')
         self.assertEqual(featured_model_instance.activity_references, [])
 
-    def test_retrieving_non_existent_list(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'):
+    def test_retrieving_non_existent_list(self) -> None:
+        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 
-    def test_updating_featured_activity_list(self):
+    def test_updating_featured_activity_list(self) -> None:
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertEqual(featured_model_instance.activity_references, [])

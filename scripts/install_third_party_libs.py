@@ -14,14 +14,15 @@
 
 """Installation script for Oppia third-party libraries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import os
+import pathlib
 import shutil
 import subprocess
 import sys
+import urllib.request as urlrequest
 import zipfile
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
@@ -29,12 +30,11 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 # These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = [
-    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+    ('pyyaml', '5.4.1', os.path.join(TOOLS_DIR, 'pyyaml-5.4.1')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
-    ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2020.12.5', os.path.join(
-        TOOLS_DIR, 'certifi-2020.12.5')),
-    ('typing', '3.7.4.3', os.path.join('third_party', 'python_libs')),
+    ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
+    ('certifi', '2021.5.30', os.path.join(
+        TOOLS_DIR, 'certifi-2021.5.30')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
@@ -44,12 +44,12 @@ for package_name, version_number, target_path in PREREQUISITES:
     uextention_text = ['--user', '--prefix=', '--system']
     current_process = subprocess.Popen(
         command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output_stderr = current_process.communicate()[1]
-    if 'can\'t combine user with prefix' in output_stderr:
+    output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
+    if b'can\'t combine user with prefix' in output_stderr:
         subprocess.check_call(command_text + uextention_text)
 
 
-import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -63,13 +63,6 @@ _PARSER = argparse.ArgumentParser(
     description="""
 Installation script for Oppia third-party libraries.
 """)
-
-PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
-    'configparser.py')
-PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
-    'configparser.py')
 
 # Download locations for buf binary.
 BUF_BASE_URL = (
@@ -135,9 +128,9 @@ def install_buf_and_protoc():
 
     common.ensure_directory_exists(BUF_DIR)
     for bin_file in buf_files:
-        python_utils.url_retrieve('%s/%s' % (
+        urlrequest.urlretrieve('%s/%s' % (
             BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
-    python_utils.url_retrieve('%s/%s' % (
+    urlrequest.urlretrieve('%s/%s' % (
         PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
     try:
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
@@ -174,6 +167,17 @@ def compile_protobuf_files(proto_files_paths):
             python_utils.PRINT(stderr)
             raise Exception('Error compiling proto files at %s' % path)
 
+    # Since there is no simple configuration for imports when using protobuf to
+    # generate Python files we need to manually fix the imports.
+    # See: https://github.com/protocolbuffers/protobuf/issues/1491
+    compiled_protobuf_dir = (
+        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
+    for p in compiled_protobuf_dir.iterdir():
+        if p.suffix == '.py':
+            common.inplace_replace_file(
+                p.absolute(),
+                r'^import (\w*_pb2 as)', r'from proto_files import \1')
+
 
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
@@ -207,7 +211,7 @@ def ensure_system_python_libraries_are_installed(package, version):
     install_backend_python_libs.pip_install_to_system(package, version)
 
 
-def main():
+def main() -> None:
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
@@ -217,7 +221,8 @@ def main():
     # must install these libraries to the developer's computer.
     system_pip_dependencies = [
         ('enum34', common.ENUM_VERSION),
-        ('protobuf', common.PROTOBUF_VERSION)
+        ('protobuf', common.PROTOBUF_VERSION),
+        ('grpcio', common.GRPCIO_VERSION),
     ]
     local_pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
@@ -240,34 +245,6 @@ def main():
 
     for package, version in system_pip_dependencies:
         ensure_system_python_libraries_are_installed(package, version)
-    # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
-    # on ConverterMapping, which is not implemented in some Python
-    # distributions.
-    pylint_newlines = []
-    with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'r') as f:
-        for line in f.readlines():
-            if line.strip() == 'ConverterMapping,':
-                continue
-            if line.strip().endswith('"ConverterMapping",'):
-                pylint_newlines.append(
-                    line[:line.find('"ConverterMapping"')] + '\n')
-            else:
-                pylint_newlines.append(line)
-    with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'w+') as f:
-        f.writelines(pylint_newlines)
-
-    # Do similar surgery on configparser in pylint-quotes-0.1.8 to remove
-    # dependency on ConverterMapping.
-    pq_newlines = []
-    with python_utils.open_file(PQ_CONFIGPARSER_FILEPATH, 'r') as f:
-        for line in f.readlines():
-            if line.strip() == 'ConverterMapping,':
-                continue
-            if line.strip() == '"ConverterMapping",':
-                continue
-            pq_newlines.append(line)
-    with python_utils.open_file(PQ_CONFIGPARSER_FILEPATH, 'w+') as f:
-        f.writelines(pq_newlines)
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
@@ -313,8 +290,7 @@ def main():
     # https://github.com/googleapis/python-ndb/issues/518
     python_utils.PRINT(
         'Checking that all google library modules contain __init__.py files...')
-    for path_list in os.walk(
-            correct_google_path):
+    for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
             with python_utils.open_file(

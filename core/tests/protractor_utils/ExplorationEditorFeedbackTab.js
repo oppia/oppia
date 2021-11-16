@@ -41,6 +41,10 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-suggestion-review-message'));
   var feedbackStatusDropdown = element(
     by.css('.protractor-test-oppia-feedback-status-menu'));
+  var feedbackMessages = element.all(
+    by.css('.protractor-test-exploration-feedback'));
+  var feedbackStatusElement = element(
+    by.css('.protractor-test-oppia-feedback-status-name'));
   /*
    * Buttons
    */
@@ -168,16 +172,12 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.readFeedbackMessagesFromThread = async function() {
-    var feedbackMessages = element.all(
-      by.css('.protractor-test-exploration-feedback'));
     await waitFor.visibilityOf(
       feedbackMessages.first(), 'Feedback message text is not visible');
     return feedbackMessages;
   };
 
   this.expectFeedbackStatusNameToBe = async function(feedbackStatus) {
-    var feedbackStatusElement = element(
-      by.css('.protractor-test-oppia-feedback-status-name'));
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
     await waitFor.textToBePresentInElement(

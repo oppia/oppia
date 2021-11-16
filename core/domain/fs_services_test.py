@@ -14,22 +14,21 @@
 
 """Tests for File System services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import json
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 from proto_files import text_classifier_pb2
-import python_utils
-import utils
 
 
 class FileSystemServicesTests(test_utils.GenericTestBase):
@@ -61,32 +60,29 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SaveOriginalAndCompressedVersionsOfImageTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self):
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
-        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
+        self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+        self.assertFalse(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
         fs_services.save_original_and_compressed_versions_of_image(
             self.FILENAME, 'exploration', self.EXPLORATION_ID,
             original_image_content, 'image', True)
-        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
+        self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+        self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
     def test_compress_image_on_prod_mode_with_small_image_size(self):
         with python_utils.open_file(

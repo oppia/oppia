@@ -16,14 +16,16 @@
 
 """Models for long-running jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
-import random
+from __future__ import annotations
 
 from core.platform import models
-import python_utils
-import utils
+
+from typing import Dict, Sequence
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -41,22 +43,6 @@ STATUS_CODE_CANCELED = 'canceled'
 
 class JobModel(base_models.BaseModel):
     """Class representing a datastore entity for a long-running job."""
-
-    @classmethod
-    def get_new_id(cls, entity_name):
-        """Overwrites superclass method.
-
-        Args:
-            entity_name: str. The name of the entity to create a new job id for.
-
-        Returns:
-            str. A job id.
-        """
-        job_type = entity_name
-        current_time_str = python_utils.UNICODE(
-            int(utils.get_current_time_in_millisecs()))
-        random_int = random.randint(0, 1000)
-        return '%s-%s-%s' % (job_type, current_time_str, random_int)
 
     # The job type.
     job_type = datastore_services.StringProperty(indexed=True)
@@ -94,17 +80,18 @@ class JobModel(base_models.BaseModel):
     additional_job_params = datastore_services.JsonProperty(default=None)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -120,7 +107,7 @@ class JobModel(base_models.BaseModel):
         })
 
     @property
-    def is_cancelable(self):
+    def is_cancelable(self) -> bool:
         """Checks if the job is cancelable.
 
         Returns:
@@ -130,26 +117,7 @@ class JobModel(base_models.BaseModel):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
-    def get_recent_jobs(cls, limit, recency_msec):
-        """Gets at most limit jobs with respect to a time after recency_msec.
-
-        Args:
-            limit: int. A limit on the number of jobs to return.
-            recency_msec: int. The number of milliseconds earlier
-                than the current time.
-
-        Returns:
-            list(JobModel) or None. A list of at most `limit` jobs
-            that come after recency_msec time.
-        """
-        earliest_time_msec = (
-            utils.get_current_time_in_millisecs() - recency_msec)
-        return cls.query().filter(
-            cls.time_queued_msec > earliest_time_msec
-        ).order(-cls.time_queued_msec).fetch(limit)
-
-    @classmethod
-    def get_all_unfinished_jobs(cls, limit):
+    def get_all_unfinished_jobs(cls, limit: int) -> Sequence[JobModel]:
         """Gets at most `limit` unfinished jobs.
 
         Args:
@@ -164,7 +132,7 @@ class JobModel(base_models.BaseModel):
         ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
-    def get_unfinished_jobs(cls, job_type):
+    def get_unfinished_jobs(cls, job_type: str) -> datastore_services.Query:
         """Gets jobs that are unfinished.
 
         Args:
@@ -178,7 +146,7 @@ class JobModel(base_models.BaseModel):
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
 
     @classmethod
-    def do_unfinished_jobs_exist(cls, job_type):
+    def do_unfinished_jobs_exist(cls, job_type: str) -> bool:
         """Checks if unfinished jobs exist.
 
         Args:

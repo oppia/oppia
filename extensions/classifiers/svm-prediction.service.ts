@@ -142,10 +142,6 @@ export class SVMPredictionService {
       }
     }
 
-    if (iter >= maxIter) {
-      console.warn('Exceeds maxIter in calculateMulticlassProbabilities');
-    }
-
     return P;
   }
 

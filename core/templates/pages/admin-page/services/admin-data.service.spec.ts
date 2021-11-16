@@ -30,7 +30,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('Admin Data Service', () => {
-  let adminDataService: AdminDataService = null;
+  let adminDataService: AdminDataService;
   let httpTestingController: HttpTestingController;
   var sampleAdminData: AdminPageDataBackendDict = {
     role_to_actions: {
@@ -58,9 +58,7 @@ describe('Admin Data Service', () => {
         is_published: false
       }
     ],
-    updatable_roles: {
-      TOPIC_MANAGER: 'topic manager'
-    },
+    updatable_roles: ['TOPIC_MANAGER'],
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
     config_properties: {
@@ -79,7 +77,9 @@ describe('Admin Data Service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: {
+    viewable_roles: ['TOPIC_MANAGER'],
+    human_readable_roles: {
+      FULL_USER: 'full user',
       TOPIC_MANAGER: 'topic manager'
     },
     feature_flags: [{
@@ -89,7 +89,7 @@ describe('Admin Data Service', () => {
       rules: [{
         filters: [{
           type: PlatformParameterFilterType.ServerMode,
-          conditions: [<[string, string]>['=', 'dev']]
+          conditions: [['=', 'dev'] as [string, string]]
         }],
         value_when_matched: true
       }],
@@ -116,6 +116,7 @@ describe('Admin Data Service', () => {
       roleToActions: sampleAdminData.role_to_actions,
       configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
+      humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
         CreatorTopicSummary.createFromBackendDict),
       featureFlags: sampleAdminData.feature_flags.map(

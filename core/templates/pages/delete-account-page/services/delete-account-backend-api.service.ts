@@ -19,6 +19,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
@@ -37,8 +38,8 @@ export class DeleteAccountBackendApiService {
       this.siteAnalyticsService.registerAccountDeletion();
       setTimeout(() => {
         this.windowRef.nativeWindow.location.href = (
-          '/logout?redirect_url=pending-account-deletion');
-      }, this.siteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+          '/logout?redirect_url=/pending-account-deletion');
+      }, AppConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
     });
   }
 }

@@ -16,10 +16,12 @@
 
 """Tests for methods in core.domain.caching_services"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+import json
+
+from core import feconf
+from core.constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import collection_domain
@@ -30,7 +32,6 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -223,7 +224,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]
             ).get(exploration_id))
 
-        caching_services.flush_memory_cache()
+        caching_services.flush_memory_caches()
 
         self.assertEqual(
             caching_services.get_multi(
@@ -491,10 +492,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c']))
 
         self.assertGreater(
-            caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION,
-                '0', [exploration_id]),
-            0)
+            len(
+                caching_services.get_multi(
+                    caching_services.CACHE_NAMESPACE_EXPLORATION,
+                    '0',
+                    [exploration_id]
+                ),
+            ),
+            0
+        )
 
         self.assertTrue(
             caching_services.delete_multi(
@@ -570,9 +576,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(key, 'config::email_footer')
                 self.assertEqual(
                     value,
-                    '"You can change your email preferences via the <a href='
-                    '\\"https://www.example.com\\">Preferences</a> page. '
-                    '\\u00a9\\u00a9\\u00ae\\u00ae"')
+                    '"You can change your email preferences via the <a href'
+                    '=\\"https://www.example.com\\">Preferences</a> page. '
+                    '\\u00a9\\u00a9\\u00ae\\u00ae"'
+                )
 
         config_id = 'email_footer'
 
@@ -584,13 +591,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             memory_cache_services, 'set_multi',
-            mock_memory_cache_services_set_multi):
+            mock_memory_cache_services_set_multi
+        ):
             caching_services.set_multi(
                 caching_services.CACHE_NAMESPACE_CONFIG, None,
                 {
                     config_id: (
                         'You can change your email preferences via the <a href'
-                        '="https://www.example.com">Preferences</a> page. ©©®®')
+                        '="https://www.example.com">Preferences</a> page. ©©®®'
+                    )
                 })
 
         cache_strings_response = caching_services.set_multi(
@@ -598,7 +607,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {
                 config_id: (
                     'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®')
+                    '="https://www.example.com">Preferences</a> page. ©©®®'
+                )
             })
 
         self.assertTrue(cache_strings_response)
@@ -610,7 +620,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {
                 config_id: (
                     'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®')
+                    '="https://www.example.com">Preferences</a> page. ©©®®'
+                )
             })
 
     def test_explorations_identically_cached_in_dev_and_test_environment(
@@ -644,8 +655,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             for key, value in id_value_mapping.items():
                 self.assertEqual(key, 'exploration:0:%s' % exploration_id)
                 self.assertEqual(
-                    value,
-                    self.json_encoded_string_representing_an_exploration)
+                    json.loads(value),
+                    json.loads(
+                        self.json_encoded_string_representing_an_exploration))
         with self.swap(
             memory_cache_services, 'set_multi',
             mock_memory_cache_services_set_multi):

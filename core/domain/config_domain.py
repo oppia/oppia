@@ -16,16 +16,14 @@
 
 """Domain objects for configuration properties."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core import schema_utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
-import feconf
-import python_utils
-import schema_utils
 
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.suggestion])
@@ -148,6 +146,11 @@ INT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_INT
 }
 
+POSITIVE_INT_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_CUSTOM,
+    'obj_type': 'PositiveInt'
+}
+
 
 class ConfigPropertyChange(change_domain.BaseChange):
     """Domain object for changes made to a config property object.
@@ -164,7 +167,7 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
-class ConfigProperty(python_utils.OBJECT):
+class ConfigProperty:
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -302,7 +305,7 @@ class ConfigProperty(python_utils.OBJECT):
             value, self._schema, global_validators=email_validators)
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are
@@ -454,7 +457,7 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 
 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'max_number_of_tags_assigned_to_blog_post',
-    INT_SCHEMA,
+    POSITIVE_INT_SCHEMA,
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10
@@ -473,11 +476,6 @@ LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
-
-CONTRIBUTOR_CAN_SUGGEST_QUESTIONS = ConfigProperty(
-    'contributor_can_suggest_questions', BOOL_SCHEMA,
-    'Whether the contributor can suggest questions for skill opportunities.',
-    False)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,

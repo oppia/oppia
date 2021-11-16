@@ -16,15 +16,14 @@
 
 """Script for running tests for custom eslint checks."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 import re
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 
@@ -40,8 +39,10 @@ def main():
         proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     encoded_tests_stdout, encoded_tests_stderr = proc.communicate()
-    tests_stdout = encoded_tests_stdout.decode(encoding='utf-8')
-    tests_stderr = encoded_tests_stderr.decode(encoding='utf-8')
+    # Standard and error output is in bytes, we need to decode the line to
+    # print it.
+    tests_stdout = encoded_tests_stdout.decode('utf-8')
+    tests_stderr = encoded_tests_stderr.decode('utf-8')
     if tests_stderr:
         python_utils.PRINT(tests_stderr)
         sys.exit(1)

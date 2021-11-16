@@ -14,15 +14,12 @@
 
 """Service functions relating to email models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import re
 
+from core import feconf
 from core.platform import models
-
-import feconf
-import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
@@ -37,7 +34,7 @@ def _is_email_valid(email_address):
     Returns:
         bool. Whether the specified email address is valid.
     """
-    if not isinstance(email_address, python_utils.BASESTRING):
+    if not isinstance(email_address, str):
         return False
 
     stripped_address = email_address.strip()
@@ -113,9 +110,8 @@ def send_mail(
             'Malformed sender email address: %s' % sender_email)
     bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
     response = platform_email_services.send_email_to_recipients(
-        sender_email, [recipient_email], subject.encode(encoding='utf-8'),
-        plaintext_body.encode(encoding='utf-8'),
-        html_body.encode(encoding='utf-8'), bcc, '', None)
+        sender_email, [recipient_email], subject,
+        plaintext_body, html_body, bcc, '', None)
     if not response:
         raise Exception((
             'Email to %s failed to send. Please try again later or ' +
@@ -164,9 +160,7 @@ def send_bulk_mail(
             'Malformed sender email address: %s' % sender_email)
 
     response = platform_email_services.send_email_to_recipients(
-        sender_email, recipient_emails, subject.encode(encoding='utf-8'),
-        plaintext_body.encode(encoding='utf-8'),
-        html_body.encode(encoding='utf-8'))
+        sender_email, recipient_emails, subject, plaintext_body, html_body)
     if not response:
         raise Exception(
             'Bulk email failed to send. Please try again later or contact us ' +

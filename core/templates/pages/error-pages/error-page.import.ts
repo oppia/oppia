@@ -16,20 +16,24 @@
  * @fileoverview Scripts for the error page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
+import 'pages/common-imports';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ErrorPageModule } from './error-page.module';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
+import { LoggerService } from 'services/contextual/logger.service';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'ui.bootstrap'
-]);
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-require('Polyfills.ts');
+const loggerService = new LoggerService();
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/error-pages/error-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+platformBrowserDynamic().bootstrapModule(ErrorPageModule).catch(
+  (err) => loggerService.error(err)
+);
 
-require('base-components/base-content.component.ts');
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';

@@ -17,7 +17,6 @@
  */
 
 var action = require('../protractor_utils/action.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -92,7 +91,6 @@ describe('Basic user journeys', function() {
 });
 
 describe('Site language', function() {
-  var adminPage = null;
   var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
@@ -104,7 +102,6 @@ describe('Site language', function() {
   var preferencesPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -116,15 +113,8 @@ describe('Site language', function() {
     var CREATOR_USERNAME = 'langCreatorExplorations';
     var EDITOR_USERNAME = 'langCollections';
 
-    await users.createUser('lang@collections.com', EDITOR_USERNAME);
-    await users.createAndLoginAdminUser(
-      'langCreator@explorations.com', CREATOR_USERNAME);
-    await users.logout();
-    await users.createAndLoginAdminUser(
-      'testlangadm@collections.com', 'testlangadm');
-    await adminPage.get();
-    await adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
-    await users.logout();
+    await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    await users.createCollectionEditor('lang@collections.com', EDITOR_USERNAME);
 
     await users.login('langCreator@explorations.com');
     await workflow.createExploration(true);
@@ -163,8 +153,7 @@ describe('Site language', function() {
     await waitFor.pageToFullyLoad();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // In the url a # is added at the end that is not part of collection ID.
-    collectionId = pathname[5].slice(0, -1);
+    collectionId = pathname[5];
     // Add existing explorations.
     await collectionEditorPage.addExistingExploration(firstExplorationId);
     await collectionEditorPage.saveDraft();
@@ -250,9 +239,13 @@ describe('Site language', function() {
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholder = await element(by.css('.protractor-test-float-form-input'))
-      .getAttribute('placeholder');
-    expect(placeholder).toEqual('Ingresa un número');
+    var placeholderElement = await element(
+      by.css('.protractor-test-float-form-input'));
+    await waitFor.visibilityOf(
+      placeholderElement, 'Placeholder Element taking too long to appear');
+    await waitFor.elementAttributeToBe(
+      placeholderElement, 'placeholder', 'Ingresa un número',
+      'Placeholder text taking too long to change from English to Spanish');
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });

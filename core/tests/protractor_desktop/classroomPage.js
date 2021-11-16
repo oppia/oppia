@@ -31,7 +31,7 @@ describe('Classroom page functionality', function() {
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createAndLoginUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
     await users.logout();
   });

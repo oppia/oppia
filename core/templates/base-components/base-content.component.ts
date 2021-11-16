@@ -16,9 +16,11 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { Component, Directive } from '@angular/core';
+import { ChangeDetectorRef, Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { CookieService } from 'ngx-cookie';
+import { Subscription } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -27,6 +29,7 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-base-content',
@@ -35,18 +38,24 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
 export class BaseContentComponent {
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
-  iframed: boolean;
+  iframed: boolean = false;
   DEV_MODE = AppConstants.DEV_MODE;
+  COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
+  ONE_YEAR_IN_MSECS = 31536000000;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private windowRef: WindowRef,
     private backgroundMaskService: BackgroundMaskService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
+    private changeDetectorRef: ChangeDetectorRef,
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
+    private cookieService: CookieService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -62,9 +71,13 @@ export class BaseContentComponent {
         this.windowRef.nativeWindow.location.hash);
     }
     this.iframed = this.urlService.isIframed();
-    this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => this.loadingMessage = message
-    );
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => {
+          this.loadingMessage = message;
+          this.changeDetectorRef.detectChanges();
+        }
+      ));
     this.keyboardShortcutService.bindNavigationShortcuts();
 
     // TODO(sll): Use 'touchstart' for mobile.
@@ -73,12 +86,20 @@ export class BaseContentComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   getHeaderText(): string {
-    return this.pageTitleService.getPageTitleForMobileView();
+    return this.pageTitleService.getNavbarTitleForMobileView();
   }
 
   getSubheaderText(): string {
-    return this.pageTitleService.getPageSubtitleForMobileView();
+    return this.pageTitleService.getNavbarSubtitleForMobileView();
   }
 
   isMainProdServer(): boolean {
@@ -107,15 +128,46 @@ export class BaseContentComponent {
   }
 
   skipToMainContent(): void {
-    let mainContentElement: HTMLElement = document.getElementById(
+    // 'getElementById' can return null if the element provided as
+    // an argument is invalid.
+    let mainContentElement: HTMLElement | null = document.getElementById(
       'oppia-main-content');
 
     if (!mainContentElement) {
-      throw new Error('Variable mainContentElement is undefined.');
+      throw new Error('Variable mainContentElement is null.');
     }
     mainContentElement.tabIndex = -1;
     mainContentElement.scrollIntoView();
     mainContentElement.focus();
+  }
+
+  hasAcknowledgedCookies(): boolean {
+    let cookieSetDateMsecs = this.cookieService.get(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
+    return (
+      !!cookieSetDateMsecs &&
+      Number(cookieSetDateMsecs) > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+    );
+  }
+
+  acknowledgeCookies(): void {
+    let currentDateInUnixTimeMsecs = new Date().valueOf();
+    // This cookie should support cross-site context so secure=true and
+    // sameSite='none' is set explicitly. Not setting this can cause
+    // inconsistent behaviour in different browsers in third-party contexts
+    // e.g. In Firefox, the cookie is accepted with a warning when
+    // sameSite='none' but secure=true is not set. For the same scenario in
+    // Chrome, the cookie gets rejected.
+    // See https://caniuse.com/same-site-cookie-attribute
+    // See https://www.chromium.org/updates/same-site/faq
+    let cookieOptions = {
+      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS),
+      secure: true,
+      sameSite: 'none' as const
+    };
+    this.cookieService.put(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),
+      cookieOptions);
   }
 }
 
@@ -126,6 +178,14 @@ export class BaseContentComponent {
   selector: 'navbar-breadcrumb'
 })
 export class BaseContentNavBarBreadCrumbDirective {}
+
+/**
+ * This directive is used as selector for navbar pre logo action transclusion.
+ */
+@Directive({
+  selector: 'navbar-pre-logo-action'
+})
+export class BaseContentNavBarPreLogoActionDirective {}
 
 
 /**

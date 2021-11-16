@@ -47,7 +47,8 @@ describe('Login required message component', () => {
       location: {
         reload: ()=>{},
         href: 'starting-url'
-      }
+      },
+      gtag: () => {}
     });
     component.ngOnInit();
   });

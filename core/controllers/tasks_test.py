@@ -14,9 +14,9 @@
 
 """Tests for Tasks Email Handler."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -29,8 +29,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -56,8 +54,7 @@ class TasksTests(test_utils.EmailTestBase):
         self.user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.set_user_role(
-            self.EDITOR_USERNAME, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
@@ -103,7 +100,7 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Assert that the message is correct.
             self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].body.decode(), expected_message)
+            self.assertEqual(messages[0].body, expected_message)
 
             # Create another message that is len = 201.
             user_b_message = 'B' * 201
@@ -116,8 +113,7 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
 
             # What is expected in the email body.
             expected_message = (
@@ -131,13 +127,13 @@ class TasksTests(test_utils.EmailTestBase):
             # and has correct message.
 
             self.assertEqual(len(messages), 2)
-            self.assertEqual(messages[1].body.decode(), expected_message)
+            self.assertEqual(messages[1].body, expected_message)
 
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
 
         user_id_b = self.user_id_b
-        class MockActivityRights(python_utils.OBJECT):
+        class MockActivityRights:
             def __init__(
                     self, exploration_id, owner_ids, editor_ids,
                     voice_artist_ids, viewer_ids, community_owned=False,
@@ -201,7 +197,7 @@ class TasksTests(test_utils.EmailTestBase):
                     ' the feedback page for your exploration.\n\nTha'
                     'nks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
-                self.assertEqual(messages[0].body.decode(), expected_message)
+                self.assertEqual(messages[0].body, expected_message)
 
     def test_instant_feedback_reply_email(self):
         """Tests Instant feedback message handler."""
@@ -242,7 +238,7 @@ class TasksTests(test_utils.EmailTestBase):
                 ' this thread.)\n\nBest wishes,\nThe Oppia'
                 ' team\n\nYou can change your email preferences'
                 ' via the Preferences page.')
-            self.assertEqual(messages[0].body.decode(), expected_message)
+            self.assertEqual(messages[0].body, expected_message)
 
     def test_email_sent_when_status_changed(self):
         """Tests Feedback Thread Status Change Email Handler."""
@@ -283,8 +279,7 @@ class TasksTests(test_utils.EmailTestBase):
                 '.)\n\nBest wishes,\nThe Oppia team\n\nYou can change your'
                 ' email preferences via the Preferences page.')
             status_change_email = messages[0]
-            self.assertEqual(
-                status_change_email.body.decode(), expected_message)
+            self.assertEqual(status_change_email.body, expected_message)
 
     def test_email_sent_to_moderator_after_flag(self):
         """Tests Flagged Exploration Email Handler."""
@@ -332,7 +327,7 @@ class TasksTests(test_utils.EmailTestBase):
                     ' .\nYou can modify the exploration by clicking here'
                     '.\n\nThanks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
-                self.assertEqual(messages[0].body.decode(), expected_message)
+                self.assertEqual(messages[0].body, expected_message)
 
     def test_deferred_tasks_handler_raises_correct_exceptions(self):
         incorrect_function_identifier = 'incorrect_function_id'
@@ -350,9 +345,9 @@ class TasksTests(test_utils.EmailTestBase):
 
         headers = {
             # Need to convert to bytes since test app doesn't allow unicode.
-            'X-Appengine-QueueName': python_utils.convert_to_bytes('queue'),
-            'X-Appengine-TaskName': python_utils.convert_to_bytes('None'),
-            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+            'X-Appengine-QueueName': b'queue',
+            'X-Appengine-TaskName': b'None',
+            'X-AppEngine-Fake-Is-Admin': b'1'
         }
         csrf_token = self.get_new_csrf_token()
 

@@ -177,7 +177,7 @@ describe('ThumbnailUploaderComponent', () => {
     });
 
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>ngbModalRef);
+      ngbModalRef as NgbModalRef);
     spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
       'image_file_name.svg');
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
@@ -240,7 +240,7 @@ describe('ThumbnailUploaderComponent', () => {
     component.bgColor = '#ff9933';
 
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>ngbModalRef);
+      ngbModalRef as NgbModalRef);
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
       .and.returnValue(new File([''], 'filename', {type: 'image/jpeg'}));
 
@@ -296,7 +296,7 @@ describe('ThumbnailUploaderComponent', () => {
     const imageSaveSpy = spyOn(component.imageSave, 'emit');
 
     spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>ngbModalRef);
+      ngbModalRef as NgbModalRef);
     spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
       'image_file_name.svg');
     spyOn(imageLocalStorageService, 'saveImage');
@@ -342,10 +342,10 @@ describe('ThumbnailUploaderComponent', () => {
     component.allowedBgColors = ['#ff9933'];
 
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: ngbModalRef,
         result: Promise.reject('cancel')
-      });
+      } as NgbModalRef);
     });
 
     component.showEditThumbnailModal();

@@ -16,18 +16,23 @@
 
 """Model for an Oppia collection."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import copy
 import datetime
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
-import feconf
-import python_utils
-import utils
+
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -42,7 +47,7 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -61,7 +66,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         datastore_services.StringProperty(indexed=True, required=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: user_id field.
         """
@@ -70,14 +75,15 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         )
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
@@ -87,7 +93,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         })
 
     @classmethod
-    def get_instance_id(cls, collection_id, version):
+    def get_instance_id(cls, collection_id: str, version: int) -> str:
         """This function returns the generated id for the get_commit function
         in the parent class.
 
@@ -102,7 +108,11 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        max_age: Optional[datetime.timedelta] = None
+    ) -> Tuple[Sequence[CollectionCommitLogEntryModel], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their last
         updated attribute.
 
@@ -178,17 +188,18 @@ class CollectionModel(base_models.VersionedModel):
         datastore_services.JsonProperty(default={}, indexed=False))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -201,12 +212,14 @@ class CollectionModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_collection_count(cls):
+    def get_collection_count(cls) -> int:
         """Returns the total number of collections."""
         return cls.get_all().count()
 
+    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @staticmethod
-    def convert_to_valid_dict(model_dict):
+    def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the CollectionModel dict.
 
         Some old CollectionModels can contain fields
@@ -234,7 +247,9 @@ class CollectionModel(base_models.VersionedModel):
 
         return model_dict
 
-    def _reconstitute(self, snapshot_dict):
+    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
+    def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> CollectionModel:
         """Populates the model instance with the snapshot.
 
         Some old CollectionModels can contain fields
@@ -254,8 +269,15 @@ class CollectionModel(base_models.VersionedModel):
             **CollectionModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
+            self,
+            committer_id: str,
+            commit_type: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -286,10 +308,17 @@ class CollectionModel(base_models.VersionedModel):
         collection_commit_log.update_timestamps()
         collection_commit_log.put()
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete_multi().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def delete_multi(
-            cls, entity_ids, committer_id, commit_message,
-            force_deletion=False):
+    def delete_multi( # type: ignore[override]
+            cls,
+            entity_ids: List[str],
+            committer_id: str,
+            commit_message: str,
+            force_deletion: bool = False
+    ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
         Note that this extends the superclass method.
@@ -313,6 +342,9 @@ class CollectionModel(base_models.VersionedModel):
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
             for model, rights_model in python_utils.ZIP(
                     versioned_models, collection_rights_models):
+                # Ruling out the possibility of None for mypy type checking.
+                assert model is not None
+                assert rights_model is not None
                 collection_commit_log = CollectionCommitLogEntryModel.create(
                     model.id, model.version, committer_id,
                     cls._COMMIT_TYPE_DELETE,
@@ -338,7 +370,7 @@ class CollectionRightsSnapshotContentModel(
     """Storage model for the content of a collection rights snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
@@ -351,7 +383,7 @@ class CollectionRightsSnapshotContentModel(
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether CollectionRightsSnapshotContentModel references
         the given user. The owner_ids, editor_ids, voice_artist_ids,
         and viewer_ids fields are checked through content_user_ids field in
@@ -410,7 +442,7 @@ class CollectionRightsModel(base_models.VersionedModel):
     )
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
@@ -420,7 +452,8 @@ class CollectionRightsModel(base_models.VersionedModel):
         )
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to collections and have varying rights.
         """
@@ -430,7 +463,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
-    def get_field_name_mapping_to_takeout_keys(cls):
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
         """Defines the mapping of field names to takeout keys since this model
         is exported as one instance shared across users.
         """
@@ -442,7 +475,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         }
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export/delete corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -456,7 +489,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether CollectionRightsModel references the given user.
 
         Args:
@@ -472,7 +505,14 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    def save(self, committer_id, commit_message, commit_cmds):
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
+    def save(
+            self,
+            committer_id: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
 
@@ -489,8 +529,10 @@ class CollectionRightsModel(base_models.VersionedModel):
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @staticmethod
-    def convert_to_valid_dict(model_dict):
+    def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the CollectionRightsModel dict.
 
         Some old CollectionRightsSnapshotContentModels can contain fields
@@ -530,7 +572,11 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    def _reconstitute(self, snapshot_dict):
+    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
+    def _reconstitute(
+            self, snapshot_dict: Dict[str, Any]
+    ) -> CollectionRightsModel:
         """Populates the model instance with the snapshot.
 
         Some old CollectionRightsSnapshotContentModels can contain fields
@@ -550,8 +596,15 @@ class CollectionRightsModel(base_models.VersionedModel):
             **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
+            self,
+            committer_id: str,
+            commit_type: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this overrides the superclass method.
@@ -590,6 +643,8 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
+        # Ruling out the possibility of None for mypy type checking.
+        assert snapshot_metadata_model is not None
 
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
@@ -600,7 +655,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = python_utils.NEXT(
+            user_id_attribute_names = next(
                 cmd['user_id_attribute_names']
                 for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
                 if cmd['name'] == commit_cmd['cmd']
@@ -614,7 +669,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.put()
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id: str) -> Dict[str, List[str]]:
         """(Takeout) Export user-relevant properties of CollectionRightsModel.
 
         Args:
@@ -725,7 +780,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     node_count = datastore_services.IntegerProperty()
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, editor_ids, owner_ids, contributor_ids,
         and contributors_summary fields.
@@ -735,7 +790,8 @@ class CollectionSummaryModel(base_models.BaseModel):
         )
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
@@ -743,7 +799,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because noteworthy details that belong to this model have already been
         exported as a part of the CollectionRightsModel.
@@ -771,7 +827,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether CollectionSummaryModel references user.
 
         Args:
@@ -787,20 +843,20 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls):
+    def get_non_private(cls) -> Sequence[CollectionSummaryModel]:
         """Returns an iterable with non-private collection summary models.
 
         Returns:
             iterable. An iterable with non-private collection summary models.
         """
-        return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        return cls.get_all().filter(
+            cls.status != constants.ACTIVITY_STATUS_PRIVATE
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_private_at_least_viewable(cls, user_id):
+    def get_private_at_least_viewable(
+        cls, user_id: str
+    ) -> Sequence[CollectionSummaryModel]:
         """Returns an iterable with private collection summary models that are
         at least viewable by the given user.
 
@@ -811,19 +867,20 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with private collection summary models that
             are at least viewable by the given user.
         """
-        return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
+        return cls.get_all().filter(
+            cls.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             datastore_services.any_of(
-                CollectionSummaryModel.owner_ids == user_id,
-                CollectionSummaryModel.editor_ids == user_id,
-                CollectionSummaryModel.viewer_ids == user_id)
-        ).filter(
-            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.viewer_ids == user_id
+            )
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_at_least_editable(cls, user_id):
+    def get_at_least_editable(
+        cls, user_id: str
+    ) -> Sequence[CollectionSummaryModel]:
         """Returns an iterable with collection summary models that are at least
         editable by the given user.
 
@@ -834,10 +891,9 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
-        return CollectionSummaryModel.query().filter(
+        return CollectionSummaryModel.get_all().filter(
             datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
-                CollectionSummaryModel.editor_ids == user_id)
-        ).filter(
-            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+                CollectionSummaryModel.editor_ids == user_id
+            )
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

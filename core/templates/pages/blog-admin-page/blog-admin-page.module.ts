@@ -20,7 +20,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 
@@ -31,7 +31,9 @@ import { RolesAndActionsVisualizerComponent } from 'pages/admin-page/roles-tab/r
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
+import { ToastrModule } from 'ngx-toastr';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 declare var angular: ng.IAngularStatic;
 
@@ -40,18 +42,20 @@ declare var angular: ng.IAngularStatic;
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     MatCardModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     BlogAdminNavbarComponent,
     BlogAdminPageComponent,
     RolesAndActionsVisualizerComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     BlogAdminNavbarComponent,
     BlogAdminPageComponent,
     RolesAndActionsVisualizerComponent
@@ -68,6 +72,10 @@ declare var angular: ng.IAngularStatic;
       deps: [PlatformFeatureService],
       multi: true,
     },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
+    }
   ],
 })
 class BlogAdminPageModule implements DoBootstrap {

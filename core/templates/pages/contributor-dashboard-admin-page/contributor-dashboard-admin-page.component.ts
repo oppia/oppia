@@ -53,7 +53,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        var taskRunningInBackground = false;
+        ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
 
         var handleErrorResponse = function(errorResponse) {
@@ -80,33 +80,31 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         };
 
         ctrl.submitAddContributionRightsForm = function(formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Adding new reviewer...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .addContributionReviewerAsync(
               formResponse.category, formResponse.username,
               formResponse.languageCode
             ).then(() => {
-              ctrl.statusMessage = (
-                'Successfully added "' + formResponse.username + '" as ' +
-              formResponse.category + ' reviewer.');
+              ctrl.statusMessage = 'Success.';
               refreshFormData();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
         };
 
         ctrl.submitViewContributorUsersForm = function(formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Processing query...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ctrl.contributionReviewersResult = {};
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             ContributorDashboardAdminBackendApiService
@@ -152,15 +150,15 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 refreshFormData();
               }, handleErrorResponse);
           }
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
         };
 
         ctrl.submitRemoveContributionRightsForm = function(formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Processing query...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .removeContributionReviewerAsync(
               formResponse.username, formResponse.category,
@@ -172,7 +170,30 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
+        };
+
+        ctrl.submitViewTranslationContributionStatsForm = function(
+            formResponse) {
+          if (ctrl.taskRunningInBackground) {
+            return;
+          }
+          ctrl.statusMessage = 'Processing query...';
+          ctrl.taskRunningInBackground = true;
+          ContributorDashboardAdminBackendApiService
+            .viewTranslationContributionStatsAsync(
+              formResponse.username
+            ).then(response => {
+              ctrl.translationContributionStatsResults = (
+                response.translation_contribution_stats);
+              ctrl.translationContributionStatsFetched = true;
+              ctrl.statusMessage = 'Success.';
+              refreshFormData();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, handleErrorResponse);
+          ctrl.taskRunningInBackground = false;
         };
 
         var refreshFormData = function() {
@@ -228,24 +249,40 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 }
                 return true;
               }
+            },
+            viewTranslationContributionStats: {
+              username: '',
+              isValid: function() {
+                if (this.username === '') {
+                  return false;
+                }
+                return true;
+              }
             }
           };
         };
 
         ctrl.$onInit = function() {
-          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {};
           UserService.getUserInfoAsync().then((userInfo) => {
+            let translationCategories = {};
+            let questionCategories = {};
             if (userInfo.isTranslationAdmin()) {
-              ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+              translationCategories = {
                 REVIEW_TRANSLATION: (
                   CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
               };
-            } else if (userInfo.isQuestionAdmin()) {
-              ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+            }
+            if (userInfo.isQuestionAdmin()) {
+              questionCategories = {
                 REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
               };
             }
+            ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+              ...translationCategories,
+              ...questionCategories
+            };
+            $rootScope.$apply();
           });
 
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
@@ -254,6 +291,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           refreshFormData();
           ctrl.contributionReviewersDataFetched = false;
           ctrl.contributionReviewersResult = {};
+          ctrl.translationContributionStatsFetched = false;
+          ctrl.translationContributionStatsResults = [];
           ctrl.statusMessage = '';
 
           ctrl.languageCodesAndDescriptions = (

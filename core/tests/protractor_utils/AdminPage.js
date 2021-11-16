@@ -17,6 +17,7 @@
  * tests.
  */
 
+const { element } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
@@ -33,43 +34,58 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-test-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-test-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-test-update-form-role-select'));
+  var usernameInputFieldForRolesEditing = element(
+    by.css('.protractor-test-username-for-role-editor'));
+  var editUserRoleButton = element(by.css('.protractor-test-role-edit-button'));
+  var addNewRoleButton = element(
+    by.css('.protractor-test-add-new-role-button'));
+  var progressSpinner = element(by.css('.protractor-test-progress-spinner'));
+  var roleSelector = element(by.css('.protractor-test-new-role-selector'));
+  var roleEditorContainer = element(
+    by.css('.protractor-test-roles-editor-card-container'));
+  var userRoleItems = element.all(
+    by.css('.protractor-test-user-role-description'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
-  var roleUsernameOption = element(by.css(
-    '.protractor-test-username-value'));
   var viewRoleButton = element(by.css('.protractor-test-role-success'));
-  var oneOffJobRows = element.all(by.css('.protractor-test-one-off-jobs-rows'));
-  var unfinishedOneOffJobRows = element.all(by.css(
-    '.protractor-test-unfinished-one-off-jobs-rows'));
-  var unfinishedOffJobIDClassName = (
-    '.protractor-test-unfinished-one-off-jobs-id');
+  var explorationElements = element.all(by.css(
+    '.protractor-test-reload-exploration-row'));
+  var reloadCollectionButtons = element.all(by.css(
+    '.protractor-test-reload-collection-button'));
+  var explorationTitleLocator = by.css(
+    '.protractor-test-reload-exploration-title');
+  var explorationButtonLocator = by.css(
+    '.protractor-test-reload-exploration-button');
+  var configTitleLocator = by.css('.protractor-test-config-title');
+  var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+  var featureFlagElements = element.all(by.css(
+    '.protractor-test-feature-flag'));
+  var featureNameLocator = by.css('.protractor-test-feature-name');
+  var noRuleIndicatorLocator = by.css('.protractor-test-no-rule-indicator');
+  var removeRuleButtonLocator = by.css(
+    '.protractor-test-remove-rule-button');
+  var saveButtonLocator = by.css('.protractor-test-save-button');
+  var addFeatureRuleButtonLocator = by.css(
+    '.protractor-test-feature-add-rule-button');
+  var valueSelectorLocator = by.css('.protractor-test-value-selector');
+  var addConditionButtonLocator = by.css(
+    '.protractor-test-add-condition-button');
+  var rolesResultRowsElements = element.all(
+    by.css('.protractor-test-roles-result-rows'));
+
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
   if (general.isInDevMode()) {
-    var explorationElements = element.all(by.css(
-      '.protractor-test-reload-exploration-row'
-    ));
-
-    var reloadCollectionButtons = element.all(by.css(
-      '.protractor-test-reload-collection-button'));
-
     var getExplorationTitleElement = function(explorationElement) {
-      return explorationElement.element(
-        by.css('.protractor-test-reload-exploration-title')
-      );
+      return explorationElement.element(explorationTitleLocator);
     };
 
     var getExplorationElementReloadButton = function(explorationElement) {
-      return explorationElement.element(
-        by.css('.protractor-test-reload-exploration-button')
-      );
+      return explorationElement.element(explorationButtonLocator);
     };
 
     this.reloadCollection = async function(collectionId) {
@@ -116,7 +132,6 @@ var AdminPage = function() {
 
   var _switchToRolesTab = async function() {
     await action.click('Admin roles tab button', adminRolesTab);
-    await waitFor.pageToFullyLoad();
 
     expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(
@@ -126,11 +141,9 @@ var AdminPage = function() {
   var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
     await waitFor.visibilityOf(
-      configProperty.element(
-        by.css('.protractor-test-config-title')),
+      configProperty.element(configTitleLocator),
       'Config Title taking too long too appear');
-    var title = await configProperty.element(
-      by.css('.protractor-test-config-title')).getText();
+    var title = await configProperty.element(configTitleLocator).getText();
     if (title.match(propertyName)) {
       await editingInstructions(
         await forms.getEditor(objectType)(configProperty));
@@ -156,23 +169,16 @@ var AdminPage = function() {
 
   this.getFeaturesTab = async function() {
     await this.get();
-    var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
     await action.click('Admin features tab', featuresTab);
-    var featureFlagElements = element.all(
-      by.css('.protractor-test-feature-flag'));
     await waitFor.visibilityOf(
       featureFlagElements.first(), 'Feature flags not showing up');
   };
 
   this.getDummyFeatureElement = async function() {
-    var featureFlagElements = element.all(
-      by.css('.protractor-test-feature-flag'));
-
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements.get(i);
-      if ((await elem.element(
-        by.css('.protractor-test-feature-name')).getText()) ===
+      if ((await elem.element(featureNameLocator).getText()) ===
           'dummy_feature') {
         return elem;
       }
@@ -182,12 +188,11 @@ var AdminPage = function() {
   };
 
   this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.isElementPresent(
-      by.css('.protractor-test-no-rule-indicator'))) {
+    while (!await featureElement.isElementPresent(noRuleIndicatorLocator)) {
       await action.click(
         'Remove feature rule button',
         featureElement
-          .element(by.css('.protractor-test-remove-rule-button'))
+          .element(removeRuleButtonLocator)
       );
     }
   };
@@ -196,7 +201,7 @@ var AdminPage = function() {
     await action.click(
       'Save feature button',
       featureElement
-        .element(by.css('.protractor-test-save-button'))
+        .element(saveButtonLocator)
     );
 
     await general.acceptAlert();
@@ -209,19 +214,19 @@ var AdminPage = function() {
     await action.click(
       'Add feature rule button',
       featureElement
-        .element(by.css('.protractor-test-feature-add-rule-button'))
+        .element(addFeatureRuleButtonLocator)
     );
 
     await action.sendKeys(
       'Rule value selector',
       featureElement
-        .element(by.css('.protractor-test-value-selector')),
+        .element(valueSelectorLocator),
       'Enabled');
 
     await action.click(
       'Add condition button',
       featureElement
-        .element(by.css('.protractor-test-add-condition-button'))
+        .element(addConditionButtonLocator)
     );
 
     await this.saveChangeOfFeature(featureElement);
@@ -249,83 +254,29 @@ var AdminPage = function() {
     }
   };
 
-  this.startOneOffJob = async function(jobName) {
-    await this._startOneOffJob(jobName, 0);
-  };
-
-  this._startOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(
-      oneOffJobRows.first(),
-      'Starting one off jobs taking too long to appear.');
-    await waitFor.visibilityOf(
-      oneOffJobRows.get(i), 'Could not get One Off Jobs');
-    var text = await oneOffJobRows.get(i).getText();
-    if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-      var oneOffJobRowsButton = oneOffJobRows.get(i).element(
-        by.css('.protractor-test-one-off-jobs-start-btn'));
-      await action.click('One Off Job Rows Button', oneOffJobRowsButton);
-    } else {
-      await this._startOneOffJob(jobName, ++i);
-    }
-  };
-
-  this.stopOneOffJob = async function(jobName) {
-    await this._stopOneOffJob(jobName, 0);
-  };
-
-  this._stopOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(
-      unfinishedOneOffJobRows.get(i),
-      'Could not get Unfinished Off Job');
-    var text = await unfinishedOneOffJobRows.get(i).getText();
-    if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-      var unfinishedOffJobRowsButton = (
-        unfinishedOneOffJobRows.get(i)
-      ).element(
-        by.css('.protractor-test-one-off-jobs-stop-btn'));
-      await action.click(
-        'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
-      await browser.refresh();
-      await waitFor.pageToFullyLoad();
-    } else {
-      await this._stopOneOffJob(jobName, ++i);
-    }
-  };
-
-  this.expectNumberOfRunningOneOffJobs = async function(count) {
-    var len = await element.all(by.css(
-      '.protractor-test-unfinished-one-off-jobs-id')).count();
-    expect(len).toEqual(count);
-  };
-
-  this.expectJobToBeRunning = async function(jobName) {
-    await browser.refresh();
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(element(
-      by.css('.protractor-test-unfinished-jobs-card')),
-    'Unfinished Jobs taking too long to appear');
-    let regex = new RegExp(`^${jobName.toLowerCase()}.*`, 'i');
-    let unfinishedJob = element(
-      by.cssContainingText(unfinishedOffJobIDClassName, regex));
-    var unfinishedJobName = await unfinishedJob.getText();
-    expect(unfinishedJobName.toLowerCase().startsWith(
-      jobName.toLowerCase())).toEqual(true);
-  };
-
-  this.updateRole = async function(name, newRole) {
+  this._editUserRole = async function(username) {
+    await this.get();
     await _switchToRolesTab();
+    await action.sendKeys(
+      'Username input field', usernameInputFieldForRolesEditing, username);
+    await action.click('Edit user role button', editUserRoleButton);
+    await waitFor.visibilityOf(
+      roleEditorContainer, 'Role editor card takes too long to appear.');
+  };
 
-    // Change values for "update role" form, and submit it.
+  this.addRole = async function(name, newRole) {
+    await this._editUserRole(name);
+
+    await action.click('Add new role', addNewRoleButton);
+    await action.matSelect('New role selector', roleSelector, newRole);
+
+    await waitFor.invisibilityOf(
+      progressSpinner, 'Progress spinner is taking too long to disappear.');
+    var removeButtonElement = element(by.css(
+      '.protractor-test-' + newRole.split(' ').join('-') +
+      '-remove-button-container'));
     await waitFor.visibilityOf(
-      updateFormName, 'Update Form name taking too long to appear.');
-    await action.sendKeys('Update Form Name', updateFormName, name);
-    await action.select('Role Drop Down', roleSelect, newRole);
-    await action.click('Update Form Submit', updateFormSubmit);
-    await waitFor.visibilityOf(
-      statusMessage, 'Confirmation message not visible');
-    await waitFor.textToBePresentInElement(
-      statusMessage, 'successfully updated to',
-      'Could not set role successfully');
+      removeButtonElement, 'Role removal button takes too long to appear.');
   };
 
   this.getUsersAsssignedToRole = async function(role) {
@@ -334,34 +285,32 @@ var AdminPage = function() {
     await action.click('View Role Button', viewRoleButton);
   };
 
-  this.viewRolesByUsername = async function(username, expectResults) {
-    await action.select('Role Drop Down', roleDropdown, 'By Username');
-    await action.sendKeys('Role Username Option', roleUsernameOption, username);
-    await action.click('View Role Button', viewRoleButton);
-    if (expectResults) {
-      await waitFor.textToBePresentInElement(
-        statusMessage, 'Success.',
-        'Toast with "Success." taking too long to appear');
-    } else {
-      await waitFor.textToBePresentInElement(
-        statusMessage, 'No results.',
-        'Toast with "No results." taking too long to appear');
+  this.expectUserRolesToMatch = async function(name, expectedRoles) {
+    await this._editUserRole(name);
+    var userRoles = await userRoleItems.map(async function(userRoleContainer) {
+      return (
+        await action.getText('Role container', userRoleContainer)
+      ).toLowerCase();
+    });
+    expect(expectedRoles.length).toEqual(userRoles.length);
+    expectedRoles.sort();
+    userRoles.sort();
+    for (j = 0; j < userRoles.length; j++) {
+      var name = userRoles[j];
+      expect(name).toEqual(expectedRoles[j]);
     }
   };
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
     if (expectedUsernamesArray.length !== 0) {
-      await waitFor.visibilityOf(element(
-        by.css('.protractor-test-roles-result-rows')));
+      await waitFor.visibilityOf(rolesResultRowsElements.first());
     }
-    var usernames = await element.all(
-      by.css('.protractor-test-roles-result-rows'))
-      .map(async function(elm) {
-        var text = await action.getText(
-          'Username in roles list on admin page', elm);
-        return text;
-      });
+    var usernames = await rolesResultRowsElements.map(async function(elm) {
+      var text = await action.getText(
+        'Username in roles list on admin page', elm);
+      return text;
+    });
 
     for (i = 0; i < usernames.length; i++) {
       var name = usernames[i];

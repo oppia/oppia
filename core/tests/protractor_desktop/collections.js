@@ -20,7 +20,6 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
@@ -29,7 +28,6 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
 describe('Collections', function() {
-  var adminPage = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
   var collectionId = null;
@@ -38,9 +36,11 @@ describe('Collections', function() {
   var thirdExplorationId = null;
   var fourthExplorationId = null;
   var libraryPage = null;
+  var lazyExplorationId = null;
+  var linearExplorationId = null;
+  var testExplorationId = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -48,13 +48,10 @@ describe('Collections', function() {
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
     await users.createUser('creator@explorations.com', CREATOR_USERNAME);
-    await users.createUser('player@collections.com', PLAYER_USERNAME);
-    await users.createUser('alice@collections.com', EDITOR_USERNAME);
-    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
-    await adminPage.get();
-    await adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
-    await adminPage.updateRole(PLAYER_USERNAME, 'collection editor');
-    await users.logout();
+    await users.createCollectionEditor(
+      'player@collections.com', PLAYER_USERNAME);
+    await users.createCollectionEditor(
+      'alice@collections.com', EDITOR_USERNAME);
 
     await users.login('creator@explorations.com');
     // Create four test explorations.
@@ -98,6 +95,8 @@ describe('Collections', function() {
       'English',
       false
     );
+    lazyExplorationId = await general.getExplorationIdFromEditor();
+
     await workflow.createAndPublishExploration(
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
@@ -105,6 +104,8 @@ describe('Collections', function() {
       'English',
       false
     );
+    linearExplorationId = await general.getExplorationIdFromEditor();
+
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',
@@ -112,6 +113,8 @@ describe('Collections', function() {
       'English',
       false
     );
+    testExplorationId = await general.getExplorationIdFromEditor();
+
     await users.logout();
     await users.login('player@collections.com');
     await creatorDashboardPage.get();
@@ -129,8 +132,7 @@ describe('Collections', function() {
     await collectionEditorPage.saveChanges();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // In the url a # is added at the end that is not part of collection ID.
-    collectionId = pathname[5].slice(0, -1);
+    collectionId = pathname[5];
     await users.logout();
   });
 
@@ -144,9 +146,9 @@ describe('Collections', function() {
     await collectionEditorPage.addExistingExploration(secondExplorationId);
     await collectionEditorPage.addExistingExploration(thirdExplorationId);
     // Search and add existing explorations.
-    await collectionEditorPage.searchForAndAddExistingExploration('Lazy');
-    await collectionEditorPage.searchForAndAddExistingExploration('Linear');
-    await collectionEditorPage.searchForAndAddExistingExploration('Test');
+    await collectionEditorPage.addExistingExploration(lazyExplorationId);
+    await collectionEditorPage.addExistingExploration(linearExplorationId);
+    await collectionEditorPage.addExistingExploration(testExplorationId);
     // Shifting nodes in the node graph.
     await collectionEditorPage.shiftNodeLeft(1);
     await collectionEditorPage.shiftNodeRight(1);

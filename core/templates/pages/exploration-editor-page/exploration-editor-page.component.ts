@@ -17,12 +17,10 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -45,8 +43,6 @@ require(
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
-require(
-  'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.component.ts');
@@ -145,20 +141,26 @@ require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/internet-connectivity.service.ts');
+require('services/alerts.service.ts');
+require('services/user.service.ts');
+require('services/ngb-modal.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$uibModal',
+    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -171,17 +173,19 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'FocusManagerService', 'GraphDataService',
-    'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
+    'LoaderService', 'NgbModal',
+    'PageTitleService', 'ParamChangesObjectFactory',
+    'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
+    'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'WindowDimensionsService',
+    'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $uibModal,
+        $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -194,25 +198,29 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        FocusManagerService, GraphDataService,
-        LoaderService, PageTitleService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        FocusManagerService, GraphDataService, InternetConnectivityService,
+        LoaderService, NgbModal, PageTitleService, ParamChangesObjectFactory,
+        ParamSpecsObjectFactory, PreventPageUnloadEventService,
+        RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        WindowDimensionsService) {
+        UserService, WindowDimensionsService) {
       var ctrl = this;
+      var reconnectedMessageTimeoutMilliseconds = 4000;
+      var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
+      ctrl.connectedToInternet = true;
 
-      var setPageTitle = function() {
+      var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             ExplorationTitleService.savedMemento + ' - Oppia Editor');
         } else {
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             'Untitled Exploration - Oppia Editor');
         }
       };
@@ -242,8 +250,10 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync()
-        ]).then(async([explorationData, featuresData, openThreadsCount]) => {
+          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          UserService.getUserInfoAsync()
+        ]).then(async(
+            [explorationData, featuresData, openThreadsCount, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
@@ -274,6 +284,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
 
+
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
           ctrl.explorationObjectiveService = ExplorationObjectiveService;
@@ -281,8 +292,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
-          ctrl.currentUserIsModerator = explorationData.is_moderator;
+          ctrl.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
+          ctrl.currentUserIsModerator = userInfo.isModerator();
 
           ctrl.currentUser = explorationData.user;
           ctrl.currentVersion = explorationData.version;
@@ -370,30 +381,8 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
-          // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and is being played by
-          // learners.
-          if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
-
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
-          }
+          // TODO(#13352): Initialize StateTopAnswersStatsService and register
+          // relevant callbacks.
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
@@ -441,12 +430,8 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.showWelcomeExplorationModal = function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
-            'welcome-modal.template.html'),
+        NgbModal.open(WelcomeModalComponent, {
           backdrop: true,
-          controller: 'WelcomeModalController',
           windowClass: 'oppia-welcome-modal'
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
@@ -494,8 +479,8 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',
@@ -514,13 +499,36 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
+        InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
-              setPageTitle();
+              setDocumentTitle();
               $rootScope.$applyAsync();
             }
           )
+        );
+        ctrl.directiveSubscriptions.add(
+          InternetConnectivityService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              ctrl.connectedToInternet = internetAccessible;
+              if (internetAccessible) {
+                AlertsService.addSuccessMessage(
+                  'Reconnected. Checking whether your changes are mergeable.',
+                  reconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.removeListener();
+              } else {
+                AlertsService.addInfoMessage(
+                  'Looks like you are offline. ' +
+                  'You can continue working, and can save ' +
+                  'your changes once reconnected.',
+                  disconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.addListener();
+                if (RouterService.getActiveTabName() !== 'main') {
+                  ctrl.selectMainTab();
+                }
+              }
+            })
         );
         ctrl.directiveSubscriptions.add(
           ChangeListService.autosaveIsInProgress$.subscribe(

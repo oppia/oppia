@@ -33,23 +33,24 @@ export class RatingComputationService {
 
     let totalNumber: number = 0;
     for (var value in ratingFrequencies) {
-      totalNumber += ratingFrequencies[<ExplorationRatingsKey> value];
+      totalNumber += ratingFrequencies[value as ExplorationRatingsKey];
     }
 
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
   }
-  // Returns 'undefined' if the ratings are less than the
+
+  // Returns 'null' if the ratings are less than the
   // minimum acceptable number of ratings. The average should
   // not be computed in this case.
   computeAverageRating(
-      ratingFrequencies: ExplorationRatings): number | undefined {
+      ratingFrequencies: ExplorationRatings): number | null {
     if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
-      return undefined;
+      return null;
     } else {
       var totalNumber = 0;
       var totalValue = 0.0;
       for (var value in ratingFrequencies) {
-        let _value = <ExplorationRatingsKey> value;
+        let _value = value as ExplorationRatingsKey;
         totalValue += parseInt(_value) * ratingFrequencies[_value];
         totalNumber += ratingFrequencies[_value];
       }

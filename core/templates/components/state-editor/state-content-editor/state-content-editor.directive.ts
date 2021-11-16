@@ -36,7 +36,7 @@ require('services/external-save.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateContentEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       link: function(scope, element) {
@@ -53,8 +53,8 @@ angular.module('oppia').directive('stateContentEditor', [
         onSaveStateContent: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-content-editor/' +
+      template: require(
+        'components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
         '$scope', 'ContextService', 'EditabilityService',
@@ -66,6 +66,14 @@ angular.module('oppia').directive('stateContentEditor', [
             StateContentService, StateEditorService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          $scope.isCardContentLengthLimitReached = function() {
+            if (StateContentService.displayed === undefined) {
+              return false;
+            }
+            var content = StateContentService.displayed.html;
+            return (content.length > 4500);
+          };
+
           $scope.isCardHeightLimitReached = function() {
             var shadowPreviewCard = $(
               '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'

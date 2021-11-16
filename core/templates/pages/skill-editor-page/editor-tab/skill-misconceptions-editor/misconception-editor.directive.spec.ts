@@ -23,10 +23,11 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
 describe('Misconception Editor Directive', function() {
   let $scope = null;
@@ -35,7 +36,6 @@ describe('Misconception Editor Directive', function() {
   let directive = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillUpdateService: SkillUpdateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
 
   let sampleSkill = null;
@@ -57,10 +57,11 @@ describe('Misconception Editor Directive', function() {
     directive = $injector.get('misconceptionEditorDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillUpdateService = $injector.get('SkillUpdateService');
-    skillObjectFactory = $injector.get('SkillObjectFactory');
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    sampleSkill = new Skill(
+      'id1', 'description', [], [], {} as ConceptCard, 'en',
+      1, 0, 'id1', false, []);
     sampleMisconception = misconceptionObjectFactory.create(
       'misconceptionId', 'name', 'notes', 'feedback', false);
 

@@ -14,15 +14,15 @@
 
 """Check for decrease in coverage from 100% of frontend files."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import fnmatch
+import logging
 import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
@@ -41,211 +41,61 @@ NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'App.ts',
-    'audio-player.service.ts',
     'audio-preloader.service.ts',
-    'base-interaction-validation.service.ts',
     'Base.ts',
-    'change-list.service.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'code-string-editor.component.ts',
-    'collection-details-editor.directive.ts',
-    'collection-editor-navbar-breadcrumb.directive.ts',
-    'collection-editor-navbar.directive.ts',
-    'collection-editor-page.directive.ts',
-    'collection-editor-tab.directive.ts',
+    'collection-editor-navbar-breadcrumb.component.ts',
     'collection-footer.component.ts',
     'collection-navbar.component.ts',
-    'collection-node-creator.directive.ts',
-    'collection-node-editor.component.ts',
     'collection-player-page.directive.ts',
     'collection.model.ts',
-    'concept-card.directive.ts',
-    'ConceptCardObjectFactory.ts',
     'contribution-and-review.service.ts',
-    'contributions-and-review.component.ts',
-    'contributor-dashboard-admin-page.component.ts',
     'conversation-skin.directive.ts',
-    'conversion.ts',
-    'convert-to-plain-text.pipe.ts',
-    'coord-two-dim-editor.component.ts',
     'current-interaction.service.ts',
-    'exploration-footer.component.ts',
-    'exploration-save.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
-    'feedback-popup.component.ts',
-    'feedback-popup.directive.ts',
-    'filepath-editor.component.ts',
-    'focus-on.directive.ts',
-    'format-timer.pipe.ts',
-    'fraction-input-validation.service.ts',
-    'generatedParser.ts',
     'google-analytics.initializer.ts',
-    'graph-input-validation.service.ts',
-    'graph-property-editor.component.ts',
-    'hint-editor.directive.ts',
-    'html-select.directive.ts',
-    'input-response-pair.component.ts',
-    'item-selection-input-validation.service.ts',
     'language-util.service.ts',
-    'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
-    'learner-view-info.directive.ts',
-    'learner-view-rating.service.ts',
-    'list-of-sets-of-translatable-html-content-ids-editor.component.ts',
-    'logic-question-editor.component.ts',
     'mathjax-bind.directive.ts',
-    'messenger.service.ts',
-    'music-notes-input-rules.service.ts',
-    'music-phrase-editor.component.ts',
-    'music-phrase-player.service.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
-    'number-with-units-validation.service.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
-    'oppia-interactive-code-repl.component.ts',
-    'oppia-interactive-drag-and-drop-sort-input.directive.ts',
-    'oppia-interactive-interactive-map.component.ts',
-    'oppia-interactive-item-selection-input.directive.ts',
-    'oppia-interactive-logic-proof.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
-    'oppia-interactive-number-with-units.directive.ts',
-    'oppia-interactive-numeric-input.component.ts',
     'oppia-interactive-pencil-code-editor.directive.ts',
-    'oppia-interactive-set-input.component.ts',
-    'oppia-noninteractive-math.component.ts',
-    'oppia-noninteractive-skillreview.component.ts',
-    'oppia-response-code-repl.component.ts',
-    'oppia-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-response-interactive-map.component.ts',
-    'oppia-response-item-selection-input.directive.ts',
-    'oppia-response-logic-proof.component.ts',
-    'oppia-response-music-notes-input.directive.ts',
-    'oppia-response-number-with-units.directive.ts',
-    'oppia-response-numeric-input.component.ts',
-    'oppia-response-pencil-code-editor.directive.ts',
-    'oppia-response-set-input.component.ts',
     'oppia-root.directive.ts',
-    'oppia-short-response-code-repl.component.ts',
-    'oppia-short-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-short-response-interactive-map.component.ts',
-    'oppia-short-response-item-selection-input.directive.ts',
-    'oppia-short-response-logic-proof.component.ts',
-    'oppia-short-response-music-notes-input.directive.ts',
-    'oppia-short-response-number-with-units.directive.ts',
-    'oppia-short-response-numeric-input.component.ts',
-    'oppia-short-response-pencil-code-editor.directive.ts',
-    'oppia-short-response-set-input.component.ts',
-    'oppia-visualization-enumerated-frequency-table.directive.ts',
-    'outcome-destination-editor.directive.ts',
-    'outcome-editor.directive.ts',
-    'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
-    'progress-nav.directive.ts',
-    'promo-bar-backend-api.service.ts',
     'python-program.tokenizer.ts',
-    'question-editor.directive.ts',
     'question-update.service.ts',
-    'random-selector.directive.ts',
-    'real-editor.component.ts',
     'refresher-exploration-confirmation-modal.service.ts',
     'release-coordinator-page.component.ts',
-    'remove-duplicates-in-array.pipe.ts',
-    'request-interceptor.service.ts',
-    'response-header.directive.ts',
-    'review-material-editor.directive.ts',
-    'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
-    'schema-based-bool-editor.directive.ts',
-    'schema-based-choices-editor.directive.ts',
-    'schema-based-custom-editor.directive.ts',
     'schema-based-custom-viewer.directive.ts',
-    'schema-based-dict-editor.directive.ts',
-    'schema-based-dict-viewer.directive.ts',
-    'schema-based-editor.directive.ts',
-    'schema-based-expression-editor.directive.ts',
-    'schema-based-float-editor.directive.ts',
-    'schema-based-html-editor.directive.ts',
     'schema-based-html-viewer.directive.ts',
-    'schema-based-int-editor.directive.ts',
-    'schema-based-list-editor.directive.ts',
     'schema-based-list-viewer.directive.ts',
-    'schema-based-primitive-viewer.directive.ts',
-    'schema-based-unicode-editor.directive.ts',
-    'schema-based-unicode-viewer.directive.ts',
-    'schema-based-viewer.directive.ts',
-    'score-ring.directive.ts',
     'select2-dropdown.directive.ts',
-    'set-of-translatable-html-content-ids-editor.component.ts',
-    'set-of-unicode-string-editor.component.ts',
-    'shared.ts',
-    'skill-concept-card-editor.directive.ts',
-    'skill-editor-navbar-breadcrumb.component.ts',
-    'skill-editor-navbar.directive.ts',
-    'skill-editor-state.service.ts',
-    'skill-prerequisite-skills-editor.directive.ts',
-    'skill-questions-tab.directive.ts',
-    'skill-rubrics-editor.directive.ts',
-    'skill-selector-editor.component.ts',
-    'skills-mastery-list.directive.ts',
-    'solution-editor.directive.ts',
-    'solution-explanation-editor.directive.ts',
     'state-card.model.ts',
     'state-content-editor.directive.ts',
-    'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'state-property.service.ts',
-    'state-solution-editor.directive.ts',
-    'state-top-answers-stats.service.ts',
-    'story-creation.service.ts',
-    'story-editor-navbar-breadcrumb.component.ts',
-    'story-editor-state.service.ts',
-    'story-editor.directive.ts',
-    'story-node-editor.directive.ts',
     'story-node.model.ts',
-    'story-update.service.ts',
-    'StoryContentsObjectFactory.ts',
-    'student.ts',
-    'subtitled-unicode-editor.component.ts',
-    'subtopic-page.model.ts',
-    'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
-    'suggestion-modal-for-exploration-editor.service.ts',
-    'supplemental-card.directive.ts',
-    'svm-prediction.service.ts',
-    'teacher.ts',
-    'teacher2.ts',
-    'top-navigation-bar.component.ts',
-    'topic-creation.service.ts',
-    'topic-editor-navbar-breadcrumb.component.ts',
-    'topic-editor-navbar.directive.ts',
-    'topic-editor-state.service.ts',
-    'topic-editor-stories-list.directive.ts',
-    'topic-summary-tile.component.ts',
-    'TopicObjectFactory.ts',
-    'translatable-html-content-id.component.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
-    'truncate.pipe.ts',
-    'tutor-card.directive.ts',
-    'unit-test-utils.ajs.ts', # Please don't try to cover this file.
-    'url-interpolation.service.ts',
-    'utils.service.ts',
-    'version-diff-visualization.directive.ts',
+    # Please don't try to cover `unit-test-utils.ajs.ts` file.
+    'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
-    'worked-example-editor.directive.ts',
 ]
 
 
-class LcovStanzaRelevantLines(python_utils.OBJECT):
+class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
     def __init__(self, stanza):
@@ -319,9 +169,10 @@ def check_not_fully_covered_filenames_list_is_sorted():
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
-        sys.exit(
+        logging.error(
             'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
             ' kept in alphabetical order.')
+        sys.exit(1)
 
 
 def check_coverage_changes():
@@ -382,7 +233,8 @@ def check_coverage_changes():
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')
         python_utils.PRINT('------------------------------------')
-        sys.exit(errors)
+        logging.error(errors)
+        sys.exit(1)
     else:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('All Frontend Coverage Checks Passed.')

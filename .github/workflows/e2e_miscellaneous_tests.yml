@@ -19,15 +19,21 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '2.x'
+          python-version: '3.7'
           architecture: 'x64'
-      - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: pip install wheel==0.35.0
       - uses: ./.github/actions/merge
-      - name: Install third party
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.install_third_party_libs
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
       - id: check-risk
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
@@ -55,6 +61,11 @@ jobs:
       - name: Run e2e Contributor Dashboard Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
+        env:
+          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Run e2e Blog Dashboard Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="blogDashboard" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run e2e Publication Test
@@ -73,3 +84,6 @@ jobs:
         with:
           name: protractor-video
           path: /home/runner/work/oppia/protractor-video
+      - name: Checking Memory Usage
+        if: ${{ always() }}
+        run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes

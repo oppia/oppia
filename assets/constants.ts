@@ -19,6 +19,7 @@
 
 export default {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   // The term 'staging' is used instead of the classroom url fragment field
@@ -74,6 +75,8 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  "RTL_LANGUAGE_CODES": ["ar"],
+
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
     "topic": ["#C6DCDA"],
@@ -108,14 +111,14 @@ export default {
   // eslint-disable-next-line max-len
   "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
 
-  // The SVG tag-specific attribute whitelist is based on the list of tags and
+  // The SVG tag-specific attribute allowlist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify
   // The mapping of SVG tag to attribute is based on the following pages:
   // https://github.com/wooorm/svg-element-attributes/blob/master/index.json
   // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute
   // https://www.w3schools.com/graphics/svg_reference.asp
-  "SVG_ATTRS_WHITELIST": {
+  "SVG_ATTRS_ALLOWLIST": {
     "a": [
       "about",
       "alignment-baseline",
@@ -5301,6 +5304,32 @@ export default {
   }],
 
   "TRANSLATION_TIPS": {
+    // Arabic.
+    "ar": [
+      // eslint-disable-next-line max-len
+      "In Oppia, we prefer to use simple words that can be easily understood by children. For example, we use “تابع قائلًا” instead of “أردف قائلًا”. Furthermore, the English words that are used in the Arab society regularly can be translated as follows; Arabic word (The regularly used English word). For example, we can translate the word cupcakes this way; كعك القوالب الصغيرة (cupcakes). ",
+      // eslint-disable-next-line max-len
+      "Use respectful ways and formal prefixes to address people. For example, use “سيدي” and “سيدتي”. ",
+      // eslint-disable-next-line max-len
+      "If the name has a meaning in Arabic, or in English, such as Baker or Crumb, always use words that indicate that they are names before writing the name itself. For example, you can use one of the following words depending on the context; “السيد، السيدة، العم، الجد، الجدة، الآنسة.”",
+      "Use the same voice (active or passive) as in the original English Text",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Arabic as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "Use the hyperlinks to different cards as shown in the original English Text."
+    ],
+    // Bangla.
+    "bn": [
+      // eslint-disable-next-line max-len
+      "Use simple Bangla words that are used in daily communication. Note that common English words (pencil, etc.) can be written as transliterations (e.g পেন্সিল ).",
+      "Use proper punctuation.",
+      "Full stop = |",
+      // eslint-disable-next-line max-len
+      "Use the same voice (active or passive) as in the original English text.",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
+    ],
+    // Chinese.
     "zh": [
       // eslint-disable-next-line max-len
       "Write fractions or numbers as they are, unless they are written out in words. For instance, one-fifth would be (五分之一)",
@@ -5315,6 +5344,7 @@ export default {
       // eslint-disable-next-line max-len
       "Make sure that you have selected the correct words (e.g. words such as 再 and 在 )."
     ],
+    // Hindi.
     "hi": [
       // eslint-disable-next-line max-len
       "Prefer simple Hindi words that are used in daily communication Note that common English words (pen, paper, cake, etc.) can be written as transliterations (पेन, पेपर, केक). For harder words, include the English word in parentheses, e.g. अंश (Numerator), हर (Denominator), भिन्न (Fraction).",
@@ -5327,28 +5357,37 @@ export default {
       // eslint-disable-next-line max-len
       "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
     ],
-    "bn": [
+    // Spanish.
+    "es": [
+      "Include proper punctuation, ¡blank!, ¿question? and accent marks.",
       // eslint-disable-next-line max-len
-      "Use simple Bangla words that are used in daily communication. Note that common English words (pencil, etc.) can be written as transliterations (e.g পেন্সিল ).",
-      "Use proper punctuation.",
-      "Full stop = |",
+      "In Spanish, the nouns are usually gendered. Make sure to use the correct article gender for the noun gender (el gato, la casa , las mujeres, los hombres etc.) El is usually used for masculine singular and la is usually for feminine singular. Los for masculine plural and las for feminine plural.",
       // eslint-disable-next-line max-len
-      "Use the same voice (active or passive) as in the original English text.",
+      "Try to make sure that the accents are placed correctly as it can make a big difference in meaning for the reader (tu = your vs. tú = informal you, si = if vs. sí = yes).",
       // eslint-disable-next-line max-len
-      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Spanish as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
     ],
-    "ar": [
+    // Portuguese.
+    "pt": [
       // eslint-disable-next-line max-len
-      "In Oppia, we prefer to use simple words that can be easily understood by children. For example, we use “تابع قائلًا” instead of “أردف قائلًا”. Furthermore, the English words that are used in the Arab society regularly can be translated as follows; Arabic word (The regularly used English word). For example, we can translate the word cupcakes this way; كعك القوالب الصغيرة (cupcakes). ",
+      "When translating names of mathematical terms, look for how these names are used in Brazilian education/literature instead of translating literally. For example, while the names may be similar in some cases (e.g. \"The Commutative Property of Multiplication\" would be \"A Propriedade Comutativa da Multiplicação\"), in other cases the literal translation will not match the names used in Brazil (e.g. \"The Carrying Method of multiplication\" would be \"O Método Tradicional de Multiplicação\"). Also, terms like \"Place Values\" may have a different translation depending on the context, which may be \"casa\"/\"ordem\" or \"valor relativo\".",
       // eslint-disable-next-line max-len
-      "Use respectful ways and formal prefixes to address people. For example, use “سيدي” and “سيدتي”. ",
+      "When writing a number, remember that \",\" in English corresponds to \".\" in Portuguese, and vice-versa.",
       // eslint-disable-next-line max-len
-      "If the name has a meaning in Arabic, or in English, such as Baker or Crumb, always use words that indicate that they are names before writing the name itself. For example, you can use one of the following words depending on the context; “السيد، السيدة، العم، الجد، الجدة، الآنسة.”",
-      "Use the same voice (active or passive) as in the original English Text",
+      "Prefer to use friendly words and sentences for children. For example, instead of using \"Diga-me o nome...\" or \"vou pedir-lhe ajuda\", you can write the sentence with a more informal language like \"Me diga o nome...\" or \"vou pedir a sua ajuda\".",
       // eslint-disable-next-line max-len
-      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Arabic as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      "In English some nouns/articles are neutral. In Portuguese the nouns are usually gendered. Be careful not to generate inconsistencies and make sure to use the correct article gender for the noun gender. For example: Nina and Sandra loved the cake. They went out to buy more. In Portuguese: Nina e Sandra adoraram o bolo. Elas saíram para comprar mais.",
       // eslint-disable-next-line max-len
-      "Use the hyperlinks to different cards as shown in the original English Text."
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Portuguese as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any).",
+      // eslint-disable-next-line max-len
+      "Images with text in English should be edited and replaced by the same images with the same text in Portuguese. If you don't know how to edit the image, please skip the translation.",
+      // eslint-disable-next-line max-len
+      "If you think you need more context in order to get the right terms and nouns, please play the lesson once before submitting the translation.",
+      // eslint-disable-next-line max-len
+      "Keep in mind that some English puns may not work for Portuguese, so you might need to adjust them or construct the same sentence without the pun.",
+      "When translating a currency, replace \"Dollar\" for \"Real\"."
     ]
   },
 
@@ -5422,7 +5461,6 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
-      "LogicProof",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",
@@ -5548,11 +5586,13 @@ export default {
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
-  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
-  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 240,
+  "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
+  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5631,7 +5671,10 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
-  "BEAM_JOBS_ARE_ENABLED": false,
+  // The name of the cookie Oppia will place the session cookie into. The name
+  // is arbitrary. If it is changed later on, then the cookie will live on in
+  // the users' browsers as garbage (although it'd expire eventually).
+  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5644,11 +5687,21 @@ export default {
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
+  // A regular expression for allowed characters for thumbnail filename.
+  "VALID_THUMBNAIL_FILENAME_REGEX": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
+
+  // A regular expression for allowed entity id's.
+  "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
+
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
+
+  // A regular expression for allowed characters in URL fragment for Blog Post.
+  // eslint-disable-next-line max-len
+  "VALID_THREAD_ID_REGEX": "(exploration|collection|skill).[a-zA-Z0-9]+.[a-zA-Z0-9=]+",
 
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
@@ -5898,20 +5951,448 @@ export default {
         }]
       },
       "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
     }
   ],
+
+  // When the site cookie policy was last updated in UNIX time milliseconds.
+  "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+
+  // Pages registered with angular router.
+  "PAGES_REGISTERED_WITH_FRONTEND": {
+    "ABOUT": {
+      "ROUTE": "about",
+      "TITLE": "About | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About foundation | Oppia",
+      "META": []
+    },
+    "CLASSROOM": {
+      "ROUTE": "learn/:classroom_url_fragment",
+      "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "CONTACT": {
+      "ROUTE": "contact",
+      "TITLE": "Contact | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
+        }
+      ]
+    },
+    "DONATE": {
+      "ROUTE": "donate",
+      "TITLE": "Donate | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+        }
+      ]
+    },
+    "GET_STARTED": {
+      "ROUTE": "get-started",
+      "TITLE": "Get Started | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Learn how to get started using Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Learn how to get started using Oppia."
+        }
+      ]
+    },
+    "LICENSE": {
+      "ROUTE": "license",
+      "TITLE": "License Page | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "License terms that Oppia is attributed under."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "License terms that Oppia is attributed under."
+        }
+      ]
+    },
+    "LOGIN": {
+      "ROUTE": "login",
+      "TITLE": "Sign in | Oppia",
+      "META": []
+    },
+    "LOGOUT": {
+      "ROUTE": "logout",
+      "TITLE": "Logout | Oppia",
+      "META": []
+    },
+    "PARTNERSHIPS": {
+      "ROUTE": "partnerships",
+      "TITLE": "Partnerships | Oppia",
+      "META": []
+    },
+    "PLAYBOOK": {
+      "ROUTE": "creator-guidelines",
+      "TITLE": "Creator Guidelines | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        }
+      ]
+    },
+    "PRIVACY": {
+      "ROUTE": "privacy-policy",
+      "TITLE": "Privacy Policy | Oppia",
+      "META": []
+    },
+    "SIGNUP": {
+      "ROUTE": "signup",
+      "TITLE": "Join the community - Oppia",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        }
+      ]
+    },
+    "TEACH": {
+      "ROUTE": "teach",
+      "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        }
+      ]
+    },
+    "TERMS": {
+      "ROUTE": "terms",
+      "TITLE": "Terms of Use | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+        }
+      ]
+    },
+    "THANKS": {
+      "ROUTE": "thanks",
+      "TITLE": "Thanks | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Thank you for donating to The Oppia Foundation!"
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Thank you for donating to The Oppia Foundation!"
+        }
+      ]
+    },
+    "DELETE_ACCOUNT": {
+      "ROUTE": "delete-account",
+      "TITLE": "Delete Account | Oppia",
+      "META": []
+    },
+    "LIBRARY_INDEX": {
+      "ROUTE": "community-library",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_RECENTLY_PUBLISHED": {
+      "ROUTE": "community-library/recently-published",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_SEARCH": {
+      "ROUTE": "search/find",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_TOP_RATED": {
+      "ROUTE": "community-library/top-rated",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "PENDING_ACCOUNT_DELETION": {
+      "ROUTE": "pending-account-deletion",
+      "TITLE": "Pending Account Deletion | Oppia",
+      "META": []
+    },
+    "PREFERENCES": {
+      "ROUTE": "preferences",
+      "TITLE": "Preferences | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Change your Oppia profile settings and preferences"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Change your Oppia profile settings and preferences"
+        }
+      ]
+    },
+    "PROFILE": {
+      "ROUTE": "profile/:username_fragment",
+      "TITLE": "Profile | Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "RELEASE_COORDINATOR_PAGE": {
+      "ROUTE": "release-coordinator",
+      "TITLE": "Oppia Release Coordinator Panel",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "SPLASH": {
+      "ROUTE": "",
+      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "STORY_VIEWER": {
+      // eslint-disable-next-line max-len
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
+      "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "VOLUNTEER": {
+      "ROUTE": "volunteer",
+      "TITLE": "Volunteer | Oppia",
+      "META": []
+    }
+  },
+
+  "STEWARDS_LANDING_PAGE": {
+    "ROUTES": ["parents", "partners", "nonprofits", "teachers", "volunteers"],
+    "TITLE": "Getting Started with Oppia",
+    "META": []
+  },
+
+  // A dict representing available landing pages, having subject as a key
+  // and list of topics as the value.
+  // Note: This dict needs to be keep in sync with frontend
+  // TOPIC_LANDING_PAGE_DATA oppia constant defined in
+  // core/templates/pages/landing-pages/topic-landing-page/
+  // topic-landing-page.constants.ts file.
+  "AVAILABLE_LANDING_PAGES": {
+    "math": ["fractions", "negative-numbers", "ratios"]
+  },
+
+  "SCHEMA_FOR_TOPIC_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
+    }
+  },
+
+  "SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
+    }
+  },
+
+  "SCHEMA_FOR_STORY_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 30
+      }]
+    }
+  },
 
   "DEV_MODE": true,
   "EMULATOR_MODE": true,

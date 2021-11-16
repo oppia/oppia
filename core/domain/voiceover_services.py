@@ -14,9 +14,9 @@
 
 """Functions to perform actions related to voiceover application."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
@@ -25,7 +25,6 @@ from core.domain import rights_manager
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
-import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 

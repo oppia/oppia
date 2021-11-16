@@ -18,21 +18,20 @@
 
 
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 
-import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -48,6 +47,11 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NonExistentTopicsAndStories } from 'domain/learner_dashboard/non-existent-topics-and-stories.model';
+import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-collections.model';
+import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-explorations.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -99,6 +103,8 @@ describe('Learner dashboard page', () => {
     LearnerDashboardBackendApiService = null;
   let suggestionModalForLearnerDashboardService:
     SuggestionModalForLearnerDashboardService = null;
+  let windowDimensionsService: WindowDimensionsService;
+  let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService = null;
 
   let profilePictureDataUrl = 'profile-picture-url';
@@ -225,43 +231,59 @@ describe('Learner dashboard page', () => {
     }
   };
 
-  let learnerDashboardData = {
-    completed_explorations_list: [],
-    completed_collections_list: [],
+
+  let learnerDashboardTopicAndStoriesData = {
     completed_stories_list: [],
     learnt_topic_list: [],
-    incomplete_explorations_list: [],
-    incomplete_collections_list: [],
     partially_learnt_topics_list: [],
     topics_to_learn_list: [],
     all_topics_list: [],
-    untracked_topics_list: [],
-    subscription_list: subscriptionsList,
-    completed_to_incomplete_collections: [],
+    untracked_topics: {},
     completed_to_incomplete_stories: [],
     learnt_to_partially_learnt_topics: [],
-    number_of_nonexistent_activities: {
-      incomplete_explorations: 0,
-      incomplete_collections: 0,
+    number_of_nonexistent_topics_and_stories: {
       partially_learnt_topics: 0,
-      completed_explorations: 0,
-      completed_collections: 0,
       completed_stories: 0,
       learnt_topics: 0,
       topics_to_learn: 0,
-      exploration_playlist: 0,
+    },
+  };
+
+
+  let learnerDashboardCollectionsData = {
+    completed_collections_list: [],
+    incomplete_collections_list: [],
+    completed_to_incomplete_collections: [],
+    number_of_nonexistent_collections: {
+      incomplete_collections: 0,
+      completed_collections: 0,
       collection_playlist: 0
     },
-    thread_summaries: threadSummaryList,
-    number_of_unread_threads: 10,
-    exploration_playlist: [],
     collection_playlist: []
   };
 
+
+  let learnerDashboardExplorationsData = {
+    completed_explorations_list: [],
+    incomplete_explorations_list: [],
+    subscription_list: subscriptionsList,
+    number_of_nonexistent_explorations: {
+      incomplete_explorations: 0,
+      completed_explorations: 0,
+      exploration_playlist: 0,
+    },
+    exploration_playlist: [],
+  };
+
+  let learnerDashboardFeedbackUpdatesData = {
+    thread_summaries: threadSummaryList,
+    number_of_unread_threads: 10,
+  };
+
   let userInfo = {
-    _role: 'USER_ROLE',
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -270,10 +292,12 @@ describe('Learner dashboard page', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
@@ -284,8 +308,10 @@ describe('Learner dashboard page', () => {
 
   describe('when succesfully fetching learner dashboard data', () => {
     beforeEach(async(() => {
+      mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule
@@ -311,6 +337,13 @@ describe('Learner dashboard page', () => {
             provide: LearnerDashboardActivityBackendApiService,
             useClass: MockLearnerDashboardActivityBackendApiService
           },
+          {
+            provide: WindowDimensionsService,
+            useValue: {
+              isWindowNarrow: () => true,
+              getResizeEvent: () => mockResizeEmitter,
+            }
+          },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
@@ -328,6 +361,7 @@ describe('Learner dashboard page', () => {
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
       focusManagerService = TestBed.inject(FocusManagerService);
+      windowDimensionsService = TestBed.inject(WindowDimensionsService);
       learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
       suggestionModalForLearnerDashboardService =
@@ -339,7 +373,7 @@ describe('Learner dashboard page', () => {
       });
       // Generate completed explorations and exploration playlist.
       for (let i = 0; i < 10; i++) {
-        learnerDashboardData.completed_explorations_list[i] = (
+        learnerDashboardExplorationsData.completed_explorations_list[i] = (
           explorationObjectFactory.createFromBackendDict(
             Object.assign(explorationDict, {
               id: i + 1,
@@ -347,14 +381,14 @@ describe('Learner dashboard page', () => {
               category: categoryList[i]
             })
           ));
-        learnerDashboardData.exploration_playlist[i] = ({
+        learnerDashboardExplorationsData.exploration_playlist[i] = ({
           id: Number(i + 1).toString()
         });
       }
 
       // Generate incomplete explorations and incomplete exploration playlist.
       for (let i = 0; i < 12; i++) {
-        learnerDashboardData.incomplete_explorations_list[i] = (
+        learnerDashboardExplorationsData.incomplete_explorations_list[i] = (
           explorationObjectFactory.createFromBackendDict(
             Object.assign(explorationDict, {
               // Create ids from 11 to 22.
@@ -368,7 +402,7 @@ describe('Learner dashboard page', () => {
 
       // Generate completed collections and collection playlist.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardData.completed_collections_list[i] = (
+        learnerDashboardCollectionsData.completed_collections_list[i] = (
           // TODO(#10875): Fix type mismatch.
           Collection.create(
             Object.assign(collectionDict, {
@@ -376,14 +410,14 @@ describe('Learner dashboard page', () => {
               category: categoryList[i]
             }) as unknown as CollectionBackendDict
           ));
-        learnerDashboardData.collection_playlist[i] = ({
+        learnerDashboardCollectionsData.collection_playlist[i] = ({
           id: Number(i + 1).toString()
         });
       }
 
       // Generate incomplete collections.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardData.incomplete_collections_list[i] = (
+        learnerDashboardCollectionsData.incomplete_collections_list[i] = (
           // TODO(#10875): Fix type mismatch.
           Collection.create(
             Object.assign(collectionDict, {
@@ -405,74 +439,54 @@ describe('Learner dashboard page', () => {
           return Promise.resolve(userInfo);
         });
 
-      spyOn(learnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardTopicsAndStoriesDataAsync')
         .and.returnValue(Promise.resolve({
-          completedExplorationsList: (
-            learnerDashboardData.completed_explorations_list.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          incompleteExplorationsList: (
-            learnerDashboardData.incomplete_explorations_list.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          explorationPlaylist: (
-            learnerDashboardData.exploration_playlist.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          completedCollectionsList: (
-            learnerDashboardData.completed_collections_list.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          incompleteCollectionsList: (
-            learnerDashboardData.incomplete_collections_list.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
           completedStoriesList: (
-            learnerDashboardData.completed_stories_list.map(
+            learnerDashboardTopicAndStoriesData.completed_stories_list.map(
               storySummary => StorySummary.createFromBackendDict(
                 storySummary))),
           learntTopicsList: (
-            learnerDashboardData.learnt_topic_list.map(
+            learnerDashboardTopicAndStoriesData.learnt_topic_list.map(
               topicSummary => LearnerTopicSummary.createFromBackendDict(
                 topicSummary))),
           partiallyLearntTopicsList: (
-            learnerDashboardData.partially_learnt_topics_list.map(
-              topicSummary => LearnerTopicSummary.createFromBackendDict(
-                topicSummary))),
+            learnerDashboardTopicAndStoriesData
+              .partially_learnt_topics_list.map(
+                topicSummary => LearnerTopicSummary.createFromBackendDict(
+                  topicSummary))),
           topicsToLearnList: (
-            learnerDashboardData.topics_to_learn_list.map(
+            learnerDashboardTopicAndStoriesData.topics_to_learn_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
           allTopicsList: (
-            learnerDashboardData.all_topics_list.map(
+            learnerDashboardTopicAndStoriesData.all_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
-          untrackedTopicsList: (
-            learnerDashboardData.untracked_topics_list.map(
-              topicSummary => LearnerTopicSummary
-                .createFromBackendDict(topicSummary))),
-          collectionPlaylist: (
-            learnerDashboardData.collection_playlist.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
-          threadSummaries: (
-            learnerDashboardData.thread_summaries.map(
-              threadSummary => FeedbackThreadSummary
-                .createFromBackendDict(threadSummary))),
-          completedToIncompleteCollections: (
-            learnerDashboardData.completed_to_incomplete_collections),
+          untrackedTopics: learnerDashboardTopicAndStoriesData.untracked_topics,
           completedToIncompleteStories: (
-            learnerDashboardData.completed_to_incomplete_stories),
+            learnerDashboardTopicAndStoriesData
+              .completed_to_incomplete_stories),
           learntToPartiallyLearntTopics: (
-            learnerDashboardData.learnt_to_partially_learnt_topics),
-          numberOfNonexistentActivities: (
-            NonExistentActivities.createFromBackendDict(
-              learnerDashboardData.number_of_nonexistent_activities)),
-          subscriptionList: (
-            learnerDashboardData.subscription_list.map(
-              profileSummary => ProfileSummary
-                .createFromCreatorBackendDict(profileSummary)))
+            learnerDashboardTopicAndStoriesData
+              .learnt_to_partially_learnt_topics),
+          numberOfNonexistentTopicsAndStories: (
+            NonExistentTopicsAndStories.createFromBackendDict(
+              learnerDashboardTopicAndStoriesData.
+                number_of_nonexistent_topics_and_stories)),
+        }));
+
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardFeedbackUpdatesDataAsync')
+        .and.returnValue(Promise.resolve({
+          numberOfUnreadThreads: learnerDashboardFeedbackUpdatesData.
+            number_of_unread_threads,
+          threadSummaries: (
+            learnerDashboardFeedbackUpdatesData.thread_summaries.map(
+              threadSummary => FeedbackThreadSummary
+                .createFromBackendDict(threadSummary)))
         }));
 
       component.ngOnInit();
@@ -485,17 +499,17 @@ describe('Learner dashboard page', () => {
     ' initialization and get data from backend', fakeAsync(() => {
       expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
       expect(component.username).toBe(userInfo.getUsername());
-
-      expect(component.noExplorationActivity).toBe(false);
-      expect(component.noCollectionActivity).toBe(false);
-      expect(component.noActivity).toBe(false);
-
-      expect(component.incompleteExplorationsList.length).toBe(12);
-      expect(component.incompleteCollectionsList.length).toBe(8);
-
-      expect(component.explorationPlaylist.length).toBe(10);
-      expect(component.explorationPlaylist.length).toBe(10);
+      expect(component.windowIsNarrow).toBeTrue();
     }));
+
+    it('should check whether window is narrow on resizing the screen', () => {
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+      expect(component.windowIsNarrow).toBeTrue();
+
+      mockResizeEmitter.emit();
+
+      expect(component.windowIsNarrow).toBeFalse();
+    });
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
@@ -512,141 +526,19 @@ describe('Learner dashboard page', () => {
 
     it('should toggle active subsection type when changing subsection type',
       () => {
-        // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when
+        // Active subsection is set as I18N_DASHBOARD_SKILL_PROFICIENCY when
         // component is initialized.
-        expect(component.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
+        expect(component.activeSubsection).toBe(
+          'I18N_DASHBOARD_SKILL_PROFICIENCY');
 
-        let newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
-        component.setActiveSubsection(newActiveSubsection);
-        expect(component.activeSubsection).toBe(newActiveSubsection);
-
-        let newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
+        let newActiveSubsection2 = 'I18N_DASHBOARD_SKILL_PROFICIENCY';
         component.setActiveSubsection(newActiveSubsection2);
         expect(component.activeSubsection).toBe(newActiveSubsection2);
       });
 
-    it('should get the correct exploration page URL corresponding to a given' +
-      ' exploration ID.', () => {
-      expect(component.getExplorationUrl('1')).toBe('/explore/1');
-      expect(component.getExplorationUrl()).toBe('/explore/undefined');
-    });
-
-    it('should get the correct collection page URL corresponding to a given' +
-      ' collection ID.', () => {
-      expect(component.getCollectionUrl('1')).toBe('/collection/1');
-      expect(component.getCollectionUrl()).toBe('/collection/undefined');
-    });
-
-    it('should detect when application is being used on a mobile', () => {
-      expect(component.checkMobileView()).toBe(false);
-
-      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-      expect(component.checkMobileView()).toBe(true);
-    });
-
     it('should show username popover based on its length', () => {
       expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(component.showUsernamePopover('abc')).toBe('none');
-    });
-
-    it('should change page when going through pages of incomplete explorations',
-      () => {
-        let section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        let subsection = 'I18N_DASHBOARD_EXPLORATIONS';
-
-        expect(component.startIncompleteExpIndex).toBe(0);
-
-        component.goToNextPage(section, subsection);
-        expect(component.startIncompleteExpIndex).toBe(8);
-
-        component.goToPreviousPage(section, subsection);
-        expect(component.startIncompleteExpIndex).toBe(0);
-      });
-
-    it('should change page when going through pages of incomplete collections',
-      () => {
-        let section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        let subsection = 'I18N_DASHBOARD_COLLECTIONS';
-
-        expect(component.startIncompleteCollectionIndex).toBe(0);
-
-        component.goToNextPage(section, subsection);
-        expect(component.startIncompleteCollectionIndex).toBe(8);
-
-        component.goToPreviousPage(section, subsection);
-        expect(component.startIncompleteCollectionIndex).toBe(0);
-      });
-
-    it('should change page when going through pages of complete explorations',
-      () => {
-        let section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-        let subsection = 'I18N_DASHBOARD_EXPLORATIONS';
-
-        let completedExplorations = learnerDashboardData
-          .completed_explorations_list.map(
-            expSummary => LearnerExplorationSummary.createFromBackendDict(
-              expSummary));
-
-        expect(component.startCompletedExpIndex).toBe(0);
-        expect(component.getVisibleExplorationList(
-          component.startCompletedExpIndex))
-          .toEqual(completedExplorations.slice(0, 8));
-
-        component.goToNextPage(section, subsection);
-        expect(component.startCompletedExpIndex).toBe(8);
-        expect(component.getVisibleExplorationList(
-          component.startCompletedExpIndex))
-          .toEqual(completedExplorations.slice(8));
-
-        component.goToPreviousPage(section, subsection);
-        expect(component.startCompletedExpIndex).toBe(0);
-        expect(component.getVisibleExplorationList(
-          component.startCompletedExpIndex))
-          .toEqual(completedExplorations.slice(0, 8));
-      });
-
-    it('should change page when going through pages of completed collections',
-      () => {
-        let section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-        let subsection = 'I18N_DASHBOARD_COLLECTIONS';
-
-        expect(component.startCompletedCollectionIndex).toBe(0);
-
-        component.goToNextPage(section, subsection);
-        expect(component.startCompletedCollectionIndex).toBe(8);
-
-        component.goToPreviousPage(section, subsection);
-        expect(component.startCompletedCollectionIndex).toBe(0);
-      });
-
-    it('should change explorations sorting options by title when changing' +
-      ' sorting type', () => {
-      component.setExplorationsSortingOptions('title');
-      expect(component.currentExpSortType).toBe('title');
-      expect(component.isCurrentExpSortDescending).toBe(true);
-    });
-
-    it('should change explorations sorting options by last played when' +
-      ' changing sorting type', () => {
-      expect(component.isCurrentExpSortDescending).toBe(true);
-      expect(component.currentExpSortType).toBe('last_played');
-      component.setExplorationsSortingOptions('last_played');
-      expect(component.isCurrentExpSortDescending).toBe(false);
-    });
-
-    it('should change subscription sorting options by username when changing' +
-      ' sorting type', () => {
-      expect(component.isCurrentSubscriptionSortDescending).toBe(true);
-      expect(component.currentSubscribersSortType).toBe('username');
-      component.setSubscriptionSortingOptions('username');
-      expect(component.isCurrentSubscriptionSortDescending).toBe(false);
-    });
-
-    it('should change subscription sorting options by impact when changing' +
-      ' sorting type', () => {
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.currentSubscribersSortType).toBe('impact');
-      expect(component.isCurrentSubscriptionSortDescending).toBe(true);
     });
 
     it('should change feedback sorting options by last update msecs when' +
@@ -663,692 +555,6 @@ describe('Learner dashboard page', () => {
       expect(component.currentFeedbackThreadsSortType).toBe('exploration');
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
     });
-
-    it('should sort explorations given sorting property' +
-      ' as last played in ascending order', fakeAsync(() => {
-      // The default sort option for Explorations is last played.
-      expect(component.currentExpSortType).toBe('last_played');
-      expect(component.isCurrentExpSortDescending).toBeTruthy;
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-
-      tick();
-      fixture.detectChanges();
-
-      const explorationTitleNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-exp-summary-tile-title');
-
-      // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a *ngFor directive.
-      // Note that given Exploration list is not sorted.
-      explorationTitleNodes.forEach((titleeNode, index) => {
-        if (index === 0) {
-          expect(titleeNode.innerText).toBe('World War III');
-        }
-        if (index === 1) {
-          expect(titleeNode.innerText).toBe('Quantum Mechanics');
-        }
-        if (index === 2) {
-          expect(titleeNode.innerText).toBe('Algebra');
-        }
-        if (index === 3) {
-          expect(titleeNode.innerText).toBe('Nouns');
-        }
-        if (index === 4) {
-          expect(titleeNode.innerText).toBe('Counting Stars');
-        }
-        if (index === 5) {
-          expect(titleeNode.innerText).toBe('Hip Hop');
-        }
-        if (index === 6) {
-          expect(titleeNode.innerText).toBe('Consiousness');
-        }
-        if (index === 7) {
-          expect(titleeNode.innerText).toBe('Database Management');
-        }
-        if (index === 8) {
-          expect(titleeNode.innerText).toBe('Plant Cell');
-        }
-        if (index === 9) {
-          expect(titleeNode.innerText).toBe('Zebra');
-        }
-      });
-    }));
-
-    it('should sort explorations given sorting property' +
-      ' as last played in descending order', fakeAsync(() => {
-      // The default sort option for Explorations is last played.
-      expect(component.currentExpSortType).toBe('last_played');
-      expect(component.isCurrentExpSortDescending).toBeTruthy;
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-
-      component.setExplorationsSortingOptions('last_played');
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-      expect(component.isCurrentExpSortDescending).toBeFalse;
-
-      tick();
-      fixture.detectChanges();
-
-      const explorationTitleNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-exp-summary-tile-title');
-
-      // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a *ngFor directive.
-      // Note that given Exploration list is not sorted.
-      explorationTitleNodes.forEach((titleeNode, index) => {
-        if (index === 0) {
-          expect(titleeNode.innerText).toBe('Zebra');
-        }
-        if (index === 1) {
-          expect(titleeNode.innerText).toBe('Plant Cell');
-        }
-        if (index === 2) {
-          expect(titleeNode.innerText).toBe('Database Management');
-        }
-        if (index === 3) {
-          expect(titleeNode.innerText).toBe('Consiousness');
-        }
-        if (index === 4) {
-          expect(titleeNode.innerText).toBe('Hip Hop');
-        }
-        if (index === 5) {
-          expect(titleeNode.innerText).toBe('Counting Stars');
-        }
-        if (index === 6) {
-          expect(titleeNode.innerText).toBe('Nouns');
-        }
-        if (index === 7) {
-          expect(titleeNode.innerText).toBe('Algebra');
-        }
-        if (index === 8) {
-          expect(titleeNode.innerText).toBe('Quantum Mechanics');
-        }
-        if (index === 9) {
-          expect(titleeNode.innerText).toBe('World War III');
-        }
-      });
-    }));
-
-    it('should sort explorations given sorting property' +
-      ' as category in ascending order', fakeAsync(() => {
-      // The default sort option for Explorations is last played.
-      expect(component.currentExpSortType).toBe('last_played');
-      expect(component.isCurrentExpSortDescending).toBeTruthy;
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-
-      component.setExplorationsSortingOptions('category');
-      expect(component.getValueOfExplorationSortKey()).toBe('category');
-
-      tick();
-      fixture.detectChanges();
-
-      const explorationTitleNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-exp-summary-tile-title');
-
-      // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a *ngFor directive.
-      // Note that given Exploration list is not sorted.
-      explorationTitleNodes.forEach((titleeNode, index) => {
-        if (index === 0) {
-          expect(titleeNode.innerText).toBe('Hip Hop');
-        }
-        if (index === 1) {
-          expect(titleeNode.innerText).toBe('Plant Cell');
-        }
-        if (index === 2) {
-          expect(titleeNode.innerText).toBe('Database Management');
-        }
-        if (index === 3) {
-          expect(titleeNode.innerText).toBe('Nouns');
-        }
-        if (index === 4) {
-          expect(titleeNode.innerText).toBe('Counting Stars');
-        }
-        if (index === 5) {
-          expect(titleeNode.innerText).toBe('Algebra');
-        }
-        if (index === 6) {
-          expect(titleeNode.innerText).toBe('Consiousness');
-        }
-        if (index === 7) {
-          expect(titleeNode.innerText).toBe('Quantum Nechanics');
-        }
-        if (index === 8) {
-          expect(titleeNode.innerText).toBe('World War III');
-        }
-        if (index === 9) {
-          expect(titleeNode.innerText).toBe('Zebra');
-        }
-      });
-    }));
-
-    it('should sort explorations given sorting property' +
-      ' as category in descending order', fakeAsync(() => {
-      // The default sort option for Explorations is last played.
-      expect(component.currentExpSortType).toBe('last_played');
-      expect(component.isCurrentExpSortDescending).toBeTruthy;
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-
-      component.setExplorationsSortingOptions('category');
-      expect(component.getValueOfExplorationSortKey()).toBe('category');
-
-      component.setExplorationsSortingOptions('category');
-      expect(component.isCurrentExpSortDescending).toBeFalse;
-
-      tick();
-      fixture.detectChanges();
-
-      const explorationTitleNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-exp-summary-tile-title');
-
-      // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a *ngFor directive.
-      // Note that given Exploration list is not sorted.
-      explorationTitleNodes.forEach((titleeNode, index) => {
-        if (index === 0) {
-          expect(titleeNode.innerText).toBe('Zebra');
-        }
-        if (index === 1) {
-          expect(titleeNode.innerText).toBe('World War III');
-        }
-        if (index === 2) {
-          expect(titleeNode.innerText).toBe('Quantum Nechanics');
-        }
-        if (index === 3) {
-          expect(titleeNode.innerText).toBe('Consiousness');
-        }
-        if (index === 4) {
-          expect(titleeNode.innerText).toBe('Algebra');
-        }
-        if (index === 5) {
-          expect(titleeNode.innerText).toBe('Counting Stars');
-        }
-        if (index === 6) {
-          expect(titleeNode.innerText).toBe('Nouns');
-        }
-        if (index === 7) {
-          expect(titleeNode.innerText).toBe('Database Management');
-        }
-        if (index === 8) {
-          expect(titleeNode.innerText).toBe('Plant Cell');
-        }
-        if (index === 9) {
-          expect(titleeNode.innerText).toBe('Hip Hop');
-        }
-      });
-    }));
-
-    it('should sort explorations given sorting property' +
-      ' as title in ascending order', fakeAsync(() => {
-      // The default sort option for Explorations is last played.
-      expect(component.currentExpSortType).toBe('last_played');
-      expect(component.isCurrentExpSortDescending).toBeTruthy;
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-
-      component.setExplorationsSortingOptions('title');
-      expect(component.getValueOfExplorationSortKey()).toBe('title');
-
-      tick();
-      fixture.detectChanges();
-
-      const explorationTitleNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-exp-summary-tile-title');
-
-      // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a *ngFor directive.
-      // Note that given Exploration list is not sorted.
-      explorationTitleNodes.forEach((titleeNode, index) => {
-        if (index === 0) {
-          expect(titleeNode.innerText).toBe('Algebra');
-        }
-        if (index === 1) {
-          expect(titleeNode.innerText).toBe('Consiousness');
-        }
-        if (index === 2) {
-          expect(titleeNode.innerText).toBe('Counting Stars');
-        }
-        if (index === 3) {
-          expect(titleeNode.innerText).toBe('Database Management');
-        }
-        if (index === 4) {
-          expect(titleeNode.innerText).toBe('Hip Hop');
-        }
-        if (index === 5) {
-          expect(titleeNode.innerText).toBe('Nouns');
-        }
-        if (index === 6) {
-          expect(titleeNode.innerText).toBe('Plant Cell');
-        }
-        if (index === 7) {
-          expect(titleeNode.innerText).toBe('Quantum Mechanics');
-        }
-        if (index === 8) {
-          expect(titleeNode.innerText).toBe('World War III');
-        }
-        if (index === 9) {
-          expect(titleeNode.innerText).toBe('Zebra');
-        }
-      });
-    }));
-
-    it('should sort explorations given sorting property' +
-      ' as title in descending order', fakeAsync(() => {
-      // The default sort option for Explorations is last played.
-      expect(component.currentExpSortType).toBe('last_played');
-      expect(component.isCurrentExpSortDescending).toBeTruthy;
-      expect(component.getValueOfExplorationSortKey()).toBe('default');
-
-      component.setExplorationsSortingOptions('title');
-      expect(component.getValueOfExplorationSortKey()).toBe('title');
-
-      component.setExplorationsSortingOptions('title');
-      expect(component.isCurrentExpSortDescending).toBeFalse;
-
-      tick();
-      fixture.detectChanges();
-
-      const explorationTitleNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-exp-summary-tile-title');
-
-      // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a *ngFor directive.
-      // Note that given Exploration list is not sorted.
-      explorationTitleNodes.forEach((titleeNode, index) => {
-        if (index === 0) {
-          expect(titleeNode.innerText).toBe('Zebra');
-        }
-        if (index === 1) {
-          expect(titleeNode.innerText).toBe('World War III');
-        }
-        if (index === 2) {
-          expect(titleeNode.innerText).toBe('Quantum Mechanics');
-        }
-        if (index === 3) {
-          expect(titleeNode.innerText).toBe('Plant Cell');
-        }
-        if (index === 4) {
-          expect(titleeNode.innerText).toBe('Nouns');
-        }
-        if (index === 5) {
-          expect(titleeNode.innerText).toBe('Hip Hop');
-        }
-        if (index === 6) {
-          expect(titleeNode.innerText).toBe('Database Management');
-        }
-        if (index === 7) {
-          expect(titleeNode.innerText).toBe('Counting Stars');
-        }
-        if (index === 8) {
-          expect(titleeNode.innerText).toBe('Consiousness');
-        }
-        if (index === 9) {
-          expect(titleeNode.innerText).toBe('Algebra');
-        }
-      });
-    }));
-
-    it('should sort subscriptions given sorting property as username' +
-      ' in ascending order', fakeAsync(() => {
-      // The default sort option for Subscriptions is username.
-      expect(component.currentSubscribersSortType).toBe('username');
-      expect(component.getValueOfSubscriptionSortKey()).toBe('username');
-
-      tick();
-      fixture.detectChanges();
-
-      const subscriptionsListImpactNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-subscription-name');
-
-      const subscriptionsListUsernameNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-impact-number');
-
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListImpactNodes.forEach((impactNode, index) => {
-        if (index === 0) {
-          expect(impactNode.innerText).toBe(1);
-        }
-        if (index === 1) {
-          expect(impactNode.innerText).toBe(0);
-        }
-        if (index === 2) {
-          expect(impactNode.innerText).toBe(2);
-        }
-        if (index === 3) {
-          expect(impactNode.innerText).toBe(3);
-        }
-      });
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
-        if (index === 0) {
-          expect(usernameNode.innerText).toBe('Arrow');
-        }
-        if (index === 1) {
-          expect(usernameNode.innerText).toBe('Bucky');
-        }
-        if (index === 2) {
-          expect(usernameNode.innerText).toBe('Captain America');
-        }
-        if (index === 3) {
-          expect(usernameNode.innerText).toBe('Deadpool');
-        }
-      });
-    }));
-
-    it('should sort subscriptions given sorting property as username' +
-      ' in descending order', fakeAsync(() => {
-      // The default sort option for Subscriptions is username.
-      expect(component.currentSubscribersSortType).toBe('username');
-      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
-
-      expect(component.currentSubscribersSortType).toBe('username');
-      expect(component.getValueOfSubscriptionSortKey()).toBe('username');
-
-      component.setSubscriptionSortingOptions('username');
-      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
-
-      tick();
-      fixture.detectChanges();
-
-      const subscriptionsListImpactNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-subscription-name');
-
-      const subscriptionsListUsernameNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-impact-number');
-
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListImpactNodes.forEach((impactNode, index) => {
-        if (index === 0) {
-          expect(impactNode.innerText).toBe(3);
-        }
-        if (index === 1) {
-          expect(impactNode.innerText).toBe(2);
-        }
-        if (index === 2) {
-          expect(impactNode.innerText).toBe(0);
-        }
-        if (index === 3) {
-          expect(impactNode.innerText).toBe(1);
-        }
-      });
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
-        if (index === 0) {
-          expect(usernameNode.innerText).toBe('Deadpool');
-        }
-        if (index === 1) {
-          expect(usernameNode.innerText).toBe('Captain America');
-        }
-        if (index === 2) {
-          expect(usernameNode.innerText).toBe('Bucky');
-        }
-        if (index === 3) {
-          expect(usernameNode.innerText).toBe('Arrow');
-        }
-      });
-    }));
-
-    it('should sort subscriptions given sorting property as impact' +
-      ' in ascending order', fakeAsync(() => {
-      // The default sort option for Subscriptions is username.
-      expect(component.currentSubscribersSortType).toBe('username');
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.currentSubscribersSortType).toBe('impact');
-      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
-
-      tick();
-      fixture.detectChanges();
-
-      const subscriptionsListImpactNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-subscription-name');
-
-      const subscriptionsListUsernameNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-impact-number');
-
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListImpactNodes.forEach((impactNode, index) => {
-        if (index === 0) {
-          expect(impactNode.innerText).toBe(0);
-        }
-        if (index === 1) {
-          expect(impactNode.innerText).toBe(1);
-        }
-        if (index === 2) {
-          expect(impactNode.innerText).toBe(2);
-        }
-        if (index === 3) {
-          expect(impactNode.innerText).toBe(3);
-        }
-      });
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
-        if (index === 0) {
-          expect(usernameNode.innerText).toBe('Bucky');
-        }
-        if (index === 1) {
-          expect(usernameNode.innerText).toBe('Arrow');
-        }
-        if (index === 2) {
-          expect(usernameNode.innerText).toBe('Captain America');
-        }
-        if (index === 3) {
-          expect(usernameNode.innerText).toBe('Deadpool');
-        }
-      });
-    }));
-
-    it('should sort subscriptions given sorting property as impact' +
-      ' in descending order', fakeAsync(() => {
-      // The default sort option for Subscriptions is username.
-      expect(component.currentSubscribersSortType).toBe('username');
-      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.currentSubscribersSortType).toBe('impact');
-      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
-
-      tick();
-      fixture.detectChanges();
-
-      const subscriptionsListImpactNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-subscription-name');
-
-      const subscriptionsListUsernameNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-impact-number');
-
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListImpactNodes.forEach((impactNode, index) => {
-        if (index === 0) {
-          expect(impactNode.innerText).toBe(3);
-        }
-        if (index === 1) {
-          expect(impactNode.innerText).toBe(2);
-        }
-        if (index === 2) {
-          expect(impactNode.innerText).toBe(1);
-        }
-        if (index === 3) {
-          expect(impactNode.innerText).toBe(0);
-        }
-      });
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
-        if (index === 0) {
-          expect(usernameNode.innerText).toBe('Deadpool');
-        }
-        if (index === 1) {
-          expect(usernameNode.innerText).toBe('Captain America');
-        }
-        if (index === 2) {
-          expect(usernameNode.innerText).toBe('Arrow');
-        }
-        if (index === 3) {
-          expect(usernameNode.innerText).toBe('Bucky');
-        }
-      });
-    }));
-    it('should sort subscriptions given sorting property as impact' +
-      ' in descending order', fakeAsync(() => {
-      // The default sort option for Subscriptions is username.
-      expect(component.currentSubscribersSortType).toBe('username');
-      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.currentSubscribersSortType).toBe('impact');
-      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
-
-      tick();
-      fixture.detectChanges();
-
-      const subscriptionsListImpactNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-subscription-name');
-
-      const subscriptionsListUsernameNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-impact-number');
-
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListImpactNodes.forEach((impactNode, index) => {
-        if (index === 0) {
-          expect(impactNode.innerText).toBe(3);
-        }
-        if (index === 1) {
-          expect(impactNode.innerText).toBe(2);
-        }
-        if (index === 2) {
-          expect(impactNode.innerText).toBe(1);
-        }
-        if (index === 3) {
-          expect(impactNode.innerText).toBe(0);
-        }
-      });
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
-        if (index === 0) {
-          expect(usernameNode.innerText).toBe('Deadpool');
-        }
-        if (index === 1) {
-          expect(usernameNode.innerText).toBe('Captain America');
-        }
-        if (index === 2) {
-          expect(usernameNode.innerText).toBe('Arrow');
-        }
-        if (index === 3) {
-          expect(usernameNode.innerText).toBe('Bucky');
-        }
-      });
-    }));
-    it('should sort subscriptions given sorting property as impact' +
-      ' in descending order', fakeAsync(() => {
-      // The default sort option for Subscriptions is username.
-      expect(component.currentSubscribersSortType).toBe('username');
-      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.currentSubscribersSortType).toBe('impact');
-      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
-
-      component.setSubscriptionSortingOptions('impact');
-      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
-
-      tick();
-      fixture.detectChanges();
-
-      const subscriptionsListImpactNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-subscription-name');
-
-      const subscriptionsListUsernameNodes =
-        fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-impact-number');
-
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListImpactNodes.forEach((impactNode, index) => {
-        if (index === 0) {
-          expect(impactNode.innerText).toBe(3);
-        }
-        if (index === 1) {
-          expect(impactNode.innerText).toBe(2);
-        }
-        if (index === 2) {
-          expect(impactNode.innerText).toBe(1);
-        }
-        if (index === 3) {
-          expect(impactNode.innerText).toBe(0);
-        }
-      });
-
-      // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
-      // Note that given subscription list is not sorted.
-      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
-        if (index === 0) {
-          expect(usernameNode.innerText).toBe('Deadpool');
-        }
-        if (index === 1) {
-          expect(usernameNode.innerText).toBe('Captain America');
-        }
-        if (index === 2) {
-          expect(usernameNode.innerText).toBe('Arrow');
-        }
-        if (index === 3) {
-          expect(usernameNode.innerText).toBe('Bucky');
-        }
-      });
-    }));
 
     it('should sort feedback updates given sorting property as last updated' +
       ' in ascending order', fakeAsync(() => {
@@ -1710,175 +916,6 @@ describe('Learner dashboard page', () => {
           });
       });
 
-    it('should open remove activity modal when removing activity', () => {
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      let activity = LearnerExplorationSummary.createFromBackendDict(
-        learnerDashboardData.exploration_playlist[1]);
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-    });
-
-    it('should not remove an incomplete exploration if it is not present',
-      fakeAsync(() => {
-        expect(component.incompleteExplorationsList.length).toBe(12);
-
-        let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-        // Get exploration with id 100.
-        let activity = LearnerExplorationSummary.createFromBackendDict(
-          // TODO(#10875): Fix type mismatch.
-          {
-            id: '100'
-          } as unknown as LearnerExplorationSummaryBackendDict);
-        component.openRemoveActivityModal(
-          sectionNameI18nId, subsectionName, activity);
-
-        tick();
-        fixture.detectChanges();
-
-        expect(component.incompleteExplorationsList.length).toBe(12);
-      }));
-
-    it('should not remove an exploration from exploration playlist' +
-      ' if it is not present', fakeAsync(() => {
-      expect(component.explorationPlaylist.length).toBe(10);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      // Get exploration with id 100.
-      let activity = LearnerExplorationSummary.createFromBackendDict(
-        // TODO(#10875): Fix type mismatch.
-        {
-          id: '100'
-        } as unknown as LearnerExplorationSummaryBackendDict);
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(component.explorationPlaylist.length).toBe(10);
-    }));
-
-    it('should not remove a collection from collection playlist' +
-      ' if it is not present', fakeAsync(() => {
-      expect(component.collectionPlaylist.length).toBe(8);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      // Get collection with id 100.
-      let activity = CollectionSummary.createFromBackendDict(
-        // TODO(#10875): Fix type mismatch.
-        {
-          id: '100'
-        } as unknown as CollectionSummaryBackendDict);
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(component.collectionPlaylist.length).toBe(8);
-    }));
-
-    it('should not remove a incomplete collection' +
-      ' if it is not present', fakeAsync(() => {
-      expect(component.incompleteCollectionsList.length).toBe(8);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      // Get collection with id 100.
-      let activity = CollectionSummary.createFromBackendDict(
-        // TODO(#10875): Fix type mismatch.
-        {
-          id: '100'
-        } as unknown as CollectionSummaryBackendDict);
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(component.incompleteCollectionsList.length).toBe(8);
-    }));
-
-    it('should remove an activity from incomplete exploration when closing' +
-      ' remove activity modal', fakeAsync(() => {
-      expect(component.incompleteExplorationsList.length).toBe(12);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      // Get exploration with id 13.
-      let activity = LearnerExplorationSummary.createFromBackendDict(
-        learnerDashboardData.incomplete_explorations_list[2]);
-
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(component.incompleteExplorationsList.length).toBe(11);
-    }));
-
-    it('should remove an activity from incomplete collection when closing' +
-      ' remove activity modal', fakeAsync(() => {
-      expect(component.incompleteCollectionsList.length).toBe(8);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-
-      // Get collection with id 11.
-      let activity = CollectionSummary.createFromBackendDict(
-        learnerDashboardData.incomplete_collections_list[2]);
-
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(component.incompleteCollectionsList.length).toBe(7);
-    }));
-
-    it('should remove an exploration from exploration playlist when closing' +
-      ' remove activity modal', fakeAsync(() => {
-      expect(component.explorationPlaylist.length).toBe(10);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-
-      // Exploration with id 2.
-      let activity = LearnerExplorationSummary.createFromBackendDict(
-        learnerDashboardData.exploration_playlist[1]);
-
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(component.explorationPlaylist.length).toBe(9);
-    }));
-
-    it('should remove an activity from collection playlist when closing' +
-      ' remove activity modal', fakeAsync(() => {
-      expect(component.collectionPlaylist.length).toBe(8);
-
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      // Get collection with id 2.
-      let activity = CollectionSummary.createFromBackendDict(
-        learnerDashboardData.collection_playlist[1]);
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
-
-      tick();
-
-      expect(component.collectionPlaylist.length).toBe(7);
-    }));
-
     it('should get css classes based on status', () => {
       expect(component.getLabelClass('open')).toBe('badge badge-info');
       expect(component.getLabelClass('compliment')).toBe('badge badge-success');
@@ -1915,6 +952,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule
@@ -1959,9 +997,11 @@ describe('Learner dashboard page', () => {
         Promise.resolve(userInfo));
     }));
 
-    it('should show an alert warning', fakeAsync(() => {
+    it('should show an alert warning when fails to get topics and' +
+     ' stories data', fakeAsync(() => {
       const fetchDataSpy = spyOn(
-        learnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardTopicsAndStoriesDataAsync')
         .and.rejectWith(404);
       const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
 
@@ -1971,8 +1011,241 @@ describe('Learner dashboard page', () => {
       fixture.detectChanges();
 
       expect(alertsSpy).toHaveBeenCalledWith(
-        'Failed to get learner dashboard data');
+        'Failed to get learner dashboard topics and stories data');
       expect(fetchDataSpy).toHaveBeenCalled();
     }));
+
+    it('should show an alert warning when fails to get collections data' +
+      'in mobile view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
+      component.setActiveSubsection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard collections data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+
+    it('should show an alert warning when fails to get explorations data in' +
+    'mobile view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
+      component.setActiveSubsection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard explorations data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+
+    it('should get explorations and collections data when user clicks ' +
+    'communtiy lessons tab in mobile view',
+    fakeAsync(() => {
+      const fetchCollectionsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedCollectionsList: (
+            learnerDashboardCollectionsData.completed_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          incompleteCollectionsList: (
+            learnerDashboardCollectionsData.incomplete_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          collectionPlaylist: (
+            learnerDashboardCollectionsData.collection_playlist.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          completedToIncompleteCollections: (
+            learnerDashboardCollectionsData
+              .completed_to_incomplete_collections),
+          numberOfNonexistentCollections: (
+            NonExistentCollections.createFromBackendDict(
+              learnerDashboardCollectionsData
+                .number_of_nonexistent_collections)),
+        }));
+
+      const fetchExplorationsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedExplorationsList: (
+            learnerDashboardExplorationsData.completed_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          incompleteExplorationsList: (
+            learnerDashboardExplorationsData.incomplete_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          explorationPlaylist: (
+            learnerDashboardExplorationsData.exploration_playlist.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          numberOfNonexistentExplorations: (
+            NonExistentExplorations.createFromBackendDict(
+              learnerDashboardExplorationsData
+                .number_of_nonexistent_explorations)),
+          subscriptionList: (
+            learnerDashboardExplorationsData.subscription_list.map(
+              profileSummary => ProfileSummary
+                .createFromCreatorBackendDict(profileSummary)))
+        }));
+
+      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
+      component.setActiveSubsection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(fetchCollectionsDataSpy).toHaveBeenCalled();
+      flush();
+      expect(fetchExplorationsDataSpy).toHaveBeenCalled();
+      expect(component.communtiyLessonsDataLoaded).toEqual(true);
+    }));
+
+    it('should show an alert warning when fails to get collections data ' +
+      'in web view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      let newActiveSectionName = (
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+      component.setActiveSection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard collections data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+
+    it('should show an alert warning when fails to get explorations data in ' +
+    'web view',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      let newActiveSectionName = (
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+      component.setActiveSection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard explorations data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+
+    it('should get explorations and collections data when user clicks ' +
+    'communtiy lessons tab in web view',
+    fakeAsync(() => {
+      const fetchCollectionsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedCollectionsList: (
+            learnerDashboardCollectionsData.completed_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          incompleteCollectionsList: (
+            learnerDashboardCollectionsData.incomplete_collections_list.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          collectionPlaylist: (
+            learnerDashboardCollectionsData.collection_playlist.map(
+              collectionSummary => CollectionSummary
+                .createFromBackendDict(collectionSummary))),
+          completedToIncompleteCollections: (
+            learnerDashboardCollectionsData
+              .completed_to_incomplete_collections),
+          numberOfNonexistentCollections: (
+            NonExistentCollections.createFromBackendDict(
+              learnerDashboardCollectionsData
+                .number_of_nonexistent_collections)),
+        }));
+
+      const fetchExplorationsDataSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync')
+        .and.returnValue(Promise.resolve({
+          completedExplorationsList: (
+            learnerDashboardExplorationsData.completed_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          incompleteExplorationsList: (
+            learnerDashboardExplorationsData.incomplete_explorations_list.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          explorationPlaylist: (
+            learnerDashboardExplorationsData.exploration_playlist.map(
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
+          numberOfNonexistentExplorations: (
+            NonExistentExplorations.createFromBackendDict(
+              learnerDashboardExplorationsData
+                .number_of_nonexistent_explorations)),
+          subscriptionList: (
+            learnerDashboardExplorationsData.subscription_list.map(
+              profileSummary => ProfileSummary
+                .createFromCreatorBackendDict(profileSummary)))
+        }));
+
+      let newActiveSectionName = (
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
+      component.setActiveSection(newActiveSectionName);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(fetchCollectionsDataSpy).toHaveBeenCalled();
+      flush();
+      expect(fetchExplorationsDataSpy).toHaveBeenCalled();
+      expect(component.communtiyLessonsDataLoaded).toEqual(true);
+    }));
+
+    it('should show an alert warning when fails to get feedback updates data',
+      fakeAsync(() => {
+        const fetchDataSpy = spyOn(
+          learnerDashboardBackendApiService,
+          'fetchLearnerDashboardFeedbackUpdatesDataAsync')
+          .and.rejectWith(404);
+        const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+        component.ngOnInit();
+
+        tick();
+        fixture.detectChanges();
+
+        expect(alertsSpy).toHaveBeenCalledWith(
+          'Failed to get learner dashboard feedback updates data');
+        expect(fetchDataSpy).toHaveBeenCalled();
+      }));
   });
 });

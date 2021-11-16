@@ -16,13 +16,11 @@
 
 """Test functions relating to roles and actions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import role_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
@@ -33,20 +31,19 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(role_actions, dict))
         for role_name, allotted_actions in role_actions.items():
-            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
+            self.assertTrue(isinstance(role_name, str))
             self.assertTrue(isinstance(allotted_actions, list))
             self.assertEqual(len(set(allotted_actions)), len(allotted_actions))
             for action_name in allotted_actions:
-                self.assertTrue(
-                    isinstance(action_name, python_utils.UNICODE))
+                self.assertTrue(isinstance(action_name, str))
 
     def test_get_all_actions(self):
         with self.assertRaisesRegexp(
             Exception, 'Role TEST_ROLE does not exist.'):
-            role_services.get_all_actions('TEST_ROLE')
+            role_services.get_all_actions(['TEST_ROLE'])
 
         self.assertEqual(
-            role_services.get_all_actions(feconf.ROLE_ID_GUEST),
+            role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
             [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
 
     def test_action_allocated_to_all_allowed_roles(self):

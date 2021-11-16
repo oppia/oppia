@@ -16,18 +16,15 @@
 
 """Unit tests for core.domain.exp_fetchers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -112,7 +109,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         explorations = (
             exp_fetchers
             .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-                self.EXP_1_ID, list(python_utils.RANGE(1, latest_version + 1)))
+                self.EXP_1_ID, list(range(1, latest_version + 1)))
         )
 
         self.assertEqual(len(explorations), 3)
@@ -276,7 +273,7 @@ tags: []
 title: Old Title
 """) % (
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
+    feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -330,11 +327,10 @@ title: Old Title
         prior to the introduction of a states schema. In particular, it deals
         with an exploration that was created before any states schema
         migrations occur. The exploration is constructed using multiple change
-        lists, then a migration job is run. The test thereafter tests if
+        lists, then a migration is run. The test thereafter tests if
         reverting to a version prior to the migration still maintains a valid
         exploration. It tests both the exploration domain object and the
         exploration model stored in the datastore for validity.
-
         Note: It is important to distinguish between when the test is testing
         the exploration domain versus its model. It is operating at the domain
         layer when using exp_fetchers.get_exploration_by_id. Otherwise, it
@@ -353,7 +349,7 @@ title: Old Title
         swap_exp_schema_46 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
-            exploration = self.save_new_valid_exploration(
+            self.save_new_valid_exploration(
                 exp_id, self.albert_id, title='Old Title',
                 end_state_name=end_state_name)
         caching_services.delete_multi(
@@ -376,7 +372,7 @@ title: Old Title
             exp_id, strict=True, version=None)
 
         # Store state id mapping model for new exploration.
-        exploration = exp_fetchers.get_exploration_from_model(exploration_model)
+        exp_fetchers.get_exploration_from_model(exploration_model)
 
         # In version 3, a new state is added.
         exploration_model.states['New state'] = {
@@ -441,9 +437,16 @@ title: Old Title
             exp_id, strict=True, version=None)
 
         # Version 4 is an upgrade based on the migration job.
-        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+        commit_cmds = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+            'from_version': str(exploration_model.states_schema_version),
+            'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+        })]
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USERNAME, exploration_model.id, commit_cmds,
+            'Update exploration states from schema version %d to %d.' % (
+                exploration_model.states_schema_version,
+                feconf.CURRENT_STATE_SCHEMA_VERSION))
 
         # Verify the latest version of the exploration has the most up-to-date
         # states schema version.
@@ -497,8 +500,7 @@ title: Old Title
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '41',
-                'to_version': python_utils.UNICODE(
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
             'version_number': 4,
         }
@@ -509,8 +511,13 @@ title: Old Title
         # Ensure the correct commit logs were entered during both migration and
         # reversion. Also, ensure the correct commit command was written during
         # migration.
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
-        self.assertDictContainsSubset(commit_dict_5, snapshots_metadata[4])
+        # These asserts check whether one dict is subset of the other.
+        # The format is assertDictEqual(a, {**a, **b}) where a is the superset
+        # and b is the subset.
+        self.assertDictEqual(
+            snapshots_metadata[3], {**snapshots_metadata[3], **commit_dict_4})
+        self.assertDictEqual(
+            snapshots_metadata[4], {**snapshots_metadata[4], **commit_dict_5})
         self.assertLess(
             snapshots_metadata[3]['created_on_ms'],
             snapshots_metadata[4]['created_on_ms'])
@@ -522,8 +529,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
         exploration = exp_fetchers.get_exploration_from_model(
-            exploration_model,
-            run_conversion=False)
+            exploration_model, run_conversion=False)
 
         # This exploration should be both up-to-date and valid.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)

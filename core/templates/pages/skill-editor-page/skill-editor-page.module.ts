@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -26,32 +26,28 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { ContentLanguageSelectorComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SkillEditorNavbarBreadcrumbComponent } from 'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent
   ],
   entryComponents: [
-    ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent
@@ -67,6 +63,10 @@ import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -77,6 +77,8 @@ class SkillEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

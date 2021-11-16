@@ -22,6 +22,24 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
 
+type nodeAttr = (
+  'style' |
+  'about' |
+  'class' |
+  'content' |
+  'datatype' |
+  'id' |
+  'lang' |
+  'property' |
+  'rel' |
+  'resource' |
+  'rev' |
+  'tabindex' |
+  'typeof'
+);
+
+type keyOfSvgAttrsAllowlist = keyof typeof constants.SVG_ATTRS_ALLOWLIST;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -71,21 +89,37 @@ export class SvgSanitizerService {
       // we need to replace these decimals with a letter so that it's easier
       // to process and validate the filenames.
       if (node.tagName.toLowerCase() === 'svg') {
-        dimensions.height = (
-          (node.getAttribute('height').match(/\d+\.*\d*/g)[0]).replace(
-            '.', 'd'));
-        dimensions.width = (
-          (node.getAttribute('width').match(/\d+\.*\d*/g)[0]).replace(
-            '.', 'd'));
+        let attrHeight = node.getAttribute('height');
+        if (attrHeight) {
+          let heightRegexpMatchResult = attrHeight.match(/\d+\.*\d*/g);
+          if (heightRegexpMatchResult) {
+            dimensions.height = heightRegexpMatchResult[0].replace('.', 'd');
+          }
+        } else {
+          throw new Error('SVG height attribute is missing.');
+        }
+        let attrWidth = node.getAttribute('width');
+        if (attrWidth) {
+          let widthRegexpMatchResult = attrWidth.match(/\d+\.*\d*/g);
+          if (widthRegexpMatchResult) {
+            dimensions.width = widthRegexpMatchResult[0].replace('.', 'd');
+          }
+        } else {
+          throw new Error('SVG width attribute is missing.');
+        }
         // This attribute is useful for the vertical alignment of the
         // Math SVG while displaying inline with other text.
         // Math SVGs don't necessarily have a vertical alignment, in that
         // case we assign it zero.
-        let styleValue = node.getAttribute('style').match(/\d+\.*\d*/g);
-        if (styleValue) {
-          dimensions.verticalPadding = styleValue[0].replace('.', 'd');
-        } else {
-          dimensions.verticalPadding = '0';
+        let styleValue: RegExpMatchArray | null;
+        let attrStyle = node.getAttribute('style');
+        if (attrStyle) {
+          styleValue = attrStyle.match(/\d+\.*\d*/g);
+          if (styleValue) {
+            dimensions.verticalPadding = styleValue[0].replace('.', 'd');
+          } else {
+            dimensions.verticalPadding = '0';
+          }
         }
       }
     });
@@ -94,16 +128,19 @@ export class SvgSanitizerService {
 
   private _getInvalidSvgTagsAndAttrs(
       svg: Document): {tags: string[], attrs: string[]} {
-    let invalidTags = [];
-    let invalidAttrs = [];
-    let allowedTags = Object.keys(constants.SVG_ATTRS_WHITELIST);
-    let nodeTagName = null;
+    let invalidTags: string[] = [];
+    let invalidAttrs: string[] = [];
+
+    let allowedTags = Object.keys(constants.SVG_ATTRS_ALLOWLIST);
+    let nodeTagName: keyOfSvgAttrsAllowlist;
     svg.querySelectorAll('*').forEach((node) => {
-      nodeTagName = node.tagName.toLowerCase();
+      nodeTagName = node.tagName.toLowerCase() as keyOfSvgAttrsAllowlist;
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
-          if (constants.SVG_ATTRS_WHITELIST[nodeTagName].indexOf(
-            node.attributes[i].name.toLowerCase()) === -1) {
+          let nodeAttrName: string = node.attributes[i].name.toLowerCase();
+          if (constants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
+            nodeAttrName as nodeAttr) === -1
+          ) {
             invalidAttrs.push(
               node.tagName + ':' + node.attributes[i].name);
           }
@@ -170,6 +207,7 @@ export class SvgSanitizerService {
    */
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
     if (this.isValidBase64Svg(base64ImageData)) {
+      // eslint-disable-next-line oppia/no-bypass-security-phrase
       return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
     }
     return null;

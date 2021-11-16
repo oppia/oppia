@@ -75,10 +75,10 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  '$rootScope', 'UrlInterpolationService',
+  '$rootScope',
   'UserExplorationPermissionsService', 'UserService',
   function(
-      $rootScope, UrlInterpolationService,
+      $rootScope,
       UserExplorationPermissionsService, UserService) {
     return {
       restrict: 'E',
@@ -117,9 +117,12 @@ angular.module('oppia').directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
-          if ((<Element>evt.target).classList.contains(
-            'oppia-drop-area-message') && scope.dropAreaIsAccessible) {
-            var files = (<DragEvent>evt.originalEvent).dataTransfer.files;
+          if (
+            (evt.target as Element).classList.contains(
+              'oppia-drop-area-message'
+            ) && scope.dropAreaIsAccessible
+          ) {
+            var files = (evt.originalEvent as DragEvent).dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
           scope.dropAreaIsAccessible = false;
@@ -134,8 +137,8 @@ angular.module('oppia').directive('audioTranslationBar', [
           return scope;
         };
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/translation-tab/' +
+      template: require(
+        'pages/exploration-editor-page/translation-tab/' +
         'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
         '$interval', '$q', '$scope', '$uibModal', '$window',
@@ -369,8 +372,8 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           $scope.openTranslationTabBusyModal = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/translation-tab/' +
+              template: require(
+                'pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/translation-tab-busy-modal.template.html'),
               backdrop: true,
               resolve: {
@@ -459,8 +462,8 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           $scope.openDeleteAudioTranslationModal = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/translation-tab/' +
+              template: require(
+                'pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/delete-audio-translation-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
@@ -479,8 +482,8 @@ angular.module('oppia').directive('audioTranslationBar', [
           $scope.openAddAudioTranslationModal = function(audioFile) {
             SiteAnalyticsService.registerUploadAudioEvent();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/translation-tab/' +
+              template: require(
+                'pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/add-audio-translation-modal.template.html'),
               backdrop: 'static',
               resolve: {

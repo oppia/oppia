@@ -14,14 +14,14 @@
 
 """Tests for the blog homepage page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import blog_services
 from core.domain import config_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -39,7 +39,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
@@ -104,7 +104,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
@@ -172,7 +172,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
@@ -235,7 +235,8 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
                 feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
                 self.BLOG_ADMIN_USERNAME),
             )
-        self.set_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_ADMIN)
+        user_services.remove_user_role(
+            self.blog_admin_id, feconf.ROLE_ID_BLOG_ADMIN)
         self.get_json(
             '%s/%s' % (
                 feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,

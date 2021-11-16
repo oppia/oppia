@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -28,30 +28,55 @@ import { OppiaAngularRootComponent } from
 
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
-import { CollectionDetailsEditor } from 'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
 import { CollectionNodeEditorComponent } from './editor-tab/collection-node-editor.component';
-import { CollectionPermissionsCard } from 'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
 import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
 import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CollectionDetailsEditorComponent } from './settings-tab/collection-details-editor.component';
+import { CollectionPermissionsCardComponent } from './settings-tab/collection-permissions-card.component';
+import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-editor-navbar-breadcrumb.component';
+import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
+import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
+import { CollectionEditorTabComponent } from './editor-tab/collection-editor-tab.component';
+import { CollectionEditorSaveModalComponent } from './modals/collection-editor-save-modal.component';
+import { CollectionEditorPrePublishModalComponent } from './modals/collection-editor-pre-publish-modal.component';
+import { ToastrModule } from 'ngx-toastr';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { CollectionEditorPageComponent } from './collection-editor-page.component';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
-    CollectionDetailsEditor,
+    CollectionNodeCreatorComponent,
+    CollectionEditorNavbarBreadcrumbComponent,
+    CollectionEditorNavbarComponent,
+    CollectionEditorPageComponent,
+    CollectionEditorPrePublishModalComponent,
+    CollectionEditorSaveModalComponent,
+    CollectionEditorTabComponent,
+    CollectionDetailsEditorComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
-    CollectionPermissionsCard,
+    CollectionPermissionsCardComponent,
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
+    CollectionNodeCreatorComponent,
+    CollectionEditorNavbarBreadcrumbComponent,
+    CollectionEditorNavbarComponent,
+    CollectionEditorPageComponent,
+    CollectionEditorPrePublishModalComponent,
+    CollectionEditorSaveModalComponent,
+    CollectionEditorTabComponent,
+    CollectionDetailsEditorComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,
@@ -68,6 +93,10 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })

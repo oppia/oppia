@@ -14,17 +14,20 @@
 
 """Controllers for the admin view."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+import io
 import logging
 import random
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
+from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -54,9 +57,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
-import python_utils
-import utils
 
 
 class AdminPage(base.BaseHandler):
@@ -201,16 +201,11 @@ class AdminHandler(base.BaseHandler):
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
-            'updatable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.UPDATABLE_ROLES
-            },
-            'viewable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.VIEWABLE_ROLES
-            },
-            'topic_summaries': topic_summary_dicts,
+            'updatable_roles': role_services.UPDATABLE_ROLES,
+            'viewable_roles': role_services.VIEWABLE_ROLES,
+            'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
             'role_to_actions': role_services.get_role_actions(),
+            'topic_summaries': topic_summary_dicts,
             'feature_flags': feature_flag_dicts,
         })
 
@@ -292,8 +287,8 @@ class AdminHandler(base.BaseHandler):
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+            self.render_json({'error': str(e)})
+            raise e
 
     def _reload_exploration(self, exploration_id):
         """Reloads the exploration in dev_mode corresponding to the given
@@ -309,11 +304,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.convert_to_bytes(
-                exploration_id))
+            exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    exploration_id))
+                user_services.get_system_user(), exploration_id)
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -414,7 +407,7 @@ class AdminHandler(base.BaseHandler):
             Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
-            if self.user.role != feconf.ROLE_ID_ADMIN:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.')
             topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -579,19 +572,17 @@ class AdminHandler(base.BaseHandler):
             Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
-            if self.user.role != feconf.ROLE_ID_ADMIN:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
-            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
-                random.getrandbits(32))
+            skill_name = 'Dummy Skill %s' % str(random.getrandbits(32))
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
-            for i in python_utils.RANGE(15):
+            for i in range(15):
                 question_id = question_services.get_new_question_id()
-                question_name = 'Question number %s %s' % (
-                    python_utils.UNICODE(i), skill_name)
+                question_name = 'Question number %s %s' % (str(i), skill_name)
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)
@@ -617,11 +608,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(
-                python_utils.convert_to_bytes(collection_id))
+            collection_services.load_demo(collection_id)
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    collection_id))
+                user_services.get_system_user(), collection_id)
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -648,7 +637,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in python_utils.RANGE(num_dummy_exps_to_generate):
+            for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()
@@ -684,7 +673,8 @@ class AdminRoleHandler(base.BaseHandler):
             },
             'role': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': role_services.VIEWABLE_ROLES
                 },
                 'default_value': None
             },
@@ -695,7 +685,7 @@ class AdminRoleHandler(base.BaseHandler):
                 'default_value': None
             }
         },
-        'POST': {
+        'PUT': {
             'role': {
                 'schema': {
                     'type': 'basestring',
@@ -706,12 +696,19 @@ class AdminRoleHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 }
+            }
+        },
+        'DELETE': {
+            'role': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.ALLOWED_USER_ROLES
+                }
             },
-            'topic_id': {
+            'username': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -723,14 +720,12 @@ class AdminRoleHandler(base.BaseHandler):
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
             role = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_ROLE)
-            users_by_role = {
-                username: role
-                for username in user_services.get_usernames_by_role(role)
-            }
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
-            self.render_json(users_by_role)
+            self.render_json({
+                'usernames': user_services.get_usernames_by_role(role)
+            })
         elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
@@ -741,37 +736,162 @@ class AdminRoleHandler(base.BaseHandler):
             if user_id is None:
                 raise self.InvalidInputException(
                     'User with given username does not exist.')
-            user_role_dict = {
-                username: user_services.get_user_role_from_id(user_id)
+
+            user_settings = user_services.get_user_settings(user_id)
+            user_roles = user_settings.roles
+            managed_topic_ids = []
+            if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
+                managed_topic_ids = [
+                    rights.id for rights in
+                    topic_fetchers.get_topic_rights_with_user(user_id)]
+            user_roles_dict = {
+                'roles': user_roles,
+                'managed_topic_ids': managed_topic_ids,
+                'banned': user_settings.banned
             }
-            self.render_json(user_role_dict)
+            self.render_json(user_roles_dict)
 
     @acl_decorators.can_access_admin_page
-    def post(self):
-        username = self.normalized_payload.get('username')
-        role = self.normalized_payload.get('role')
-        topic_id = self.normalized_payload.get('topic_id')
+    def put(self):
+        username = self.payload.get('username')
+        role = self.payload.get('role')
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            # The Topic manager role assignment is handled via
+            # TopicManagerRoleHandler.
+            raise self.InvalidInputException(
+                'Unsupported role for this handler.')
+
+        user_services.add_user_role(user_settings.user_id, role)
+
+        self.render_json({})
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        username = self.request.get('username')
+        role = self.request.get('role')
+
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
 
-        if (
-                user_services.get_user_role_from_id(user_id) ==
-                feconf.ROLE_ID_TOPIC_MANAGER):
-            topic_services.deassign_user_from_all_topics(
-                user_services.get_system_user(), user_id)
+        if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            topic_services.deassign_user_from_all_topics(self.user, user_id)
 
-        user_services.update_user_role(user_id, role)
-        role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
-            username=username)
+        user_services.remove_user_role(user_id, role)
 
-        if topic_id:
-            user = user_services.get_user_actions_info(user_id)
+        self.render_json({})
+
+
+class TopicManagerRoleHandler(base.BaseHandler):
+    """Handler to assign or deassigning manager to a topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign']
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.normalized_payload.get('username')
+        action = self.normalized_payload.get('action')
+        topic_id = self.normalized_payload.get('topic_id')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_TOPIC_MANAGER in user_settings.roles:
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
+            topic_manager = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
-                user_services.get_system_user(), user,
-                topic_domain.ROLE_MANAGER, topic_id)
+                user_services.get_system_user(),
+                topic_manager, topic_domain.ROLE_MANAGER, topic_id)
+        elif action == 'deassign':
+            topic_services.deassign_manager_role_from_topic(
+                user_services.get_system_user(), user_id, topic_id)
+
+            if not topic_fetchers.get_topic_rights_with_user(user_id):
+                user_services.remove_user_role(
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
+        self.render_json({})
+
+
+class BannedUsersHandler(base.BaseHandler):
+    """Handler to ban and unban users."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        },
+        'DELETE': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.normalized_payload.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+        topic_services.deassign_user_from_all_topics(self.user, user_id)
+        user_services.mark_user_banned(user_id)
+
+        self.render_json({})
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        username = self.normalized_request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+        user_services.unmark_user_banned(user_id)
 
         self.render_json({})
 
@@ -843,9 +963,16 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
+        topic_similarities = (
+            recommendations_services.get_topic_similarities_as_csv()
+        )
+        # Downloadable file accepts only bytes, so we need to encode
+        # topic_similarities to bytes.
         self.render_downloadable_file(
-            recommendations_services.get_topic_similarities_as_csv(),
-            'topic_similarities.csv', 'text/csv')
+            io.BytesIO(topic_similarities.encode('utf-8')),
+            'topic_similarities.csv',
+            'text/csv'
+        )
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
@@ -1047,3 +1174,60 @@ class DeleteUserHandler(base.BaseHandler):
             )
         wipeout_service.pre_delete_user(user_id)
         self.render_json({'success': True})
+
+
+class UpdateBlogPostHandler(base.BaseHandler):
+    """Handler for changing author ids and published on date in
+    blog posts."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'author_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            },
+            'published_on': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        blog_post_id = self.normalized_payload.get('blog_post_id')
+        author_username = self.normalized_payload.get('author_username')
+        published_on = self.normalized_payload.get('published_on')
+
+        author_id = user_services.get_user_id_from_username(author_username)
+        if author_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % author_username)
+
+        user_actions = user_services.get_user_actions_info(author_id).actions
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
+            raise self.InvalidInputException(
+                'User does not have enough rights to be blog post author.')
+
+        blog_post = (
+            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
+        if blog_post is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post with the given id or url doesn\'t exist.'))
+
+        blog_services.update_blog_models_author_and_published_on_date(
+            blog_post_id, author_id, published_on)
+        self.render_json({})

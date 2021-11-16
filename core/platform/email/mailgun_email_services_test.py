@@ -16,26 +16,31 @@
 
 """Tests for the Mailgun API wrapper."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
+from core import python_utils
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
-import feconf
-import python_utils
+
+from typing import Dict, Tuple
+
+MailgunQueryType = Tuple[str, bytes, Dict[str, str]]
 
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    class Response(python_utils.OBJECT):
+    class Response:
         """Class to mock python_utils.url_open responses."""
 
-        def __init__(self, url, expected_url):
+        def __init__(
+            self, url: MailgunQueryType, expected_url: MailgunQueryType
+        ) -> None:
             self.url = url
             self.expected_url = expected_url
 
-        def getcode(self):
+        def getcode(self) -> int:
             """Gets the status code of this url_open mock.
 
             Returns:
@@ -43,16 +48,19 @@ class EmailTests(test_utils.GenericTestBase):
             """
             return 200 if self.url == self.expected_url else 500
 
-    def test_send_email_to_mailgun(self):
+    def test_send_email_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
-        expected_query_url = (
+        expected_query_url: MailgunQueryType = (
             'https://api.mailgun.net/v3/domain/messages',
-            (
-                'from=a%40a.com&text=plaintext_body+%F0%9F%98%82&recipient_vari'
-                'ables=%7B%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&'
-                'subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
-            {'Authorization': 'Basic YXBpOmtleQ=='})
+            b'from=a%40a.com&'
+            b'subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate&'
+            b'text=plaintext_body+%F0%9F%98%82&'
+            b'html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&'
+            b'to=b%40b.com&'
+            b'recipient_variables=%7B%7D',
+            {'Authorization': 'Basic YXBpOmtleQ=='}
+        )
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
@@ -65,22 +73,23 @@ class EmailTests(test_utils.GenericTestBase):
             resp = mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com'],
-                (
-                    'Hola 😂 - invitation to collaborate'
-                    .encode(encoding='utf-8')),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂')
             self.assertTrue(resp)
 
         # Test sending email with single bcc and single recipient email.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
-            (
-                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body' +
-                '+%F0%9F%98%82&bcc=c%40c.com&recipient_variables=%7Bu' +
-                '%27b%40b.com%27%3A+%7Bu%27id%27%3A+1%2C+u%27first%27%3A+u%' +
-                '27Bob%27%7D%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%9' +
-                '8%82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
+            b'from=a%40a.com&'
+            b'subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate&'
+            b'text=plaintext_body+%F0%9F%98%82&'
+            b'html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&'
+            b'to=b%40b.com&'
+            b'bcc=c%40c.com&'
+            b'h%3AReply-To=abc&'
+            b'recipient_variables=%7B%27b%40b.com'
+            b'%27%3A+%7B%27first%27%3A+%27Bob%27%2C+%27id%27%3A+1%7D%7D',
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
@@ -93,11 +102,9 @@ class EmailTests(test_utils.GenericTestBase):
             resp = mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com'],
-                (
-                    'Hola 😂 - invitation to collaborate'
-                    .encode(encoding='utf-8')),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂',
                 bcc=['c@c.com'],
                 reply_to='abc',
                 recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
@@ -107,13 +114,15 @@ class EmailTests(test_utils.GenericTestBase):
         # differentiated by recipient_variables ids.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
-            (
-                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
-                '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
-                'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
-                '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
-                'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
-                '+-+invitation+to+collaborate'),
+            b'from=a%40a.com&'
+            b'subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate&'
+            b'text=plaintext_body+%F0%9F%98%82&'
+            b'html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&'
+            b'to=b%40b.com&'
+            b'bcc=%5B%27c%40c.com%27%2C+%27d%40d.com%27%5D&'
+            b'h%3AReply-To=abc&'
+            b'recipient_variables=%7B%27b%40b.com'
+            b'%27%3A+%7B%27first%27%3A+%27Bob%27%2C+%27id%27%3A+1%7D%7D',
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
@@ -126,25 +135,24 @@ class EmailTests(test_utils.GenericTestBase):
             resp = mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com'],
-                (
-                    'Hola 😂 - invitation to collaborate'
-                    .encode(encoding='utf-8')),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂',
                 bcc=['c@c.com', 'd@d.com'],
                 reply_to='abc',
                 recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
             self.assertTrue(resp)
 
-    def test_batch_send_to_mailgun(self):
+    def test_batch_send_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
-        expected_query_url = (
+        expected_query_url: MailgunQueryType = (
             'https://api.mailgun.net/v3/domain/messages',
-            (
-                'from=a%40a.com&text=plaintext_body+%F0%9F%98%82&'
-                'recipient_variables=%7B%7D&to=%5Bu%27b%40b.com%27%2C+u%27c%40c'
-                '.com%27%2C+u%27d%40d.com%27%5D&html=Hi+abc%2C%3Cbr%3E+%F0%9F%'
-                '98%82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
+            b'from=a%40a.com&'
+            b'subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate&'
+            b'text=plaintext_body+%F0%9F%98%82&'
+            b'html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&'
+            b'to=%5B%27b%40b.com%27%2C+%27c%40c.com%27%2C+%27d%40d.com%27%5D&'
+            b'recipient_variables=%7B%7D',
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
@@ -158,51 +166,47 @@ class EmailTests(test_utils.GenericTestBase):
             resp = mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com', 'c@c.com', 'd@d.com'],
-                'Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂')
             self.assertTrue(resp)
 
-    def test_mailgun_key_or_domain_name_not_set_raises_exception(self):
+    def test_mailgun_key_or_domain_name_not_set_raises_exception(self) -> None:
         """Test that exceptions are raised when API key or domain name are
         unset.
         """
         # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegexp(
+        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailgun API key is not available.')
         with mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com', 'c@c.com', 'd@d.com'],
-                'Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂')
 
         # Testing no mailgun domain name.
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegexp(
+        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailgun domain name is not set.')
         with swap_api, mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com', 'c@c.com', 'd@d.com'],
-                'Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂')
 
-    def test_invalid_status_code_returns_false(self):
-        expected_query_url = (
+    def test_invalid_status_code_returns_false(self) -> None:
+        expected_query_url: MailgunQueryType = (
             'https://api.mailgun.net/v3/domain/messages',
-            (
-                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
-                '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
-                'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
-                '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
-                'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
-                '+-+invitation+to+collaborate'),
+            b'from=a%40a.com&'
+            b'subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate&'
+            b'text=plaintext_body+%F0%9F%98%82&'
+            b'html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&'
+            b'to=%5B%27b%40b.com%27%2C+%27c%40c.com%27%2C+%27d%40d.com%27%5D&'
+            b'recipient_variables=%7B%7D',
             {'Authorization': 'Basic'})
         swapped_request = lambda *args: args
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
@@ -216,11 +220,9 @@ class EmailTests(test_utils.GenericTestBase):
             resp = mailgun_email_services.send_email_to_recipients(
                 'a@a.com',
                 ['b@b.com'],
-                (
-                    'Hola 😂 - invitation to collaborate'
-                    .encode(encoding='utf-8')),
-                'plaintext_body 😂'.encode(encoding='utf-8'),
-                'Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                'Hola 😂 - invitation to collaborate',
+                'plaintext_body 😂',
+                'Hi abc,<br> 😂',
                 bcc=['c@c.com', 'd@d.com'],
                 reply_to='abc',
                 recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))

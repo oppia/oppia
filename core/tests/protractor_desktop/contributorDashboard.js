@@ -74,13 +74,7 @@ describe('Contributor dashboard page', function() {
     await users.createUser(USER_EMAILS[1], 'user1');
     await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
 
-    await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
-    await adminPage.editConfigProperty(
-      'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
-
+    await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -98,7 +92,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
 
     await adminPage.get();
-    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     // Add topic to classroom to make it available for question contributions.
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
@@ -288,16 +282,11 @@ describe('Contributor dashboard admin page contribution rights form', () => {
     await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
     await users.createUser(TRANSLATION_ADMIN_EMAIL, TRANSLATION_ADMIN_USERNAME);
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
 
-    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
-    await adminPage.updateRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
-    await adminPage.editConfigProperty(
-      'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.addRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await users.logout();
   });
 
@@ -362,7 +351,7 @@ describe('Translation contribution featured languages', () => {
       new ContributorDashboardPage.ContributorDashboardPage());
     contributorDashboardTranslateTextTab = (
       contributorDashboardPage.getTranslateTextTab());
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
     var adminPage = new AdminPage.AdminPage();
     await adminPage.editConfigProperty(

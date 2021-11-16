@@ -119,17 +119,6 @@
       "description": "is a proper subset of {{x|SetOfTranslatableHtmlContentIds}}"
     }
   },
-  "LogicProof": {
-    "Correct": {
-      "description": "is correct"
-    },
-    "NotCorrect": {
-      "description": "is not correct"
-    },
-    "NotCorrectByCategory": {
-      "description": "is not correct due to {{c|LogicErrorCategory}}"
-    }
-  },
   "MathEquationInput": {
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"

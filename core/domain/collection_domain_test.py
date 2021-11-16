@@ -16,18 +16,16 @@
 
 """Tests for collection domain objects and methods defined on them."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -461,6 +459,35 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             versioned_collection_contents['collection_contents'], {})
 
+    def test_update_collection_contents_from_model_with_schema_version_5(self):
+        versioned_collection_contents = {
+            'schema_version': 5,
+            'collection_contents': {
+                'nodes': [
+                    {
+                        'prerequisite_skill_ids': ['11', '22'],
+                        'acquired_skill_ids': ['33', '44'],
+                        'other_field': 'value1'
+                    },
+                    {
+                        'prerequisite_skill_ids': ['11', '22'],
+                        'acquired_skill_ids': ['33', '44'],
+                        'other_field': 'value2'
+                    }
+                ]
+            }
+        }
+
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, 5)
+
+        self.assertEqual(versioned_collection_contents['schema_version'], 6)
+        self.assertEqual(
+            versioned_collection_contents['collection_contents']['nodes'], [
+                {'other_field': 'value1'}, {'other_field': 'value2'}
+            ]
+        )
+
     def test_update_collection_contents_from_model_with_invalid_schema_version(
             self):
         versioned_collection_contents = {
@@ -687,8 +714,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-        for version_num in python_utils.RANGE(
-                1, current_collection_schema_version):
+        for version_num in range(1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
@@ -705,8 +731,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        for version_num in python_utils.RANGE(
-                1, current_collection_schema_version):
+        for version_num in range(1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_v%s_dict_to_v%s_dict' % (

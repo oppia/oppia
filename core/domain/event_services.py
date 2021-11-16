@@ -16,11 +16,12 @@
 
 """Classes for handling events."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 
+from core import feconf
+from core import python_utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -28,8 +29,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.platform import models
-import feconf
-import python_utils
 
 (feedback_models, stats_models, user_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.statistics, models.NAMES.user])
@@ -37,7 +36,7 @@ import python_utils
 transaction_services = models.Registry.import_transaction_services()
 
 
-class BaseEventHandler(python_utils.OBJECT):
+class BaseEventHandler:
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by
@@ -81,7 +80,7 @@ class StatsEventsHandler(BaseEventHandler):
         if 'undefined' in aggregated_stats['state_stats_mapping']:
             logging.error(
                 'Aggregated stats contains an undefined state name: %s'
-                % aggregated_stats['state_stats_mapping'].keys())
+                % list(aggregated_stats['state_stats_mapping'].keys()))
             return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(

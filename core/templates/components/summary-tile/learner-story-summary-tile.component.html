@@ -1,61 +1,104 @@
-<mat-card class="oppia-story-dashboard-card">
-  <a [href]="getStoryLink()"
-     target="{{ openInNewWindow ? '_blank' : '_self' }}"
-     class="oppia-story-link">
-    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
-      <div class="oppia-story-completion">
-        <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
-        <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
-          {{storyProgress}}% Complete
+<div class="learner-story-summary-tile" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
+  <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
+    {{nextIncompleteNodeTitle}}
+  </div>
+  <mat-card class="oppia-story-dashboard-card">
+    <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
+      <div class="story-card">
+        <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+          <img class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
+          <div class="oppia-story-completion">
+            <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
+            <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
+              {{storyProgress}}% Complete
+            </p>
+          </div>
+        </div>
+        <div class="oppia-summary-section">
+          <span class="oppia-story-title protractor-test-story-name-in-learner-story-summary-tile">
+            {{storyTitle}}
+          </span>
+          <span class="oppia-topic-title protractor-test-topic-name-in-learner-story-summary-tile">
+            {{topicName}}
+          </span>
+        </div>
+      </div>
+      <div class="continue-button" *ngIf="isDisplayAreaHome()">
+        <p class="continue-button-text">
+          Continue
         </p>
       </div>
-    </div>
-    <div class="oppia-summary-section">
-      <span class="oppia-story-title">
-        {{storyTitle}}
-      </span>
-      <span class="oppia-topic-title">
-        {{topicName}}
-      </span>
-    </div>
-  </a>
-</mat-card>
+    </a>
+  </mat-card>
+</div>
 <style>
-  .oppia-story-dashboard-card .oppia-story-title {
+  .learner-story-summary-tile .oppia-story-title {
     color: #333;
     display: inline-block;
     font-size: 16px;
     height: 40px;
     letter-spacing: 0;
-    margin: 0 8px 0 8px;
+    margin: 8px 8px 0 8px;
     opacity: 1;
     text-align: left;
   }
-  .oppia-story-dashboard-card .oppia-story-completion {
+  .learner-story-summary-tile .next-incomplete-chapter {
+    color: #333;
+    font-size: 17px;
+    font-weight: 500;
+    margin: 24px 0 12px 6px;
+    text-align: left;
+  }
+  .learner-story-summary-tile .continue-button {
+    background: #00645C 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    bottom: 110px;
+    box-shadow: 0 2px 2px #0000003d;
+    display: none;
+    height: 28px;
+    left: 40px;
+    position: relative;
+    width: 112px;
+  }
+  .learner-story-summary-tile .continue-button-text {
+    color: #FFF;
+    font-size: 14px;
+    left: 1px;
+    letter-spacing: 0;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: 6px;
+  }
+  .learner-story-summary-tile .oppia-story-completion {
     background: #000C 0% 0% no-repeat padding-box;
     border-radius: 2px;
     bottom: 23px;
     float: right;
     height: 19px;
+    margin: 0 8px 0 8px;
     position: relative;
     right: 4px;
+    text-align: left;
     width: 90px;
   }
-  .oppia-story-dashboard-card .oppia-svg-star-image {
+  .learner-story-summary-tile .story-completion {
+    bottom: 52px;
+  }
+  .learner-story-summary-tile .oppia-svg-star-image {
     bottom: 3px;
     filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
     left: 3px;
     position: relative;
     width: 11px;
   }
-  .oppia-story-dashboard-card .oppia-story-link {
+  .learner-story-summary-tile .oppia-story-link {
     text-decoration: none;
   }
-  .oppia-story-dashboard-card .oppia-summary-section {
+  .learner-story-summary-tile .oppia-summary-section {
     position: absolute;
   }
-  .oppia-story-dashboard-card .oppia-topic-title {
+  .learner-story-summary-tile .oppia-topic-title {
     color: #333;
     display: block;
     font-size: 14px;
@@ -66,8 +109,9 @@
     padding-bottom: 12px;
     text-align: left;
     text-transform: uppercase;
+    width: 100%;
   }
-  .oppia-story-dashboard-card .oppia-story-completed-percent {
+  .learner-story-summary-tile .oppia-story-completed-percent {
     bottom: 24px;
     color: #FFF;
     font-size: 10px;
@@ -78,7 +122,7 @@
     position: relative;
     width: 100%;
   }
-  .oppia-story-dashboard-card .oppia-percent-story-completed {
+  .learner-story-summary-tile .oppia-percent-story-completed {
     color: #FFF;
     font-size: 10px;
     letter-spacing: 0;
@@ -86,25 +130,33 @@
     padding: 2px;
     width: 100%;
   }
-  .oppia-story-dashboard-card {
+  .learner-story-summary-tile .oppia-story-dashboard-card {
     border-radius: 4px;
     box-shadow: 0 3px 6px #00000029;
     display: inline-block;
-    height: 224px;
+    height: 250px;
     margin: 0 2px 30px 6px;
     padding: 0;
     position: relative;
     width: 192px;
     z-index: 5;
   }
-  .oppia-story-dashboard-card .oppia-title-section {
+  .learner-story-summary-tile .oppia-title-section {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     height: 144px;
     width: 192px;
   }
-  .oppia-story-dashboard-card .oppia-thumbnail-image {
+  .learner-story-summary-tile .oppia-thumbnail-image {
     height: 144px;
     width: 192px;
+  }
+  .learner-story-summary-tile .oppia-story-dashboard-card .continue-button:hover {
+    display: block;
+    float: left;
+  }
+  .learner-story-summary-tile .oppia-story-dashboard-card .story-card:hover + .continue-button {
+    display: block;
+    float: left;
   }
 </style>

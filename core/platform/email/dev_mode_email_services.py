@@ -16,19 +16,25 @@
 
 """Provides email services api to log emails in DEV_MODE."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 import textwrap
 
-import python_utils
+from typing import Dict, List, Optional, Union
 
 
 def send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
+        sender_email: str,
+        recipient_emails: List[str],
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
+) -> bool:
     """Prints information about sent emails to the terminal console, in order
     to model sending an email in development mode.
 
@@ -70,8 +76,7 @@ def send_email_to_recipients(
          (recipient_email,) for recipient_email in recipient_emails[:3]])
     if len(recipient_emails) > 3:
         recipient_email_list_str += (
-            '... Total: ' +
-            python_utils.convert_to_bytes(len(recipient_emails)) + ' emails.')
+            '... Total: %s emails.' % (str(len(recipient_emails))))
 
     # Show the first 3 emails in bcc email list.
     if bcc:
@@ -79,9 +84,7 @@ def send_email_to_recipients(
             ['%s' %
              (bcc_email,) for bcc_email in bcc[:3]])
         if len(bcc) > 3:
-            bcc_email_list_str += (
-                '... Total: ' +
-                python_utils.convert_to_bytes(len(bcc)) + ' emails.')
+            bcc_email_list_str += '... Total: %s emails.' % str(len(bcc))
 
     msg = (
         """

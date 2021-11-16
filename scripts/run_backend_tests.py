@@ -46,10 +46,10 @@ imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
+import contextlib
 import importlib
 import inspect
 import json
@@ -62,15 +62,15 @@ import threading
 import time
 import unittest
 
-
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
@@ -102,15 +102,15 @@ _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=python_utils.UNICODE)
+    type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=python_utils.UNICODE)
+    type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_shard',
     help='optional name of shard to run',
-    type=python_utils.UNICODE)
+    type=str)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
@@ -138,9 +138,10 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
-    # Converting to unicode to stay compatible with the rest of the strings.
-    last_stdout_str = last_stdout_str.decode(encoding='utf-8')
-    last_stderr_str = last_stderr_str.decode(encoding='utf-8')
+    # Standard and error output is in bytes, we need to decode them to be
+    # compatible with rest of the code.
+    last_stdout_str = last_stdout_str.decode('utf-8')
+    last_stderr_str = last_stderr_str.decode('utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -159,7 +160,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TestingTaskSpec(python_utils.OBJECT):
+class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):
@@ -172,14 +173,14 @@ class TestingTaskSpec(python_utils.OBJECT):
         if self.generate_coverage_report:
             exc_list = [
                 sys.executable, COVERAGE_MODULE_PATH, 'run', '-p',
-                TEST_RUNNER_PATH, test_target_flag]
+                TEST_RUNNER_PATH, test_target_flag
+            ]
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
         result = run_shell_cmd(exc_list)
 
-        return [concurrent_task_utils.TaskResult(
-            None, None, None, [result])]
+        return [concurrent_task_utils.TaskResult(None, None, None, [result])]
 
 
 def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
@@ -198,7 +199,7 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
         """
         class_names = []
         test_target_path = os.path.relpath(
-            path, os.getcwd())[:-3].replace('/', '.')
+            path, start=os.getcwd())[:-3].replace('/', '.')
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
@@ -212,23 +213,21 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
     excluded_dirs = [
-        '.git', 'third_party', 'core/tests', 'node_modules', 'venv']
+        '.git', 'third_party', 'node_modules', 'venv',
+        'core/tests/data', 'core/tests/build_sources']
     for root in os.listdir(base_path):
-        if any([s in root for s in excluded_dirs]):
+        if any(s in root for s in excluded_dirs):
             continue
         if root.endswith('_test.py'):
             result = result + (
                 _get_test_target_classes(os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
-            if _LOAD_TESTS_DIR in subroot and include_load_tests:
-                for f in files:
-                    if f.endswith('_test.py'):
-                        result = result + (
-                            _get_test_target_classes(os.path.join(subroot, f)))
-
+            if any(s in subroot for s in excluded_dirs):
+                continue
+            if _LOAD_TESTS_DIR in subroot and not include_load_tests:
+                continue
             for f in files:
-                if (f.endswith('_test.py') and
-                        os.path.join('core', 'tests') not in subroot):
+                if f.endswith('_test.py'):
                     result = result + (
                         _get_test_target_classes(os.path.join(subroot, f)))
 
@@ -311,25 +310,29 @@ def main(args=None):
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
-            % common.OPPIA_TOOLS_DIR)
+            % common.OPPIA_TOOLS_DIR
+        )
         if not os.path.exists(
                 os.path.join(
                     common.OPPIA_TOOLS_DIR,
-                    'coverage-%s' % common.COVERAGE_VERSION)):
+                    'coverage-%s' % common.COVERAGE_VERSION
+                )
+        ):
             raise Exception(
                 'Coverage is not installed, please run the start script.')
 
         pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
             pythonpath_components.append(os.environ.get('PYTHONPATH'))
-
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
     test_specs_provided = sum([
         1 if argument else 0
         for argument in (
-            parsed_args.test_target, parsed_args.test_path,
-            parsed_args.test_shard)
+            parsed_args.test_target,
+            parsed_args.test_path,
+            parsed_args.test_shard
+        )
     ])
 
     if test_specs_provided > 1:
@@ -341,60 +344,60 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    if parsed_args.test_target:
-        if '_test' in parsed_args.test_target:
-            all_test_targets = [parsed_args.test_target]
+    with contextlib.ExitStack() as stack:
+        stack.enter_context(servers.managed_cloud_datastore_emulator())
+        stack.enter_context(servers.managed_redis_server())
+        if parsed_args.test_target:
+            if '_test' in parsed_args.test_target:
+                all_test_targets = [parsed_args.test_target]
+            else:
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '---------------------------------------------------------')
+                python_utils.PRINT(
+                    'WARNING : test_target flag should point to the test file.')
+                python_utils.PRINT(
+                    '---------------------------------------------------------')
+                python_utils.PRINT('')
+                time.sleep(3)
+                python_utils.PRINT(
+                    'Redirecting to its corresponding test file...')
+                all_test_targets = [parsed_args.test_target + '_test']
+        elif parsed_args.test_shard:
+            validation_error = _check_shards_match_tests(
+                include_load_tests=True)
+            if validation_error:
+                raise Exception(validation_error)
+            all_test_targets = _get_all_test_targets_from_shard(
+                parsed_args.test_shard)
         else:
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                '---------------------------------------------------------')
-            python_utils.PRINT(
-                'WARNING : test_target flag should point to the test file.')
-            python_utils.PRINT(
-                '---------------------------------------------------------')
-            python_utils.PRINT('')
-            time.sleep(3)
-            python_utils.PRINT('Redirecting to its corresponding test file...')
-            all_test_targets = [parsed_args.test_target + '_test']
-    elif parsed_args.test_shard:
-        validation_error = _check_shards_match_tests(
-            include_load_tests=False)
-        if validation_error:
-            raise Exception(validation_error)
-        all_test_targets = _get_all_test_targets_from_shard(
-            parsed_args.test_shard)
-    else:
-        include_load_tests = not parsed_args.exclude_load_tests
-        all_test_targets = _get_all_test_targets_from_path(
-            test_path=parsed_args.test_path,
-            include_load_tests=include_load_tests)
+            include_load_tests = not parsed_args.exclude_load_tests
+            all_test_targets = _get_all_test_targets_from_path(
+                test_path=parsed_args.test_path,
+                include_load_tests=include_load_tests)
 
-    # Prepare tasks.
-    max_concurrent_runs = 25
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
+        # Prepare tasks.
+        max_concurrent_runs = 25
+        concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
+        semaphore = threading.Semaphore(concurrent_count)
 
-    task_to_taskspec = {}
-    tasks = []
-    for test_target in all_test_targets:
-        test = TestingTaskSpec(
-            test_target, parsed_args.generate_coverage_report)
-        task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, semaphore, name=test_target,
-            report_enabled=False)
-        task_to_taskspec[task] = test
-        tasks.append(task)
+        task_to_taskspec = {}
+        tasks = []
+        for test_target in all_test_targets:
+            test = TestingTaskSpec(
+                test_target,
+                parsed_args.generate_coverage_report)
+            task = concurrent_task_utils.create_task(
+                test.run, parsed_args.verbose, semaphore, name=test_target,
+                report_enabled=False)
+            task_to_taskspec[task] = test
+            tasks.append(task)
 
-    task_execution_failed = False
-    try:
-        concurrent_task_utils.execute_tasks(tasks, semaphore)
-    except Exception:
-        task_execution_failed = True
-
-    for task in tasks:
-        if task.exception:
-            concurrent_task_utils.log(
-                python_utils.convert_to_bytes(task.exception.args[0]))
+        task_execution_failed = False
+        try:
+            concurrent_task_utils.execute_tasks(tasks, semaphore)
+        except Exception:
+            task_execution_failed = True
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
@@ -412,20 +415,19 @@ def main(args=None):
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif (task.exception and
-              'No tests were run' in python_utils.convert_to_bytes(
-                  task.exception.args[0])):
+        elif task.exception and 'No tests were run' in task.exception.args[0]:
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = python_utils.convert_to_bytes(task.exception.args[0])
+            exc_str = task.exception.args[0]
             python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                python_utils.convert_to_bytes(task.exception.args[0]))
+                task.exception.args[0]
+            )
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))
@@ -493,7 +495,7 @@ def main(args=None):
             [sys.executable, COVERAGE_MODULE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing'],
-            stdout=subprocess.PIPE)
+            stdout=subprocess.PIPE, encoding='utf-8')
 
         report_stdout, _ = process.communicate()
         python_utils.PRINT(report_stdout)

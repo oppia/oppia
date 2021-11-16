@@ -16,532 +16,559 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
-import { of } from 'rxjs';
-import { ClassroomBackendApiService } from
-  'domain/classroom/classroom-backend-api.service';
+import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-
-describe('Library controller', function() {
-  var ctrl = null;
-  var $flushPendingTasks = null;
-  var $httpBackend = null;
-  var $log = null;
-  var $q = null;
-  var $scope = null;
-  var classroomBackendApiService = null;
-  var csrfTokenService = null;
-  var i18nLanguageCodeService = null;
-  var userService = null;
-
-  var logErrorSpy = null;
-  var mockWindow = null;
-  importAllAngularServices();
-
-  beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
-  beforeEach(function() {
-    classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
-    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
-    OppiaAngularRootComponent.pageTitleService = (
-      TestBed.get(PageTitleService)
-    );
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
-    $provide.value(
-      'UserService', TestBed.get(UserService));
-  }));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowDimensionsService', {
-      getWidth: () => 768,
-      getResizeEvent: () => of(new Event('resize'))
-    });
-  }));
-
-  afterEach(function() {
-    ctrl.$onDestroy();
-  });
-
-  describe('when window location pathname is invalid', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      mockWindow = {
-        location: {
-          pathname: '/invalid',
-          href: ''
-        }
-      };
-      $provide.value('$window', mockWindow);
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      $httpBackend = $injector.get('$httpBackend');
-      $log = $injector.get('$log');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
-
-      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
-
-      logErrorSpy = spyOn($log, 'error');
-      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
-          isLoggedIn: () => true
-        }));
-
-      $httpBackend.expectGET('/libraryindexhandler').respond({
-        activity_summary_dicts_by_category: [{
-          activity_summary_dicts: [{
-            activity_type: 'exploration',
-            id: 'exp1',
-            title: 'Exploration Summary'
-          }, {
-            activity_type: 'collection',
-            id: 'col1',
-            title: 'Collection Summary'
-          }, {
-            activity_type: 'invalid',
-            id: '3',
-            title: 'Invalid Summary'
-          }, {
-            activity_type: 'exploration',
-            id: 'exp4',
-            title: 'Exploration Summary'
-          }]
-        }]
-      });
-      $httpBackend.expectGET('/creatordashboardhandler/data').respond({
-        explorations_list: [{id: 'exp2'}, {id: 'exp3'}],
-        collections_list: [{id: 'col2'}, {id: 'col3'}]
-      });
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('libraryPage', {
-        $scope: $scope,
-        I18nLanguageCodeService: i18nLanguageCodeService
-      });
-
-      // This approach was choosen because spyOn() doesn't work on properties
-      // that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property classroomBackendApiService does not have access type get'
-      // or 'Property classroomBackendApiService does not have access type set'
-      // error.
-      Object.defineProperty(ctrl, 'classroomBackendApiService', {
-        get: () => undefined,
-        set: () => {}
-      });
-      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
-        classroomBackendApiService);
-      spyOn(
-        classroomBackendApiService,
-        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
-        $q.resolve(true));
-      ctrl.$onInit();
-      $scope.$apply();
-      $httpBackend.flush(2);
-    }));
-
-    it('should initialize controller properties after its initialization',
-      function() {
-        expect(['banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'])
-          .toContain(ctrl.bannerImageFilename);
-        expect(ctrl.bannerImageFileUrl).toBe(
-          '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-        expect(logErrorSpy.calls.allArgs()).toContain(
-          ['INVALID URL PATH: /invalid']);
-        expect(
-          OppiaAngularRootComponent.pageTitleService.setPageTitle
-        ).toHaveBeenCalledWith('Community Library Lessons | Oppia');
-        expect(ctrl.activitiesOwned).toEqual({
-          explorations: {
-            exp1: false,
-            exp2: true,
-            exp3: true,
-            exp4: false
-          },
-          collections: {
-            col1: false,
-            col2: true,
-            col3: true,
-          }});
-        expect(ctrl.tileDisplayCount).toBe(0);
-      });
-
-    it('should set active group index', function() {
-      expect(ctrl.activeGroupIndex).toBe(null);
-
-      ctrl.setActiveGroup(1);
-      expect(ctrl.activeGroupIndex).toBe(1);
-
-      ctrl.clearActiveGroup();
-      expect(ctrl.activeGroupIndex).toBe(null);
-    });
-
-    it('should change left most card index carousel after carousel is' +
-      ' initialized', function() {
-      var windowMock = $(window);
-      windowMock.width(1200);
-      var libraryCarouselMock = $(document.createElement('div'));
-      var carouselMock = $(document.createElement('div'));
-      spyOn(carouselMock, 'scrollLeft').and.returnValue(100);
-
-      var jQuerySpy = spyOn(window, '$');
-      jQuerySpy
-        .withArgs(window).and.returnValue(windowMock)
-        .withArgs('.oppia-library-carousel').and
-        .returnValue(libraryCarouselMock);
-      jQuerySpy.withArgs('.oppia-library-carousel-tiles:eq(0)').and
-        .returnValue(carouselMock);
-      jQuerySpy.and.callThrough();
-
-      // Init carousels.
-      $flushPendingTasks();
-
-      expect(ctrl.tileDisplayCount).toBe(2);
-      expect(libraryCarouselMock.css('width')).toBe('416px');
-      expect(ctrl.leftmostCardIndices).toEqual([1]);
-
-      ctrl.incrementLeftmostCardIndex(0);
-      expect(ctrl.leftmostCardIndices).toEqual([2]);
-      ctrl.decrementLeftmostCardIndex(0);
-      expect(ctrl.leftmostCardIndices).toEqual([1]);
-    });
-
-    it('should change page view when resizing window', function() {
-      window.dispatchEvent(new Event('resize'));
-
-      expect(ctrl.libraryWindowIsNarrow).toBe(false);
-    });
-
-    it('should log an error when exploration summary tile element width' +
-      ' is different from 208 pixels', function() {
-      var divMock = $(document.createElement('div'));
-      divMock.width(100);
-
-      var jQuerySpy = spyOn(window, '$');
-      jQuerySpy.withArgs('exploration-summary-tile').and.returnValue(
-        divMock);
-      jQuerySpy.and.callThrough();
-      $flushPendingTasks();
-
-      expect($log.error).toHaveBeenCalledWith(
-        'The actual width of tile is different than the ' +
-        'expected width. Actual size: 100, Expected size: 208');
-    });
-
-    it('should search for content by category when no url is provided',
-      function() {
-        ctrl.showFullResultsPage(['Algebra', 'Math']);
-
-        expect(mockWindow.location.href).toBe(
-          '/search/find?q=&category=("Algebra" OR "Math")');
-      });
-
-    it('should search for content by url', function() {
-      ctrl.showFullResultsPage([], '/search/find?q=all');
-
-      expect(mockWindow.location.href).toBe(
-        '/search/find?q=all');
-    });
-
-    it('should not scroll carousel when it is already being scrolled',
-      function() {
-        var cssValue = null;
-        var windowMock = $(window);
-        windowMock.width(1200);
-        var libraryCarouselMock = $(document.createElement('div'));
-        var carouselMock = $(document.createElement('div'));
-        spyOn(carouselMock, 'scrollLeft').and.returnValue(100);
-        var animateSpy = spyOn(carouselMock, 'animate').and.callFake(
-          // This throws an error of argument type. We need to suppress this
-          // error because animate expect to receive properties with different
-          // names from css and animationSettings.
-          // @ts-expect-error
-          (css, animationSettings) => {
-            cssValue = css;
-            animationSettings.start();
-          });
-
-        var jQuerySpy = spyOn(window, '$');
-        jQuerySpy.withArgs(window).and.returnValue(windowMock);
-        jQuerySpy.withArgs('.oppia-library-carousel').and
-          .returnValue(libraryCarouselMock);
-        jQuerySpy.withArgs('.oppia-library-carousel-tiles:eq(0)').and
-          .returnValue(carouselMock);
-        jQuerySpy.and.callThrough();
-
-        // Init carousels.
-        $flushPendingTasks();
-
-        ctrl.scroll(0, true);
-        expect(animateSpy).toHaveBeenCalled();
-        expect(cssValue.scrollLeft).toBe(-316);
-
-        animateSpy.calls.reset();
-        ctrl.scroll(0, false);
-        expect(cssValue.scrollLeft).toBe(-316);
-
-        expect(animateSpy).not.toHaveBeenCalled();
-      });
-
-    it('should scroll carousel again when it already finished scrolling',
-      function() {
-        var cssValue = null;
-        var windowMock = $(window);
-        windowMock.width(1200);
-        var libraryCarouselMock = $(document.createElement('div'));
-        var carouselMock = $(document.createElement('div'));
-        spyOn(carouselMock, 'scrollLeft').and.returnValue(100);
-        var animateSpy = spyOn(carouselMock, 'animate').and.callFake(
-          // This throws an error of argument type. We need to suppress this
-          // error because animate expect to receive properties with different
-          // names from css and animationSettings.
-          // @ts-expect-error
-          (css, animationSettings) => {
-            cssValue = css;
-            animationSettings.start();
-            animationSettings.complete();
-          });
-
-        var jQuerySpy = spyOn(window, '$');
-        jQuerySpy.withArgs(window).and.returnValue(windowMock);
-        jQuerySpy.withArgs('.oppia-library-carousel').and
-          .returnValue(libraryCarouselMock);
-        jQuerySpy.withArgs('.oppia-library-carousel-tiles:eq(0)').and
-          .returnValue(carouselMock);
-        jQuerySpy.and.callThrough();
-
-        // Init carousels.
-        $flushPendingTasks();
-
-        ctrl.scroll(0, true);
-        expect(cssValue.scrollLeft).toBe(-316);
-        ctrl.scroll(0, false);
-        expect(cssValue.scrollLeft).toBe(516);
-
-        expect(animateSpy).toHaveBeenCalledTimes(2);
-      });
-  });
-
-  describe('when window location pathname is invalid and user is not' +
-    ' logged in on the platform', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      mockWindow = {
-        location: {
-          pathname: '/invalid'
-        }
-      };
-      $provide.value('$window', mockWindow);
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      $httpBackend = $injector.get('$httpBackend');
-      $log = $injector.get('$log');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
-
-      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
-
-      logErrorSpy = spyOn($log, 'error');
-      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
-          isLoggedIn: () => false
-        }));
-
-      $httpBackend.expectGET('/libraryindexhandler').respond({
-        activity_summary_dicts_by_category: [{
-          activity_summary_dicts: [{
-            activity_type: 'exploration',
-            id: '1',
-            title: 'Exploration Summary'
-          }]
-        }]
-      });
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('libraryPage', {
-        $scope: $scope,
-        I18nLanguageCodeService: i18nLanguageCodeService
-      });
-
-      // This approach was choosen because spyOn() doesn't work on properties
-      // that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property classroomBackendApiService does not have access type get'
-      // or 'Property classroomBackendApiService does not have access type set'
-      // error.
-      Object.defineProperty(ctrl, 'classroomBackendApiService', {
-        get: () => undefined,
-        set: () => {}
-      });
-      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
-        classroomBackendApiService);
-      spyOn(
-        classroomBackendApiService,
-        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
-        $q.resolve(true));
-      ctrl.$onInit();
-      $scope.$apply();
-      $httpBackend.flush();
-    }));
-
-    it('should initialize controller properties after its initialization',
-      function() {
-        expect(['banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'])
-          .toContain(ctrl.bannerImageFilename);
-        expect(ctrl.bannerImageFileUrl).toBe(
-          '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-        expect(logErrorSpy.calls.allArgs()).toContain(
-          ['INVALID URL PATH: /invalid']);
-        expect(
-          OppiaAngularRootComponent.pageTitleService.setPageTitle
-        ).toHaveBeenCalledWith('Community Library Lessons | Oppia');
-        expect(ctrl.activitiesOwned).toEqual({
-          explorations: {},
-          collections: {}
-        });
-        expect(ctrl.tileDisplayCount).toBe(0);
-      });
-
-    it('should not scroll carousel where there are more carousel pixed' +
-      ' widhts than tile widths', function() {
-      var windowMock = $(window);
-      windowMock.width(1200);
-      var libraryCarouselMock = $(document.createElement('div'));
-      var carouselMock = $(document.createElement('div'));
-      spyOn(carouselMock, 'animate');
-
-      var jQuerySpy = spyOn(window, '$');
-      jQuerySpy.withArgs(window).and.returnValue(windowMock);
-      jQuerySpy.withArgs('.oppia-library-carousel').and
-        .returnValue(libraryCarouselMock);
-      jQuerySpy.withArgs('.oppia-library-carousel-tiles:eq(0)').and
-        .returnValue(carouselMock);
-      jQuerySpy.and.callThrough();
-
-      // Init carousels.
-      $flushPendingTasks();
-
-      expect(ctrl.tileDisplayCount).toBe(2);
-
-      ctrl.scroll(0, true);
-
-      expect(carouselMock.animate).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('when window location pathname is group mode', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      mockWindow = {
-        location: {
-          pathname: '/community-library/top-rated'
-        }
-      };
-      $provide.value('$window', mockWindow);
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $httpBackend = $injector.get('$httpBackend');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
-      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
-
-      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
-          isLoggedIn: () => true
-        }));
-
-      $httpBackend.expectGET('/librarygrouphandler?group_name=top-rated')
-        .respond({
-          activity_list: [],
-          header_i18n_id: '',
-          preferred_language_codes: ['en']
-        });
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('libraryPage', {
-        $scope: $scope,
-        I18nLanguageCodeService: i18nLanguageCodeService
-      });
-
-      // This approach was choosen because spyOn() doesn't work on properties
-      // that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property classroomBackendApiService does not have access type get'
-      // or 'Property classroomBackendApiService does not have access type set'
-      // error.
-      Object.defineProperty(ctrl, 'classroomBackendApiService', {
-        get: () => undefined,
-        set: () => {}
-      });
-      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
-        classroomBackendApiService);
-      spyOn(
-        classroomBackendApiService,
-        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
-        $q.resolve(true));
-      ctrl.$onInit();
-      $scope.$apply();
-      $httpBackend.flush();
-    }));
-
-    it('should initialize controller properties after its initialization',
-      function() {
-        expect(['banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'])
-          .toContain(ctrl.bannerImageFilename);
-        expect(ctrl.bannerImageFileUrl).toBe(
-          '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-        expect(
-          OppiaAngularRootComponent.pageTitleService.setPageTitle
-        ).toHaveBeenCalledWith('Find explorations to learn from - Oppia');
-        expect(ctrl.activitiesOwned).toBe(undefined);
-        expect(ctrl.activityList).toEqual([]);
-        expect(ctrl.groupHeaderI18nId).toEqual('');
-        expect(ctrl.tileDisplayCount).toBe(0);
-      });
-
-    it(
-      'should get complete image path corresponding to a given relative path',
-      function() {
-        var imagePath = '/path/to/image.png';
-        expect(
-          ctrl.getStaticImageUrl(imagePath)
-        ).toBe('/assets/images/path/to/image.png');
+import { MockTranslateModule } from 'tests/unit-test-utils';
+import { LibraryPageComponent } from './library-page.component';
+import { LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/community-library/top-rated',
+      href: ''
+    }
+  };
+}
+
+class MockWindowDimensionsService {
+  getResizeEvent() {
+    return {
+      subscribe: (callb) => {
+        callb();
+        return {
+          unsubscribe() {}
+        };
       }
-    );
+    };
+  }
+
+  getWidth(): number {
+    return 700;
+  }
+}
+
+describe('Library Page Component', () => {
+  let fixture: ComponentFixture<LibraryPageComponent>;
+  let componentInstance: LibraryPageComponent;
+  let loaderService: LoaderService;
+  let urlInterpolationService: UrlInterpolationService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let pageTitleService: PageTitleService;
+  let libraryPageBackendApiService: LibraryPageBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let windowDimensionsService: WindowDimensionsService;
+  let windowRef: MockWindowRef;
+  let userService: UserService;
+  let keyboardShortcutService: KeyboardShortcutService;
+  let loggerService: LoggerService;
+  let searchService: SearchService;
+
+  let explorationList = [{
+    category: '',
+    community_owned: true,
+    activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
+    last_updated_msec: 1,
+    ratings: null,
+    id: 'id1',
+    created_on_msec: 12,
+    human_readable_contributors_summary: null,
+    language_code: '',
+    num_views: 2,
+    objective: '',
+    status: '',
+    tags: [],
+    thumbnail_bg_color: '',
+    thumbnail_icon_url: '',
+    title: '',
+    num_total_threads: 3,
+    num_open_threads: 3
+  }];
+
+  let collectionList = [{
+    category: '',
+    community_owned: true,
+    last_updated_msec: 2,
+    id: '',
+    created_on: 2,
+    language_code: '',
+    objective: '',
+    status: '',
+    thumbnail_bg_color: '',
+    thumbnail_icon_url: '',
+    title: '',
+    node_count: 2
+  }];
+
+  let libraryIndexData = {
+    activity_summary_dicts_by_category: [{
+      activity_summary_dicts: [{
+        activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
+        category: '',
+        community_owned: true,
+        id: 'id1',
+        language_code: '',
+        num_views: 5,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      },
+      {
+        activity_type: AppConstants.ACTIVITY_TYPE_COLLECTION,
+        category: '',
+        community_owned: true,
+        id: 'id2',
+        language_code: '',
+        num_views: 5,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      },
+      {
+        activity_type: '',
+        category: '',
+        community_owned: true,
+        id: 'id1',
+        language_code: '',
+        num_views: 5,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      }],
+      categories: [],
+      header_i18n_id: 'id',
+      has_full_results_page: true,
+      full_results_url: '',
+      protractor_id: ''
+    }],
+    preferred_language_codes: []
+  };
+
+  beforeEach(waitForAsync(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        MockTranslateModule
+      ],
+      declarations: [
+        LibraryPageComponent
+      ],
+      providers: [
+        LoggerService,
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+        I18nLanguageCodeService,
+        KeyboardShortcutService,
+        LibraryPageBackendApiService,
+        LoaderService,
+        SearchService,
+        UrlInterpolationService,
+        UserService,
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        },
+        ClassroomBackendApiService,
+        PageTitleService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LibraryPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = TestBed.inject(LoaderService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    libraryPageBackendApiService = TestBed.inject(LibraryPageBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
+    keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
+    loggerService = TestBed.inject(LoggerService);
+    searchService = TestBed.inject(SearchService);
+  });
+
+  afterEach(() => {
+    componentInstance.ngOnDestroy();
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(libraryPageBackendApiService, 'fetchLibraryGroupDataAsync')
+      .and.returnValue(Promise.resolve({
+        activity_list: [],
+        header_i18n_id: '',
+        preferred_language_codes: []
+      }));
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(900);
+    componentInstance.ngOnInit();
+    spyOn(componentInstance, 'initCarousels');
+    tick();
+    tick();
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
+      'I18N_LIBRARY_LOADING');
+    expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+      .toHaveBeenCalled();
+    expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBeTrue();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(libraryPageBackendApiService.fetchLibraryGroupDataAsync)
+      .toHaveBeenCalled();
+    expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit)
+      .toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(windowDimensionsService.getWidth).toHaveBeenCalled();
+  }));
+
+  it('should initialize for non group pages', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(pageTitleService, 'setDocumentTitle');
+    windowRef.nativeWindow.location.pathname = '/community-library';
+    fixture.detectChanges();
+    spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
+      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      new UserInfo(
+        ['role'], true, true, true, true, true, 'en', 'user',
+        'user@user.com', true)));
+    spyOn(libraryPageBackendApiService, 'fetchCreatorDashboardDataAsync')
+      .and.returnValue(Promise.resolve({
+        explorations_list: explorationList,
+        collections_list: collectionList
+      }));
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+    spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
+    spyOn(componentInstance, 'initCarousels');
+    spyOn(loggerService, 'error');
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick(4000);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+    expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+      .toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(libraryPageBackendApiService.fetchLibraryIndexDataAsync)
+      .toHaveBeenCalled();
+    expect(userService.getUserInfoAsync).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.initCarousels).toHaveBeenCalled();
+  }));
+
+  it('should initialize for non group pages and user is not logged in',
+    fakeAsync(() => {
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(urlInterpolationService, 'getStaticImageUrl');
+      spyOn(
+        classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+        .and.returnValue(Promise.resolve(true));
+      spyOn(pageTitleService, 'setDocumentTitle');
+      windowRef.nativeWindow.location.pathname = '/community-library';
+      fixture.detectChanges();
+      spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
+        .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({ isLoggedIn: () => false } as UserInfo));
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+      spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
+      spyOn(componentInstance, 'initCarousels');
+      spyOn(loggerService, 'error');
+      let actualWidth = 200;
+      spyOn(window, '$').and.returnValue({
+        width: () => {
+          return actualWidth;
+        }
+      } as JQLite);
+      componentInstance.ngOnInit();
+      tick();
+      tick();
+      tick();
+      tick();
+      tick(4000);
+      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+      expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+      expect(
+        classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+        .toHaveBeenCalled();
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+      expect(userService.getUserInfoAsync).toHaveBeenCalled();
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'The actual width of tile is different than the ' +
+        'expected width. Actual size: ' + actualWidth +
+        ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX
+      );
+    }));
+
+  it('should log when invalid path is used', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(pageTitleService, 'setDocumentTitle');
+    windowRef.nativeWindow.location.pathname = '/not-valid';
+    fixture.detectChanges();
+    spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
+      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({ isLoggedIn: () => false } as UserInfo));
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(loggerService, 'error');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+    spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
+    spyOn(componentInstance, 'initCarousels');
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick(4000);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+    expect(
+      classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+      .toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(userService.getUserInfoAsync).toHaveBeenCalled();
+    expect(loggerService.error).toHaveBeenCalled();
+  }));
+
+  it('should show full results page when full results url is available',
+    () => {
+      let fullResultsUrl = 'full_results_url';
+      componentInstance.showFullResultsPage([], fullResultsUrl);
+      expect(windowRef.nativeWindow.location.href).toEqual(fullResultsUrl);
+    });
+
+  it('should show full results page when results url is not available',
+    () => {
+      let urlQueryString = 'urlQueryString';
+      spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
+        urlQueryString);
+      componentInstance.showFullResultsPage(['id'], '');
+      expect(windowRef.nativeWindow.location.href).toEqual(
+        '/search/find?q=' + urlQueryString);
+    });
+
+  it('should increment and decrement carousel', () => {
+    componentInstance.libraryGroups = [{
+      activity_summary_dicts: [{
+        activity_type: '',
+        category: '',
+        community_owned: true,
+        id: '',
+        language_code: '',
+        num_views: 2,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: '',
+      }],
+      categories: [],
+      header_i18n_id: '',
+      has_full_results_page: true,
+      full_results_url: '',
+      protractor_id: ''
+    }];
+    componentInstance.tileDisplayCount = 0;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.incrementLeftmostCardIndex(0);
+    expect(componentInstance.leftmostCardIndices).toEqual([1]);
+    componentInstance.decrementLeftmostCardIndex(0);
+    expect(componentInstance.leftmostCardIndices).toEqual([0]);
+  });
+
+  it('should get static image url', () => {
+    let url = 'url';
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(url);
+    expect(componentInstance.getStaticImageUrl('')).toEqual(url);
+  });
+
+  it('should set active group', () => {
+    let groupIndex = 20;
+    componentInstance.setActiveGroup(groupIndex);
+    expect(componentInstance.activeGroupIndex).toEqual(groupIndex);
+  });
+
+  it('should clear active group', () => {
+    componentInstance.setActiveGroup(10);
+    componentInstance.clearActiveGroup();
+    expect(componentInstance.activeGroupIndex).toBeNull();
+  });
+
+  it('should intialize carousels', () => {
+    componentInstance.libraryGroups = [{
+      activity_summary_dicts: [],
+      categories: [],
+      header_i18n_id: '',
+      has_full_results_page: true,
+      full_results_url: '',
+      protractor_id: ''
+    }];
+    componentInstance.initCarousels();
+    expect(componentInstance.leftmostCardIndices.length).toEqual(1);
+  });
+
+  it('should not initialize carousels if there are no library groups',
+    () => {
+      componentInstance.initCarousels();
+      expect(componentInstance.leftmostCardIndices.length).toEqual(0);
+    });
+
+  it('should scroll carousel', () => {
+    componentInstance.libraryGroups = [];
+    let activityDicts = [];
+
+    for (let i = 0; i < 5; i++) {
+      activityDicts.push({
+        activity_type: '',
+        category: '',
+        community_owned: true,
+        id: '',
+        language_code: '',
+        num_views: 10,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      });
+    }
+
+    for (let i = 0; i < 10; i++) {
+      componentInstance.libraryGroups.push({
+        activity_summary_dicts: activityDicts,
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: true,
+        full_results_url: '',
+        protractor_id: ''
+      });
+    }
+
+    spyOn(window, '$').and.returnValue({
+      animate: (options, arg2: {
+        duration: number,
+        queue: boolean,
+        start: () => void,
+        complete: () => void
+      }) => {
+        arg2.start();
+        arg2.complete();
+      },
+      scrollLeft: () => {}
+    } as JQLite);
+
+    componentInstance.scroll(3, false);
+    componentInstance.scroll(3, true);
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toEqual(false);
+  });
+
+  it('should not scroll if other carousel is currently scrolling', () => {
+    componentInstance.isAnyCarouselCurrentlyScrolling = true;
+    componentInstance.leftmostCardIndices = [];
+    componentInstance.scroll(0, true);
+    expect(componentInstance.leftmostCardIndices).toEqual([]);
+  });
+
+  it('should not scroll if all tiles are already showing', () => {
+    componentInstance.libraryGroups = [];
+    let activityDicts = [];
+
+    for (let i = 0; i < 3; i++) {
+      activityDicts.push({
+        activity_type: '',
+        category: '',
+        community_owned: true,
+        id: '',
+        language_code: '',
+        num_views: 10,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      });
+    }
+
+    for (let i = 0; i < 2; i++) {
+      componentInstance.libraryGroups.push({
+        activity_summary_dicts: activityDicts,
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: true,
+        full_results_url: '',
+        protractor_id: ''
+      });
+    }
+
+    spyOn(window, '$').and.returnValue({
+      animate: (options, arg2: {
+        duration: number,
+        queue: boolean,
+        start: () => void,
+        complete: () => void
+      }) => {
+        arg2.start();
+        arg2.complete();
+      },
+      scrollLeft: () => {}
+    } as JQLite);
+
+    componentInstance.tileDisplayCount = 5;
+    componentInstance.scroll(1, false);
+    expect(componentInstance.leftmostCardIndices).toEqual([]);
   });
 });

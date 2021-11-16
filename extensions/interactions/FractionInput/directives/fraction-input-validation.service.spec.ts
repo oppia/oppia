@@ -45,9 +45,10 @@ describe('FractionInputValidationService', () => {
     HasFractionalPartExactlyEqualToNegativeValue: Rule,
     HasFractionalPartExactlyEqualToThreeHalfs: Rule,
     HasFractionalPartExactlyEqualToTwoFifthsRule: Rule,
-    greaterThanMinusOneRule: Rule, integerPartEqualsOne: Rule,
-    integerPartEqualsZero: Rule, lessThanTwoRule: Rule, nonIntegerRule: Rule,
-    numeratorEqualsFiveRule: Rule, zeroDenominatorRule: Rule;
+    HasNoFractionalPart: Rule, greaterThanMinusOneRule: Rule,
+    integerPartEqualsOne: Rule, integerPartEqualsZero: Rule,
+    lessThanTwoRule: Rule, nonIntegerRule: Rule, numeratorEqualsFiveRule: Rule,
+    zeroDenominatorRule: Rule;
   let createFractionDict: (
     isNegative: boolean, wholeNumber: number,
         numerator: number, denominator: number) => FractionDict;
@@ -224,6 +225,13 @@ describe('FractionInputValidationService', () => {
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 3, 2)
+      }
+    }, 'FractionInput');
+
+    HasNoFractionalPart = rof.createFromBackendDict({
+      rule_type: 'HasNoFractionalPart',
+      inputs: {
+        f: createFractionDict(false, 2, 0, 1)
       }
     }, 'FractionInput');
 
@@ -418,6 +426,16 @@ describe('FractionInputValidationService', () => {
           1 + ' will never be matched because it has a ' +
           'non zero integer part')
       }]);
+    });
+
+  it('should not catch anything when there is no fractional part',
+    () => {
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [HasNoFractionalPart];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([]);
     });
 
   it('should catch if not allowNonzeroIntegerPart and ' +

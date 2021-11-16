@@ -27,6 +27,7 @@ export interface LearnerTopicSummaryBackendDict {
   'description': string;
   'version': number;
   'story_titles': string[];
+  'total_published_node_count': number,
   'canonical_story_summary_dict': StorySummaryBackendDict[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
@@ -46,6 +47,7 @@ export class LearnerTopicSummary {
       public description: string,
       public version: number,
       public storyTitles: string[],
+      public totalPublishedNodeCount: number,
       public canonicalStorySummaryDicts: StorySummary[],
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
@@ -74,7 +76,9 @@ export class LearnerTopicSummary {
       topicSummaryBackendDict.language_code,
       topicSummaryBackendDict.description,
       topicSummaryBackendDict.version,
-      topicSummaryBackendDict.story_titles, canonicalStorySummaries,
+      topicSummaryBackendDict.story_titles,
+      topicSummaryBackendDict.total_published_node_count,
+      canonicalStorySummaries,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.classroom,
@@ -106,6 +110,10 @@ export class LearnerTopicSummary {
 
   getStoryTitles(): string[] {
     return this.storyTitles;
+  }
+
+  getTotalPublishedNodeCount(): number {
+    return this.totalPublishedNodeCount;
   }
 
   getCanonicalStorySummaryDicts(): StorySummary[] {

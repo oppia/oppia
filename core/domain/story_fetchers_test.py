@@ -14,8 +14,7 @@
 
 """Tests the methods defined in story fetchers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -64,14 +63,16 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(

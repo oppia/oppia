@@ -25,9 +25,9 @@
     <div class="oppia-question-player-card question-player-results-header">
       <h3 class="oppia-question-player-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
       <h3 class="oppia-question-player-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
-      <score-ring score="$ctrl.totalScore"
-                  test-is-passed="$ctrl.testIsPassed">
-      </score-ring>
+      <oppia-score-ring [score]="$ctrl.totalScore"
+                        [test-is-passed]="$ctrl.testIsPassed">
+      </oppia-score-ring>
     </div>
 
     <div class="oppia-question-player-card question-player-skills-results">
@@ -46,7 +46,7 @@
         <tr ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping"
             class="list-item"
             ng-click="$ctrl.openSkillMasteryModal(skillId)">
-          <td> <[scorePerSkill.description]> </td>
+          <td class="skill-score-description"> <[scorePerSkill.description]> </td>
           <td>
             <div class="oppia-skill-score-container">
               <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScore(scorePerSkill)}"></div>
@@ -64,7 +64,7 @@
     <div class="oppia-question-player-card question-player-results-footer"
          ng-if="$ctrl.showActionButtonsFooter()">
       <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
-            ng-click="$ctrl.performAction(actionButton)">
+            ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
           <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
             <div ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></div>
@@ -112,14 +112,13 @@
   .oppia-question-player-container .action-button-text {
     font-size: 12px;
     margin: 0 auto;
-    width: 50px;
   }
 
-  .oppia-question-player-container .boost-score-outer {
+  .oppia-question-player-container .review-lowest-scored-skill-outer {
     background-color: #D95C0C;
   }
 
-  .oppia-question-player-container .boost-score-inner {
+  .oppia-question-player-container .review-lowest-scored-skill-inner {
     background-color: #F3EAE6;
   }
 
@@ -177,6 +176,7 @@
     font-weight: normal;
     line-height: normal;
     margin-bottom: 0;
+    padding: 10px;
     text-align: center;
   }
 
@@ -212,6 +212,16 @@
   .oppia-question-player-container .skill-score-table .skill-score-table-headings {
     padding-bottom: 0.5em;
     text-align: center;
+  }
+
+  .skill-score-description {
+    padding-left: 10px;
+    text-align: center;
+  }
+
+  .skill-score-description:hover {
+    cursor: pointer;
+    text-decoration: underline;
   }
 
   .oppia-question-player-container .skill-score-table .oppia-skill-score-container {

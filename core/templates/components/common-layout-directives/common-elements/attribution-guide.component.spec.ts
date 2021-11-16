@@ -25,6 +25,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { AttributionService } from 'services/attribution.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockAttributionService {
   init() {
@@ -81,10 +83,14 @@ class MockContextService {
 describe('Attribution Guide Component', function() {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AttributionGuideComponent],
+      declarations: [
+        AttributionGuideComponent,
+        MockTranslatePipe
+      ],
       providers: [
         { provide: AttributionService, useClass: MockAttributionService },
         { provide: BrowserCheckerService, useClass: MockBrowserCheckerService },
@@ -97,7 +103,11 @@ describe('Attribution Guide Component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AttributionGuideComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
     component = fixture.componentInstance;
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should initialize component properties correctly', () => {
@@ -141,6 +151,10 @@ describe('Attribution Guide Component', function() {
 
   it('should get exploration title', () => {
     expect(component.getExplorationTitle()).toEqual('Place Values');
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should run the copy command and show a tooltip', () => {

@@ -16,8 +16,7 @@
 
 """Python configuration for EndExploration interaction."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from extensions.interactions import base
 
@@ -55,6 +54,10 @@ class EndExploration(base.BaseInteraction):
             'items': {
                 'type': 'unicode',
             },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': 3,
+            }],
             'ui_config': {
                 'add_element_text': 'Add exploration ID',
             }

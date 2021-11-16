@@ -332,7 +332,7 @@ describe('ItemSelectionInputValidationService', () => {
     });
 
   it('should expect all rule inputs to match choices', () => {
-    const ruleInput = <string[]> goodAnswerGroups[0].rules[0].inputs.x;
+    const ruleInput = goodAnswerGroups[0].rules[0].inputs.x as string[];
     ruleInput[0] = 'invalid_content_id';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -342,6 +342,238 @@ describe('ItemSelectionInputValidationService', () => {
       message: (
         'Rule 1 from answer group 1 options do not match ' +
         'customization argument choices.')
+    }]);
+  });
+
+  it('should warn user when user selects more than one answer choice', () => {
+    customizationArguments.choices.value =
+      [new SubtitledHtml('Selection 1', 'ca_0'),
+        new SubtitledHtml('Selection 2', 'ca_1')];
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    customizationArguments.minAllowableSelectionCount.value = 0;
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['ca_0', 'ca_1']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'In answer group 1, rule 1, ' +
+        'please select only one answer choice.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'In answer group 1, rule 1, ' +
+        'please select only one answer choice.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'In answer group 1, ' +
+        'rule 1, the number of correct ' +
+        'options in the "Equals" rule should be between ' +
+        '0 and 1' +
+        ' (the minimum and maximum allowed selection counts).')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'In answer group 1, ' +
+        'rule 1, the number of correct ' +
+        'options in the "Equals" rule should be between ' +
+        '0 and 1' +
+        ' (the minimum and maximum allowed selection counts).')
+    }]);
+  });
+
+  it('should not warn user when user selects only one answer choice', () => {
+    // CustomizationArguments.choices.value =
+    // [new SubtitledHtml('Selection 1', 'ca_0')];
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    customizationArguments.minAllowableSelectionCount.value = 0;
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['ca_0']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([]);
+  });
+
+  it('should warn user to add a message for Oppia for all other answers' +
+  ' when user has not covered all responses for \'IsProperSubsetOf\' ' +
+  'rule', () => {
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    goodDefaultOutcome.feedback.html = '';
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsProperSubsetOf',
+        inputs: {
+          x: ['ca_0', 'ca_1']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      'Second State', customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Please specify what Oppia should do in answer group 1.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Please add something for Oppia to say in the ' +
+        '\"All other answers\" response.')
+    }]);
+  });
+
+  it('should not warn user to add a message for Oppia for all other answers' +
+  ' when user has covered all responses for \'IsProperSubsetOf\' ' +
+  'rule', () => {
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsProperSubsetOf',
+        inputs: {
+          x: ['ca_0', 'ca_1', 'ca_2']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([]);
+  });
+
+  it('should warn user to add a message for Oppia for all other answers' +
+  ' when user has not covered all responses for \'ContainsAtLeastOneOf\' ' +
+  'rule', () => {
+    goodDefaultOutcome.feedback.html = '';
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    customizationArguments.choices.value =
+    [new SubtitledHtml('Selection 3', 'ca_2')];
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'ContainsAtLeastOneOf',
+        inputs: {
+          x: ['ca_0', 'ca_1']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      'Second State', customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Please specify what Oppia should do in answer group 1.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Please add something for Oppia to say in the ' +
+        '\"All other answers\" response.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not' +
+        ' match customization argument choices.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not' +
+        ' match customization argument choices.')
+    }]);
+  });
+
+  it('should not warn user to add a message for Oppia for all other answers ' +
+  'when user has covered all responses for \'DoesNotContainAtLeastOneOf\'' +
+  ' rule', () => {
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'DoesNotContainAtLeastOneOf',
+        inputs: {
+          x: ['ca_0', 'ca_1', 'ca_2']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([]);
+  });
+
+  it('should warn user to add a message for Oppia for all other answers ' +
+  'when user has not covered all responses for \'DoesNotContainAtLeastOneOf\'' +
+  ' rule', () => {
+    goodDefaultOutcome.feedback.html = '';
+    customizationArguments.maxAllowableSelectionCount.value = 1;
+    let answerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'DoesNotContainAtLeastOneOf',
+        inputs: {
+          x: ['ca_0']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      'Second State', customizationArguments, answerGroups,
+      goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Please specify what Oppia should do in answer group 1.')
+    }, {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Please add something for Oppia to say in the ' +
+          '\"All other answers\" response.')
     }]);
   });
 });

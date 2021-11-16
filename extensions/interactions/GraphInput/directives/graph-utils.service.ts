@@ -21,7 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { GraphAnswer } from 'interactions/answer-defs';
 
-type AdjacencyMatrix = (number | null)[][];
+// 'null' indicates that the pairs of vertices are not adjacent in the graph.
+export type AdjacencyMatrix = (number | null)[][];
 
 @Injectable({
   providedIn: 'root'

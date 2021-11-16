@@ -23,71 +23,37 @@ import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import {
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 
-/**
- * @fileoverview A service for handling contribution opportunities in different
- * fields.
- */
-
-interface TranslatableObject {
-  translationHtml: string,
+export interface TranslatableItem {
+  translation: string | string[],
   status: Status,
-  text: string,
+  text: string | string[],
   more: boolean
+  dataFormat: string,
+  contentType: string,
+  interactionId?: string,
+  ruleType?: string
 }
 
 export type Status = 'pending' | 'submitted';
 
 export class StateAndContent {
   constructor(
-    private _stateName: string,
-    private _contentID: string,
-    private _contentText: string,
-    private _status: Status,
-    private _translationHtml: string
-  ) { }
-
-  get stateName(): string {
-    return this._stateName;
-  }
-
-  set stateName(newStateName: string) {
-    this._stateName = newStateName;
-  }
-
-  get contentID(): string {
-    return this._contentID;
-  }
-
-  set contentID(newContentID: string) {
-    this._contentID = newContentID;
-  }
-
-  get contentText(): string {
-    return this._contentText;
-  }
-
-  set contentText(newContentText: string) {
-    this._contentText = newContentText;
-  }
-
-  get status(): Status {
-    return this._status;
-  }
-
-  set status(newStatus: Status) {
-    this._status = newStatus;
-  }
-
-  get translationHtml(): string {
-    return this._translationHtml;
-  }
-
-  set translationHtml(newTranslationHtml: string) {
-    this._translationHtml = newTranslationHtml;
-  }
+    public stateName: string,
+    public contentID: string,
+    public contentText: string | string[],
+    public status: Status,
+    public translation: string | string[],
+    public dataFormat: string,
+    public contentType: string,
+    public interactionId?: string,
+    public ruleType?: string
+  ) {}
 }
-
 
 @Injectable({
   providedIn: 'root'
@@ -111,20 +77,21 @@ export class TranslateTextService {
   constructor(
     private translateTextBackedApiService:
       TranslateTextBackendApiService
-  ) {}
+  ) { }
 
-  private _getNextText(): string {
+  private _getNextText(): string | string[] {
     if (this.stateAndContent.length === 0) {
       return null;
     }
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
     this.activeContentId = this.stateAndContent[this.activeIndex].contentID;
-    this.activeContentText = this.stateAndContent[this.activeIndex].contentText;
+    this.activeContentText = (
+      this.stateAndContent[this.activeIndex].contentText);
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string {
+  private _getPreviousText(): string | string[] {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
       return null;
     }
@@ -139,11 +106,47 @@ export class TranslateTextService {
     return this.activeIndex > 0;
   }
 
-  private _isMoreTextAvailabelForTranslation(): boolean {
+  private _isMoreTextAvailableForTranslation(): boolean {
     if (this.stateAndContent.length === 0) {
       return false;
     }
     return (this.activeIndex + 1 < this.stateAndContent.length);
+  }
+
+  private _isSetDataFormat(dataFormat: string): boolean {
+    return (
+      dataFormat === TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
+      dataFormat === TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+    );
+  }
+
+  private _getUpdatedTextToTranslate(
+      text: string | string[],
+      more: boolean,
+      status: Status,
+      translation: string
+  ): TranslatableItem {
+    const {
+      dataFormat,
+      contentType,
+      interactionId,
+      ruleType
+    }: {
+      dataFormat?: string,
+      contentType?: string,
+      interactionId?: string,
+      ruleType?: string
+    } = this.stateAndContent[this.activeIndex] || {};
+    return {
+      text: text,
+      more: more,
+      status: status,
+      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
+      dataFormat: dataFormat,
+      contentType: contentType,
+      interactionId: interactionId,
+      ruleType: ruleType
+    };
   }
 
   init(expId: string, languageCode: string, successCallback: () => void): void {
@@ -163,19 +166,26 @@ export class TranslateTextService {
       for (const stateName in this.stateWiseContents) {
         let stateHasText: boolean = false;
         const contentIds = [];
-        for (const [contentId, text] of Object.entries(
-          this.stateWiseContents[stateName]
-        )) {
-          if (text !== '') {
-            contentIds.push(contentId);
-
-            this.stateAndContent.push(
-              new StateAndContent(
-                stateName, contentId, text as string, this.PENDING as Status, ''
-              )
-            );
-            stateHasText = true;
+        const contentIdToContentMapping = this.stateWiseContents[stateName];
+        for (const contentId in contentIdToContentMapping) {
+          const translatableItem = contentIdToContentMapping[contentId];
+          if (translatableItem.content === '') {
+            continue;
           }
+          contentIds.push(contentId);
+          this.stateAndContent.push(
+            new StateAndContent(
+              stateName, contentId,
+              translatableItem.content,
+              this.PENDING as Status,
+              this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
+              translatableItem.dataFormat,
+              translatableItem.contentType,
+              translatableItem.interactionId,
+              translatableItem.ruleType
+            )
+          );
+          stateHasText = true;
         }
 
         if (stateHasText) {
@@ -191,51 +201,51 @@ export class TranslateTextService {
     return this.activeIndex;
   }
 
-  getTextToTranslate(): TranslatableObject {
-    let {
+  getTextToTranslate(): TranslatableItem {
+    const text = this._getNextText();
+    const {
       status = this.PENDING,
-      translationHtml = ''
+      translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
-    return {
-      text: this._getNextText(),
-      more: this._isMoreTextAvailabelForTranslation(),
-      status: status,
-      translationHtml: translationHtml
-    };
+    return this._getUpdatedTextToTranslate(
+      text, this._isMoreTextAvailableForTranslation(), status, translation);
   }
 
-  getPreviousTextToTranslate(): TranslatableObject {
-    let {
+  getPreviousTextToTranslate(): TranslatableItem {
+    const text = this._getPreviousText();
+    const {
       status = this.PENDING,
-      translationHtml = ''
+      translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
-    return {
-      text: this._getPreviousText(),
-      more: this._isPreviousTextAvailableForTranslation(),
-      status: status,
-      translationHtml: translationHtml
-    };
+    return this._getUpdatedTextToTranslate(
+      text, this._isPreviousTextAvailableForTranslation(), status, translation);
   }
 
   suggestTranslatedText(
-      translationHtml: string, languageCode: string, imagesData:
-      ImagesData[], successCallback: () => void,
-      errorCallback: () => void): void {
+      translation: string | string[], languageCode: string, imagesData:
+      ImagesData[], dataFormat: string, successCallback: () => void,
+      errorCallback: (reason: string) => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
       this.activeContentId,
       this.activeStateName,
       languageCode,
-      this.stateWiseContents[this.activeStateName][this.activeContentId],
-      translationHtml,
-      imagesData
+      this.stateWiseContents[
+        this.activeStateName][this.activeContentId].content,
+      translation,
+      imagesData,
+      dataFormat
     ).then(() => {
       this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
-      this.stateAndContent[this.activeIndex].translationHtml = (
-        translationHtml);
+      this.stateAndContent[this.activeIndex].translation = (
+        translation);
       successCallback();
-    }, errorCallback);
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
   }
 }
 

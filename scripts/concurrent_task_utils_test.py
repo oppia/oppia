@@ -16,14 +16,13 @@
 
 """Unit tests for scripts/concurrent_task_utils.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import threading
 import time
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import concurrent_task_utils
 
@@ -48,8 +47,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.task_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
+            self.task_stdout.append(' '.join(str(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
 
@@ -108,12 +106,14 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        self.assertTrue(
-            'test_function() takes exactly 1 argument '
-            '(0 given)' in self.task_stdout)
+        self.assertIn(
+            'test_function() missing 1 required '
+            'positional argument: \'unused_arg\'',
+            self.task_stdout
+        )
 
     def test_task_thread_with_verbose_mode_enabled(self):
-        class HelperTests(python_utils.OBJECT):
+        class HelperTests:
             def test_show(self):
                 return concurrent_task_utils.TaskResult('name', True, [], [])
             def test_perform_all_check(self):
@@ -136,7 +136,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             'name check failed')
 
     def test_task_thread_with_task_report_disabled(self):
-        class HelperTests(python_utils.OBJECT):
+        class HelperTests:
             def test_show(self):
                 return concurrent_task_utils.TaskResult(
                     None, None, None, ['msg'])
@@ -171,7 +171,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_multiple_task(self):
         task_list = []
-        for _ in python_utils.RANGE(6):
+        for _ in range(6):
             task = concurrent_task_utils.create_task(
                 test_function('unused_arg'), False, self.semaphore)
             task_list.append(task)
@@ -182,12 +182,14 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_exception(self):
         task_list = []
-        for _ in python_utils.RANGE(6):
+        for _ in range(6):
             task = concurrent_task_utils.create_task(
                 test_function, True, self.semaphore)
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
-        self.assertTrue(
-            'test_function() takes exactly 1 argument '
-            '(0 given)' in self.task_stdout)
+        self.assertIn(
+            'test_function() missing 1 required '
+            'positional argument: \'unused_arg\'',
+            self.task_stdout
+        )

@@ -16,11 +16,11 @@
 
 """Service functions to set and retrieve data from the memory cache."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import json
 
+from core import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
@@ -28,7 +28,6 @@ from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
-import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -89,8 +88,8 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
-    CACHE_NAMESPACE_CONFIG: lambda x: json.loads(x.decode('utf-8')),
-    CACHE_NAMESPACE_DEFAULT: lambda x: json.loads(x.decode('utf-8'))
+    CACHE_NAMESPACE_CONFIG: json.loads,
+    CACHE_NAMESPACE_DEFAULT: json.loads
 }
 
 SERIALIZATION_FUNCTIONS = {
@@ -100,8 +99,8 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
-    CACHE_NAMESPACE_CONFIG: lambda x: json.dumps(x).encode('utf-8'),
-    CACHE_NAMESPACE_DEFAULT: lambda x: json.dumps(x).encode('utf-8')
+    CACHE_NAMESPACE_CONFIG: json.dumps,
+    CACHE_NAMESPACE_DEFAULT: json.dumps
 }
 
 
@@ -135,9 +134,9 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
         sub_namespace_key_string, MEMCACHE_KEY_DELIMITER, obj_id)
 
 
-def flush_memory_cache():
-    """Flushes the memory cache by wiping all of the data."""
-    memory_cache_services.flush_cache()
+def flush_memory_caches():
+    """Flushes the memory caches by wiping all of the data."""
+    memory_cache_services.flush_caches()
 
 
 def get_multi(namespace, sub_namespace, obj_ids):
@@ -211,12 +210,11 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
     if namespace not in SERIALIZATION_FUNCTIONS:
         raise ValueError('Invalid namespace: %s.' % namespace)
 
-    memory_cache_id_value_mapping = (
-        {
-            _get_memcache_key(namespace, sub_namespace, obj_id):
-            SERIALIZATION_FUNCTIONS[namespace](value)
-            for obj_id, value in id_value_mapping.items()
-        })
+    memory_cache_id_value_mapping = {
+        _get_memcache_key(namespace, sub_namespace, obj_id):
+        SERIALIZATION_FUNCTIONS[namespace](value)
+        for obj_id, value in id_value_mapping.items()
+    }
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 

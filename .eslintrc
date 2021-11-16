@@ -121,6 +121,14 @@
       }
     },
     {
+      "files": [
+        "core/tests/protractor_utils/*.js",
+      ],
+      "rules": {
+        "oppia/check-element-selector-at-top": "error"
+      }
+    },
+    {
       // We exclude spec files to the no-testonly check
       "files": ["*spec.js", "*spec.ts"],
       "rules": {
@@ -141,6 +149,15 @@
       "rules": {
         "oppia/no-inner-html": "error"
       }
+    },
+    {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": [
+      "core/tests/**"
+      ],
+      "rules": {
+        "oppia/no-relative-import": "error"
+      }
     }
   ],
   "rules": {
@@ -148,6 +165,7 @@
     "oppia/constant-declaration": "error",
     "oppia/comment-style": "error",
     "oppia/disallow-flags": "error",
+    "oppia/disallow-httpclient": "error",
     "oppia/disallow-angularjs-properties": "error",
     "oppia/import-lodash": "error",
     "oppia/no-multiple-component": "error",
@@ -160,6 +178,7 @@
     "oppia/match-line-break": "error",
     "oppia/no-test-blockers": "error",
     "oppia/no-inject": "error",
+    "oppia/no-bypass-security-phrase": "error",
     "angular/di": [
       "error",
       "array"
@@ -413,6 +432,7 @@
         "default": "array"
       }
     ],
+    "@typescript-eslint/consistent-type-assertions": ["error"],
     "@typescript-eslint/no-non-null-assertion": ["error"],
     "@typescript-eslint/no-non-null-asserted-optional-chain": ["error"],
     "@typescript-eslint/prefer-namespace-keyword": ["error"],
@@ -434,6 +454,7 @@
     "wrap-iife": [
       "error",
       "any"
-    ]
+    ],
+    "@typescript-eslint/method-signature-style": ["error"]
   }
 }

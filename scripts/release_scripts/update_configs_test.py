@@ -16,15 +16,15 @@
 
 """Unit tests for scripts/release_scripts/update_configs.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+import builtins
 import getpass
 import os
 import tempfile
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts.release_scripts import update_configs
 
@@ -77,9 +77,16 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             raise Exception('Not found.')
         url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         with url_open_swap, self.assertRaisesRegexp(
-            Exception, 'Terms mainpage does not exist on Github.'):
+            Exception, 'Terms mainpage does not exist on Github.'
+        ):
             update_configs.main(
-                'test-release-dir', 'test-deploy-dir', 'test-token', True)
+                args=[
+                    '--release_dir_path', 'test-release-dir',
+                    '--deploy_data_path', 'test-deploy-dir',
+                    '--personal_access_token', 'test-token',
+                    '--prompt_for_mailgun_and_terms_update'
+                ]
+            )
 
     def test_invalid_user_input(self):
         print_msgs = []
@@ -91,7 +98,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_print(msg):
             if 'Invalid Input' in msg:
                 print_msgs.append(msg)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, print_swap:
@@ -109,7 +116,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 attributes={
                     'commit': {'committer': {'date': '2016-11-15T3:41:01Z'}}},
                 completed='')
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         get_commit_swap = self.swap(
             github.Repository.Repository, 'get_commit', mock_get_commit)
 
@@ -558,8 +565,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             with apply_changes_swap, verify_feconf_swap:
                 with add_mailchimp_api_key_swap:
                     update_configs.main(
-                        'test-release-dir', 'test-deploy-dir', 'test-token',
-                        True)
+                        args=[
+                            '--release_dir_path', 'test-release-dir',
+                            '--deploy_data_path', 'test-deploy-dir',
+                            '--personal_access_token', 'test-token',
+                            '--prompt_for_mailgun_and_terms_update',
+                        ])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
@@ -594,5 +605,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'verify_feconf', mock_verify_feconf)
         with apply_changes_swap, verify_feconf_swap:
             update_configs.main(
-                'test-release-dir', 'test-deploy-dir', 'test-token', False)
+                args=[
+                    '--release_dir_path', 'test-release-dir',
+                    '--deploy_data_path', 'test-deploy-dir',
+                    '--personal_access_token', 'test-token'
+                ]
+            )
         self.assertEqual(check_function_calls, expected_check_function_calls)

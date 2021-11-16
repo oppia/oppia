@@ -30,6 +30,7 @@ export const ServicesConstants = {
     TOPIC_EDITOR: 'topic_editor',
     TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
     CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
+    BLOG_DASHBOARD: 'blog_dashboard',
     OTHER: 'other'
   },
 
@@ -73,4 +74,13 @@ export const ServicesConstants = {
     '/createhandler/state_answer_stats/<exploration_id>',
 
   RTE_COMPONENT_SPECS: RTE_COMPONENT_SPECS,
+
+  MESSENGER_PAYLOAD: {
+    HEIGHT_CHANGE: 'heightChange',
+    EXPLORATION_LOADED: 'explorationLoaded',
+    STATE_TRANSITION: 'stateTransition',
+    EXPLORATION_RESET: 'explorationReset',
+    EXPLORATION_COMPLETED: 'explorationCompleted'
+  },
+
 } as const;

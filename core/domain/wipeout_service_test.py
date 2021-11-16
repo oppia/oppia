@@ -14,13 +14,13 @@
 
 """Tests for wipeout service."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -36,6 +36,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -43,8 +44,6 @@ from core.domain import wipeout_domain
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     app_feedback_report_models, auth_models, blog_models,
@@ -76,16 +75,14 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         super(WipeoutServiceHelpersTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.user_1_role = user_services.get_user_settings(self.user_1_id).role
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_2_role = user_services.get_user_settings(self.user_2_id).role
 
     def test_gets_pending_deletion_request(self):
         wipeout_service.save_pending_deletion_requests(
             [
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_EMAIL, self.user_1_role)
+                    self.user_1_id, self.USER_1_EMAIL)
             ]
         )
 
@@ -106,9 +103,9 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         wipeout_service.save_pending_deletion_requests(
             [
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_EMAIL, self.user_1_role),
+                    self.user_1_id, self.USER_1_EMAIL),
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_2_id, self.USER_2_EMAIL, self.user_2_role)
+                    self.user_2_id, self.USER_2_EMAIL)
             ]
         )
         number_of_pending_deletion_requests = (
@@ -118,7 +115,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.user_1_role))
+                self.user_1_id, self.USER_1_EMAIL))
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
@@ -138,7 +135,6 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
                 email=self.USER_1_EMAIL,
-                role=self.user_1_role,
                 deletion_complete=False,
                 pseudonymizable_entity_mappings={}
             )
@@ -147,7 +143,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
 
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.user_1_role)
+                self.user_1_id, self.USER_1_EMAIL)
         )
         pending_deletion_request.deletion_complete = True
         pending_deletion_request.pseudonymizable_entity_mappings = {
@@ -186,7 +182,10 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         super(WipeoutServicePreDeleteTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -269,9 +268,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             observed_log_messages,
             ['Email ID %s permanently deleted from bulk email provider\'s db. '
              'Cannot access API, since this is a dev environment'
-             % self.USER_1_EMAIL, 'Updated status of email ID %s\'s bulk email '
-             'preference in the service provider\'s db to False. Cannot access '
-             'API, since this is a dev environment.' % self.USER_1_EMAIL])
+             % self.USER_1_EMAIL])
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
@@ -364,7 +361,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             self.USER_3_USERNAME)
 
     def test_pre_delete_user_with_activities_multiple_owners(self):
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
@@ -447,6 +444,26 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertTrue(exp_summary_model.community_owned)
 
+    def test_pre_delete_user_exploration_ownership_is_released_with_voice_art(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            self.user_1_actions,
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertFalse(exp_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertTrue(exp_summary_model.community_owned)
+
     def test_pre_delete_user_collection_user_is_deassigned(self):
         self.save_new_valid_collection('col_id', self.user_1_id)
         rights_manager.assign_role_for_collection(
@@ -511,12 +528,28 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(WipeoutServiceRunFunctionsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
         date_10_days_ago = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+
+        self.save_new_topic(
+            self.topic_id, self.owner_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+
+        self.set_topic_managers([self.USER_1_USERNAME], self.topic_id)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -550,11 +583,24 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     def test_run_user_deletion_completion_with_user_properly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
-        self.assertEqual(
-            wipeout_service.run_user_deletion_completion(
-                self.pending_deletion_request),
-            wipeout_domain.USER_VERIFICATION_SUCCESS
+
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_account_deleted_email',
+            lambda x, y: None,
+            expected_args=[(
+                self.pending_deletion_request.user_id,
+                self.pending_deletion_request.email
+            )]
         )
+
+        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_SUCCESS
+            )
+
         self.assertIsNotNone(
             user_models.DeletedUserModel.get_by_id(self.user_1_id))
         self.assertTrue(user_services.is_username_taken(self.USER_1_USERNAME))
@@ -570,7 +616,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(
                 self.user_1_id))
 
-    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
+            self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
@@ -589,7 +636,37 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             expected_args=[('WIPEOUT: Account deletion failed', email_content)]
         )
 
-        with send_email_swap:
+        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_FAILURE)
+
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_disabled(
+            self):
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
+        ).put()
+
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            # Func shouldn't be called when emails are disabled.
+            called=False
+        )
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -651,9 +728,9 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -672,6 +749,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -693,6 +771,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -714,6 +793,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -849,9 +929,9 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -871,6 +951,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -892,6 +973,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -926,6 +1008,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -1325,7 +1408,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
                 'snapshot models [\'CollectionSnapshotMetadataModel\', '
                 '\'CollectionRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
+                'commit logs without snapshots: [\'%s\'].' % self.COL_2_ID,
             ]
         )
 
@@ -1719,7 +1802,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
                 'snapshot models [\'ExplorationSnapshotMetadataModel\', '
                 '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'%s\'].' % self.EXP_2_ID
+                'commit logs without snapshots: [\'%s\'].' % self.EXP_2_ID
             ]
         )
 
@@ -2070,7 +2153,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_feedbacks_are_pseudonymized(self):
         feedback_thread_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_thread_models.append(
                 feedback_models.GeneralFeedbackThreadModel(
                     id='feedback-%s' % i,
@@ -2085,7 +2168,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
                 feedback_thread_models)
         feedback_message_models = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
                 feedback_models.GeneralFeedbackMessageModel(
                     id='message-%s' % i,
@@ -2394,7 +2477,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceDeleteQuestionModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -2451,7 +2534,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             ['[WIPEOUT] The commit log model \'QuestionCommitLogEntryModel\' '
              'and snapshot models [\'QuestionSnapshotMetadataModel\'] IDs '
              'differ. Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.QUESTION_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.QUESTION_2_ID])
 
         # Verify user is deleted.
         question_mappings = (
@@ -2736,7 +2819,7 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceVerifyDeleteQuestionModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -2794,7 +2877,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceDeleteSkillModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -2841,7 +2924,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             ['[WIPEOUT] The commit log model \'SkillCommitLogEntryModel\' and '
              'snapshot models [\'SkillSnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.SKILL_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.SKILL_2_ID])
 
         # Verify user is deleted.
         skill_mappings = (
@@ -3040,7 +3123,7 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceVerifyDeleteSkillModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -3145,7 +3228,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             ['[WIPEOUT] The commit log model \'StoryCommitLogEntryModel\' and '
              'snapshot models [\'StorySnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.STORY_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.STORY_2_ID])
 
         # Verify user is deleted.
         story_mappings = (
@@ -3465,7 +3548,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
              '\'SubtopicPageCommitLogEntryModel\' and snapshot models '
              '[\'SubtopicPageSnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.SUBTOP_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.SUBTOP_2_ID])
 
         # Verify user is deleted.
         subtopic_mappings = (
@@ -3740,6 +3823,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
     VOICEOVER_1_ID = 'voiceover_1_id'
     VOICEOVER_2_ID = 'voiceover_2_id'
+    TRANSLATION_STATS_1_ID = 'translation_1_id'
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
 
@@ -3771,6 +3855,20 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             author_id=self.user_2_id,
             final_reviewer_id=self.user_1_id,
         ).put()
+        suggestion_models.TranslationContributionStatsModel(
+            id=self.TRANSLATION_STATS_1_ID,
+            language_code='cs',
+            contributor_user_id=self.user_1_id,
+            topic_id='topic',
+            submitted_translations_count=1,
+            submitted_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=2,
+            accepted_translation_word_count=3,
+            rejected_translations_count=4,
+            rejected_translation_word_count=6,
+            contribution_dates=[]
+        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -3800,6 +3898,14 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             voiceover_application_model_2.final_reviewer_id,
             suggestion_mappings[self.VOICEOVER_2_ID]
         )
+
+    def test_translation_contribution_stats_are_deleted(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.TranslationContributionStatsModel.get_by_id(
+                self.TRANSLATION_STATS_1_ID))
 
 
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(
@@ -3891,9 +3997,9 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        user_services.update_user_role(
-            self.user_1_id, feconf.ROLE_ID_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
+            self.user_1_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        user_services.add_user_role(
             self.user_2_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -4023,7 +4129,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
                 'and snapshot models [\'TopicSnapshotMetadataModel\', '
                 '\'TopicRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'%s\'].' % self.TOP_2_ID
+                'commit logs without snapshots: [\'%s\'].' % self.TOP_2_ID
             ]
         )
 
@@ -4805,7 +4911,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_blog_post_models_are_pseudonymized(self):
         blog_post_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_models_list.append(
                 blog_models.BlogPostModel(
                     id='blogmodel-%s' % i,
@@ -4821,7 +4927,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             blog_models.BlogPostModel.update_timestamps_multi(
                 blog_post_models_list)
         blog_post_summary_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_summary_models_list.append(
                 blog_models.BlogPostSummaryModel(
                     id='blogmodel-%s' % i,
@@ -4838,7 +4944,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_models_list)
 
         blog_post_rights_models_list = []
-        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+        for i in range(self.NUMBER_OF_MODELS):
             blog_post_rights_models_list.append(
                 blog_models.BlogPostRightsModel(
                     id='blogmodel-%s' % i,
@@ -4935,9 +5041,13 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.can_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_repeated_deletion_is_successful(self):
-        with self.send_mail_to_admin_swap:
+    def test_repeated_deletion_is_successful_when_emails_enabled(self):
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertIn('SUCCESS', self.email_bodies[0])
             self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -4945,8 +5055,32 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn('ALREADY DONE', self.email_bodies[1])
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
+    def test_repeated_deletion_is_successful_when_emails_disabled(self):
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            # Func shouldn't be called when emails are disabled.
+            called=False
+        )
+        with send_mail_to_admin_swap, self.cannot_send_email_swap:
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+
+    def test_no_email_is_sent_when_there_are_no_users_pending_deletion(self):
+        pending_deletion_request_models = (
+            user_models.PendingDeletionRequestModel.query().fetch())
+        for pending_deletion_request_model in pending_deletion_request_models:
+            pending_deletion_request_model.delete()
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+            # When there are no pending deletion models, expect no emails.
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+
     def test_regular_deletion_is_successful(self):
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5008,12 +5142,28 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.can_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_verification_when_user_is_not_deleted(self):
-        with self.send_mail_to_admin_swap:
+    def test_verification_when_user_is_not_deleted_emails_enabled(self):
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('NOT DELETED', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
+
+    def test_verification_when_user_is_not_deleted_emails_disabled(self):
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            # Func shouldn't be called when emails are disabled.
+            called=False
+        )
+        with send_mail_to_admin_swap, self.cannot_send_email_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertEqual(len(self.email_bodies), 0)
 
     def test_verification_when_user_is_deleted_is_successful(self):
         pending_deletion_request = (
@@ -5023,7 +5173,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5044,7 +5194,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             story_ids=[], learnt_topic_ids=[]
         ).put()
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])

@@ -19,17 +19,17 @@
 
 """Unit tests for scripts/pylint_extensions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import tempfile
 import unittest
 
-import python_utils
+from core import python_utils
 
 from . import pylint_extensions
 
 import astroid  # isort:skip
+from pylint import interfaces  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
 from pylint import utils  # isort:skip
@@ -47,8 +47,8 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
     def test_finds_non_explicit_keyword_args(self):
         (
             func_call_node_one, func_call_node_two, func_call_node_three,
-            func_call_node_four, func_call_node_five, func_call_node_six,
-            class_call_node) = astroid.extract_node(
+            func_call_node_four, func_call_node_five, class_call_node
+        ) = astroid.extract_node(
                 """
         class TestClass():
             pass
@@ -61,15 +61,11 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         def test_1(test_var_one, test_var_one):
             pass
 
-        def test_2((a, b)):
-            pass
-
         test(2, 5, test_var_three=6) #@
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
         max(5, 1) #@
         test_1(1, 2) #@
-        test_2((1, 2)) #@
 
         TestClass() #@
         """)
@@ -113,9 +109,6 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_call(func_call_node_five)
-
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_call(func_call_node_six)
 
     def test_finds_arg_name_for_non_keyword_arg(self):
         node_arg_name_for_non_keyword_arg = astroid.extract_node(
@@ -169,6 +162,16 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
                     pass
 
             TestClass(first=1, second=2) #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
+                node_with_no_error_message)
+
+    def test_checker_skips_object_call_when_noncallable_object_is_called(self):
+        node_with_no_error_message = astroid.extract_node(
+            """
+            1() #@
             """)
 
         with self.checker_test_object.assertNoMessages():
@@ -299,6 +302,27 @@ class HangingIndentCheckerTests(unittest.TestCase):
                 u"""self.post_json(func(  # Random comment
                 '(',
                 self.payload, expect_errors=True, expected_status_int=401))""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_hanging_indentation_with_a_comment_after_square_bracket(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""self.post_json([  # Random comment
+                '(',
+                '', '', ''])""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -1457,7 +1481,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_yield_type_func_node,
             missing_yield_type_yield_node) = astroid.extract_node(
                 """
-        class Test(python_utils.OBJECT):
+        class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -1498,7 +1522,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_return_type_func_node,
             missing_return_type_return_node) = astroid.extract_node(
                 """
-        class Test(python_utils.OBJECT):
+        class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -1577,7 +1601,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         valid_raise_node = astroid.extract_node(
             """
-        class Test(python_utils.OBJECT):
+        class Test:
             raise Exception #@
         """)
         with self.checker_test_object.assertNoMessages():
@@ -2388,6 +2412,73 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_inline_comment_with_allowed_pragma_raises_no_error(self):
+        node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # type: ignore[some-rule]
+                """)
+
+        node_inline_comment_with_allowed_pragma.file = filename
+        node_inline_comment_with_allowed_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_inline_comment_with_multiple_allowed_pragmas_raises_no_error(self):
+        node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
+                """)
+
+        node_inline_comment_with_allowed_pragma.file = filename
+        node_inline_comment_with_allowed_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_inline_comment_with_invalid_pragma_raises_error(self):
+        node_inline_comment_with_invalid_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # not_a_valid_pragma
+                """)
+
+        node_inline_comment_with_invalid_pragma.file = filename
+        node_inline_comment_with_invalid_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_invalid_pragma))
+
+        message = testutils.Message(
+            msg_id='no-allowed-inline-pragma',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
     def test_variable_name_in_comment(self):
         node_variable_name_in_comment = astroid.scoped_nodes.Module(
             name='test',
@@ -3045,8 +3136,8 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         (
             self.checker_test_object
             .checker.config.disallowed_functions_and_replacements_str) = [
-                b'example_func',
-                b'a.example_attr',
+                'example_func',
+                'a.example_attr',
             ]
         self.checker_test_object.checker.open()
 
@@ -3059,18 +3150,21 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_remove_example_func = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call1,
-            args=b'example_func'
+            args='example_func',
+            confidence=interfaces.UNDEFINED
         )
 
         message_remove_example_attr = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call2,
-            args=b'a.example_attr'
+            args='a.example_attr',
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_remove_example_func,
-            message_remove_example_attr):
+            message_remove_example_attr
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
 
@@ -3078,21 +3172,19 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         (
             self.checker_test_object
             .checker.config.disallowed_functions_and_replacements_str) = [
-                b'datetime.datetime.now=>datetime.datetime.utcnow',
-                b'self.assertEquals=>self.assertEqual',
-                b'b.next=>python_utils.NEXT',
-                b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
+                'datetime.datetime.now=>datetime.datetime.utcnow',
+                'self.assertEquals=>self.assertEqual',
+                'b.next=>python_utils.NEXT',
             ]
         self.checker_test_object.checker.open()
 
         (
-            call1, call2, call3,
-            call4, call5
+            call1, call2,
+            call3, call4
             ) = astroid.extract_node(
                 """
         datetime.datetime.now() #@
         self.assertEquals() #@
-        str(1) #@
         b.next() #@
         b.a.next() #@
         """)
@@ -3100,45 +3192,35 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_replace_disallowed_datetime = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call1,
-            args=(
-                b'datetime.datetime.now',
-                b'datetime.datetime.utcnow')
+            args=('datetime.datetime.now', 'datetime.datetime.utcnow'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_disallowed_assert_equals = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call2,
-            args=(
-                b'self.assertEquals',
-                b'self.assertEqual')
-        )
-
-        message_replace_disallowed_str = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call3,
-            args=(
-                b'str',
-                b'python_utils.convert_to_bytes or python_utils.UNICODE')
+            args=('self.assertEquals', 'self.assertEqual'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_disallowed_next = testutils.Message(
             msg_id='replace-disallowed-function-calls',
-            node=call4,
-            args=(
-                b'b.next',
-                b'python_utils.NEXT')
+            node=call3,
+            args=('b.next', 'python_utils.NEXT'),
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_replace_disallowed_datetime,
             message_replace_disallowed_assert_equals,
-            message_replace_disallowed_str,
-            message_replace_disallowed_next):
+            message_replace_disallowed_next
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
             self.checker_test_object.checker.visit_call(call3)
+
+        with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_call(call4)
-            self.checker_test_object.checker.visit_call(call5)
 
     def test_disallowed_removals_regex(self):
         (
@@ -3158,18 +3240,21 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_remove_example_func = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call1,
-            args=b'somethingexample_func'
+            args='somethingexample_func',
+            confidence=interfaces.UNDEFINED
         )
 
         message_remove_example_attr = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call2,
-            args=b'c.someexample_attr'
+            args='c.someexample_attr',
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_remove_example_func,
-            message_remove_example_attr):
+            message_remove_example_attr
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
 
@@ -3193,32 +3278,37 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_replace_example_func = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call1,
-            args=(b'somethingexample_func', b'other_func')
+            args=('somethingexample_func', 'other_func'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_example_attr1 = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call2,
-            args=(b'd.example_attr', b'other_attr')
+            args=('d.example_attr', 'other_attr'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_example_attr2 = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call3,
-            args=(b'd.example_attr', b'other_attr')
+            args=('d.example_attr', 'other_attr'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_example_attr3 = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call4,
-            args=(b'd.b.example_attr', b'other_attr')
+            args=('d.b.example_attr', 'other_attr'),
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_replace_example_func,
             message_replace_example_attr1,
             message_replace_example_attr2,
-            message_replace_example_attr3):
+            message_replace_example_attr3
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
             self.checker_test_object.checker.visit_call(call3)
@@ -3285,74 +3375,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
-
-
-class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
-
-    def test_wrong_metaclass_usage_raises_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class FakeClass(python_utils.OBJECT):
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-                def fake_method(self, name):
-                    yield (name, name)
-            class MyObject: #@
-                __metaclass__ = FakeClass
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-dunder-metaclass',
-                node=metaclass_node
-            )
-        ):
-            checker_test_object.checker.visit_classdef(metaclass_node)
-
-    def test_no_metaclass_usage_raises_no_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class MyObject: #@
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(metaclass_node)
-
-    def test_correct_metaclass_usage_raises_no_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class FakeClass(python_utils.OBJECT):
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-                def fake_method(self, name):
-                    yield (name, name)
-            class MyObject: #@
-                python_utils.with_metaclass(FakeClass)
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(metaclass_node)
 
 
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
@@ -3533,3 +3555,48 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_classdef(
                 schemaless_class_node)
+
+
+class DisallowedImportsCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(DisallowedImportsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowedImportsChecker)
+        self.checker_test_object.setup_method()
+
+    def test_importing_text_from_typing_in_single_line_raises_error(self):
+        node = astroid.extract_node("""from typing import Any, cast, Text""")
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-text-import',
+                node=node,
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node)
+
+    def test_importing_text_from_typing_in_multi_line_raises_error(self):
+        node = astroid.extract_node(
+            """
+            from typing import (
+                Any, Dict, List, Optional, Sequence, Text, TypeVar)
+            """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-text-import',
+                node=node,
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node)
+
+    def test_non_import_of_text_from_typing_does_not_raise_error(self):
+        node = astroid.extract_node(
+            """
+            from typing import Any, Dict, List, Optional
+            """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node)

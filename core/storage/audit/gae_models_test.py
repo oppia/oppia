@@ -16,12 +16,16 @@
 
 """Test for audit models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import audit_models
+    from mypy_imports import base_models
 
 (audit_models, base_models) = models.Registry.import_models(
     [models.NAMES.audit, models.NAMES.base_model])
@@ -36,24 +40,24 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     USERNAME = 'username'
     ROLE = 'role'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
         super(RoleQueryAuditModelUnitTests, self).setUp()
 
         audit_models.RoleQueryAuditModel(
             id=self.ID,
             user_id=self.USER_ID,
-            intent=feconf.ROLE_ACTION_UPDATE,
+            intent=feconf.ROLE_ACTION_ADD,
             role=self.ROLE,
             username=self.USERNAME
         ).put()
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             audit_models.RoleQueryAuditModel
             .has_reference_to_user_id(self.USER_ID)
@@ -63,11 +67,13 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_model(self):
+    def test_get_model(self) -> None:
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
-        self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
+        self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_ADD)
         self.assertEqual(audit_model.user_id, self.USER_ID)
         self.assertEqual(audit_model.role, self.ROLE)
         self.assertEqual(audit_model.username, self.USERNAME)
@@ -82,7 +88,7 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     OLD_USERNAME = 'old_username'
     NEW_USERNAME = 'new_username'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
         super(UsernameChangeAuditModelUnitTests, self).setUp()
 
@@ -93,12 +99,12 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
             new_username=self.NEW_USERNAME
         ).put()
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             audit_models.UsernameChangeAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             audit_models.UsernameChangeAuditModel
             .has_reference_to_user_id(self.COMMITTER_ID)
@@ -108,8 +114,10 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_COMMITTER_ID)
         )
 
-    def test_get_model(self):
+    def test_get_model(self) -> None:
         audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)

@@ -32,6 +32,7 @@ require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/internet-connectivity.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
    'user-exploration-permissions.service.ts');
@@ -46,9 +47,10 @@ angular.module('oppia').component('editorNavigation', {
     'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
-    'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+    'ExplorationWarningsService',
+    'InternetConnectivityService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'ThreadDataBackendApiService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
@@ -56,9 +58,10 @@ angular.module('oppia').component('editorNavigation', {
         ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
-        ExplorationWarningsService, RouterService, SiteAnalyticsService,
+        ExplorationWarningsService,
+        InternetConnectivityService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        ThreadDataBackendApiService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService) {
       this.directiveSubscriptions = new Subscription();
@@ -68,8 +71,8 @@ angular.module('oppia').component('editorNavigation', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',
@@ -90,6 +93,7 @@ angular.module('oppia').component('editorNavigation', {
       $scope.saveIsInProcess = false;
       $scope.publishIsInProcess = false;
       $scope.loadingDotsAreShown = false;
+      $scope.connectedToInternet = true;
 
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
@@ -208,6 +212,13 @@ angular.module('oppia').component('editorNavigation', {
               }
             }
           )
+        );
+        this.directiveSubscriptions.add(
+          InternetConnectivityService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              $scope.connectedToInternet = internetAccessible;
+              $scope.$applyAsync();
+            })
         );
 
         $scope.isPostTutorialHelpPopoverShown = (

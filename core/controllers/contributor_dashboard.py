@@ -14,12 +14,12 @@
 
 """Controllers for the contributor dashboard page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import json
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -29,7 +29,6 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
-import feconf
 
 
 class ContributorDashboardPage(base.BaseHandler):
@@ -76,6 +75,12 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -94,11 +99,12 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+            topic_name = self.request.get('topic_name', None)
             if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
-                    language_code, search_cursor))
+                    language_code, topic_name, search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
             if language_code is None:
@@ -115,12 +121,11 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             'next_cursor': next_cursor,
             'more': more
         }
-
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(self, cursor):
         """Returns a list of skill opportunities available for questions with
-        topic information.
+        a corresponding topic name.
 
         Args:
             cursor: str or None. If provided, the list of returned entities
@@ -144,32 +149,50 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
             classroom_topic_ids.extend(classroom_dict['topic_ids'])
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
-        classroom_topics_with_skills = [
-            topic for topic in classroom_topics
-            if topic and topic.get_all_skill_ids()
-        ]
+        # Associate each skill with one classroom topic name.
+        # TODO(#8912): Associate each skill/skill opportunity with  all linked
+        # topics.
+        classroom_topic_skill_id_to_topic_name = {}
+        for topic in classroom_topics:
+            if topic is None:
+                continue
+            for skill_id in topic.get_all_skill_ids():
+                classroom_topic_skill_id_to_topic_name[skill_id] = topic.name
+
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
-        id_to_skill_opportunity_dict = {
-            opp.id: opp.to_dict() for opp in skill_opportunities}
         opportunities = []
-        for topic in classroom_topics_with_skills:
-            for skill_id in topic.get_all_skill_ids():
-                if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
-                    break
-                if skill_id in id_to_skill_opportunity_dict:
-                    skill_opportunity_dict = (
-                        id_to_skill_opportunity_dict[skill_id])
-                    skill_opportunity_dict['topic_name'] = topic.name
+        # Fetch opportunities until we have at least a page's worth that
+        # correspond to a classroom or there are no more opportunities.
+        while len(opportunities) < constants.OPPORTUNITIES_PAGE_SIZE:
+            for skill_opportunity in skill_opportunities:
+                if (
+                        skill_opportunity.id
+                        in classroom_topic_skill_id_to_topic_name):
+                    skill_opportunity_dict = skill_opportunity.to_dict()
+                    skill_opportunity_dict['topic_name'] = (
+                        classroom_topic_skill_id_to_topic_name[
+                            skill_opportunity.id])
                     opportunities.append(skill_opportunity_dict)
+            if (
+                    not more or
+                    len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE):
+                break
+            skill_opportunities, cursor, more = (
+                opportunity_services.get_skill_opportunities(cursor))
+
         return opportunities, cursor, more
 
-    def _get_translation_opportunity_dicts(self, language_code, search_cursor):
+    def _get_translation_opportunity_dicts(
+            self, language_code, topic_name, search_cursor):
         """Returns a list of translation opportunity dicts.
 
         Args:
             language_code: str. The language for which translation opportunities
                 should be fetched.
+            topic_name: str or None. The topic for which translation
+                opportunities should be fetched. If topic_name is None or empty,
+                fetch translation opportunities from all topics.
             search_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise, the
                 returned entities start from the beginning of the full list of
@@ -186,7 +209,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         """
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities(
-                language_code, search_cursor))
+                language_code, topic_name, search_cursor))
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
 
@@ -261,7 +284,6 @@ class TranslatableTextHandler(base.BaseHandler):
                     exp_id, language_code)
             )
         )
-
         self.values = {
             'state_names_to_content_id_mapping': (
                 state_names_to_not_in_review_content_id_mapping),
@@ -276,27 +298,36 @@ class TranslatableTextHandler(base.BaseHandler):
         minus any contents found in suggestions.
 
         Args:
-            state_names_to_content_id_mapping: dict(str, dict(str, str)). A dict
-                where state_name is the key and a dict with content_id as the
-                key and html content as value.
+            state_names_to_content_id_mapping:
+                dict(str, dict(str, TranslatableItem)). A dict whose keys are
+                state names, and whose corresponding values are each dicts
+                mapping content IDs to the corresponding translatable items.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
+            dict(str, dict(str, TranslatableItem)). A dict where state_name
+            is the key and a dict with content_id as the key and
+            TranslatableItem as value.
         """
         final_mapping = {}
         for state_name in state_names_to_content_id_mapping:
-            content_id_to_text = dict(
+            content_id_to_translatable_item = dict(
                 state_names_to_content_id_mapping[state_name])
-            for content_id in content_id_to_text.keys():
-                if self._content_in_review(state_name, content_id, suggestions):
-                    del content_id_to_text[content_id]
-            if content_id_to_text:
-                final_mapping[state_name] = content_id_to_text
+            content_id_to_unsubmitted_translatable_item = {}
+            for content_id, item in content_id_to_translatable_item.items():
+                if not self._is_content_in_review(
+                        state_name, content_id, suggestions):
+                    content_id_to_unsubmitted_translatable_item[content_id] = (
+                        item)
+            if content_id_to_unsubmitted_translatable_item:
+                final_mapping[state_name] = {
+                    cid: translatable_item.to_dict()
+                    for cid, translatable_item in (
+                        content_id_to_unsubmitted_translatable_item.items())
+                }
         return final_mapping
 
-    def _content_in_review(self, state_name, content_id, suggestions):
+    def _is_content_in_review(self, state_name, content_id, suggestions):
         """Returns whether a suggestion exists in suggestions with a change dict
         matching the supplied state_name and content_id.
 
@@ -403,15 +434,16 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             target_language_code)
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
-        content_id_to_text_mapping = (
+        content_id_to_translatable_item_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts = {}
         for content_id in content_ids:
-            if content_id not in content_id_to_text_mapping:
+            if content_id not in content_id_to_translatable_item_mapping:
                 translated_texts[content_id] = None
                 continue
 
-            source_text = content_id_to_text_mapping[content_id]
+            source_text = content_id_to_translatable_item_mapping[
+                content_id].content
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
                     exp.language_code, target_language_code, source_text)
@@ -450,7 +482,6 @@ class UserContributionRightsDataHandler(base.BaseHandler):
                 contribution_rights.can_review_questions
                 if contribution_rights else False),
             'can_suggest_questions': (
-                config_domain.CONTRIBUTOR_CAN_SUGGEST_QUESTIONS.value and
                 (contribution_rights.can_submit_questions
                  if contribution_rights else False))
         })
@@ -472,3 +503,22 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
             'featured_translation_languages':
                 config_domain.FEATURED_TRANSLATION_LANGUAGES.value
         })
+
+
+class AllTopicNamesHandler(base.BaseHandler):
+    """Provides names of all existing topics in the datastore."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        topic_names = [summary.name for summary in topic_summaries]
+        self.values = {
+            'topic_names': topic_names
+        }
+        self.render_json(self.values)

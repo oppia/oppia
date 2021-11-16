@@ -17,9 +17,20 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-contact-page-root',
   templateUrl: './contact-page-root.component.html'
 })
-export class ContactPageRootComponent {}
+export class ContactPageRootComponent {
+  constructor(
+    private pageHeadService: PageHeadService
+  ) {}
+
+  ngOnInit(): void {
+    this.pageHeadService.updateTitleAndMetaTags(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT);
+  }
+}

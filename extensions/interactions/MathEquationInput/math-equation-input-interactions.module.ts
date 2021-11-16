@@ -20,8 +20,7 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { InteractiveMathEquationInput } from './directives/oppia-interactive-math-equation-input.component';
 import { ResponseMathEquationInput } from './directives/oppia-response-math-equation-input.component';
 import { ShortResponseMathEquationInput } from './directives/oppia-short-response-math-equation-input.component';
@@ -29,7 +28,6 @@ import { ShortResponseMathEquationInput } from './directives/oppia-short-respons
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     MaterialModule
   ],
   declarations: [

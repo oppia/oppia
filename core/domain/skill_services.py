@@ -14,13 +14,14 @@
 
 """Commands that can be used to operate on skills."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import collections
 import logging
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
@@ -36,8 +37,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
@@ -725,7 +724,7 @@ def apply_change_list(skill_id, change_list, committer_id):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, skill_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_skill(committer_id, skill, commit_message, change_list):
@@ -815,10 +814,10 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
-    misconception_is_deleted = any([
+    misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
         for change in change_list
-    ])
+    )
     if misconception_is_deleted:
         deleted_skill_misconception_ids = [
             skill.generate_skill_misconception_id(change.misconception_id)
@@ -1109,7 +1108,7 @@ def filter_skills_by_mastery(user_id, skill_ids):
 
     # Arranges the skill_ids in the order as it was received.
     arranged_filtered_skill_ids = []
-    for i in python_utils.RANGE(len(skill_ids)):
-        if skill_ids[i] in filtered_skill_ids:
-            arranged_filtered_skill_ids.append(skill_ids[i])
+    for skill_id in skill_ids:
+        if skill_id in filtered_skill_ids:
+            arranged_filtered_skill_ids.append(skill_id)
     return arranged_filtered_skill_ids

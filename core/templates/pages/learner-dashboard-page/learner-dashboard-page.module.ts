@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -25,37 +25,49 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
-import { ProgressTabComponent } from './new-learner-dashboard/progress-tab.component';
-import { GoalsTabComponent } from './new-learner-dashboard-page/goals-tab.component';
-import { CommunityLessonsTabComponent } from './new-learner-dashboard/community-lessons-tab.component';
+import { ProgressTabComponent } from './progress-tab.component';
+import { GoalsTabComponent } from './goals-tab.component';
+import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
+import { LearnerTopicSummaryTileComponent } from 'components/summary-tile/learner-topic-summary-tile.component';
+import { HomeTabComponent } from './home-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
     GoalsTabComponent,
+    HomeTabComponent,
+    LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
     GoalsTabComponent,
+    HomeTabComponent,
+    LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
@@ -71,6 +83,10 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -81,6 +97,7 @@ class LearnerDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

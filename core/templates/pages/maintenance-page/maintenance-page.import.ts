@@ -13,21 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the maintenance page.
+ * @fileoverview Directive scripts for the maintenance page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
+import 'pages/common-imports';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
+import { MaintenancePageModule } from './maintenance-page.module';
+import { LoggerService } from 'services/contextual/logger.service';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'ui.bootstrap'
-]);
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-require('Polyfills.ts');
+const loggerService = new LoggerService();
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/maintenance-page/maintenance-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+platformBrowserDynamic().bootstrapModule(MaintenancePageModule).catch(
+  (err) => loggerService.error(err)
+);
+
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';

@@ -29,7 +29,7 @@ import { CreatorTopicSummary } from
   'domain/topic/creator-topic-summary.model';
 
 describe('Topic and Skill dashboard page service', () => {
-  let tsds: TopicsAndSkillsDashboardPageService = null;
+  let tsds: TopicsAndSkillsDashboardPageService;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
@@ -143,7 +143,7 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([]);
 
-    topic3.classroom = null;
+    topic3.classroom = undefined;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3]);
 

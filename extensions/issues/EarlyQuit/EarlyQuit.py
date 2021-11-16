@@ -16,8 +16,7 @@
 
 """Python configuration for recording early quit issue."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from extensions.issues import base
 

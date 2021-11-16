@@ -15,6 +15,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { SkillRights, SkillRightsBackendDict } from 'domain/skill/skill-rights.model';
 
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
@@ -69,7 +70,9 @@ describe('Skill Description Editor Component', () => {
     sampleSkillRights = SkillRights.createFromBackendDict(
       skillRightsDict);
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    sampleSkill = new Skill(
+      'id1', 'Skill description loading', [], [], {} as ConceptCard, 'en',
+      1, 0, 'id1', false, []);
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getSkillRights')

@@ -64,7 +64,7 @@ require('services/context.service');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateInteractionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       link: function(scope, element) {
@@ -83,8 +83,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
         recomputeGraph: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-interaction-editor/' +
+      template: require(
+        'components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'ContextService',
@@ -229,8 +229,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               AlertsService.clearWarnings();
 
               $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/editor-tab/templates/' +
+                template: require(
+                  'pages/exploration-editor-page/editor-tab/templates/' +
                   'modal-templates/customize-interaction-modal.template.html'),
                 resolve: {
                   showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
@@ -252,8 +252,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
           $scope.deleteInteraction = function() {
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'

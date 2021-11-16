@@ -20,7 +20,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('third-party-imports/select2.import.ts');
 
 angular.module('oppia').directive('select2Dropdown', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     // Directive for incorporating select2 dropdowns.
     return {
       restrict: 'E',
@@ -41,12 +41,16 @@ angular.module('oppia').directive('select2Dropdown', [
         // The regex used to validate newly-entered choices that do not
         // already exist. If it is undefined then all new choices are rejected.
         newChoiceRegex: '@',
+        // The maximum length of each input item. Defaults to no limit.
+        maximumInputLength: '@',
+        // The maximum number of items in the dropdown. Defaults to no limit.
+        maximumSelectionLength: '@',
         onSelectionChange: '&',
         placeholder: '@',
         width: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
+      template: require(
+        'components/forms/custom-forms-directives/' +
         'select2-dropdown.directive.html'),
       controller: ['$element', '$scope', function($element, $scope) {
         var ctrl = this;
@@ -58,6 +62,8 @@ angular.module('oppia').directive('select2Dropdown', [
             data: $scope.choices,
             multiple: $scope.allowMultipleChoices === 'true',
             tags: $scope.newChoiceRegex !== undefined,
+            maximumInputLength: $scope.maximumInputLength || 0,
+            maximumSelectionLength: $scope.maximumSelectionLength || 0,
             placeholder: $scope.placeholder,
             width: $scope.width || '250px',
             dropdownCssClass: null,

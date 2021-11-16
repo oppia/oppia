@@ -49,7 +49,12 @@
     <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
   </div>
   <div class="mt-2">
+    <div ng-if="isCardContentLengthLimitReached()" class="oppia-card-content-limit-error protractor-test-card-height-limit-warning mt-2">
+      <i class="material-icons oppia-hide-card-content-error-icon protractor-test-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
+      <span translate="I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE"></span>
+    </div>
     <button type="button"
+            ng-disabled="isCardContentLengthLimitReached()"
             class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content float-right"
             ng-click="onSaveContentButtonClicked()">
       <[getStateContentSaveButtonPlaceholder()]>
@@ -63,8 +68,18 @@
   .oppia-hide-card-height-warning-icon {
     color: #827127;
   }
+  .oppia-hide-card-content-error-icon {
+    color: #d1180a;
+  }
   .oppia-card-height-limit-warning {
     background: #FFF5C8;
+    border: 0.0625rem solid #827127;
+    border-radius: 0.25rem;
+    color: #333;
+    padding-left: 0.25rem;
+  }
+  .oppia-card-content-limit-error {
+    background: #ea4a1757;
     border: 0.0625rem solid #827127;
     border-radius: 0.25rem;
     color: #333;

@@ -17,9 +17,38 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { LoaderService } from 'services/loader.service';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-delete-account-page-root',
   templateUrl: './delete-account-page-root.component.html'
 })
-export class DeleteAccountPageRootComponent {}
+export class DeleteAccountPageRootComponent {
+  pageIsShown: boolean = false;
+  errorPageIsShown: boolean = false;
+
+  constructor(
+    private accessValidationBackendApiService:
+      AccessValidationBackendApiService,
+    private loaderService: LoaderService,
+    private pageHeadService: PageHeadService
+  ) {}
+
+  ngOnInit(): void {
+    this.pageHeadService.updateTitleAndMetaTags(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE);
+
+    this.loaderService.showLoadingScreen('Loading');
+    this.accessValidationBackendApiService.validateCanManageOwnAccount()
+      .then(() => {
+        this.pageIsShown = true;
+      }, (err) => {
+        this.errorPageIsShown = true;
+      }).then(() => {
+        this.loaderService.hideLoadingScreen();
+      });
+  }
+}

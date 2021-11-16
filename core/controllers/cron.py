@@ -14,188 +14,23 @@
 
 """Controllers for the cron jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-import logging
-
-from core import jobs
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import activity_jobs_one_off
+from core.domain import app_feedback_report_services
+from core.domain import beam_job_services
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
-from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import user_jobs_one_off
 from core.domain import user_services
-import feconf
-import utils
-
-TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
-MAX_JOBS_TO_REPORT_ON = 50
-
-
-class JobStatusMailerHandler(base.BaseHandler):
-    """Handler for mailing admin about job failures."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        # TODO(sll): Get the 50 most recent failed shards, not all of them.
-        failed_jobs = cron_services.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
-        if failed_jobs:
-            email_subject = 'MapReduce failure alert'
-            email_message = (
-                '%s jobs have failed in the past 25 hours. More information '
-                '(about at most %s jobs; to see more, please check the logs):'
-            ) % (len(failed_jobs), MAX_JOBS_TO_REPORT_ON)
-
-            for job in failed_jobs[:MAX_JOBS_TO_REPORT_ON]:
-                email_message += '\n'
-                email_message += '-----------------------------------'
-                email_message += '\n'
-                email_message += (
-                    'Job with mapreduce ID %s (key name %s) failed. '
-                    'More info:\n\n'
-                    '  counters_map: %s\n'
-                    '  shard_retries: %s\n'
-                    '  slice_retries: %s\n'
-                    '  last_update_time: %s\n'
-                    '  last_work_item: %s\n'
-                ) % (
-                    job.mapreduce_id, job.key().name(), job.counters_map,
-                    job.retries, job.slice_retries, job.update_time,
-                    job.last_work_item
-                )
-        else:
-            email_subject = 'MapReduce status report'
-            email_message = 'All MapReduce jobs are running fine.'
-
-        email_manager.send_mail_to_admin(email_subject, email_message)
-
-
-class CronDashboardStatsHandler(base.BaseHandler):
-    """Handler for appending dashboard stats to a list."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
-            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
-
-
-class CronUserDeletionHandler(base.BaseHandler):
-    """Handler for running the user deletion one off job."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
-
-
-class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
-    """Handler for running the fully complete user deletion one off job."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
-
-
-class CronExplorationRecommendationsHandler(base.BaseHandler):
-    """Handler for computing exploration recommendations."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        job_class = (
-            recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
-        job_class.enqueue(job_class.create_new())
-
-
-class CronActivitySearchRankHandler(base.BaseHandler):
-    """Handler for computing activity search ranks."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(
-            activity_jobs_one_off.IndexAllActivitiesJobManager.create_new())
-
-
-class CronMapreduceCleanupHandler(base.BaseHandler):
-    """Handler for cleaning up data items of completed map/reduce jobs."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Clean up intermediate data items for completed M/R jobs that
-        started more than MAX_MAPREDUCE_METADATA_RETENTION_MSECS milliseconds
-        ago.
-
-        Map/reduce runs leave around a large number of rows in several
-        tables.  This data is useful to have around for a while:
-        - it helps diagnose any problems with jobs that may be occurring
-        - it shows where resource usage is occurring
-        However, after a few days, this information is less relevant, and
-        should be cleaned up.
-        """
-        # Only consider jobs that started at most 1 week before recency_msec.
-        # The latest start time that a job scheduled for cleanup may have.
-        max_start_time_msec = (
-            utils.get_current_time_in_millisecs() -
-            jobs.MAX_MAPREDUCE_METADATA_RETENTION_MSECS
-        )
-
-        jobs.cleanup_old_jobs_pipelines()
-
-        if jobs.do_unfinished_jobs_exist(
-                cron_services.MapReduceStateModelsCleanupManager.__name__):
-            logging.warning('A previous cleanup job is still running.')
-        else:
-            cron_services.MapReduceStateModelsCleanupManager.enqueue(
-                cron_services.MapReduceStateModelsCleanupManager.create_new(),
-                additional_job_params={
-                    jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
-                })
-            logging.warning(
-                'Deletion jobs for auxiliary MapReduce entities kicked off.')
-
-        if jobs.do_unfinished_jobs_exist(
-                cron_services.JobModelsCleanupManager.__name__):
-            logging.warning(
-                'A previous JobModels cleanup job is still running.')
-        else:
-            cron_services.JobModelsCleanupManager.enqueue(
-                cron_services.JobModelsCleanupManager.create_new())
-            logging.warning('Deletion jobs for JobModels entities kicked off.')
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs
+from core.jobs.batch_jobs import user_stats_computation_jobs
 
 
 class CronModelsCleanupHandler(base.BaseHandler):
@@ -203,6 +38,7 @@ class CronModelsCleanupHandler(base.BaseHandler):
     specific types of models as deleted.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -218,6 +54,39 @@ class CronModelsCleanupHandler(base.BaseHandler):
         """
         cron_services.delete_models_marked_as_deleted()
         cron_services.mark_outdated_models_as_deleted()
+        return self.render_json({})
+
+
+class CronUserDeletionHandler(base.BaseHandler):
+    """Handler for running the user deletion one off job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        return self.render_json({})
+
+
+class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+    """Handler for running the fully complete user deletion one off job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        return self.render_json({})
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(
@@ -226,6 +95,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
     Dashboard that need review.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -239,19 +109,21 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         # Only execute this job if it's possible to send the emails and there
         # are reviewers to notify.
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
         if not (config_domain
                 .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
-            return
+            return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
-            return
+            return self.render_json({})
+
         reviewers_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 reviewer_ids))
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
             reviewer_ids, reviewers_suggestion_email_infos)
+        return self.render_json({})
 
 
 class CronMailAdminContributorDashboardBottlenecksHandler(
@@ -260,6 +132,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
     longer reviewer turnaround time on the Contributor Dashboard.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -271,25 +144,31 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to get reviewed.
         """
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
+
+        admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+        question_admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_QUESTION_ADMIN)
+        translation_admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_TRANSLATION_ADMIN)
 
         if (
                 config_domain
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
-            admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_ADMIN)
             suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
             )
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                admin_ids, suggestion_types_needing_reviewers)
+                admin_ids,
+                translation_admin_ids,
+                question_admin_ids,
+                suggestion_types_needing_reviewers)
         if (
                 config_domain
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
                 .value):
-            admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_ADMIN)
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
                 .get_info_about_suggestions_waiting_too_long_for_review()
@@ -298,5 +177,86 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 email_manager
                 .send_mail_to_notify_admins_suggestions_waiting_long(
                     admin_ids,
+                    translation_admin_ids,
+                    question_admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+        return self.render_json({})
+
+
+class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
+    """Handler for scrubbing app feedback reports that are expiring."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests to scrub reports. This cron handler scrubs all
+        app feedback report models that are expiring; expired reports have a
+        created_on field at least feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS
+        before tthe date this services is called.
+        """
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+
+
+class CronDashboardStatsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                user_stats_computation_jobs.CollectWeeklyDashboardStatsJob))
+
+
+class CronExplorationRecommendationsHandler(base.BaseHandler):
+    """Handler for computing exploration recommendations."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                exp_recommendation_computation_jobs
+                .ComputeExplorationRecommendationsJob))
+
+
+class CronActivitySearchRankHandler(base.BaseHandler):
+    """Handler for computing activity search ranks."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob)
+
+
+class CronTranslationContributionStatsHandler(base.BaseHandler):
+    """Handler for running the translation contribution stats populate job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                suggestion_stats_computation_jobs
+                .GenerateTranslationContributionStatsJob))

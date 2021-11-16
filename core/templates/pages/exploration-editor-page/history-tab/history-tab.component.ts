@@ -18,7 +18,7 @@
 
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'pages/exploration-editor-page/history-tab/modal-templates/' +
   'revert-exploration-modal.controller.ts');
@@ -43,13 +43,11 @@ angular.module('oppia').component('historyTab', {
     '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'LoaderService', 'RouterService',
-    'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
         $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         LoaderService, RouterService,
-        UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -231,8 +229,8 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.showRevertExplorationModal = function(version) {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/history-tab/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/history-tab/modal-templates/' +
             'revert-exploration-modal.template.html'),
           backdrop: true,
           resolve: {

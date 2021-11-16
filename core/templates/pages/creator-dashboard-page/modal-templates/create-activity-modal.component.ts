@@ -28,9 +28,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './create-activity-modal.component.html',
 })
 export class CreateActivityModalComponent implements OnInit {
-  explorationImageUrl: string;
-  collectionImageUrl: string;
-  canCreateCollections: boolean = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationImageUrl!: string;
+  collectionImageUrl!: string;
+  canCreateCollections: boolean = false;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,

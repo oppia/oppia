@@ -156,8 +156,13 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     const answer: string = this.answer;
     try {
       const fraction = Fraction.fromRawInputString(answer);
+      // To check if the input fraction is in simplest form, the string
+      // representation of the input fraction and the simplified fraction is
+      // compared. Just comparing 'fraction' and
+      // 'fraction.convertToSimplestForm()' will not work, since both are
+      // objects that cannot be compared directly.
       if (this.requireSimplestForm &&
-        !(fraction === (fraction.convertToSimplestForm()))
+        !(fraction.toString() === fraction.convertToSimplestForm().toString())
       ) {
         this.errorMessage = (
           'Please enter an answer in simplest form ' +

@@ -16,14 +16,13 @@
 
 """Provides a shim for taskqueue-related operations."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 import json
 
+from core import feconf
 from core.platform import models
-import feconf
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 

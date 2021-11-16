@@ -14,8 +14,7 @@
 
 """Installation script for Oppia python backend libraries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import collections
 import json
@@ -25,13 +24,15 @@ import shutil
 import subprocess
 import sys
 
-import python_utils
-from scripts import common
-import utils
+from core import python_utils
+from core import utils
 
 import pkg_resources
 
-OPPIA_REQUIRED_PIP_VERSION = '20.3.4'
+from . import common
+
+# This is the version that is set in install_prerequisites.sh.
+OPPIA_REQUIRED_PIP_VERSION = '21.2.3'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -296,18 +297,12 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.convert_to_bytes(requirements_version))
+            _install_library(normalized_library_name, str(requirements_version))
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.convert_to_bytes(requirements_version))
-            _remove_metadata(
-                normalized_library_name,
-                python_utils.convert_to_bytes(directory_version))
+            _install_library(normalized_library_name, str(requirements_version))
+            _remove_metadata(normalized_library_name, str(directory_version))
 
 
 def _is_git_url_mismatch(mismatch_item):
@@ -390,8 +385,6 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
-    # TODO(#11474): The '-py2.7' suffix might be used in some metadata directory
-    # names, this will need to be changed after the Python 3 migration.
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
@@ -404,10 +397,10 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
         normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (library_name, version_string)),
+            '%s-%s-py3.7.egg-info' % (library_name, version_string)),
         normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
+            '%s-%s-py3.7.egg-info' % (
+                library_name.replace('-', '_'), version_string))
     }
 
 
@@ -445,7 +438,8 @@ def verify_pip_is_installed():
             common.print_each_string_after_two_new_lines([
                 'Oppia requires pip==%s, but you have pip==%s installed.' % (
                     OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
-                'Upgrading pip on your behalf...',
+                'Upgrading pip to %s on your behalf...' % (
+                    OPPIA_REQUIRED_PIP_VERSION),
             ])
             _run_pip_command(
                 ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])
@@ -465,7 +459,8 @@ def _run_pip_command(cmd_parts):
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
     process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        encoding='utf-8')
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
@@ -665,8 +660,16 @@ def main():
     # callstack to exit.
     # Therefore, in order to allow continued execution after the requirements
     # file is generated, we must call it as a separate process.
+    # The option --no-emit-index-url is specified to prevent pip compile from
+    # generating an index configuration line(s) in requirements.txt when the
+    # local pip configuration uses one or more custom index servers.
     subprocess.check_call(
-        ['python', '-m', 'scripts.regenerate_requirements'],
+        [
+            'python',
+            '-m',
+            'scripts.regenerate_requirements',
+            '--no-emit-index-url',
+        ],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     # Adds a note to the beginning of the 'requirements.txt' file to make sure

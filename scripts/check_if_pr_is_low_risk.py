@@ -19,15 +19,14 @@ called with a URL to a PR, this script exits with code 0 if and only if
 the PR is low-risk. Otherwise, the exit code is nonzero.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import json
 import re
 import sys
 
-import python_utils
+from core import python_utils
 from scripts import common
 
 

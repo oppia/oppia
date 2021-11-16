@@ -18,6 +18,7 @@
 
 export const AdminPageConstants = {
   ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
+  TOPIC_MANAGER_ROLE_HANDLER_URL: '/topicmanagerrolehandler',
 
   ADMIN_HANDLER_URL: '/adminhandler',
   ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL: '/admintopicscsvdownloadhandler',
@@ -32,6 +33,8 @@ export const AdminPageConstants = {
     '/verifyusermodelsdeletedhandler',
   ADMIN_DELETE_USER_HANDLER_URL: '/deleteuserhandler',
   ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL: '/adminsuperadminhandler',
+  ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
+  ADMIN_UPDATE_BLOG_POST_DATA_HANDLER: '/updateblogpostdatahandler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#/activities',

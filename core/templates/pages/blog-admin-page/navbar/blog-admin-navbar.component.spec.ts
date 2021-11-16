@@ -21,6 +21,7 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 
 describe('Blog Admin navbar component', () => {
@@ -35,7 +36,10 @@ describe('Blog Admin navbar component', () => {
   let fixture: ComponentFixture<BlogAdminNavbarComponent>;
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockRouterModule
+      ],
       declarations: [BlogAdminNavbarComponent]
     }).compileComponents();
 
@@ -56,7 +60,6 @@ describe('Blog Admin navbar component', () => {
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
     expect(component.username).toBe('username1');
     expect(component.profileUrl).toBe(profileUrl);
-    expect(component.logoutUrl).toBe('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
   });
 

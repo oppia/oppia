@@ -13,423 +13,314 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the signup page component.
+ * @fileoverview Unit tests for sign up page component.
  */
 
-import { fakeAsync, tick } from '@angular/core/testing';
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { MockTranslateModule } from 'tests/unit-test-utils';
+import { SignupPageBackendApiService } from './services/signup-page-backend-api.service';
+import { SignupPageComponent } from './signup-page.component';
 
-import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
-
-require('pages/signup-page/signup-page.component.ts');
-require('services/csrf-token.service.ts');
-
-describe('Signup page', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $q = null;
-  var $rootScope = null;
-  var $uibModal = null;
-  var AlertsService = null;
-  var CsrfService = null;
-  var LoaderService = null;
-  var SiteAnalyticsService = null;
-  var UrlService = null;
-
-  var addWarningSpy = null;
-  var clearWarningsSpy = null;
-  var loadingMessage;
-  var subscriptions = [];
-  var mockWindow = {
+class MockWindowRef {
+  nativeWindow = {
     location: {
-      href: '',
-      reload: () => {}
-    }
+      href: ''
+    },
+    gtag: () => {}
   };
+}
 
-  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
+describe('Sign up page component', () => {
+  let fixture: ComponentFixture<SignupPageComponent>;
+  let componentInstance: SignupPageComponent;
+  let loaderService: LoaderService;
+  let signupPageBackendApiService: SignupPageBackendApiService;
+  let focusManagerService: FocusManagerService;
+  let ngbModal: NgbModal;
+  let alertsService: AlertsService;
+  let urlService: UrlService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-    $provide.value('$window', mockWindow);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        MockTranslateModule,
+        NgbModalModule,
+        FormsModule
+      ],
+      declarations: [
+        SignupPageComponent,
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        AlertsService,
+        FocusManagerService,
+        LoaderService,
+        SignupPageBackendApiService,
+        SiteAnalyticsService,
+        UrlService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($componentController, $injector) {
-    $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
-    AlertsService = $injector.get('AlertsService');
-    CsrfService = $injector.get('CsrfTokenService');
-    loadingMessage = '';
-    LoaderService = $injector.get('LoaderService');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-    UrlService = $injector.get('UrlService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SignupPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = TestBed.inject(LoaderService);
+    signupPageBackendApiService = TestBed.inject(SignupPageBackendApiService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    ngbModal = TestBed.inject(NgbModal);
+    alertsService = TestBed.inject(AlertsService);
+    urlService = TestBed.inject(UrlService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+  });
 
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
 
-    spyOn(CsrfService, 'getTokenAsync').and.returnValue(
-      $q.resolve('sample-csrf-token'));
+  it('should intialize', fakeAsync(() => {
+    const canSendEmails = true;
+    const hasAgreedToLatestTerms = true;
+    const hasEverRegistered = true;
+    const username = 'test_user';
 
-    addWarningSpy = spyOn(AlertsService, 'addWarning');
-    clearWarningsSpy = spyOn(AlertsService, 'clearWarnings');
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(focusManagerService, 'setFocus');
+    spyOn(signupPageBackendApiService, 'fetchSignupPageDataAsync')
+      .and.returnValue(Promise.resolve({
+        can_send_emails: canSendEmails,
+        has_agreed_to_latest_terms: hasAgreedToLatestTerms,
+        has_ever_registered: hasEverRegistered,
+        username: username
+      }));
 
-    ctrl = $componentController('signupPage', {
-      $rootScope: $rootScope,
-    });
+    componentInstance.ngOnInit();
+    tick();
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(focusManagerService.setFocus).toHaveBeenCalled();
+    expect(componentInstance.username).toEqual(username);
+    expect(componentInstance.hasEverRegistered).toEqual(hasEverRegistered);
+    expect(componentInstance.hasAgreedToLatestTerms).toEqual(
+      hasAgreedToLatestTerms);
+    expect(componentInstance.username).toEqual(username);
   }));
 
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
-    }
+  it('should validate form input', () => {
+    componentInstance.hasAgreedToLatestTerms = true;
+    componentInstance.hasUsername = true;
+    componentInstance.warningI18nCode = '';
+    expect(componentInstance.isFormValid()).toBeTrue();
   });
 
-  describe('when has no user logged', function() {
-    beforeEach(function() {
-      $httpBackend.expectGET('/signuphandler/data').respond({
-        username: '',
-        has_agreed_to_latest_terms: false,
-        can_send_emails: true
-      });
+  it('should confirm license explanation modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
+    } as NgbModalRef);
+    componentInstance.showLicenseExplanationModal(
+      { target: { innerText: 'here' } });
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
 
-      ctrl.$onInit();
-      $httpBackend.flush();
+  it('should cancel license explanation modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
+    } as NgbModalRef);
+    componentInstance.showLicenseExplanationModal(
+      { target: { innerText: 'here' } });
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
+
+  it('should not trigger license explanation modal if click elsewhere',
+    () => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
+      componentInstance.showLicenseExplanationModal(
+        { target: { innerText: '' } });
+      expect(ngbModal.open).not.toHaveBeenCalled();
     });
 
-    it('should show warning and not submit form', function() {
-      ctrl.updateWarningText(ctrl.username);
-      ctrl.submitPrerequisitesForm(true, '', true);
+  it('should confirm registration session expired modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
+    } as NgbModalRef);
+    componentInstance.showRegistrationSessionExpiredModal();
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
 
-      expect(ctrl.warningI18nCode).toBe('I18N_SIGNUP_ERROR_NO_USERNAME');
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
+  it('should cancel registration session expired modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
+    } as NgbModalRef);
+    componentInstance.showRegistrationSessionExpiredModal();
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
 
-    it('should show warning if email preference is not selected by the user',
-      function() {
-        expect(ctrl.emailPreferencesWarningText).toBe(undefined);
-
-        ctrl.submitPrerequisitesForm(true, '', null);
-
-        expect(ctrl.emailPreferencesWarningText).toBe(
-          'I18N_SIGNUP_FIELD_REQUIRED');
-
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-
-        ctrl.onSelectEmailPreference();
-        expect(ctrl.emailPreferencesWarningText).toBe('');
-      });
-
-    it('should successfully signup when user opts to receive email updates',
-      fakeAsync(() => {
-        spyOn(UrlService, 'getUrlParams').and.returnValue({
-          return_url: '/expected_url'
-        });
-        spyOn(SiteAnalyticsService, 'registerNewSignupEvent').and.callThrough();
-
-        var isRequestTheExpectOne = function(queryParams) {
-          return decodeURIComponent(queryParams).match(
-            '"can_receive_email_updates":true');
-        };
-
-        $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
-          .respond({
-            bulk_email_signup_message_should_be_shown: false
-          });
-        ctrl.submitPrerequisitesForm(true, '', 'yes');
-        $httpBackend.flush();
-        tick(200);
-
-        expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
-        expect(mockWindow.location.href).toBe('/expected_url');
+  it('should handle username input blur event', fakeAsync(() => {
+    spyOn(alertsService, 'clearWarnings');
+    spyOn(componentInstance, 'updateWarningText');
+    spyOn(signupPageBackendApiService, 'checkUsernameAvailableAsync')
+      .and.returnValue(Promise.resolve({
+        username_is_taken: true
       }));
+    componentInstance.warningI18nCode = '';
+    componentInstance.onUsernameInputFormBlur('');
+    tick();
+    expect(componentInstance.blurredAtLeastOnce).toBeTrue();
+    expect(componentInstance.usernameCheckIsInProgress).toBeFalse();
+    expect(componentInstance.warningI18nCode).toEqual(
+      'I18N_SIGNUP_ERROR_USERNAME_TAKEN');
+  }));
 
-    it('should show signup link if the user cannot be added automatically',
-      fakeAsync(() => {
-        expect(ctrl.showEmailSignupLink).toBeFalse();
-        var isRequestTheExpectOne = function(queryParams) {
-          return decodeURIComponent(queryParams).match(
-            '"can_receive_email_updates":true');
-        };
-        $httpBackend.expectPOST(
-          '/signuphandler/data', isRequestTheExpectOne).respond({
-          bulk_email_signup_message_should_be_shown: true
-        });
-        ctrl.submitPrerequisitesForm(true, '', 'yes');
-        $httpBackend.flush();
-        tick(200);
-
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-
-        expect(ctrl.showEmailSignupLink).toBeTrue();
-      }));
-
-    it('should successfully signup when user opts to not receive email updates',
-      fakeAsync(() => {
-        spyOn(UrlService, 'getUrlParams').and.returnValue({
-          return_url: '/expected_url'
-        });
-        spyOn(SiteAnalyticsService, 'registerNewSignupEvent').and.callThrough();
-
-        var isRequestTheExpectOne = function(queryParams) {
-          return decodeURIComponent(queryParams).match(
-            '"can_receive_email_updates":false');
-        };
-
-        $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
-          .respond({
-            bulk_email_signup_message_should_be_shown: false
-          });
-        ctrl.submitPrerequisitesForm(true, '', 'no');
-        $httpBackend.flush();
-        tick(200);
-
-        expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
-        expect(mockWindow.location.href).toBe('/expected_url');
-      }));
-
-    it('should throw an error when email preferences is invalid', function() {
-      expect(() => {
-        ctrl.submitPrerequisitesForm(true, '', 'invalid value');
-      }).toThrowError('Invalid value for email preferences: invalid value');
-    });
+  it('should not perform checks for empty username', () => {
+    spyOn(alertsService, 'clearWarnings');
+    componentInstance.hasUsername = true;
+    componentInstance.onUsernameInputFormBlur('');
+    expect(alertsService.clearWarnings).not.toHaveBeenCalled();
   });
 
-  describe('when user has not agreed to terms', function() {
-    beforeEach(function() {
-      $httpBackend.expectGET('/signuphandler/data').respond({
-        username: 'myUsername',
-        has_agreed_to_latest_terms: false
-      });
-
-      ctrl.$onInit();
-    });
-
-    it('should show a loading message until the user data is retrieved',
-      function() {
-        expect(loadingMessage).toBe('I18N_SIGNUP_LOADING');
-        $httpBackend.flush();
-        expect(loadingMessage).toBeFalsy();
-      });
-
-    it('should show warning when user has not agreed to terms', function() {
-      ctrl.submitPrerequisitesForm(false, null);
-      expect(addWarningSpy).toHaveBeenCalledWith(
-        'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
-    });
-
-    it('should get user data correctly from backend', function() {
-      $httpBackend.flush();
-      expect(ctrl.username).toBe('myUsername');
-      expect(ctrl.hasAgreedToLatestTerms).toBe(false);
-    });
-
-    it('should check that form is not valid', function() {
-      $httpBackend.flush();
-      expect(ctrl.isFormValid()).toBe(false);
-    });
-
-    it('should not check username availability when user is already logged in',
-      function() {
-        $httpBackend.flush();
-        ctrl.onUsernameInputFormBlur();
-
-        expect(clearWarningsSpy).not.toHaveBeenCalled();
-        expect(ctrl.blurredAtLeastOnce).toBe(false);
-        expect(ctrl.warningI18nCode).toEqual('');
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-      });
-  });
-
-  describe('when user has agreed to terms', function() {
-    beforeEach(function() {
-      $httpBackend.expectGET('/signuphandler/data').respond({
-        username: 'myUsername',
-        has_agreed_to_latest_terms: true,
-      });
-
-      ctrl.$onInit();
-    });
-
-    it('should submit prerequisites form when return url is creator dashboard',
-      fakeAsync(() => {
-        spyOn(UrlService, 'getUrlParams').and.returnValue({
-          return_url: '/creator-dashboard'
-        });
-
-        $httpBackend.expect('POST', '/signuphandler/data').respond({
-          bulk_email_signup_message_should_be_shown: false
-        });
-        ctrl.submitPrerequisitesForm(true, 'myUsername', true);
-        $httpBackend.flush();
-        tick(200);
-
-        expect(mockWindow.location.href).toBe('/creator-dashboard');
-      }));
-
-    it('should submit prerequisites form when return url is not creator ' +
-      'dashboard', fakeAsync(() => {
-      spyOn(UrlService, 'getUrlParams').and.returnValue({
-        return_url: '/another_url'
-      });
-
-      $httpBackend.expect('POST', '/signuphandler/data').respond({
-        bulk_email_signup_message_should_be_shown: false
-      });
-      ctrl.submitPrerequisitesForm(true, 'myUsername', true);
-      $httpBackend.flush();
-      tick(200);
-
-      expect(mockWindow.location.href).toBe('/another_url');
-    }));
-
-    it('should get user data correctly from backend', function() {
-      $httpBackend.flush();
-      expect(ctrl.username).toBe('myUsername');
-      expect(ctrl.hasAgreedToLatestTerms).toBe(true);
-    });
-
-    it('should check form validity', function() {
-      $httpBackend.flush();
-      expect(ctrl.isFormValid()).toBe(true);
-    });
-  });
-
-  it('should show warning when creating a username and it\'s already' +
-     ' being used', function() {
-    $httpBackend.expectPOST('usernamehandler/data').respond({
-      username_is_taken: true
-    });
-    ctrl.onUsernameInputFormBlur('myUsername');
-    $httpBackend.flush();
-
-    expect(clearWarningsSpy).toHaveBeenCalled();
-    expect(ctrl.blurredAtLeastOnce).toBe(true);
-    expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_USERNAME_TAKEN');
-  });
-
-  it('should show warning when creating a username and it\'s not being used',
-    function() {
-      $httpBackend.expectPOST('usernamehandler/data').respond({
-        username_is_taken: false
-      });
-      ctrl.onUsernameInputFormBlur('myUsername');
-      $httpBackend.flush();
-
-      expect(clearWarningsSpy).toHaveBeenCalled();
-      expect(ctrl.blurredAtLeastOnce).toBe(true);
-      expect(ctrl.warningI18nCode).toEqual('');
-    });
-
-  it('should show warning when no username is provided', function() {
-    ctrl.updateWarningText('');
-    expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
-
-    ctrl.submitPrerequisitesForm(false);
-    expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
-  });
-
-  it('should show warning when username has spaces', function() {
-    ctrl.updateWarningText('new user');
-    expect(ctrl.warningI18nCode).toEqual(
+  it('should update warning text', () => {
+    componentInstance.updateWarningText('');
+    expect(componentInstance.warningI18nCode).toEqual(
+      'I18N_SIGNUP_ERROR_NO_USERNAME');
+    componentInstance.updateWarningText(' ');
+    expect(componentInstance.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES');
-  });
-
-  it('should show warning when username is too long', function() {
-    ctrl.updateWarningText(
-      'abcdefghijklmnopqrstuvwxyzyxwvu');
-    expect(ctrl.warningI18nCode).toEqual(
+    componentInstance.updateWarningText(
+      'this_username_is_longer_than_thiry_characters');
+    expect(componentInstance.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG');
-  });
-
-  it('should show warning when username has non-alphanumeric characters',
-    function() {
-      ctrl.updateWarningText('a-a');
-      expect(ctrl.warningI18nCode).toEqual(
-        'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
-    }
-  );
-
-  it('should show warning when username has \'admin\' in it', function() {
-    ctrl.updateWarningText('administrator');
-    expect(ctrl.warningI18nCode).toEqual(
+    componentInstance.updateWarningText('$%');
+    expect(componentInstance.warningI18nCode).toEqual(
+      'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
+    componentInstance.updateWarningText('admin');
+    expect(componentInstance.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
-  });
-
-  it('should show warning when username contains oppia word', function() {
-    ctrl.updateWarningText('oppiauser');
-    expect(ctrl.warningI18nCode).toEqual(
+    componentInstance.updateWarningText('oppia');
+    expect(componentInstance.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE');
+    componentInstance.updateWarningText('validusername');
+    expect(componentInstance.warningI18nCode).toEqual('');
   });
 
-  it('should show continue registration modal when user is logged out in new' +
-    ' tab', function() {
-    spyOn(ctrl, 'showRegistrationSessionExpiredModal');
-    var errorResponseObject = {
-      status_code: 401,
-      error: (
-        'Sorry, you have been logged out [probably in another ' +
-        'window]. Please log in again. You will be redirected ' +
-        'to main page in a while!')
-    };
-    $httpBackend.expectPOST('/signuphandler/data').respond(
-      401, errorResponseObject);
-    ctrl.submitPrerequisitesForm(true, 'myUsername', 'no');
-    $httpBackend.flush();
-    expect(ctrl.showRegistrationSessionExpiredModal).toHaveBeenCalled();
+  it('should update email preference warning', () => {
+    componentInstance.onSelectEmailPreference();
+    expect(componentInstance.emailPreferencesWarningText).toEqual('');
   });
 
-  it('should close license explanation modal', function() {
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
-    ctrl.showLicenseExplanationModal();
-    $rootScope.$apply();
-
-    expect(modalSpy).toHaveBeenCalled();
+  it('should not submit if user doesnot agree to terms', () => {
+    spyOn(alertsService, 'addWarning');
+    componentInstance.submitPrerequisitesForm(false, 'test', 'yes');
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
   });
 
-  it('should dismiss license explanation modal', function() {
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    ctrl.showLicenseExplanationModal();
-    $rootScope.$apply();
-
-    expect(modalSpy).toHaveBeenCalled();
+  it('should not submit if username is not valid', () => {
+    spyOn(urlService, 'getUrlParams');
+    componentInstance.warningI18nCode = 'not_empty';
+    componentInstance.submitPrerequisitesForm(true, '', 'yes');
+    expect(urlService.getUrlParams).not.toHaveBeenCalled();
   });
 
-  it('should close registration session expired modal',
-    function() {
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      ctrl.showRegistrationSessionExpiredModal();
-      $rootScope.$apply();
-
-      expect(modalSpy).toHaveBeenCalled();
+  it('should submit prerequisites form', fakeAsync(() => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      return_url: 'creator-dashboard'
     });
+    spyOn(signupPageBackendApiService, 'updateUsernameAsync')
+      .and.returnValue(Promise.resolve({
+        bulk_email_signup_message_should_be_shown: true
+      }));
+    spyOn(siteAnalyticsService, 'registerNewSignupEvent');
+    componentInstance.hasUsername = false;
+    componentInstance.showEmailPreferencesForm = true;
 
-  it('should dismiss registration session expired modal',
-    function() {
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      ctrl.showRegistrationSessionExpiredModal();
-      $rootScope.$apply();
+    componentInstance.submitPrerequisitesForm(true, 'username', 'yes');
+    tick();
+    expect(componentInstance.showEmailSignupLink).toBeTrue();
+    expect(componentInstance.submissionInProcess).toBeFalse();
+  }));
 
-      expect(modalSpy).toHaveBeenCalled();
+  it('should not submit when receive emails not enabled', () => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      return_url: 'learner-dashboard'
     });
+    spyOn(signupPageBackendApiService, 'updateUsernameAsync')
+      .and.returnValue(Promise.resolve({
+        bulk_email_signup_message_should_be_shown: true
+      }));
+    spyOn(siteAnalyticsService, 'registerNewSignupEvent');
+    componentInstance.hasUsername = false;
+    componentInstance.showEmailPreferencesForm = true;
+
+    componentInstance.submitPrerequisitesForm(true, 'username', null);
+    expect(componentInstance.emailPreferencesWarningText).toEqual(
+      'I18N_SIGNUP_FIELD_REQUIRED');
+  });
+
+  it('should submit prerequisites form and save analytics', fakeAsync(() => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      return_url: 'creator-dashboard'
+    });
+    spyOn(signupPageBackendApiService, 'updateUsernameAsync')
+      .and.returnValue(Promise.resolve({
+        bulk_email_signup_message_should_be_shown: false
+      }));
+    spyOn(siteAnalyticsService, 'registerNewSignupEvent');
+    componentInstance.hasUsername = false;
+    componentInstance.showEmailPreferencesForm = true;
+
+    componentInstance.submitPrerequisitesForm(true, 'username', 'no');
+    tick();
+    tick(200);
+    expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
+  }));
+
+  it('should throw error if canReceiveEmailUpdates param is not valid', () => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      return_url: 'creator-dashboard'
+    });
+    componentInstance.hasUsername = false;
+    componentInstance.showEmailPreferencesForm = true;
+
+    expect(() => {
+      componentInstance.submitPrerequisitesForm(true, 'username', 'not_valid');
+    }).toThrowError();
+  });
+
+  it('should handle if form is not processed at backend', fakeAsync(() => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      return_url: 'creator-dashboard'
+    });
+    spyOn(signupPageBackendApiService, 'updateUsernameAsync')
+      .and.returnValue(Promise.reject({
+        status_code: 401
+      }));
+    spyOn(componentInstance, 'showRegistrationSessionExpiredModal');
+    componentInstance.hasUsername = false;
+    componentInstance.showEmailPreferencesForm = true;
+
+    componentInstance.submitPrerequisitesForm(true, 'username', 'no');
+    tick();
+    expect(componentInstance.showRegistrationSessionExpiredModal)
+      .toHaveBeenCalled();
+    expect(componentInstance.submissionInProcess).toBeFalse();
+  }));
 });

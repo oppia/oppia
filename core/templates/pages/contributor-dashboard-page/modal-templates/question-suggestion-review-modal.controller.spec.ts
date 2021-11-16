@@ -28,6 +28,8 @@ describe('Question Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $http = null;
   let $httpBackend = null;
+  var $q = null;
+  var $uibModal = null;
   let $uibModalInstance = null;
   let QuestionObjectFactory = null;
   let SiteAnalyticsService = null;
@@ -35,6 +37,8 @@ describe('Question Suggestion Review Modal Controller', function() {
   let acceptSuggestionSpy = null;
   let rejectSuggestionSpy = null;
   let cancelSuggestionSpy = null;
+  let skillBackendApiService = null;
+  let skillObjectFactory = null;
 
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
@@ -70,6 +74,10 @@ describe('Question Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       const $http = $injector.get('$http');
+      $q = $injector.get('$q');
+      $uibModal = $injector.get('$uibModal');
+      skillBackendApiService = $injector.get('SkillBackendApiService');
+      skillObjectFactory = $injector.get('SkillObjectFactory');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
@@ -145,8 +153,44 @@ describe('Question Suggestion Review Modal Controller', function() {
           },
         },
       });
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+        $q.resolve({
+          skill: skillObjectFactory.createFromBackendDict({
+            id: 'skill1',
+            description: 'test description 1',
+            misconceptions: [{
+              id: '2',
+              name: 'test name',
+              notes: 'test notes',
+              feedback: 'test feedback',
+              must_be_addressed: true
+            }],
+            rubrics: [{
+              difficulty: 'Easy',
+              explanations: ['explanation']
+            }],
+            skill_contents: {
+              explanation: {
+                html: 'test explanation',
+                content_id: 'explanation',
+              },
+              worked_examples: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              }
+            },
+            language_code: 'en',
+            version: 3,
+            prerequisite_skill_ids: ['skill_1']
+          })
+        }));
 
-      suggestion = { status: 'accepted' };
+      suggestion = {
+        status: 'accepted',
+        change: {
+          skill_id: 'skill_1'
+        }
+      };
 
       $scope = $rootScope.$new();
       $controller('QuestionSuggestionReviewModalController', {
@@ -165,6 +209,28 @@ describe('Question Suggestion Review Modal Controller', function() {
         suggestionId: suggestionId
       });
     }));
+
+    it('should open edit question modal when clicking on' +
+      ' edit button', function() {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      $scope.edit();
+      $scope.$apply();
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should return nothing when edit question modal is' +
+      ' resolved', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({})
+      });
+
+      $scope.edit();
+      $scope.$apply();
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
 
     it('should initialize $scope properties after controller is initialized',
       function() {

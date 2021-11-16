@@ -32,8 +32,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(interactionId, attributes) {
       return {
-        showChoicesInShuffledOrder:
-          JSON.parse(attributes.showChoicesInShuffledOrderWithValue),
+        showChoicesInShuffledOrder: {
+          value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue)
+        },
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
         }

@@ -16,40 +16,49 @@
  * @fileoverview Unit tests for libraryFooter.
  */
 
-describe('Library Footer Component', function() {
-  var ctrl = null;
-  var $window = null;
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LibraryFooterComponent } from './library-footer.component';
 
-  var mockWindow = {
+class MockWindowRef {
+  nativeWindow = {
     location: {
-      pathname: ''
+      pathname: '/search/find'
     }
   };
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
+describe('Library footer component', () => {
+  let componentInstance: LibraryFooterComponent;
+  let fixture: ComponentFixture<LibraryFooterComponent>;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        LibraryFooterComponent
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $window = $injector.get('$window');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LibraryFooterComponent);
+    componentInstance = fixture.componentInstance;
+  });
 
-    ctrl = $componentController('libraryFooter', {
-      $window: $window
-    });
-  }));
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
 
-  it('should show library footer when not searching for explorations',
-    function() {
-      mockWindow.location.pathname = '/community-library';
-      ctrl.$onInit();
-
-      expect(ctrl.footerIsDisplayed).toBe(true);
-    });
-
-  it('should hide library footer when searching for explorations', function() {
-    mockWindow.location.pathname = '/search/find';
-    ctrl.$onInit();
-
-    expect(ctrl.footerIsDisplayed).toBe(false);
+  it('should initialize', () => {
+    componentInstance.ngOnInit();
+    expect(componentInstance.footerIsDisplayed).toBeFalse();
   });
 });

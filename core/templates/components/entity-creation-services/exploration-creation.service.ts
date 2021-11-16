@@ -34,7 +34,7 @@ import { ExplorationCreationBackendApiService } from './exploration-creation-bac
  })
 export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-  explorationCreationInProgress: boolean;
+  explorationCreationInProgress: boolean = false;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private csrfTokenService: CsrfTokenService,
@@ -55,7 +55,7 @@ export class ExplorationCreationService {
     this.alertsService.clearWarnings();
     this.loaderService.showLoadingScreen('Creating exploration');
 
-    this.explorationCreationBackendApiService.registerNewExplorationAsync()
+    this.explorationCreationBackendApiService.registerNewExplorationAsync({})
       .then((response) => {
         this.siteAnalyticsService.registerCreateNewExplorationEvent(
           response.explorationId);
@@ -84,8 +84,9 @@ export class ExplorationCreationService {
       this.loaderService.showLoadingScreen('Creating exploration');
 
       var form = new FormData();
-      form.append('yaml_file', yamlFile);
-      form.append('payload', JSON.stringify({}));
+      form.append('payload', JSON.stringify({
+        yaml_file: yamlFile
+      }));
       this.csrfTokenService.getTokenAsync().then((token) => {
         form.append('csrf_token', token);
         $.ajax({

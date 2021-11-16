@@ -33,21 +33,55 @@
     background: #aaa;
     border-radius: 8px;
   }
+  .oppia-usernames-loading-spinner {
+    height: 200px;
+    padding: 25% 40%;
+  }
 </style>
 
 <div class="oppia-roles-container">
   <div class="oppia-role-container" [ngClass]="{'oppia-selected-role': activeRole === role}" *ngFor="let role of roles" (click)="setActiveRole(role)">
-    <img class="oppia-role-avatar" [src]="avatarPictureUrl" alt="User with {{ role }} role">
-    <span class="oppia-role-name-lable"><strong>{{ role }}</strong></span>
+    <img class="oppia-role-avatar" [src]="avatarPictureUrl" alt="User with {{ humanReadableRoles[role] }} role">
+    <span class="oppia-role-name-lable"><strong>{{ humanReadableRoles[role] | titlecase}}</strong></span>
   </div>
 </div>
 
 <div class="oppia-actions-container">
-  <strong>Actions allocated to {{ activeRole }}:</strong>
-  <ul>
-    <li *ngIf="!roleToActions[activeRole]?.length">
-      <i class="oppia-no-actions-message">{{ activeRole }} cannot perform any actions.</i>
+  <div class="font-weight-bold mb-3">{{ humanReadableRoles[activeRole] | titlecase }}:</div>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <button class="nav-link"
+              [ngClass]="activeTab===TAB_ACTIONS ? 'active' : ''"
+              (click)="activeTab=TAB_ACTIONS">
+         Allocated actions
+      </button>
     </li>
-    <li *ngFor="let action of roleToActions[activeRole]">{{ action }}</li>
+    <li class="nav-item">
+      <button class="nav-link"
+              [ngClass]="activeTab===TAB_ASSIGNED_USER ? 'active' : ''"
+              (click)="activeTab=TAB_ASSIGNED_USER; showAssignedUsers()"
+              [class.disabled]="viewableRoles.includes(activeRole) ? null : true">
+        Assigned users
+      </button>
+    </li>
   </ul>
+  <div class="mt-3">
+    <div *ngIf="activeTab===TAB_ACTIONS">
+      <ul>
+        <li *ngIf="!roleToActions[activeRole]?.length">
+          <i class="oppia-no-actions-message">{{ activeRole }} cannot perform any actions.</i>
+        </li>
+        <li *ngFor="let action of roleToReadableActions[activeRole]">{{ action }}</li>
+      </ul>
+    </div>
+    <div *ngIf="activeTab===TAB_ASSIGNED_USER" class="container">
+      <div class="oppia-usernames-loading-spinner" *ngIf="loadingAssignedUsernames">
+        <mat-spinner class="center-block" [diameter]="40"></mat-spinner>
+      </div>
+      <i *ngIf="!loadingAssignedUsernames && !assignUsersToActiveRole.length">There are no users assigned to this role.</i>
+      <ul *ngIf="!loadingAssignedUsernames && assignUsersToActiveRole.length">
+        <li *ngFor="let username of assignUsersToActiveRole">{{ username }}</li>
+      </ul>
+    </div>
+  </div>
 </div>

@@ -26,6 +26,29 @@ describe('Music Notes Input rules service', () => {
     mnirs = new MusicNotesInputRulesService(new UtilsService());
   });
 
+  it('should return the MIDI Note value when called', () => {
+    let note = {
+      readableNoteName: 'A5',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    };
+    expect(MusicNotesInputRulesService._getMidiNoteValue(note)).toBe(81);
+  });
+
+  it('should throw error if a invalid note is passed', () => {
+    let note = {
+      readableNoteName: 'Z5',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    };
+    expect(() => {
+      MusicNotesInputRulesService._getMidiNoteValue(note);
+    }).toThrowError('Invalid music note [object Object]');
+  });
   it('should have a correct \'equals\' rule', () => {
     expect(mnirs.Equals([{
       readableNoteName: 'A4',

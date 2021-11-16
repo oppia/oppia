@@ -14,15 +14,14 @@
 
 """Controllers for queries relating to recent commits."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
+from core import python_utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import user_services
-import feconf
-import python_utils
 
 
 class RecentCommitsHandler(base.BaseHandler):
@@ -47,7 +46,7 @@ class RecentCommitsHandler(base.BaseHandler):
         else:
             raise self.PageNotFoundException
 
-        exp_ids = set([commit.exploration_id for commit in all_commits])
+        exp_ids = set(commit.exploration_id for commit in all_commits)
         exp_ids_to_exp_data = (
             exp_services.get_exploration_titles_and_categories(exp_ids))
 

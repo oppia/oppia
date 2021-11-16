@@ -16,11 +16,13 @@
 
 """Unit tests for core.domain.stats_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -30,9 +32,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -383,6 +382,14 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_starts_v2, 3)
         self.assertEqual(exploration_stats.num_actual_starts_v2, 2)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
+
+    def test_get_stats_for_new_exp_creates_new_stats(self):
+        new_stats = stats_services.get_stats_for_new_exp_version(
+            'exp_id', 1, [], None, None)
+
+        self.assertEqual(new_stats.exp_id, 'exp_id')
+        self.assertEqual(new_stats.exp_version, 1)
+        self.assertEqual(new_stats.state_stats_mapping, {})
 
     def test_get_stats_for_new_exp_version(self):
         """Test the get_stats_for_new_exp_version method."""
@@ -803,6 +810,25 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id_2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
+    def test_update_exp_issues_for_new_exp_version(self):
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        exp = self.save_new_valid_exploration('exp_id', admin_id)
+
+        stats_models.ExplorationIssuesModel.delete_by_id(
+            '%s.%s' % ('exp_id', 1))
+        self.assertIsNone(
+            stats_models.ExplorationIssuesModel.get(
+                '%s.%s' % ('exp_id', 1), strict=False))
+
+        exp.version += 1
+        stats_services.update_exp_issues_for_new_exp_version(
+            exp, exp_domain.ExplorationVersionsDiff([]), None)
+
+        exploration_issues_model = (
+            stats_models.ExplorationIssuesModel.get('%s.%s' % ('exp_id', 1)))
+        self.assertEqual(exploration_issues_model.unresolved_issues, [])
+
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Unit tests focused on services related to exploration issues."""
@@ -927,7 +953,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
-            for _ in python_utils.RANGE(num_times_answered_incorrectly))
+            for _ in range(num_times_answered_incorrectly))
         actions.append({
             'action_type': 'ExplorationQuit',
             'action_customization_args': {
@@ -1912,7 +1938,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, python_utils.UNICODE(self.exploration.version),
+            self.exploration.id, str(self.exploration.version),
             self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 

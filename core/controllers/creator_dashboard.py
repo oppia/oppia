@@ -16,12 +16,13 @@
 activities.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
@@ -36,9 +37,6 @@ from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import topic_fetchers
 from core.domain import user_services
-import feconf
-import python_utils
-import utils
 
 EXPLORATION_ID_KEY = 'exploration_id'
 COLLECTION_ID_KEY = 'collection_id'
@@ -46,6 +44,9 @@ COLLECTION_ID_KEY = 'collection_id'
 
 class OldContributorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old contributor dashboard URL to the new one."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -55,6 +56,9 @@ class OldContributorDashboardRedirectPage(base.BaseHandler):
 
 class OldCreatorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old creator dashboard URL to the new one."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -66,6 +70,8 @@ class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
     ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
@@ -77,6 +83,21 @@ class CreatorDashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'display_preference': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': (
+                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS
+                        .values()
+                    )
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
@@ -92,7 +113,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             Returns:
                 float. The rounded average value of rating.
             """
-            return python_utils.ROUND(
+            return round(
                 rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         subscribed_exploration_summaries = (
@@ -255,7 +276,8 @@ class CreatorDashboardHandler(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def post(self):
-        creator_dashboard_display_pref = self.payload.get('display_preference')
+        creator_dashboard_display_pref = (
+            self.normalized_payload.get('display_preference'))
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
         self.render_json({})
@@ -264,10 +286,22 @@ class CreatorDashboardHandler(base.BaseHandler):
 class NewExplorationHandler(base.BaseHandler):
     """Creates a new exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'title': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': feconf.DEFAULT_EXPLORATION_TITLE
+            }
+        }
+    }
+
     @acl_decorators.can_create_exploration
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
+        title = self.normalized_payload.get('title')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -281,6 +315,11 @@ class NewExplorationHandler(base.BaseHandler):
 
 class NewCollectionHandler(base.BaseHandler):
     """Creates a new collection."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
 
     @acl_decorators.can_create_collection
     def post(self):
@@ -298,10 +337,22 @@ class NewCollectionHandler(base.BaseHandler):
 class UploadExplorationHandler(base.BaseHandler):
     """Uploads a new exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'yaml_file': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
-        yaml_content = self.request.get('yaml_file')
+        yaml_content = self.normalized_payload.get('yaml_file')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:

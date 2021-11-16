@@ -16,9 +16,10 @@
 
 """Unit tests for scripts/release_scripts/update_changelog_and_credits.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+import builtins
+import contextlib
 import getpass
 import os
 import re
@@ -26,9 +27,9 @@ import subprocess
 import sys
 import tempfile
 
-import constants
+from core import constants
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
 
@@ -44,6 +45,7 @@ MOCK_AUTHORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
 MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
 MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH = 'about_temp_file.ts'
 MOCK_PACKAGE_JSON_PATH = os.path.join(RELEASE_TEST_DIR, 'mock_package.json')
+MOCK_FECONF_PATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
@@ -113,25 +115,31 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_get_previous_release_version_without_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'v2.0.6\nv2.0.7\n'
+            return b'v2.0.6\nv2.0.7\n'
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
                     constants.release_constants.BRANCH_TYPE_RELEASE,
-                    '2.0.8'), '2.0.7')
+                    '2.0.8'
+                ),
+                '2.0.7'
+            )
 
     def test_get_previous_release_version_with_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
+            return b'v2.0.6\nv2.0.7\nv2.0.8\n'
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
                     constants.release_constants.BRANCH_TYPE_HOTFIX,
-                    '2.0.8'), '2.0.7')
+                    '2.0.8'
+                ),
+                '2.0.7'
+            )
 
     def test_get_previous_release_version_with_invalid_branch_type(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
+            return b'v2.0.6\nv2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(
@@ -142,12 +150,13 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     def test_get_previous_release_version_with_repeated_previous_version(
             self):
         def mock_check_output(unused_cmd_tokens):
-            return 'v2.0.7\nv2.0.8\n'
+            return b'v2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(
             AssertionError,
-            'Previous release version is same as current release version.'):
+            'Previous release version is same as current release version.'
+        ):
             update_changelog_and_credits.get_previous_release_version(
                 'release', '2.0.8')
 
@@ -173,7 +182,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_update_changelog_with_current_version_changelog_present(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'v1.0.0\nv1.0.1\n'
+            return b'v1.0.0\nv1.0.1\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         try:
@@ -198,7 +207,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_update_changelog_with_hotfix_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'v1.0.0\nv1.0.1\nv1.0.2\n'
+            return b'v1.0.0\nv1.0.1\nv1.0.2\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         try:
@@ -256,8 +265,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_update_developer_names(self):
         with python_utils.open_file(
-            update_changelog_and_credits.ABOUT_PAGE_CONSTANTS_FILEPATH,
-            'r') as f:
+            update_changelog_and_credits.ABOUT_PAGE_CONSTANTS_FILEPATH, 'r'
+        ) as f:
             about_page_lines = f.readlines()
             start_index = about_page_lines.index(
                 update_changelog_and_credits.CREDITS_START_LINE) + 1
@@ -268,12 +277,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         tmp_file = tempfile.NamedTemporaryFile()
         tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
         with python_utils.open_file(
-            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as f:
+            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
+        ) as f:
             for line in about_page_lines:
-                f.write(python_utils.UNICODE(line))
+                f.write(str(line))
 
-        release_summary_lines = read_from_file(
-            MOCK_RELEASE_SUMMARY_FILEPATH)
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         new_developer_names = update_changelog_and_credits.get_new_contributors(
             release_summary_lines, return_only_names=True)
 
@@ -299,6 +308,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             actual_developer_names = about_page_lines[start_index:end_index]
 
             self.assertEqual(actual_developer_names, expected_developer_names)
+
+        tmp_file.close()
+        if os.path.isfile(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH):
+            # Occasionally this temp file is not deleted.
+            os.remove(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH)
 
     def test_missing_section_in_release_summary(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -451,7 +465,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'ask_user_to_confirm_gets_called': 3,
             'is_order_of_sections_valid_gets_called': 2
         }
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def readlines(self):
                 """Read lines of the file object."""
 
@@ -551,24 +565,40 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.LIST_OF_FILEPATHS_TO_MODIFY
         )
 
-    def test_update_package_json(self):
+    def test_update_version_in_config_files_updates_version(self):
         package_json_swap = self.swap(
-            update_changelog_and_credits, 'PACKAGE_JSON_FILEPATH',
-            MOCK_PACKAGE_JSON_PATH)
+            update_changelog_and_credits,
+            'PACKAGE_JSON_FILEPATH',
+            MOCK_PACKAGE_JSON_PATH
+        )
         package_json_content = python_utils.open_file(
             MOCK_PACKAGE_JSON_PATH, 'r').read()
-        regex = re.compile('"version": ".*"')
-        expected_package_json_content = regex.sub(
+        package_json_regex = re.compile('"version": ".*"')
+        expected_package_json_content = package_json_regex.sub(
             '"version": "1.2.3"', package_json_content)
+
+        feconf_swap = self.swap(common, 'FECONF_PATH', MOCK_FECONF_PATH)
+        feconf_content = python_utils.open_file(MOCK_FECONF_PATH, 'r').read()
+        feconf_regex = re.compile('OPPIA_VERSION = \'.*\'')
+        expected_feconf_content = feconf_regex.sub(
+            'OPPIA_VERSION = \'1.2.3\'', feconf_content)
+
         try:
-            with self.branch_name_swap, package_json_swap:
-                update_changelog_and_credits.update_package_json()
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(self.branch_name_swap)
+                stack.enter_context(feconf_swap)
+                stack.enter_context(package_json_swap)
+                update_changelog_and_credits.update_version_in_config_files()
             updated_package_json_content = python_utils.open_file(
                 MOCK_PACKAGE_JSON_PATH, 'r').read()
+            updated_feconf_content = python_utils.open_file(
+                MOCK_FECONF_PATH, 'r').read()
             self.assertEqual(
                 updated_package_json_content, expected_package_json_content)
+            self.assertEqual(updated_feconf_content, expected_feconf_content)
         finally:
             write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
+            write_to_file(MOCK_FECONF_PATH, feconf_content)
 
     def test_function_calls(self):
         check_function_calls = {
@@ -633,7 +663,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
-        def mock_update_package_json():
+        def mock_update_version_in_config_files():
             check_function_calls['update_package_json_gets_called'] = True
 
         get_org_swap = self.swap(
@@ -664,15 +694,15 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             mock_get_release_summary_lines)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
         get_org_repo_swap = self.swap(
             github.Organization.Organization, 'get_repo', mock_get_repo)
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         update_swap = self.swap(
-            update_changelog_and_credits, 'update_package_json',
-            mock_update_package_json)
+            update_changelog_and_credits, 'update_version_in_config_files',
+            mock_update_version_in_config_files)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
             with self.getpass_swap, input_swap, check_prs_swap:

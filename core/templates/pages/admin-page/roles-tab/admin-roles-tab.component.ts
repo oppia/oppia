@@ -13,155 +13,163 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Roles tab in the admin panel.
+ * @fileoverview Component for editing user roles.
  */
 
-import { Component, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { AdminBackendApiService, RoleToActionsBackendResponse, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AdminDataService } from '../services/admin-data.service';
-import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-
-export interface ViewUserRolesAction {
-  filterCriterion: string;
-  role: string;
-  username: string;
-  isValid: () => boolean;
-}
-
-export interface UpdateRoleAction {
-  newRole: string;
-  username: string;
-  topicId: string;
-  isValid: () => boolean;
-}
-
-export interface AdminRolesFormData {
-  viewUserRoles: ViewUserRolesAction;
-  updateRole: UpdateRoleAction;
-}
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
+import { AlertsService } from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-admin-roles-tab',
   templateUrl: './admin-roles-tab.component.html'
 })
-export class AdminRolesTabComponent {
-  @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
-  userRolesResult: UserRolesBackendResponse = null;
-  resultRolesVisible: boolean = false;
-  topicSummaries: CreatorTopicSummary[] = null;
-  roleToActions: RoleToActionsBackendResponse = null;
-  formData: AdminRolesFormData;
+export class AdminRolesTabComponent implements OnInit {
+  UPDATABLE_ROLES = null;
+  VIEWABLE_ROLES = null;
+  HUMAN_READABLE_ROLES = null;
+  topicSummaries = null;
+  roleToActions = null;
+  rolesFetched = false;
 
-  USER_FILTER_CRITERION_USERNAME = AppConstants.USER_FILTER_CRITERION_USERNAME;
-  USER_FILTER_CRITERION_ROLE = AppConstants.USER_FILTER_CRITERION_ROLE;
-  UPDATABLE_ROLES: UserRolesBackendResponse = {};
-  VIEWABLE_ROLES: UserRolesBackendResponse = {};
+  roleSelectorIsShown = false;
+  username = '';
+  userRoles = [];
+  possibleRolesToAdd = [];
+  managedTopicIds = [];
+  // The roleCurrentlyBeingUpdatedInBackend holds the role which is either being
+  // removed or added to user roles. This value is used to present a progress
+  // spinner next to the role which is currently being updated in the backend.
+  roleCurrentlyBeingUpdatedInBackend = null;
+  errorMessage = null;
+  bannedStatusChangeInProgress = false;
+  userIsBanned = false;
+  roleIsCurrentlyBeingEdited = false;
 
   constructor(
-    private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
-    private adminTaskManagerService: AdminTaskManagerService,
+    private adminBackendApiService: AdminBackendApiService,
+    private alertsService: AlertsService,
+    private modalService: NgbModal
   ) {}
 
-  ngOnInit(): void {
-    this.refreshFormData();
-    this.setStatusMessage.emit('');
-    this.adminDataService.getDataAsync().then((adminDataObject) => {
-      this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
-      this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
-      this.topicSummaries = adminDataObject.topicSummaries;
-      this.roleToActions = adminDataObject.roleToActions;
+  addWarning(errorMessage: string): void {
+    this.alertsService.addWarning(
+      errorMessage || 'Error communicating with server.');
+  }
+
+  startEditing(): void {
+    this.roleIsCurrentlyBeingEdited = true;
+    this.adminBackendApiService.viewUsersRoleAsync(
+      this.username).then((userRoles) => {
+      this.rolesFetched = true;
+      this.userRoles = userRoles.roles;
+      this.managedTopicIds = userRoles.managed_topic_ids;
+      this.userIsBanned = userRoles.banned;
     });
   }
 
-  handleErrorResponse(errorResponse: string): void {
-    this.setStatusMessage.emit('Server error: ' + errorResponse);
+  showNewRoleSelector(): void {
+    this.possibleRolesToAdd = this.UPDATABLE_ROLES.filter(
+      role => !this.userRoles.includes(role)).sort();
+    this.roleSelectorIsShown = true;
   }
 
-  submitRoleViewForm(formResponse: ViewUserRolesAction): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
+  removeRole(roleToRemove: string): void {
+    this.roleCurrentlyBeingUpdatedInBackend = roleToRemove;
+
+    var roleIndex = this.userRoles.indexOf(roleToRemove);
+    this.adminBackendApiService.removeUserRoleAsync(
+      roleToRemove, this.username).then(() => {
+      if (roleToRemove === 'TOPIC_MANAGER') {
+        this.managedTopicIds = [];
+      }
+      this.userRoles.splice(roleIndex, 1);
+      this.roleCurrentlyBeingUpdatedInBackend = null;
+    });
+  }
+
+  openTopicManagerRoleEditor(): void {
+    const modalRef = this.modalService.open(
+      TopicManagerRoleEditorModalComponent);
+    modalRef.componentInstance.managedTopicIds = (
+      this.managedTopicIds);
+    modalRef.componentInstance.username = this.username;
+    let topicIdToName = {};
+    this.topicSummaries.forEach(
+      topicSummary => topicIdToName[topicSummary.id] = topicSummary.name);
+    modalRef.componentInstance.topicIdToName = topicIdToName;
+    modalRef.result.then(managedTopicIds => {
+      this.managedTopicIds = managedTopicIds;
+      if (
+        !this.userRoles.includes('TOPIC_MANAGER') &&
+        managedTopicIds.length) {
+        this.userRoles.push('TOPIC_MANAGER');
+      }
+      this.roleSelectorIsShown = false;
+    });
+  }
+
+  addNewRole(role: string): void {
+    if (role === 'TOPIC_MANAGER') {
+      this.openTopicManagerRoleEditor();
       return;
     }
 
-    this.setStatusMessage.emit('Processing query...');
+    this.roleCurrentlyBeingUpdatedInBackend = role;
+    this.userRoles.push(role);
+    this.roleSelectorIsShown = false;
 
-    this.adminTaskManagerService.startTask();
-    this.userRolesResult = {};
-    this.adminBackendApiService.viewUsersRoleAsync(
-      formResponse.filterCriterion, formResponse.role,
-      formResponse.username
-    ).then((userRoles) => {
-      this.userRolesResult = userRoles;
-      if (Object.keys(this.userRolesResult).length === 0) {
-        this.resultRolesVisible = false;
-        this.setStatusMessage.emit('No results.');
-      } else {
-        this.resultRolesVisible = true;
-        this.setStatusMessage.emit('Success.');
-      }
-      this.refreshFormData();
-    }, this.handleErrorResponse.bind(this));
-    this.adminTaskManagerService.finishTask();
+    this.adminBackendApiService.addUserRoleAsync(
+      role, this.username).then(() => {
+      this.roleCurrentlyBeingUpdatedInBackend = null;
+    }, this.addWarning.bind(this));
   }
 
-  submitUpdateRoleForm(formResponse: UpdateRoleAction): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    this.setStatusMessage.emit('Updating User Role');
-    this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.updateUserRoleAsync(
-      formResponse.newRole, formResponse.username,
-      formResponse.topicId
-    ).then(() => {
-      this.setStatusMessage.emit(
-        'Role of ' + formResponse.username + ' successfully updated to ' +
-        formResponse.newRole);
-      this.refreshFormData();
-    }, this.handleErrorResponse.bind(this));
-    this.adminTaskManagerService.finishTask();
+  markUserBanned(): void {
+    this.bannedStatusChangeInProgress = true;
+    this.adminBackendApiService.markUserBannedAsync(this.username).then(() => {
+      this.bannedStatusChangeInProgress = false;
+      this.userIsBanned = true;
+      this.userRoles = [];
+    }, this.addWarning.bind(this));
   }
 
-  refreshFormData(): void {
-    this.formData = {
-      viewUserRoles: {
-        filterCriterion: AppConstants.USER_FILTER_CRITERION_ROLE,
-        role: null,
-        username: '',
-        isValid: function() {
-          if (this.filterCriterion ===
-            AppConstants.USER_FILTER_CRITERION_ROLE) {
-            return Boolean(this.role);
-          }
-          if (this.filterCriterion ===
-            AppConstants.USER_FILTER_CRITERION_USERNAME) {
-            return Boolean(this.username);
-          }
-          return false;
-        }
-      },
-      updateRole: {
-        newRole: null,
-        username: '',
-        topicId: null,
-        isValid: function() {
-          if (this.newRole === 'TOPIC_MANAGER') {
-            return Boolean(this.topicId);
-          } else if (this.newRole) {
-            return Boolean(this.username);
-          }
-          return false;
-        }
-      }
-    };
+  unmarkUserBanned(): void {
+    this.bannedStatusChangeInProgress = true;
+    this.adminBackendApiService.unmarkUserBannedAsync(
+      this.username).then(() => {
+      this.bannedStatusChangeInProgress = false;
+      this.userIsBanned = false;
+      this.startEditing();
+    }, this.addWarning.bind(this));
   }
 
-  clearResults(): void {
-    this.resultRolesVisible = false;
-    this.userRolesResult = {};
+  clearEditor(): void {
+    this.rolesFetched = false;
+    this.roleSelectorIsShown = false;
+    this.username = '';
+    this.userRoles = [];
+    this.possibleRolesToAdd = [];
+    this.managedTopicIds = [];
+    this.roleCurrentlyBeingUpdatedInBackend = null;
+    this.bannedStatusChangeInProgress = false;
+    this.userIsBanned = false;
+    this.roleIsCurrentlyBeingEdited = false;
+  }
+
+  ngOnInit(): void {
+    this.adminDataService.getDataAsync().then(adminDataObject => {
+      this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
+      this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
+      this.HUMAN_READABLE_ROLES = adminDataObject.humanReadableRoles;
+      this.topicSummaries = adminDataObject.topicSummaries;
+      this.roleToActions = adminDataObject.roleToActions;
+    });
   }
 }
 

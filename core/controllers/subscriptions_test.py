@@ -14,13 +14,12 @@
 
 """Tests for user subscriptions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

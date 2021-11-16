@@ -16,16 +16,15 @@
 
 """Unit tests for recommendations_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (recommendations_models, exp_models,) = models.Registry.import_models([
     models.NAMES.recommendations, models.NAMES.exploration])
@@ -240,9 +239,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
     }
 
     def setUp(self):
-        """Before each individual test, set up dummy explorations, users
-        and admin.
-        """
+        """Before each individual test, set up dummy explorations and users."""
         super(RecommendationsServicesUnitTests, self).setUp()
 
         for name, user in self.USER_DATA.items():
@@ -262,11 +259,6 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             owner = user_services.get_user_actions_info(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.get_user_actions_info(self.admin_id)
-
     def test_recommendation_categories_and_matrix_headers_match(self):
         topic_similarities_lines = (
             recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING.split(
@@ -279,36 +271,25 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
     def test_get_item_similarity(self):
         exp_summaries = exp_services.get_all_exploration_summaries()
 
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_1'].category,
-            exp_summaries['exp_id_1'].language_code,
-            exp_summaries['exp_id_1'].owner_ids,
-            exp_summaries['exp_id_2'].category,
-            exp_summaries['exp_id_2'].language_code,
-            exp_summaries['exp_id_2'].exploration_model_last_updated,
-            exp_summaries['exp_id_2'].owner_ids,
-            exp_summaries['exp_id_2'].status), 4.5)
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].exploration_model_last_updated,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].status), 9.0)
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),
+            4.5
+        )
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_4'], exp_summaries['exp_id_4']),
+            9.0
+        )
 
-        rights_manager.unpublish_exploration(self.admin, 'exp_id_2')
+        system_user = user_services.get_system_user()
+        rights_manager.unpublish_exploration(system_user, 'exp_id_2')
         exp_summaries = exp_services.get_all_exploration_summaries()
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_1'].category,
-            exp_summaries['exp_id_1'].language_code,
-            exp_summaries['exp_id_1'].owner_ids,
-            exp_summaries['exp_id_2'].category,
-            exp_summaries['exp_id_2'].language_code,
-            exp_summaries['exp_id_2'].exploration_model_last_updated,
-            exp_summaries['exp_id_2'].owner_ids,
-            exp_summaries['exp_id_2'].status), 0.0)
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),
+            0.0
+        )
 
     def test_get_and_set_exploration_recommendations(self):
         recommended_exp_ids = ['exp_id_2', 'exp_id_3']

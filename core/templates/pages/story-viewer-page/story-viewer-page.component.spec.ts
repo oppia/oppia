@@ -51,9 +51,9 @@ describe('Story Viewer Page component', () => {
   let windowRef: WindowRef;
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
-    role: 'USER_ROLE',
+    roles: ['USER_ROLE'],
     is_moderator: false,
-    is_admin: false,
+    is_curriculum_admin: false,
     is_super_admin: false,
     is_topic_manager: false,
     can_create_collections: true,
@@ -351,13 +351,13 @@ describe('Story Viewer Page component', () => {
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         Promise.resolve(_samplePlaythroughObject));
 
-      spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+      spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
       spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
       component.ngOnInit();
 
       flushMicrotasks();
 
-      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
         'Learn Topic 1 | Story | Oppia');
       expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
         'Story meta tag content');

@@ -16,21 +16,17 @@
  * @fileoverview Unit tests for the ExplorationTaskModel.
  */
 
-import { ExplorationTaskModel } from
-  'domain/improvements/exploration-task.model';
-import { HighBounceRateTask } from
-  'domain/improvements/high-bounce-rate-task.model';
-import { TaskEntryBackendDict } from
-  'domain/improvements/task-entry.model';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/ineffective-feedback-loop-task.model';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/needs-guiding-response-task.model';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/successive-incorrect-answers-task.model';
+import { ExplorationTaskBackendDict, ExplorationTaskModel } from 'domain/improvements/exploration-task.model';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+import { TaskEntryBackendDict } from 'domain/improvements/task-entry.model';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
+import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
 
 describe('Exploration task model', () => {
-  let newTaskEntryBackendDict;
+  let newTaskEntryBackendDict: {
+    (taskType: string): TaskEntryBackendDict<string>;
+  };
 
   beforeEach(() => {
     newTaskEntryBackendDict = (
@@ -52,28 +48,34 @@ describe('Exploration task model', () => {
   it('should return a high bounce rate task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        newTaskEntryBackendDict('high_bounce_rate'))
+        newTaskEntryBackendDict(
+          'high_bounce_rate'
+        ) as ExplorationTaskBackendDict
+      )
     ).toBeInstanceOf(HighBounceRateTask);
   });
 
   it('should return a ineffective feedback loop task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        newTaskEntryBackendDict('ineffective_feedback_loop'))
+        newTaskEntryBackendDict(
+          'ineffective_feedback_loop') as ExplorationTaskBackendDict)
     ).toBeInstanceOf(IneffectiveFeedbackLoopTask);
   });
 
   it('should return a needs guiding responses task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        newTaskEntryBackendDict('needs_guiding_responses'))
+        newTaskEntryBackendDict(
+          'needs_guiding_responses') as ExplorationTaskBackendDict)
     ).toBeInstanceOf(NeedsGuidingResponsesTask);
   });
 
   it('should return a successive incorrect answers task', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
-        newTaskEntryBackendDict('successive_incorrect_answers'))
+        newTaskEntryBackendDict(
+          'successive_incorrect_answers') as ExplorationTaskBackendDict)
     ).toBeInstanceOf(SuccessiveIncorrectAnswersTask);
   });
 
@@ -100,7 +102,8 @@ describe('Exploration task model', () => {
   it('should throw an error if task type is unknown', () => {
     expect(
       () => ExplorationTaskModel.createFromBackendDict(
-        newTaskEntryBackendDict('unknown_task_type'))
+        newTaskEntryBackendDict(
+          'unknown_task_type') as ExplorationTaskBackendDict)
     ).toThrowError(new RegExp(
       'Unsupported task type "unknown_task_type" for backend dict: ' +
       '{.*"task_type":"unknown_task_type".*}'));

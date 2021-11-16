@@ -21,16 +21,16 @@ require(
   'skill-description-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'skill-concept-card-editor.directive.ts');
+  'skill-concept-card-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'skill-misconceptions-editor.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-prerequisite-skills-editor/' +
-  'skill-prerequisite-skills-editor.directive.ts');
+  'skill-prerequisite-skills-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
-  'skill-rubrics-editor.directive.ts');
+  'skill-rubrics-editor.component.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
@@ -115,7 +115,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $scope.assignedSkillTopicData = null;
             $scope.topicName = null;
             $scope.subtopicName = null;
-            PageTitleService.setPageTitleForMobileView('Skill Editor');
+            PageTitleService.setNavbarTitleForMobileView('Skill Editor');
             // To ensure that the focus event function executes only after
             // all the functions in the main thread have executed,
             // $timeout is required.

@@ -14,10 +14,10 @@
 
 """Tests for the topic viewer page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -26,8 +26,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
@@ -37,27 +35,25 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         super(BaseTopicViewerControllerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.topic_id = 'topic'
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
-        self.topic_id_1 = 'topic1'
-        self.topic_id_2 = 'topic2'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', 'description', self.topic_id_1,
+            self.story_id_1, 'story_title', 'description', self.topic_id,
             'story-frag-one')
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', 'description', self.topic_id_2,
+            self.story_id_2, 'story_title', 'description', self.topic_id,
             'story-frag-two')
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
@@ -86,15 +82,6 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_1)
         story_services.save_new_story(self.admin_id, self.story_2)
 
-        self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name',
-            'private_topic_name', 'description')
-        self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
-        self.topic.url_fragment = 'private'
-        topic_services.save_new_topic(self.admin_id, self.topic)
-
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id_1, self.admin_id)
@@ -117,10 +104,19 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
         self.get_html_response('/learn/staging/%s' % 'public')
 
     def test_accessibility_of_unpublished_topic_viewer_page(self):
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'private_topic_name',
+            'private_topic_name', 'description')
+        topic.thumbnail_filename = 'Image.svg'
+        topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic.url_fragment = 'private'
+        topic_services.save_new_topic(self.admin_id, topic)
+
         self.get_html_response(
             '/learn/staging/%s' % 'private',
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response('/learn/staging/%s' % 'private')
         self.logout()
 
@@ -195,9 +191,7 @@ class TopicPageDataHandlerTests(
                 ' present in topic with id %s' % (
                     self.skill_id_1, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'topic_id': self.topic_id,
@@ -320,7 +314,7 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
-        for index in python_utils.RANGE(number_of_questions):
+        for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -371,7 +365,7 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
-        for index in python_utils.RANGE(number_of_questions):
+        for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -405,11 +399,11 @@ class TopicPageDataHandlerTests(
         number_of_questions = [1, 2, 2]
         self.topic_id = 'new_topic'
         skill_ids = (
-            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+            [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
-        for index in python_utils.RANGE(number_of_skills):
+        for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -423,12 +417,12 @@ class TopicPageDataHandlerTests(
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        for i in python_utils.RANGE(number_of_skills):
+        for i in range(number_of_skills):
             self.save_new_skill(
                 skill_ids[i], self.admin_id,
                 description='Skill Description')
-        for i in python_utils.RANGE(number_of_skills):
-            for j in python_utils.RANGE(number_of_questions[i]):
+        for i in range(number_of_skills):
+            for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
@@ -454,11 +448,11 @@ class TopicPageDataHandlerTests(
         number_of_questions[46] = 2
         self.topic_id = 'new_topic'
         skill_ids = (
-            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+            [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
-        for index in python_utils.RANGE(number_of_skills):
+        for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -472,12 +466,12 @@ class TopicPageDataHandlerTests(
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        for i in python_utils.RANGE(number_of_skills):
+        for i in range(number_of_skills):
             self.save_new_skill(
                 skill_ids[i], self.admin_id,
                 description='Skill Description')
-        for i in python_utils.RANGE(number_of_skills):
-            for j in python_utils.RANGE(number_of_questions[i]):
+        for i in range(number_of_skills):
+            for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
@@ -505,11 +499,11 @@ class TopicPageDataHandlerTests(
         number_of_questions[29] = 10
         self.topic_id = 'new_topic'
         skill_ids = (
-            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+            [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
-        for index in python_utils.RANGE(number_of_skills):
+        for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -523,12 +517,12 @@ class TopicPageDataHandlerTests(
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        for i in python_utils.RANGE(number_of_skills):
+        for i in range(number_of_skills):
             self.save_new_skill(
                 skill_ids[i], self.admin_id,
                 description='Skill Description')
-        for i in python_utils.RANGE(number_of_skills):
-            for j in python_utils.RANGE(number_of_questions[i]):
+        for i in range(number_of_skills):
+            for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,

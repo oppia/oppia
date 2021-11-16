@@ -16,14 +16,13 @@
 
 """Tests for core.domain.auth_domain"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import utils
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))

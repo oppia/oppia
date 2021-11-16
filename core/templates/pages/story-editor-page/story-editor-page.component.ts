@@ -93,10 +93,10 @@ angular.module('oppia').component('storyEditorPage', {
             ), '_self');
         }
       };
-      var setPageTitle = function() {
-        PageTitleService.setPageTitle(
+      var setDocumentTitle = function() {
+        PageTitleService.setDocumentTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
-        PageTitleService.setPageSubtitleForMobileView(
+        PageTitleService.setNavbarSubtitleForMobileView(
           StoryEditorStateService.getStory().getTitle());
       };
 
@@ -189,7 +189,7 @@ angular.module('oppia').component('storyEditorPage', {
 
       var _initPage = function() {
         ctrl.story = StoryEditorStateService.getStory();
-        setPageTitle();
+        setDocumentTitle();
         _validateStory();
       };
 
@@ -225,7 +225,7 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         ctrl.story = StoryEditorStateService.getStory();
 
-        PageTitleService.setPageTitleForMobileView('Story Editor');
+        PageTitleService.setNavbarTitleForMobileView('Story Editor');
 
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();
@@ -234,7 +234,7 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
         ctrl.directiveSubscriptions.add(
-          UndoRedoService.onUndoRedoChangeApplied$().subscribe(
+          UndoRedoService.getUndoRedoChangeEventEmitter().subscribe(
             () => _initPage()
           )
         );

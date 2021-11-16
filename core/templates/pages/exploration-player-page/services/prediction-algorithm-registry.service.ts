@@ -21,9 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface PredictionService {
-  predict(classifierData, answer): number;
+  predict: (classifierData: ArrayBuffer, answer: InteractionAnswer) => number;
 }
 
 type AlgorithmIdPredictionServiceMap = (
@@ -43,12 +44,15 @@ export class PredictionAlgorithmRegistryService {
   }
 
   getPredictionService(
-      algorithmId: string, dataSchemaVersion: number): PredictionService {
-    if (this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
+      algorithmId: string, dataSchemaVersion: number):
+     PredictionService | null {
+    const predictionServicesByAlgorithmId = (
+      this.algorithmIdPredictionServiceMapping.get(algorithmId));
+    if (predictionServicesByAlgorithmId) {
       const predictionServicesByDataSchemaVersion = (
-        this.algorithmIdPredictionServiceMapping.get(algorithmId));
-      if (predictionServicesByDataSchemaVersion.has(dataSchemaVersion)) {
-        return predictionServicesByDataSchemaVersion.get(dataSchemaVersion);
+        predictionServicesByAlgorithmId).get(dataSchemaVersion);
+      if (predictionServicesByDataSchemaVersion) {
+        return predictionServicesByDataSchemaVersion;
       }
     }
     return null;
@@ -57,11 +61,12 @@ export class PredictionAlgorithmRegistryService {
   testOnlySetPredictionService(
       algorithmId: string, dataSchemaVersion: number,
       service: PredictionService): void {
-    if (!this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
+    if (!this.algorithmIdPredictionServiceMapping.get(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }
-    this.algorithmIdPredictionServiceMapping.get(algorithmId)
-      .set(dataSchemaVersion, service);
+    let _algorithmId = (
+      this.algorithmIdPredictionServiceMapping.get(algorithmId));
+    _algorithmId?.set(dataSchemaVersion, service);
   }
 }
 

@@ -20,7 +20,7 @@ import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
 
 describe('Review test engine service', () => {
-  let rtes: ReviewTestEngineService = null;
+  let rtes: ReviewTestEngineService;
 
   beforeEach(() => {
     rtes = new ReviewTestEngineService;

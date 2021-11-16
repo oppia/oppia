@@ -14,12 +14,13 @@
 
 """Tests for the topic editor page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_fetchers
@@ -29,8 +30,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
@@ -40,16 +39,15 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         super(BaseTopicEditorControllerTests, self).setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
@@ -82,7 +80,8 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
@@ -106,7 +105,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
     def test_handler_updates_story_summary_dicts(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_id = story_services.get_new_story_id()
@@ -177,7 +176,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.logout()
 
     def test_story_creation(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
             'title': 'Story title',
@@ -189,7 +188,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -204,7 +204,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.logout()
 
     def test_story_creation_fails_with_invalid_image(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
             'title': 'Story title',
@@ -216,7 +216,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -229,7 +230,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
     def test_story_creation_fails_with_duplicate_story_url_fragment(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
             'title': 'Story title',
@@ -250,7 +251,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -267,7 +269,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
     def test_get_can_not_access_handler_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.get_json(
             '%s/%s/%s' % (
@@ -312,10 +314,6 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         }, json_response['subtopic_page']['page_contents'])
         self.logout()
 
-        topic_services.assign_role(
-            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-            self.topic_id)
-
         # Check that topic managers can access the subtopic page.
         self.login(self.TOPIC_MANAGER_EMAIL)
         json_response = self.get_json(
@@ -341,7 +339,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
         # Check that admins can access the editable subtopic data.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         json_response = self.get_json(
             '%s/%s/%s' % (
                 feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
@@ -369,7 +367,7 @@ class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.get_html_response(
             '%s/%s' % (
@@ -401,7 +399,7 @@ class TopicEditorTests(
         self.logout()
 
         # Check that admins can access the editor page.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
         self.logout()
@@ -423,7 +421,7 @@ class TopicEditorTests(
         self.logout()
 
         # Check that admins can access the editable topic data.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -451,15 +449,13 @@ class TopicEditorTests(
                 ' present in topic with id %s' % (
                     self.skill_id_2, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
 
         self.logout()
 
         # Check that editable topic handler is accessed only when a topic id
         # passed has an associated topic.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.get_json(
             '%s/%s' % (
@@ -479,7 +475,7 @@ class TopicEditorTests(
                 'new_value': 0
             }]
         }
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
@@ -502,7 +498,7 @@ class TopicEditorTests(
                 'new_value': 0
             }]
         }
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
@@ -585,7 +581,7 @@ class TopicEditorTests(
                 'subtopic_id': 2
             }]
         }
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
@@ -611,9 +607,7 @@ class TopicEditorTests(
                 ' present in topic with id %s' % (
                     self.skill_id_2, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
 
         # Test if the corresponding subtopic pages were created.
         json_response = self.get_json(
@@ -680,7 +674,7 @@ class TopicEditorTests(
             change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
         # Check that topic can not be edited when version is None.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -695,7 +689,7 @@ class TopicEditorTests(
 
         # Check topic can not be edited when payload version differs from
         # topic version.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -791,10 +785,6 @@ class TopicEditorTests(
                 'subtopic_id': 2
             }]
         }
-        # Assign the topic manager to the topic.
-        topic_services.assign_role(
-            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-            self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -819,7 +809,7 @@ class TopicEditorTests(
 
     def test_cannot_delete_invalid_topic(self):
         # Check that an invalid topic can not be deleted.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
@@ -828,7 +818,7 @@ class TopicEditorTests(
 
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
@@ -845,7 +835,7 @@ class TopicEditorTests(
 
         # Check that topic can not be deleted when the topic id passed does
         # not have a topic associated with it.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.delete_json(
             '%s/%s' % (
@@ -859,7 +849,7 @@ class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     def test_send_mail(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.put_json(
@@ -873,16 +863,14 @@ class TopicPublishSendMailHandlerTests(
             ' and publish if it looks good.'
             % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
         self.assertEqual(len(messages), 1)
-        self.assertIn(
-            expected_email_html_body,
-            messages[0].html.decode())
+        self.assertIn(expected_email_html_body, messages[0].html)
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get_topic_rights(self):
         """Test the get topic rights functionality."""
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Test whether admin can access topic rights.
         json_response = self.get_json(
             '%s/%s' % (
@@ -901,7 +889,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
     def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
             self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         json_response = self.get_json(
             '%s/%s' % (
@@ -917,7 +905,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get_can_not_access_handler_with_invalid_publish_status(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -933,7 +921,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
@@ -962,7 +950,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         self.logout()
 
     def test_get_can_not_access_handler_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
 
@@ -974,7 +962,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=404)
 
     def test_cannot_publish_a_published_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s/%s' % (
@@ -991,7 +979,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(response['error'], 'The topic is already published.')
 
     def test_cannot_unpublish_an_unpublished_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
@@ -1008,7 +996,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicUrlFragmentHandler."""
 
     def test_topic_url_fragment_handler_when_unique(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_url_fragment = 'fragment'
 
@@ -1041,7 +1029,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         self.logout()
 
     def test_topic_url_fragment_handler_when_duplicate(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_url_fragment = 'fragment'
 
@@ -1076,7 +1064,7 @@ class TopicNameHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicNameHandler."""
 
     def test_topic_name_handler_when_unique(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_name = 'Topic Name'
 
@@ -1104,7 +1092,7 @@ class TopicNameHandlerTest(BaseTopicEditorControllerTests):
         self.logout()
 
     def test_topic_name_handler_when_duplicate(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_name = 'Topic Name'
 

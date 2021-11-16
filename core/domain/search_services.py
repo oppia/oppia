@@ -16,8 +16,7 @@
 
 """Commands for operating on the search status of activities."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -84,8 +83,10 @@ def _should_index_exploration(exp_summary):
         bool. Whether the given exploration should be indexed for future
         search queries.
     """
-    rights = rights_manager.get_exploration_rights(exp_summary.id)
-    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    return (
+        not exp_summary.deleted and
+        exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    )
 
 
 def get_search_rank_from_exp_summary(exp_summary):
@@ -106,10 +107,11 @@ def get_search_rank_from_exp_summary(exp_summary):
 
     rank = _DEFAULT_RANK
     if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
+        for rating_value in exp_summary.ratings.keys():
             rank += (
                 exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
+                rating_weightings[rating_value]
+            )
 
     # Ranks must be non-negative.
     return max(rank, 0)

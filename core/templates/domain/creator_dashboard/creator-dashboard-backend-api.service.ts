@@ -74,7 +74,8 @@ interface CreatorDashboardDataBackendDict {
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  lastWeekStats: CreatorDashboardStats;
+  // 'lastWeekStats' is null for a new creator.
+  lastWeekStats: CreatorDashboardStats | null;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
@@ -173,7 +174,7 @@ export class CreatorDashboardBackendApiService {
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
               topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
-                topicSummaryDict))) : null)
+                topicSummaryDict))) : [])
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
@@ -182,6 +183,12 @@ export class CreatorDashboardBackendApiService {
 
   async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardDataAsync();
+  }
+
+  async postExplorationViewAsync(newViewType: string): Promise<void> {
+    return this.http.post<void>('/creatordashboardhandler/data', {
+      display_preference: newViewType
+    }).toPromise();
   }
 }
 

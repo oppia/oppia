@@ -14,12 +14,10 @@
 
 """Unit tests for scripts/check_if_pr_is_low_risk.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
-
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 

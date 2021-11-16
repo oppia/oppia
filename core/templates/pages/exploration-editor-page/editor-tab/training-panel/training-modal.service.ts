@@ -50,10 +50,8 @@ require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
   '$uibModal', 'AlertsService', 'ExternalSaveService',
-  'UrlInterpolationService',
   function(
-      $uibModal, AlertsService, ExternalSaveService,
-      UrlInterpolationService) {
+      $uibModal, AlertsService, ExternalSaveService) {
     return {
       /**
       * Opens unresolved answer trainer modal for given answer.
@@ -65,8 +63,8 @@ angular.module('oppia').factory('TrainingModalService', [
           unhandledAnswer, finishTrainingCallback) {
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/training-unresolved-answer-modal.template.html'),
           backdrop: 'static',
           resolve: {

@@ -26,6 +26,10 @@ var TopicViewerPage = function() {
     element.all(by.css('.protractor-test-story-summary-title'));
   var startPracticeButton =
     element(by.css('.protractor-test-practice-start-button'));
+  var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
+  var practiceTabLink = element(by.css('.protractor-test-practice-tab-link'));
+  var messageOnCompletion = element(
+    by.css('.protractor-test-practice-complete-message'));
 
   this.get = async function(classroomUrlFragment, topicName) {
     await browser.get(`/learn/${classroomUrlFragment}`);
@@ -58,12 +62,10 @@ var TopicViewerPage = function() {
   };
 
   this.moveToRevisionTab = async function() {
-    var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
     await action.click('Revision Tab', revisionTabLink);
   };
 
   this.moveToPracticeTab = async function() {
-    var practiceTabLink = element(by.css('.protractor-test-practice-tab-link'));
     await action.click('Practice Tab', practiceTabLink);
   };
 
@@ -79,8 +81,6 @@ var TopicViewerPage = function() {
   };
 
   this.expectMessageAfterCompletion = async function(message) {
-    var messageOnCompletion = element(
-      by.css('.protractor-test-practice-complete-message'));
     await waitFor.visibilityOf(
       messageOnCompletion, 'Completion message takes too long to be visible.');
     var text = await messageOnCompletion.getText();

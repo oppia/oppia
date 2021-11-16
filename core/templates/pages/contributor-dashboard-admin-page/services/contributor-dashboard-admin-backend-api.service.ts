@@ -35,6 +35,23 @@ export interface ContributionRightsBackendResponse {
   'can_submit_questions': boolean
 }
 
+export interface TranslationContributionStatsBackendResponse {
+  'translation_contribution_stats': TranslationContributionStats[];
+}
+
+interface TranslationContributionStats {
+  'language': string,
+  'topic_name': string,
+  'submitted_translations_count': number,
+  'submitted_translation_word_count': number,
+  'accepted_translations_count': number,
+  'accepted_translations_without_reviewer_edits_count': number,
+  'accepted_translation_word_count': number,
+  'rejected_translations_count': number,
+  'rejected_translation_word_count': number,
+  'contribution_months': string[]
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,7 +66,7 @@ export class ContributorDashboardAdminBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         this.urlInterpolationService.interpolateUrl(
-          PageConstants.ADD_CONTRIBUTION_RIGHTS_HANDLER_URL, { category }), {
+          PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category }), {
           username: username,
           language_code: languageCode
         }
@@ -88,7 +105,7 @@ export class ContributorDashboardAdminBackendApiService {
       username: string): Promise<ContributionRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<ContributionRightsBackendResponse>(
-        PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, {
+        PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL, {
           params: {
             username: username
           }
@@ -104,12 +121,32 @@ export class ContributorDashboardAdminBackendApiService {
   async removeContributionReviewerAsync(
       username: string, category: string, languageCode: string): Promise<void> {
     var url = this.urlInterpolationService.interpolateUrl(
-      PageConstants.REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
+      PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
+    var params = {
+      username: username,
+      language_code: languageCode
+    };
     return new Promise((resolve, reject) => {
-      this.http.put<void>(url, {
-        username: username,
-        language_code: languageCode
+      this.http.delete<void>(url, {
+        params
       }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async viewTranslationContributionStatsAsync(
+      username: string): Promise<TranslationContributionStatsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<TranslationContributionStatsBackendResponse>(
+        PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL, {
+          params: {
+            username: username
+          }
+        }
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {

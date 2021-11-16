@@ -16,12 +16,13 @@
 subclasses for each type of suggestion.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import copy
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -35,14 +36,11 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(python_utils.OBJECT):
+class BaseSuggestion:
     """Base class for a suggestion.
 
     Attributes:
@@ -168,7 +166,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -183,7 +181,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -195,7 +193,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'received %s' % self.author_id)
 
         if self.final_reviewer_id is not None:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
@@ -208,7 +206,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be in a valid user ID '
                     'format, received %s' % self.final_reviewer_id)
 
-        if not isinstance(self.score_category, python_utils.BASESTRING):
+        if not isinstance(self.score_category, str):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))
@@ -638,12 +636,6 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change.state_name not in exploration.states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
-        content_html = exploration.get_content_html(
-            self.change.state_name, self.change.content_id)
-        if content_html != self.change.content_html:
-            raise utils.ValidationError(
-                'The Exploration content has changed since this translation '
-                'was submitted.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -651,6 +643,19 @@ class SuggestionTranslateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
+        # If the translation is for a set of strings, we don't want to process
+        # the HTML strings for images.
+        if (
+                hasattr(self.change, 'data_format') and (
+                    self.change.data_format == 'set_of_normalized_string' or
+                    self.change.data_format == 'set_of_unicode_string'
+                )
+        ):
+            exp_services.update_exploration(
+                self.final_reviewer_id, self.target_id, [self.change],
+                commit_message, is_suggestion=True)
+            return
+
         self._copy_new_images_to_target_entity_storage()
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
@@ -662,7 +667,16 @@ class SuggestionTranslateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        return [self.change.translation_html, self.change.content_html]
+        content_strings = []
+        if isinstance(self.change.translation_html, list):
+            content_strings.extend(self.change.translation_html)
+        else:
+            content_strings.append(self.change.translation_html)
+        if isinstance(self.change.content_html, list):
+            content_strings.extend(self.change.content_html)
+        else:
+            content_strings.append(self.change.content_html)
+        return content_strings
 
     def get_target_entity_html_strings(self):
         """Gets all html content strings from target entity used in the
@@ -965,12 +979,12 @@ class SuggestionAddQuestion(BaseSuggestion):
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 43)
+                        'question_state_data_schema_version'] < 45)
             )
         )
 
 
-class BaseVoiceoverApplication(python_utils.OBJECT):
+class BaseVoiceoverApplication:
     """Base class for a voiceover application."""
 
     def __init__(self):
@@ -1028,7 +1042,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -1038,7 +1052,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -1048,13 +1062,12 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                     'Expected final_reviewer_id to be None as the '
                     'voiceover application is not yet handled.')
         else:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' % (
                         type(self.final_reviewer_id)))
             if self.status == suggestion_models.STATUS_REJECTED:
-                if not isinstance(
-                        self.rejection_message, python_utils.BASESTRING):
+                if not isinstance(self.rejection_message, str):
                     raise utils.ValidationError(
                         'Expected rejection_message to be a string for a '
                         'rejected application, received %s' % type(
@@ -1066,7 +1079,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                         'accepted voiceover application, received %s' % (
                             self.rejection_message))
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -1074,12 +1087,12 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.filename, python_utils.BASESTRING):
+        if not isinstance(self.filename, str):
             raise utils.ValidationError(
                 'Expected filename to be a string, received %s' % type(
                     self.filename))
 
-        if not isinstance(self.content, python_utils.BASESTRING):
+        if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected content to be a string, received %s' % type(
                     self.content))
@@ -1183,7 +1196,7 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
 }
 
 
-class CommunityContributionStats(python_utils.OBJECT):
+class CommunityContributionStats:
     """Domain object for the CommunityContributionStatsModel.
 
     Attributes:
@@ -1384,7 +1397,81 @@ class CommunityContributionStats(python_utils.OBJECT):
                     self.question_reviewer_count)))
 
 
-class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
+class TranslationContributionStats:
+    """Domain object for the TranslationContributionStatsModel."""
+
+    def __init__(
+            self, language_code, contributor_user_id, topic_id,
+            submitted_translations_count, submitted_translation_word_count,
+            accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count,
+            accepted_translation_word_count, rejected_translations_count,
+            rejected_translation_word_count, contribution_dates):
+        self.language_code = language_code
+        self.contributor_user_id = contributor_user_id
+        self.topic_id = topic_id
+        self.submitted_translations_count = submitted_translations_count
+        self.submitted_translation_word_count = submitted_translation_word_count
+        self.accepted_translations_count = accepted_translations_count
+        self.accepted_translations_without_reviewer_edits_count = (
+            accepted_translations_without_reviewer_edits_count
+        )
+        self.accepted_translation_word_count = accepted_translation_word_count
+        self.rejected_translations_count = rejected_translations_count
+        self.rejected_translation_word_count = rejected_translation_word_count
+        self.contribution_dates = contribution_dates
+
+    @classmethod
+    def create_default(
+        cls, language_code=None, contributor_user_id=None, topic_id=None
+    ) -> TranslationContributionStats:
+        """Create default translation contribution stats.
+
+        Args:
+            language_code: str. The language code for which are these stats
+                generated.
+            contributor_user_id: str. User ID of the contributor to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the translations created.
+
+        Returns:
+            TranslationContributionStats. Default translation contribution
+            stats.
+        """
+        return cls(
+            language_code, contributor_user_id, topic_id,
+            0, 0, 0, 0, 0, 0, 0, set()
+        )
+
+    def to_dict(self):
+        """Returns a dict representation of a TranslationContributionStats
+        domain object.
+
+        Returns:
+            dict. A dict representation of a TranslationContributionStats
+            domain object.
+        """
+        return {
+            'language_code': self.language_code,
+            'contributor_user_id': self.contributor_user_id,
+            'topic_id': self.topic_id,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'contribution_dates': self.contribution_dates
+        }
+
+
+class ReviewableSuggestionEmailInfo:
     """Stores key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.

@@ -29,13 +29,13 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Exploration Html Formatter Service', () => {
-  let ehfs: ExplorationHtmlFormatterService = null;
+  let ehfs: ExplorationHtmlFormatterService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    ehfs = TestBed.get(ExplorationHtmlFormatterService);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
   });
 
   it('should correctly set interaction HTML for a non migrated interaction ' +
@@ -50,7 +50,7 @@ describe('Exploration Html Formatter Service', () => {
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
       '</oppia-interactive-non-migrated-interaction>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
       .toBe(expectedHtmlTag);
   });
 
@@ -66,7 +66,7 @@ describe('Exploration Html Formatter Service', () => {
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
       .toBe(expectedHtmlTag);
   });
 
@@ -83,7 +83,7 @@ describe('Exploration Html Formatter Service', () => {
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
     expect(ehfs.getInteractionHtml(
-      interactionId, custArgs, true, null, null))
+      interactionId, custArgs, true, '', null))
       .toBe(expectedHtmlTag);
   });
 

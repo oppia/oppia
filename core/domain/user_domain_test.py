@@ -16,19 +16,18 @@
 
 """Tests for user domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import auth_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 user_models, = models.Registry.import_models([models.NAMES.user])
 
@@ -99,7 +98,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
-        self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(self.owner.roles, [feconf.ROLE_ID_FULL_USER])
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -149,6 +148,52 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_invalid_banned_value_type_raises_exception(self):
+        self.user_settings.banned = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected banned to be a bool'):
+            self.user_settings.validate()
+
+        self.user_settings.banned = '123'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected banned to be a bool'):
+            self.user_settings.validate()
+
+    def test_validate_invalid_roles_value_type_raises_exception(self):
+        self.user_settings.roles = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected roles to be a list'):
+            self.user_settings.validate()
+
+        self.user_settings.roles = True
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected roles to be a list'):
+            self.user_settings.validate()
+
+    def test_validate_banned_user_with_roles_raises_exception(self):
+        self.user_settings.roles = ['FULL_USER']
+        self.user_settings.banned = True
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected roles for banned user to be empty'):
+            self.user_settings.validate()
+
+    def test_validate_roles_with_duplicate_value_raise_exception(self):
+        self.user_settings.roles = ['FULL_USER', 'FULL_USER', 'TOPIC_MANAGER']
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Roles contains duplicate values:'):
+            self.user_settings.validate()
+
+    def test_validate_roles_without_any_default_role_raise_exception(self):
+        self.user_settings.roles = ['TOPIC_MANAGER']
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected roles to contains one default role.'):
+            self.user_settings.validate()
+
     def test_validate_non_str_pin_id(self):
         self.user_settings.pin = 0
         with self.assertRaisesRegexp(
@@ -193,14 +238,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_non_str_role_raises_exception(self):
-        self.user_settings.role = 0
+        self.user_settings.roles = [0]
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected role to be a string'
+            utils.ValidationError, 'Expected roles to be a string'
         ):
             self.user_settings.validate()
 
     def test_validate_invalid_role_name_raises_exception(self):
-        self.user_settings.role = 'invalid_role'
+        self.user_settings.roles = ['invalid_role']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
@@ -266,11 +311,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             user_services.set_username(self.owner_id, self.OWNER_USERNAME)
 
-    def test_cannot_update_user_role_with_invalid_role(self):
+    def test_cannot_add_user_role_with_invalid_role(self):
         with self.assertRaisesRegexp(
             Exception, 'Role invalid_role does not exist.'
         ):
-            user_services.update_user_role(self.owner_id, 'invalid_role')
+            user_services.add_user_role(self.owner_id, 'invalid_role')
 
     def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(self):
         observed_log_messages = []
@@ -290,7 +335,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'User id invalid_user_id not known in list of user_ids '
-                '[u\'invalid_user_id\']'
+                '[\'invalid_user_id\']'
             ])
 
     def test_get_human_readable_user_ids(self):
@@ -1193,13 +1238,36 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': 'user_id',
         }
-        invalid_schema_versions = [
-            -1, 0, user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1,
-            '', 'abc', '-1', '1'
-        ]
+        current_version_plus_one = (
+            user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1)
+        invalid_schema_versions = (
+            -1, 0, current_version_plus_one
+        )
         for version in invalid_schema_versions:
-            error_msg = 'Invalid version %s received.' % version
             user_data_dict['schema_version'] = version
+            error_msg = 'Invalid version %s received.' % version
+            with self.assertRaisesRegexp(Exception, error_msg):
+                user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+
+    def test_from_raw_dict_with_invalid_schema_version_type_raises_error(self):
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        invalid_schema_versions = (
+            '', 'abc', '-1', '1', {}, [1], 1.0
+        )
+        for version in invalid_schema_versions:
+            user_data_dict['schema_version'] = version
+            error_msg = (
+                'Version has invalid type, expected int, '
+                'received %s' % type(version)
+            )
             with self.assertRaisesRegexp(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 

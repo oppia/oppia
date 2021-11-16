@@ -18,44 +18,44 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroupObjectFactory, AnswerGroupBackendDict } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { InteractionObjectFactory, Interaction } from
+import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { InteractionObjectFactory, Interaction, InteractionBackendDict } from
   'domain/exploration/InteractionObjectFactory';
-import { OutcomeObjectFactory } from
+import { OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { SolutionObjectFactory } from
+import { SolutionBackendDict, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('Interaction object factory', () => {
-  let iof = null;
-  let oof = null;
-  let agof = null;
-  let hof = null;
-  let sof = null;
-  let answerGroupsDict = null;
-  let defaultOutcomeDict = null;
-  let solutionDict = null;
-  let hintsDict = null;
-  let interactionDict = null;
+  let iof: InteractionObjectFactory;
+  let oof: OutcomeObjectFactory;
+  let agof: AnswerGroupObjectFactory;
+  let hof: HintObjectFactory;
+  let sof: SolutionObjectFactory;
+  let answerGroupsDict: AnswerGroupBackendDict[];
+  let defaultOutcomeDict: OutcomeBackendDict;
+  let solutionDict: SolutionBackendDict;
+  let hintsDict: HintBackendDict[];
+  let interactionDict: InteractionBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    iof = TestBed.get(InteractionObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    hof = TestBed.get(HintObjectFactory);
-    sof = TestBed.get(SolutionObjectFactory);
+    iof = TestBed.inject(InteractionObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    hof = TestBed.inject(HintObjectFactory);
+    sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
       feedback: {
@@ -355,14 +355,21 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        requireNonnegativeInput: {
+          value: true
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
-
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      requireNonnegativeInput: {
+        value: true
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +
@@ -370,14 +377,22 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        requireNonnegativeInput: {
+          value: false
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      requireNonnegativeInput: {
+        value: false
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +
@@ -456,7 +471,7 @@ describe('Interaction object factory', () => {
   it('should correctly set the new answer group', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
-    let newAnswerGroup = {
+    const newAnswerGroupBackendDict: AnswerGroupBackendDict = {
       rule_specs: [],
       outcome: {
         dest: 'dest_3',
@@ -488,7 +503,8 @@ describe('Interaction object factory', () => {
       training_data: ['training_data'],
       tagged_skill_misconception_id: 'skill_id-1'
     }, 'TextInput')]);
-    newAnswerGroup = agof.createFromBackendDict(newAnswerGroup, 'TextInput');
+    const newAnswerGroup = (
+      agof.createFromBackendDict(newAnswerGroupBackendDict, 'TextInput'));
     testInteraction.setAnswerGroups([newAnswerGroup]);
     expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
   });
@@ -578,9 +594,11 @@ describe('Interaction object factory', () => {
       }
     };
     const newHint = hof.createFromBackendDict(newHintDict);
-    expect(testInteraction.hints).toEqual(hintsDict.map(function(hintDict) {
-      return hof.createFromBackendDict(hintDict);
-    }));
+    expect(testInteraction.hints).toEqual(hintsDict.map(
+      (hintDict: HintBackendDict) => {
+        return hof.createFromBackendDict(hintDict);
+      }
+    ));
     testInteraction.setHints([newHint]);
     expect(testInteraction.hints).toEqual([newHint]);
   });
@@ -656,7 +674,10 @@ describe('Interaction object factory', () => {
     const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    otherInteraction.customizationArgs.showChoicesInShuffledOrder.value = false;
+    const args = (
+      otherInteraction.customizationArgs
+    ) as MultipleChoiceInputCustomizationArgs;
+    args.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
@@ -689,7 +710,7 @@ describe('Interaction object factory', () => {
 
   it('should correctly convert an Interaction with MultipleChoice to a ' +
      'backend dict', () => {
-    let mcInteractionDict = {
+    const mcInteractionDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -775,14 +796,19 @@ describe('Interaction object factory', () => {
 
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
-    Object.keys(INTERACTION_SPECS).forEach(interactionId => {
+    const keys = Object.keys(
+      InteractionSpecsConstants.INTERACTION_SPECS
+    ) as InteractionSpecsKey[];
+    keys.forEach(interactionId => {
       expect(() => {
-        const defaultCa = {};
-        const caSpecs = INTERACTION_SPECS[
+        const defaultCa: Record<string, Object> = {};
+        const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
           interactionId].customization_arg_specs;
-        caSpecs.forEach(caSpec => {
-          defaultCa[caSpec.name] = {value: caSpec.default_value};
-        });
+        caSpecs.forEach(
+          (caSpec: { name: string; 'default_value': Object; }) => {
+            defaultCa[caSpec.name] = {value: caSpec.default_value};
+          }
+        );
 
         iof.createFromBackendDict({
           answer_groups: answerGroupsDict,

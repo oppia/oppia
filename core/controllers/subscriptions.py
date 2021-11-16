@@ -14,9 +14,9 @@
 
 """Controllers related to user subscriptions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import subscription_services
@@ -26,10 +26,25 @@ from core.domain import user_services
 class SubscribeHandler(base.BaseHandler):
     """Handles operations relating to new subscriptions."""
 
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'creator_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_subscribe_to_users
     def post(self):
         creator_id = user_services.get_user_id_from_username(
-            self.payload.get('creator_username'))
+            self.normalized_payload.get('creator_username'))
         subscription_services.subscribe_to_creator(self.user_id, creator_id)
         self.render_json(self.values)
 
@@ -37,10 +52,25 @@ class SubscribeHandler(base.BaseHandler):
 class UnsubscribeHandler(base.BaseHandler):
     """Handles operations related to unsubscriptions."""
 
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'creator_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_subscribe_to_users
     def post(self):
         creator_id = user_services.get_user_id_from_username(
-            self.payload.get('creator_username'))
+            self.normalized_payload.get('creator_username'))
         subscription_services.unsubscribe_from_creator(
             self.user_id, creator_id)
         self.render_json(self.values)

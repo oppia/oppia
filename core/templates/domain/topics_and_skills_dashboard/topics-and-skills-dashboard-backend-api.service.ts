@@ -61,6 +61,11 @@ export interface CategorizedSkills {
   };
 }
 
+interface SubtopicSkills {
+  [subtopicName: string]: ShortSkillSummary[];
+  uncategorized: ShortSkillSummary[];
+}
+
 export interface TopicsAndSkillsDashboardDataBackendDict {
   'all_classroom_names': string[];
   'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
@@ -118,10 +123,12 @@ export class TopicsAndSkillsDashboardBackendApiService {
   async fetchDashboardDataAsync(): Promise<TopicsAndSkillDashboardData> {
     return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise().then(response => {
-      let categorizedSkills = {};
+      let categorizedSkills: CategorizedSkills = {};
       for (let topic in response.categorized_skills_dict) {
         let subtopicSkillsDict = response.categorized_skills_dict[topic];
-        let subtopicSkills = {};
+        let subtopicSkills: SubtopicSkills = {
+          uncategorized: []
+        };
         for (let subtopic in subtopicSkillsDict) {
           subtopicSkills[subtopic] = (
             subtopicSkillsDict[subtopic].map(

@@ -14,24 +14,21 @@
 
 """Unit tests for scripts/install_chrome_for_ci.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import subprocess
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
-
 from scripts import install_chrome_for_ci
-
 
 URL = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
-    'google-chrome-stable_88.0.4324.96-1_amd64.deb'
+    'google-chrome-stable_89.0.4389.90-1_amd64.deb'
 )
-DOWNLOAD_VERSION = '88.0.4324.96-1'
-INSTALLED_VERSION = '88.0.4324.96'
+DOWNLOAD_VERSION = '89.0.4389.90-1'
+INSTALLED_VERSION = '89.0.4389.90'
 CHROME_DEB_FILE = 'google-chrome.deb'
 
 

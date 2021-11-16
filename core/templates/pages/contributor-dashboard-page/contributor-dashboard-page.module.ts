@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -30,6 +30,8 @@ import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-ed
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
+import { TranslationTopicSelectorComponent } from
+  './translation-topic-selector/translation-topic-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
 
@@ -40,19 +42,21 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TranslationModalComponent } from './modal-templates/translation-modal.component';
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
     NgbModalModule,
-    SharedFormsModule
+    SharedFormsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -60,10 +64,10 @@ import { TranslationOpportunitiesComponent } from './translation-opportunities/t
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
+    TranslationTopicSelectorComponent,
     TranslationModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -71,6 +75,7 @@ import { TranslationOpportunitiesComponent } from './translation-opportunities/t
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
+    TranslationTopicSelectorComponent,
     TranslationModalComponent
   ],
   providers: [
@@ -84,6 +89,10 @@ import { TranslationOpportunitiesComponent } from './translation-opportunities/t
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -95,6 +104,7 @@ class ContributorDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

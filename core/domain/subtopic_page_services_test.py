@@ -16,11 +16,11 @@
 
 """Tests for subtopic page domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import re
 
+from core import feconf
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -28,8 +28,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
 
 (base_models, subtopic_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.subtopic])
@@ -233,7 +231,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 
-    def test_migrate_page_contents_to_latest_schema(self):
+    def test_migrate_page_contents_from_v1_to_v2_schema(self):
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
         html_content = (
@@ -342,6 +340,231 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 subtopic_page_model)
 
         self.assertEqual(subtopic_page.page_contents_schema_version, 2)
+        self.assertEqual(
+            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
+
+    def test_migrate_page_contents_from_v2_to_v3_schema(self):
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 3)
+        html_content = (
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="&quot;img1.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-svgdiagram>'
+        )
+        expected_html_content = (
+            '<oppia-noninteractive-image alt-with-value=\'\"Image\"\''
+            ' caption-with-value="&amp;quot;&amp;quot;" '
+            'filepath-with-value=\'\"img1.svg\"\'>'
+            '</oppia-noninteractive-image>')
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_math = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': expected_html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False,
+                        'duration_secs': 7.213
+                    }
+                }
+            }
+        }
+        page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': html_content
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict
+        }
+        expected_page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': expected_html_content
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict_math
+        }
+
+        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
+        subtopic_page_model = subtopic_models.SubtopicPageModel(
+            id=subtopic_page_id,
+            topic_id=self.TOPIC_ID,
+            page_contents=page_contents_dict,
+            page_contents_schema_version=2,
+            language_code='en'
+        )
+        self.assertEqual(subtopic_page_model.page_contents_schema_version, 2)
+
+        with current_schema_version_swap:
+            subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
+                subtopic_page_model)
+
+        self.assertEqual(subtopic_page.page_contents_schema_version, 3)
+        self.assertEqual(
+            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
+
+    def test_migrate_page_contents_from_v3_to_v4_schema(self):
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 4)
+        expected_html_content = (
+            '<p>1 × 3 😕 😊</p>'
+        )
+        html_content = (
+            '<p>1 Ã— 3 ðŸ˜• ðŸ˜Š</p>'
+        )
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_math = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': expected_html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False,
+                        'duration_secs': 7.213
+                    }
+                }
+            }
+        }
+        page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': html_content
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict
+        }
+        expected_page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': expected_html_content
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict_math
+        }
+
+        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
+        subtopic_page_model = subtopic_models.SubtopicPageModel(
+            id=subtopic_page_id,
+            topic_id=self.TOPIC_ID,
+            page_contents=page_contents_dict,
+            page_contents_schema_version=3,
+            language_code='en'
+        )
+        self.assertEqual(subtopic_page_model.page_contents_schema_version, 3)
+
+        with current_schema_version_swap:
+            subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
+                subtopic_page_model)
+
+        self.assertEqual(subtopic_page.page_contents_schema_version, 4)
         self.assertEqual(
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 

@@ -47,8 +47,7 @@ $ export PORTSERVER_ADDRESS=portserver.sock
 $ # ... launch a bunch of tests that use portpicker ...
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import collections
@@ -58,7 +57,7 @@ import socket
 import sys
 import threading
 
-import python_utils
+from core import python_utils
 
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
@@ -174,7 +173,7 @@ def _should_allocate_port(pid):
     return True
 
 
-class _PortInfo(python_utils.OBJECT):
+class _PortInfo:
     """Container class for information about a given port assignment.
 
     Attributes:
@@ -192,7 +191,7 @@ class _PortInfo(python_utils.OBJECT):
         self.start_time = 0
 
 
-class _PortPool(python_utils.OBJECT):
+class _PortPool:
     """Manage available ports for processes.
 
     Ports are reclaimed when the reserving process exits and the reserved port
@@ -274,7 +273,7 @@ class _PortPool(python_utils.OBJECT):
         self._port_queue.append(port_info)
 
 
-class _PortServerRequestHandler(python_utils.OBJECT):
+class _PortServerRequestHandler:
     """A class to handle port allocation and status requests.
 
     Allocates ports to process ids via the dead simple port server protocol
@@ -379,16 +378,16 @@ def _parse_port_ranges(pool_str):
             a, b = range_str.split('-', 1)
             start, end = int(a), int(b)
         except ValueError:
-            logging.error('Ignoring unparsable port range %r.', range_str)
+            logging.info('Ignoring unparsable port range %r.', range_str)
             continue
         if start < 1 or end > 65535:
-            logging.error('Ignoring out of bounds port range %r.', range_str)
+            logging.info('Ignoring out of bounds port range %r.', range_str)
             continue
-        ports.update(set(python_utils.RANGE(start, end + 1)))
+        ports.update(set(range(start, end + 1)))
     return ports
 
 
-class Server(python_utils.OBJECT):
+class Server:
     """Manages the portserver server.
 
     Attributes:
@@ -478,8 +477,7 @@ class Server(python_utils.OBJECT):
             sock.bind(path)
         except socket.error as err:
             raise RuntimeError(
-                'Failed to bind socket {}. Error: {}'.format(
-                    path, err)
+                'Failed to bind socket {}. Error: {}'.format(path, err)
             )
         sock.listen(self.max_backlog)
         return sock
@@ -493,10 +491,13 @@ class Server(python_utils.OBJECT):
             is created.
         """
         if hasattr(socket, 'AF_UNIX'):
-            return socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         else:
             # Fallback to AF_INET if this is not unix.
-            return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Make the socket reusable.
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return sock
 
 
 def main():
@@ -516,9 +517,7 @@ def main():
         config.portserver_unix_socket_address.replace('@', '\0', 1),
     )
     logging.info(
-        'Serving portserver on %s',
-        config.portserver_unix_socket_address
-    )
+        'Serving portserver on %s' % config.portserver_unix_socket_address)
     try:
         server.run()
     except KeyboardInterrupt:
@@ -527,6 +526,7 @@ def main():
         server.close()
         request_handler.dump_stats()
         logging.info('Shutting down portserver.')
+        sys.exit(0)
 
 
 if __name__ == '__main__':

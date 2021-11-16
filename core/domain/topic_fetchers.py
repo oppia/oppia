@@ -16,19 +16,17 @@
 
 """Getter commands for for topic models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import copy
 
+from core import feconf
+from core import utils
 from core.domain import caching_services
 from core.domain import classroom_services
 from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (skill_models, topic_models,) = models.Registry.import_models([
     models.NAMES.skill, models.NAMES.topic])
@@ -176,7 +174,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_topic = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_TOPIC,
         sub_namespace,

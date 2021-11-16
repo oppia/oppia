@@ -14,14 +14,15 @@
 
 """Tests for the library page and associated handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import json
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services
@@ -34,8 +35,6 @@ from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import utils
 
 CAN_EDIT_STR = 'can_edit'
 
@@ -59,22 +58,19 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
     def test_library_page(self):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain('<library-page></library-page>')
+        response.mustcontain('<oppia-root></oppia-root>')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'is_admin': False,
-            'is_topic_manager': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'search_cursor': None
@@ -96,7 +92,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Change title and category.
         exp_services.update_exploration(
@@ -126,17 +122,15 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
     def test_library_handler_for_created_explorations(self):
         """Test the library data handler for manually created explorations."""
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertDictContainsSubset({
-            'is_admin': True,
-            'is_moderator': True,
             'is_super_admin': False,
             'activity_list': [],
-            'user_email': self.ADMIN_EMAIL,
-            'username': self.ADMIN_USERNAME,
+            'user_email': self.CURRICULUM_ADMIN_EMAIL,
+            'username': self.CURRICULUM_ADMIN_USERNAME,
             'search_cursor': None,
         }, response_dict)
 
@@ -202,9 +196,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_handler_with_exceeding_query_limit_logs_error(self):
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'is_admin': False,
-            'is_topic_manager': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'search_cursor': None
@@ -232,7 +223,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'You may be running up against the default query limits.')
 
     def test_library_handler_with_given_category_and_language_code(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -256,24 +247,50 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'category': 'missing-outer-parens',
             'language_code': '("en")'
         }, expected_status_int=400)
-        self.assertEqual(response_1['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'category\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object missing-outer-parens'
+        )
+        self.assertEqual(response_1['error'], error_msg)
+
         response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '(missing-inner-quotes)',
             'language_code': '("en")'
         }, expected_status_int=400)
-        self.assertEqual(response_2['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'category\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object (missing-inner-quotes)'
+        )
+        self.assertEqual(response_2['error'], error_msg)
 
     def test_library_handler_with_invalid_language_code(self):
         response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '("A category")',
             'language_code': 'missing-outer-parens'
         }, expected_status_int=400)
-        self.assertEqual(response_1['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object missing-outer-parens'
+        )
+        self.assertEqual(response_1['error'], error_msg)
+
         response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '("A category")',
             'language_code': '(missing-inner-quotes)'
         }, expected_status_int=400)
-        self.assertEqual(response_2['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object (missing-inner-quotes)'
+        )
+        self.assertEqual(response_2['error'], error_msg)
 
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
@@ -444,8 +461,6 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
         self.assertDictContainsSubset({
-            'is_admin': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'preferred_language_codes': ['en'],
@@ -481,8 +496,6 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
         self.assertDictContainsSubset({
-            'is_admin': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'preferred_language_codes': ['en'],

@@ -71,26 +71,7 @@ describe('Learner Local Nav Component ', () => {
     record_playthrough_probability: 1
   };
 
-  const userInfoForCollectionCreator = {
-    _isModerator: true,
-    _isAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: null,
-    _email: 'tester@example.org',
-    _isLoggedIn: false,
-    isModerator: () => true,
-    isAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => null,
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => false
-  } as UserInfo;
+  const userInfoForCollectionCreator = UserInfo.createDefault();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -163,10 +144,10 @@ describe('Learner Local Nav Component ', () => {
     'clicking on flag button', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: {},
           result: Promise.resolve()
-        });
+        }) as NgbModalRef;
     });
 
     component.showFlagExplorationModal();

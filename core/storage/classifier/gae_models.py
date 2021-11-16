@@ -14,21 +14,30 @@
 
 """Models for storing the classification data models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
+
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-
 datastore_services = models.Registry.import_datastore_services()
 
 NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
+
+TrainingDataUnionType = Union[
+    Dict[str, Union[int, List[str]]],
+    List[Dict[str, Union[int, List[str]]]]
+]
 
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
@@ -71,17 +80,18 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         required=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -97,7 +107,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(cls, exp_id):
+    def _generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the training job of the form
         '[exp_id].[random hash of 16 chars]'.
 
@@ -112,12 +122,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 producing too many collisions.
         """
 
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(
-                        utils.get_random_int(base_models.RAND_RANGE)),
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -128,9 +137,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, interaction_id, exp_id, exp_version,
-            next_scheduled_check_time, training_data, state_name, status,
-            algorithm_version):
+            cls,
+            algorithm_id: str,
+            interaction_id: str,
+            exp_id: str,
+            exp_version: int,
+            next_scheduled_check_time: datetime.datetime,
+            training_data: TrainingDataUnionType,
+            state_name: str,
+            status: str,
+            algorithm_version: int
+    ) -> str:
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -173,7 +190,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_new_and_pending_training_jobs(cls, offset):
+    def query_new_and_pending_training_jobs(
+            cls, offset: int
+    ) -> Tuple[Sequence[ClassifierTrainingJobModel], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -185,20 +204,30 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             A tuple containing the list of the ClassifierTrainingJobModels
             with status new or pending and the offset value.
         """
-        query = cls.query(cls.status.IN([
-            feconf.TRAINING_JOB_STATUS_NEW,
-            feconf.TRAINING_JOB_STATUS_PENDING])).filter(
-                cls.next_scheduled_check_time <= (
-                    datetime.datetime.utcnow())).order(
-                        cls.next_scheduled_check_time, cls._key)
+        query = (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.status.IN([
+                        feconf.TRAINING_JOB_STATUS_NEW,
+                        feconf.TRAINING_JOB_STATUS_PENDING
+                    ]),
+                    cls.next_scheduled_check_time <= datetime.datetime.utcnow()
+                )
+            )
+            .order(cls.next_scheduled_check_time)
+        )
 
-        job_models = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
-        offset = offset + len(job_models)
-        return job_models, offset
+        classifier_job_models: Sequence[ClassifierTrainingJobModel] = (
+            query.fetch(
+                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset))
+        offset = offset + len(classifier_job_models)
+        return classifier_job_models, offset
 
+    # TODO(#13523): Change 'job_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @classmethod
-    def create_multi(cls, job_dicts_list):
+    def create_multi(cls, job_dicts_list: List[Dict[str, Any]]) -> List[str]:
         """Creates multiple new  ClassifierTrainingJobModel entries.
 
         Args:
@@ -251,17 +280,18 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         required=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -271,7 +301,12 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(cls, exp_id, exp_version, state_name):
+    def _generate_id(
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str
+    ) -> str:
         """Generates a unique ID for the Classifier Exploration Mapping of the
         form [exp_id].[exp_version].[state_name].
 
@@ -285,11 +320,12 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         Returns:
             str. ID of the new Classifier Exploration Mapping instance.
         """
-        new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return python_utils.convert_to_bytes(new_id)
+        return '%s.%s.%s' % (exp_id, exp_version, state_name)
 
     @classmethod
-    def get_models(cls, exp_id, exp_version, state_names):
+    def get_models(
+        cls, exp_id: str, exp_version: int, state_names: List[str]
+    ) -> List[Optional[StateTrainingJobsMappingModel]]:
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
@@ -312,7 +348,9 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         return mapping_instances
 
     @classmethod
-    def get_model(cls, exp_id, exp_version, state_name):
+    def get_model(
+        cls, exp_id: str, exp_version: int, state_name: str
+    ) -> Optional[StateTrainingJobsMappingModel]:
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -334,7 +372,12 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, algorithm_ids_to_job_ids):
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            algorithm_ids_to_job_ids: Dict[str, str]
+    ) -> str:
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -367,7 +410,10 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         raise Exception('A model with the same ID already exists.')
 
     @classmethod
-    def create_multi(cls, state_training_jobs_mappings):
+    def create_multi(
+            cls,
+            state_training_jobs_mappings: List[StateTrainingJobsMappingModel]
+    ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 
         Args:

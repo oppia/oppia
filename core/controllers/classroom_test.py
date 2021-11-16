@@ -14,16 +14,15 @@
 
 """Tests for the classroom page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
@@ -47,17 +46,17 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         response = self.get_html_response('/learn/math')
-        self.assertIn('<oppia-classroom-page></oppia-classroom-page>', response)
+        self.assertIn('<oppia-root></oppia-root>', response)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(

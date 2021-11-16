@@ -28,10 +28,13 @@ import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/com
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AlertsService } from 'services/alerts.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('Cancel beam job dialog', () => {
   const beamJobRun = (
-    new BeamJobRun('123', 'FooJob', 'RUNNING', [], 0, 0, false));
+    new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false));
 
   let fixture: ComponentFixture<CancelBeamJobDialogComponent>;
   let component: CancelBeamJobDialogComponent;
@@ -50,8 +53,11 @@ describe('Cancel beam job dialog', () => {
       imports: [
         BrowserDynamicTestingModule,
         MatButtonModule,
+        MatCardModule,
         MatDialogModule,
+        MatIconModule,
         MatProgressBarModule,
+        MatTooltipModule,
         NoopAnimationsModule,
       ],
       providers: [
@@ -87,7 +93,7 @@ describe('Cancel beam job dialog', () => {
 
   it('should lock the dialog and cancel the job before finally closing', () => {
     const cancelledBeamJobRun = (
-      new BeamJobRun('123', 'FooJob', 'CANCELLED', [], 0, 0, false));
+      new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false));
     const caneclBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
       .and.returnValue(of(cancelledBeamJobRun));
     const closeDialogSpy = spyOn(matDialogRef, 'close');

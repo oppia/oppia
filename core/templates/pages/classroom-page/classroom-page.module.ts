@@ -16,73 +16,30 @@
  * @fileoverview Module for the classroom page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { NgModule } from '@angular/core';
 import { ClassroomPageComponent } from './classroom-page.component';
 import { TopicSummaryTileComponent } from
   'components/summary-tile/topic-summary-tile.component';
+import { ClassroomPageRootComponent } from './classroom-page-root.component';
+import { CommonModule } from '@angular/common';
+import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    ClassroomPageRoutingModule
   ],
   declarations: [
     ClassroomPageComponent,
-    OppiaAngularRootComponent,
+    ClassroomPageRootComponent,
     TopicSummaryTileComponent
   ],
   entryComponents: [
     ClassroomPageComponent,
-    OppiaAngularRootComponent,
+    ClassroomPageRootComponent,
     TopicSummaryTileComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
   ]
 })
-class ClassroomPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ClassroomPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ClassroomPageModule {}

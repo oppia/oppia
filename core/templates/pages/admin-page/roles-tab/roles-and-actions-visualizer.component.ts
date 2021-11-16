@@ -19,6 +19,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Component({
@@ -27,20 +28,42 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 })
 export class RolesAndActionsVisualizerComponent implements OnInit {
   @Input() roleToActions;
+  @Input() viewableRoles;
+  @Input() humanReadableRoles;
 
+  TAB_ACTIONS: string = 'TAB_ACTIONS';
+  TAB_ASSIGNED_USERS: string = 'TAB_ASSIGNED_USERS';
   activeRole: string;
+  activeTab: string;
   avatarPictureUrl: string;
+  loadingAssignedUsernames: boolean;
   roles: string[];
+  roleToReadableActions = {};
+  assignUsersToActiveRole: string[];
 
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private adminBackendApiService: AdminBackendApiService) {}
 
   setActiveRole(role: string): void {
     this.activeRole = role;
+    this.activeTab = this.TAB_ACTIONS;
+  }
+
+  showAssignedUsers(): void {
+    this.loadingAssignedUsernames = true;
+    this.adminBackendApiService.fetchUsersAssignedToRoleAsync(
+      this.activeRole).then((response) => {
+      this.assignUsersToActiveRole = response.usernames;
+      this.loadingAssignedUsernames = false;
+    });
   }
 
   ngOnInit(): void {
+    this.loadingAssignedUsernames = false;
     this.avatarPictureUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/user_blue_72px.png');
+    this.activeTab = this.TAB_ACTIONS;
 
     let getSortedReadableTexts = (texts: string[]): string[] => {
       let readableTexts = [];
@@ -53,10 +76,8 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
     };
 
     for (let role in this.roleToActions) {
-      let readableRole = getSortedReadableTexts([role])[0];
-      this.roleToActions[readableRole] = getSortedReadableTexts(
+      this.roleToReadableActions[role] = getSortedReadableTexts(
         this.roleToActions[role]);
-      delete this.roleToActions[role];
     }
 
     this.roles = Object.keys(this.roleToActions).sort();

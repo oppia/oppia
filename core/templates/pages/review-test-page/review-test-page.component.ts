@@ -75,7 +75,7 @@ angular.module('oppia').component('reviewTestPage', {
           function(result) {
             var skillIdList = [];
             var skillDescriptions = [];
-            PageTitleService.setPageTitle(
+            PageTitleService.setDocumentTitle(
               'Review Test: ' + result.storyName + ' - Oppia');
             for (var skillId in result.skillDescriptions) {
               skillIdList.push(skillId);
@@ -85,8 +85,8 @@ angular.module('oppia').component('reviewTestPage', {
             var questionPlayerConfig = {
               resultActionButtons: [
                 {
-                  type: 'BOOST_SCORE',
-                  i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                  type: 'REVIEW_LOWEST_SCORED_SKILL',
+                  i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
                 },
                 {
                   type: 'RETRY_SESSION',

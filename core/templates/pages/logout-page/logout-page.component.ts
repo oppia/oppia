@@ -24,6 +24,7 @@ import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
+import { UtilsService } from 'services/utils.service';
 
 @Component({
   selector: 'logout-page',
@@ -32,7 +33,8 @@ import { LoaderService } from 'services/loader.service';
 export class LogoutPageComponent implements OnInit {
   constructor(
       private alertsService: AlertsService, private authService: AuthService,
-      private loaderService: LoaderService, private windowRef: WindowRef) {}
+      private loaderService: LoaderService, private windowRef: WindowRef,
+      private utilsService: UtilsService) {}
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('I18N_LOGOUT_LOADING');
@@ -44,7 +46,8 @@ export class LogoutPageComponent implements OnInit {
     const searchParams = (
       new URLSearchParams(this.windowRef.nativeWindow.location.search));
     const redirectUrl = searchParams.get('redirect_url') ?? '/';
-    this.windowRef.nativeWindow.location.assign(redirectUrl);
+    this.windowRef.nativeWindow.location.assign(
+      this.utilsService.getSafeReturnUrl(redirectUrl));
   }
 
   private onSignOutError(error: firebase.auth.Error): void {

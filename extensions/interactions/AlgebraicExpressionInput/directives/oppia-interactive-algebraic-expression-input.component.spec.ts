@@ -21,7 +21,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { AlgebraicExpressionInputInteractionComponent } from './oppia-interactive-algebraic-expression-input.component';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('AlgebraicExpressionInputInteractive', () => {
@@ -87,7 +87,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });

@@ -1,8 +1,8 @@
 <div>
   <div class="oppia-content">
     <br>
-    <ul ngbNav #nav="ngbNav" [animation]="false">
-      <li [ngbNavItem]="1">
+    <nav ngbNav #nav="ngbNav" [animation]="false">
+      <div [ngbNavItem]="1">
         <a ngbNavLink>Recent Commits</a>
         <ng-template ngbNavContent>
           <h3>Recent Commits (all non-private explorations)</h3>
@@ -33,9 +33,9 @@
             </table>
           </div>
         </ng-template>
-      </li>
+      </div>
 
-      <li [ngbNavItem]="2">
+      <div [ngbNavItem]="2">
         <a ngbNavLink>Recent Feedback Messages</a>
         <ng-template ngbNavContent>
           <h3>Recent Feedback Messages</h3>
@@ -62,9 +62,9 @@
             </table>
           </div>
         </ng-template>
-      </li>
+      </div>
 
-      <li [ngbNavItem]="3">
+      <div [ngbNavItem]="3">
         <a ngbNavLink>Featured Activities</a>
         <ng-template ngbNavContent>
           <h3>Activities to feature in the library</h3>
@@ -84,8 +84,8 @@
             Save Featured Activities
           </button>
         </ng-template>
-      </li>
-    </ul>
+      </div>
+    </nav>
     <div [ngbNavOutlet]="nav"></div>
   </div>
 </div>

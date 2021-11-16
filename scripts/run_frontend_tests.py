@@ -14,15 +14,14 @@
 
 """This script runs unit tests for frontend JavaScript code (using Karma)."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 
 from . import build
 from . import check_frontend_test_coverage
@@ -52,6 +51,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--skip_install',
     help='optional; if specified, skips installing dependencies',
+    action='store_true')
+_PARSER.add_argument(
+    '--verbose',
+    help='optional; if specified, enables the karma terminal and prints all the'
+    ' logs.',
     action='store_true')
 _PARSER.add_argument(
     '--run_minified_tests',
@@ -108,21 +112,21 @@ def main(args=None):
         'on your filesystem.',
         'Running test in development environment'])
 
+    cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
-        cmd = [
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--prodEnv']
+        cmd.append('--prodEnv')
     else:
         build.main(args=[])
 
-        cmd = [
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+    if parsed_args.verbose:
+        cmd.append('--terminalEnabled')
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
@@ -132,9 +136,13 @@ def main(args=None):
         # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
-        if line:
-            python_utils.PRINT(line, end='')
+        # Suppressing the karma web-server logs.
+        if line and not '[web-server]:' in line.decode('utf-8'):
+            # Standard output is in bytes, we need to decode
+            # the line to print it.
+            python_utils.PRINT(line.decode('utf-8'), end='')
             output_lines.append(line)
+    # Standard output is in bytes, we need to decode the line to print it.
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)
 

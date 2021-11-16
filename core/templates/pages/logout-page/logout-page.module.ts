@@ -16,57 +16,27 @@
  * @fileoverview Module for the logout page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
+import { NgModule } from '@angular/core';
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { LogoutPageRootComponent } from './logout-page-root.component';
+import { CommonModule } from '@angular/common';
+import { LogoutPageRoutingModule } from './logout-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
+    LogoutPageRoutingModule
   ],
   declarations: [
     LogoutPageComponent,
-    OppiaAngularRootComponent,
+    LogoutPageRootComponent
   ],
   entryComponents: [
     LogoutPageComponent,
-    OppiaAngularRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-  ],
+    LogoutPageRootComponent,
+  ]
 })
-class LogoutPageModule {
-  ngDoBootstrap() {}
-}
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(
-  downgradeModule(async(providers) => {
-    return platformBrowserDynamic(providers).bootstrapModule(LogoutPageModule);
-  }));
-
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}) as angular.IDirectiveFactory);
+export class LogoutPageModule {}

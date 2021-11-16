@@ -21,7 +21,7 @@ import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-d
 import { SkillCreationService } from './skill-creation.service';
 
 describe('SkillCreationService', () => {
-  let skillCreationService: SkillCreationService = null;
+  let skillCreationService: SkillCreationService;
 
   beforeEach(() => {
     skillCreationService = TestBed.inject(SkillCreationService);

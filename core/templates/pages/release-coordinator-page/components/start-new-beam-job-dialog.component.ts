@@ -25,12 +25,14 @@ import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { of } from 'rxjs';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'start-new-beam-job-dialog',
   templateUrl: './start-new-beam-job-dialog.component.html',
 })
 export class StartNewBeamJobDialogComponent {
+  readonly DEV_MODE: boolean = AppConstants.DEV_MODE;
   isRunning = false;
 
   constructor(
@@ -44,7 +46,7 @@ export class StartNewBeamJobDialogComponent {
     this.isRunning = true;
     this.matDialogRef.disableClose = true;
 
-    this.backendApiService.startNewBeamJob(this.beamJob, []).pipe(
+    this.backendApiService.startNewBeamJob(this.beamJob).pipe(
       take(1),
       catchError(error => {
         this.alertsService.addWarning(error.message);

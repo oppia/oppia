@@ -36,23 +36,29 @@ interface SetOfAlgebraicIdentifierEditorSchema {
     id: 'is_uniquified'
   }]
 }
+
 @Component({
   selector: 'set-of-algebraic-identifier-editor',
   templateUrl: './set-of-algebraic-identifier-editor.component.html',
   styleUrls: []
 })
 export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string[];
+  SCHEMA!: SetOfAlgebraicIdentifierEditorSchema;
   @Output() valueChanged = new EventEmitter();
   PLACEHOLDER_INFO = (
     'NOTE: This rule will consider each side of the equation ' +
     'independently and won\'t allow reordering of terms ' +
     'around the = sign.');
-  SCHEMA: SetOfAlgebraicIdentifierEditorSchema;
+
   constructor(
     private guppyInitializationService: GuppyInitializationService,
-    private changeDetectorRef: ChangeDetectorRef) { }
+    private changeDetectorRef: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     let customOskLetters = (
@@ -82,13 +88,12 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: unknown): void {
-    if (this.value === newValue) {
-      return;
+  updateValue(newValue: string[]): void {
+    if (this.value !== newValue) {
+      this.value = newValue;
+      this.valueChanged.emit(this.value);
+      this.changeDetectorRef.detectChanges();
     }
-    this.value = newValue;
-    this.valueChanged.emit(this.value);
-    this.changeDetectorRef.detectChanges();
   }
 }
 

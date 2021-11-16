@@ -16,14 +16,13 @@
 
 """Tests for blog post domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core import utils
+from core.constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.tests import test_utils
-import utils
 
 
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):
@@ -108,19 +107,17 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Expected thumbnail filename to be a string, received 10', 10)
+            'Expected image filename to be a string, received 10', 10)
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should not start with a dot.', '.name')
+            'Image filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should not include slashes or '
+            'Image filename should not include slashes or '
             'consecutive dot characters.', 'file/name')
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should not include slashes or '
+            'Image filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should include an extension.', 'name')
-        self._assert_valid_thumbnail_filename_for_blog_post(
-            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+            'Image filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Thumbnail filename should not be empty', '')
 
@@ -315,19 +312,17 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Expected thumbnail filename to be a string, received 10', 10)
+            'Expected image filename to be a string, received 10', 10)
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should not start with a dot.', '.name')
+            'Image filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should not include slashes or '
+            'Image filename should not include slashes or '
             'consecutive dot characters.', 'file/name')
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should not include slashes or '
+            'Image filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_thumbnail_filename_for_blog_post(
-            'Thumbnail filename should include an extension.', 'name')
-        self._assert_valid_thumbnail_filename_for_blog_post(
-            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+            'Image filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Thumbnail filename should not be empty', '')
 

@@ -14,16 +14,16 @@
 
 """Python execution environent set up for all scripts."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
-import python_utils
+from core import python_utils
 
 from . import clean
 from . import common
@@ -51,8 +51,8 @@ def create_directory(directory_path):
 # if it does not match the expected prefix.
 def test_python_version():
     running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '2.7':
-        python_utils.PRINT('Please use Python2.7. Exiting...')
+    if running_python_version != '3.7':
+        python_utils.PRINT('Please use Python 3.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
@@ -79,7 +79,7 @@ def download_and_install_package(url_to_retrieve, filename):
             downloaded.
         filename: string. The name of the tar file.
     """
-    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    urlrequest.urlretrieve(url_to_retrieve, filename=filename)
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
@@ -115,7 +115,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
+        urlrequest.urlretrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',
@@ -213,6 +213,9 @@ def main(args=None):
     elif os.path.isfile('/usr/bin/chromium-browser'):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
+    elif os.path.isfile('/usr/bin/brave'):
+        # Arch Linux.
+        chrome_bin = '/usr/bin/brave'
     elif os.path.isfile('/usr/bin/chromium'):
         # Arch Linux.
         chrome_bin = '/usr/bin/chromium'

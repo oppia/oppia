@@ -14,10 +14,9 @@
 
 """Tests for classroom services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.domain import classroom_services
 from core.domain import config_services
 from core.domain import topic_fetchers
@@ -29,9 +28,10 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ClassroomServicesTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME, self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_can_get_classroom_by_url_fragment(self):
         topic_id = topic_fetchers.get_new_topic_id()

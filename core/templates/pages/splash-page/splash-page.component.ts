@@ -68,7 +68,7 @@ export class SplashPageComponent implements OnInit {
 
   onClickStartContributingButton(): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
-    this.windowRef.nativeWindow.location.href = 'https://www.oppiafoundation.org/volunteer';
+    this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 
   onClickStartTeachingButton(): void {

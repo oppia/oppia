@@ -39,8 +39,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val) => {}
+      replace: (val: string) => {}
     },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -70,9 +71,9 @@ describe('CreateActivityButtonComponent', () => {
   let ngbModal: NgbModal;
 
   let userInfoForCollectionCreator = {
-    _role: 'USER_ROLE',
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -81,10 +82,12 @@ describe('CreateActivityButtonComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
@@ -94,9 +97,9 @@ describe('CreateActivityButtonComponent', () => {
   };
 
   let userInfoForNonCollectionCreator = {
-    _role: 'USER_ROLE',
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -105,11 +108,13 @@ describe('CreateActivityButtonComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
     isQuestionAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     canCreateCollections: () => false,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -191,9 +196,9 @@ describe('CreateActivityButtonComponent', () => {
         }
       });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
       });
       const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
@@ -210,9 +215,9 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/creator-dashboard');
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
       });
       const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
@@ -229,9 +234,9 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/creator-dashboard');
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.reject('cancel')
-        });
+        } as NgbModalRef);
       });
 
       component.initCreationProcess();

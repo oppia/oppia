@@ -151,11 +151,15 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await publishStoryButton.click();
+    await action.click('Publish Story Button', publishStoryButton);
   };
 
   this.unpublishStory = async function() {
-    await unpublishStoryButton.click();
+    await action.click('Unpublish Story Button', unpublishStoryButton);
+    await action.click('Close Save Modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Unpublish message modal takes too long to disappear.');
   };
 
   this.deleteChapterWithIndex = async function(index) {
@@ -217,6 +221,8 @@ var StoryEditorPage = function() {
 
   this.navigateToStoryEditorTab = async function() {
     await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      backToStoryEditorButton, 'Back to story button is not visible');
     await general.scrollToTop();
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
@@ -435,9 +441,7 @@ var StoryEditorPage = function() {
       _selectSkillBasedOnIndex: async function(index) {
         await waitFor.visibilityOf(skillListItems.get(0));
         var selectedSkill = skillListItems.get(index);
-        await waitFor.elementToBeClickable(
-          selectedSkill, 'selectedSkill takes too long to be clickable.');
-        await selectedSkill.click();
+        await action.click('Selected Skill', selectedSkill);
       },
 
       selectSkill: async function(name) {
@@ -499,6 +503,9 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       warningIndicator, 'Warning Indicator taking too long to appear.');
     await browser.actions().mouseMove(warningIndicator).perform();
+    await waitFor.visibilityOf(
+      warningTextElements.first(),
+      'Warning Text Elements taking too long to appear');
     var warningElemCount = await warningTextElements.count();
     var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {

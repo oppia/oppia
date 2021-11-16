@@ -14,17 +14,16 @@
 
 """Tests for the exploration voice artist work."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -46,7 +45,7 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
 
         self.voiceover_admin_id = self.get_user_id_from_email(
             'voiceoveradmin@app.com')
-        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.voiceover_admin = user_services.get_user_actions_info(
             self.voiceover_admin_id)
 
@@ -92,7 +91,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_put_with_no_payload_version_raises_error(self):
         with self.assertRaisesRegexp(
-            Exception, 'Invalid POST request: a version must be specified.'):
+            Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
@@ -346,7 +345,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             self.private_exp_id_2, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_owner_cannot_assign_voice_artist(self):

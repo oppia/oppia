@@ -20,6 +20,7 @@ import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import constants from 'assets/constants';
@@ -40,6 +41,7 @@ export class OpportunitiesListComponent {
     new EventEmitter()
   );
   @Input() opportunityHeadingTruncationLength: number;
+  @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
   lastPageNumber: number = 1000;
@@ -53,13 +55,18 @@ export class OpportunitiesListComponent {
     private zone: NgZone,
     private readonly contributionOpportunitiesService:
       ContributionOpportunitiesService,
-    private readonly translationLanguageService: TranslationLanguageService) {
+    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly translationTopicService: TranslationTopicService) {
     this.init();
   }
 
   init(): void {
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(
+        () => this.ngOnInit()));
+
+    this.directiveSubscriptions.add(
+      this.translationTopicService.onActiveTopicChanged.subscribe(
         () => this.ngOnInit()));
 
     this.directiveSubscriptions.add(
@@ -89,12 +96,6 @@ export class OpportunitiesListComponent {
       // migration is complete.
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
-        // "more" returned from GAE storage is not always reliable if true.
-        // TODO(#11900): The following may not work if the last fetched
-        // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
-        // robust solution.
-        more = more &&
-        opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
         this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
@@ -113,13 +114,6 @@ export class OpportunitiesListComponent {
       this.loadMoreOpportunities().then(
         ({opportunitiesDicts, more}) => {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
-          // "more" returned from GAE storage is not always reliable if
-          // true.
-          // TODO(#11900): The following may not work if the last fetched
-          // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
-          // robust solution.
-          more = (
-            more && opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
           this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(

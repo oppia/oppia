@@ -26,6 +26,8 @@ import { AppConstants } from 'app.constants';
 })
 export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 }
 
 angular.module('oppia').directive('oppiaFooter',

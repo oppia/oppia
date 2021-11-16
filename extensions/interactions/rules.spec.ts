@@ -28,8 +28,6 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
-import { LogicProofRulesService } from
-  'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
@@ -83,7 +81,6 @@ describe('Rule spec services', function() {
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
     $provide.value(
       'InteractiveMapRulesService', new InteractiveMapRulesService());
-    $provide.value('LogicProofRulesService', new LogicProofRulesService());
     $provide.value(
       'MusicNotesInputRulesService', new MusicNotesInputRulesService(
         new UtilsService()));

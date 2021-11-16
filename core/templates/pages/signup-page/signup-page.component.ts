@@ -16,213 +16,228 @@
  * @fileoverview Component for the Oppia profile page.
  */
 
-require('base-components/base-content.component.ts');
-require(
-  'pages/signup-page/modal-templates/license-explanation-modal.controller.ts');
-require(
-  'pages/signup-page/modal-templates/' +
-  'registration-session-expired-modal.controller.ts');
+import { Component } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { UtilsService } from 'services/utils.service';
+import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
+import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
+import { SignupPageBackendApiService } from './services/signup-page-backend-api.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-require('services/id-generation.service.ts');
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
-require('services/contextual/url.service.ts');
-require('services/stateful/focus-manager.service.ts');
+@Component({
+  selector: 'oppia-signup-page',
+  templateUrl: './signup-page.component.html'
+})
+export class SignupPageComponent {
+  MAX_USERNAME_LENGTH = AppConstants.MAX_USERNAME_LENGTH;
+  warningI18nCode = '';
+  siteName = AppConstants.SITE_NAME;
+  submissionInProcess = false;
+  usernameCheckIsInProgress = false;
+  showEmailSignupLink = false;
+  emailSignupLink = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
+  username: string;
+  hasEverRegistered: boolean;
+  hasAgreedToLatestTerms: boolean;
+  showEmailPreferencesForm: boolean;
+  hasUsername: boolean;
+  blurredAtLeastOnce = false;
+  canReceiveEmailUpdates: boolean;
+  emailPreferencesWarningText: string;
 
-angular.module('oppia').component('signupPage', {
-  template: require('./signup-page.component.html'),
-  controller: [
-    '$http', '$uibModal', '$window', 'AlertsService',
-    'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UrlService', 'BULK_EMAIL_SERVICE_SIGNUP_URL',
-    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER', 'MAX_USERNAME_LENGTH',
-    'SITE_NAME',
-    function(
-        $http, $uibModal, $window, AlertsService,
-        FocusManagerService, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UrlService, BULK_EMAIL_SERVICE_SIGNUP_URL,
-        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER, MAX_USERNAME_LENGTH,
-        SITE_NAME) {
-      var ctrl = this;
-      var _SIGNUP_DATA_URL = '/signuphandler/data';
-      ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
-      ctrl.isFormValid = function() {
-        return (
-          ctrl.hasAgreedToLatestTerms &&
-          (ctrl.hasUsername || !ctrl.warningI18nCode)
-        );
-      };
+  constructor(
+    private ngbModal: NgbModal,
+    private windowRef: WindowRef,
+    private alertsService: AlertsService,
+    private focusManagerService: FocusManagerService,
+    private loaderService: LoaderService,
+    private signupPageBackendApiService: SignupPageBackendApiService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlService: UrlService,
+    private utilsService: UtilsService
+  ) {}
 
-      ctrl.showLicenseExplanationModal = function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/signup-page/modal-templates/' +
-            'license-explanation-modal.template.directive.html'),
-          backdrop: true,
-          controller: 'LicenseExplanationModalController'
-        }).result.then(function() {}, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
+  ngOnInit(): void {
+    this.loaderService.showLoadingScreen('I18N_SIGNUP_LOADING');
 
-      ctrl.onUsernameInputFormBlur = function(username) {
-        if (ctrl.hasUsername) {
-          return;
-        }
-        AlertsService.clearWarnings();
-        ctrl.blurredAtLeastOnce = true;
-        ctrl.updateWarningText(username);
-        if (!ctrl.warningI18nCode) {
-          ctrl.usernameCheckIsInProgress = true;
-          $http.post('usernamehandler/data', {
-            username: username
-          }).then(function(response) {
-            if (response.data.username_is_taken) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
-            }
-            ctrl.usernameCheckIsInProgress = false;
-          });
-        }
-      };
+    this.signupPageBackendApiService.fetchSignupPageDataAsync()
+      .then((data) => {
+        this.loaderService.hideLoadingScreen();
+        this.username = data.username;
+        this.hasEverRegistered = data.has_ever_registered;
+        this.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+        this.showEmailPreferencesForm = data.can_send_emails;
+        this.hasUsername = Boolean(this.username);
+        this.focusManagerService.setFocus('usernameInputField');
+      });
+  }
 
-      // Returns the warning text corresponding to the validation error for
-      // the given username, or an empty string if the username is valid.
-      ctrl.updateWarningText = function(username) {
-        var alphanumericRegex = /^[A-Za-z0-9]+$/;
-        var adminRegex = /admin/i;
-        var oppiaRegex = /oppia/i;
+  isFormValid(): boolean {
+    return (
+      this.hasAgreedToLatestTerms &&
+      (this.hasUsername || !this.warningI18nCode)
+    );
+  }
 
-        if (!username) {
-          ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
-        } else if (username.indexOf(' ') !== -1) {
-          ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-        } else if (username.length > ctrl.MAX_USERNAME_LENGTH) {
-          ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG';
-        } else if (!alphanumericRegex.test(username)) {
-          ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
-        } else if (adminRegex.test(username)) {
-          ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
-        } else if (oppiaRegex.test(username)) {
-          ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
-        } else {
-          ctrl.warningI18nCode = '';
-        }
-      };
-
-      ctrl.onSelectEmailPreference = function() {
-        ctrl.emailPreferencesWarningText = '';
-      };
-
-      ctrl.submitPrerequisitesForm = function(
-          agreedToTerms, username, canReceiveEmailUpdates) {
-        if (!agreedToTerms) {
-          AlertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
-          return;
-        }
-
-        if (!ctrl.hasUsername && ctrl.warningI18nCode) {
-          return;
-        }
-
-        var defaultDashboard = DASHBOARD_TYPE_LEARNER;
-        var returnUrl = decodeURIComponent(
-          UrlService.getUrlParams().return_url);
-
-        if (returnUrl.indexOf('creator-dashboard') !== -1) {
-          defaultDashboard = DASHBOARD_TYPE_CREATOR;
-        } else {
-          defaultDashboard = DASHBOARD_TYPE_LEARNER;
-        }
-
-        var requestParams = {
-          agreed_to_terms: agreedToTerms,
-          can_receive_email_updates: null,
-          default_dashboard: defaultDashboard,
-          username: null
-        };
-
-        if (!ctrl.hasUsername) {
-          requestParams.username = username;
-        }
-
-        if (ctrl.showEmailPreferencesForm && !ctrl.hasUsername) {
-          if (canReceiveEmailUpdates === null) {
-            ctrl.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
-            return;
-          }
-
-          if (canReceiveEmailUpdates === 'yes') {
-            requestParams.can_receive_email_updates = true;
-          } else if (canReceiveEmailUpdates === 'no') {
-            requestParams.can_receive_email_updates = false;
-          } else {
-            throw new Error(
-              'Invalid value for email preferences: ' +
-              canReceiveEmailUpdates);
-          }
-        }
-
-        ctrl.submissionInProcess = true;
-        $http.post(_SIGNUP_DATA_URL, requestParams).then(function(returnValue) {
-          if (returnValue.data.bulk_email_signup_message_should_be_shown) {
-            ctrl.showEmailSignupLink = true;
-            ctrl.submissionInProcess = false;
-            return;
-          }
-          SiteAnalyticsService.registerNewSignupEvent();
-          setTimeout(() => {
-            $window.location.href = decodeURIComponent(
-              UrlService.getUrlParams().return_url);
-          }, SiteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
-        }, function(rejection) {
-          if (rejection.data && rejection.data.status_code === 401) {
-            ctrl.showRegistrationSessionExpiredModal();
-          }
-          ctrl.submissionInProcess = false;
-        });
-      };
-
-      ctrl.showRegistrationSessionExpiredModal = function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/signup-page/modal-templates/' +
-            'registration-session-expired-modal.template.html'),
-          backdrop: 'static',
-          keyboard: false,
-          controller: 'RegistrationSessionExpiredModalController'
-        }).result.then(function() {}, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-      ctrl.$onInit = function() {
-        LoaderService.showLoadingScreen('I18N_SIGNUP_LOADING');
-        ctrl.warningI18nCode = '';
-        ctrl.siteName = SITE_NAME;
-        ctrl.submissionInProcess = false;
-        ctrl.usernameCheckIsInProgress = false;
-        ctrl.showEmailSignupLink = false;
-        ctrl.emailSignupLink = BULK_EMAIL_SERVICE_SIGNUP_URL;
-
-        $http.get(_SIGNUP_DATA_URL).then(function(response) {
-          var data = response.data;
-          LoaderService.hideLoadingScreen();
-          ctrl.username = data.username;
-          ctrl.hasEverRegistered = data.has_ever_registered;
-          ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-          ctrl.showEmailPreferencesForm = data.can_send_emails;
-          ctrl.hasUsername = Boolean(ctrl.username);
-          FocusManagerService.setFocus('usernameInputField');
-        });
-
-        ctrl.blurredAtLeastOnce = false;
-        ctrl.canReceiveEmailUpdates = null;
-      };
+  showLicenseExplanationModal(evt: { target: {innerText: string} }): void {
+    if (evt.target.innerText !== 'here') {
+      return;
     }
-  ]
-});
+    let modalRef = this.ngbModal.open(LicenseExplanationModalComponent, {
+      backdrop: true
+    });
+
+    modalRef.result.then(() => {
+      // Note to developers:
+      // This callback is triggered when the Confirm button is clicked.
+      // No further action is needed.
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  onUsernameInputFormBlur(username: string): void {
+    if (this.hasUsername) {
+      return;
+    }
+    this.alertsService.clearWarnings();
+    this.blurredAtLeastOnce = true;
+    this.updateWarningText(username);
+    if (!this.warningI18nCode) {
+      this.usernameCheckIsInProgress = true;
+      this.signupPageBackendApiService.checkUsernameAvailableAsync(username)
+        .then((response) => {
+          if (response.username_is_taken) {
+            this.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
+          }
+          this.usernameCheckIsInProgress = false;
+        });
+    }
+  }
+
+  // Returns the warning text corresponding to the validation error for
+  // the given username, or an empty string if the username is valid.
+  updateWarningText(username: string): void {
+    let alphanumericRegex = /^[A-Za-z0-9]+$/;
+    let adminRegex = /admin/i;
+    let oppiaRegex = /oppia/i;
+
+    if (!username) {
+      this.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
+    } else if (username.indexOf(' ') !== -1) {
+      this.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
+    } else if (username.length > this.MAX_USERNAME_LENGTH) {
+      this.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG';
+    } else if (!alphanumericRegex.test(username)) {
+      this.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
+    } else if (adminRegex.test(username)) {
+      this.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
+    } else if (oppiaRegex.test(username)) {
+      this.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
+    } else {
+      this.warningI18nCode = '';
+    }
+  }
+
+  onSelectEmailPreference(): void {
+    this.emailPreferencesWarningText = '';
+  }
+
+  submitPrerequisitesForm(
+      agreedToTerms: boolean,
+      username: string,
+      canReceiveEmailUpdates: string): void {
+    if (!agreedToTerms) {
+      this.alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+      return;
+    }
+
+    if (!this.hasUsername && this.warningI18nCode) {
+      return;
+    }
+
+    let defaultDashboard: string = AppConstants.DASHBOARD_TYPE_LEARNER;
+    let returnUrl = (
+      decodeURIComponent(this.urlService.getUrlParams().return_url));
+
+    if (returnUrl.indexOf('creator-dashboard') !== -1) {
+      defaultDashboard = AppConstants.DASHBOARD_TYPE_CREATOR;
+    } else {
+      defaultDashboard = AppConstants.DASHBOARD_TYPE_LEARNER;
+    }
+
+    let requestParams = {
+      agreed_to_terms: agreedToTerms,
+      can_receive_email_updates: null,
+      default_dashboard: defaultDashboard,
+      username: null
+    };
+
+    if (!this.hasUsername) {
+      requestParams.username = username;
+    }
+
+    if (this.showEmailPreferencesForm && !this.hasUsername) {
+      if (canReceiveEmailUpdates === null) {
+        this.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
+        return;
+      }
+
+      if (canReceiveEmailUpdates === 'yes') {
+        requestParams.can_receive_email_updates = true;
+      } else if (canReceiveEmailUpdates === 'no') {
+        requestParams.can_receive_email_updates = false;
+      } else {
+        throw new Error(
+          'Invalid value for email preferences: ' +
+          canReceiveEmailUpdates);
+      }
+    }
+
+    this.submissionInProcess = true;
+    this.signupPageBackendApiService.updateUsernameAsync(requestParams)
+      .then((returnValue) => {
+        if (returnValue.bulk_email_signup_message_should_be_shown) {
+          this.showEmailSignupLink = true;
+          this.submissionInProcess = false;
+          return;
+        }
+        this.siteAnalyticsService.registerNewSignupEvent();
+        setTimeout(() => {
+          this.windowRef.nativeWindow.location.href = (
+            this.utilsService.getSafeReturnUrl(returnUrl));
+        }, AppConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+      }, (rejection) => {
+        if (rejection && rejection.status_code === 401) {
+          this.showRegistrationSessionExpiredModal();
+        }
+        this.submissionInProcess = false;
+      });
+  }
+
+  showRegistrationSessionExpiredModal(): void {
+    let modalRef = this.ngbModal.open(
+      RegistrationSessionExpiredModalComponent, {
+        backdrop: 'static',
+        keyboard: false
+      });
+
+    modalRef.result.then(() => {
+      // Note to developers:
+      // This callback is triggered when the Confirm button is clicked.
+      // No further action is needed.
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+}

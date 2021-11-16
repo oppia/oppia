@@ -22,8 +22,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
 export class GuppyObject {
-  divId = null;
-  guppyInstance = null;
+  // These properties are initialized using constructor function
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  divId!: string;
+  guppyInstance!: Guppy;
   constructor(divId: string, guppyInstance: Guppy) {
     this.divId = divId;
     this.guppyInstance = guppyInstance;

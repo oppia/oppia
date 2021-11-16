@@ -21,10 +21,9 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
@@ -33,7 +32,6 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
     CommonModule,
     CustomFormsComponentsModule,
     DynamicContentModule,

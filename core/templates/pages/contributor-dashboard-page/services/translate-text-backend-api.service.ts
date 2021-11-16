@@ -21,8 +21,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
 
-import { TRANSLATION_DATA_FORMAT_HTML } from 'domain/exploration/WrittenTranslationObjectFactory';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -44,8 +42,9 @@ export class TranslateTextBackendApiService {
 
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
-      languageCode: string, contentHtml: string, translationHtml: string,
-      imagesData: ImagesData[]): Promise<unknown> {
+      languageCode: string, contentHtml: string | string[],
+      translationHtml: string | string[], imagesData: ImagesData[],
+      dataFormat: string): Promise<unknown> {
     const postData = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
@@ -59,13 +58,18 @@ export class TranslateTextBackendApiService {
         language_code: languageCode,
         content_html: contentHtml,
         translation_html: translationHtml,
-        data_format: TRANSLATION_DATA_FORMAT_HTML
+        data_format: dataFormat
       }
     };
 
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    imagesData.forEach(obj => body.append(obj.filename, obj.imageBlob));
+    imagesData.forEach(obj => {
+      if (obj.imageBlob === null) {
+        throw new Error('No image data found');
+      }
+      body.append(obj.filename, obj.imageBlob);
+    });
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
   }

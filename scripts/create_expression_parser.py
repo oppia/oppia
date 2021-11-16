@@ -14,14 +14,13 @@
 
 """This script produces the expression parser."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 
-import python_utils
+from core import python_utils
 
 from . import common
 from . import setup

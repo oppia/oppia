@@ -16,103 +16,112 @@
  * @fileoverview Unit tests for searchResults.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { SearchResultsComponent } from './search-results.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
+import { SearchService } from 'services/search.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserService } from 'services/user.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserInfo } from 'domain/user/user-info.model';
+import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 
-describe('Search Results component', function() {
-  var ctrl = null;
-  var $flushPendingTasks = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var searchService = null;
-  var siteAnalyticsService = null;
-  var userService = null;
+describe('Search Results component', () => {
+  let fixture: ComponentFixture<SearchResultsComponent>;
+  let componentInstance: SearchResultsComponent;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let searchService: SearchService;
+  let userService: UserService;
+  let loaderService: LoaderService;
+  let urlInterpolationService: UrlInterpolationService;
+  let mockOnInitialSearchResultsLoaded = (
+    new EventEmitter<ExplorationSummaryDict[]>());
 
-  var mockWindow = {
-    location: ''
-  };
-  var initialSearchResultsLoadedEmitter = new EventEmitter();
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: ''
+      },
+      gtag: () => {}
+    };
+  }
 
-  importAllAngularServices();
-
-  beforeEach(function() {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        SearchResultsComponent,
+        MockTranslatePipe
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        LoaderService,
+        SearchService,
+        SiteAnalyticsService,
+        UrlInterpolationService,
+        UserService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(function() {
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SearchResultsComponent);
+    componentInstance = fixture.componentInstance;
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    searchService = TestBed.inject(SearchService);
+    userService = TestBed.inject(UserService);
+    loaderService = TestBed.inject(LoaderService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $flushPendingTasks = $injector.get('$flushPendingTasks');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    searchService = $injector.get('SearchService');
-    userService = $injector.get('UserService');
+  afterEach(() => {
+    componentInstance.ngOnDestroy();
+  });
 
-    spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
-      .returnValue(initialSearchResultsLoadedEmitter);
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    let userIsLoggedIn = true;
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve({
-        isLoggedIn: () => true
-      }));
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('searchResults', {
-      $scope: $scope,
-      SiteAnalyticsService: siteAnalyticsService
-    });
-    ctrl.$onInit();
-    $scope.$apply();
+      Promise.resolve(new UserInfo(
+        ['admin'], true, true,
+        true, true, true, 'en', 'test', null, userIsLoggedIn)));
+    spyOnProperty(searchService, 'onInitialSearchResultsLoaded')
+      .and.returnValue(mockOnInitialSearchResultsLoaded);
+    componentInstance.ngOnInit();
+    mockOnInitialSearchResultsLoaded.emit([]);
+    tick();
+    tick();
+    expect(componentInstance.someResultsExist).toBeFalse();
+    expect(componentInstance.userIsLoggedIn).toEqual(userIsLoggedIn);
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
-  afterEach(function() {
-    ctrl.$onDestroy();
-  });
-
-  it('should initialize controller properties after its initialization and' +
-    ' get data from backend', function() {
-    expect(ctrl.someResultsExist).toBe(true);
-    expect(ctrl.userIsLoggedIn).toBe(true);
-  });
-
-  it('should show search results when data retrieved from backend is not' +
-    ' empty', function() {
-    initialSearchResultsLoadedEmitter.emit(new Array(2));
-    $scope.$apply();
-    expect(ctrl.someResultsExist).toBe(true);
-  });
-
-  it('should not show search results when data retrieved from back is empty',
-    function() {
-      initialSearchResultsLoadedEmitter.emit([]);
-      $scope.$apply();
-      expect(ctrl.someResultsExist).toBe(false);
-    });
-
-  it('should get url for static image resources', function() {
-    var imagePath = '/path/to/image.png';
-    expect(ctrl.getStaticImageUrl(imagePath)).toBe(
-      '/assets/images/path/to/image.png');
-  });
-
-  it('should redirect to login page when trying to create a exploration' +
-    ' question and user is not logged in', function() {
+  it('should redirect to login', fakeAsync(() => {
     spyOn(siteAnalyticsService, 'registerStartLoginEvent');
-    ctrl.onRedirectToLogin('login-url');
-    $flushPendingTasks();
-
+    componentInstance.onRedirectToLogin('login');
+    tick(200);
     expect(siteAnalyticsService.registerStartLoginEvent).toHaveBeenCalled();
-    expect(mockWindow.location).toBe('login-url');
+  }));
+
+  it('should get static image url', () => {
+    let staticUrl = 'test_url';
+    spyOn(urlInterpolationService, 'getStaticAssetUrl')
+      .and.returnValue(staticUrl);
+    expect(componentInstance.getStaticImageUrl('path')).toEqual(staticUrl);
   });
 });

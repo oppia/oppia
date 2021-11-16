@@ -16,12 +16,10 @@
 
 """Tests for methods in the visualization registry."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import importlib
 import inspect
-import os
 import re
 
 from core.domain import visualization_registry
@@ -98,30 +96,10 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
 
 class VisualizationsNameTests(test_utils.GenericTestBase):
 
-    def _get_all_python_files(self):
-        """Recursively collects all Python files in the core/ and extensions/
-        directory.
-
-        Returns:
-            list(str). A list of Python files.
-        """
-        current_dir = os.getcwd()
-        files_in_directory = []
-        for _dir, _, files in os.walk(current_dir):
-            for file_name in files:
-                filepath = os.path.relpath(
-                    os.path.join(_dir, file_name), current_dir)
-                if filepath.endswith('.py') and (
-                        filepath.startswith('core/') or (
-                            filepath.startswith('extensions/'))):
-                    module = filepath[:-3].replace('/', '.')
-                    files_in_directory.append(module)
-        return files_in_directory
-
     def test_visualization_names(self):
         """This function checks for duplicate visualizations."""
 
-        all_python_files = self._get_all_python_files()
+        all_python_files = self.get_all_python_files()
         all_visualizations = []
 
         for file_name in all_python_files:

@@ -20,22 +20,21 @@ delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import copy
 
+from core import feconf
 from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
 
 
-def _migrate_story_contents_to_latest_schema(versioned_story_contents):
+def _migrate_story_contents_to_latest_schema(
+        versioned_story_contents, story_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the story structure based on the schema version of the input
     story dictionary. If the current story_contents schema changes, a new
@@ -47,6 +46,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
           - schema_version: str. The schema version for the story_contents dict.
           - story_contents: dict. The dict comprising the story
               contents.
+        story_id: str. The unique ID of the story.
 
     Raises:
         Exception. The schema version of the story_contents is outside of what
@@ -62,7 +62,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
     while (story_contents_schema_version <
            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         story_domain.Story.update_story_contents_from_model(
-            versioned_story_contents, story_contents_schema_version)
+            versioned_story_contents, story_contents_schema_version, story_id)
         story_contents_schema_version += 1
 
 
@@ -89,7 +89,7 @@ def get_story_from_model(story_model):
     if (story_model.story_contents_schema_version !=
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         _migrate_story_contents_to_latest_schema(
-            versioned_story_contents)
+            versioned_story_contents, story_model.id)
 
     return story_domain.Story(
         story_model.id, story_model.title, story_model.thumbnail_filename,
@@ -144,7 +144,7 @@ def get_story_by_id(story_id, strict=True, version=None):
         Story or None. The domain object representing a story with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_story = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_STORY,
         sub_namespace,

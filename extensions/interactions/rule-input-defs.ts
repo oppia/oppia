@@ -108,10 +108,6 @@ export interface ItemSelectionRuleInputs {
   x: string[];
 }
 
-export interface LogicProofRuleInputs {
-  c: string;
-}
-
 // MathEquation interaction has multiple types of inputs based on
 // rule type. Parameter y is supposed to represent the side of the equation that
 // needs to be checked.
@@ -260,7 +256,6 @@ export type InteractionRuleInputs = (
   ImageClickRuleInputs |
   InteractiveMapRuleInputs |
   ItemSelectionRuleInputs |
-  LogicProofRuleInputs |
   MathEquationRuleInputs |
   MultipleChoiceRuleInputs |
   MusicNotesRuleInputs |

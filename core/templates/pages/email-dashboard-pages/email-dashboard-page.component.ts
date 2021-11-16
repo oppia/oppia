@@ -16,114 +16,143 @@
  * @fileoverview Component for oppia email dashboard page.
  */
 
-require('base-components/base-content.component.ts');
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { QueryData } from 'domain/email-dashboard/email-dashboard-backend-api.service';
+import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
+import { LoaderService } from 'services/loader.service';
+import { Schema } from 'services/schema-default-value.service';
+import { UserService } from 'services/user.service';
+import { EmailDashboardDataService } from './email-dashboard-data.service';
 
-require('services/user.service.ts');
+interface CustomizationArgSpec {
+  'backend_id': string;
+  'backend_attr': string;
+  'description': string;
+  'schema': Schema;
+  'default_value': number | boolean | string;
+}
 
-require('./email-dashboard-data.service');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+@Component({
+  selector: 'oppia-email-dashboard-page',
+  templateUrl: './email-dashboard-page.component.html'
+})
+export class EmailDashboardPageComponent {
+  data!: QueryData;
+  currentPageOfQueries!: EmailDashboardQuery[];
+  showSuccessMessage: boolean = false;
+  username!: string | null;
+  customizationArgSpecs = AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION;
+  isRequired: boolean = false;
 
-angular.module('oppia').component('emailDashboardPage', {
-  template: require('./email-dashboard-page.component.html'),
-  controller: [
-    '$rootScope', 'EmailDashboardDataService', 'LoaderService',
-    'UserService', 'EMAIL_DASHBOARD_PREDICATE_DEFINITION', function(
-        $rootScope, EmailDashboardDataService, LoaderService,
-        UserService, EMAIL_DASHBOARD_PREDICATE_DEFINITION) {
-      var ctrl = this;
-      ctrl.resetForm = function() {
-        ctrl.data = {};
-        EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
-          ctrl.data[predicate.backend_attr] = predicate.default_value;
-        });
-      };
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    private emailDashboardDataService: EmailDashboardDataService,
+    private loaderService: LoaderService,
+    private userService: UserService,
+  ) {}
 
-      ctrl.areAllInputsEmpty = function() {
-        return Object.values(ctrl.data).every(
-          value => value === null || value === false);
-      };
+  ngOnInit(): void {
+    this.currentPageOfQueries = [];
+    this.username = '';
 
-      ctrl.submitQueryAsync = async function() {
-        EmailDashboardDataService.submitQueryAsync(ctrl.data).then(
-          function(queries) {
-            ctrl.currentPageOfQueries = queries;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular.
-            $rootScope.$apply();
-          });
-        ctrl.resetForm();
-        ctrl.showSuccessMessage = true;
-      };
+    this.loaderService.showLoadingScreen('Loading');
+    this.resetForm();
 
-      ctrl.getNextPageOfQueries = function() {
-        if (EmailDashboardDataService.isNextPageAvailable()) {
-          EmailDashboardDataService.getNextQueriesAsync().then(
-            function(queries) {
-              ctrl.currentPageOfQueries = queries;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            });
-        }
-      };
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.username = userInfo.getUsername();
+      this.loaderService.hideLoadingScreen();
+    });
 
-      ctrl.getPreviousPageOfQueries = function() {
-        if (EmailDashboardDataService.isPreviousPageAvailable()) {
-          ctrl.currentPageOfQueries = (
-            EmailDashboardDataService.getPreviousQueries());
-        }
-      };
+    this.emailDashboardDataService.getNextQueriesAsync().then((queries) => {
+      this.currentPageOfQueries = queries;
+    });
+  }
 
-      ctrl.showNextButton = function() {
-        return EmailDashboardDataService.isNextPageAvailable();
-      };
-
-      ctrl.showPreviousButton = function() {
-        return EmailDashboardDataService.isPreviousPageAvailable();
-      };
-
-      ctrl.recheckStatus = function(index) {
-        var query = ctrl.currentPageOfQueries !== undefined ?
-          ctrl.currentPageOfQueries[index] : null;
-        if (query) {
-          var queryId = query.id;
-          EmailDashboardDataService.fetchQueryAsync(queryId).then(
-            function(query) {
-              ctrl.currentPageOfQueries[index] = query;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            });
-        }
-      };
-
-      ctrl.showLinkToResultPage = function(submitter, status) {
-        return (submitter === ctrl.username) && (status === 'completed');
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.username = '';
-        LoaderService.showLoadingScreen('Loading');
-        ctrl.customizationArgSpecs = EMAIL_DASHBOARD_PREDICATE_DEFINITION;
-        ctrl.resetForm();
-
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.username = userInfo.getUsername();
-          LoaderService.hideLoadingScreen();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-
-        ctrl.currentPageOfQueries = [];
-        EmailDashboardDataService.getNextQueriesAsync().then(function(queries) {
-          ctrl.currentPageOfQueries = queries;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular.
-          $rootScope.$apply();
-        });
-      };
+  updateQueryData(newValue: boolean | number, field: string): void {
+    if (this.data[field] !== newValue) {
+      this.data[field] = newValue;
+      this.changeDetectorRef.detectChanges();
     }
-  ]
-});
+  }
+
+  getSchema(customizationArgSpec: CustomizationArgSpec): () => Schema {
+    let callb = () => {
+      return customizationArgSpec.schema;
+    };
+    return callb.bind(this);
+  }
+
+  isFieldRequired(): boolean {
+    return this.isRequired;
+  }
+
+  resetForm(): void {
+    this.data = {};
+    AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
+      this.data[predicate.backend_attr] = predicate.default_value;
+    });
+  }
+
+  areAllInputsEmpty(): boolean {
+    return Object.values(this.data).every(
+      value => value === null || value === false);
+  }
+
+  submitQueryAsync(): void {
+    this.emailDashboardDataService.submitQueryAsync(this.data)
+      .then((queries) => {
+        this.currentPageOfQueries = queries;
+      });
+    this.resetForm();
+    this.showSuccessMessage = true;
+  }
+
+  getNextPageOfQueries(): void {
+    if (this.emailDashboardDataService.isNextPageAvailable()) {
+      this.emailDashboardDataService.getNextQueriesAsync().then(
+        (queries) => {
+          this.currentPageOfQueries = queries;
+        }
+      );
+    }
+  }
+
+  getPreviousPageOfQueries(): void {
+    if (this.emailDashboardDataService.isPreviousPageAvailable()) {
+      this.currentPageOfQueries = (
+        this.emailDashboardDataService.getPreviousQueries());
+    }
+  }
+
+  showNextButton(): boolean {
+    return this.emailDashboardDataService.isNextPageAvailable();
+  }
+
+  showPreviousButton(): boolean {
+    return this.emailDashboardDataService.isPreviousPageAvailable();
+  }
+
+
+  recheckStatus(index: number): void {
+    let query = this.currentPageOfQueries !== undefined ?
+      this.currentPageOfQueries[index] : null;
+    if (query) {
+      let queryId = query.id;
+      this.emailDashboardDataService.fetchQueryAsync(queryId).then(
+        (query) => {
+          this.currentPageOfQueries[index] = query;
+        });
+    }
+  }
+
+  showLinkToResultPage(submitter: string, status: string): boolean {
+    return (submitter === this.username) && (status === 'completed');
+  }
+}
+
+angular.module('oppia').directive('oppiaEmailDashboardPage',
+  downgradeComponent({
+    component: EmailDashboardPageComponent
+  }) as angular.IDirectiveFactory);

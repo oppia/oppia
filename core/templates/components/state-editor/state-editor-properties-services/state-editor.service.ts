@@ -47,6 +47,9 @@ export interface AnswerChoice {
   label: string;
 }
 
+type CustomizationArgs = (
+  ItemSelectionInputCustomizationArgs | DragAndDropSortInputCustomizationArgs);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -66,20 +69,23 @@ export class StateEditorService {
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
-  activeStateName: string = null;
-  stateNames: string[] = [];
-  correctnessFeedbackEnabled: boolean = null;
-  inQuestionMode: boolean = null;
+  activeStateName: string | null = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
   // interaction.
-  interaction: Interaction = null;
+  interaction!: Interaction;
+  linkedSkillId!: string;
+  stateNames: string[] = [];
+  correctnessFeedbackEnabled: boolean = false;
+  inQuestionMode: boolean = false;
   misconceptionsBySkill: {} = {};
-  linkedSkillId: string = null;
   explorationIsWhitelisted: boolean = false;
-  solicitAnswerDetails: boolean = null;
-  cardIsCheckpoint: boolean = null;
+  solicitAnswerDetails: boolean = false;
+  cardIsCheckpoint: boolean = false;
   stateContentEditorInitialised: boolean = false;
   stateInteractionEditorInitialised: boolean = false;
   stateResponsesInitialised: boolean = false;
@@ -132,7 +138,7 @@ export class StateEditorService {
       this.stateEditorDirectiveInitialised);
   }
 
-  getActiveStateName(): string {
+  getActiveStateName(): string | null {
     return this.activeStateName;
   }
 
@@ -201,20 +207,27 @@ export class StateEditorService {
     return cloneDeep(this.interaction);
   }
 
+  // Function will return null if interactionId does not exist or is not
+  // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
+  // 'DragAndDropSortInput'.
   getAnswerChoices(
       interactionId: string,
-      customizationArgs: InteractionCustomizationArgs): AnswerChoice[] {
+      customizationArgs: InteractionCustomizationArgs
+  ): AnswerChoice[] | null {
     if (!interactionId) {
       return null;
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
-      return (<MultipleChoiceInputCustomizationArgs> customizationArgs)
-        .choices.value.map((val, ind) => ({ val: ind, label: val.html }));
+      return (
+        customizationArgs as MultipleChoiceInputCustomizationArgs
+      ).choices.value.map((val, ind) => (
+        { val: ind, label: val.html }
+      )) as AnswerChoice[];
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
-        <ImageClickInputCustomizationArgs> customizationArgs)
+        customizationArgs as ImageClickInputCustomizationArgs)
         .imageAndRegions.value;
       for (
         var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
@@ -229,13 +242,12 @@ export class StateEditorService {
       interactionId === 'DragAndDropSortInput'
     ) {
       return (
-        <
-          ItemSelectionInputCustomizationArgs|
-          DragAndDropSortInputCustomizationArgs
-        > customizationArgs)
-        .choices.value.map(val => (
-          { val: val.contentId, label: val.html}
-        ));
+        customizationArgs as CustomizationArgs
+      ).choices.value.map(
+        val => ({
+          val: val.contentId, label: val.html}
+        )
+      ) as AnswerChoice[];
     } else {
       return null;
     }
@@ -293,10 +305,16 @@ export class StateEditorService {
   }
 
   isCurrentSolutionValid(): boolean {
+    if (this.activeStateName === null) {
+      return false;
+    }
     return this.solutionValidityService.isSolutionValid(this.activeStateName);
   }
 
   deleteCurrentSolutionValidity(): void {
+    if (this.activeStateName === null) {
+      throw new Error('Active State for this solution is not set');
+    }
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 

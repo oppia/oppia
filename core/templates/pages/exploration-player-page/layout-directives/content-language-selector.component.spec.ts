@@ -40,10 +40,13 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockContentTranslationLanguageService {
+  currentLanguageCode: string;
+
   getCurrentContentLanguageCode() {
-    return 'en';
+    return this.currentLanguageCode;
   }
   getLanguageOptionsForDropdown() {
     return [
@@ -52,7 +55,15 @@ class MockContentTranslationLanguageService {
       {value: 'en', displayed: 'English'}
     ];
   }
-  setCurrentContentLanguageCode(languageCode: string) {}
+  setCurrentContentLanguageCode(languageCode: string) {
+    this.currentLanguageCode = languageCode;
+  }
+}
+
+class MockI18nLanguageCodeService {
+  getCurrentI18nLanguageCode() {
+    return 'fr';
+  }
 }
 
 describe('Content language selector component', () => {
@@ -79,6 +90,9 @@ describe('Content language selector component', () => {
       providers: [{
         provide: ContentTranslationLanguageService,
         useClass: MockContentTranslationLanguageService
+      }, {
+        provide: I18nLanguageCodeService,
+        useClass: MockI18nLanguageCodeService
       }]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
@@ -100,7 +114,7 @@ describe('Content language selector component', () => {
 
   it('should correctly initialize selectedLanguageCode and ' +
      'languagesInExploration', () => {
-    expect(component.selectedLanguageCode).toBe('en');
+    expect(component.selectedLanguageCode).toBe('fr');
     expect(component.languageOptions).toEqual([
       {value: 'fr', displayed: 'français (French)'},
       {value: 'zh', displayed: '中文 (Chinese)'},

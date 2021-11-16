@@ -14,15 +14,14 @@
 
 """Tests for the handler that returns concept card for a skill."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
@@ -31,11 +30,11 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, create a dummy skill."""
         super(ConceptCardDataHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),

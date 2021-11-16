@@ -18,6 +18,8 @@
 
 import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
@@ -38,16 +40,19 @@ export class ImageUploaderComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() allowedImageFormats!: string[];
+  @Input() isBlogPostThumbnailUploader!: boolean;
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
   @ViewChild('imageInput') imageInputRef!: ElementRef;
   fileInputClassName!: string;
   // The errorMessage will be null if the uploaded file is valid .
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
+  licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   constructor(
+    private blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
   ) { }
 
   ngOnInit(): void {

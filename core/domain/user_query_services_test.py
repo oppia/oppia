@@ -16,15 +16,16 @@
 
 """Tests for user query services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
+from core.domain import email_services
 from core.domain import user_query_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(email_models, user_models) = models.Registry.import_models([
+    models.NAMES.email, models.NAMES.user])
 
 
 class UserQueryServicesTests(test_utils.GenericTestBase):
@@ -34,8 +35,10 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserQueryServicesTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_user_id = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
@@ -43,7 +46,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             id=self.USER_QUERY_1_ID,
             has_not_logged_in_for_n_days=20,
             submitter_id=self.admin_user_id,
-            query_status=feconf.USER_QUERY_STATUS_ARCHIVED,
+            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
+            user_ids=[self.new_user_id, self.admin_user_id]
         )
         self.user_query_model_1.update_timestamps()
         self.user_query_model_1.put()
@@ -145,3 +149,47 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             archived_user_query_model.query_status,
             feconf.USER_QUERY_STATUS_ARCHIVED)
         self.assertTrue(archived_user_query_model.deleted)
+
+    def test_send_email_to_qualified_users(self):
+        self.assertIsNone(
+            user_models.UserBulkEmailsModel.get(self.new_user_id, strict=False))
+        self.assertIsNone(
+            user_models.UserBulkEmailsModel.get(
+                self.admin_user_id, strict=False))
+
+        send_bulk_email_swap = self.swap_with_checks(
+            email_services,
+            'send_bulk_mail',
+            lambda *_: None,
+            expected_args=[(
+                '%s <%s>' % (
+                    self.CURRICULUM_ADMIN_USERNAME, self.CURRICULUM_ADMIN_EMAIL
+                ),
+                [self.NEW_USER_EMAIL],
+                'subject',
+                'body',
+                'body'
+            )]
+        )
+
+        with send_bulk_email_swap:
+            user_query_services.send_email_to_qualified_users(
+                self.USER_QUERY_1_ID,
+                'subject',
+                'body',
+                feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
+                1
+            )
+
+        archived_user_query_model = (
+            user_models.UserQueryModel.get_by_id(self.USER_QUERY_1_ID))
+        self.assertEqual(
+            archived_user_query_model.query_status,
+            feconf.USER_QUERY_STATUS_ARCHIVED)
+        self.assertTrue(archived_user_query_model.deleted)
+
+        new_user_bulk_email_model = user_models.UserBulkEmailsModel.get(
+            self.new_user_id)
+        self.assertIsNotNone(
+            email_models.BulkEmailModel.get(
+                new_user_bulk_email_model.sent_email_model_ids[0]))

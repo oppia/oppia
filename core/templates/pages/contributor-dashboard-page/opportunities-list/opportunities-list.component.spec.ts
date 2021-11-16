@@ -21,6 +21,7 @@ import { EventEmitter } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from './opportunities-list.component';
@@ -30,8 +31,10 @@ describe('Opportunities List Component', () => {
   let fixture: ComponentFixture<OpportunitiesListComponent>;
 
   let translationLanguageService: TranslationLanguageService;
+  let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
   const mockActiveLanguageEventEmitter = new EventEmitter();
+  const mockActiveTopicEventEmitter = new EventEmitter();
   const mockReloadOpportunitiesEventEmitter = new EventEmitter();
   const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
 
@@ -39,13 +42,19 @@ describe('Opportunities List Component', () => {
     id: 'id1',
     labelText: 'text',
     labelColor: 'red',
-    progressPercentage: 50
+    progressPercentage: 50,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 50
   },
   {
     id: 'id2',
     labelText: 'text',
     labelColor: 'blue',
-    progressPercentage: 30
+    progressPercentage: 30,
+    inReviewCount: 20,
+    totalCount: 100,
+    translationsCount: 30
   }];
 
   beforeEach(() => {
@@ -54,7 +63,8 @@ describe('Opportunities List Component', () => {
       declarations: [OpportunitiesListComponent],
       providers: [
         ContributionOpportunitiesService,
-        TranslationLanguageService
+        TranslationLanguageService,
+        TranslationTopicService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -64,6 +74,7 @@ describe('Opportunities List Component', () => {
     fixture = TestBed.createComponent(OpportunitiesListComponent);
     component = fixture.componentInstance;
     translationLanguageService = TestBed.inject(TranslationLanguageService);
+    translationTopicService = TestBed.inject(TranslationTopicService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);
 
@@ -78,6 +89,8 @@ describe('Opportunities List Component', () => {
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
       .and.returnValue(mockActiveLanguageEventEmitter);
+    spyOnProperty(translationTopicService, 'onActiveTopicChanged')
+      .and.returnValue(mockActiveTopicEventEmitter);
     spyOnProperty(
       contributionOpportunitiesService, 'reloadOpportunitiesEventEmitter')
       .and.returnValue(mockReloadOpportunitiesEventEmitter);
@@ -102,6 +115,8 @@ describe('Opportunities List Component', () => {
     // Added two opportunities with id's as 'id1' and 'id2'.
     mockActiveLanguageEventEmitter.emit();
     tick();
+    mockActiveTopicEventEmitter.emit();
+    tick();
     mockReloadOpportunitiesEventEmitter.emit();
     tick();
     expect(component.opportunities).toEqual(ExplorationOpportunityDict);
@@ -117,7 +132,10 @@ describe('Opportunities List Component', () => {
         id: 'id1',
         labelText: 'text',
         labelColor: 'red',
-        progressPercentage: 50
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50
       }
     ]);
   }));

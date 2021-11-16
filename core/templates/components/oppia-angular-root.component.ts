@@ -61,10 +61,8 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
-import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheService } from 'ngx-translate-cache';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -86,7 +84,6 @@ import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia
 import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
 import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import { NoninteractiveSvgdiagram } from 'rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
@@ -95,7 +92,7 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
+import { I18nService } from 'i18n/i18n.service';
 
 const componentMap = {
   Collapsible: {
@@ -113,9 +110,6 @@ const componentMap = {
   Skillreview: {
     component_class: NoninteractiveSkillreview,
   },
-  Svgdiagram: {
-    component_class: NoninteractiveSvgdiagram,
-  },
   Tabs: {
     component_class: NoninteractiveTabs,
   },
@@ -123,6 +117,7 @@ const componentMap = {
     component_class: NoninteractiveVideo,
   }
 };
+
 @Component({
   selector: 'oppia-angular-root',
   templateUrl: './oppia-angular-root.component.html'
@@ -138,22 +133,19 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
+  static rteElementsAreInitialized: boolean = false;
   static rteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static translateService: TranslateService;
-  static translateCacheService: TranslateCacheService;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
-    private documentAttributeCustomizationService:
-      DocumentAttributeCustomizationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private htmlEscaperService: HtmlEscaperService,
+    private i18nService: I18nService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private ngZone: NgZone,
     private pageTitleService: PageTitleService,
@@ -161,12 +153,14 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private ratingComputationService: RatingComputationService,
     private reviewTestBackendApiService: ReviewTestBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
-    private translateService: TranslateService,
-    private translateCacheService: TranslateCacheService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private injector: Injector
   ) {
+    if (OppiaAngularRootComponent.rteElementsAreInitialized) {
+      return;
+    }
+
     for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
       const rteElement = createCustomElement(
         componentMap[rteKey].component_class,
@@ -177,6 +171,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         rteElement
       );
     }
+    OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
   public ngAfterViewInit(): void {
@@ -202,13 +197,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       this.reviewTestBackendApiService);
     OppiaAngularRootComponent.storyViewerBackendApiService = (
       this.storyViewerBackendApiService);
-    OppiaAngularRootComponent.translateService = this.translateService;
-    OppiaAngularRootComponent.translateCacheService = (
-      this.translateCacheService);
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
-    this.metaTagCustomizationService.addMetaTags([
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
       {
         propertyType: 'name',
         propertyValue: 'application-name',
@@ -252,25 +244,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     ]);
 
     // Initialize translations.
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => {
-        this.translateService.use(code);
-        for (var i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
-          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
-            this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
-            break;
-          }
-        }
-        this.documentAttributeCustomizationService.addAttribute('lang', code);
-        this.changeDetectorRef.detectChanges();
-      }
-    );
-    this.translateCacheService.init();
-
-    const cachedLanguage = this.translateCacheService.getCachedLanguage();
-    if (cachedLanguage) {
-      this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
-    }
+    this.i18nService.initialize();
+    this.i18nService.directionChangeEventEmitter.subscribe((direction) => {
+      this.direction = direction;
+    });
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

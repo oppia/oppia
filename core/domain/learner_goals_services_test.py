@@ -16,18 +16,16 @@
 
 """Tests for learner goals services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -75,12 +73,13 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         super(LearnerGoalsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.curriculum_admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Save the topics.
         self.save_new_topic(
@@ -89,28 +88,28 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_1], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.curriculum_admin_id)
         self.save_new_topic(
             self.TOPIC_ID_2, self.owner_id, name=self.TOPIC_NAME_2,
             url_fragment='topic-two',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_2], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_2, self.curriculum_admin_id)
         self.save_new_topic(
             self.TOPIC_ID_3, self.owner_id, name=self.TOPIC_NAME_3,
             url_fragment='topic-three',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_3], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_3, self.curriculum_admin_id)
         self.save_new_topic(
             self.TOPIC_ID_4, self.owner_id, name=self.TOPIC_NAME_4,
             url_fragment='topic-four',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_4], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_4, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_4, self.curriculum_admin_id)
 
     def _get_all_topic_ids_to_learn(self, user_id):
         """Returns the list of all the topic ids to learn
@@ -187,7 +186,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
     def test_number_of_topics_cannot_exceed_max(self):
         # Add MAX_CURRENT_GOALS_COUNT topics.
         topic_ids = ['SAMPLE_TOPIC_ID_%s' % index for index in (
-            python_utils.RANGE(0, MAX_CURRENT_GOALS_COUNT))]
+            range(0, MAX_CURRENT_GOALS_COUNT))]
         for topic_id in topic_ids:
             learner_progress_services.validate_and_add_topic_to_learn_goal(
                 self.viewer_id, topic_id)

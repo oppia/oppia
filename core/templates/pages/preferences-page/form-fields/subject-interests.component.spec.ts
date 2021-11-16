@@ -19,7 +19,8 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaterialModule } from 'components/material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from 'modules/material.module';
 import { SubjectInterestsComponent } from './subject-interests.component';
 
 describe('Subject interests form field Component', () => {
@@ -29,6 +30,7 @@ describe('Subject interests form field Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         ReactiveFormsModule
@@ -63,7 +65,7 @@ describe('Subject interests form field Component', () => {
     input = 'math';
     componentInstance.formCtrl = {
       valueChanges: {
-        subscribe(callb) {
+        subscribe(callb: (val: string) => void) {
           callb(input);
         }
       }

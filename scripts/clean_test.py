@@ -16,8 +16,7 @@
 
 """Unit tests for scripts/clean_test.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 import shutil

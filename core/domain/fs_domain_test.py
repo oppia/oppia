@@ -16,16 +16,15 @@
 
 """Tests for filesystem-related domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import re
 
+from core import feconf
+from core import utils
 from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
 
@@ -43,7 +42,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_get_and_save(self):
         self.fs.commit('abc.png', 'file_contents')
-        self.assertEqual(self.fs.get('abc.png'), 'file_contents')
+        self.assertEqual(self.fs.get('abc.png'), b'file_contents')
 
     def test_validate_entity_parameters(self):
         with self.assertRaisesRegexp(
@@ -72,10 +71,13 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             self.fs.get('abc.png')
 
         with self.assertRaisesRegexp(
-            IOError, 'Image does not exist: fake_file.png'):
+            IOError, 'File does not exist: fake_file.png'
+        ):
             self.fs.delete('fake_file.png')
 
     def test_listdir(self):
+        self.assertItemsEqual(self.fs.listdir(''), [])
+
         self.fs.commit('abc.png', 'file_contents')
         self.fs.commit('abcd.png', 'file_contents_2')
         self.fs.commit('abc/abcd.png', 'file_contents_3')
@@ -83,7 +85,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
 
-        self.assertEqual(self.fs.listdir(''), file_names)
+        self.assertItemsEqual(self.fs.listdir(''), file_names)
 
         self.assertEqual(
             self.fs.listdir('abc'), ['abc/abcd.png'])

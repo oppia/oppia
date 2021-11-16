@@ -14,14 +14,15 @@
 
 """Tests for methods relating to sending emails."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 import logging
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
@@ -34,8 +35,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
@@ -52,32 +51,33 @@ class FailedMLTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_property = config_domain.Registry.get_config_property(
             'notification_user_ids_for_failed_tasks')
         config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(self.ADMIN_EMAIL)])
+            'committer_id', [self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL)])
 
     def test_send_failed_ml_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
-            messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
+            messages = (
+                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
             email_manager.send_job_failure_email('123ABC')
 
             # Make sure emails are sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
-            messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
+            messages = (
+                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
 
@@ -144,17 +144,14 @@ class DummyMailTest(test_utils.EmailTestBase):
             email_manager.send_dummy_mail_to_admin(dummy_system_name)
 
             # Make sure emails are sent.
-            messages = self._get_sent_email_messages(
-                dummy_receiver_address)
+            messages = self._get_sent_email_messages(dummy_receiver_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
             self.assertEqual(messages[0].to, [dummy_receiver_address])
-            self.assertEqual(
-                messages[0].subject.decode(), 'Test Mail')
+            self.assertEqual(messages[0].subject, 'Test Mail')
             self.assertIn(
-                'This is a test mail from DUMMY_SYSTEM_NAME',
-                messages[0].html.decode())
+                'This is a test mail from DUMMY_SYSTEM_NAME', messages[0].html)
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
@@ -169,9 +166,9 @@ class EmailRightsTest(test_utils.GenericTestBase):
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_sender_id_validation(self):
         sender_ids_to_test = [
@@ -182,22 +179,22 @@ class EmailRightsTest(test_utils.GenericTestBase):
         expected_validation_results = {
             feconf.EMAIL_INTENT_SIGNUP: (True, False, False, False),
             feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
-            feconf.EMAIL_INTENT_MARKETING: (True, True, False, False),
+            feconf.EMAIL_INTENT_MARKETING: (True, False, False, False),
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-                True, True, True, False),
+                True, False, True, False),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-                True, True, True, False),
+                True, False, True, False),
         }
 
-        for intent in expected_validation_results:
+        for intent, results in expected_validation_results.items():
             for ind, sender_id in enumerate(sender_ids_to_test):
-                if expected_validation_results[intent][ind]:
+                if results[ind]:
                     email_manager.require_sender_id_is_valid(
                         intent, sender_id)
                 else:
                     with self.assertRaisesRegexp(
                         Exception, 'Invalid sender_id'
-                        ):
+                    ):
                         email_manager.require_sender_id_is_valid(
                             intent, sender_id)
 
@@ -257,8 +254,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                     'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
@@ -270,8 +266,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
@@ -279,8 +274,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_editor_role_emails_is_false(self):
@@ -289,8 +283,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id,
                 rights_domain.ROLE_EDITOR, self.exploration.id,
                 self.exploration.title)
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_role_emails_sent_are_correct(self):
@@ -299,8 +292,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_domain.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -309,9 +301,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             sent_email_model = all_models[0]
 
             # Check that email details are correct.
-            self.assertEqual(
-                sent_email_model.recipient_id,
-                self.new_user_id)
+            self.assertEqual(sent_email_model.recipient_id, self.new_user_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.NEW_USER_EMAIL)
             self.assertEqual(
@@ -324,8 +314,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
             self.assertEqual(
-                sent_email_model.subject,
-                self.expected_email_subject)
+                sent_email_model.subject, self.expected_email_subject)
 
     def test_correct_rights_are_written_in_manager_role_email_body(self):
         expected_email_html_body = (
@@ -378,16 +367,11 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_correct_rights_are_written_in_editor_role_email_body(self):
         expected_email_html_body = (
@@ -438,16 +422,11 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_domain.ROLE_EDITOR,
                 self.exploration.id, self.exploration.title)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_correct_rights_are_written_in_voice_artist_role_email_body(self):
         expected_email_html_body = (
@@ -499,16 +478,11 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 rights_domain.ROLE_VOICE_ARTIST, self.exploration.id,
                 self.exploration.title)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_correct_rights_are_written_in_playtester_role_email_body(self):
         expected_email_html_body = (
@@ -557,16 +531,11 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_domain.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_correct_undefined_role_raises_an_exception(self):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
@@ -584,9 +553,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def setUp(self):
         super(SignupEmailTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.new_footer = (
             'Unsubscribe from emails at your '
@@ -636,13 +605,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that no email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_not_modified(self):
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         logged_errors = []
 
@@ -677,13 +644,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'emails to be sent.')
 
             # Check that no email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_partially_modified(self):
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
@@ -726,13 +691,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'emails to be sent.')
 
             # Check that no email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_email_with_bad_content_is_not_sent(self):
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
@@ -770,8 +733,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Original email HTML body does not match cleaned HTML body'))
 
             # Check that no email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self):
@@ -797,8 +759,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(
@@ -806,10 +767,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertEqual(messages[0].subject, 'Welcome!')
-            self.assertEqual(
-                messages[0].body.decode(), self.expected_text_email_content)
-            self.assertEqual(
-                messages[0].html.decode(), self.expected_html_email_content)
+            self.assertEqual(messages[0].body, self.expected_text_email_content)
+            self.assertEqual(messages[0].html, self.expected_html_email_content)
 
     def test_email_only_sent_once_for_repeated_signups_by_same_user(self):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -831,8 +790,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Send a second POST request.
@@ -843,8 +801,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
     def test_email_only_sent_if_signup_was_successful(self):
@@ -869,8 +826,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 csrf_token=csrf_token, expected_status_int=400)
 
             # Check that no email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
             # Redo the signup process with a good username.
@@ -881,8 +837,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self):
@@ -911,8 +866,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -935,8 +889,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_SIGNUP)
-            self.assertEqual(
-                sent_email_model.subject, 'Welcome!')
+            self.assertEqual(sent_email_model.subject, 'Welcome!')
             self.assertEqual(
                 sent_email_model.html_body, self.expected_html_email_content)
 
@@ -950,9 +903,9 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.new_footer = (
             'You can change your email preferences via the '
@@ -972,8 +925,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         self.generate_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(
-                _generate_hash_for_tests,
-                email_models.SentEmailModel))
+                _generate_hash_for_tests, email_models.SentEmailModel))
 
     def test_send_email_does_not_resend_if_same_hash_exists(self):
         can_send_emails_ctx = self.swap(
@@ -1021,8 +973,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(0, len(messages))
 
             # Check that the content of this email was not recorded in
@@ -1061,8 +1012,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1083,8 +1033,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was not recorded in
@@ -1119,8 +1068,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1169,8 +1117,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1219,8 +1166,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1284,8 +1230,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1318,8 +1263,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.expected_email_subject = (
             'You\'ve received 3 new messages on your explorations')
 
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.can_not_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
         self.can_send_feedback_email_ctx = self.swap(
@@ -1338,8 +1282,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self._get_sent_email_messages(
-            self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
@@ -1353,8 +1296,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self._get_sent_email_messages(
-            self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_feedback_messages_are_empty(self):
@@ -1364,8 +1306,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self._get_sent_email_messages(
-            self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_correct_email_body_is_sent(self):
@@ -1419,23 +1360,17 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
             # Check that email body is correct.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Check that email model is correct.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
             sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.recipient_id, self.editor_id)
+            self.assertEqual(sent_email_model.recipient_id, self.editor_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
@@ -1532,23 +1467,16 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 self.recipient_list)
 
             # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
             sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.editor_id)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.editor_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
@@ -1590,8 +1518,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-        messages = self._get_sent_email_messages(
-            self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_subscription_emails_is_false(self):
@@ -1599,8 +1526,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-        messages = self._get_sent_email_messages(
-            self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_subscription_emails_are_correct(self):
@@ -1638,23 +1564,16 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.exploration.id, self.exploration.title)
 
             # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
             sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.new_user_id)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.new_user_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.NEW_USER_EMAIL)
             self.assertEqual(
@@ -1698,8 +1617,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 self.exploration.id, 'a subject')
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(
-            self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
@@ -1710,8 +1628,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 self.exploration.id, 'a subject')
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(
-            self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_feedback_message_emails_are_correct(self):
@@ -1753,20 +1670,14 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
             sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.new_user_id)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.new_user_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.NEW_USER_EMAIL)
             self.assertEqual(
@@ -1807,9 +1718,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
-
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.can_not_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
 
@@ -1820,8 +1729,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 self.report_text)
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(
-            self.MODERATOR_EMAIL)
+        messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_flag_exploration_emails_are_correct(self):
@@ -1860,33 +1768,22 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 self.report_text)
 
             # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.MODERATOR_EMAIL)
+            messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email is sent to multiple moderators.
-            messages = self._get_sent_email_messages(
-                self.moderator2_email)
+            messages = self._get_sent_email_messages(self.moderator2_email)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator_id)
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(
                 sent_email_model.recipient_email, self.MODERATOR_EMAIL)
             self.assertEqual(
@@ -1895,12 +1792,10 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
-            sent_email_model = python_utils.NEXT(
+                sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator2_id)
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(
                 sent_email_model.recipient_email, self.moderator2_email)
             self.assertEqual(
@@ -1909,8 +1804,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
 
 
 class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
@@ -1935,8 +1829,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 self.reviewer_id, 'Algebra')
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(
-            self.REVIEWER_EMAIL)
+        messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
@@ -1968,19 +1861,15 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 self.reviewer_id, 'Algebra')
 
             # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
             sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.reviewer_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.REVIEWER_EMAIL)
             self.assertEqual(
@@ -1989,8 +1878,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
@@ -2039,19 +1927,15 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 self.reviewer_id, 'Algebra')
 
             # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
             sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.reviewer_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.REVIEWER_EMAIL)
             self.assertEqual(
@@ -2368,8 +2252,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2427,8 +2310,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2487,7 +2369,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+            messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2546,7 +2428,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+            messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2604,8 +2486,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2663,8 +2544,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2722,8 +2602,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2790,8 +2669,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2901,12 +2779,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_reviewer_1)
+        self.assertEqual(messages[0].html, expected_email_html_body_reviewer_1)
         messages = self._get_sent_email_messages(self.REVIEWER_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_reviewer_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_reviewer_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -2969,8 +2845,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.reviewer_1_id,
@@ -3027,8 +2902,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3088,8 +2962,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3149,8 +3022,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3210,8 +3082,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3271,8 +3142,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3332,8 +3202,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3400,8 +3269,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3511,12 +3379,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_reviewer_1)
+        self.assertEqual(messages[0].html, expected_email_html_body_reviewer_1)
         messages = self._get_sent_email_messages(self.REVIEWER_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_reviewer_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_reviewer_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3628,12 +3494,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_reviewer_1)
+        self.assertEqual(messages[0].html, expected_email_html_body_reviewer_1)
         messages = self._get_sent_email_messages(self.REVIEWER_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_reviewer_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_reviewer_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
@@ -3658,10 +3522,10 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     mocked_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
-    ADMIN_1_USERNAME = 'user1'
-    ADMIN_1_EMAIL = 'user1@community.org'
-    ADMIN_2_USERNAME = 'user2'
-    ADMIN_2_EMAIL = 'user2@community.org'
+    CURRICULUM_ADMIN_1_USERNAME = 'user1'
+    CURRICULUM_ADMIN_1_EMAIL = 'user1@community.org'
+    CURRICULUM_ADMIN_2_USERNAME = 'user2'
+    CURRICULUM_ADMIN_2_EMAIL = 'user2@community.org'
 
     def _create_translation_suggestion_in_lang_with_html_and_datetime(
             self, language_code, translation_html, submission_datetime):
@@ -3782,10 +3646,14 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             self).setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.signup(self.ADMIN_1_EMAIL, self.ADMIN_1_USERNAME)
-        self.admin_1_id = self.get_user_id_from_email(self.ADMIN_1_EMAIL)
-        self.signup(self.ADMIN_2_EMAIL, self.ADMIN_2_USERNAME)
-        self.admin_2_id = self.get_user_id_from_email(self.ADMIN_2_EMAIL)
+        self.signup(
+            self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_1_USERNAME)
+        self.admin_1_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_1_EMAIL)
+        self.signup(
+            self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
+        self.admin_2_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
@@ -3823,6 +3691,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
                         [self.admin_1_id],
+                        [],
+                        [],
                         [self.reviewable_suggestion_email_info])
                 )
 
@@ -3845,7 +3715,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [self.admin_1_id],
+                        [self.admin_1_id], [], [],
                         [self.reviewable_suggestion_email_info])
                 )
 
@@ -3870,7 +3740,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        ['admin_id_without_email'],
+                        ['admin_id_without_email'], [], [],
                         [self.reviewable_suggestion_email_info])
                 )
 
@@ -3894,7 +3764,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [], [self.reviewable_suggestion_email_info])
+                        [], [], [], [self.reviewable_suggestion_email_info])
                 )
 
         messages = self._get_all_sent_email_messages()
@@ -3916,7 +3786,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [self.admin_1_id], [])
+                        [self.admin_1_id], [], [], [])
                 )
 
         messages = self._get_all_sent_email_messages()
@@ -3980,20 +3850,19 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             [reviewable_suggestion_email_info])
                     )
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_email_sent_to_admin_if_multiple_questions_have_waited_for_review(
             self):
@@ -4058,20 +3927,19 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             reviewable_suggestion_email_infos)
                     )
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_email_sent_to_admin_if_translation_has_waited_too_long_for_review(
             self):
@@ -4127,20 +3995,19 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             [reviewable_suggestion_email_info])
                     )
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_email_sent_to_admin_if_multi_translations_have_waited_for_review(
             self):
@@ -4205,20 +4072,19 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             reviewable_suggestion_email_infos)
                     )
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_email_sent_to_admin_if_multi_suggestion_types_waiting_for_review(
             self):
@@ -4275,9 +4141,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>The following French translation suggestion was submitted for '
             'review 2 days ago:'
             '<br>Translation 2</li><br>'
-            '<li>The following question suggestion was submitted for review 2 '
-            'days ago:'
-            '<br>Question 1</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
@@ -4294,20 +4157,41 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             reviewable_suggestion_email_infos)
                     )
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
+        messages.sort(key=lambda m: m.html)
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+        sent_email_models = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id == self.admin_1_id).fetch()
+        self.assertEqual(len(sent_email_models), 2)
+        sent_email_models.sort(key=lambda m: m.html_body)
+        sent_email_model = sent_email_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager
+            .ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, self.admin_1_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, self.CURRICULUM_ADMIN_1_EMAIL)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
     def test_email_sent_to_multiple_admins(self):
         config_services.set_property(
@@ -4389,27 +4273,25 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id, self.admin_2_id],
+                            [self.admin_1_id, self.admin_2_id], [], [],
                             [reviewable_suggestion_email_info])
                     )
 
         # Make sure correct emails are sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_admin_1)
-        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(messages[0].html, expected_email_html_body_admin_1)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_admin_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_admin_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_admin_1, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_admin_2, self.admin_2_id,
-            self.ADMIN_2_EMAIL)
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
@@ -4418,10 +4300,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     specific suggestion types.
     """
 
-    ADMIN_1_USERNAME = 'user1'
-    ADMIN_1_EMAIL = 'user1@community.org'
-    ADMIN_2_USERNAME = 'user2'
-    ADMIN_2_EMAIL = 'user2@community.org'
+    CURRICULUM_ADMIN_1_USERNAME = 'user1'
+    CURRICULUM_ADMIN_1_EMAIL = 'user1@community.org'
+    CURRICULUM_ADMIN_2_USERNAME = 'user2'
+    CURRICULUM_ADMIN_2_EMAIL = 'user2@community.org'
     AUTHOR_EMAIL = 'author@example.com'
     target_id = 'exp1'
     skill_id = 'skill_123456'
@@ -4515,10 +4397,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.signup(self.ADMIN_1_EMAIL, self.ADMIN_1_USERNAME)
-        self.admin_1_id = self.get_user_id_from_email(self.ADMIN_1_EMAIL)
-        self.signup(self.ADMIN_2_EMAIL, self.ADMIN_2_USERNAME)
-        self.admin_2_id = self.get_user_id_from_email(self.ADMIN_2_EMAIL)
+        self.signup(
+            self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_1_USERNAME)
+        self.admin_1_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_1_EMAIL)
+        self.signup(
+            self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
+        self.admin_2_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
@@ -4546,7 +4432,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], self.suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4562,7 +4449,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], self.suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4580,7 +4468,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [], self.suggestion_types_needing_reviewers)
+                [], [], [],
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4596,7 +4485,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_info_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], {})
+                [self.admin_1_id], [], [], {})
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4612,7 +4501,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                ['admin_id_without_email'],
+                ['admin_id_without_email'], [], [],
                 self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
@@ -4655,17 +4544,18 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], self.suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                self.suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
+            expected_email_html_body, self.admin_1_id,
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
             self):
@@ -4717,26 +4607,24 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_1)
-        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
-            self.ADMIN_2_EMAIL)
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
     def test_admin_email_sent_if_translations_need_reviewers_for_one_lang(
             self):
@@ -4769,17 +4657,18 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
+            expected_email_html_body, self.admin_1_id,
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_one_lang(
             self):
@@ -4829,26 +4718,24 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_1)
-        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
-            self.ADMIN_2_EMAIL)
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
     def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
             self):
@@ -4888,17 +4775,18 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
+            expected_email_html_body, self.admin_1_id,
+            self.CURRICULUM_ADMIN_1_EMAIL)
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
             self):
@@ -4960,26 +4848,24 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_1)
-        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+            self.CURRICULUM_ADMIN_1_EMAIL)
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
-            self.ADMIN_2_EMAIL)
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
     def test_email_sent_to_admins_if_mutli_suggestion_types_needing_reviewers(
             self):
@@ -5014,15 +4900,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             '<li><b>French</b></li><br>'
             '<li><b>Hindi</b></li><br>'
             '</ul><br>'
-            'There have been <b>question suggestions</b> created on the '
-            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
-            'enough reviewers.'
-            '<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL, feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -5041,40 +4922,55 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             '<li><b>French</b></li><br>'
             '<li><b>Hindi</b></li><br>'
             '</ul><br>'
-            'There have been <b>question suggestions</b> created on the '
-            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
-            'enough reviewers.'
-            '<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL, feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id], [self.admin_2_id], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
+        messages.sort(key=lambda m: m.html)
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(messages[1].html, expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_1)
-        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body_for_admin_1, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
+        sent_email_models = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id == self.admin_1_id).fetch()
+        self.assertEqual(len(sent_email_models), 2)
+        sent_email_models.sort(key=lambda m: m.html_body)
+        sent_email_model = sent_email_models[1]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager.ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, self.admin_1_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, self.CURRICULUM_ADMIN_1_EMAIL)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body_for_admin_1)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
+
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
-            self.ADMIN_2_EMAIL)
+            self.CURRICULUM_ADMIN_2_EMAIL)
 
 
 class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
@@ -5100,7 +4996,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
         self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
-        self.set_admins([self.SENDER_USERNAME, ])
+        self.set_curriculum_admins([self.SENDER_USERNAME, ])
         self.recipient_a_id = self.get_user_id_from_email(
             self.RECIPIENT_A_EMAIL)
         self.recipient_b_id = self.get_user_id_from_email(
@@ -5144,10 +5040,8 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5202,7 +5096,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             'You can change your email preferences via the Preferences page.')
 
         expected_admin_email_text_body = (
-            '(Sent from dummy-cloudsdk-project-id)\n\n'
+            '(Sent from dev-project-id)\n\n'
             'Query job with qid query id has failed in its execution.\n'
             'Query parameters:\n\n'
             'key1: val1\n'
@@ -5216,10 +5110,8 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5244,12 +5136,12 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(admin_messages), 1)
             self.assertEqual(
-                admin_messages[0].body.decode(), expected_admin_email_text_body)
+                admin_messages[0].body, expected_admin_email_text_body)
 
     def test_send_user_query_email(self):
         email_subject = 'Bulk Email User Query Subject'
         email_body = 'Bulk Email User Query Body'
-        email_intent = feconf.BULK_EMAIL_INTENT_MARKETING
+        email_intent = feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION
         with self.can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
@@ -5335,8 +5227,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5380,8 +5271,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5459,8 +5349,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5508,7 +5397,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
-        self.set_admins([self.SENDER_USERNAME])
+        self.set_curriculum_admins([self.SENDER_USERNAME])
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self):
@@ -5519,23 +5408,19 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids, email_subject,
-                email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
+                email_html_body, feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
         messages_a = self._get_sent_email_messages(
             self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 1)
-        self.assertEqual(
-            messages_a[0].html.decode(), email_html_body)
-        self.assertEqual(
-            messages_a[0].body.decode(), email_text_body)
+        self.assertEqual(messages_a[0].html, email_html_body)
+        self.assertEqual(messages_a[0].body, email_text_body)
 
         messages_b = self._get_sent_email_messages(
             self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 1)
-        self.assertEqual(
-            messages_b[0].html.decode(), email_html_body)
-        self.assertEqual(
-            messages_b[0].body.decode(), email_text_body)
+        self.assertEqual(messages_b[0].html, email_html_body)
+        self.assertEqual(messages_b[0].body, email_text_body)
 
         # Make sure correct email model is stored.
         all_models = email_models.BulkEmailModel.get_all().fetch()
@@ -5554,7 +5439,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             '%s <%s>' % (self.SENDER_USERNAME, self.SENDER_EMAIL))
         self.assertEqual(
             sent_email_model.intent,
-            feconf.BULK_EMAIL_INTENT_MARKETING)
+            feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
     def test_email_not_sent_if_original_html_not_matches_cleaned_html(self):
         email_subject = 'Dummy Email Subject'
@@ -5564,7 +5449,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
                 email_subject, email_html_body,
-                feconf.BULK_EMAIL_INTENT_MARKETING)
+                feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
         # Check that no email was sent.
         messages_a = self._get_sent_email_messages(
@@ -5601,8 +5486,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             email_manager.send_test_email_for_bulk_emails(
                 self.sender_id, email_subject, email_body
             )
-        messages = self._get_sent_email_messages(
-            self.SENDER_EMAIL)
+        messages = self._get_sent_email_messages(self.SENDER_EMAIL)
         self.assertEqual(len(messages), 1)
 
 
@@ -5754,7 +5638,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def setUp(self):
         super(ContributionReviewerEmailTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -5837,8 +5721,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5884,8 +5767,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -5930,8 +5812,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.QUESTION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -6010,8 +5891,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -6056,8 +5936,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -6100,8 +5979,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.QUESTION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()

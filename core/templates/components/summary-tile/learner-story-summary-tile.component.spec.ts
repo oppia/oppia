@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, TestBed } from
   '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -26,6 +26,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { StorySummary} from 'domain/story/story-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerStorySummaryTileComponent } from './learner-story-summary-tile.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 describe('Learner Story Summary Tile Component', () => {
@@ -36,6 +37,7 @@ describe('Learner Story Summary Tile Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule
@@ -83,6 +85,87 @@ describe('Learner Story Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should get the next incomplete node title on init', () => {
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Chapter 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+    const sampleStorySummaryBackendDict = {
+      id: '0',
+      title: 'Story Title',
+      description: 'Story Description',
+      node_titles: ['Chapter 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: [],
+      url_fragment: 'story-title',
+      all_node_dicts: [nodeDict],
+      topic_name: 'Topic',
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'topic'
+    };
+    component.storySummary = StorySummary.createFromBackendDict(
+      sampleStorySummaryBackendDict);
+    component.ngOnInit();
+    expect(component.nextIncompleteNodeTitle).toEqual('Chapter 1: Chapter 1');
+  });
+
+  it('should make the tile blurred if it is hovered', () => {
+    component.cardIsHovered = true;
+    component.displayArea = 'homeTab';
+    expect(component.isCardHovered()).toBe(
+      '-webkit-filter: blur(2px); filter: blur(2px);');
+  });
+
+  it('should get story link url for exploration page on homeTab', () => {
+    component.displayArea = 'homeTab';
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: 'test',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+    const sampleStorySummaryBackendDict = {
+      id: '0',
+      title: 'Story Title',
+      description: 'Story Description',
+      node_titles: ['Chapter 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story',
+      all_node_dicts: [nodeDict],
+      topic_name: 'Topic',
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'topic'
+    };
+    component.storySummary = StorySummary.createFromBackendDict(
+      sampleStorySummaryBackendDict);
+    component.completedNodeCount = 0;
+    expect(component.getStoryLink()).toBe(
+      '/explore/test?topic_url_fragment=topic&' +
+      'classroom_url_fragment=math&story_url_fragment=story&' +
+      'node_id=node_1');
   });
 
   it('should get # as story link url for story page', () => {

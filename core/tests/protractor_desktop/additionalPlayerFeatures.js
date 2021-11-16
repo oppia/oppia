@@ -35,8 +35,10 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Full exploration editor', function() {
+  var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -45,8 +47,10 @@ describe('Full exploration editor', function() {
 
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var parentExplorationId = null;
 
   beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -63,7 +67,7 @@ describe('Full exploration editor', function() {
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
 
-      await workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial(false);
       await explorationEditorMainTab.startTutorial();
       await explorationEditorMainTab.playTutorial();
       await explorationEditorMainTab.finishTutorial();
@@ -139,12 +143,13 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.moveToState('card 2');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'this is card 2 with non-inline interaction'));
-    await explorationEditorMainTab.setInteraction(
-      'LogicProof',
-      '', '', 'from p we have p');
+    await explorationEditorMainTab.setInteraction('CodeRepl');
     await explorationEditorMainTab.addResponse(
-      'LogicProof', await forms.toRichText('Great'),
-      'final card', true, 'Correct');
+      'CodeRepl', await forms.toRichText('Nice. Press continue button'),
+      'final card', true, 'CodeDoesNotContain', 'test');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('try again'));
 
     // Setup a terminating state.
     await explorationEditorMainTab.moveToState('final card');
@@ -156,7 +161,7 @@ describe('Full exploration editor', function() {
     var backButton = element(by.css('.protractor-test-back-button'));
     var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
-    await explorationPlayerPage.submitAnswer('LogicProof');
+    await explorationPlayerPage.submitAnswer('CodeRepl');
     await waitFor.visibilityOf(
       nextCardButton, 'Next Card button taking too long to show up.');
     await waitFor.invisibilityOf(
@@ -219,7 +224,9 @@ describe('Full exploration editor', function() {
 
   it('should give option for redirection when author has specified ' +
       'a refresher exploration ID', async function() {
-    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    await users.createCollectionEditor('testadm@collections.com', 'testadm');
+    await users.login('testadm@collections.com');
+    await adminPage.addRole('testadm', 'curriculum admin');
 
     // Create Parent Exploration not added to collection.
     await creatorDashboardPage.get();
@@ -237,7 +244,12 @@ describe('Full exploration editor', function() {
       await forms.toRichText('Parent Exploration Content'));
     await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [await forms.toRichText('Correct'), await forms.toRichText('Incorrect')]);
+      [
+        await forms.toRichText('Correct'),
+        await forms.toRichText('Incorrect'),
+        await forms.toRichText('Wrong'),
+        await forms.toRichText('Not correct')
+      ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -264,7 +276,12 @@ describe('Full exploration editor', function() {
       'Parent Exploration Content'));
     await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [await forms.toRichText('Correct'), await forms.toRichText('Incorrect')]);
+      [
+        await forms.toRichText('Correct'),
+        await forms.toRichText('Incorrect'),
+        await forms.toRichText('Wrong'),
+        await forms.toRichText('Not correct')
+      ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -275,6 +292,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
+    parentExplorationId = await general.getExplorationIdFromEditor();
 
     // Create Refresher Exploration.
     await creatorDashboardPage.get();
@@ -315,8 +333,7 @@ describe('Full exploration editor', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateCollectionButton();
-    await collectionEditorPage.searchForAndAddExistingExploration(
-      'Parent Exploration in collection');
+    await collectionEditorPage.addExistingExploration(parentExplorationId);
     await collectionEditorPage.saveDraft();
     await collectionEditorPage.closeSaveModal();
     await collectionEditorPage.publishCollection();
@@ -384,7 +401,9 @@ describe('Full exploration editor', function() {
         'MultipleChoiceInput',
         [
           await forms.toRichText('return'),
-          await forms.toRichText('complete')
+          await forms.toRichText('complete'),
+          await forms.toRichText('incomplete'),
+          await forms.toRichText('needs to be done')
         ]
       );
       await explorationEditorMainTab.addResponse(

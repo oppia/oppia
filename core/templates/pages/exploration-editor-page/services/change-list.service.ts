@@ -18,7 +18,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, OnInit, Output } from '@angular/core';
+import { EventEmitter, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -29,11 +29,12 @@ import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChangeListService implements OnInit {
+export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
   undoneChangeStack: ExplorationChange[] = [];
@@ -41,6 +42,8 @@ export class ChangeListService implements OnInit {
   // undone change.
   ndoneChangeStack = [];
   loadingMessage: string = '';
+  // Temporary list of the changes made to the exploration when offline.
+  temporaryListOfChanges: ExplorationChange[] = [];
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -88,12 +91,23 @@ export class ChangeListService implements OnInit {
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-  ) {}
-
-  ngOnInit(): void {
+    private internetConnectivityService: InternetConnectivityService,
+  ) {
+    // We have added subscriptions in the constructor.
+    // Since, ngOnInit does not work in angular services.
+    // Ref: https://github.com/angular/angular/issues/23235.
     this.loaderService.onLoadingMessageChange.subscribe(
       (message: string) => this.loadingMessage = message
     );
+    this.internetConnectivityService.onInternetStateChange.subscribe(
+      internetAccessible => {
+        if (internetAccessible && this.temporaryListOfChanges.length > 0) {
+          for (let change of this.temporaryListOfChanges) {
+            this.addChange(change);
+          }
+          this.temporaryListOfChanges = [];
+        }
+      });
   }
 
   private autosaveChangeListOnChange(explorationChangeList) {
@@ -134,6 +148,10 @@ export class ChangeListService implements OnInit {
 
   private addChange(changeDict: ExplorationChange) {
     if (this.loadingMessage) {
+      return;
+    }
+    if (!this.internetConnectivityService.isOnline()) {
+      this.temporaryListOfChanges.push(changeDict);
       return;
     }
     this.explorationChangeList.push(changeDict);
@@ -295,10 +313,27 @@ export class ChangeListService implements OnInit {
 
   /**
    * Saves a change dict that represents marking a translation as needing
-   * update.
+   * update in a particular language.
    *
    * @param {string} contentId - The content id of the translated content.
    * @param {string} languageCode - The language code.
+   * @param {string} stateName - The current state name.
+   */
+  markTranslationAsNeedingUpdate(
+      contentId: string, languageCode: string, stateName: string): void {
+    this.addChange({
+      cmd: 'mark_written_translation_as_needing_update',
+      content_id: contentId,
+      language_code: languageCode,
+      state_name: stateName
+    });
+  }
+
+  /**
+   * Saves a change dict that represents marking a translation as needing
+   * update in all languages.
+   *
+   * @param {string} contentId - The content id of the translated content.
    * @param {string} stateName - The current state name.
    */
   markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {

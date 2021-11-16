@@ -14,12 +14,12 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -43,8 +43,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -101,10 +99,10 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.logout()
 
-    def test_unpublished_explorations_are_visible_to_admins(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL)
+    def test_unpublished_explorations_are_visible_to_moderator(self):
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.login(self.MODERATOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.logout()
@@ -343,8 +341,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         skill_ids_for_url = ''
 
         # Create multiple skills, questions and skill links.
-        for _ in python_utils.RANGE(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+        for _ in range(feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
@@ -357,7 +354,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         # Create additional skills with user skill mastery > 0.0,
         # so that these are filtered out correctly.
-        for _ in python_utils.RANGE(5):
+        for _ in range(5):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
@@ -369,13 +366,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX,
-            python_utils.convert_to_bytes(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
-            skill_ids_for_url, 'true')
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+            skill_ids_for_url,
+            'true'
+        )
         json_response = self.get_json(url)
         self.assertEqual(
             len(json_response['question_dicts']),
-            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+            feconf.QUESTION_BATCH_SIZE)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
@@ -1058,12 +1056,8 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_non_logged_in_users_cannot_report(self):
         """Check that non-logged in users cannot report."""
@@ -1100,9 +1094,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -1570,7 +1564,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
-            'playthrough_id': None
         }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1861,31 +1854,38 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self):
         self.aggregated_stats.pop('num_starts')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+        response = self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+        }, expected_status_int=400)
 
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn(
-            'num_starts not in aggregated stats dict.', captured_logs[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: num_starts not in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
             self):
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
-            self.post_json('/explorehandler/stats_events/%s' % (
+        response = self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+                    'exp_version': self.exp_version}, expected_status_int=400)
 
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn(
-            'total_hit_count not in state stats mapping '
-            'of Home in aggregated stats dict.', captured_logs[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: total_hit_count not in '
+            'state stats mapping of Home in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
@@ -2403,8 +2403,9 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             }
         )
         self.assertIn(
-            '<exploration-player-page></exploration-player-page>',
-            response.body)
+            b'<exploration-player-page></exploration-player-page>',
+            response.body
+        )
 
         self.logout()
 

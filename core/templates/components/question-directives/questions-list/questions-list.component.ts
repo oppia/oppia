@@ -27,7 +27,7 @@ require(
   'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
@@ -76,7 +76,7 @@ angular.module('oppia').component('questionsList', {
     canEditQuestion: '&',
     getSkillIdToRubricsObject: '&skillIdToRubricsObject',
     getSelectedSkillId: '&selectedSkillId',
-    getGroupedSkillSummaries: '=',
+    getGroupedSkillSummaries: '&groupedSkillSummaries',
     getSkillsCategorizedByTopics: '=',
     getUntriagedSkillSummaries: '='
   },
@@ -116,10 +116,6 @@ angular.module('oppia').component('questionsList', {
         ctrl.questionEditorIsShown = false;
         ctrl.question = null;
         _reInitializeSelectedSkillIds();
-        QuestionsListService.getQuestionSummariesAsync(
-          ctrl.selectedSkillId, resetHistoryAndFetch,
-          resetHistoryAndFetch
-        );
         ctrl.questionIsBeingUpdated = false;
         ctrl.misconceptionsBySkill = {};
         ctrl.misconceptionIdsForSelectedSkill = [];
@@ -135,6 +131,11 @@ angular.module('oppia').component('questionsList', {
         }
         if (SkillEditorRoutingService.navigateToQuestionEditor()) {
           ctrl.createQuestion();
+        } else {
+          QuestionsListService.getQuestionSummariesAsync(
+            ctrl.selectedSkillId, resetHistoryAndFetch,
+            resetHistoryAndFetch
+          );
         }
       };
       ctrl.getQuestionIndex = function(index) {
@@ -294,7 +295,6 @@ angular.module('oppia').component('questionsList', {
               skillId, '', null));
         });
         ctrl.showDifficultyChoices = true;
-        ctrl.editorIsOpen = true;
         ctrl.initiateQuestionCreation();
       };
 
@@ -494,6 +494,7 @@ angular.module('oppia').component('questionsList', {
             ctrl.associatedSkillSummaries.filter(function(summary) {
               return summary.getId() !== skillId;
             });
+        ctrl.updateSkillLinkage();
       };
       ctrl.isQuestionSavable = function() {
         // Not savable if there are no changes.
@@ -563,6 +564,7 @@ angular.module('oppia').component('questionsList', {
             task: 'add',
             difficulty: DEFAULT_SKILL_DIFFICULTY
           });
+          ctrl.updateSkillLinkage();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is
@@ -570,11 +572,12 @@ angular.module('oppia').component('questionsList', {
         });
       };
 
-      ctrl.updateSkillLinkage = function(commitMsg) {
+      ctrl.updateSkillLinkageAndQuestions = function(commitMsg) {
         EditableQuestionBackendApiService.editQuestionSkillLinksAsync(
           ctrl.questionId, ctrl.skillLinkageModificationsArray
         ).then(
           data => {
+            ctrl.skillLinkageModificationsArray = [];
             $timeout(function() {
               QuestionsListService.resetPageNumber();
               _reInitializeSelectedSkillIds();
@@ -584,6 +587,17 @@ angular.module('oppia').component('questionsList', {
               ctrl.editorIsOpen = false;
               ctrl.saveAndPublishQuestion(commitMsg);
             }, 500);
+            $rootScope.$apply();
+          });
+      };
+
+      ctrl.updateSkillLinkage = function() {
+        EditableQuestionBackendApiService.editQuestionSkillLinksAsync(
+          ctrl.questionId, ctrl.skillLinkageModificationsArray
+        ).then(
+          data => {
+            ctrl.skillLinkageModificationsArray = [];
+            $rootScope.$apply();
           });
       };
 
@@ -602,7 +616,7 @@ angular.module('oppia').component('questionsList', {
           }).result.then(function(commitMessage) {
             if (ctrl.skillLinkageModificationsArray &&
                 ctrl.skillLinkageModificationsArray.length > 0) {
-              ctrl.updateSkillLinkage(commitMessage);
+              ctrl.updateSkillLinkageAndQuestions(commitMessage);
             } else {
               ContextService.resetImageSaveDestination();
               ctrl.saveAndPublishQuestion(commitMessage);

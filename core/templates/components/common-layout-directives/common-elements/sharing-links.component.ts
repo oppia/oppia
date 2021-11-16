@@ -35,17 +35,20 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   styleUrls: []
 })
 export class SharingLinksComponent implements OnInit {
-  @Input() layoutType: string;
-  @Input() layoutAlignType: string;
-  @Input() shareType: ShareType;
-  @Input() explorationId: string;
-  @Input() collectionId: string;
-  @Input() smallFont: boolean;
-  classroomUrl: string;
-  activityId: string;
-  activityUrlFragment: string;
-  serverName: string;
-  escapedTwitterText: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() layoutType!: string;
+  @Input() layoutAlignType!: string;
+  @Input() shareType!: ShareType;
+  @Input() explorationId!: string;
+  @Input() collectionId!: string;
+  @Input() smallFont!: boolean;
+  classroomUrl!: string;
+  activityId!: string;
+  activityUrlFragment!: string;
+  serverName!: string;
+  escapedTwitterText!: string;
 
   constructor(
     private nbgModal: NgbModal,
@@ -96,16 +99,32 @@ export class SharingLinksComponent implements OnInit {
   }
 
   getUrl(network: SharingPlatform): string {
-    if (network === 'facebook') {
-      return `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=${this.serverName}/${this.activityUrlFragment}/${this.activityId}&display=popup&ref=plugin&src=share_button`;
-    }
+    let queryString: string;
+    const url = (
+      `${this.serverName}/${this.activityUrlFragment}/${this.activityId}`);
+    switch (network) {
+      case 'facebook':
+        queryString = (
+          'sdk=joey&' +
+          `u=${url}&` +
+          'display=popup&' +
+          'ref=plugin&' +
+          'src=share_button'
+        );
+        return `https://www.facebook.com/sharer/sharer.php?${queryString}`;
 
-    if (network === 'twitter') {
-      return `https://twitter.com/share?text=${this.escapedTwitterText}&url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
-    }
+      case 'twitter':
+        queryString = (
+          `text=${this.escapedTwitterText}&` +
+          `url=${url}`
+        );
+        return `https://twitter.com/share?${queryString}`;
 
-    if (network === 'classroom') {
-      return `https://classroom.google.com/share?url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
+      case 'classroom':
+        queryString = (
+          `url=${url}`
+        );
+        return `https://classroom.google.com/share?${queryString}`;
     }
   }
 

@@ -16,14 +16,13 @@
 
 """Methods for returning the correct file system class to the client."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
+from core import utils
 from core.domain import fs_domain
 from core.domain import image_services
 from core.platform import models
-import feconf
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -75,20 +74,20 @@ def save_original_and_compressed_versions_of_image(
     # already there. Also, even if the compressed, micro versions for some
     # image exists, then this would prevent from creating another copy of
     # the same.
-    if not fs.isfile(filepath.encode('utf-8')):
+    if not fs.isfile(filepath):
         fs.commit(
-            filepath.encode('utf-8'), original_image_content,
-            mimetype=mimetype)
+            filepath, original_image_content, mimetype=mimetype)
 
-    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
+    if not fs.isfile(compressed_image_filepath):
         fs.commit(
-            compressed_image_filepath.encode('utf-8'),
-            compressed_image_content, mimetype=mimetype)
+            compressed_image_filepath,
+            compressed_image_content,
+            mimetype=mimetype
+        )
 
-    if not fs.isfile(micro_image_filepath.encode('utf-8')):
+    if not fs.isfile(micro_image_filepath):
         fs.commit(
-            micro_image_filepath.encode('utf-8'),
-            micro_image_content, mimetype=mimetype)
+            micro_image_filepath, micro_image_content, mimetype=mimetype)
 
 
 def save_classifier_data(exp_id, job_id, classifier_data_proto):

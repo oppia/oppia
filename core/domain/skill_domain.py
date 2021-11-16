@@ -14,21 +14,19 @@
 
 """Domain objects relating to skills."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import copy
 import json
 
-import android_validation_constants
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
-import feconf
-import python_utils
-import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -179,7 +177,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-class Misconception(python_utils.OBJECT):
+class Misconception:
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -259,7 +257,7 @@ class Misconception(python_utils.OBJECT):
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
-        if not isinstance(self.name, python_utils.BASESTRING):
+        if not isinstance(self.name, str):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
@@ -271,7 +269,7 @@ class Misconception(python_utils.OBJECT):
                 'Misconception name should be less than %d chars, received %s'
                 % (misconception_name_length_limit, self.name))
 
-        if not isinstance(self.notes, python_utils.BASESTRING):
+        if not isinstance(self.notes, str):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
@@ -281,13 +279,13 @@ class Misconception(python_utils.OBJECT):
                 'Expected must_be_addressed to be a bool, received %s' %
                 self.must_be_addressed)
 
-        if not isinstance(self.feedback, python_utils.BASESTRING):
+        if not isinstance(self.feedback, str):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
 
 
-class Rubric(python_utils.OBJECT):
+class Rubric:
     """Domain object describing a skill rubric."""
 
     def __init__(self, difficulty, explanations):
@@ -335,7 +333,7 @@ class Rubric(python_utils.OBJECT):
             ValidationError. One or more attributes of the rubric are
                 invalid.
         """
-        if not isinstance(self.difficulty, python_utils.BASESTRING):
+        if not isinstance(self.difficulty, str):
             raise utils.ValidationError(
                 'Expected difficulty to be a string, received %s' %
                 self.difficulty)
@@ -349,13 +347,13 @@ class Rubric(python_utils.OBJECT):
                 self.explanations)
 
         for explanation in self.explanations:
-            if not isinstance(explanation, python_utils.BASESTRING):
+            if not isinstance(explanation, str):
                 raise utils.ValidationError(
                     'Expected each explanation to be a string, received %s' %
                     explanation)
 
 
-class WorkedExample(python_utils.OBJECT):
+class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
     def __init__(self, question, explanation):
@@ -423,7 +421,7 @@ class WorkedExample(python_utils.OBJECT):
         return worked_example
 
 
-class SkillContents(python_utils.OBJECT):
+class SkillContents:
     """Domain object representing the skill_contents dict."""
 
     def __init__(
@@ -526,7 +524,7 @@ class SkillContents(python_utils.OBJECT):
         return skill_contents
 
 
-class Skill(python_utils.OBJECT):
+class Skill:
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -595,7 +593,7 @@ class Skill(python_utils.OBJECT):
         Args:
             skill_id: str. The skill id to validate.
         """
-        if not isinstance(skill_id, python_utils.BASESTRING):
+        if not isinstance(skill_id, str):
             raise utils.ValidationError('Skill id should be a string.')
 
         if len(skill_id) != 12:
@@ -608,7 +606,7 @@ class Skill(python_utils.OBJECT):
         Args:
             description: str. The description to validate.
         """
-        if not isinstance(description, python_utils.BASESTRING):
+        if not isinstance(description, str):
             raise utils.ValidationError('Description should be a string.')
 
         if description == '':
@@ -673,7 +671,7 @@ class Skill(python_utils.OBJECT):
                     self.skill_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -727,7 +725,7 @@ class Skill(python_utils.OBJECT):
                 'received %s' % self.prerequisite_skill_ids)
 
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
+            if not isinstance(skill_id, str):
                 raise utils.ValidationError(
                     'Expected each skill ID to be a string, '
                     'received %s' % skill_id)
@@ -787,8 +785,8 @@ class Skill(python_utils.OBJECT):
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         skill_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -809,7 +807,7 @@ class Skill(python_utils.OBJECT):
             skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
-        return json.dumps(skill_dict).encode('utf-8')
+        return json.dumps(skill_dict)
 
     @classmethod
     def deserialize(cls, json_string):
@@ -817,13 +815,13 @@ class Skill(python_utils.OBJECT):
 
         Args:
             json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Skill. Only call
-                on strings that were created using serialize().
+                decoded into a dictionary representing a Skill.
+                Only call on strings that were created using serialize().
 
         Returns:
             Skill. The corresponding Skill domain object.
         """
-        skill_dict = json.loads(json_string.decode('utf-8'))
+        skill_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 skill_dict['created_on'])
@@ -935,6 +933,37 @@ class Skill(python_utils.OBJECT):
         return '%s-%d' % (self.id, misconception_id)
 
     @classmethod
+    def convert_html_fields_in_skill_contents(
+            cls, skill_contents_dict, conversion_fn):
+        """Applies a conversion function on all the html strings in a skill
+        to migrate them to a desired state.
+
+        Args:
+            skill_contents_dict: dict. The dict representation of skill
+                contents.
+            conversion_fn: function. The conversion function to be applied on
+                the skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        skill_contents_dict['explanation']['html'] = conversion_fn(
+            skill_contents_dict['explanation']['html'])
+        skill_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                skill_contents_dict['written_translations'], conversion_fn))
+
+        for value_index, value in enumerate(
+                skill_contents_dict['worked_examples']):
+            skill_contents_dict['worked_examples'][value_index][
+                'question']['html'] = conversion_fn(value['question']['html'])
+            skill_contents_dict['worked_examples'][value_index][
+                'explanation']['html'] = conversion_fn(
+                    value['explanation']['html'])
+        return skill_contents_dict
+
+    @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
         """Converts v1 skill contents to the v2 schema. In the v2 schema,
         the new Math components schema is introduced.
@@ -945,29 +974,40 @@ class Skill(python_utils.OBJECT):
         Returns:
             dict. The converted skill_contents_dict.
         """
-        skill_contents_dict['explanation']['html'] = (
-            html_validation_service.add_math_content_to_math_rte_components(
-                skill_contents_dict['explanation']['html']))
-        skill_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                skill_contents_dict['written_translations'],
-                html_validation_service.
-                add_math_content_to_math_rte_components))
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.add_math_content_to_math_rte_components)
 
-        for value_index, value in enumerate(
-                skill_contents_dict['worked_examples']):
-            skill_contents_dict['worked_examples'][value_index][
-                'question']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        value['question']['html']))
-            skill_contents_dict['worked_examples'][value_index][
-                'explanation']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        value['explanation']['html']))
-        return skill_contents_dict
+    @classmethod
+    def _convert_skill_contents_v2_dict_to_v3_dict(cls, skill_contents_dict):
+        """Converts v2 skill contents to the v3 schema. The v3 schema
+        deprecates oppia-noninteractive-svgdiagram tag and converts existing
+        occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            skill_contents_dict: dict. The v1 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+
+    @classmethod
+    def _convert_skill_contents_v3_dict_to_v4_dict(cls, skill_contents_dict):
+        """Converts v3 skill contents to the v4 schema. The v4 schema
+        fixes HTML encoding issues.
+
+        Args:
+            skill_contents_dict: dict. The v3 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.fix_incorrectly_encoded_chars)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -1055,6 +1095,45 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_misconception_v3_dict_to_v4_dict(cls, misconception_dict):
+        """Converts v3 misconception schema to the v4 schema. The v4 schema
+        deprecates oppia-noninteractive-svgdiagram tag and converts existing
+        occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            misconception_dict: dict. The v3 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['notes'] = (
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                misconception_dict['notes']))
+        misconception_dict['feedback'] = (
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                misconception_dict['feedback']))
+        return misconception_dict
+
+    @classmethod
+    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict):
+        """Converts v4 misconception schema to the v5 schema. The v5 schema
+        fixes HTML encoding issues.
+
+        Args:
+            misconception_dict: dict. The v4 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['notes'] = (
+            html_validation_service.fix_incorrectly_encoded_chars(
+                misconception_dict['notes']))
+        misconception_dict['feedback'] = (
+            html_validation_service.fix_incorrectly_encoded_chars(
+                misconception_dict['feedback']))
+        return misconception_dict
+
+    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -1085,6 +1164,43 @@ class Skill(python_utils.OBJECT):
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
                 html_validation_service.add_math_content_to_math_rte_components(
+                    explanation))
+        return rubric_dict
+
+    @classmethod
+    def _convert_rubric_v3_dict_to_v4_dict(cls, rubric_dict):
+        """Converts v3 rubric schema to the v4 schema. The v4 schema
+        deprecates oppia-noninteractive-svgdiagram tag and converts existing
+        occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            rubric_dict: dict. The v2 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        for explanation_index, explanation in enumerate(
+                rubric_dict['explanations']):
+            rubric_dict['explanations'][explanation_index] = (
+                html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                    explanation))
+        return rubric_dict
+
+    @classmethod
+    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict):
+        """Converts v4 rubric schema to the v5 schema. The v4 schema
+        fixes HTML encoding issues.
+
+        Args:
+            rubric_dict: dict. The v4 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        for explanation_index, explanation in enumerate(
+                rubric_dict['explanations']):
+            rubric_dict['explanations'][explanation_index] = (
+                html_validation_service.fix_incorrectly_encoded_chars(
                     explanation))
         return rubric_dict
 
@@ -1415,7 +1531,7 @@ class Skill(python_utils.OBJECT):
         self.misconceptions[index].feedback = feedback
 
 
-class SkillSummary(python_utils.OBJECT):
+class SkillSummary:
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -1454,13 +1570,13 @@ class SkillSummary(python_utils.OBJECT):
             ValidationError. One or more attributes of skill summary are
                 invalid.
         """
-        if not isinstance(self.description, python_utils.BASESTRING):
+        if not isinstance(self.description, str):
             raise utils.ValidationError('Description should be a string.')
 
         if self.description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -1508,7 +1624,7 @@ class SkillSummary(python_utils.OBJECT):
         }
 
 
-class AugmentedSkillSummary(python_utils.OBJECT):
+class AugmentedSkillSummary:
     """Domain object for Augmented Skill Summary, which has all the properties
     of SkillSummary along with the topic names to which the skill is assigned
     and the classroom names to which the topics are assigned.
@@ -1571,7 +1687,7 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         }
 
 
-class TopicAssignment(python_utils.OBJECT):
+class TopicAssignment:
     """Domain object for Topic Assignment, which provides the details of a
     single topic (and, if applicable, the subtopic within that topic) to which
     the skill is assigned.
@@ -1609,7 +1725,7 @@ class TopicAssignment(python_utils.OBJECT):
         }
 
 
-class UserSkillMastery(python_utils.OBJECT):
+class UserSkillMastery:
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id, skill_id, degree_of_mastery):

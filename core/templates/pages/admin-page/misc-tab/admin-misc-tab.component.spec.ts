@@ -341,6 +341,41 @@ describe('Admin misc tab component ', () => {
     }));
   });
 
+  describe('when clicking on update blog post button ', () => {
+    it('should update blog post successfully', fakeAsync(() => {
+      component.authorUsername = 'username';
+      component.publishedOn = '05/09/2001';
+      component.blogPostId = '123456sample';
+      let updateBlogPostSpy = spyOn(
+        adminBackendApiService, 'updateBlogPostDataAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.updateBlogPostData();
+      tick();
+
+      expect(updateBlogPostSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Successfully updated blog post data');
+    }));
+
+    it('should not update blog post in case of backend ' +
+      'error', fakeAsync(() => {
+      component.authorUsername = 'username';
+      component.publishedOn = '05/09/2001';
+      component.blogPostId = '123456sample';
+      let updateBlogPostSpy = spyOn(
+        adminBackendApiService, 'updateBlogPostDataAsync')
+        .and.rejectWith('Internal Server Error.');
+
+      component.updateBlogPostData();
+      tick();
+
+      expect(updateBlogPostSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
   describe('when clicking on number of deletion requests button ', () => {
     it('should show number of deletion requests successfully', fakeAsync(() => {
       let updateUsernameSpy = spyOn(

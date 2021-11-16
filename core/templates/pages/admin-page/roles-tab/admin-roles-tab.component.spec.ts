@@ -17,15 +17,18 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { AdminBackendApiService, AdminPageData, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AdminDataService } from '../services/admin-data.service';
-import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-import { AdminRolesTabComponent, UpdateRoleAction, ViewUserRolesAction } from './admin-roles-tab.component';
+import { AdminRolesTabComponent} from './admin-roles-tab.component';
+import { AlertsService } from 'services/alerts.service';
+
+import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
 
 describe('Admin roles tab component ', function() {
   let component: AdminRolesTabComponent;
@@ -33,9 +36,8 @@ describe('Admin roles tab component ', function() {
 
   let adminBackendApiService: AdminBackendApiService;
   let adminDataService: AdminDataService;
-  let adminTaskManagerService: AdminTaskManagerService;
+  let alertsService: AlertsService;
 
-  let statusMessageSpy: jasmine.Spy;
   const sampleCreatorTopicSummaryBackendDict = {
     id: 'sample_topic_id',
     name: 'Topic Name',
@@ -73,14 +75,14 @@ describe('Admin roles tab component ', function() {
     demoCollections: [
       ['collectionId']
     ],
-    updatableRoles: {updatableRole: 'user1'},
+    updatableRoles: ['MODERATOR'],
     roleToActions: {
       Admin: ['Accept any suggestion', 'Access creator dashboard']
     },
     configProperties: {},
-    viewableRoles: {
-      MODERATOR: 'moderator',
-      TOPIC_MANAGER: 'topic manager'
+    viewableRoles: ['MODERATOR', 'TOPIC_MANAGER'],
+    humanReadableRoles: {
+      FULL_USER: 'full user'
     },
     topicSummaries: [
       sampleTopicSummary
@@ -98,7 +100,7 @@ describe('Admin roles tab component ', function() {
       providers: [
         AdminBackendApiService,
         AdminDataService,
-        AdminTaskManagerService
+        AlertsService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -110,291 +112,266 @@ describe('Admin roles tab component ', function() {
   beforeEach(() => {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminDataService = TestBed.inject(AdminDataService);
-    adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
-
-    statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue(null);
+    alertsService = TestBed.inject(AlertsService);
   });
 
   it('should retrieve data from the backend and ' +
-    'set properties when initialized', fakeAsync(() => {
-    spyOn(adminDataService, 'getDataAsync').and.resolveTo(adminPageData);
+     'set properties when initialized', fakeAsync(() => {
+    spyOn(adminDataService, 'getDataAsync').and.returnValue(
+      Promise.resolve(adminPageData));
 
     // Prechecks.
-    expect(component.UPDATABLE_ROLES).toEqual({});
-    expect(component.roleToActions).toBe(null);
-    expect(component.VIEWABLE_ROLES).toEqual({});
-    expect(component.topicSummaries).toBe(null);
+    expect(component.UPDATABLE_ROLES).toEqual(null);
+    expect(component.roleToActions).toEqual(null);
+    expect(component.VIEWABLE_ROLES).toEqual(null);
+    expect(component.topicSummaries).toEqual(null);
 
     component.ngOnInit();
     tick();
     fixture.detectChanges();
 
-    expect(component.UPDATABLE_ROLES).toBe(adminPageData.updatableRoles);
-    expect(component.roleToActions).toBe(adminPageData.roleToActions);
-    expect(component.VIEWABLE_ROLES).toBe(adminPageData.viewableRoles);
-    expect(component.topicSummaries).toBe(adminPageData.topicSummaries);
+    expect(component.UPDATABLE_ROLES).toEqual(adminPageData.updatableRoles);
+    expect(component.roleToActions).toEqual(adminPageData.roleToActions);
+    expect(component.VIEWABLE_ROLES).toEqual(adminPageData.viewableRoles);
+    expect(component.topicSummaries).toEqual(adminPageData.topicSummaries);
   }));
 
-  it('should clear results when ever change is detected in ' +
-    'the form', fakeAsync(() => {
-    const viewUserRolesAction: ViewUserRolesAction = {
-      filterCriterion: 'username',
-      role: 'admin',
-      username: 'user1',
-      isValid: () => true
-    };
+  it('should flush the value to properties on calling clearEditor', () => {
+    component.userRoles = ['MODERATOR'];
+    component.roleCurrentlyBeingUpdatedInBackend = 'FULL_USER';
+    component.userIsBanned = true;
 
-    const userRolesResult: UserRolesBackendResponse = {
-      admin: 'admin'
-    };
+    component.clearEditor();
 
-    spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-      .and.returnValue(Promise.resolve({admin: 'admin'}));
-
-    // Prechecks.
-    expect(component.userRolesResult).toBe(null);
-
-    // Clicking on view roles button to fill form with user data.
-    component.submitRoleViewForm(viewUserRolesAction);
-    tick();
-
-    expect(Object.keys(component.userRolesResult))
-      .toContain(userRolesResult.admin);
-
-    // Clearing results.
-    component.clearResults();
-    expect(component.userRolesResult).toEqual({});
-  }));
-
-  it('should handle error responses sent from the backend', () => {
-    component.handleErrorResponse('User name does not exist.');
-    expect(statusMessageSpy).toHaveBeenCalledWith(
-      'Server error: User name does not exist.');
+    expect(component.userRoles).toEqual([]);
+    expect(component.roleCurrentlyBeingUpdatedInBackend).toEqual(null);
+    expect(component.userIsBanned).toEqual(false);
   });
 
-  describe('on clicking view roles button ', () => {
-    it('should successfully show role of a user given the ' +
-      'username', fakeAsync(() => {
-      // Note that username is filter criterion here.
-      const viewUserRolesAction: ViewUserRolesAction = {
-        filterCriterion: 'username',
-        role: 'admin',
-        username: 'user1',
-        isValid: () => true
-      };
-
-      const userRolesResult: UserRolesBackendResponse = {
-        admin: 'admin'
-      };
-
+  describe('on startEditing', function() {
+    beforeEach(function() {
       spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-        .and.returnValue(Promise.resolve({admin: 'admin'}));
-
-      expect(component.userRolesResult).toEqual(null);
-
-      component.submitRoleViewForm(viewUserRolesAction);
-      tick();
-
-      expect(Object.keys(component.userRolesResult))
-        .toContain(userRolesResult.admin);
-      expect(statusMessageSpy).toHaveBeenCalledWith('Success.');
-    }));
-
-    it('should successfully show users given the ' +
-      'role name', fakeAsync(() => {
-      // Note that role is filter criterion here.
-      const viewUserRolesAction: ViewUserRolesAction = {
-        filterCriterion: 'role',
-        role: 'admin',
-        username: 'user1',
-        isValid: () => true
-      };
-
-      const userRolesResult: UserRolesBackendResponse = {
-        admin: 'admin'
-      };
-
-      spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-        .and.returnValue(Promise.resolve({admin: 'admin'}));
-
-      expect(component.userRolesResult).toEqual(null);
-
-      component.submitRoleViewForm(viewUserRolesAction);
-      tick();
-
-      expect(Object.keys(component.userRolesResult))
-        .toContain(userRolesResult.admin);
-      expect(statusMessageSpy).toHaveBeenCalledWith('Success.');
-    }));
-
-    it('should not show any results if the given role is unclaimed ' +
-      'by any user', fakeAsync(() => {
-      // Note that role is filter criterion here.
-      const viewUserRolesAction: ViewUserRolesAction = {
-        filterCriterion: 'role',
-        role: 'admin',
-        username: 'user1',
-        isValid: () => true
-      };
-
-      // Note that we are returning empty dict.
-      spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-        .and.returnValue(Promise.resolve({}));
-
-      expect(component.userRolesResult).toEqual(null);
-
-      component.submitRoleViewForm(viewUserRolesAction);
-      tick();
-
-      expect(statusMessageSpy).toHaveBeenCalledWith('No results.');
-    }));
-
-    it('should not send request to backend if a task ' +
-      'is still running in the queue', fakeAsync(() => {
-      // Setting task running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'viewUsersRoleAsync')
-        .and.returnValue(Promise.resolve({}));
-
-      const viewUserRolesAction: ViewUserRolesAction = {
-        filterCriterion: 'username',
-        role: 'admin',
-        username: 'user1',
-        isValid: () => true
-      };
-
-      component.submitRoleViewForm(viewUserRolesAction);
-      tick();
-
-      expect(adminBackendServiceSpy).not.toHaveBeenCalled();
-    }));
-  });
-
-  describe('on clicking update role button ', () => {
-    it('should successfully update the role of the user', fakeAsync(() => {
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'updateUserRoleAsync')
-        .and.returnValue(Promise.resolve(null));
-
-      const updateRoleAction: UpdateRoleAction = {
-        newRole: 'admin',
-        username: 'user1',
-        topicId: 'topicId',
-        isValid: () => true
-      };
-
-      component.submitUpdateRoleForm(updateRoleAction);
-      tick();
-
-      expect(adminBackendServiceSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Role of user1 successfully updated to admin');
-    }));
-
-    it('should not send request to backend if a task ' +
-      'is still running in the queue', fakeAsync(() => {
-      // Setting task running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'updateUserRoleAsync')
-        .and.returnValue(Promise.resolve(null));
-
-      const updateRoleAction: UpdateRoleAction = {
-        newRole: 'admin',
-        username: 'user1',
-        topicId: 'topicId',
-        isValid: () => true
-      };
-
-      component.submitUpdateRoleForm(updateRoleAction);
-      tick();
-
-      expect(adminBackendServiceSpy).not.toHaveBeenCalled();
-    }));
-  });
-
-  // Note that 'refreshFormData()' is called when
-  // ever change is detected in any one of the
-  // forms available in admin-roles-tab.
-  describe('on validating form data ', () => {
-    describe('in the view user roles section ', () => {
-      it('should return true if there are no validation errors ' +
-        'when fetching user roles', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting filter criterion to be username.
-        component.formData.viewUserRoles.filterCriterion = 'username';
-        component.formData.viewUserRoles.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.viewUserRoles.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return false if there are validation errors ' +
-        'when fetching user roles', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting filter criterion to be invalid.
-        component.formData.viewUserRoles.filterCriterion = 'invalid';
-        component.formData.viewUserRoles.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.viewUserRoles.isValid();
-        expect(result).toBe(false);
-      }));
+        .and.returnValue(Promise.resolve({
+          roles: ['TOPIC_MANAGER'],
+          managed_topic_ids: ['topic_id_1'],
+          banned: false
+        }));
     });
 
-    describe('in the update role section ', () => {
-      it('should return true if there are no validation errors ' +
-        'when updating role to topic manager', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
+    it('should enable roleIsCurrentlyBeingEdited', fakeAsync(() => {
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
-        // Setting new role to be 'TOPIC_MANAGER'.
-        component.formData.updateRole.newRole = 'TOPIC_MANAGER';
-        component.formData.updateRole.topicId = 'topicId';
-        component.formData.updateRole.username = 'user1';
-        fixture.detectChanges();
+      component.startEditing();
+      tick();
 
-        let result = component.formData.updateRole.isValid();
-        expect(result).toBe(true);
+      expect(component.roleIsCurrentlyBeingEdited).toBeTrue();
+    }));
+
+    it('should fetch user roles and intialize properties', fakeAsync(() => {
+      // Prechecks.
+      expect(component.rolesFetched).toBeFalse();
+      expect(component.userRoles).toEqual([]);
+      expect(component.managedTopicIds).toEqual([]);
+      expect(component.userIsBanned).toBeFalse();
+
+      component.startEditing();
+      tick();
+
+      expect(component.rolesFetched).toBeTrue();
+      expect(component.userRoles).toEqual(['TOPIC_MANAGER']);
+      expect(component.managedTopicIds).toEqual(['topic_id_1']);
+      expect(component.userIsBanned).toBeFalse();
+    }));
+  });
+
+  describe('on calling markUserBanned', function() {
+    it('should enable bannedStatusChangeInProgress until user is banned',
+      fakeAsync(() => {
+        spyOn(adminBackendApiService, 'markUserBannedAsync')
+          .and.returnValue(Promise.resolve());
+
+        expect(component.bannedStatusChangeInProgress).toBeFalse();
+
+        component.markUserBanned();
+        expect(component.bannedStatusChangeInProgress).toBeTrue();
+
+        tick();
+
+        expect(component.bannedStatusChangeInProgress).toBeFalse();
       }));
 
-      it('should return true if there are no validation errors ' +
-        'when updating role to any role other than topic ' +
-        'manager', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
+    it('should set userIsBanned to true', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'markUserBannedAsync')
+        .and.returnValue(Promise.resolve());
 
-        // Setting new role to be 'admin'.
-        component.formData.updateRole.newRole = 'admin';
-        component.formData.updateRole.topicId = 'topicId';
-        component.formData.updateRole.username = 'user1';
-        fixture.detectChanges();
+      expect(component.userIsBanned).toBeFalse();
 
-        let result = component.formData.updateRole.isValid();
-        expect(result).toBe(true);
+      component.markUserBanned();
+      tick();
+
+      expect(component.userIsBanned).toBeTrue();
+    }));
+
+    it('should set alert warning on failed request', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(adminBackendApiService, 'markUserBannedAsync')
+        .and.returnValue(Promise.reject('Failed!'));
+
+      component.markUserBanned();
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalled();
+    }));
+  });
+
+  describe('on calling unmarkUserBanned', function() {
+    beforeEach(function() {
+      spyOn(adminBackendApiService, 'unmarkUserBannedAsync')
+        .and.returnValue(Promise.resolve());
+    });
+
+    it('should enable bannedStatusChangeInProgress until user is unbanned',
+      fakeAsync(() => {
+        expect(component.bannedStatusChangeInProgress).toBeFalse();
+
+        component.unmarkUserBanned();
+        expect(component.bannedStatusChangeInProgress).toBeTrue();
+
+        tick();
+
+        expect(component.bannedStatusChangeInProgress).toBeFalse();
       }));
 
-      it('should return false if there are validation errors ' +
-        'when updating user role', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
+    it('should set userIsBanned to false', fakeAsync(() => {
+      component.userIsBanned = true;
 
-        // Setting new role to be null.
-        component.formData.updateRole.newRole = null;
-        fixture.detectChanges();
+      component.unmarkUserBanned();
+      tick();
 
-        let result = component.formData.updateRole.isValid();
-        expect(result).toBe(false);
+      expect(component.userIsBanned).toBeFalse();
+    }));
+  });
+
+  describe('on calling removeRole', function() {
+    beforeEach(function() {
+      spyOn(adminBackendApiService, 'removeUserRoleAsync')
+        .and.returnValue(Promise.resolve());
+    });
+
+    it('should remove the given role',
+      fakeAsync(() => {
+        component.userRoles = ['MODERATOR', 'TOPIC_MANAGER'];
+
+        component.removeRole('MODERATOR');
+        tick();
+
+        expect(component.userRoles).toEqual(['TOPIC_MANAGER']);
       }));
+
+    it('should flush managedTopicIds while removing topic manager role',
+      fakeAsync(() => {
+        component.userRoles = ['MODERATOR', 'TOPIC_MANAGER'];
+        component.managedTopicIds = ['topic_1', 'topic_2'];
+
+        component.removeRole('TOPIC_MANAGER');
+        tick();
+
+        expect(component.userRoles).toEqual(['MODERATOR']);
+        expect(component.managedTopicIds).toEqual([]);
+      }));
+  });
+
+  describe('on calling addNewRole', function() {
+    beforeEach(function() {
+      spyOn(adminBackendApiService, 'addUserRoleAsync')
+        .and.returnValue(Promise.resolve());
+    });
+
+    it('should add the given role',
+      fakeAsync(() => {
+        component.userRoles = ['TOPIC_MANAGER'];
+
+        component.addNewRole('MODERATOR');
+        tick();
+
+        expect(component.userRoles).toEqual(['TOPIC_MANAGER', 'MODERATOR']);
+      }));
+
+    it('should open topic manager modal on adding topic manager role', () => {
+      spyOn(component, 'openTopicManagerRoleEditor').and.returnValue();
+
+      component.addNewRole('TOPIC_MANAGER');
+
+      expect(component.openTopicManagerRoleEditor).toHaveBeenCalled();
+    });
+  });
+
+  describe('on calling openTopicManagerRoleEditor', function() {
+    let modalSpy = null;
+    let ngbModal: NgbModal;
+
+    class MockNgbModalRef {
+      componentInstance: {};
+    }
+
+    beforeEach(function() {
+      ngbModal = TestBed.inject(NgbModal);
+      component.topicSummaries = [sampleTopicSummary];
+      modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(['topic_id_1'])
+        }) as NgbModalRef;
+      });
+    });
+
+    it('should open the TopicManagerRoleEditorModal', fakeAsync(() => {
+      component.userRoles = ['MODERATOR'];
+      component.managedTopicIds = [];
+
+      component.openTopicManagerRoleEditor();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalledWith(
+        TopicManagerRoleEditorModalComponent);
+      expect(component.managedTopicIds).toEqual(['topic_id_1']);
+      expect(component.userRoles).toEqual(['MODERATOR', 'TOPIC_MANAGER']);
+    }));
+
+    it('should not readd topic manager role if user is already a manager',
+      fakeAsync(() => {
+        component.userRoles = ['MODERATOR', 'TOPIC_MANAGER'];
+        component.managedTopicIds = [];
+
+        component.openTopicManagerRoleEditor();
+        tick();
+
+        expect(modalSpy).toHaveBeenCalledWith(
+          TopicManagerRoleEditorModalComponent);
+        expect(component.managedTopicIds).toEqual(['topic_id_1']);
+        expect(component.userRoles).toEqual(['MODERATOR', 'TOPIC_MANAGER']);
+      }));
+  });
+
+  describe('on calling showNewRoleSelector', function() {
+    it('should enable roleSelectorIsShown', () => {
+      component.roleSelectorIsShown = false;
+      component.userRoles = ['FULL_USER', 'MODERATOR'];
+      component.UPDATABLE_ROLES = ['MODERATOR', 'TOPIC_MANAGER'];
+
+      component.showNewRoleSelector();
+
+      expect(component.roleSelectorIsShown).toBeTrue();
+    });
+
+    it('should set correct value for possibleRolesToAdd', () => {
+      component.userRoles = ['FULL_USER', 'MODERATOR'];
+      component.UPDATABLE_ROLES = ['MODERATOR', 'TOPIC_MANAGER'];
+      component.possibleRolesToAdd = [];
+
+      component.showNewRoleSelector();
+
+      expect(component.possibleRolesToAdd).toEqual(['TOPIC_MANAGER']);
     });
   });
 });

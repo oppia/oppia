@@ -943,7 +943,8 @@ describe('Topic update service', function() {
     expect(() => {
       topicUpdateService.moveSkillToSubtopic(
         _sampleTopic, 1, 2, _secondSkillSummary);
-    }).toThrowError('Cannot read property \'addSkill\' of null');
+    }).toThrowError(
+      'Cannot read properties of null (reading \'addSkill\')');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 

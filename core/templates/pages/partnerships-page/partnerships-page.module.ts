@@ -16,50 +16,27 @@
  * @fileoverview Module for the partnerships page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
+import { NgModule } from '@angular/core';
 import { PartnershipsPageComponent } from './partnerships-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { PartnershipsPageRootComponent } from
   './partnerships-page-root.component';
+import { CommonModule } from '@angular/common';
+import { PartnershipsPageRoutingModule } from './partnerships-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    PartnershipsPageRoutingModule
   ],
   declarations: [
     PartnershipsPageComponent,
-    PartnershipsPageRootComponent,
-    OppiaAngularRootComponent
+    PartnershipsPageRootComponent
   ],
   entryComponents: [
     PartnershipsPageComponent,
-    PartnershipsPageRootComponent,
-    OppiaAngularRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [PartnershipsPageRootComponent]
+    PartnershipsPageRootComponent
+  ]
 })
 export class PartnershipsPageModule {}

@@ -16,12 +16,13 @@
 
 """Tests for topic services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import question_domain
@@ -37,8 +38,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     topic_models, suggestion_models
@@ -91,17 +90,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(
@@ -591,6 +592,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
+        self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
         rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
             Exception, 'Exploration with ID exp_id is not public. Please '
@@ -608,10 +612,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
     def test_update_topic(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
-            self.TOPIC_ID)
-
         # Save a dummy image on filesystem, to be used as thumbnail.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
@@ -923,6 +923,29 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
+
+    def test_update_topic_schema(self):
+        orig_topic_dict = (
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID).to_dict())
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+            'from_version': 2,
+            'to_version': 3,
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist, 'Update schema.')
+
+        new_topic_dict = (
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID).to_dict())
+
+        # Check version is updated.
+        self.assertEqual(new_topic_dict['version'], 3)
+
+        # Delete version and check that the two dicts are the same.
+        del orig_topic_dict['version']
+        del new_topic_dict['version']
+        self.assertEqual(orig_topic_dict, new_topic_dict)
 
     def test_add_uncategorized_skill(self):
         topic_services.add_uncategorized_skill(
@@ -1268,10 +1291,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.publish_topic(self.TOPIC_ID, self.user_id_a)
 
     def test_create_new_topic_rights(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
@@ -1280,18 +1299,25 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
     def test_non_admin_cannot_assign_roles(self):
+        self.signup('x@example.com', 'X')
+        self.signup('y@example.com', 'Y')
+
+        user_id_x = self.get_user_id_from_email('x@example.com')
+        user_id_y = self.get_user_id_from_email('y@example.com')
+
+        user_x = user_services.get_user_actions_info(user_id_x)
+        user_y = user_services.get_user_actions_info(user_id_y)
         with self.assertRaisesRegexp(
             Exception,
             'UnauthorizedUserException: Could not assign new role.'):
             topic_services.assign_role(
-                self.user_b, self.user_a,
-                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+                user_y, user_x, topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
+            user_x, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+            user_y, topic_rights))
 
     def test_role_cannot_be_assigned_to_non_topic_manager(self):
         with self.assertRaisesRegexp(
@@ -1302,10 +1328,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
     def test_manager_cannot_assign_roles(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
         with self.assertRaisesRegexp(
             Exception,
             'UnauthorizedUserException: Could not assign new role.'):
@@ -1516,6 +1538,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_topic_and_subtopic_pages_with_empty_commit_message(
             self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        # Test can have an empty commit message when not published.
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            None)
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        # Test must have a commit message when published.
         with self.assertRaisesRegexp(
             Exception, 'Expected a commit message, received none.'):
             topic_services.update_topic_and_subtopic_pages(
@@ -1584,9 +1618,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         topic_services.assign_role(
             self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
             topic_domain.ROLE_MANAGER, 'topic_2')
         topic_rights = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
         self.assertEqual(len(topic_rights), 2)
@@ -1597,9 +1628,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic_rights), 0)
 
     def test_reassigning_manager_role_to_same_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
         with self.assertRaisesRegexp(
             Exception, 'This user already is a manager for this topic'):
             topic_services.assign_role(
@@ -1612,11 +1640,32 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-    def test_deassigning_manager_role(self):
+    def test_assigning_none_role(self):
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+
+        self.assertTrue(topic_services.check_can_edit_topic(
+            self.user_a, topic_rights))
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+        # Assigning None role to manager.
         topic_services.assign_role(
             self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
 
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_a, topic_rights))
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
+        # Assigning None role to another role.
+        topic_services.assign_role(
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
+
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
+    def test_deassigning_manager_role(self):
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
@@ -1624,28 +1673,27 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_NONE, self.TOPIC_ID)
+        topic_services.deassign_manager_role_from_topic(
+            self.user_admin, self.user_id_a, self.TOPIC_ID)
 
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_NONE, self.TOPIC_ID)
-
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
+    def test_deassigning_an_unassigned_user_from_topic_raise_exception(self):
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
+        with self.assertRaisesRegexp(
+            Exception, 'User does not have manager rights in topic.'):
+            topic_services.deassign_manager_role_from_topic(
+                self.user_admin, self.user_id_b, self.TOPIC_ID)
 
-# TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class
+
+# TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
-# See issue: https://github.com/oppia/oppia/issues/7009.
 class MockTopicObject(topic_domain.Topic):
     """Mocks Topic domain object."""
 

@@ -39,7 +39,7 @@ describe('Skill Editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
     await topicsAndSkillsDashboardPage.get();
     var handle = await browser.getWindowHandle();

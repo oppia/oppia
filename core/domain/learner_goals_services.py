@@ -16,12 +16,11 @@
 
 """Services for the learner goals feature of the learner dashboard."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import user_domain
 from core.platform import models
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

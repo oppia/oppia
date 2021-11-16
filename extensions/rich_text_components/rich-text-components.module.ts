@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -29,20 +28,20 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
 import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.component';
-import { NoninteractiveSvgdiagram } from './Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
-import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { ConceptCardComponent } from 'components/concept-card/concept-card.component';
 import { PortalModule } from '@angular/cdk/portal';
 import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-output-display.component';
 
+import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
 
 @NgModule({
   imports: [
+    CommonElementsModule,
     CommonModule,
-    BrowserModule,
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,
@@ -59,7 +58,6 @@ import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-outp
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
@@ -72,7 +70,6 @@ import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-outp
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
@@ -85,7 +82,6 @@ import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-outp
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,

@@ -22,18 +22,16 @@ delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import copy
 import logging
 
+from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
-import feconf
-import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 datastore_services = models.Registry.import_datastore_services()
@@ -249,7 +247,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated,
-        exp_summary_model.first_published_msec
+        exp_summary_model.first_published_msec,
+        exp_summary_model.deleted
     )
 
 
@@ -302,7 +301,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     Returns:
         Exploration. The domain object corresponding to the given exploration.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_exploration = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION,
         sub_namespace,
@@ -377,8 +376,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        eid: db_results_dict[eid] for eid in db_results_dict
-        if db_results_dict[eid] is not None
+        eid: results for eid, results in db_results_dict.items()
+        if results is not None
     }
 
     if cache_update:

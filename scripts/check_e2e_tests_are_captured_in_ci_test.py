@@ -14,13 +14,13 @@
 
 """Unit tests for scripts/check_e2e_tests_are_captured_in_ci.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
+import re
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import check_e2e_tests_are_captured_in_ci
 
@@ -119,10 +119,13 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             with mock_protractor_test_suites:
                 with mock_ci_scripts:
                     with self.assertRaisesRegexp(
-                        Exception, 'Protractor test suites and CI test '
-                                   'suites are not in sync. Following suites'
-                                   ' are not in sync: '
-                                   r'\[u\'notPresent\', u\'invalid\'\]'):
+                        Exception,
+                        re.escape(
+                            'Protractor test suites and CI test suites are not '
+                            'in sync. Following suites are not in sync: '
+                            '[\'invalid\', \'notPresent\']'
+                        )
+                    ):
                         check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_missing_test_fail(self):

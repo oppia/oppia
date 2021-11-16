@@ -14,15 +14,13 @@
 
 """ Tests for services relating to emails."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import email_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
@@ -49,8 +47,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, 'subject')
             self.assertEqual(messages[0].body, 'body')
@@ -66,8 +63,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
 
@@ -79,7 +75,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertRaisesRegexp(
                 Exception, 'This app cannot send emails to users.'))
         with send_email_exception, (
-            self.swap(constants, 'DEV_MODE', False)):
+            self.swap(constants, 'DEV_MODE', False)
+        ):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
@@ -95,8 +92,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, recipients)
 

@@ -26,7 +26,7 @@ import { LoaderService } from 'services/loader.service';
 
 class MockWindowRef {
   constructor(
-      public location: string = null, public searchParams: string = '') {}
+    public location: string | null = null, public searchParams: string = '') {}
 
   get nativeWindow() {
     const that = this;
@@ -46,11 +46,11 @@ class MockWindowRef {
 class PendingPromise<T = void> {
   public readonly promise: Promise<T>;
   public readonly resolve: (_: T | PromiseLike<T>) => void;
-  public readonly reject: (_?) => void;
+  public readonly reject: (_?: Object) => void;
 
   constructor() {
-    let resolve: (_: T | PromiseLike<T>) => void;
-    let reject: (_?) => void;
+    let resolve: (_: T | PromiseLike<T>) => void = () => {};
+    let reject: (_?: Object) => void = () => {};
     this.promise = new Promise((res, rej) => {
       // Can't assign to this directly because resolve and reject are readonly.
       resolve = res;

@@ -540,56 +540,6 @@
       "CodeDoesNotContain": "has code that does not contain {{x|CodeString}}"
     }
   },
-  "LogicProof": {
-    "can_have_solution": true,
-    "show_generic_submit_button": true,
-    "instructions": "Construct a proof",
-    "is_trainable": false,
-    "narrow_instructions": "Construct a proof",
-    "description": "Allows learners to write proofs for simple logical statements.",
-    "needs_summary": true,
-    "name": "Logic Proof",
-    "answer_type": "CheckedProof",
-    "is_linear": false,
-    "display_mode": "supplemental",
-    "id": "LogicProof",
-    "customization_arg_specs": [
-      {
-        "description": "Question to ask",
-        "name": "question",
-        "schema": {
-          "obj_type": "LogicQuestion",
-          "type": "custom"
-        },
-        "default_value": {
-          "assumptions": [
-            {
-              "arguments": [],
-              "top_kind_name": "variable",
-              "dummies": [],
-              "top_operator_name": "p"
-            }
-          ],
-          "results": [
-            {
-              "arguments": [],
-              "top_kind_name": "variable",
-              "dummies": [],
-              "top_operator_name": "p"
-            }
-          ],
-          "default_proof_string": ""
-        }
-      }
-    ],
-    "is_terminal": false,
-    "default_outcome_heading": null,
-    "rule_descriptions": {
-      "Correct": "is correct",
-      "NotCorrect": "is not correct",
-      "NotCorrectByCategory": "is not correct due to {{c|LogicErrorCategory}}"
-    }
-  },
   "MathEquationInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,

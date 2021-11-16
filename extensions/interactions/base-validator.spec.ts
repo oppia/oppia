@@ -136,6 +136,20 @@ describe('Interaction validator', function() {
       }
     );
 
+    it('should have a warning for an answer group with a self-loop labelled' +
+    ' as correct', function() {
+      goodOutcomeFeedback.labelledAsCorrect = true;
+      var answerGroups = [
+        agof.createNew([], goodOutcomeFeedback, false, null)
+      ];
+      var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message:
+            'In answer group 1, self-loops should not be labelled as correct.'
+      }]);
+    });
+
     it('should not have any warnings for a non-confusing default outcome',
       function() {
         var warnings = bivs.getDefaultOutcomeWarnings(
@@ -154,6 +168,19 @@ describe('Interaction validator', function() {
         type: WARNING_TYPES.ERROR,
         message: 'Please add feedback for the user in the [All other ' +
           'answers] rule.'
+      }]);
+    });
+
+    it('should have a warning for a default outcome with a self-loop' +
+    ' labelled as correct', function() {
+      goodOutcomeFeedback.labelledAsCorrect = true;
+      var warnings = bivs.getDefaultOutcomeWarnings(
+        goodOutcomeFeedback, currentState);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In the [All other answers] group, self-loops should not be ' +
+          'labelled as correct.')
       }]);
     });
 

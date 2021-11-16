@@ -16,14 +16,13 @@
 the same e2e test suites.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 import re
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
@@ -185,7 +184,7 @@ def main():
             'but it is missing.'
             .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
-    if protractor_test_suites != ci_suite_names:
+    if set(protractor_test_suites) != set(ci_suite_names):
         raise Exception(
             'Protractor test suites and CI test suites are not in sync. '
             'Following suites are not in sync: {}'.format(

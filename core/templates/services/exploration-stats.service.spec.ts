@@ -28,17 +28,18 @@ import { ExplorationStatsService } from 'services/exploration-stats.service';
 describe('Exploration stats service', function() {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
   let explorationStatsService: ExplorationStatsService;
+  let explorationStats: ExplorationStats;
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
     explorationStatsBackendApiService = (
-      TestBed.get(ExplorationStatsBackendApiService));
-    explorationStatsService = TestBed.get(ExplorationStatsService);
+      TestBed.inject(ExplorationStatsBackendApiService));
+    explorationStatsService = TestBed.inject(ExplorationStatsService);
   });
 
   beforeEach(() => {
-    this.explorationStats = (
+    explorationStats = (
       ExplorationStats.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 1,
@@ -51,7 +52,7 @@ describe('Exploration stats service', function() {
 
   it('should callout to backend api service for stats', fakeAsync(() => {
     spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
-      .and.returnValue(Promise.resolve(this.explorationStats));
+      .and.returnValue(Promise.resolve(explorationStats));
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
@@ -60,14 +61,14 @@ describe('Exploration stats service', function() {
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
-    expect(onSuccess).toHaveBeenCalledWith(this.explorationStats);
+    expect(onSuccess).toHaveBeenCalledWith(explorationStats);
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
   it('should cache results after the first call', fakeAsync(() => {
     const backendApiSpy = (
       spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
-        .and.returnValue(Promise.resolve(this.explorationStats)));
+        .and.returnValue(Promise.resolve(explorationStats)));
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
@@ -80,7 +81,7 @@ describe('Exploration stats service', function() {
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
-    expect(onSuccess).toHaveBeenCalledWith(this.explorationStats);
+    expect(onSuccess).toHaveBeenCalledWith(explorationStats);
     expect(onSuccess).toHaveBeenCalledTimes(3);
     expect(onFailure).not.toHaveBeenCalled();
     expect(backendApiSpy).toHaveBeenCalledTimes(1);

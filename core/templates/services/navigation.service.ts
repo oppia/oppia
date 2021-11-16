@@ -20,21 +20,45 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+interface KeyFunc {
+  shiftKeyIsPressed: boolean;
+  keyCode: number;
+}
+
+interface KeyboardEventToCodes {
+  [keys: string]: KeyFunc;
+  enter: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
+  };
+  tab: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
+  };
+  shiftTab: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
+  };
+}
+
 export interface EventToCodes {
-  enter?: string,
-  tab?: string,
-  shiftTab?: string,
+  [keys: string]: string;
+  enter: string;
+  tab: string;
+  shiftTab: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class NavigationService {
-  constructor() {}
-  activeMenuName: string;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeMenuName!: string;
   ACTION_OPEN: string = 'open';
   ACTION_CLOSE: string = 'close';
-  KEYBOARD_EVENT_TO_KEY_CODES = {
+  KEYBOARD_EVENT_TO_KEY_CODES: KeyboardEventToCodes = {
     enter: {
       shiftKeyIsPressed: false,
       keyCode: 13
@@ -48,6 +72,8 @@ export class NavigationService {
       keyCode: 9
     }
   };
+
+  constructor() {}
 
   /**
   * Opens the submenu.

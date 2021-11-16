@@ -16,12 +16,11 @@
 
 """Definition of platform parameters."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import python_utils
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-import python_utils
 
 Registry = registry.Registry
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name

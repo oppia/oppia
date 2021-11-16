@@ -16,20 +16,18 @@
 
 """Tests for core.domain.stats_domain."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 import re
 
+from core import feconf
+from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -346,7 +344,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_stats_a, state_stats_c)
 
     def test_equality_with_different_class(self):
-        class DifferentStats(python_utils.OBJECT):
+        class DifferentStats:
             """A different class."""
 
             pass
@@ -388,7 +386,7 @@ class StateStatsTests(test_utils.GenericTestBase):
                 10, 11, 10, 12, 10, 13, 10, 14, 15, 10, 16))
 
     def test_aggregate_from_different_stats(self):
-        class DifferentStats(python_utils.OBJECT):
+        class DifferentStats:
             """A different class."""
 
             pass
@@ -538,7 +536,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(session_state_stats_a, session_state_stats_c)
 
     def test_equality_with_different_class(self):
-        class DifferentStats(python_utils.OBJECT):
+        class DifferentStats:
             """A different class."""
 
             pass
@@ -1857,7 +1855,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
 
-    class MockCalculationOutputObjectWithUnknownType(python_utils.OBJECT):
+    class MockCalculationOutputObjectWithUnknownType:
         pass
 
     def setUp(self):
@@ -1989,10 +1987,9 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         id_base = 'id:'
         self.assertEqual(
             len(self.learner_answer_details.learner_answer_info_list), 1)
-        for i in python_utils.RANGE(36):
+        for i in range(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + python_utils.UNICODE(
-                    i), answer, answer_details, created_on)
+                id_base + str(i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
         self.assertEqual(
@@ -2180,7 +2177,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         learner_answer_info_id = (
             stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
         self.assertNotEqual(learner_answer_info_id, None)
-        self.assertTrue(isinstance(learner_answer_info_id, bytes))
+        self.assertTrue(isinstance(learner_answer_info_id, str))
 
     def test_id_must_be_string(self):
         self.learner_answer_info.id = 123

@@ -16,8 +16,7 @@
 
 """Tests for translation fetchers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.domain import translation_domain
 from core.domain import translation_fetchers

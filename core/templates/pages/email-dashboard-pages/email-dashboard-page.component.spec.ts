@@ -16,204 +16,184 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
+import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
+import { UserInfo } from 'domain/user/user-info.model';
+import { LoaderService } from 'services/loader.service';
+import { CustomSchema } from 'services/schema-default-value.service';
+import { UserService } from 'services/user.service';
+import { EmailDashboardDataService } from './email-dashboard-data.service';
+import { EmailDashboardPageComponent } from './email-dashboard-page.component';
 
-require('pages/email-dashboard-pages/email-dashboard-page.component.ts');
+describe('Email Dashboard Page Component', () => {
+  let fixture: ComponentFixture<EmailDashboardPageComponent>;
+  let componentInstance: EmailDashboardPageComponent;
+  let loaderService: LoaderService;
+  let userService: UserService;
+  let emailDashboardDataService: EmailDashboardDataService;
 
-describe('Email Dashboard Page', function() {
-  var $scope = null;
-  var ctrl = null;
-  var $q = null;
-  var EmailDashboardDataService = null;
-  var UserService = null;
-  var LoaderService = null;
-  var loadingMessage = null;
-  var subscriptions = [];
-  var firstPageQueries = [
-    {id: 1, status: 'completed'},
-    {id: 2, status: 'completed'}
-  ];
-  var secondPageQueries = [
-    {id: 3, status: 'processing'},
-    {id: 4, status: 'processing'}
-  ];
-  var EMAIL_DASHBOARD_PREDICATE_DEFINITION = null;
+  class MockChangeDetectorRef {
+    detectChanges(): void {}
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    EmailDashboardDataService = $injector.get('EmailDashboardDataService');
-    UserService = $injector.get('UserService');
-    EMAIL_DASHBOARD_PREDICATE_DEFINITION = $injector.get(
-      'EMAIL_DASHBOARD_PREDICATE_DEFINITION');
-    loadingMessage = '';
-    LoaderService = $injector.get('LoaderService');
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
-    $q = $injector.get('$q');
-
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('emailDashboardPage', {
-      $rootScope: $scope
-    });
-
-    spyOn(EmailDashboardDataService, 'isNextPageAvailable').and.returnValue(
-      true);
-    spyOn(EmailDashboardDataService, 'isPreviousPageAvailable').and.returnValue(
-      true);
-
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        getUsername: function() {
-          return 'username';
-        }
-      });
-      return deferred.promise;
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        EmailDashboardPageComponent
+      ],
+      providers: [
+        {
+          provide: ChangeDetectorRef,
+          useClass: MockChangeDetectorRef
+        },
+        EmailDashboardDataService,
+        LoaderService,
+        UserService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
-    }
+  beforeEach(() => {
+    fixture = TestBed.createComponent(EmailDashboardPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = TestBed.inject(LoaderService);
+    userService = TestBed.inject(UserService);
+    emailDashboardDataService = TestBed.inject(EmailDashboardDataService);
   });
 
-  it('should clear form when form is reset', function() {
-    // Initialize ctrl.data.
-    ctrl.resetForm();
-    ctrl.data.edited_fewer_than_n_exps = 1;
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
 
-    ctrl.resetForm();
+  it('should intialize', fakeAsync(() => {
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(componentInstance, 'resetForm');
 
-    EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
-      expect(ctrl.data[predicate.backend_attr]).toBe(predicate.default_value);
+    let username = 'user';
+    let userInfo = new UserInfo(
+      [], true, true, true, true, true, '', username, '', true);
+    let queries: EmailDashboardQuery[] = [];
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
+    spyOn(emailDashboardDataService, 'getNextQueriesAsync').and.returnValue(
+      Promise.resolve(queries));
+    componentInstance.ngOnInit();
+    tick();
+    expect(componentInstance.username).toEqual(username);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.currentPageOfQueries).toEqual(queries);
+  }));
+
+  it('should tell if field is required', () => {
+    let fieldIsRequired = true;
+    componentInstance.isRequired = fieldIsRequired;
+    expect(componentInstance.isFieldRequired()).toEqual(fieldIsRequired);
+  });
+
+  it('should provide schema object', () => {
+    let schema = {} as CustomSchema;
+    let customizationArgSpec = {
+      backend_id: '',
+      backend_attr: '',
+      description: '',
+      schema,
+      default_value: ''
+    };
+    expect(componentInstance.getSchema(customizationArgSpec)()).toEqual(schema);
+  });
+
+  it('should update query data', () => {
+    let field = 'f1';
+    componentInstance.data = {};
+    componentInstance.data[field] = 2;
+    componentInstance.updateQueryData(3, field);
+  });
+
+  it('should reset form', () => {
+    let expectedData: Record<string, boolean | null> = {};
+    AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
+      expectedData[predicate.backend_attr] = predicate.default_value;
     });
+    componentInstance.resetForm();
+    expect(componentInstance.data).toEqual(expectedData);
   });
 
-  it('should check if all inputs are empty', function() {
-    ctrl.resetForm();
-    expect(ctrl.areAllInputsEmpty()).toBe(true);
-
-    ctrl.data.edited_fewer_than_n_exps = 1;
-    expect(ctrl.areAllInputsEmpty()).toBe(false);
-
-    ctrl.resetForm();
-    ctrl.data.created_collection = true;
-    expect(ctrl.areAllInputsEmpty()).toBe(false);
+  it('should tell are inputs empty', () => {
+    componentInstance.data = {};
+    expect(componentInstance.areAllInputsEmpty()).toBeTrue();
   });
 
-  it('should submit query when submitting form', function() {
-    // Initialize ctrl.data.
-    ctrl.resetForm();
-    ctrl.data.edited_fewer_than_n_exps = 1;
+  it('should submit query', fakeAsync(() => {
+    let queries: EmailDashboardQuery[] = [];
+    spyOn(emailDashboardDataService, 'submitQueryAsync').and.returnValue(
+      Promise.resolve(queries));
+    spyOn(componentInstance, 'resetForm');
+    componentInstance.submitQueryAsync();
+    tick();
+    expect(componentInstance.currentPageOfQueries).toEqual(queries);
+    expect(componentInstance.showSuccessMessage).toBeTrue();
+  }));
 
-    spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(
-      function() {
-        var deferred = $q.defer();
-        deferred.resolve(firstPageQueries);
-        return deferred.promise;
-      });
+  it('should get next page of queries', fakeAsync(() => {
+    let queries: EmailDashboardQuery[] = [];
+    spyOn(emailDashboardDataService, 'isNextPageAvailable').and.returnValue(
+      true);
+    spyOn(emailDashboardDataService, 'getNextQueriesAsync').and.returnValue(
+      Promise.resolve(queries));
+    componentInstance.getNextPageOfQueries();
+    tick();
+    expect(componentInstance.currentPageOfQueries).toEqual(queries);
+  }));
 
-    ctrl.submitQueryAsync();
-    $scope.$apply();
-
-    expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
-    expect(ctrl.showSuccessMessage).toBe(true);
+  it('should get previous page of queries', () => {
+    spyOn(emailDashboardDataService, 'isPreviousPageAvailable').and.returnValue(
+      true);
+    spyOn(emailDashboardDataService, 'getPreviousQueries').and.returnValue([]);
+    componentInstance.getPreviousPageOfQueries();
+    expect(emailDashboardDataService.isPreviousPageAvailable)
+      .toHaveBeenCalled();
+    expect(componentInstance.currentPageOfQueries).toEqual([]);
   });
 
-  it('should get next page of queries', function() {
-    spyOn(EmailDashboardDataService, 'getNextQueriesAsync').and.callFake(
-      function() {
-        var deferred = $q.defer();
-        deferred.resolve(secondPageQueries);
-        return deferred.promise;
-      });
-
-    ctrl.getNextPageOfQueries();
-    $scope.$apply();
-
-    expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
+  it('should show next button', () => {
+    let nextPageIsAvailable = true;
+    spyOn(emailDashboardDataService, 'isNextPageAvailable').and.returnValue(
+      nextPageIsAvailable);
+    expect(componentInstance.showNextButton()).toEqual(nextPageIsAvailable);
   });
 
-  it('should get previous page of queries', function() {
-    spyOn(EmailDashboardDataService, 'getPreviousQueries').and.returnValue(
-      firstPageQueries);
-
-    ctrl.getPreviousPageOfQueries();
-
-    expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
+  it('should show previous button', () => {
+    let previousPageIsAvailable = true;
+    spyOn(emailDashboardDataService, 'isPreviousPageAvailable').and.returnValue(
+      previousPageIsAvailable);
+    expect(componentInstance.showPreviousButton()).toEqual(
+      previousPageIsAvailable);
   });
 
-  it('should evaluate when next button is displayed', function() {
-    expect(ctrl.showNextButton()).toBe(true);
+  it('should recheck status', fakeAsync(() => {
+    let query = new EmailDashboardQuery('', '', 0, '', '');
+    componentInstance.currentPageOfQueries = [query];
+    spyOn(emailDashboardDataService, 'fetchQueryAsync').and.returnValue(
+      Promise.resolve(query));
+    componentInstance.recheckStatus(0);
+    tick();
+    expect(componentInstance.currentPageOfQueries[0]).toEqual(query);
+  }));
+
+  it('should link to result page', () => {
+    let submitter = 'submitter1';
+    componentInstance.username = submitter;
+    expect(componentInstance.showLinkToResultPage(
+      submitter, 'completed')).toBeTrue();
   });
-
-  it('should evaluate when previous button is displayed', function() {
-    expect(ctrl.showPreviousButton()).toBe(true);
-  });
-
-  describe('recheckStatus', function() {
-    it('should fetch query page again when getting next page of queries',
-      function() {
-        spyOn(EmailDashboardDataService, 'getNextQueriesAsync').and.callFake(
-          function() {
-            var deferred = $q.defer();
-            deferred.resolve(secondPageQueries);
-            return deferred.promise;
-          });
-
-        ctrl.getNextPageOfQueries();
-        $scope.$apply();
-
-        expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
-
-        var updatedQuery = {id: 3, status: 'completed'};
-        spyOn(EmailDashboardDataService, 'fetchQueryAsync').and.callFake(
-          function() {
-            var deferred = $q.defer();
-            deferred.resolve(updatedQuery);
-            return deferred.promise;
-          });
-
-        ctrl.recheckStatus(0);
-        $scope.$apply();
-
-        expect(ctrl.currentPageOfQueries[0]).toEqual(updatedQuery);
-      });
-
-    it('should not get query page again when it does not exist', function() {
-      expect(ctrl.currentPageOfQueries).toBe(undefined);
-      ctrl.recheckStatus(0);
-      expect(ctrl.currentPageOfQueries).toBe(undefined);
-    });
-  });
-
-  it('should get user info and next queries after controller initialization',
-    function() {
-      spyOn(EmailDashboardDataService, 'getNextQueriesAsync').and.callFake(
-        function() {
-          var deferred = $q.defer();
-          deferred.resolve(secondPageQueries);
-          return deferred.promise;
-        });
-
-      ctrl.$onInit();
-      expect(loadingMessage).toBe('Loading');
-      expect(ctrl.currentPageOfQueries).toEqual([]);
-      // For UserService.
-      $scope.$apply();
-      // For EmailDashboardDataService.
-      $scope.$apply();
-
-      expect(ctrl.username).toBe('username');
-      expect(loadingMessage).toBe('');
-      expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
-
-      expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);
-    });
 });

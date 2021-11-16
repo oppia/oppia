@@ -17,6 +17,11 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // Skill editor page is upgraded to Angular 8.
@@ -30,7 +35,6 @@ describe('Skill editor page', function() {
   var PreventPageUnloadEventService = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
-  var SkillObjectFactory = null;
   var UndoRedoService = null;
   var $uibModal = null;
   var UrlService = null;
@@ -45,7 +49,6 @@ describe('Skill editor page', function() {
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     $uibModal = $injector.get('$uibModal');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
     $rootScope = $injector.get('$rootScope');
@@ -126,10 +129,18 @@ describe('Skill editor page', function() {
     });
 
   it('should return warnings count for the skill', function() {
-    ctrl.skill = SkillObjectFactory.createInterstitialSkill();
-    // This is because an interstitial skill has empty rubrics
-    // array, and hence there's a warning. See SkillObjectFactory
-    // for reference.
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [], RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      })
+    );
+    ctrl.skill = new Skill(
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+    );
     expect(ctrl.getWarningsCount()).toEqual(1);
   });
 });

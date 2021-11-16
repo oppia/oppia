@@ -16,15 +16,16 @@
 
 """Lint checks of other file types."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import glob
 import json
-
 import os
+import re
 
-import python_utils
+from core import python_utils
+
+import yaml
 
 from .. import concurrent_task_utils
 
@@ -37,29 +38,35 @@ WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
 
 APP_YAML_FILEPATH = os.path.join(os.getcwd(), 'app_dev.yaml')
 
-MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
+DEPENDENCIES_JSON_FILE_PATH = os.path.join(os.getcwd(), 'dependencies.json')
 PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH = len('.d.ts')
-_DEPENDENCY_SOURCE_MANIFEST = 'manifest.json'
+_DEPENDENCY_SOURCE_DEPENDENCIES_JSON = 'dependencies.json'
 _DEPENDENCY_SOURCE_PACKAGE = 'package.json'
+
+WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
+WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
+MERGE_STEP = {'uses': './.github/actions/merge'}
+WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
+    'backend_tests.yml', 'pending-review-notification.yml')
 
 THIRD_PARTY_LIBS = [
     {
         'name': 'Guppy',
         'dependency_key': 'guppy',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
+        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
         'type_defs_filename_prefix': 'guppy-defs-'
     },
     {
         'name': 'Skulpt',
         'dependency_key': 'skulpt-dist',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
+        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
         'type_defs_filename_prefix': 'skulpt-defs-'
     },
     {
         'name': 'MIDI',
         'dependency_key': 'midiJs',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
+        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
@@ -71,7 +78,7 @@ THIRD_PARTY_LIBS = [
 ]
 
 
-class CustomLintChecksManager(python_utils.OBJECT):
+class CustomLintChecksManager:
     """Manages other files lint checks."""
 
     def __init__(self, file_cache):
@@ -132,8 +139,8 @@ class CustomLintChecksManager(python_utils.OBJECT):
         failed = False
         error_messages = []
 
-        manifest = json.load(python_utils.open_file(
-            MANIFEST_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
+        dependencies_json = json.load(python_utils.open_file(
+            DEPENDENCIES_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
 
         package = json.load(python_utils.open_file(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
@@ -144,9 +151,10 @@ class CustomLintChecksManager(python_utils.OBJECT):
         for third_party_lib in THIRD_PARTY_LIBS:
             lib_dependency_source = third_party_lib['dependency_source']
 
-            if lib_dependency_source == _DEPENDENCY_SOURCE_MANIFEST:
+            if lib_dependency_source == _DEPENDENCY_SOURCE_DEPENDENCIES_JSON:
                 lib_version = (
-                    manifest[third_party_lib['dependency_key']]['version'])
+                    dependencies_json[
+                        third_party_lib['dependency_key']]['version'])
 
             elif lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
                 lib_version = package[third_party_lib['dependency_key']]
@@ -272,6 +280,54 @@ class CustomLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_github_workflows_use_merge_action(self):
+        """Checks that all github actions workflows use the merge action.
+
+        Returns:
+            TaskResult. A TaskResult object describing any workflows
+            that failed to use the merge action.
+        """
+        name = 'Github workflows use merge action'
+        workflow_paths = {
+            os.path.join(WORKFLOWS_DIR, filename)
+            for filename in os.listdir(WORKFLOWS_DIR)
+            if re.search(WORKFLOW_FILENAME_REGEX, filename)
+            if filename not in WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT
+        }
+        errors = []
+        for workflow_path in workflow_paths:
+            workflow_str = self.file_cache.read(workflow_path)
+            workflow_dict = yaml.load(workflow_str, Loader=yaml.Loader)
+            errors += self._check_that_workflow_steps_use_merge_action(
+                workflow_dict, workflow_path)
+        return concurrent_task_utils.TaskResult(
+            name, bool(errors), errors, errors)
+
+    @staticmethod
+    def _check_that_workflow_steps_use_merge_action(
+            workflow_dict, workflow_path):
+        """Check that a workflow uses the merge action.
+
+        Args:
+            workflow_dict: dict. Dictionary representation of the
+                workflow YAML file.
+            workflow_path: str. Path to workflow file.
+
+        Returns:
+            list(str). A list of error messages describing any jobs
+            failing to use the merge action.
+        """
+        jobs_without_merge = []
+        for job, job_dict in workflow_dict['jobs'].items():
+            if MERGE_STEP not in job_dict['steps']:
+                jobs_without_merge.append(job)
+        error_messages = [
+            '%s --> Job %s does not use the .github/actions/merge action.' % (
+                workflow_path, job)
+            for job in jobs_without_merge
+        ]
+        return error_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -287,6 +343,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(self.check_webpack_config_file())
         linter_stdout.append(
             self.check_filenames_in_tsconfig_strict_are_sorted())
+        linter_stdout.append(self.check_github_workflows_use_merge_action())
 
         return linter_stdout
 

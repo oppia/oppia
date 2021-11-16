@@ -38,7 +38,8 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       }
-    }
+    },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -84,7 +85,7 @@ describe('ExplorationCreationService', () => {
       spyOn(ecbas, 'registerNewExplorationAsync');
       ecs.explorationCreationInProgress = true;
 
-      expect(ecs.createNewExploration()).toBe(undefined);
+      expect(ecs.createNewExploration()).toBeUndefined();
       expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
     });
 
@@ -113,13 +114,13 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
       tick(150);
 
-      expect(ecs.explorationCreationInProgress).toBe(true);
+      expect(ecs.explorationCreationInProgress).toBeTrue();
       expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
     }));
 
@@ -135,13 +136,13 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
       tick(150);
 
-      expect(ecs.explorationCreationInProgress).toBe(false);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
       expect(siteAnalyticsService.registerCreateNewExplorationEvent)
         .not.toHaveBeenCalled();
@@ -153,18 +154,18 @@ describe('ExplorationCreationService', () => {
   describe('on calling showUploadExplorationModal', () => {
     it('should show upload exploration modal', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.resolve({
             yamlFile: ''
           })
-        }
+        } as NgbModalRef
       );
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.resolveTo('sample-csrf-token');
 
       // @ts-ignore in order to ignore JQuery properties that should
       // be declared.
-      spyOn($, 'ajax').and.callFake((options) => {
+      spyOn($, 'ajax').and.callFake((options: Promise) => {
         let d = $.Deferred();
         d.resolve(
           options.dataFilter(')]}\',\n{"explorationId": "expId"}')
@@ -181,11 +182,11 @@ describe('ExplorationCreationService', () => {
     it('should show upload exploration modal and display alert if post' +
       ' request fails', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
+        {
           result: Promise.resolve({
             yamlFile: ''
           })
-        }
+        } as NgbModalRef
       );
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.resolveTo('sample-csrf-token');

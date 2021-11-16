@@ -14,14 +14,13 @@
 
 """Tests for the page that allows learners to play through a collection."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
@@ -73,9 +72,9 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_collections_are_visible_to_admins(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.login(self.MODERATOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.logout()

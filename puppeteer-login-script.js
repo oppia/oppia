@@ -18,7 +18,7 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
-const ADMIN_URL = 'http://127.0.0.1:8181/admin';
+const LOGIN_URL = 'http://127.0.0.1:8181/login';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
@@ -29,23 +29,28 @@ var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
 var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
-var updateFormName = '.protractor-test-update-form-name';
-var updateFormSubmit = '.protractor-test-update-form-submit';
-var roleSelect = '.protractor-test-update-form-role-select';
-var statusMessage = '.protractor-test-status-message';
+var usernameInputFieldForRolesEditing = (
+  '.protractor-test-username-for-role-editor');
+var editUserRoleButton = '.protractor-test-role-edit-button';
+var roleEditorContainer = '.protractor-test-roles-editor-card-container';
+var addNewRoleButton = '.protractor-test-add-new-role-button';
+var roleSelect = '.protractor-test-new-role-selector';
 
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
-  if (context.url.includes('admin')) {
-    await login(context, page);
+  await login(context, page);
+  if (context.url.includes('moderator')) {
+    await setRole(page, 'MODERATOR');
   } else if (context.url.includes('emaildashboard')) {
-    await setRole(page, 'string:ADMIN');
+    await setRole(page, 'ADMIN');
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {
     await createExplorations(context, page);
+  } else if (context.url.includes('blog-dashboard')) {
+    await setRole(page, 'BLOG_ADMIN');
   }
   await page.close();
 };
@@ -54,7 +59,11 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
+    await page.goto(LOGIN_URL, {waitUntil: networkIdle});
+    // The user is already logged in.
+    if (!page.url().includes('login')) {
+      return;
+    }
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
@@ -80,17 +89,19 @@ const setRole = async function(page, role) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
-    await page.waitForSelector(updateFormName);
-    await page.type(updateFormName, 'username1');
-    await page.select(roleSelect, role);
-    await page.waitForSelector(updateFormSubmit);
-    await page.click(updateFormSubmit);
-    await page.waitForSelector(statusMessage);
-    await page.waitForFunction(
-      'document.querySelector(' +
-        '".protractor-test-status-message").innerText.includes(' +
-        '"successfully updated to")'
-    );
+    await page.waitForSelector(usernameInputFieldForRolesEditing);
+    await page.type(usernameInputFieldForRolesEditing, 'username1');
+    await page.waitForSelector(editUserRoleButton);
+    await page.click(editUserRoleButton);
+    await page.waitForSelector(roleEditorContainer);
+
+    await page.waitForSelector(addNewRoleButton);
+    await page.click(addNewRoleButton);
+
+    await page.click(roleSelect);
+    var selector = `mat-option[ng-reflect-value="${role}"]`;
+    await page.click(selector);
+    await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
@@ -99,12 +110,11 @@ const setRole = async function(page, role) {
   }
 };
 
-
 const createCollections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
-    await setRole(page, 'string:COLLECTION_EDITOR');
+    await setRole(page, 'COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');

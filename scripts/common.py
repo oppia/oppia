@@ -14,11 +14,12 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import contextlib
+import errno
 import getpass
+import io
 import os
 import platform
 import re
@@ -28,8 +29,8 @@ import subprocess
 import sys
 import time
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -38,15 +39,15 @@ CURRENT_PYTHON_BIN = sys.executable
 # Versions of libraries used in devflow.
 COVERAGE_VERSION = '5.3'
 ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '4.3.21'
+ISORT_VERSION = '5.8.0'
 PYCODESTYLE_VERSION = '2.6.0'
-PSUTIL_VERSION = '5.7.3'
-PYLINT_VERSION = '1.9.5'
-PYLINT_QUOTES_VERSION = '0.1.8'
+PSUTIL_VERSION = '5.8.0'
+PYLINT_VERSION = '2.8.3'
+PYLINT_QUOTES_VERSION = '0.1.9'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
-PIP_TOOLS_VERSION = '5.4.0'
-GRPCIO_VERSION = '1.0.0'
+PIP_TOOLS_VERSION = '6.0.1'
+GRPCIO_VERSION = '1.38.0'
 ENUM_VERSION = '1.1.10'
 PROTOBUF_VERSION = '3.13.0'
 SETUPTOOLS_VERSION = '36.6.0'
@@ -81,7 +82,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.0.10'
+REDIS_CLI_VERSION = '6.2.4'
 ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
@@ -95,10 +96,11 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+ISORT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'isort-%s' % ISORT_VERSION)
 WEBPACK_BIN_PATH = (
     os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
 DEV_APPSERVER_PATH = (
-    os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'dev_appserver.py'))
+    os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
@@ -140,9 +142,9 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
-FECONF_PATH = os.path.join('feconf.py')
+FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60 * 2
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
@@ -184,18 +186,14 @@ PROTRACTOR_CONFIG_FILE_PATH = (
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
     PYLINT_PATH,
-
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
     PSUTIL_DIR,
+    os.path.join(CURR_DIR, 'proto_files'),
     os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
@@ -244,7 +242,7 @@ def run_cmd(cmd_tokens):
         str. The output of the command.
     """
     return subprocess.check_output(
-        cmd_tokens, stderr=subprocess.STDOUT).strip()
+        cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
 
 def ensure_directory_exists(d):
@@ -278,12 +276,12 @@ def open_new_tab_in_browser_if_possible(url):
         python_utils.PRINT(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
-        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+        USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
         python_utils.PRINT(
             'Please open the following link in browser: %s' % url)
         return
-    browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
+    browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
@@ -301,13 +299,13 @@ def open_new_tab_in_browser_if_possible(url):
     python_utils.PRINT(
         'the function open_new_tab_in_browser_if_possible() to work on your')
     python_utils.PRINT('system.')
-    python_utils.INPUT()
+    input()
 
 
 def get_remote_alias(remote_url):
     """Finds the correct alias for the given remote repository URL."""
     git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).split('\n')
+        ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
     for line in git_remote_output:
         if remote_url in line:
@@ -323,10 +321,11 @@ def get_remote_alias(remote_url):
 def verify_local_repo_is_clean():
     """Checks that the local Git repo is clean."""
     git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split('\n')
+        ['git', 'status']
+    ).strip().split(b'\n')
 
-    branch_is_clean_message_1 = 'nothing to commit, working directory clean'
-    branch_is_clean_message_2 = 'nothing to commit, working tree clean'
+    branch_is_clean_message_1 = b'nothing to commit, working directory clean'
+    branch_is_clean_message_2 = b'nothing to commit, working tree clean'
     if (
             not branch_is_clean_message_1 in git_status_output and
             not branch_is_clean_message_2 in git_status_output):
@@ -341,10 +340,11 @@ def get_current_branch_name():
         str. The name of current branch.
     """
     git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split('\n')
+        ['git', 'status']).decode('utf-8').strip().split('\n')
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
+    # Standard output is in bytes, we need to decode the line to print it.
     return git_status_first_line[len(branch_message_prefix):]
 
 
@@ -500,7 +500,7 @@ def ask_user_to_confirm(message):
             '******************************************************')
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
+        answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
@@ -607,7 +607,12 @@ def create_readme(dir_path, readme_content):
         f.write(readme_content)
 
 
-def inplace_replace_file(filename, regex_pattern, replacement_string):
+def inplace_replace_file(
+    filename,
+    regex_pattern,
+    replacement_string,
+    expected_number_of_replacements=None
+):
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
@@ -619,20 +624,39 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         filename: str. The name of the file to be changed.
         regex_pattern: str. The pattern to check.
         replacement_string: str. The content to be replaced.
+        expected_number_of_replacements: optional(int). The number of
+            replacements that should be made. When None no check is done.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
     new_contents = []
+    total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
         with python_utils.open_file(backup_filename, 'r') as f:
             for line in f:
-                new_contents.append(regex.sub(replacement_string, line))
+                new_line, number_of_replacements = regex.subn(
+                    replacement_string, line)
+                new_contents.append(new_line)
+                total_number_of_replacements += number_of_replacements
 
         with python_utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
+
+        if (
+                expected_number_of_replacements is not None and
+                total_number_of_replacements != expected_number_of_replacements
+        ):
+            raise ValueError(
+                'Wrong number of replacements. Expected %s. Performed %s.' % (
+                    expected_number_of_replacements,
+                    total_number_of_replacements
+                )
+            )
+
         os.remove(backup_filename)
+
     except Exception:
         # Restore the content if there was en error.
         os.remove(filename)
@@ -714,7 +738,7 @@ def wait_for_port_to_not_be_in_use(port_number):
     return not is_port_in_use(port_number)
 
 
-def fix_third_party_imports():
+def fix_third_party_imports() -> None:
     """Sets up up the environment variables and corrects the system paths so
     that the backend tests and imports work correctly.
     """
@@ -748,7 +772,7 @@ def fix_third_party_imports():
     sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
-class CD(python_utils.OBJECT):
+class CD:
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):
@@ -784,3 +808,32 @@ def swap_env(key, value):
             del os.environ[key]
         else:
             os.environ[key] = old_value
+
+
+def write_stdout_safe(string):
+    """Tries to write the input string to stdout in a non-blocking way.
+
+    https://stackoverflow.com/a/44961052/4859885
+
+    Args:
+        string: str|bytes. The string to write to stdout.
+    """
+    string_bytes = string.encode('utf-8') if isinstance(string, str) else string
+
+    num_bytes_written = 0
+    while num_bytes_written < len(string_bytes):
+        try:
+            num_bytes_written += os.write(
+                sys.stdout.fileno(), string_bytes[num_bytes_written:])
+        # The os.write might not be supported, thus we need
+        # to try sys.stdout.write.
+        except io.UnsupportedOperation:
+            # Standard output accepts str, we need to decode the string_bytes
+            # in order to write it.
+            sys.stdout.write(string_bytes.decode('utf-8'))
+            return
+        except OSError as e:
+            if e.errno == errno.EAGAIN:
+                continue
+            else:
+                raise

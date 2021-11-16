@@ -52,13 +52,13 @@ angular.module('oppia').factory('ExplorationStatesService', [
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
-  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
+  'StatesObjectFactory', 'ValidatorsService',
   function(
       $filter, $injector, $location, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
       SolutionValidityService, StateEditorRefreshService, StateEditorService,
-      StatesObjectFactory, UrlInterpolationService, ValidatorsService) {
+      StatesObjectFactory, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
@@ -450,6 +450,15 @@ angular.module('oppia').factory('ExplorationStatesService', [
         }
         _states.setState(stateName, angular.copy(stateData));
       },
+      markWrittenTranslationAsNeedingUpdate: function(
+          contentId, languageCode, stateName) {
+        ChangeListService.markTranslationAsNeedingUpdate(
+          contentId, languageCode, stateName);
+        let stateData = _states.getState(stateName);
+        stateData.writtenTranslations.translationsMapping[contentId][
+          languageCode].markAsNeedingUpdate();
+        _states.setState(stateName, angular.copy(stateData));
+      },
       markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
         ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
         let stateData = _states.getState(stateName);
@@ -501,8 +510,8 @@ angular.module('oppia').factory('ExplorationStatesService', [
         }
 
         return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
           resolve: {

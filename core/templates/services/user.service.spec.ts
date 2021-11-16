@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
@@ -27,6 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserService } from 'services/user.service';
 import { UrlService } from './contextual/url.service';
+import { PreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
 
 class MockWindowRef {
   _window = {
@@ -46,6 +47,7 @@ describe('User Api Service', () => {
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
   let windowRef: MockWindowRef;
+  let userBackendApiService: UserBackendApiService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -58,6 +60,7 @@ describe('User Api Service', () => {
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
     csrfService = TestBed.get(CsrfTokenService);
+    userBackendApiService = TestBed.inject(UserBackendApiService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       async() => {
@@ -74,9 +77,9 @@ describe('User Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
-      role: 'USER_ROLE',
+      roles: ['USER_ROLE'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -89,7 +92,8 @@ describe('User Api Service', () => {
       sampleUserInfoBackendObject);
 
     userService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
+      expect(userInfo.isCurriculumAdmin()).toBe(
+        sampleUserInfo.isCurriculumAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
       expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());
@@ -133,9 +137,9 @@ describe('User Api Service', () => {
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
-      role: 'USER_ROLE',
+      roles: ['USER_ROLE'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -166,7 +170,7 @@ describe('User Api Service', () => {
     const sampleUserInfoBackendObject = {
       role: 'USER_ROLE',
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -192,7 +196,7 @@ describe('User Api Service', () => {
     // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -225,7 +229,7 @@ describe('User Api Service', () => {
       // Creating a test user for checking profile picture of user.
       var sampleUserInfoBackendObject = {
         is_moderator: false,
-        is_admin: false,
+        is_curriculum_admin: false,
         is_super_admin: false,
         is_topic_manager: false,
         can_create_collections: true,
@@ -257,7 +261,7 @@ describe('User Api Service', () => {
       // Creating a test user for checking profile picture of user.
       const sampleUserInfoBackendObject = {
         is_moderator: false,
-        is_admin: false,
+        is_curriculum_admin: false,
         is_super_admin: false,
         is_topic_manager: false,
         can_create_collections: true,
@@ -378,4 +382,16 @@ describe('User Api Service', () => {
 
       flushMicrotasks();
     }));
+
+  it('should get user preferred dashboard', fakeAsync(() => {
+    let defaultDashboard = 'learner';
+    spyOn(userBackendApiService, 'getPreferencesAsync').and.returnValue(
+      Promise.resolve({
+        default_dashboard: defaultDashboard
+      } as PreferencesBackendDict));
+    userService.getUserPreferredDashboardAsync().then(preferredDashboard => {
+      expect(preferredDashboard).toEqual(defaultDashboard);
+    });
+    tick();
+  }));
 });

@@ -17,9 +17,9 @@
  */
 
 export interface UserInfoBackendDict {
-  'role': string;
+  'roles': string[];
   'is_moderator': boolean;
-  'is_admin': boolean;
+  'is_curriculum_admin': boolean;
   'is_super_admin': boolean;
   'is_topic_manager': boolean;
   'can_create_collections': boolean;
@@ -30,9 +30,9 @@ export interface UserInfoBackendDict {
 }
 
 export class UserInfo {
-  _role: string;
+  _roles: string[];
   _isModerator: boolean;
-  _isAdmin: boolean;
+  _isCurriculumAdmin: boolean;
   _isTopicManager: boolean;
   _isSuperAdmin: boolean;
   _canCreateCollections: boolean;
@@ -44,13 +44,13 @@ export class UserInfo {
   _isLoggedIn: boolean;
 
   constructor(
-      role: string, isModerator: boolean, isAdmin: boolean,
+      roles: string[], isModerator: boolean, isCurriculumAdmin: boolean,
       isSuperAdmin: boolean, isTopicManager: boolean,
       canCreateCollections: boolean, preferredSiteLanguageCode: string | null,
       username: string | null, email: string | null, isLoggedIn: boolean) {
-    this._role = role;
+    this._roles = roles;
     this._isModerator = isModerator;
-    this._isAdmin = isAdmin;
+    this._isCurriculumAdmin = isCurriculumAdmin;
     this._isTopicManager = isTopicManager;
     this._isSuperAdmin = isSuperAdmin;
     this._canCreateCollections = canCreateCollections;
@@ -63,30 +63,38 @@ export class UserInfo {
   static createFromBackendDict(
       data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
-      data.role, data.is_moderator, data.is_admin, data.is_super_admin,
-      data.is_topic_manager, data.can_create_collections,
+      data.roles, data.is_moderator, data.is_curriculum_admin,
+      data.is_super_admin, data.is_topic_manager, data.can_create_collections,
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
   }
   static createDefault(): UserInfo {
     return new UserInfo(
-      'GUEST', false, false, false, false, false, null, null, null, false);
+      ['GUEST'], false, false, false, false, false, null, null, null, false);
   }
 
   isModerator(): boolean {
     return this._isModerator;
   }
 
-  isAdmin(): boolean {
-    return this._isAdmin;
+  isBlogAdmin(): boolean {
+    return (this._roles.includes('BLOG_ADMIN'));
+  }
+
+  isBlogPostEditor(): boolean {
+    return (this._roles.includes('BLOG_POST_EDITOR'));
+  }
+
+  isCurriculumAdmin(): boolean {
+    return this._isCurriculumAdmin;
   }
 
   isTranslationAdmin(): boolean {
-    return this._role.includes('TRANSLATION_ADMIN');
+    return this._roles.includes('TRANSLATION_ADMIN');
   }
 
   isQuestionAdmin(): boolean {
-    return this._role.includes('QUESTION_ADMIN');
+    return this._roles.includes('QUESTION_ADMIN');
   }
 
   isTopicManager(): boolean {

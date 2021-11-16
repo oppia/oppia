@@ -22,14 +22,12 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage = require(
   '../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 
 describe('Exploration translation and voiceover tab', function() {
-  var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
@@ -39,7 +37,6 @@ describe('Exploration translation and voiceover tab', function() {
   var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -49,11 +46,8 @@ describe('Exploration translation and voiceover tab', function() {
     await users.createUser(
       'voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
-    await users.createUser('voiceoverAdmin@exp.com', 'voiceoverManager');
-    await users.createAndLoginAdminUser(
-      'superUser@translationTab.com', 'superUser');
-    await adminPage.updateRole('voiceoverManager', 'voiceover admin');
-    await users.logout();
+    await users.createUserWithRole(
+      'voiceoverAdmin@exp.com', 'voiceoverManager', 'voiceover admin');
     await users.login('user@editorTab.com');
     await workflow.createExploration(true);
 

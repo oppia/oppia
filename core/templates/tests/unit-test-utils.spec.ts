@@ -18,6 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { MockTranslatePipe } from './unit-test-utils';
+import { MockCapitalizePipe } from './unit-test-utils';
 
 describe('Testing MockTranslatePipe', () => {
   let mtp: MockTranslatePipe;
@@ -35,5 +36,24 @@ describe('Testing MockTranslatePipe', () => {
   it('should return same value', () => {
     expect(mtp.transform('a')).toEqual('a');
     expect(mtp.transform('abc')).toEqual('abc');
+  });
+});
+
+describe('Testing MockCapitalizePipe', () => {
+  let mcp: MockCapitalizePipe;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [MockCapitalizePipe]
+    });
+    mcp = TestBed.inject(MockCapitalizePipe);
+  });
+
+  it('should have all expected pipes', () => {
+    expect(mcp).not.toEqual(null);
+  });
+
+  it('should return same value', () => {
+    expect(mcp.transform('a')).toEqual('a');
+    expect(mcp.transform('abc')).toEqual('abc');
   });
 });

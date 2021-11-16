@@ -45,8 +45,7 @@ class MockI18nLanguageCodeService {
 }
 
 describe('Splash Page', () => {
-  const siteAnalyticsServiceStub = new SiteAnalyticsService(
-    new WindowRef());
+  let siteAnalyticsService: SiteAnalyticsService;
   let loaderService: LoaderService = null;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
@@ -66,7 +65,7 @@ describe('Splash Page', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
+        SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
@@ -74,7 +73,8 @@ describe('Splash Page', () => {
             nativeWindow: {
               location: {
                 href: ''
-              }
+              },
+              gtag: () => {}
             }
           }
         }
@@ -89,6 +89,7 @@ describe('Splash Page', () => {
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   let component;
@@ -104,28 +105,28 @@ describe('Splash Page', () => {
 
   it('should record analytics when Browse Lessons is clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickBrowseLessonsButtonEvent')
+      siteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
     component.onClickBrowseLessonsButton();
-    expect(siteAnalyticsServiceStub.registerClickBrowseLessonsButtonEvent)
+    expect(siteAnalyticsService.registerClickBrowseLessonsButtonEvent)
       .toHaveBeenCalled();
   });
 
   it('should record analytics when Start Contributing is clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickStartContributingButtonEvent')
+      siteAnalyticsService, 'registerClickStartContributingButtonEvent')
       .and.callThrough();
     component.onClickStartContributingButton();
-    expect(siteAnalyticsServiceStub.registerClickStartContributingButtonEvent)
+    expect(siteAnalyticsService.registerClickStartContributingButtonEvent)
       .toHaveBeenCalled();
   });
 
   it('should record analytics when Start Teaching is clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickStartTeachingButtonEvent'
+      siteAnalyticsService, 'registerClickStartTeachingButtonEvent'
     ).and.callThrough();
     component.onClickStartTeachingButton();
-    expect(siteAnalyticsServiceStub.registerClickStartTeachingButtonEvent)
+    expect(siteAnalyticsService.registerClickStartTeachingButtonEvent)
       .toHaveBeenCalled();
   });
 
@@ -152,9 +153,9 @@ describe('Splash Page', () => {
 
   it('should evaluate if user is logged in', fakeAsync(() => {
     const UserInfoObject = {
-      role: 'USER_ROLE',
+      roles: ['USER_ROLE'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -173,9 +174,9 @@ describe('Splash Page', () => {
 
   it('should evaluate if user is not logged in', fakeAsync(() => {
     const UserInfoObject = {
-      role: 'USER_ROLE',
+      roles: ['USER_ROLE'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,

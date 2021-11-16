@@ -29,6 +29,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
 
 describe('Learner Dashboard Icons Component', () => {
   let component: LearnerDashboardIconsComponent;
@@ -38,6 +40,7 @@ describe('Learner Dashboard Icons Component', () => {
     LearnerDashboardIdsBackendApiService;
   let learnerDashboardActivityBackendApiService:
     LearnerDashboardActivityBackendApiService;
+  let learnerPlaylistSpy: jasmine.Spy;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -48,6 +51,7 @@ describe('Learner Dashboard Icons Component', () => {
       ],
       declarations: [
         LearnerDashboardIconsComponent,
+        LearnerPlaylistModalComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -55,6 +59,10 @@ describe('Learner Dashboard Icons Component', () => {
         LearnerDashboardActivityBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [LearnerPlaylistModalComponent],
+      }
     }).compileComponents();
   }));
 
@@ -66,6 +74,10 @@ describe('Learner Dashboard Icons Component', () => {
     learnerDashboardActivityBackendApiService =
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     fixture.detectChanges();
+    learnerPlaylistSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'removeFromLearnerPlaylistModal'
+    ).and.callThrough();
   });
 
   it('should intialize the component and set values', fakeAsync(() => {
@@ -720,16 +732,10 @@ describe('Learner Dashboard Icons Component', () => {
     let activityTitle = 'Title';
     let activityType = 'exploration';
 
-    const learnerPlaylistSpy =
-      spyOn(
-        learnerDashboardActivityBackendApiService,
-        'removeFromLearnerPlaylistModal')
-        .and.returnValue(null);
-
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
-
     fixture.detectChanges();
+    tick(15000);
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
   }
@@ -741,16 +747,10 @@ describe('Learner Dashboard Icons Component', () => {
     let activityTitle = 'Title';
     let activityType = 'collection';
 
-    const learnerPlaylistSpy =
-      spyOn(
-        learnerDashboardActivityBackendApiService,
-        'removeFromLearnerPlaylistModal')
-        .and.returnValue(null);
-
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
-
     fixture.detectChanges();
+    tick(15000);
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
   }

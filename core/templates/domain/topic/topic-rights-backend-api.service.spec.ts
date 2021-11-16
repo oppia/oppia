@@ -25,11 +25,11 @@ import { TopicRightsBackendApiService } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Topic rights backend API service', () => {
-  let topicRightsBackendApiService: TopicRightsBackendApiService = null;
+  let topicRightsBackendApiService: TopicRightsBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   let topicId = '0';
 
@@ -38,10 +38,10 @@ describe('Topic rights backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    topicRightsBackendApiService = TestBed.get(TopicRightsBackendApiService);
+    topicRightsBackendApiService = TestBed.inject(TopicRightsBackendApiService);
 
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
@@ -134,7 +134,7 @@ describe('Topic rights backend API service', () => {
   it('should report an uncached topic rights after caching it',
     fakeAsync(() => {
       // The topic should not currently be cached.
-      expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
+      expect(topicRightsBackendApiService.isCached(topicId)).toBeFalse();
 
       // A new topic should be fetched from the backend. Also,
       // the returned topic should match the expected topic object.
@@ -155,12 +155,12 @@ describe('Topic rights backend API service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
       // It should now be cached.
-      expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
+      expect(topicRightsBackendApiService.isCached(topicId)).toBeTrue();
     }));
 
   it('should report a cached topic rights after caching it', fakeAsync(() => {
     // The topic should not currently be cached.
-    expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
+    expect(topicRightsBackendApiService.isCached(topicId)).toBeFalse();
 
     // Cache a topic rights object.
     topicRightsBackendApiService.cacheTopicRights(topicId, {
@@ -170,7 +170,7 @@ describe('Topic rights backend API service', () => {
     });
 
     // It should now be cached.
-    expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
+    expect(topicRightsBackendApiService.isCached(topicId)).toBeTrue();
 
     // A new topic should not have been fetched from the backend. Also,
     // the returned topic should match the expected topic object.
@@ -189,7 +189,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should send a topic rights mail', fakeAsync(() => {
-    topicRightsBackendApiService.sendMailAsync(topicId, null).then(
+    topicRightsBackendApiService.sendMailAsync(topicId, 'dummyTopic').then(
       successHandler, failHandler);
     const req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
@@ -203,7 +203,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should handler error on sending topic rights mail', fakeAsync(() => {
-    topicRightsBackendApiService.sendMailAsync(topicId, null).then(
+    topicRightsBackendApiService.sendMailAsync(topicId, 'dummyTopic').then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

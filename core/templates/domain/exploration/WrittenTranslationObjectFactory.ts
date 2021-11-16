@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
@@ -33,7 +34,8 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
 
-type DataFormatToDefaultValuesKey = keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
+export type DataFormatToDefaultValuesKey = (
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
 
 export interface TranslationBackendDict {
   'data_format': string;
@@ -43,7 +45,7 @@ export interface TranslationBackendDict {
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: string,
+      public dataFormat: DataFormatToDefaultValuesKey,
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
@@ -78,7 +80,7 @@ export class WrittenTranslation {
   setTranslation(translation: string|string[]): void {
     if (typeof translation !==
         typeof DATA_FORMAT_TO_DEFAULT_VALUES[
-          <DataFormatToDefaultValuesKey> this.dataFormat]) {
+          this.dataFormat as DataFormatToDefaultValuesKey]) {
       throw new Error(
         'This translation is not of the correct type for data format ' +
         this.dataFormat);
@@ -105,14 +107,20 @@ export class WrittenTranslationObjectFactory {
     }
 
     return new WrittenTranslation(
-      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[
-        <DataFormatToDefaultValuesKey> dataFormat], false);
+      dataFormat as DataFormatToDefaultValuesKey,
+      cloneDeep(
+        DATA_FORMAT_TO_DEFAULT_VALUES[
+          dataFormat as DataFormatToDefaultValuesKey
+        ]
+      ),
+      false
+    );
   }
 
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.data_format,
+      translationBackendDict.data_format as DataFormatToDefaultValuesKey,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }

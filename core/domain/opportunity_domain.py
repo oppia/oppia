@@ -16,15 +16,13 @@
 
 """Domain object for contribution opportunities."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
-import python_utils
-import utils
+from core import utils
+from core.constants import constants
 
 
-class ExplorationOpportunitySummary(python_utils.OBJECT):
+class ExplorationOpportunitySummary:
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
@@ -33,7 +31,8 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,
             translation_counts, language_codes_needing_voice_artists,
-            language_codes_with_assigned_voice_artists):
+            language_codes_with_assigned_voice_artists,
+            translation_in_review_counts):
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -54,6 +53,9 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             language_codes_with_assigned_voice_artists: list(str). A list of
                 language code for which a voice-artist is already assigned to
                 the exploration.
+            translation_in_review_counts: dict. A dict with language code as a
+                key and number of translation in review in that language as the
+                value.
         """
         self.id = exp_id
         self.topic_id = topic_id
@@ -69,6 +71,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             language_codes_needing_voice_artists)
         self.language_codes_with_assigned_voice_artists = (
             language_codes_with_assigned_voice_artists)
+        self.translation_in_review_counts = translation_in_review_counts
         self.validate()
 
     @classmethod
@@ -97,7 +100,9 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             exploration_opportunity_summary_dict[
                 'language_codes_needing_voice_artists'],
             exploration_opportunity_summary_dict[
-                'language_codes_with_assigned_voice_artists'])
+                'language_codes_with_assigned_voice_artists'],
+            exploration_opportunity_summary_dict[
+                'translation_in_review_counts'])
 
     def to_dict(self):
         """Return a copy of the object as a dictionary. It includes all
@@ -117,7 +122,8 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             'story_title': self.story_title,
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
-            'translation_counts': self.translation_counts
+            'translation_counts': self.translation_counts,
+            'translation_in_review_counts': self.translation_in_review_counts
         }
 
     def validate(self):
@@ -126,21 +132,21 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, python_utils.BASESTRING):
+        if not isinstance(self.topic_id, str):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, python_utils.BASESTRING):
+        if not isinstance(self.topic_name, str):
             raise utils.ValidationError(
                 'Expected topic_name to be a string, received %s' %
                 self.topic_name)
-        if not isinstance(self.story_id, python_utils.BASESTRING):
+        if not isinstance(self.story_id, str):
             raise utils.ValidationError(
                 'Expected story_id to be a string, received %s' % self.story_id)
-        if not isinstance(self.story_title, python_utils.BASESTRING):
+        if not isinstance(self.story_title, str):
             raise utils.ValidationError(
                 'Expected story_title to be a string, received %s' %
                 self.story_title)
-        if not isinstance(self.chapter_title, python_utils.BASESTRING):
+        if not isinstance(self.chapter_title, str):
             raise utils.ValidationError(
                 'Expected chapter_title to be a string, received %s' %
                 self.chapter_title)
@@ -164,8 +170,39 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'languages to be disjoint, received: %s, %s' % (
                     self.language_codes_needing_voice_artists,
                     self.language_codes_with_assigned_voice_artists))
+
+        self._validate_translation_counts(self.translation_counts)
+        self._validate_translation_counts(self.translation_in_review_counts)
+
+        expected_set_of_all_languages = set(
+            self.incomplete_translation_language_codes +
+            self.language_codes_needing_voice_artists +
+            self.language_codes_with_assigned_voice_artists)
+
+        for language_code in expected_set_of_all_languages:
+            if language_code not in allowed_language_codes:
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % language_code)
+
+        if expected_set_of_all_languages != set(allowed_language_codes):
+            raise utils.ValidationError(
+                'Expected set of all languages available in '
+                'incomplete_translation, needs_voiceover and assigned_voiceover'
+                ' to be the same as the supported audio languages, '
+                'received %s' % list(sorted(expected_set_of_all_languages)))
+
+    def _validate_translation_counts(self, translation_counts):
+        """Validates per-language counts of translations.
+
+        Args:
+            translation_counts: dict. A dict with language code as a key and
+                number of translations in that language as the value.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
         for language_code, count in (
-                self.translation_counts.items()):
+                translation_counts.items()):
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
@@ -184,25 +221,8 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                     'less than or equal to content_count(%s), received %s' % (
                         language_code, self.content_count, count))
 
-        expected_set_of_all_languages = set(
-            self.incomplete_translation_language_codes +
-            self.language_codes_needing_voice_artists +
-            self.language_codes_with_assigned_voice_artists)
 
-        for language_code in expected_set_of_all_languages:
-            if language_code not in allowed_language_codes:
-                raise utils.ValidationError(
-                    'Invalid language_code: %s' % language_code)
-
-        if expected_set_of_all_languages != set(allowed_language_codes):
-            raise utils.ValidationError(
-                'Expected set of all languages available in '
-                'incomplete_translation, needs_voiceover and assigned_voiceover'
-                ' to be the same as the supported audio languages, '
-                'received %s' % list(expected_set_of_all_languages))
-
-
-class SkillOpportunity(python_utils.OBJECT):
+class SkillOpportunity:
     """The domain object for skill opportunities."""
 
     def __init__(
@@ -225,7 +245,7 @@ class SkillOpportunity(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.skill_description, python_utils.BASESTRING):
+        if not isinstance(self.skill_description, str):
             raise utils.ValidationError(
                 'Expected skill_description to be a string, received %s' %
                 self.skill_description)

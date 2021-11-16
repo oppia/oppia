@@ -28,12 +28,21 @@ var suites = {
       'protractor_desktop/additionalEditorFeatures.js'
     ],
 
+    additionalEditorFeaturesModals: [
+      'protractor_desktop/additionalEditorFeaturesModals.js'
+    ],
+
+
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
     ],
 
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
+    ],
+  
+    blogDashboard: [
+      'protractor_desktop/blogDashboard.js'
     ],
 
     classroomPage: [
@@ -58,10 +67,6 @@ var suites = {
 
     creatorDashboard: [
       'protractor_desktop/creatorDashboard.js'
-    ],
-
-    emailDashboard: [
-      'protractor_desktop/emailDashboard.js'
     ],
 
     embedding: [

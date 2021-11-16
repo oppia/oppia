@@ -57,10 +57,23 @@ var getText = async function(elementName, element) {
   return await element.getText();
 };
 
+var getAttribute = async function(elementName, element, attribute) {
+  await waitFor.presenceOf(
+    element, `${elementName} is not present for getAttribute(${attribute})`);
+  return await element.getAttribute(attribute);
+};
+
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = selectorElement.element(
     by.cssContainingText('option', optionToSelect));
+  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+};
+
+var matSelect = async function(selectorName, selectorElement, optionToSelect) {
+  await click(selectorName, selectorElement);
+  var optionElement = element(
+    by.cssContainingText('.mat-option-text', optionToSelect));
   await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
@@ -85,7 +98,9 @@ var sendKeys = async function(
 exports.clear = clear;
 exports.click = click;
 exports.getText = getText;
+exports.getAttribute = getAttribute;
 exports.select = select;
 exports.select2 = select2;
+exports.matSelect = matSelect;
 exports.sendKeys = sendKeys;
 exports.waitForAutosave = waitForAutosave;

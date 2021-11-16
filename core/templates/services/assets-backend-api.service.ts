@@ -17,7 +17,7 @@
  * assets from Google Cloud Storage.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -106,8 +106,11 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveAudioResponse>(
         this.getAudioUploadUrl(explorationId), form).toPromise();
-    } catch (reason) {
-      return Promise.reject(reason.error);
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse) {
+        return Promise.reject(error.error);
+      }
+      throw error;
     }
   }
 
@@ -122,8 +125,11 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveImageResponse>(
         this.getImageUploadUrl(entityType, entityId), form).toPromise();
-    } catch (reason) {
-      return Promise.reject(reason.error);
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse) {
+        return Promise.reject(error.error);
+      }
+      throw error;
     }
   }
 
@@ -143,9 +149,6 @@ export class AssetsBackendApiService {
         entity_type: entityType,
         entity_id: entityId
       });
-    if (thumbnailFileUrl === null) {
-      throw new Error('Thumbnail File Url is null');
-    }
     return this.http.post<{filename: string}>(thumbnailFileUrl, form);
   }
 
@@ -197,9 +200,6 @@ export class AssetsBackendApiService {
         asset_type: assetType,
         filename: filename,
       });
-    if (downloadUrl === null) {
-      throw new Error('Download Url is null');
-    }
     return downloadUrl;
   }
 
@@ -261,9 +261,6 @@ export class AssetsBackendApiService {
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
-    if (audioUploadUrl === null) {
-      throw new Error('Audio Upload Url is null');
-    }
     return audioUploadUrl;
   }
 
@@ -272,9 +269,6 @@ export class AssetsBackendApiService {
     let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
-    if (imageUploadUrl === null) {
-      throw new Error('Image Upload Url is null');
-    }
     return imageUploadUrl;
   }
 }

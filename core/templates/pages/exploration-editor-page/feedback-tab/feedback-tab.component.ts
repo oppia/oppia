@@ -50,14 +50,14 @@ angular.module('oppia').component('feedbackTab', {
     'FocusManagerService', 'LoaderService',
     'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
-    'UrlInterpolationService', 'UserService',
+    'UserService',
     function(
         $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
         FocusManagerService, LoaderService,
         SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
-        UrlInterpolationService, UserService) {
+        UserService) {
       var ctrl = this;
 
       var _resetTmpMessageFields = function() {
@@ -96,8 +96,8 @@ angular.module('oppia').component('feedbackTab', {
 
       ctrl.showCreateThreadModal = function() {
         return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/feedback-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/feedback-tab/templates/' +
             'create-feedback-thread-modal.template.html'),
           backdrop: 'static',
           controller: 'CreateFeedbackThreadModalController'

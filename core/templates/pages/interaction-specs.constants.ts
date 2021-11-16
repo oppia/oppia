@@ -21,3 +21,5 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 export const InteractionSpecsConstants = {
   INTERACTION_SPECS: INTERACTION_SPECS
 } as const;
+
+export type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;

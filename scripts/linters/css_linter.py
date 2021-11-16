@@ -16,20 +16,17 @@
 
 """Lint checks for python files."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 import re
 import subprocess
 
-import python_utils
-
 from .. import common
 from .. import concurrent_task_utils
 
 
-class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
+class ThirdPartyCSSLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, config_path, files_to_lint):
@@ -100,8 +97,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
+        # Standard and error output is in bytes, we need to decode the line to
+        # print it.
+        linter_stdout = encoded_linter_stdout.decode('utf-8')
+        linter_stderr = encoded_linter_stderr.decode('utf-8')
 
         if linter_stderr:
             raise Exception(linter_stderr)

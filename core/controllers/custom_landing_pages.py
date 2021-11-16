@@ -16,8 +16,7 @@
 
 """Controllers for custom landing pages."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -25,6 +24,11 @@ from core.controllers import base
 
 class FractionLandingRedirectPage(base.BaseHandler):
     """The handler redirecting to the Fractions landing page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -35,6 +39,17 @@ class FractionLandingRedirectPage(base.BaseHandler):
 class TopicLandingRedirectPage(base.BaseHandler):
     """The handler redirecting the old landing page URL to the new one."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self, topic):
         """Handles GET requests.
@@ -43,25 +58,3 @@ class TopicLandingRedirectPage(base.BaseHandler):
             topic: str. Topic of page to be redirected to.
         """
         self.redirect('/math/%s' % topic)
-
-
-class TopicLandingPage(base.BaseHandler):
-    """Page showing the topic landing page."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-
-        self.render_template('topic-landing-page.mainpage.html')
-
-
-class StewardsLandingPage(base.BaseHandler):
-    """Page showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template(
-            'stewards-landing-page.mainpage.html')

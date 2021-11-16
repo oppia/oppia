@@ -18,8 +18,7 @@
 using release_summary.md.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import datetime
@@ -27,8 +26,8 @@ import os
 import subprocess
 import sys
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -45,6 +44,7 @@ AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
+SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
 LIST_OF_FILEPATHS_TO_MODIFY = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
@@ -159,9 +159,12 @@ def get_previous_release_version(branch_type, current_release_version_number):
         Exception. Branch type is invalid.
         Exception. Previous release version is same as current release version.
     """
-    all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
+    all_tags = subprocess.check_output(
+        ['git', 'tag']
+    )[:-1].decode('utf-8').split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
+    # Standard output is in bytes, we need to decode the line to print it.
     if branch_type == constants.release_constants.BRANCH_TYPE_RELEASE:
         previous_release_version = all_tags[-1][1:]
     elif branch_type == constants.release_constants.BRANCH_TYPE_HOTFIX:
@@ -350,7 +353,7 @@ def update_developer_names(release_summary_lines):
     with python_utils.open_file(
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
-            about_page_file.write(python_utils.UNICODE(line))
+            about_page_file.write(str(line))
     python_utils.PRINT('Updated about-page file!')
 
 
@@ -478,7 +481,7 @@ def get_release_summary_lines():
     return release_summary_lines
 
 
-def update_package_json():
+def update_version_in_config_files():
     """Updates version param in package json file to match the current
     release version.
     """
@@ -486,8 +489,17 @@ def update_package_json():
         common.get_current_branch_name())
 
     common.inplace_replace_file(
-        PACKAGE_JSON_FILEPATH, '"version": ".*"',
-        '"version": "%s"' % release_version)
+        PACKAGE_JSON_FILEPATH,
+        '"version": ".*"',
+        '"version": "%s"' % release_version,
+        expected_number_of_replacements=1
+    )
+    common.inplace_replace_file(
+        common.FECONF_PATH,
+        'OPPIA_VERSION = \'.*\'',
+        'OPPIA_VERSION = \'%s\'' % release_version,
+        expected_number_of_replacements=1
+    )
 
 
 def main():
@@ -573,7 +585,7 @@ def main():
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
-    update_package_json()
+    update_version_in_config_files()
 
     list_of_numbered_files = []
     for i, filepath in enumerate(LIST_OF_FILEPATHS_TO_MODIFY, start=1):

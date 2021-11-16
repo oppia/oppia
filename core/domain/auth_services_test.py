@@ -16,10 +16,9 @@
 
 """Tests for core.domain.auth_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import user_domain

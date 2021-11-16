@@ -14,14 +14,14 @@
 
 """Unit tests for scripts/create_topological_sort_of_all_services.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import collections
 import os
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
+
 from . import create_topological_sort_of_all_services
 
 MOCK_DIRECTORY_NAMES = [os.path.join('core', 'tests', 'services_sources')]
@@ -58,12 +58,12 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 'ATestFactory.ts': ['CTest.service.ts'],
                 'CTest.service.ts': ['ETestFactory.ts']}
 
-            expected_node_set = set([
+            expected_node_set = {
                 'DTest.service.ts', 'ETestFactory.ts', 'BTestService.ts',
-                'CTest.service.ts', 'ATestFactory.ts'])
+                'CTest.service.ts', 'ATestFactory.ts'}
 
             self.assertEqual(
-                sorted(adj_list.keys()), sorted(expected_adj_list.keys())) # pylint: disable=dict-keys-not-iterating
+                sorted(adj_list.keys()), sorted(expected_adj_list.keys()))
 
             for key in adj_list:
                 self.assertEqual(
@@ -90,6 +90,4 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         expected_output_2 = [
             'DTest.service.ts', 'ATestFactory.ts', 'BTestService.ts',
             'CTest.service.ts', 'ETestFactory.ts']
-        self.assertTrue((
-            actual_output == expected_output_1) or (
-                actual_output == expected_output_2))
+        self.assertIn(actual_output, (expected_output_1, expected_output_2))

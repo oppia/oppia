@@ -1,0 +1,19 @@
+<div *ngIf="activeTab === 'editor_tab'"
+     (click)="blogDashboardPageService.navigateToMainTab()"
+     class="oppia-blog-post-editor-back-button protractor-test-back-button">
+  <span class="material-icons oppia-navbar-back-button">
+    arrow_back
+  </span>
+</div>
+<style>
+  @media (max-width: 570px) {
+    .oppia-blog-post-editor-back-button {
+      margin-left: -10px;
+    }
+  }
+
+  .oppia-navbar-back-button {
+    cursor: pointer;
+  }
+
+</style>

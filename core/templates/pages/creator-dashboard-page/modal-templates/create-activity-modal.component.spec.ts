@@ -28,21 +28,15 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  dismiss(): void {
-    return;
-  }
+  dismiss(): void {}
 }
 
 class MockExplorationCreationService {
-  createNewExploration(): void {
-    return null;
-  }
+  createNewExploration(): void {}
 }
 
 class MockCollectionCreationService {
-  createNewCollection(): void {
-    return null;
-  }
+  createNewCollection(): void {}
 }
 
 describe('Create Activity Modal Component', () =>{
@@ -83,9 +77,9 @@ describe('Create Activity Modal Component', () =>{
   it('should evalute component properties after component is initialized',
     fakeAsync(() => {
       const UserInfoObject = {
-        role: 'USER_ROLE',
+        roles: ['USER_ROLE'],
         is_moderator: false,
-        is_admin: false,
+        is_curriculum_admin: false,
         is_super_admin: false,
         is_topic_manager: false,
         can_create_collections: true,

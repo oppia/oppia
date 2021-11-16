@@ -16,29 +16,30 @@
 
 """Classes for Rich Text Components in Oppia."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+import os
 import re
 
-import bs4
-import constants
+from core import constants
+from core import feconf
+from core import python_utils
+from core import utils
 from extensions.objects.models import objects
-import feconf
-import python_utils
-import utils
+
+import bs4
 
 
-class BaseRteComponent(python_utils.OBJECT):
+class BaseRteComponent:
     """Base Rte Component class.
 
     This is the superclass for rich text components in Oppia, such as
     Image and Video.
     """
 
-    with python_utils.open_file(
-        feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
-        rich_text_component_specs = constants.parse_json_from_js(f)
+    package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
+    rich_text_component_specs = constants.parse_json_from_ts(
+        python_utils.get_package_file_contents(package, filepath))
 
     obj_types_to_obj_classes = {
         'unicode': objects.UnicodeString,
@@ -100,9 +101,7 @@ class Collapsible(BaseRteComponent):
         """Validates Collapsible component."""
         super(Collapsible, cls).validate(value_dict)
         content = value_dict['content-with-value']
-        inner_soup = bs4.BeautifulSoup(
-            content.encode(encoding='utf-8'),
-            'html.parser')
+        inner_soup = bs4.BeautifulSoup(content, 'html.parser')
         collapsible = inner_soup.findAll(
             name='oppia-noninteractive-collapsible')
         tabs = inner_soup.findAll(
@@ -122,19 +121,6 @@ class Image(BaseRteComponent):
         filepath = value_dict['filepath-with-value']
         if not re.match(filename_re, filepath):
             raise utils.ValidationError('Invalid filepath')
-
-
-class Svgdiagram(BaseRteComponent):
-    """Class for Svgdiagram component."""
-
-    @classmethod
-    def validate(cls, value_dict):
-        """Validates Svgdiagram component."""
-        super(Svgdiagram, cls).validate(value_dict)
-        filename_re = r'^[A-Za-z0-9+/_-]*\.(svg)$'
-        filename = value_dict['svg_filename-with-value']
-        if not re.match(filename_re, filename):
-            raise utils.ValidationError('Invalid filename')
 
 
 class Link(BaseRteComponent):
@@ -173,9 +159,8 @@ class Tabs(BaseRteComponent):
         super(Tabs, cls).validate(value_dict)
         tab_contents = value_dict['tab_contents-with-value']
         for tab_content in tab_contents:
-            inner_soup = bs4.BeautifulSoup(
-                tab_content['content'].encode(encoding='utf-8'),
-                'html.parser')
+            inner_soup = (
+                bs4.BeautifulSoup(tab_content['content'], 'html.parser'))
             collapsible = inner_soup.findAll(
                 name='oppia-noninteractive-collapsible')
             tabs = inner_soup.findAll(

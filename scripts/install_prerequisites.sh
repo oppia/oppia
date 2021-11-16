@@ -29,16 +29,28 @@ sudo apt-get update
 sudo apt-get install curl
 sudo apt-get install git
 sudo apt-get install openjdk-8-jre
-sudo apt-get install python-setuptools
-sudo apt-get install python-dev
-sudo apt-get install python-pip
+sudo apt-get install python3-setuptools
+sudo apt-get install python3-dev
+sudo apt-get install python3-pip
 sudo apt-get install unzip
-sudo apt-get install python-yaml
-# This is only done to address an
-#     "ImportError: No module named functools_lru_cache"
-# error. See the Troubleshooting page for details:
-#    https://github.com/oppia/oppia/wiki/Troubleshooting
+sudo apt-get install python3-yaml
 sudo apt-get install python-matplotlib
-# TODO(#11547): Pip 21 doesn't support Python 2, so we need to stay on pip 20
-# until we migrate to Python 3.
-sudo pip install --upgrade pip==20.3.4
+sudo apt-get install python3-matplotlib
+pip install --upgrade pip==21.2.3
+# Prerequirements for pyenv.
+sudo apt-get install make
+sudo apt-get install build-essential
+sudo apt-get install libssl-dev
+sudo apt-get install lib1g-dev
+sudo apt-get install libbz2-dev
+sudo apt-get install libreadline-dev
+sudo apt-get install libsqlite3-dev
+sudo apt-get install wget
+sudo apt-get install llvm
+sudo apt-get install libncursesw5-dev
+sudo apt-get install xz-utils
+sudo apt-get install tk-dev
+sudo apt-get install libxml2-dev
+sudo apt-get install libxmlsec1-dev
+sudo apt-get install libffi-dev
+sudo apt-get install liblzma-dev

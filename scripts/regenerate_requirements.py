@@ -22,8 +22,7 @@ Therefore, in order to allow continued execution after the requirements
 file is generated, we must call the CLI in a separate process.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import os
 import re
@@ -56,8 +55,7 @@ def main():
     # directory to the python system path in order to import the required
     # libraries correctly.
     sys.argv[0] = re.sub(
-        r'(-script\.pyw|\.exe)?$', '',
-        common.REQUIREMENTS_FILE_PATH)
+        r'(-script\.pyw|\.exe)?$', '', common.REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 

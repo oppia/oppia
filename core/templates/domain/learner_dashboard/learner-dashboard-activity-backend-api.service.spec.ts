@@ -30,7 +30,7 @@ import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance = {
     activityId: null,
     activityTitle: null,
     activityType: null
@@ -38,7 +38,7 @@ class MockNgbModalRef {
 }
 
 class MockRemoveActivityNgbModalRef {
-  componentInstance: {
+  componentInstance = {
     sectionNameI18nId: null,
     subsectionName: null,
     activityId: null,
@@ -239,11 +239,10 @@ describe('Learner playlist Backend Api service ', () => {
         untracked_topic_ids: []
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
       '0', 'title', 'exploration', learnerDashboardActivityIds);
@@ -253,11 +252,10 @@ describe('Learner playlist Backend Api service ', () => {
   it('should remove an exploration from learner playlist' +
     ' when calling removeFromLearnerPlaylistModal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
@@ -288,11 +286,10 @@ describe('Learner playlist Backend Api service ', () => {
   it('should remove a collection from learner playlist' +
     ' when calling removeFromLearnerPlaylistModal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
@@ -324,11 +321,10 @@ describe('Learner playlist Backend Api service ', () => {
     'button is clicked when calling removeFromLearnerPlaylistModal',
   fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.reject('fail')
-        });
+        } as NgbModalRef);
     });
 
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
@@ -360,11 +356,10 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('url')
-        });
+        } as NgbModalRef);
     });
 
     let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
@@ -389,11 +384,10 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
@@ -417,11 +411,10 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('url')
-        });
+        } as NgbModalRef);
     });
 
     let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
@@ -446,11 +439,10 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
     });
 
     let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
@@ -474,11 +466,10 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.reject('fail')
-        });
+        } as NgbModalRef);
     });
 
     let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';

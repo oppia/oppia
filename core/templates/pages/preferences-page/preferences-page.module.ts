@@ -16,85 +16,48 @@
  * @fileoverview Module for the preferences page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { PreferencesPageComponent } from './preferences-page.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-language-selector.component';
+import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
+import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
+import { PreferencesPageRootComponent } from './preferences-page-root.component';
+import { CommonModule } from '@angular/common';
+import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
+    CommonModule,
     NgbPopoverModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     ReactiveFormsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    PreferencesPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     PreferencesPageComponent,
+    PreferencesPageRootComponent,
     PreferredLanguagesComponent,
     PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent
   ],
   entryComponents: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     PreferencesPageComponent,
+    PreferencesPageRootComponent,
     PreferredLanguagesComponent,
     PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
   ]
 })
-class PreferencesPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
-import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
-import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-language-selector.component';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(PreferencesPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class PreferencesPageModule {}

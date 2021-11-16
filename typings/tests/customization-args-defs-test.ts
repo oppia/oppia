@@ -38,8 +38,6 @@ import {
   InteractiveMapCustomizationArgsBackendDict,
   ItemSelectionInputCustomizationArgs,
   ItemSelectionInputCustomizationArgsBackendDict,
-  LogicProofCustomizationArgs,
-  LogicProofCustomizationArgsBackendDict,
   MathEquationInputCustomizationArgs,
   MathEquationInputCustomizationArgsBackendDict,
   MultipleChoiceInputCustomizationArgs,
@@ -168,14 +166,6 @@ type TestItemSelectionInputCustomizationArgsInterfacesMatch = AssertTrue<
   >
 >;
 
-type TestLogicProofCustomizationArgsInterfacesMatch = AssertTrue<
-  IsExactAfterReplacement<
-    LogicProofCustomizationArgsBackendDict,
-    {},
-    LogicProofCustomizationArgs
-  >
->;
-
 type TestMathEquationInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     MathEquationInputCustomizationArgsBackendDict,
@@ -219,7 +209,7 @@ type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
 type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     NumericInputCustomizationArgsBackendDict,
-    {},
+    { requireNonnegativeInput: { value: boolean } },
     NumericInputCustomizationArgs
   >
 >;

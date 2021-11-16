@@ -140,6 +140,14 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.errorMsg).toBe(null);
     });
 
+  it('should validate explorationId correctly',
+    function() {
+      $scope.explorationId = 'validId';
+      expect($scope.validateExplorationId()).toBeTrue();
+      $scope.explorationId = 'oppia.org/validId';
+      expect($scope.validateExplorationId()).toBeFalse();
+    });
+
   it('should update thumbnail filename when changing thumbnail file',
     function() {
       var storyUpdateSpy = spyOn(

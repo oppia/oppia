@@ -27,7 +27,7 @@ method-rgx=^([_a-z][a-z0-9_]*|__[a-z0-9]+__)$
 const-rgx=^(([A-Z_][A-Z0-9_]*)|(__.*__)|([a-z_]+_models)|([a-z_]+_services))$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
+good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff,T
 
 # Regex for dummy variables (to prevent 'unused argument' errors)
 dummy-variables-rgx=_|unused_*
@@ -59,7 +59,7 @@ bad-functions=apply,input
 [FORMAT]
 
 max-line-length=80
-ignore-long-lines=^.*#\stype:.*$|^\s*(# )?<?https?://\S+>?$
+ignore-long-lines=^.*#\stype:\signore.*$|^\s*(# )?<?https?://\S+>?$
 
 indent-string='    '
 
@@ -71,31 +71,8 @@ forbidden-imports=
 
 disallowed-functions-and-replacements-str=
   assertEquals=>self.assertEqual,
-  basestring=>python_utils.BASESTRING,
-  contextlib2.ExitStack=>python_utils.ExitStack,
-  contextlib2.nullcontext=>python_utils.nullcontext,
-  contextlib2.redirect_stdout=>python_utils.redirect_stdout,
-  input=>python_utils.INPUT,
-  iteritems=>items,
-  iterkeys=>keys,
-  itervalues=>values,
-  map=>python_utils.MAP,
-  next=>python_utils.NEXT,
   now=>datetime.datetime.utcnow,
-  open=>python_utils.open_file,
-  print=>python_utils.PRINT,
-  range=>python_utils.RANGE,
-  round=>python_utils.ROUND,
-  str=>python_utils.convert_to_bytes or python_utils.UNICODE,
-  StringIO=>python_utils.string_io,
-  urllib.unquote=>python_utils.urllib_unquote,
-  urllib.urlparse.unquote=>python_utils.urllib_unquote,
-  urlparse.parse_qs=>python_utils.parse_query_string,
-  urlparse.urljoin=>python_utils.url_join,
-  urlparse.urlparse=>python_utils.url_parse,
-  urlparse.urlsplit=>python_utils.url_split,
-  urlparse.urlunsplit=>python_utils.url_unsplit,
-  zip=>python_utils.ZIP
+  beam.CombineValues=>beam.CombinePerKey
 
 disallowed-functions-and-replacements-regex=
   \.put_async\(=>put,
@@ -107,7 +84,54 @@ ignore-imports=yes
 
 [MESSAGES CONTROL]
 
-disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,inconsistent-return-statements,len-as-condition,missing-raises-doc,multiple-constructor-doc,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,redundant-returns-doc,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements,wrong-import-order
+disable=abstract-method,
+        arguments-differ,
+        broad-except,
+        consider-using-ternary,
+        duplicate-code,
+        fixme,
+        inconsistent-return-statements,
+        len-as-condition,
+        locally-disabled,
+        locally-enabled,
+        logging-not-lazy,
+        multiple-constructor-doc,
+        no-else-return,
+        no-member,
+        no-self-use,
+        not-context-manager,
+        redefined-variable-type,
+        redundant-returns-doc,
+        too-many-arguments,
+        too-many-boolean-expressions,
+        too-many-branches,
+        too-many-instance-attributes,
+        too-many-lines,
+        too-many-locals,
+        too-many-nested-blocks,
+        too-many-public-methods,
+        too-many-statements,
+        wrong-import-order,
+# TODO(#12912): Remove these after the Python 3 migration.
+        arg-name-for-non-keyword-arg,
+        arguments-renamed,
+        consider-using-dict-items,
+        consider-using-with,
+        cyclic-import,
+        deprecated-method,
+        import-outside-toplevel,
+        missing-raises-doc,
+        no-else-break,
+        no-else-continue,
+        no-else-raise,
+        non-explicit-keyword-args,
+        not-an-iterable,
+        raise-missing-from,
+        super-with-arguments,
+        unnecessary-pass,
+        useless-object-inheritance,
+        consider-using-f-string,
+        consider-using-in
 
 [REPORTS]
 

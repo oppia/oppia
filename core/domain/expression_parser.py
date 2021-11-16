@@ -29,14 +29,12 @@ It uses the following grammar in Backus-Naur form:
 <function> ::= 'sqrt' | 'abs' | 'cos' | 'sin' | 'tan' | 'cot' | 'sec' | 'cosec'
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import collections
 import re
 
-from constants import constants
-import python_utils
+from core.constants import constants
 
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
@@ -124,7 +122,7 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys() +
+            list(constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys()) +
             constants.MATH_FUNCTION_NAMES,
             reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
@@ -157,20 +155,24 @@ def tokenize(expression):
     # Adding '*' sign after identifiers, numbers and closing brackets if they
     # are not followed by a valid operator.
     final_token_list = []
-    for i in python_utils.RANGE(len(token_list)):
-        final_token_list.append(token_list[i])
+    for i, token in enumerate(token_list):
+        final_token_list.append(token)
         if i != len(token_list) - 1:
             # If a closing term is directly followed by another closing term,
             # instead of being followed by an operator, we assume that the
             # operation to be performed is multiplication and insert a '*' sign
             # to explicitly denote the operation. For eg. 'ab+x' would be
             # transformed into 'a*b+x'.
-            if ((
-                    token_list[i].category in _CLOSING_CATEGORIES or
-                    token_list[i].text in _CLOSING_PARENS) and
+            if (
+                    (
+                        token.category in _CLOSING_CATEGORIES or
+                        token.text in _CLOSING_PARENS
+                    ) and
                     (
                         token_list[i + 1].category in _OPENING_CATEGORIES or
-                        token_list[i + 1].text in _OPENING_PARENS)):
+                        token_list[i + 1].text in _OPENING_PARENS
+                    )
+            ):
                 final_token_list.append(Token('*'))
 
     return final_token_list
@@ -199,7 +201,7 @@ def get_variables(expression):
     return list(variables)
 
 
-class Token(python_utils.OBJECT):
+class Token:
     """Class for tokens of the math expression."""
 
     def __init__(self, text):
@@ -273,7 +275,7 @@ class Token(python_utils.OBJECT):
         return text in _VALID_OPERATORS
 
 
-class Node(python_utils.OBJECT):
+class Node:
     """Instances of the classes that inherit this class act as nodes of the
     parse tree. These could be internal as well as leaf nodes. For leaf nodes,
     the children parameter would be an empty list.
@@ -404,7 +406,7 @@ class UnaryFunctionNode(Node):
         super(UnaryFunctionNode, self).__init__([child])
 
 
-class Parser(python_utils.OBJECT):
+class Parser:
     """Class representing the math expression parser.
     Implements a greedy, recursive-descent parser that tries to consume
     as many tokens as possible while obeying the grammar.

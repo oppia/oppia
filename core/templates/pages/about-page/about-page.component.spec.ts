@@ -25,34 +25,41 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: '',
+    },
+    gtag: () => {}
+  };
+}
 
 describe('About Page', () => {
-  const siteAnalyticsService = new SiteAnalyticsService(
-    new WindowRef());
+  let windowRef: MockWindowRef;
+  let component: AboutPageComponent;
+  let siteAnalyticsService: SiteAnalyticsService;
+
   beforeEach(async() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [AboutPageComponent,
-        MockTranslatePipe],
+      declarations: [
+        AboutPageComponent,
+        MockTranslatePipe
+      ],
       providers: [
-        { provide: SiteAnalyticsService, useValue: siteAnalyticsService },
+        SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              }
-            }
-          }
-        }
+          useValue: windowRef
+        },
       ]
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     component = aboutPageComponent.componentInstance;
   });
   beforeEach(angular.mock.module('oppia'));
-  let component = null;
 
   it('should successfully instantiate the component',
     () => {
@@ -74,7 +81,7 @@ describe('About Page', () => {
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
-    expect(component.windowRef.nativeWindow.location.href).toBe(
+    expect(windowRef.nativeWindow.location.href).toBe(
       '/creator-dashboard?mode=create');
   });
 
@@ -87,7 +94,7 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
         .toHaveBeenCalledWith();
-      expect(component.windowRef.nativeWindow.location.href).toBe(
+      expect(windowRef.nativeWindow.location.href).toBe(
         '/learn/math');
     });
 
@@ -101,7 +108,7 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
         .toHaveBeenCalledWith();
-      expect(component.windowRef.nativeWindow.location.href)
+      expect(windowRef.nativeWindow.location.href)
         .toBe('/community-library');
     });
 });

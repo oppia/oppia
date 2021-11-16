@@ -19,14 +19,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 
-import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { SearchBackendApiService } from './search-backend-api.service';
+import { SearchBackendApiService, SearchResponseBackendDict } from './search-backend-api.service';
+import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
+import cloneDeep from 'lodash/cloneDeep';
 
-export class SelectionList {
+export interface SelectionList {
   [key: string]: boolean;
 }
 
-class FilterDetails {
+interface FilterDetails {
   description: string;
   itemsName: string;
   masterList: {
@@ -38,7 +39,8 @@ class FilterDetails {
   summary: string;
 }
 
-export class SelectionDetails {
+export interface SelectionDetails {
+  [key: string]: FilterDetails;
   categories: FilterDetails;
   languageCodes: FilterDetails;
 }
@@ -47,14 +49,17 @@ export class SelectionDetails {
   providedIn: 'root'
 })
 export class SearchService {
-  private _lastQuery: string = null;
+  // These properties are initialized using functions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _lastQuery!: string;
+  private _searchCursor!: string;
   private _lastSelectedCategories: SelectionList = {};
   private _lastSelectedLanguageCodes: SelectionList = {};
-  private _searchCursor: string = null;
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
-    new EventEmitter<ExplorationSummaryBackendDict>();
+    new EventEmitter<ExplorationSummaryDict[]>();
   public numSearchesInProgress = 0;
 
   constructor(
@@ -157,8 +162,8 @@ export class SearchService {
     this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
       .then((response) => {
         this._lastQuery = searchQuery;
-        this._lastSelectedCategories = angular.copy(selectedCategories);
-        this._lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
+        this._lastSelectedCategories = cloneDeep(selectedCategories);
+        this._lastSelectedLanguageCodes = cloneDeep(selectedLanguageCodes);
         this._searchCursor = response.search_cursor;
         this.numSearchesInProgress--;
 
@@ -227,13 +232,21 @@ export class SearchService {
     );
   }
 
+  // Here failure callback is optional so that it gets invoked
+  // only when the end of page has reached and return void otherwise.
   loadMoreData(
-      successCallback: (SearchResponseData, boolean) => void,
-      failureCallback?: (any) => void): void {
+      successCallback: (
+        SearchResponseData: SearchResponseBackendDict,
+        boolean: boolean
+      ) => void,
+      failureCallback?: (arg0: boolean) => void
+  ): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
-      failureCallback(this.hasReachedEndOfPage());
+      if (failureCallback) {
+        failureCallback(this.hasReachedEndOfPage());
+      }
       return;
     }
 
@@ -260,7 +273,7 @@ export class SearchService {
   }
 
   get onInitialSearchResultsLoaded():
-    EventEmitter<ExplorationSummaryBackendDict> {
+    EventEmitter<ExplorationSummaryDict[]> {
     return this._initialSearchResultsLoadedEventEmitter;
   }
 }

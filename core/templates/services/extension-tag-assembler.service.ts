@@ -51,29 +51,29 @@ export class ExtensionTagAssemblerService {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
     ): Object[] | Object => {
-      let result: Object[] | Object;
-
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        result = value.toBackendDict();
+        return value.toBackendDict();
       } else if (value instanceof Array) {
-        result = value.map(
+        return value.map(
           element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
-        result = {};
-        Object.keys(value).forEach(key => {
-          result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
+        type KeyOfValue = keyof typeof value;
+        let _result: Record<KeyOfValue, Object> = {};
+        let keys = Object.keys(value) as KeyOfValue[];
+        keys.forEach(key => {
+          _result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
         });
+        return _result as Object;
       }
 
-      return result || value;
+      return value;
     };
 
-    const customizationArgsBackendDict:
-      InteractionCustomizationArgsBackendDict = {};
-    Object.keys(customizationArgs).forEach(caName => {
+    const customizationArgsBackendDict: Record<string, Object> = {};
+    Object.entries(customizationArgs).forEach(([caName, caValue]) => {
       customizationArgsBackendDict[caName] = {
         value: traverseSchemaAndConvertSubtitledToDicts(
-          customizationArgs[caName].value)
+          caValue.value)
       };
     });
 
@@ -84,10 +84,11 @@ export class ExtensionTagAssemblerService {
       element: JQuery,
       customizationArgs: InteractionCustomizationArgs
   ): JQuery {
+    const caBackendDict = (
+      this._convertCustomizationArgsToBackendDict(customizationArgs)
+    ) as Record<string, Record<string, Object>>;
     for (const caName in customizationArgs) {
-      const caBackendDict = (
-        this._convertCustomizationArgsToBackendDict(customizationArgs));
-      let caBackendDictValue = caBackendDict[caName].value;
+      const caBackendDictValue = caBackendDict[caName].value;
       element.attr(
         this.camelCaseToHyphens.transform(caName) + '-with-value',
         this.htmlEscaperService.objToEscapedJson(caBackendDictValue));

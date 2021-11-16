@@ -16,20 +16,19 @@
 
 """Tests for the domain taskqueue services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
+from core import feconf
+from core import python_utils
 from core.domain import taskqueue_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     """Tests for domain taskqueue services."""
 
     def test_exception_raised_when_deferred_payload_is_not_serializable(self):
-        class NonSerializableArgs(python_utils.OBJECT):
+        class NonSerializableArgs:
             """Object that is not JSON serializable."""
 
             def __init__(self):
@@ -64,8 +63,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         correct_payload = {
             'user_id': '1'
         }
-        correct_url = feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
+        correct_url = feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS
         correct_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
+
         def mock_create_http_task(
                 queue_name, url, payload=None, scheduled_for=None,
                 task_name=None):
@@ -95,16 +95,15 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             for line in lines:
                 if 'name' in line:
                     queue_name = line.split(':')[1]
-                    queue_name_dict[queue_name.encode('utf-8').strip()] = False
+                    queue_name_dict[queue_name.strip()] = False
 
         # Get all attributes of taskqueue_services using the dir function.
         attributes = dir(taskqueue_services)
-        # Check if the queue names in the queue.yaml file exist in as a queue
+        # Check if the queue names in the queue.yaml file exist as a queue
         # name in taskqueue_services.
         for attribute in attributes:
-            value = getattr(taskqueue_services, attribute)
-            if python_utils.convert_to_bytes(value) in queue_name_dict:
-                queue_name_dict[value] = True
+            if attribute.startswith('QUEUE_NAME_'):
+                queue_name_dict[getattr(taskqueue_services, attribute)] = True
 
         for queue_name, in_taskqueue_services in queue_name_dict.items():
             self.assertTrue(in_taskqueue_services)

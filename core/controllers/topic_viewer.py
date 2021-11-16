@@ -14,19 +14,18 @@
 
 """Controllers for the topic viewer page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import logging
 
+from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
-import feconf
-import utils
 
 
 class TopicViewerPage(base.BaseHandler):

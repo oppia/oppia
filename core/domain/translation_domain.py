@@ -16,14 +16,12 @@
 
 """Domain objects related to translations."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-import python_utils
-import utils
+from core import utils
 
 
-class MachineTranslation(python_utils.OBJECT):
+class MachineTranslation:
     """Domain object for machine translation of exploration content."""
 
     def __init__(
@@ -53,7 +51,7 @@ class MachineTranslation(python_utils.OBJECT):
             ValidationError. One or more attributes of the MachineTranslation
                 are invalid.
         """
-        if not isinstance(self.source_language_code, python_utils.BASESTRING):
+        if not isinstance(self.source_language_code, str):
             raise utils.ValidationError(
                 'Expected source_language_code to be a string, received %s' %
                 self.source_language_code
@@ -68,7 +66,7 @@ class MachineTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid source language code: %s' % self.source_language_code)
 
-        if not isinstance(self.target_language_code, python_utils.BASESTRING):
+        if not isinstance(self.target_language_code, str):
             raise utils.ValidationError(
                 'Expected target_language_code to be a string, received %s' %
                 self.target_language_code
@@ -90,13 +88,13 @@ class MachineTranslation(python_utils.OBJECT):
                     'target_language_code: "%s" = "%s"') % (
                         self.source_language_code, self.target_language_code))
 
-        if not isinstance(self.source_text, python_utils.BASESTRING):
+        if not isinstance(self.source_text, str):
             raise utils.ValidationError(
                 'Expected source_text to be a string, received %s' %
                 self.source_text
             )
 
-        if not isinstance(self.translated_text, python_utils.BASESTRING):
+        if not isinstance(self.translated_text, str):
             raise utils.ValidationError(
                 'Expected translated_text to be a string, received %s' %
                 self.translated_text

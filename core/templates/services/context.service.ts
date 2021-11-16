@@ -126,6 +126,10 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
+        } else if (pathnameArray[i] === 'blog-dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD;
         }
       }
 
@@ -187,6 +191,9 @@ export class ContextService {
       if (hashValues.length === 3 && hashValues[1] === '/questions') {
         return decodeURI(hashValues[2]);
       }
+      if (pathnameArray[i] === 'blog-dashboard') {
+        return decodeURI(this.urlService.getBlogPostIdFromUrl());
+      }
     }
     return decodeURI(pathnameArray[2]);
   }
@@ -219,15 +226,21 @@ export class ContextService {
         }
         return AppConstants.ENTITY_TYPE.SKILL;
       }
+      if (pathnameArray[i] === 'blog-dashboard') {
+        return AppConstants.ENTITY_TYPE.BLOG_POST;
+      }
     }
   }
 
   // Returns a string representing the explorationId (obtained from the
   // URL).
-  getExplorationId(): string | undefined {
+  getExplorationId(): string {
     if (this.explorationId) {
       return this.explorationId;
-    } else if (!this.isInQuestionPlayerMode()) {
+    } else if (
+      !this.isInQuestionPlayerMode() ||
+      this.getQuestionPlayerIsManuallySet()
+    ) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
       let pathnameArray = this.urlService.getPathname().split('/');
@@ -243,10 +256,11 @@ export class ContextService {
           return this.explorationId;
         }
       }
-      throw new Error(
-        'ContextService should not be used outside the ' +
-        'context of an exploration or a question.');
     }
+    throw new Error(
+      'ContextService should not be used outside the ' +
+      'context of an exploration or a question.'
+    );
   }
 
   // Following method helps to know whether exploration editor is
@@ -288,7 +302,8 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
       ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
       ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD,
-      ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD
+      ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD,
+      ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD,
     ];
     return (allowedPageContext.includes(currentPageContext));
   }

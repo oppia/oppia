@@ -64,7 +64,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   beforeAll(async function() {
     // Should create a user and login.
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'user11@accessibility.com', 'user11accessibility');
     libraryPage = new LibraryPage.LibraryPage();
   });

@@ -82,7 +82,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTutorialFirstTimeService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
@@ -92,7 +92,7 @@ angular.module('oppia').component('explorationEditorTab', {
         LoaderService,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
-        StateTutorialFirstTimeService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -292,8 +292,8 @@ angular.module('oppia').component('explorationEditorTab', {
         });
         if (shouldPrompt) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/mark-all-audio-and-' +
+            template: require(
+              'components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'

@@ -68,8 +68,6 @@ angular.module('oppia').directive('objectEditor', [
           'list-of-sets-of-translatable-html-content-ids',
           'list-of-tabs',
           'list-of-unicode-string',
-          'logic-error-category',
-          'logic-question',
           'math-equation',
           'math-expression-content',
           'set-of-unicode-string',

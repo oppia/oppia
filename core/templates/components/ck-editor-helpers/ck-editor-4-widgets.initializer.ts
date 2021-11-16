@@ -147,16 +147,15 @@ export class CkEditorInitializerService {
                       editor.fire('saveSnapshot');
                     }
                   },
-                  function() {
-                    var newWidgetSelector = (
-                      '[data-cke-widget-id="' + that.id + '"]');
-                    // The below check is required, since without this, even a
-                    // valid RTE component was getting removed from the editor
-                    // when 'Cancel' was clicked in the customization modal.
-                    var widgetElement = editor.editable().findOne(
-                      newWidgetSelector);
-                    if (widgetElement && widgetElement.getText() === '') {
-                      widgetElement.remove();
+                  function(widgetShouldBeRemoved) {
+                    if (widgetShouldBeRemoved) {
+                      var newWidgetSelector = (
+                        '[data-cke-widget-id="' + that.id + '"]');
+                      var widgetElement = editor.editable().findOne(
+                        newWidgetSelector);
+                      if (widgetElement) {
+                        widgetElement.remove();
+                      }
                     }
                   });
               },
@@ -167,7 +166,9 @@ export class CkEditorInitializerService {
               downcast: function(element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
-                (<CKEDITOR.htmlParser.element>element.children[0]).setHtml('');
+                (
+                  element.children[0] as CKEDITOR.htmlParser.element
+                ).setHtml('');
                 // Return just the rich text component, without its wrapper.
                 return element.children[0];
               },
@@ -181,7 +182,7 @@ export class CkEditorInitializerService {
                   element.name !== 'p' &&
                   element.children.length > 0 &&
                   (
-                    <CKEDITOR.htmlParser.element>element.children[0]
+                    element.children[0] as CKEDITOR.htmlParser.element
                   ).name === tagName);
               },
               data: function() {

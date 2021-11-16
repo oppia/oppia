@@ -16,15 +16,14 @@
 
 """Tests for the domain objects relating to the user queries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
+from core import utils
 from core.domain import user_query_domain
 from core.tests import test_utils
-import feconf
-import utils
 
 
 class UserQueryTests(test_utils.GenericTestBase):
@@ -32,11 +31,11 @@ class UserQueryTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserQueryTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(
             inactive_in_last_n_days=20
-        ),
+        )
         self.user_query = user_query_domain.UserQuery(
             query_id='user_query_id',
             query_params=self.user_query_params,

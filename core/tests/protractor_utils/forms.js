@@ -39,6 +39,13 @@ var DictionaryEditor = function(elem) {
 };
 
 var GraphEditor = function(graphInputContainer) {
+  var addNodeButton = graphInputContainer.element(
+    by.css('.protractor-test-Add-Node-button'));
+  var addEdgeButton = graphInputContainer.element(
+    by.css('.protractor-test-Add-Edge-button'));
+  var deleteButton = graphInputContainer.element(
+    by.css('.protractor-test-Delete-button'));
+  var allEdgesElement = element.all(by.css('.protractor-test-graph-edge'));
   if (!graphInputContainer) {
     throw new Error('Please provide Graph Input Container element');
   }
@@ -50,9 +57,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createVertex = async function(xOffset, yOffset) {
-    var addNodeButton = graphInputContainer.element(
-      by.css('.protractor-test-Add-Node-button'));
-    await addNodeButton.click();
+    await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -60,9 +65,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
-    var addEdgeButton = graphInputContainer.element(
-      by.css('.protractor-test-Add-Edge-button'));
-    await addEdgeButton.click();
+    await action.click('Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -88,12 +91,10 @@ var GraphEditor = function(graphInputContainer) {
       }
     },
     clearDefaultGraph: async function() {
-      var deleteButton = graphInputContainer.element(
-        by.css('.protractor-test-Delete-button'));
-      await deleteButton.click();
+      await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await vertexElement(i).click();
+        await action.click(`Vertex Element ${i}`, vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -109,8 +110,6 @@ var GraphEditor = function(graphInputContainer) {
       if (edgesList) {
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
-        var allEdgesElement = element.all(by.css(
-          '.protractor-test-graph-edge'));
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
@@ -118,6 +117,8 @@ var GraphEditor = function(graphInputContainer) {
 };
 
 var ListEditor = function(elem) {
+  var deleteListEntryLocator = by.css('.protractor-test-delete-list-entry');
+  var addListEntryLocator = by.css('.protractor-test-add-list-entry');
   // NOTE: this returns a promise, not an integer.
   var _getLength = async function() {
     var items = (
@@ -131,7 +132,8 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    await elem.element(by.css('.protractor-test-add-list-entry')).click();
+    var addListEntryButton = elem.element(addListEntryLocator);
+    await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -140,9 +142,12 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    await elem.element(
-      await by.repeater('item in localValue track by $index').row(index)
-    ).element(by.css('.protractor-test-delete-list-entry')).click();
+    var deleteItemField = await by
+      .repeater('item in localValue track by $index')
+      .row(index);
+    var deleteItemFieldElem = deleteItemField.element(
+      deleteListEntryLocator);
+    await action.click('Delete Item Field Elem', deleteItemFieldElem);
   };
 
   return {
@@ -179,14 +184,16 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
+  var rteElements = elem.all(by.css('.protractor-test-rte'));
+  var modalDialogElements = element.all(by.css('.modal-dialog'));
+  var closeRteComponentButtonLocator = by.css(
+    '.protractor-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(elem.all(
-    by.css('.protractor-test-rte')).first());
-  await (await elem.all(by.css('.protractor-test-rte')).first()).click();
+  await waitFor.elementToBeClickable(rteElements.first());
+  await (await rteElements.first()).click();
 
   var _appendContentText = async function(text) {
-    await (await elem.all(
-      by.css('.protractor-test-rte')).first()).sendKeys(text);
+    await (await rteElements.first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
@@ -196,9 +203,9 @@ var RichTextEditor = async function(elem) {
   };
   var _clearContent = async function() {
     expect(
-      await (await elem.all(by.css('.protractor-test-rte')).first()).isPresent()
+      await (await rteElements.first()).isPresent()
     ).toBe(true);
-    await (await elem.all(by.css('.protractor-test-rte')).first()).clear();
+    await (await rteElements.first()).clear();
   };
 
   return {
@@ -246,7 +253,7 @@ var RichTextEditor = async function(elem) {
         'cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM.
-      var modal = element.all(by.css('.modal-dialog')).last();
+      var modal = modalDialogElements.last();
 
       // Need to convert arguments to an actual array; we tell the component
       // which modal to act on but drop the componentName.
@@ -256,27 +263,27 @@ var RichTextEditor = async function(elem) {
       }
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
-      var doneButton = modal.element(
-        by.css(
-          '.protractor-test-close-rich-text-component-editor'));
-      await waitFor.elementToBeClickable(
-        doneButton,
-        'save button taking too long to be clickable');
-      await doneButton.click();
+      var doneButton = modal.element(closeRteComponentButtonLocator);
+      await action.click('Save Button', doneButton);
       await waitFor.invisibilityOf(
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (
         [
-          'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
+          'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
-        await elem.all(
-          by.css('.protractor-test-rte')).first().sendKeys(protractor.Key.DOWN);
+        // RteElementFirst can be found in beginning of RichTextEditor function.
+        await action.sendKeys(
+          'First RTE Element',
+          rteElements.first(),
+          protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await elem.all(by.css('.protractor-test-rte')).first().sendKeys(
+      await action.sendKeys(
+        'First RTE Element',
+        rteElements.first(),
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -298,66 +305,77 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(text);
+      await action.clear('Input Field', elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Input Field',
+        elem.element(by.tagName('input')), text);
     }
   };
 };
 
 var AutocompleteDropdownEditor = function(elem) {
+  var containerLocator = by.css('.select2-container');
+  var dropdownElement = element(by.css('.select2-dropdown'));
+  var searchInputLocator = by.css('.select2-search input');
   return {
     setValue: async function(text) {
-      await elem.element(by.css('.select2-container')).click();
+      await action.click('Container Element', elem.element(containerLocator));
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys(text + '\n');
+      await action.sendKeys(
+        'Dropdown Element',
+        dropdownElement.element(searchInputLocator),
+        text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await elem.element(by.css('.select2-container')).click();
-      var actualOptions = await element(by.css('.select2-dropdown'))
-        .all(by.tagName('li')).map(
-          async function(optionElem) {
-            return await optionElem.getText();
-          }
-        );
+      await action.click('Container Element', elem.element(containerLocator));
+      var actualOptions = await dropdownElement.all(by.tagName('li')).map(
+        async function(optionElem) {
+          return await action.getText('Option Elem', optionElem);
+        }
+      );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      await element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys('\n');
+      await action.sendKeys(
+        'Dropdown Element',
+        dropdownElement.element(searchInputLocator),
+        '\n');
     }
   };
 };
 
 var AutocompleteMultiDropdownEditor = function(elem) {
+  var selectionChoiceRemoveLocator = by.css(
+    '.select2-selection__choice__remove');
+  var selectionRenderedLocator = by.css('.select2-selection__rendered');
+  var searchFieldElement = elem.element(by.css('.select2-search__field'));
   return {
     setValues: async function(texts) {
       // Clear all existing choices.
-      var deleteButtons = await elem.element(
-        by.css('.select2-selection__rendered')
-      ).all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.element(
-          by.css('.select2-selection__choice__remove'));
+      var deleteButtons = await elem.element(selectionRenderedLocator).all(
+        by.tagName('li')).map(function(choiceElem) {
+        return choiceElem.element(selectionChoiceRemoveLocator);
       });
       // We iterate in descending order, because clicking on a delete button
       // removes the element from the DOM. We also omit the last element
       // because it is the field for new input.
       for (var i = deleteButtons.length - 2; i >= 0; i--) {
-        await deleteButtons[i].click();
+        await action.click(`Delete Buttons ${i}`, deleteButtons[i]);
       }
 
       for (var i = 0; i < texts.length; i++) {
-        await elem.element(by.css('.select2-container')).click();
-        await elem.element(by.css('.select2-search__field')).sendKeys(
+        await action.click('Container Element', elem.element(containerLocator));
+        await action.sendKeys(
+          'Search Field Element',
+          searchFieldElement,
           texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
-      actualSelection = await elem.element(
-        by.css('.select2-selection__rendered')
-      ).all(by.tagName('li')).map(async function(choiceElem) {
+      actualSelection = await elem.element(selectionRenderedLocator).all(
+        by.tagName('li')).map(async function(choiceElem) {
         return await choiceElem.getText();
       });
       // Remove the element corresponding to the last <li>, which actually
@@ -369,13 +387,19 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 };
 
 var MultiSelectEditor = function(elem) {
+  var searchBarDropdownToggleElement = elem.element(
+    by.css('.protractor-test-search-bar-dropdown-toggle'));
+  var searchBarDropdownMenuLocator = by.css(
+    '.protractor-test-search-bar-dropdown-menu');
+  var selectedLocator = by.css('.protractor-test-selected');
   // This function checks that the options corresponding to the given texts
   // have the expected class name, and then toggles those options accordingly.
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    await elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-toggle')).click();
+    await action.click(
+      'Searchbar DropDown Toggle Element',
+      searchBarDropdownToggleElement);
 
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
@@ -386,7 +410,7 @@ var MultiSelectEditor = function(elem) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
-        await filteredElement.click();
+        await action.click('Filtered Element', filteredElement);
       }
     }
 
@@ -397,8 +421,9 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    await elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-toggle')).click();
+    await action.click(
+      'Searchbar Dropdown Toggle Element',
+      searchBarDropdownToggleElement);
   };
 
   return {
@@ -412,21 +437,21 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      await elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+      await action.click(
+        'Searchbar Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
 
       // Find the selected elements.
-      var actualSelection = await elem.element(
-        by.css('.protractor-test-search-bar-dropdown-menu')
-      ).all(by.css('.protractor-test-selected'))
-        .map(async function(selectedElem) {
-          return await selectedElem.getText();
+      var actualSelection = await elem.element(searchBarDropdownMenuLocator)
+        .all(selectedLocator).map(async function(selectedElem) {
+          return await action.getText('Selected Elem', selectedElem);
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      await elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+      await action.click(
+        'Searchbar Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
     }
   };
 };
@@ -489,7 +514,7 @@ var expectRichText = function(elem) {
 //   the rich-text area, obtained from getText(), e.g. ['bold'].
 // 'fullText': a string consisting of all the visible text in the rich text
 //   area (including both element and text nodes, so more than just the
-//   concatenation of arrayOfTexts), e.g. 'textbold'.
+//   concatenation of arrayOfTexts), e.g. 'textBold'.
 var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
@@ -591,6 +616,11 @@ var toRichText = async function(text) {
  * loads more divs.
  */
 var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
+  var lineContentElements = elem.all(by.css('.CodeMirror-line'));
+  var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
+  var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
+  var codeMirrorLineNumberLocator = by.css('.CodeMirror-linenumber');
+  var codeMirrorLineBackgroundLocator = by.css('.CodeMirror-linebackground');
   // The number of lines to scroll between reading different sections of
   // CodeMirror's text.
   var NUMBER_OF_LINES_TO_SCROLL = 15;
@@ -599,7 +629,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    * This recursive function is used by expectTextWithHighlightingToBe().
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
-   * codemirror should scroll to,
+   * codeMirror should scroll to,
    * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
    * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
@@ -607,13 +637,12 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'text': the exact string of text expected on that line
    *  - 'highlighted': true or false, whether the line is highlighted
    *  - 'checked': true or false, whether the line has been checked
-   * compareHightlighting: Whether highlighting should be compared.
+   * compareHighLighting: Whether highlighting should be compared.
    */
-  var _compareText = async function(compareDict, compareHightlighting) {
+  var _compareText = async function(compareDict, compareHighLighting) {
     var scrollTo = 0;
     var prevScrollTop = -1;
     var actualDiffDict = {};
-    var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
     var scrollBarWebElement = null;
     if (codeMirrorPaneToScroll === 'first') {
       scrollBarWebElement = await scrollBarElements.first().getWebElement();
@@ -628,7 +657,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
         '().scrollTop(' + String(scrollTo) + ');');
       var lineHeight = await elem.element(
-        by.css('.CodeMirror-linenumber')).getAttribute('clientHeight');
+        codeMirrorLineNumberLocator).getAttribute('clientHeight');
       var currentScrollTop = await browser.executeScript(
         'return arguments[0].scrollTop;', scrollBarWebElement);
       if (currentScrollTop === prevScrollTop) {
@@ -637,8 +666,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         prevScrollTop = currentScrollTop;
       }
       var lineDivElements = elem.all(by.xpath('./div'));
-      var lineContentElements = elem.all(by.css('.CodeMirror-line'));
-      var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
+
       var totalCount = await lineNumberElements.count();
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = await lineNumberElements.get(i);
@@ -649,7 +677,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineDivElement = await lineDivElements.get(i);
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
-          by.css('.CodeMirror-linebackground')).isPresent();
+          codeMirrorLineBackgroundLocator).isPresent();
         var text = await lineElement.getText();
         actualDiffDict[lineNumber] = {
           text: text,
@@ -661,7 +689,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     for (var lineNumber in compareDict) {
       expect(actualDiffDict[lineNumber].text).toEqual(
         compareDict[lineNumber].text);
-      if (compareHightlighting) {
+      if (compareHighLighting) {
         expect(actualDiffDict[lineNumber].highlighted).toEqual(
           compareDict[lineNumber].highlighted);
       }
@@ -670,7 +698,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 
   return {
     /**
-     * Compares text and highlighting with codemirror-mergeview. The input
+     * Compares text and highlighting with codeMirror-mergeView. The input
      * should be an object whose keys are line numbers and whose values should
      * be an object with the following key-value pairs:
      *  - text: the exact string of text expected on that line
@@ -685,8 +713,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await _compareText(expectedTextDict, true);
     },
     /**
-     * Compares text with codemirror. The input should be a string (with
-     * line breaks) of the expected display on codemirror.
+     * Compares text with codeMirror. The input should be a string (with
+     * line breaks) of the expected display on codeMirror.
      */
     expectTextToBe: async function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
@@ -706,8 +734,12 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 var CodeStringEditor = function(elem) {
   return {
     setValue: async function(code) {
-      await elem.element(by.tagName('textarea')).clear();
-      await elem.element(by.tagName('textarea')).sendKeys(code);
+      var stringEditorTextArea = elem.element(by.tagName('textarea'));
+      await action.clear('String Editor Text Area', stringEditorTextArea);
+      await action.sendKeys(
+        'String Editor Text Area',
+        stringEditorTextArea,
+        code);
     }
   };
 };
