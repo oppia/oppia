@@ -151,11 +151,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-
             # Content in set format is a list, content in unicode and html
-            # format is a string this code normalizes the content to the same
-            # format for the purpose of counting words.
-            if state_domain.WrittenTranslation.is_data_format_set(
+            # format is a string. This code normalizes the content to the list
+            # type so that we can easily count words.
+            if state_domain.WrittenTranslation.is_data_format_list(
                     suggestion.change.data_format
             ):
                 content_items = suggestion.change.content_html

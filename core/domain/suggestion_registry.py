@@ -647,7 +647,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         # the HTML strings for images.
         if (
                 hasattr(self.change, 'data_format') and
-                state_domain.WrittenTranslation.is_data_format_set(
+                state_domain.WrittenTranslation.is_data_format_list(
                     self.change.data_format)
         ):
             exp_services.update_exploration(
