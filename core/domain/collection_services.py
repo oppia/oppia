@@ -579,7 +579,7 @@ def get_collection_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Offset indicating where, in the list of
+        offset: int or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:
@@ -590,7 +590,7 @@ def get_collection_ids_matching_query(
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_offset: str. Search offset for future fetches.
+            search_offset: int. Search offset for future fetches.
     """
     returned_collection_ids = []
     search_offset = offset
