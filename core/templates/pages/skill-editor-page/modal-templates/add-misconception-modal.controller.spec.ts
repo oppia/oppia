@@ -124,23 +124,19 @@ describe('Add Misconception Modal Controller', function() {
 
   it('should check content length in misconception notes within 1000 chars',
     function() {
-      var contentText = 'This is just a sample text.';
-
-      $scope.misconceptionNotes = contentText;
+      $scope.misconceptionNotes = 'a'.repeat(1000);
       expect($scope.isMisconceptionNotesHtmlLengthExceeded()).toBe(false);
 
-      $scope.misconceptionNotes = contentText.repeat(50);
+      $scope.misconceptionNotes = 'a'.repeat(1001);
       expect($scope.isMisconceptionNotesHtmlLengthExceeded()).toBe(true);
     });
 
   it('should check content length in misconception feedback within 1000 chars',
     function() {
-      var contentText = 'This is just a sample text.';
-
-      $scope.misconceptionFeedback = contentText;
+      $scope.misconceptionFeedback = 'a'.repeat(1000);
       expect($scope.isMisconceptionFeedbackHtmlLengthExceeded()).toBe(false);
 
-      $scope.misconceptionFeedback = contentText.repeat(50);
+      $scope.misconceptionFeedback = 'a'.repeat(1001);
       expect($scope.isMisconceptionFeedbackHtmlLengthExceeded()).toBe(true);
     });
 });
