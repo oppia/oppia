@@ -30,7 +30,7 @@ import { NumericInputCustomizationArgs } from 'interactions/customization-args-d
 import { NumericInputRulesService } from './numeric-input-rules.service';
 import { NumericInputValidationService } from './numeric-input-validation.service';
 
-interface NumericInputFormDict {
+interface NumericInputFormSchema {
   type: string;
   'ui_config': {};
 }
@@ -46,7 +46,7 @@ export class InteractiveNumericInput implements OnInit {
   errorString = '';
   requireNonnegativeInput: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormDict;
+  NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormSchema;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -89,7 +89,7 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): NumericInputFormDict {
+  getSchema(): NumericInputFormSchema {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 
