@@ -106,7 +106,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     ) -> Dict[str, Union[
         str,
         job_run_result.JobRunResult,
-        opportunity_models.SkillOpportunityModel]
+        opportunity_models.SkillOpportunityModel,
+        None]
     ]:
         """Generate opportunities related to a skill.
 
@@ -168,7 +169,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             question_skill_link_models, _ = (
                 question_models.QuestionSkillLinkModel
                 .get_question_skill_links_by_skill_ids(
-                    constants.MAX_QUESTIONS_PER_SKILL, [skill_id], ''))
+                    constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0))
 
             count = (
                 question_skill_link_models
