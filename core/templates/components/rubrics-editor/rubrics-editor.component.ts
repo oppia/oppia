@@ -103,10 +103,10 @@ export class RubricsEditorComponent {
   }
 
   isMediumLevelExplanationValid(): boolean {
-    if (this.rubrics[1]._explanations.length > 1) {
+    if (this.rubrics[1]._explanations.length >= 1) {
       return true;
     }
-    return this.editableExplanations[this.skillDifficultyMedium][0].length > 0;
+    return false;
   }
 
   isTotalExplanationsLengthReached(): boolean {
@@ -120,12 +120,12 @@ export class RubricsEditorComponent {
 
       return (
         totalEasyExplanations + totalMediumExplanations +
-        totalHardExplanations === 10);
+        totalHardExplanations >= 10);
     }
   }
 
   isExplanationLengthValid(): boolean {
-    return this.editableExplanations[this.rubric.getDifficulty()][0].length < 300;
+    return this.editableExplanations[this.rubric.getDifficulty()][0].length <= 300;
   }
 
   updateExplanation($event: string, idx: number): void {

@@ -55,9 +55,7 @@
           <div>
             <button type="button"
                     class="btn btn-danger protractor-test-delete-rubric-explanation-button"
-                    [disabled]="this.ismediumLevelExplanationLengthEqualsOne(this.rubric.getDifficulty())"
-                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)"
-                    title="There should be at least one explanation for the Medium level rubric.">
+                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)">
               Delete
             </button>
             <button type="button"
@@ -74,10 +72,6 @@
             </button>
           </div>
           <br>
-          <div *ngIf="!this.isMediumLevelExplanationValid()"
-               class="rubric-error-message">
-            There should be at least one explanation for the Medium level rubric.
-          </div>
           <div *ngIf="!this.isExplanationLengthValid()" class="rubric-error-message">
             Explanations should have at most 300 characters.
           </div>
@@ -93,6 +87,10 @@
             [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.isTotalExplanationsLengthReached()">
       + ADD EXPLANATION FOR DIFFICULTY
     </button>
+    <div *ngIf="!this.isMediumLevelExplanationValid()"
+          class="rubric-error-message">
+      There should be at least one explanation for the Medium level rubric.
+    </div>
   </div>
 </div>
 
