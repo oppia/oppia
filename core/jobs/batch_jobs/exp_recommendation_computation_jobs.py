@@ -16,14 +16,12 @@
 
 """Jobs that are run by CRON scheduler."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
-from core import python_utils
 from core.domain import recommendations_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -87,12 +85,8 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
 
         return (
             exp_recommendations_models
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS %s' % x))
+            | 'Create job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
         )
 
     @staticmethod
@@ -115,8 +109,8 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
         sorted_similarities = sorted(
             similarities, reverse=True, key=lambda x: x['similarity_score'])
         return [
-            python_utils.UNICODE(item['exp_id']) for item in sorted_similarities
-        ][:MAX_RECOMMENDATIONS]
+                str(item['exp_id']) for item in sorted_similarities
+            ][:MAX_RECOMMENDATIONS]
 
     @staticmethod
     def _create_recommendation(

@@ -14,8 +14,7 @@
 
 """Unit tests for scripts/common.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import builtins
 import contextlib
@@ -500,50 +499,6 @@ class CommonTests(test_utils.GenericTestBase):
             'the script'):
             common.get_personal_access_token()
 
-    def test_closed_blocking_bugs_milestone_results_in_exception(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'state': 'closed'}, completed='')
-        get_milestone_swap = self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone)
-        with get_milestone_swap, self.assertRaisesRegexp(
-            Exception, 'The blocking bug milestone is closed.'):
-            common.check_blocking_bug_issue_count(mock_repo)
-
-    def test_non_zero_blocking_bug_issue_count_results_in_exception(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_open_tab(unused_url):
-            pass
-        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        get_milestone_swap = self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with get_milestone_swap, open_tab_swap, self.assertRaisesRegexp(
-            Exception, (
-                'There are 10 unresolved blocking bugs. Please '
-                'ensure that they are resolved before release '
-                'summary generation.')):
-            common.check_blocking_bug_issue_count(mock_repo)
-
-    def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
-        mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
-            return github.Milestone.Milestone(
-                requester='', headers='',
-                attributes={'open_issues': 0, 'state': 'open'}, completed='')
-        with self.swap(
-            github.Repository.Repository, 'get_milestone', mock_get_milestone):
-            common.check_blocking_bug_issue_count(mock_repo)
-
     def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
             self):
         mock_repo = github.Repository.Repository(
@@ -654,12 +609,40 @@ class CommonTests(test_utils.GenericTestBase):
         )
         with remove_swap:
             common.inplace_replace_file(
-                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+                origin_file,
+                '"DEV_MODE": .*',
+                '"DEV_MODE": true,',
+                expected_number_of_replacements=1
+            )
         with python_utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         os.remove(origin_file)
         shutil.move(backup_file, origin_file)
+
+    def test_inplace_replace_file_with_expected_number_of_replacements_raises(
+            self
+    ):
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        with python_utils.open_file(origin_file, 'r') as f:
+            origin_content = f.readlines()
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
+        ):
+            common.inplace_replace_file(
+                origin_file,
+                '"DEV_MODEa": .*',
+                '"DEV_MODE": true,',
+                expected_number_of_replacements=1
+            )
+        self.assertFalse(os.path.isfile(backup_file))
+        with python_utils.open_file(origin_file, 'r') as f:
+            new_content = f.readlines()
+        self.assertEqual(origin_content, new_content)
 
     def test_inplace_replace_file_with_exception_raised(self):
         origin_file = os.path.join(

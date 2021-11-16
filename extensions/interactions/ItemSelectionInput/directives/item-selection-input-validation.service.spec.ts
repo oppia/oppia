@@ -332,7 +332,7 @@ describe('ItemSelectionInputValidationService', () => {
     });
 
   it('should expect all rule inputs to match choices', () => {
-    const ruleInput = <string[]> goodAnswerGroups[0].rules[0].inputs.x;
+    const ruleInput = goodAnswerGroups[0].rules[0].inputs.x as string[];
     ruleInput[0] = 'invalid_content_id';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
