@@ -119,6 +119,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
+    let value = this.value;
+    value = value.replace(
+      /<oppia-noninteractive-/g,
+      '<oppia-noninteractive-ckeditor-'
+    );
+    value = value.replace(
+      /<\/oppia-noninteractive-/g,
+      '</oppia-noninteractive-ckeditor-'
+    );
+    this.value = value;
     if (this.ck && this.ck.status === 'ready' && changes.value) {
       this.ck.setData(this.wrapComponents(this.value));
     }
@@ -234,16 +244,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   }
 
   ngAfterViewInit(): void {
-    let value = this.value;
-    value = value.replace(
-      /<oppia-noninteractive-/g,
-      '<oppia-noninteractive-ckeditor-'
-    );
-    value = value.replace(
-      /<\/oppia-noninteractive-/g,
-      '</oppia-noninteractive-ckeditor-'
-    );
-    this.value = value;
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
@@ -354,7 +354,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     loadingDiv.innerText = 'Loading...';
     // This div is placed as a child of `schema-based-editor`.
     this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
-
 
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
@@ -479,6 +478,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         '</oppia-noninteractive-'
       );
       this.valueChange.emit(html);
+      this.currentValue = html;
     });
     ck.setData(this.value);
     this.ck = ck;

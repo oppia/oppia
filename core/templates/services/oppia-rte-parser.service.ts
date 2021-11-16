@@ -23,7 +23,6 @@ import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia
 import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
 import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import { NoninteractiveSvgdiagram } from 'rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 
@@ -33,7 +32,6 @@ const selectorToComponentClassMap = {
   'oppia-noninteractive-link': NoninteractiveLink,
   'oppia-noninteractive-math': NoninteractiveMath,
   'oppia-noninteractive-skillreview': NoninteractiveSkillreview,
-  'oppia-noninteractive-svgdiagram': NoninteractiveSvgdiagram,
   'oppia-noninteractive-tabs': NoninteractiveTabs,
   'oppia-noninteractive-video': NoninteractiveVideo
 };
