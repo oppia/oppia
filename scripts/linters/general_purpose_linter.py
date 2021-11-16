@@ -192,14 +192,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('core/platform',),
     },
     {
-        'regexp': re.compile(r'\Wprint\('),
-        'message': 'Please do not use print statement.',
-        'excluded_files': (
-            'core/tests/test_utils.py',
-            'core/tests/performance_framework/perf_domain.py'),
-        'excluded_dirs': ('scripts/',)
-    },
-    {
         'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
