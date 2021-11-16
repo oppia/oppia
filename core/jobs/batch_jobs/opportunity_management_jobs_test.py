@@ -101,7 +101,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        
+
         # Create Question models
         question_1_model = self.create_model(
             question_models.QuestionModel,
@@ -111,9 +111,10 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             version=0,
             linked_skill_ids=[self.SKILL_1_ID],
             inapplicable_skill_misconception_ids=[],
-            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION
+            question_state_data_schema_version=feconf
+                .CURRENT_STATE_SCHEMA_VERSION
         )
-        
+
         question_2_model = self.create_model(
             question_models.QuestionModel,
             id=self.QUESTION_2_ID,
@@ -122,11 +123,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             version=0,
             linked_skill_ids=[self.SKILL_2_ID],
             inapplicable_skill_misconception_ids=[],
-            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION
+            question_state_data_schema_version=feconf
+                .CURRENT_STATE_SCHEMA_VERSION
         )
         question_1_model.update_timestamps()
         question_2_model.update_timestamps()
-        
+
         # Create QuestionSkillLinkModels
         question_1_skilllinkmodel = self.create_model(
             question_models.QuestionSkillLinkModel,
@@ -143,7 +145,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         )
         question_1_skilllinkmodel.update_timestamps()
         question_2_skilllinkmodel.update_timestamps()
-        
+
         skill_1_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
