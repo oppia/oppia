@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import re
 
-from core import python_utils
 from scripts import common
 
 
