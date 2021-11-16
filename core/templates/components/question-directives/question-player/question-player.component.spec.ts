@@ -88,8 +88,8 @@ describe('QuestionPlayerComponent', () => {
       });
 
       spyOnProperty(
-        QuestionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
-        .and.returnValue(new EventEmitter<boolean>());
+        QuestionPlayerStateService, 'resultsPageIsLoadedEventEmitter'
+      ).and.returnValue(new EventEmitter<boolean>());
       spyOn(QuestionPlayerStateService.resultsPageIsLoadedEventEmitter, 'emit');
     }));
 

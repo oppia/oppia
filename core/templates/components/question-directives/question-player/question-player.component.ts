@@ -584,8 +584,8 @@ angular.module('oppia').component('questionPlayer', {
         // called in $scope.$on when some external events are triggered.
         initResults();
         ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
-        QuestionPlayerStateService.resultsPageIsLoadedEventEmitter
-          .emit($scope.resultsLoaded);
+        QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+          $scope.resultsLoaded);
       };
 
       ctrl.$onDestroy = function() {
