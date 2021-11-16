@@ -647,12 +647,10 @@ def check_can_modify_core_activity_roles(user, activity_rights):
     if activity_rights is None:
         return False
 
-    if (activity_rights.community_owned or
-            activity_rights.cloned_from):
+    if activity_rights.community_owned or activity_rights.cloned_from:
         return False
 
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in
-            user.actions):
+    if role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in user.actions:
         return True
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
