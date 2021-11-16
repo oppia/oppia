@@ -282,17 +282,6 @@ class SkillOpportunity:
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-<<<<<<< HEAD
-        if not isinstance(self.skill_description, str):
-            raise utils.ValidationError(
-                'Expected skill_description to be a string, received %s' %
-                self.skill_description)
-        if not isinstance(self.question_count, int):
-            raise utils.ValidationError(
-                'Expected question_count to be an integer, received %s' %
-                self.question_count)
-=======
->>>>>>> develop
 
         if self.question_count < 0:
             raise utils.ValidationError(
