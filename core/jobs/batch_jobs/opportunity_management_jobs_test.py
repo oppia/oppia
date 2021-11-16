@@ -32,10 +32,10 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
+    from mypy_imports import question_models
+    from mypy_imports import skill_models
     from mypy_imports import story_models
     from mypy_imports import topic_models
-    from mypy_imports import skill_models
-    from mypy_imports import question_models
 
 (
     exp_models, opportunity_models, story_models,
@@ -102,7 +102,6 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        # Create Question models
         question_1_model = self.create_model(
             question_models.QuestionModel,
             id=self.QUESTION_1_ID,
@@ -129,7 +128,6 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         question_1_model.update_timestamps()
         question_2_model.update_timestamps()
 
-        # Create QuestionSkillLinkModels
         question_1_skilllinkmodel = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
@@ -218,9 +216,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         skill_1_model.update_timestamps()
         skill_2_model.update_timestamps()
 
-        datastore_services.put_multi([skill_1_model, skill_2_model, 
-                                      question_1_model, question_2_model, 
-                                      question_1_skilllinkmodel, question_2_skilllinkmodel])
+        datastore_services.put_multi(
+            [skill_1_model, skill_2_model,
+             question_1_model, question_2_model,
+             question_1_skilllinkmodel, 
+             question_2_skilllinkmodel]
+        )
 
     def test_generation_job_creates_new_models(self) -> None:
         all_opportunity_models = list(
