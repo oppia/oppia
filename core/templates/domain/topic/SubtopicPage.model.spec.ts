@@ -41,8 +41,8 @@ describe('Subtopic page Model', () => {
     () => {
       var subtopicPage =
       SubtopicPage.createInterstitialSubtopicPage();
-      expect(subtopicPage.getId()).toEqual('');
-      expect(subtopicPage.getTopicId()).toEqual('');
+      expect(subtopicPage.getId()).toEqual(null);
+      expect(subtopicPage.getTopicId()).toEqual(null);
       expect(subtopicPage.getPageContents()).toEqual(null);
       expect(subtopicPage.getLanguageCode()).toBe('en');
     });

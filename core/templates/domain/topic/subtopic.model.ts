@@ -22,12 +22,16 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import constants from 'assets/constants';
 
 export interface SubtopicBackendDict {
+  // When creating a new subtopic, property below are always
+  // initialized with null values. These are null until populated
+  // from the backend and are populated from the backend only when
+  // the subtopic is retrieved.
   'id': number;
   'title': string;
   'skill_ids': string[];
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'url_fragment': string;
+  'thumbnail_filename': string | null;
+  'thumbnail_bg_color': string | null;
+  'url_fragment': string | null;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -41,15 +45,14 @@ export class Subtopic {
   _skillIds: string[];
   // The thumbnail and URL fragment might not be set,
   // then they will be 'null'.
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
-  _urlFragment: string;
+  _thumbnailFilename: string | null;
+  _thumbnailBgColor: string | null;
+  _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string,
-      thumbnailBgColor: string,
-      urlFragment: string) {
+      thumbnailFilename: string | null, thumbnailBgColor: string | null,
+      urlFragment: string | null) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -85,7 +88,7 @@ export class Subtopic {
   }
 
   // Returns 'null' if there is no url fragment.
-  getUrlFragment(): string {
+  getUrlFragment(): string | null {
     return this._urlFragment;
   }
 
@@ -197,9 +200,9 @@ export class Subtopic {
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: '',
-      thumbnail_bg_color: '',
-      url_fragment: ''
+      thumbnail_filename: null,
+      thumbnail_bg_color: null,
+      url_fragment: null
     }, {});
   }
 }

@@ -27,7 +27,7 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface QuestionBackendDict {
-  'id': string;
+  'id': string | null;
   'question_state_data': StateBackendDict,
   'question_state_data_schema_version': number;
   'language_code': string;
@@ -37,6 +37,9 @@ export interface QuestionBackendDict {
 }
 
 export class Question {
+  // When creating a new question, property below are always
+  // initialized with null values. These are null until populated
+  // from the backend and are not null afterwards.
   _id: string | null;
   _stateData: State;
   _languageCode: string;
@@ -98,8 +101,8 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
-
-  getValidationErrorMessage(): string {
+  // Returns 'null' when the message is valid.
+  getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
     var interactionId = interaction.id as InteractionSpecsKey;
     var questionContent = this._stateData.content._html;
@@ -135,7 +138,7 @@ export class Question {
     if (!atLeastOneAnswerCorrect) {
       return 'At least one answer should be marked correct';
     }
-    return '';
+    return null;
   }
 
   getUnaddressedMisconceptionNames(
@@ -155,8 +158,7 @@ export class Question {
     }
     var unaddressedMisconceptionNames: string[] = [];
     var self = this;
-    type MisconceptionsBySkillKeys = (
-      keyof typeof misconceptionsBySkill)[ ];
+    type MisconceptionsBySkillKeys = (keyof typeof misconceptionsBySkill)[];
     var misconceptionsBySkillKeys = (
       Object.keys(misconceptionsBySkill) as MisconceptionsBySkillKeys
     );
@@ -184,7 +186,7 @@ export class Question {
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict: QuestionBackendDict = {
-      id: '',
+      id: null,
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
       language_code: this._languageCode,
@@ -194,7 +196,7 @@ export class Question {
       version: 0,
     };
     if (!isNewQuestion) {
-      questionBackendDict.id = this._id !== null ? this._id : '';
+      questionBackendDict.id = this._id;
       questionBackendDict.version = this._version;
     }
     return questionBackendDict;

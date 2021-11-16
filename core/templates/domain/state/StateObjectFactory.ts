@@ -61,7 +61,10 @@ export interface StateBackendDict {
 }
 
 export class State {
-  name: string;
+  // When creating a new state, property below are always
+  // initialized with null values. These are null until populated
+  // from the backend and are not null afterwards.
+  name: string | null;
   classifierModelId: string | null;
   linkedSkillId: string | null;
   content: SubtitledHtml;
@@ -74,7 +77,7 @@ export class State {
   nextContentIdIndex: number;
 
   constructor(
-      name: string, classifierModelId: string | null,
+      name: string | null, classifierModelId: string | null,
       linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
@@ -166,22 +169,21 @@ export class StateObjectFactory {
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
-
+  // Passes newstatename as null untill new question is created it will be null.
   createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
-    var newState = this.createFromBackendDict(
-      newStateName !== null ? newStateName : '', {
-        classifier_model_id: newStateTemplate.classifier_model_id,
-        linked_skill_id: newStateTemplate.linked_skill_id,
-        content: newStateTemplate.content,
-        interaction: newStateTemplate.interaction,
-        param_changes: newStateTemplate.param_changes,
-        recorded_voiceovers: newStateTemplate.recorded_voiceovers,
-        solicit_answer_details: newStateTemplate.solicit_answer_details,
-        card_is_checkpoint: newStateTemplate.card_is_checkpoint,
-        written_translations: newStateTemplate.written_translations,
-        next_content_id_index: newStateTemplate.next_content_id_index
-      });
+    var newState = this.createFromBackendDict(newStateName, {
+      classifier_model_id: newStateTemplate.classifier_model_id,
+      linked_skill_id: newStateTemplate.linked_skill_id,
+      content: newStateTemplate.content,
+      interaction: newStateTemplate.interaction,
+      param_changes: newStateTemplate.param_changes,
+      recorded_voiceovers: newStateTemplate.recorded_voiceovers,
+      solicit_answer_details: newStateTemplate.solicit_answer_details,
+      card_is_checkpoint: newStateTemplate.card_is_checkpoint,
+      written_translations: newStateTemplate.written_translations,
+      next_content_id_index: newStateTemplate.next_content_id_index
+    });
     if (newState.interaction.defaultOutcome !== null) {
       let defaultOutcome = newState.interaction.defaultOutcome;
       defaultOutcome.dest = newStateName as string;
@@ -189,8 +191,10 @@ export class StateObjectFactory {
     return newState;
   }
 
+  // Passes newstatename as null untill new question is created it will be null
+  // until fetch from the backend and are not null afterwards.
   createFromBackendDict(
-      stateName: string, stateDict: StateBackendDict
+      stateName: string | null, stateDict: StateBackendDict
   ): State {
     return new State(
       stateName,

@@ -58,7 +58,10 @@ export interface TopicBackendDict {
 import constants from 'assets/constants';
 
 export class Topic {
-  _id: string;
+  // When creating a topic, property below are always
+  // initialized with null values. These are null until populated
+  // from the backend and provided themselves by the user.
+  _id: string | null;
   _name: string;
   _abbreviatedName: string;
   _description: string;
@@ -77,7 +80,7 @@ export class Topic {
   _pageTitleFragmentForWeb: string;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string, name: string, abbreviatedName: string,
+      id: string | null, name: string, abbreviatedName: string,
       urlFragment: string, description: string, languageCode: string,
       canonicalStoryReferences: StoryReference[],
       additionalStoryReferences: StoryReference[],
@@ -114,7 +117,7 @@ export class Topic {
   }
 
   // ---- Instance methods ----
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -614,7 +617,7 @@ export class TopicObjectFactory {
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
-      '', 'Topic name loading', 'Abbrev. name loading',
+      null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], null, '', {},
       this.storyReferenceObjectFactory, false, '', ''
