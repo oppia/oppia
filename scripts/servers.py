@@ -157,13 +157,16 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
-    # OK to use shell=True here because we are not passing anything that came
-    # from an untrusted user, only other callers of the script, so there's no
-    # risk of shell-injection attacks.
     with contextlib.ExitStack() as stack:
+        # OK to use shell=True here because we are not passing anything that
+        # came from an untrusted user, only other callers of the script,
+        # so there's no risk of shell-injection attacks.
         proc = stack.enter_context(managed_process(
-            dev_appserver_args, human_readable_name='GAE Development Server',
-            shell=True, env=env))
+            dev_appserver_args,
+            human_readable_name='GAE Development Server',
+            shell=True,
+            env=env
+        ))
         common.wait_for_port_to_be_in_use(port)
         yield proc
 
