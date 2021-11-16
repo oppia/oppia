@@ -14,11 +14,9 @@
 
 """Tests for the learner playlist."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
@@ -148,8 +146,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # learner playlist.
         # Add feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT - 2 activities to reach
         # the maximum limit.
-        for exp_id in python_utils.RANGE(
-                5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
+        for exp_id in range(5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
             self.post_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_PLAYLIST_DATA_URL,
@@ -164,8 +161,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
                 'exp_id_%s' %
-                python_utils.UNICODE(
-                    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
+                str(feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['playlist_limit_exceeded'], True)
 
@@ -247,8 +243,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # learner playlist.
         # Add feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT - 2 activities to reach
         # the maximum limit.
-        for exp_id in python_utils.RANGE(
-                5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
+        for exp_id in range(5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
             response = self.post_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_PLAYLIST_DATA_URL,
@@ -263,8 +258,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
                 'exp_id_%s' %
-                python_utils.UNICODE(
-                    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
+                str(feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['playlist_limit_exceeded'], True)
 

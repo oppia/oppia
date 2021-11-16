@@ -16,15 +16,12 @@
 
 """Lint checks for HTML files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import html.parser
 import os
 import re
 import subprocess
-
-from core import python_utils
 
 from .. import common
 from .. import concurrent_task_utils
@@ -258,7 +255,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             self.error_messages.append(error_message)
 
 
-class HTMLLintChecksManager(python_utils.OBJECT):
+class HTMLLintChecksManager:
     """Manages all the HTML linting functions."""
 
     def __init__(self, files_to_lint, file_cache):
@@ -327,7 +324,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         return [self.check_html_tags_and_attributes()]
 
 
-class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
+class ThirdPartyHTMLLintChecksManager:
     """Manages all the HTML linting functions."""
 
     def __init__(self, files_to_lint):

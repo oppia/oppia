@@ -14,8 +14,7 @@
 
 """Installation script for Oppia third-party libraries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 import argparse
 import os
@@ -23,6 +22,7 @@ import pathlib
 import shutil
 import subprocess
 import sys
+import urllib.request as urlrequest
 import zipfile
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
@@ -32,7 +32,7 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 PREREQUISITES = [
     ('pyyaml', '5.4.1', os.path.join(TOOLS_DIR, 'pyyaml-5.4.1')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
-    ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
+    ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
     ('certifi', '2021.5.30', os.path.join(
         TOOLS_DIR, 'certifi-2021.5.30')),
 ]
@@ -128,9 +128,9 @@ def install_buf_and_protoc():
 
     common.ensure_directory_exists(BUF_DIR)
     for bin_file in buf_files:
-        python_utils.url_retrieve('%s/%s' % (
+        urlrequest.urlretrieve('%s/%s' % (
             BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
-    python_utils.url_retrieve('%s/%s' % (
+    urlrequest.urlretrieve('%s/%s' % (
         PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
     try:
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:

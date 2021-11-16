@@ -28,6 +28,7 @@ describe('QuestionPlayerComponent', () => {
   let $uibModal = null;
 
   let PlayerPositionService = null;
+  let PreventPageUnloadEventService = null;
   let ExplorationPlayerStateService = null;
   let QuestionPlayerStateService = null;
   let UserService = null;
@@ -75,6 +76,8 @@ describe('QuestionPlayerComponent', () => {
       $uibModal = $injector.get('$uibModal');
 
       PlayerPositionService = $injector.get('PlayerPositionService');
+      PreventPageUnloadEventService = $injector.get(
+        'PreventPageUnloadEventService');
       ExplorationPlayerStateService = $injector.get(
         'ExplorationPlayerStateService');
       QuestionPlayerStateService = $injector.get('QuestionPlayerStateService');
@@ -207,20 +210,9 @@ describe('QuestionPlayerComponent', () => {
     expect(ctrl.testIsPassed).toBe(true);
   });
 
-  it('should get the outer class name for action button', () => {
-    expect(ctrl.getActionButtonOuterClass('BOOST_SCORE'))
-      .toBe('boost-score-outer');
-    expect(ctrl.getActionButtonOuterClass('RETRY_SESSION'))
-      .toBe('new-session-outer');
-    expect(ctrl.getActionButtonOuterClass('DASHBOARD'))
-      .toBe('my-dashboard-outer');
-    expect(ctrl.getActionButtonOuterClass('INVALID_TYPE'))
-      .toBe('');
-  });
-
   it('should get the inner class name for action button', () => {
-    expect(ctrl.getActionButtonInnerClass('BOOST_SCORE'))
-      .toBe('boost-score-inner');
+    expect(ctrl.getActionButtonInnerClass('REVIEW_LOWEST_SCORED_SKILL'))
+      .toBe('review-lowest-scored-skill-inner');
     expect(ctrl.getActionButtonInnerClass('RETRY_SESSION'))
       .toBe('new-session-inner');
     expect(ctrl.getActionButtonInnerClass('DASHBOARD'))
@@ -230,20 +222,17 @@ describe('QuestionPlayerComponent', () => {
   });
 
   it('should get html for action button icon', () => {
-    expect(ctrl.getActionButtonIconHtml('BOOST_SCORE').toString())
-      .toBe(
-        '&#10;          &#10;          &#10;          <img alt="" ' +
-        'class="action-button-icon" src="/assets/images/icons/' +
-        'rocket@2x.png">&#10;          '
-      );
+    expect(ctrl.getActionButtonIconHtml(
+      'REVIEW_LOWEST_SCORED_SKILL').toString())
+      .toBe('<i class="material-icons md-18 action-button-icon">&#59497;</i>');
     expect(ctrl.getActionButtonIconHtml('RETRY_SESSION').toString())
-      .toBe('<i class="material-icons md-36 action-button-icon">&#58837;</i>');
+      .toBe('<i class="material-icons md-18 action-button-icon">&#58837;</i>');
     expect(ctrl.getActionButtonIconHtml('DASHBOARD').toString())
-      .toBe('<i class="material-icons md-36 action-button-icon">&#59530;</i>');
+      .toBe('<i class="material-icons md-18 action-button-icon">&#59530;</i>');
   });
 
-  it('should open boost score modal when use clicks on action button with' +
-    ' type BOOST_SCORE', () => {
+  it('should open review lowest scored skill modal when use clicks ' +
+    'on action button with type REVIEW_LOWEST_SCORED_SKILL', () => {
     let skills, skillIds;
     spyOn($uibModal, 'open').and.callFake((options) => {
       skills = options.resolve.skills();
@@ -266,7 +255,7 @@ describe('QuestionPlayerComponent', () => {
     };
 
     ctrl.performAction({
-      type: 'BOOST_SCORE'
+      type: 'REVIEW_LOWEST_SCORED_SKILL'
     });
     $scope.$apply();
 
@@ -274,7 +263,7 @@ describe('QuestionPlayerComponent', () => {
     expect(skillIds).toEqual(['skill1']);
   });
 
-  it('should close boost score modal', () => {
+  it('should close review lowest scored skill modal', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -290,7 +279,7 @@ describe('QuestionPlayerComponent', () => {
     };
 
     ctrl.performAction({
-      type: 'BOOST_SCORE'
+      type: 'REVIEW_LOWEST_SCORED_SKILL'
     });
     $scope.$apply();
 
@@ -488,6 +477,39 @@ describe('QuestionPlayerComponent', () => {
     expect(ctrl.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
   });
 
+  it('should get color for score bar based on score per skill', () => {
+    let scorePerSkill = {
+      score: 5,
+      total: 7
+    };
+    ctrl.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'NOT_PASS_FAIL',
+        passCutoff: 1.5
+      }
+    };
+
+    expect(ctrl.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
+
+    ctrl.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 1.5
+      }
+    };
+
+    expect(ctrl.getColorForScoreBar(scorePerSkill)).toBe('rgb(217, 92, 12)');
+
+    ctrl.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 0.5
+      }
+    };
+
+    expect(ctrl.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
+  });
+
   it('should open skill mastery modal when user clicks on skill', () => {
     let masteryPerSkillMapping;
     let skillId;
@@ -533,5 +555,16 @@ describe('QuestionPlayerComponent', () => {
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should prevent page reload or exit in between' +
+  'practice session', function() {
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 });

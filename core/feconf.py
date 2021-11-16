@@ -16,8 +16,7 @@
 
 """Stores various configuration options and constants for Oppia."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import datetime
@@ -97,16 +96,14 @@ VISUALIZATIONS_DIR = os.path.join(
 VISUALIZATIONS_DIR_FOR_JS = os.path.join(
     'local_compiled_js', 'extensions', 'visualizations')
 
-OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
-    'extensions', 'objects', 'object_defaults.json')
-RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
-HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions',
-    'html_field_types_to_rule_specs.json')
-LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR = os.path.join(
-    os.getcwd(), 'extensions', 'interactions',
-    'legacy_html_field_types_to_rule_specs_by_state_version')
+OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH = os.path.join(
+    'objects', 'object_defaults.json')
+RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH = os.path.join(
+    'interactions', 'rule_templates.json')
+HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
+    'interactions', 'html_field_types_to_rule_specs.json')
+LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
+    'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
@@ -209,6 +206,10 @@ DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
+
+# The maximum number of results to retrieve in a datastore query
+# for suggestions.
+DEFAULT_SUGGESTION_QUERY_LIMIT = 100
 
 # The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
@@ -499,10 +500,8 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-# TODO(#13967): Increment the version number according to the Oppia version.
-# The path to the package contains version number but we don't increment
-# the version number.
-OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-0.0.1.tar.gz'
+OPPIA_VERSION = '3.1.4'
+OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -883,6 +882,8 @@ LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data')
+LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
+    '/learnerdashboardfeedbackupdateshandler/data')
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
@@ -1132,6 +1133,7 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 USER_FILTER_CRITERION_ROLE = 'role'
 USER_FILTER_CRITERION_USERNAME = 'username'
 
+# Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
@@ -1251,10 +1253,6 @@ CLOUD_DATASTORE_EMULATOR_PORT = 8089
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 FIREBASE_EMULATOR_PORT = 9099
 
-# The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live on in the
-# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
-FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
 # duration expires, a new cookie will need to be generated. Generating a new
 # cookie requires the user to sign-in _explicitly_.

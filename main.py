@@ -14,8 +14,7 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
@@ -79,7 +78,8 @@ from core.controllers import voice_artist
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-from typing import Any, Dict, Optional, Type, TypeVar
+import google.cloud.logging
+from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
 
@@ -91,6 +91,15 @@ T = TypeVar('T')  # pylint: disable=invalid-name
 
 cache_services = models.Registry.import_cache_services()
 datastore_services = models.Registry.import_datastore_services()
+
+# Cloud Logging is disabled in emulator mode, since it is unnecessary and
+# creates a lot of noise.
+if not constants.EMULATOR_MODE:
+    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # environment you're running in and integrates the handler with the Python
+    # logging module.
+    client = google.cloud.logging.Client()
+    client.setup_logging()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -291,6 +300,9 @@ URLS = [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
+        r'/getalltopicnames',
+        contributor_dashboard.AllTopicNamesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -388,6 +400,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
         learner_dashboard.LearnerDashboardExplorationsProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
@@ -972,8 +987,7 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
-        r'%s' % feconf.TASK_URL_DEFERRED,
-        tasks.DeferredTasksHandler),
+        r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).
@@ -987,14 +1001,17 @@ class NdbWsgiMiddleware:
         self.wsgi_app = wsgi_app
 
     def __call__(
-            self,
-            environ: Dict[str, str],
-            start_response: webapp2.Response
-    ) -> Any:
+        self,
+        environ: Dict[str, str],
+        start_response: webapp2.Response
+    ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            return self.wsgi_app(environ, start_response)
+            # Cast is needed since webapp2.WSGIApplication is not
+            # correctly typed.
+            return cast(
+                webapp2.Response, self.wsgi_app(environ, start_response))
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)

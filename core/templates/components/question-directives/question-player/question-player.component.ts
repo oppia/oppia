@@ -100,7 +100,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/concept-card/concept-card.directive.ts');
+require('components/concept-card/concept-card.component.ts');
 require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
@@ -125,6 +125,7 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 angular.module('oppia').component('questionPlayer', {
   bindings: {
@@ -134,9 +135,9 @@ angular.module('oppia').component('questionPlayer', {
   controller: [
     '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
     '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
-    'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-    'UrlInterpolationService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
-    'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
+    'PreventPageUnloadEventService', 'QuestionPlayerStateService',
+    'SkillMasteryBackendApiService', 'UserService',
+    'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
     'MAX_MASTERY_LOSS_PER_QUESTION', 'MAX_SCORE_PER_QUESTION',
     'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
     'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
@@ -144,9 +145,9 @@ angular.module('oppia').component('questionPlayer', {
     function(
         $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
         $window, ExplorationPlayerStateService, PlayerPositionService,
-        QuestionPlayerStateService, SkillMasteryBackendApiService,
-        UrlInterpolationService, UserService, COLORS_FOR_PASS_FAIL_MODE,
-        HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
+        PreventPageUnloadEventService, QuestionPlayerStateService,
+        SkillMasteryBackendApiService, UserService,
+        COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
         MAX_MASTERY_LOSS_PER_QUESTION, MAX_SCORE_PER_QUESTION,
         QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
         VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
@@ -159,19 +160,10 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.totalQuestions = 0;
         ctrl.currentProgress = 0;
         ctrl.totalScore = 0.0;
+        ctrl.allQuestions = 0;
+        ctrl.finalCorrect = 0.0;
         ctrl.scorePerSkillMapping = {};
         ctrl.testIsPassed = true;
-      };
-      var getStaticImageUrl = function(url) {
-        return UrlInterpolationService.getStaticImageUrl(url);
-      };
-
-      ctrl.getActionButtonOuterClass = function(actionButtonType) {
-        var className = getClassNameForType(actionButtonType);
-        if (className) {
-          return className + 'outer';
-        }
-        return '';
       };
 
       ctrl.getActionButtonInnerClass = function(actionButtonType) {
@@ -184,29 +176,22 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.getActionButtonIconHtml = function(actionButtonType) {
         var iconHtml = '';
-        if (actionButtonType === 'BOOST_SCORE') {
-          iconHtml = `<picture>
-          <source type="image/webp"
-          srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
-          <source type="image/png"
-          srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
-          <img alt=""
-                class="action-button-icon"
-                src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
-          </picture>`;
+        if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
+          iconHtml = '<i class="material-icons md-18 ' +
+          'action-button-icon">&#xe869</i>';
         } else if (actionButtonType === 'RETRY_SESSION') {
-          iconHtml = '<i class="material-icons md-36 ' +
+          iconHtml = '<i class="material-icons md-18 ' +
           'action-button-icon">&#xE5D5</i>';
         } else if (actionButtonType === 'DASHBOARD') {
-          iconHtml = '<i class="material-icons md-36 ' +
+          iconHtml = '<i class="material-icons md-18 ' +
           'action-button-icon">&#xE88A</i>';
         }
         return $sce.trustAsHtml($sanitize(iconHtml));
       };
 
       ctrl.performAction = function(actionButton) {
-        if (actionButton.type === 'BOOST_SCORE') {
-          ctrl.boostScoreModal();
+        if (actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL') {
+          ctrl.reviewLowestScoredSkillsModal();
         } else if (actionButton.url) {
           $window.location.href = actionButton.url;
         }
@@ -218,18 +203,17 @@ angular.module('oppia').component('questionPlayer', {
           ctrl.questionPlayerConfig.resultActionButtons.length > 0);
       };
 
-      ctrl.getWorstSkillId = function() {
-        var minScore = Number.MAX_VALUE;
-        var worstSkillId = '';
+      ctrl.getWorstSkillIds = function() {
+        var minScore = 0.95;
+        var worstSkillIds = [];
         Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
           var skillScoreData = ctrl.scorePerSkillMapping[skillId];
           var scorePercentage = skillScoreData.score / skillScoreData.total;
           if (scorePercentage < minScore) {
-            minScore = scorePercentage;
-            worstSkillId = skillId;
+            worstSkillIds.push([scorePercentage, skillId]);
           }
         });
-        return worstSkillId;
+        return worstSkillIds.sort().slice(0, 3).map(info => info[1]);
       };
 
       ctrl.openConceptCardModal = function(skillIds) {
@@ -256,14 +240,16 @@ angular.module('oppia').component('questionPlayer', {
       };
 
 
-      ctrl.boostScoreModal = function() {
-        var worstSkillId = ctrl.getWorstSkillId();
-        ctrl.openConceptCardModal([worstSkillId]);
+      ctrl.reviewLowestScoredSkillsModal = function() {
+        var reviewLowestScoredSkill = ctrl.getWorstSkillIds();
+        if (reviewLowestScoredSkill.length !== 0) {
+          ctrl.openConceptCardModal(reviewLowestScoredSkill);
+        }
       };
 
       var getClassNameForType = function(actionButtonType) {
-        if (actionButtonType === 'BOOST_SCORE') {
-          return 'boost-score-';
+        if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
+          return 'review-lowest-scored-skill-';
         }
         if (actionButtonType === 'RETRY_SESSION') {
           return 'new-session-';
@@ -375,6 +361,9 @@ angular.module('oppia').component('questionPlayer', {
           // Calculate total score.
           ctrl.totalScore += questionScore;
 
+          // Increment number of questions.
+          ctrl.allQuestions += 1;
+
           // Calculate scores per skill.
           if (!(questionData.linkedSkillIds)) {
             continue;
@@ -388,6 +377,7 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].total += 1.0;
           }
         }
+        ctrl.finalCorrect = ctrl.totalScore;
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);
         $scope.resultsLoaded = true;
@@ -502,6 +492,19 @@ angular.module('oppia').component('questionPlayer', {
         }
       };
 
+      ctrl.getColorForScoreBar = function(scorePerSkill) {
+        if (!isInPassOrFailMode()) {
+          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
+        }
+        var correctionRate = scorePerSkill.score / scorePerSkill.total;
+        if (correctionRate >=
+          ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
+        } else {
+          return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+        }
+      };
+
       ctrl.reviewConceptCardAndRetryTest = function() {
         if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
           throw new Error('No failed skills');
@@ -581,6 +584,11 @@ angular.module('oppia').component('questionPlayer', {
         // called in $scope.$on when some external events are triggered.
         initResults();
         ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+        PreventPageUnloadEventService.addListener(
+          () => {
+            return (getCurrentQuestion() > 1);
+          }
+        );
       };
 
       ctrl.$onDestroy = function() {

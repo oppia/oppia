@@ -79,19 +79,19 @@ angular.module('oppia').component('practiceSessionPage', {
           var questionPlayerConfig = {
             resultActionButtons: [
               {
-                type: 'BOOST_SCORE',
-                i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                type: 'REVIEW_LOWEST_SCORED_SKILL',
+                i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
+              },
+              {
+                type: 'DASHBOARD',
+                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+                url: topicViewerUrl
               },
               {
                 type: 'RETRY_SESSION',
                 i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
                 url: practiceSessionsUrl
               },
-              {
-                type: 'DASHBOARD',
-                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-                url: topicViewerUrl
-              }
             ],
             skillList: skillList,
             skillDescriptions: skillDescriptions,

@@ -131,7 +131,7 @@ export class States {
       let interaction = this._states[stateName].interaction;
       if (
         interaction.id &&
-        INTERACTION_SPECS[<InteractionSpecsKey>interaction.id].is_terminal
+        INTERACTION_SPECS[interaction.id as InteractionSpecsKey].is_terminal
       ) {
         finalStateNames.push(stateName);
       }

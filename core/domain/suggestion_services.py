@@ -16,15 +16,13 @@
 suggestions.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import heapq
 import logging
 import re
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -877,8 +875,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for _ in python_utils.RANGE(
-                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
+        for _ in range(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
             _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
@@ -1344,7 +1341,7 @@ def update_translation_suggestion(suggestion_id, translation_html):
     # Clean the translation HTML if not a list of strings.
     suggestion.change.translation_html = (
         html_cleaner.clean(translation_html)
-        if isinstance(translation_html, python_utils.BASESTRING)
+        if isinstance(translation_html, str)
         else translation_html
     )
     suggestion.edited_by_reviewer = True

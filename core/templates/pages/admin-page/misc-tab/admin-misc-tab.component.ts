@@ -100,11 +100,11 @@ export class AdminMiscTabComponent {
 
   uploadTopicSimilaritiesFile(): void {
     let file = (
-      <HTMLInputElement>document.getElementById(
-        'topicSimilaritiesFile')).files[0];
+      document.getElementById(
+        'topicSimilaritiesFile') as HTMLInputElement).files[0];
     let reader = new FileReader();
     reader.onload = (e) => {
-      let data = (<FileReader>e.target).result;
+      let data = (e.target as FileReader).result;
       this.adminBackendApiService.uploadTopicSimilaritiesAsync(data as string)
         .then(() => {
           this.setStatusMessage.emit(

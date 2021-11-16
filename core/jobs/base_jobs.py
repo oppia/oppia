@@ -54,9 +54,7 @@ Oppia, we use DataflowRunner() to have our Pipelines run on the Google Cloud
 Dataflow service: https://cloud.google.com/dataflow.
 """
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
 from core.jobs.types import job_run_result
 
@@ -117,7 +115,11 @@ class JobMetaclass(type):
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
+                if not name.endswith('Job'):
+                    raise TypeError('Job name "%s" must end with "Job"' % name)
+
                 cls._JOB_REGISTRY[name] = job_cls
+
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
