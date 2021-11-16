@@ -16,8 +16,7 @@
 
 """Tests for generic controller behavior."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import importlib
@@ -27,7 +26,6 @@ import json
 import logging
 import os
 import re
-import sys
 import types
 
 from core import feconf
@@ -42,6 +40,7 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -356,6 +355,28 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.get_html_response(
             'https://oppiaserver.appspot.com/cron/unknown',
             expected_status_int=404)
+
+    def test_no_redirection_for_tasks(self):
+        tasks_data = '{"fn_identifier": "%s", "args": [[]], "kwargs": {}}' % (
+            taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS
+        )
+
+        # Valid URL, where user now has permissions.
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.post_json(
+            'https://oppiaserver.appspot.com/task/deferredtaskshandler',
+            tasks_data,
+            use_payload=False,
+            expected_status_int=200
+        )
+        self.logout()
+
+        # Valid URL, but user does not have permissions.
+        self.post_json(
+            'https://oppiaserver.appspot.com/task/deferredtaskshandler',
+            tasks_data,
+            expected_status_int=401
+        )
 
     def test_splash_redirect(self):
         # Tests that the old '/splash' URL is redirected to '/'.
@@ -1288,8 +1309,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1302,8 +1323,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -1608,6 +1629,8 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration/%s' % self.exp_id,
                     expected_status_int=400)
             error_msg = (
+                'At \'http://localhost/mock_play_exploration/exp_id\' '
+                'these errors are happening:\n'
                 'Schema validation for \'exploration_id\' failed: Could not '
                 'convert str to int: %s' % self.exp_id)
             self.assertEqual(response['error'], error_msg)
@@ -1961,3 +1984,53 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             )
             filename = response_dict['filename']
         self.logout()
+
+
+class UrlPathNormalizationTest(test_utils.GenericTestBase):
+    """Tests that ensure url path arguments are normalized"""
+
+    class MockHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'mock_list': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'mock_int': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        def get(self, mock_list, mock_int):
+            if not isinstance(mock_list, list):
+                raise self.InvalidInputException(
+                    'Expected arg mock_list to be a list. Was type %s' %
+                    type(mock_list))
+            if not isinstance(mock_int, int):
+                raise self.InvalidInputException(
+                    'Expected arg mock_int to be a int. Was type %s' %
+                    type(mock_int))
+            self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
+
+    def setUp(self):
+        super(UrlPathNormalizationTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_normalization/<mock_int>/<mock_list>',
+            self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_url_path_arg_normalization_is_successful(self):
+        list_string = '["id1", "id2", "id3"]'
+        int_string = '1'
+
+        with self.swap(self, 'testapp', self.testapp):
+            self.get_json(
+                '/mock_normalization/%s/%s' % (int_string, list_string),
+                expected_status_int=200)

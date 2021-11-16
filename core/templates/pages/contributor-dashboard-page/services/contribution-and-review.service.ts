@@ -136,8 +136,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         return $http.put(url, {
           translation_html: translationHtml
         }).then(function() {
-          onSuccess(suggestionId);
-        }, () => onFailure && onFailure(suggestionId));
+          onSuccess();
+        }, (error) => onFailure && onFailure(error));
       },
       updateQuestionSuggestionAsync: async function(
           suggestionId, skillDifficulty, questionStateData, imagesData,

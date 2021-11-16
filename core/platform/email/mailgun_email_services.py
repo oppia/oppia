@@ -16,10 +16,10 @@
 
 """Provides mailgun api to send emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
+import urllib
 
 from core import feconf
 from core import python_utils
@@ -121,7 +121,10 @@ def send_email_to_recipients(
         server = (
             ('https://api.mailgun.net/v3/%s/messages')
             % feconf.MAILGUN_DOMAIN_NAME)
-        encoded_url = python_utils.url_encode(data)
+        # The 'ascii' is used here, because only ASCII char are allowed in url,
+        # also the docs recommend this approach:
+        # https://docs.python.org/3.7/library/urllib.request.html#urllib-examples
+        encoded_url = urllib.parse.urlencode(data).encode('ascii')
         req = python_utils.url_request(server, encoded_url, header)
         resp = python_utils.url_open(req)
         # The function url_open returns a file_like object that can be queried

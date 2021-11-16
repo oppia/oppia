@@ -27,3 +27,5 @@ NOREPLY_EMAIL_ADDRESS = 'norep@example.com'
 
 MAILGUN_API_KEY = None
 MAILCHIMP_API_KEY = None
+
+OPPIA_VERSION = '3.1.4'

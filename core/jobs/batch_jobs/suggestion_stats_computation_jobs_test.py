@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.batch_jobs.suggestion_stats_computation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -105,7 +104,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
@@ -176,7 +175,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
@@ -233,7 +232,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
@@ -313,7 +312,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_1_model, suggestion_2_model])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
