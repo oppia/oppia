@@ -2249,9 +2249,14 @@ class Exploration:
             dict. The dict representation of the Exploration domain object,
             following schema version v55.
         """
+        # The demo exploration does not contain id. 
+        # Adding a sample id here. 
+        if exploration_dict.get('id') is None:
+            exploration_dict['id'] = '0'
         exploration = cls.from_dict(exploration_dict)
         exploration_dict['proto_size_in_bytes'] = (
             exploration.get_proto_size())
+        del exploration_dict['id']
         return exploration_dict
 
     @classmethod
