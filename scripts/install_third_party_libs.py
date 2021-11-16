@@ -228,25 +228,25 @@ def rewrite_android_proto_files():
     for p in protobuf_dir:
         if p.suffix == '.proto':
             # Remove package statement.
-            # Example - 'package org.oppia.proto.v1.api'
+            # Example - 'package org.oppia.proto.v1.api'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^package ([^\s]+)',
                 r'')
             # Remove option statement.
-            # Example - 'option java_package = "org.oppia.proto.v1.api";'
+            # Example - 'option java_package = "org.oppia.proto.v1.api";'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^option java_.+',
                 r'')
             # Update import statement.
-            # Example - 'import "org/oppia/proto/v1/api/state.proto";'
+            # Example - 'import "org/oppia/proto/v1/api/state.proto";'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^import (?!\"google)([^\s]+)[\\/]([^\s]+)',
                 r'import "\2')
             # Remove all subpackage directories.
-            # Example - 'org.oppia.'
+            # Example - 'org.oppia.'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'org.oppia.*\.',
