@@ -5161,6 +5161,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
+proto_size_in_bytes: 298
 schema_version: 46
 states:
   (untitled state):
@@ -5277,7 +5278,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
+proto_size_in_bytes: 298
 schema_version: 55
 states:
   (untitled state):
@@ -5403,6 +5404,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
+proto_size_in_bytes: 384
 schema_version: 46
 states:
   (untitled state):
@@ -5531,7 +5533,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
+proto_size_in_bytes: 384
 schema_version: 55
 states:
   (untitled state):
@@ -5667,6 +5669,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
+proto_size_in_bytes: 226
 schema_version: 46
 states:
   (untitled state):
@@ -5757,7 +5760,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
+proto_size_in_bytes: 226
 schema_version: 55
 states:
   (untitled state):

@@ -5367,9 +5367,10 @@ class HintDomainTests(test_utils.GenericTestBase):
 class SolutionDomainTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
-        explanation = state_domain.SubtitledHtml(
-                'solution', '<p>This is a solution.</p>')
-        solution_proto = explanation.to_proto()
+        solution = state_domain.Solution(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
+        solution_proto = solution.to_proto()
         self.assertEqual(
             solution_proto.explanation.content_id,
             'solution')

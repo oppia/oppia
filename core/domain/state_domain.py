@@ -1556,7 +1556,7 @@ class InteractionInstance:
         solution_proto = None
         if solution is not None:
             solution_proto = state_pb2.NumericInputInstance.Solution(
-                base_solution=solution.explanation.to_proto(),
+                base_solution=solution.to_proto(),
                 correct_answer=solution.correct_answer)
 
         return solution_proto
@@ -1830,7 +1830,7 @@ class InteractionInstance:
         if solution is not None:
             solution_proto = (
                 state_pb2.RatioExpressionInputInstance.Solution(
-                    base_solution=solution.explanation.to_proto(),
+                    base_solution=solution.to_proto(),
                     correct_answer=(
                         cls._to_ratio_expression_proto(
                             solution.correct_answer))))
@@ -2193,7 +2193,7 @@ class InteractionInstance:
         if solution is not None:
             solution_proto = (
                 state_pb2.DragAndDropSortInputInstance.Solution(
-                    base_solution=solution.explanation.to_proto(),
+                    base_solution=solution.to_proto(),
                     correct_answer=(
                         cls._to_list_of_set_of_translatable_html_content_ids(
                             solution.correct_answer))))
@@ -2217,13 +2217,13 @@ class InteractionInstance:
 
         for set_of_content_id in correct_answer:
             translatable_html_content_id_proto = (
-                cls._to_set_of_translatable_html_content_ids(
+                cls._to_set_of_translatable_html_content_ids_proto(
                     set_of_content_id))
             content_id_lists_proto.append(translatable_html_content_id_proto)
 
         list_of_set_of_translatable_html_content_ids_proto = (
             objects_pb2.ListOfSetsOfTranslatableHtmlContentIds(
-                content_id_lists=content_id_lists_proto))
+                content_id_sets=content_id_lists_proto))
 
         return list_of_set_of_translatable_html_content_ids_proto
 
