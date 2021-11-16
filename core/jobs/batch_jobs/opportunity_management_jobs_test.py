@@ -219,7 +219,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         datastore_services.put_multi(
             [skill_1_model, skill_2_model,
              question_1_model, question_2_model,
-             question_1_skilllinkmodel, 
+             question_1_skilllinkmodel,
              question_2_skilllinkmodel]
         )
 
