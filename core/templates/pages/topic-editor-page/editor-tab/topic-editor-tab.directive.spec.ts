@@ -385,6 +385,34 @@ describe('Topic editor tab directive', function() {
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
 
+  it('should not call the TopicUpdateService for practice tab if there are less than 10 questions '+
+   'in the topic, no matter what', function () {
+     // There are initially less than 10 questions in the topic
+    var topicPracticeTabSpy = (
+      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.updatePracticeTabIsDisplayed(true);
+    $scope.updatePracticeTabIsDisplayed(false);
+    expect(topicPracticeTabSpy).not.toHaveBeenCalled();
+   })
+  
+  it('should call the TopicUpdateService for practice tab if there are more than 10 questions '+
+  'in the topic, if practice tab is displayed property is changed', function () {
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    $scope.createQuestion();
+    var topicPracticeTabSpy = (
+      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.updatePracticeTabIsDisplayed(true);
+    expect(topicPracticeTabSpy).toHaveBeenCalled();
+  })
+
   it('should call the TopicUpdateService if skill is deleted from topic',
     function() {
       var topicDeleteSpy = (
