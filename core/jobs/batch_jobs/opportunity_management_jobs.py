@@ -236,11 +236,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             | 'Filter the results with SUCCESS status' >> beam.Filter(
                 lambda result: result.is_ok())
             | 'Fetch the models to be put' >> beam.FlatMap(
-<<<<<<< HEAD
-                lambda result: result['models'])
-=======
                 lambda result: result.unwrap())
->>>>>>> develop
             | 'Add ID as a key' >> beam.WithKeys(lambda model: model.id)  # pylint: disable=no-value-for-parameter
             | 'Allow only one item per key' >> (
                 beam.combiners.Sample.FixedSizePerKey(1))
