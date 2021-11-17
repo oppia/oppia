@@ -29,15 +29,18 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, List, Union
+import result
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import story_models
@@ -50,6 +53,7 @@ if MYPY: # pragma: no cover
     models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.story,
     models.NAMES.topic
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
@@ -78,11 +82,8 @@ class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
 
         return (
             exp_opportunity_summary_model
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda n: n > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda n: job_run_result.JobRunResult(stdout='SUCCESS %s' % n))
+            | 'Create job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
         )
 
 
@@ -98,10 +99,8 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
         topic: topic_domain.Topic,
         stories_dict: Dict[str, story_domain.Story],
         exps_dict: Dict[str, exp_domain.Exploration]
-    ) -> Dict[str, Union[
-        str,
-        job_run_result.JobRunResult,
-        List[opportunity_models.ExplorationOpportunitySummaryModel]]
+    ) -> result.Result[
+        List[opportunity_models.ExplorationOpportunitySummaryModel], Exception
     ]:
         """Generate opportunities related to a topic.
 
@@ -150,37 +149,38 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                             topic, story, exps_dict[exp_id]))
 
             exploration_opportunity_summary_model_list = []
-            for opportunity in exploration_opportunity_summary_list:
-                model = opportunity_models.ExplorationOpportunitySummaryModel(
-                    id=opportunity.id,
-                    topic_id=opportunity.topic_id,
-                    topic_name=opportunity.topic_name,
-                    story_id=opportunity.story_id,
-                    story_title=opportunity.story_title,
-                    chapter_title=opportunity.chapter_title,
-                    content_count=opportunity.content_count,
-                    incomplete_translation_language_codes=(
-                        opportunity.incomplete_translation_language_codes),
-                    translation_counts=opportunity.translation_counts,
-                    language_codes_needing_voice_artists=(
-                        opportunity.language_codes_needing_voice_artists),
-                    language_codes_with_assigned_voice_artists=(
-                        opportunity.language_codes_with_assigned_voice_artists))
-                model.update_timestamps()
-                exploration_opportunity_summary_model_list.append(model)
+            with datastore_services.get_ndb_context():
+                for opportunity in exploration_opportunity_summary_list:
+                    model = (
+                        opportunity_models.ExplorationOpportunitySummaryModel(
+                            id=opportunity.id,
+                            topic_id=opportunity.topic_id,
+                            topic_name=opportunity.topic_name,
+                            story_id=opportunity.story_id,
+                            story_title=opportunity.story_title,
+                            chapter_title=opportunity.chapter_title,
+                            content_count=opportunity.content_count,
+                            incomplete_translation_language_codes=(
+                                opportunity
+                                .incomplete_translation_language_codes
+                            ),
+                            translation_counts=opportunity.translation_counts,
+                            language_codes_needing_voice_artists=(
+                                opportunity
+                                .language_codes_needing_voice_artists
+                            ),
+                            language_codes_with_assigned_voice_artists=(
+                                opportunity
+                                .language_codes_with_assigned_voice_artists
+                            )
+                        )
+                    )
+                    model.update_timestamps()
+                    exploration_opportunity_summary_model_list.append(model)
 
-            return {
-                'status': 'SUCCESS',
-                'job_result': job_run_result.JobRunResult(stdout='SUCCESS'),
-                'models': exploration_opportunity_summary_model_list
-            }
+            return result.Ok(exploration_opportunity_summary_model_list)
         except Exception as e:
-            return {
-                'status': 'FAILURE',
-                'job_result': job_run_result.JobRunResult(
-                    stderr='FAILURE: %s' % e),
-                'models': []
-            }
+            return result.Err(e)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
@@ -234,14 +234,19 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
         unused_put_result = (
             opportunities_results
             | 'Filter the results with SUCCESS status' >> beam.Filter(
-                lambda result: result['status'] == 'SUCCESS')
+                lambda result: result.is_ok())
             | 'Fetch the models to be put' >> beam.FlatMap(
-                lambda result: result['models'])
+                lambda result: result.unwrap())
+            | 'Add ID as a key' >> beam.WithKeys(lambda model: model.id)  # pylint: disable=no-value-for-parameter
+            | 'Allow only one item per key' >> (
+                beam.combiners.Sample.FixedSizePerKey(1))
+            | 'Remove the IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Flatten the list of lists of models' >> beam.FlatMap(lambda x: x)
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
         return (
             opportunities_results
-            | 'Fetch the job results' >> beam.Map(
-                lambda result: result['job_result'])
+            | 'Count the output' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
