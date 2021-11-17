@@ -439,7 +439,7 @@ def main(args=None):
             test_count = 0
         elif task.exception and isinstance(
                 task.exception, subprocess.CalledProcessError):
-            python_utils.PRINT(
+            print(
                 'ERROR     %s: Error raised by subprocess.')
             raise task.exception
         elif task.exception and 'No tests were run' in task.exception.args[0]:
@@ -499,10 +499,10 @@ def main(args=None):
                 if spec.test_target in coverage_exclusions:
                     continue
                 if coverage != 100:
-                    python_utils.PRINT('INCOMPLETE COVERAGE (%s%%): %s' % (
+                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
-                    python_utils.PRINT(task.task_results[0].get_report()[-3])
+                    print(task.task_results[0].get_report()[-3])
 
         total_count += test_count
 

@@ -77,7 +77,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         def mock_print(val):
             actual_output.append(val)
 
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
         dir_names_swap = self.swap(
             create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
             MOCK_DIRECTORY_NAMES)

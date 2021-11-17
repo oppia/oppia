@@ -243,7 +243,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
             """Mock for print."""
             self.log = ' '.join(python_utils.UNICODE(arg) for arg in args)
 
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_print_failure_message_prints_in_red_color(self):
         message = 'Failure Message'

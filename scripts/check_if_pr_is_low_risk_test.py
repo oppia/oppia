@@ -206,7 +206,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     'upstream/develop'],),
             ])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 ('Failed to parse diff --name-status line "A B C D"',),
             ])
@@ -247,7 +247,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     'modified'],),
             ])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            python_utils, 'builtins, print', mock_print,
             expected_args=[
                 ('Failed to find end of header in "modified" diff',),
             ])
@@ -637,7 +637,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', print, expected_args=[
+            python_utils, 'builtins, print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type changelog '
                     'because: Source branch does not indicate a '
@@ -730,7 +730,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', print, expected_args=[
+            python_utils, 'builtins, print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '
@@ -823,7 +823,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', print, expected_args=[
+            python_utils, 'builtins, print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Invalid change foo',
@@ -920,7 +920,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', print, expected_args=[
+            python_utils, 'builtins, print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '

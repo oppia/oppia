@@ -37,7 +37,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_print(msg):
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_install_hook_with_existing_symlink(self):
         def mock_islink(unused_file):

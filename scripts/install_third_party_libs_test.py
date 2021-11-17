@@ -80,7 +80,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_check_call)
         self.Popen_error_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
         def mock_ensure_directory_exists(unused_path):
             pass

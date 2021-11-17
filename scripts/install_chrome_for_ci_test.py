@@ -134,7 +134,7 @@ class MainTests(test_utils.GenericTestBase):
             mock_get_chrome_version,
             expected_args=[tuple()])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 (
                     'Chrome version {} installed.'.format(

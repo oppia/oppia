@@ -267,7 +267,7 @@ class SetupTests(test_utils.GenericTestBase):
             print_arr.append(msg)
 
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
         with self.test_py_swap, getcwd_swap, print_swap:
             with self.assertRaisesRegexp(Exception, 'Invalid root directory.'):
                 setup.main(args=[])
@@ -582,7 +582,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
 
         with self.test_py_swap, self.create_swap, self.uname_swap:
             with self.exists_swap, self.chown_swap, self.chmod_swap, print_swap:
