@@ -41,6 +41,10 @@ export class SubtopicPage {
     private languageCode: string,
   ) {}
 
+  // Some methods have either string or null return value,
+  // because when we create interstitial subtopicpage
+  // their fields get null value.
+
   // Returns the id of the subtopic page.
   getId(): string | null {
     return this.id;

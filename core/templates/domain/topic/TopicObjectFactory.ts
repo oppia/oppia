@@ -58,9 +58,8 @@ export interface TopicBackendDict {
 import constants from 'assets/constants';
 
 export class Topic {
-  // When creating a topic, property below are always
-  // initialized with null values. These are null until populated
-  // from the backend and provided themselves by the user.
+  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
+  // topic until the actual is fetched from the backend.
   _id: string | null;
   _name: string;
   _abbreviatedName: string;
@@ -116,7 +115,9 @@ export class Topic {
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
-  // ---- Instance methods ----
+  // Some methods have either string or null return value,
+  // because when we create interstitial topic object
+  // their fields get null value.
   getId(): string | null {
     return this._id;
   }

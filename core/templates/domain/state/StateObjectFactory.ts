@@ -61,9 +61,8 @@ export interface StateBackendDict {
 }
 
 export class State {
-  // When creating a new state, property below are always
-  // initialized with null values. These are null until populated
-  // from the backend and are not null afterwards.
+  // A null 'name' indicates that the 'State' has been created
+  // but not saved.
   name: string | null;
   classifierModelId: string | null;
   linkedSkillId: string | null;
@@ -169,7 +168,7 @@ export class StateObjectFactory {
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
-  // Passes newstatename as null untill new question is created it will be null.
+  // Passes name as null before saving a state.
   createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
@@ -191,8 +190,7 @@ export class StateObjectFactory {
     return newState;
   }
 
-  // Passes newstatename as null untill new question is created it will be null
-  // until fetch from the backend and are not null afterwards.
+  // Passes name as null before saving a state.
   createFromBackendDict(
       stateName: string | null, stateDict: StateBackendDict
   ): State {

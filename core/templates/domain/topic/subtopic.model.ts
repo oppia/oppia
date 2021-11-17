@@ -22,10 +22,6 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import constants from 'assets/constants';
 
 export interface SubtopicBackendDict {
-  // When creating a new subtopic, property below are always
-  // initialized with null values. These are null until populated
-  // from the backend and are populated from the backend only when
-  // the subtopic is retrieved.
   'id': number;
   'title': string;
   'skill_ids': string[];
@@ -51,7 +47,8 @@ export class Subtopic {
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string | null, thumbnailBgColor: string | null,
+      thumbnailFilename: string | null,
+      thumbnailBgColor: string | null,
       urlFragment: string | null) {
     this._id = subtopicId;
     this._title = title;
