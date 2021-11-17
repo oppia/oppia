@@ -55,14 +55,21 @@ class AudioUploadHandler(base.BaseHandler):
         'POST': {
             'raw_audio_file': {
                 'schema': {
-                    'type': 'basestring'
-                 }
-             },
-             'filename': {
-                 'schema': {
-                    'type': 'basestring'
-                 }
-             }
+                    'type': 'basestring',
+                    'validators': [{
+                    'id': 'is_nonempty'
+                    }]
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
+                    }]
+                }
+            }
         }
     }
 
