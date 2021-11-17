@@ -23,6 +23,13 @@ import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { TranslateService } from '@ngx-translate/core';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('AlgebraicExpressionInputInteractive', () => {
   let component: AlgebraicExpressionInputInteractionComponent;
@@ -66,8 +73,13 @@ describe('AlgebraicExpressionInputInteractive', () => {
       {
         declarations: [AlgebraicExpressionInputInteractionComponent],
         providers: [
-          { provide: CurrentInteractionService,
+          {
+            provide: CurrentInteractionService,
             useValue: mockCurrentInteractionService
+          },
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
           }
         ]
       }).compileComponents();
