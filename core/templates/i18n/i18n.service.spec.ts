@@ -96,20 +96,30 @@ describe('I18n service', () => {
 
   it('should set cache language according to URL lang param', () => {
     // Setting 'en' as cache language code.
-    i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    if (i18nService.localStorage) {
+      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    }
     // This sets the url to 'http://localhost:8181/?lang=es'
     // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/?lang=es');
-    expect(i18nService.localStorage.getItem(CACHE_KEY)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null)
+      .toBe('en');
 
     i18nService.initialize();
 
-    expect(i18nService.localStorage.getItem(CACHE_KEY)).toBe('es');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null)
+      .toBe('es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
-    i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    if (i18nService.localStorage) {
+      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    }
     // This sets the url to 'http://localhost:8181/?lang=invalid'
     // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
@@ -119,23 +129,29 @@ describe('I18n service', () => {
 
     // Translation cache should not be updated as the language param
     // is invalid.
-    expect(i18nService.localStorage.getItem(CACHE_KEY)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
   });
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
-    i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    if (i18nService.localStorage) {
+      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    }
     // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/');
-    spyOn(i18nService.localStorage, 'setItem');
 
-    expect(i18nService.localStorage.getItem(CACHE_KEY)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
 
     i18nService.initialize();
 
-    expect(i18nService.localStorage.setItem).not.toHaveBeenCalledWith();
-    expect(i18nService.localStorage.getItem(CACHE_KEY)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
   });
 
   it('should remove url lang param', () => {
