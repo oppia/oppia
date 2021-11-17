@@ -32,8 +32,8 @@ export class SideNavigationBarComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @Input() display!: boolean;
    currentUrl!: string;
-   classroomSubmenuIsShownLEARN: boolean = true;
-   classroomSubmenuIsShownINVOLVED: boolean = false;
+   learnSubmenuIsShown: boolean = true;
+   getinvolvedSubmenuIsShown: boolean = false;
    PAGES_REGISTERED_WITH_FRONTEND = (
      AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -50,8 +50,8 @@ export class SideNavigationBarComponent {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
    }
 
-   toggleClassroomSubmenuLearn(): void {
-     this.classroomSubmenuIsShownLEARN = !this.classroomSubmenuIsShownLEARN;
+   togglelearnSubmenu(): void {
+     this.learnSubmenuIsShown = !this.learnSubmenuIsShown;
      var expandiconLEARN = document.querySelector('.expand-icon-learn');
      var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
      if (expandiconLEARN !== null && bordertoggleEleLEARN !== null) {
@@ -60,10 +60,10 @@ export class SideNavigationBarComponent {
      }
    }
 
-   toggleClassroomSubmenuINVOLVED(): void {
-     this.classroomSubmenuIsShownINVOLVED =
-     !this.classroomSubmenuIsShownINVOLVED;
-     this.classroomSubmenuIsShownLEARN = false;
+   togglegetinvolvedSubmenu(): void {
+     this.getinvolvedSubmenuIsShown =
+     !this.getinvolvedSubmenuIsShown;
+     this.learnSubmenuIsShown = false;
 
      var expandiconLEARN = document.querySelector('.expand-icon-learn');
      var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
