@@ -24,9 +24,6 @@ import { ImagesData } from 'services/image-local-storage.service';
 @Injectable({
   providedIn: 'root'
 })
-interface IObjectKeys {
-  [key: string]: string | number;
-}
 export class TranslateTextBackendApiService {
   constructor(private http: HttpClient) {}
 
@@ -67,7 +64,6 @@ export class TranslateTextBackendApiService {
       });
     });
   }
-  
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
