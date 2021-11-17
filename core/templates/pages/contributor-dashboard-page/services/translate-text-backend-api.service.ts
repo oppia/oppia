@@ -24,6 +24,9 @@ import { ImagesData } from 'services/image-local-storage.service';
 @Injectable({
   providedIn: 'root'
 })
+interface IObjectKeys {
+  [key: string]: string | number;
+}
 export class TranslateTextBackendApiService {
   constructor(private http: HttpClient) {}
 
@@ -64,6 +67,7 @@ export class TranslateTextBackendApiService {
       });
     });
   }
+  
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
@@ -84,12 +88,12 @@ export class TranslateTextBackendApiService {
         translation_html: translationHtml,
         data_format: dataFormat
       },
-      files: undefined
+      files: null
     };
     const body = new FormData();
     const images = await this.ImagesDict(imagesData);
     if (Object.keys(images).length !== 0) {
-      postData.files = images;
+      postData.files = {...images};
     }
     body.append('payload', JSON.stringify(postData));
     return this.http.post(
