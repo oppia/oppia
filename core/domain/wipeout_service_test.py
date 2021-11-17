@@ -500,6 +500,27 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertEqual(exp_summary_model.editor_ids, [])
 
+    def test_pre_delete_user_exp_user_with_voice_artist_role_is_deassigned(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            user_services.get_system_user(),
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST
+        )
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.voice_artist_ids, [self.user_2_id])
+
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.voice_artist_ids, [])
+
     def test_pre_delete_user_user_is_deassigned_from_topics(self):
         self.save_new_topic('top_id', self.user_1_id)
         topic_services.assign_role(
