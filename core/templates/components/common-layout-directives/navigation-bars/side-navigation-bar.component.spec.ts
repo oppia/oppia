@@ -84,15 +84,15 @@ describe('Side Navigation Bar Component', () => {
   });
 
   it('should toggle learn submenu', () => {
-    componentInstance.classroomSubmenuIsShownLEARN = false;
-    componentInstance.toggleClassroomSubmenuLearn();
-    expect(componentInstance.classroomSubmenuIsShownLEARN).toBeTrue();
+    componentInstance.learnSubmenuIsShown = false;
+    componentInstance.togglelearnSubmenu();
+    expect(componentInstance.learnSubmenuIsShown).toBeTrue();
   });
 
   it('should toggle get involved submenu', () => {
-    componentInstance.classroomSubmenuIsShownINVOLVED = false;
-    componentInstance.toggleClassroomSubmenuINVOLVED();
-    expect(componentInstance.classroomSubmenuIsShownINVOLVED).toBeTrue();
+    componentInstance.getinvolvedSubmenuIsShown = false;
+    componentInstance.togglegetinvolvedSubmenu();
+    expect(componentInstance.getinvolvedSubmenuIsShown).toBeTrue();
   });
 
   it('should get static image url', () => {
