@@ -39,7 +39,31 @@ export class TranslateTextBackendApiService {
       return TranslatableTexts.createFromBackendDict(backendDict);
     });
   }
-
+  blob2Base64 = (blob: Blob): Promise<string> => {
+    return new Promise<string> ((resolve, reject)=> {
+      const reader = new FileReader();
+      reader.onerror = error => reject(error);
+      reader.onloadend = () => {
+        const dataurl = reader.result as string;
+        const base64 = dataurl.substring(dataurl.indexOf(',') + 1);
+        resolve(base64);
+      };
+      reader.readAsDataURL(blob);
+    });
+  };
+  async ImagesDict(imagesData: ImagesData[]): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+      const images = {};
+      imagesData.forEach(async obj => {
+        if (obj.imageBlob === null) {
+          throw new Error('No image data found');
+        }
+        const image = await this.blob2Base64(obj.imageBlob);
+        images[obj.filename] = image;
+        resolve(images);
+      });
+    });
+  }
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
@@ -59,17 +83,15 @@ export class TranslateTextBackendApiService {
         content_html: contentHtml,
         translation_html: translationHtml,
         data_format: dataFormat
-      }
+      },
+      files: null
     };
-
     const body = new FormData();
+    const images = await this.ImagesDict(imagesData);
+    if (Object.keys(images).length !== 0) {
+      postData.files = images;
+    }
     body.append('payload', JSON.stringify(postData));
-    imagesData.forEach(obj => {
-      if (obj.imageBlob === null) {
-        throw new Error('No image data found');
-      }
-      body.append(obj.filename, obj.imageBlob);
-    });
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
   }
