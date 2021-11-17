@@ -25,10 +25,14 @@ import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { EventEmitter } from '@angular/core';
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
+  let translationLanguageService: TranslationLanguageService;
+  let activeLanguageChangedEmitter = new EventEmitter();
 
   let featuredLanguages = [
     FeaturedTranslationLanguage.createFromBackendDict({
@@ -64,6 +68,8 @@ describe('Translation language selector', () => {
     fixture = TestBed.createComponent(TranslationLanguageSelectorComponent);
     component = fixture.componentInstance;
     component.activeLanguageCode = 'en';
+    spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
+      .returnValue(activeLanguageChangedEmitter);
     fixture.detectChanges();
   });
 
@@ -175,4 +181,17 @@ describe('Translation language selector', () => {
     expect(component.languageSelection).toBe('English');
     expect(component.activeLanguageCode).toBe('en');
   });
+
+  it('should show the correct language when the language is changed'
+    , () => {
+      spyOn(
+        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+        'en');
+      component.ngOnInit();
+      expect(component.languageSelection).toBe('Select a language...');
+
+      activeLanguageChangedEmitter.emit();
+
+      expect(component.languageSelection).toBe('English');
+    });
 });
