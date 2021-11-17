@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
+import builtins
 import subprocess
 
-import builtins
 from core.tests import test_utils
 from scripts import common
 from scripts import install_chrome_for_ci

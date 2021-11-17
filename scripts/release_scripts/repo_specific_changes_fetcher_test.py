@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import builtins
 import os
-from core import python_utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import repo_specific_changes_fetcher
