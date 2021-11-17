@@ -84,7 +84,7 @@ export class TranslateTextBackendApiService {
         translation_html: translationHtml,
         data_format: dataFormat
       },
-      files: null
+      files: undefined
     };
     const body = new FormData();
     const images = await this.ImagesDict(imagesData);
