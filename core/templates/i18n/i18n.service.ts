@@ -101,10 +101,6 @@ export class I18nService {
         // language code from the local storage to set site language.
         // This removes the need of continously syncing URL lang param and
         // cache, and avoids race conditions.
-        // this.cookieService.put(
-        //   this.translateCacheSettings.cacheName, siteLanguageCode, {
-        //     path: this.windowRef.nativeWindow.location.pathname
-        //   });
         if (this.localStorage) {
           this.localStorage.setItem('lang', siteLanguageCode);
         }
