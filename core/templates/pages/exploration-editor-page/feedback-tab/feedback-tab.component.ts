@@ -16,7 +16,7 @@
  * @fileoverview Component for the exploration editor feedback tab.
  */
 
-import { CreateFeedbackThreadModalComponent } from './pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');

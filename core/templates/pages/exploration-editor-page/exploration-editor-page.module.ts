@@ -44,7 +44,8 @@ import { PostPublishModalComponent } from './modal-templates/post-publish-modal.
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
-import { CreateFeedbackThreadModalComponent } from './pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+
 @NgModule({
   imports: [
     BrowserModule,
