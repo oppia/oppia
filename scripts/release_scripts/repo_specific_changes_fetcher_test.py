@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
+import builtins
 import os
-
 from core import python_utils
 from core.tests import test_utils
 from scripts import common

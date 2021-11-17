@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import itertools
 import json
 import os

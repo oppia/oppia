@@ -16,10 +16,10 @@
 
 from __future__ import annotations
 
+import builtins
 import collections
 import os
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import create_topological_sort_of_all_services
