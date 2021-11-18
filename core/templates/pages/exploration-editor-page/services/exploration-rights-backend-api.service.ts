@@ -27,15 +27,15 @@ import { AlertsService } from 'services/alerts.service';
 
 export interface ExplorationRightsBackendData {
   rights: {
-    'editor_names': string[],
-    'owner_names': string[],
-    'voice_artist_names': string[],
-    'viewer_names': string[],
-    'status': string,
-    'cloned_from': string,
-    'community_owned': boolean,
-    'viewable_if_private': boolean
-  }
+    'editor_names': string[];
+    'owner_names': string[];
+    'voice_artist_names': string[];
+    'viewer_names': string[];
+    'status': string;
+    'cloned_from': string;
+    'community_owned': boolean;
+    'viewable_if_private': boolean;
+  };
 }
 
 @Injectable({
