@@ -24,7 +24,9 @@ require(
   'teach-oppia-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights-backend-api.service.ts');
+require(
+  'pages/exploration-editor-page/services' +
+  '/exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
