@@ -29,8 +29,11 @@ describe('Player correctness feedback enabled service', () => {
   it('should initialize the serivce with the given' +
   'correctness feedback enabled value and fetch the same', () => {
     pcfes.init(true);
+
     expect(pcfes.isEnabled()).toBeTrue();
+
     pcfes.init(false);
+
     expect(pcfes.isEnabled()).toBeFalse();
   });
 });

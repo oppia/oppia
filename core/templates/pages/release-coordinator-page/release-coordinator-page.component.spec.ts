@@ -91,8 +91,11 @@ describe('Release coordinator page', () => {
         Promise.resolve());
 
       component.updatePromoBarConfig();
+
       expect(component.statusMessage).toEqual('Updating promo-bar config...');
+
       tick();
+
       expect(pbbas.updatePromoBarDataAsync).toHaveBeenCalled();
       expect(component.statusMessage).toEqual('Success!');
     }));
@@ -103,8 +106,11 @@ describe('Release coordinator page', () => {
         Promise.reject('failed to update'));
 
       component.updatePromoBarConfig();
+
       expect(component.statusMessage).toEqual('Updating promo-bar config...');
+
       tick();
+
       expect(pbbas.updatePromoBarDataAsync).toHaveBeenCalled();
       expect(component.statusMessage).toEqual('Server error: failed to update');
     }));

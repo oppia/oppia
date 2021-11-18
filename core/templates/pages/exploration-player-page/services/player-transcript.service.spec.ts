@@ -230,6 +230,7 @@ describe('Player transcript service', () => {
       {} as WrittenTranslations, '', atls);
 
     pts.updateLatestInteractionHtml(secondCard.getInteractionHtml());
+
     expect(pts.getLastCard().getInteractionHtml()).toEqual(
       secondCard.getInteractionHtml());
   });
@@ -263,10 +264,12 @@ describe('Player transcript service', () => {
 
     pts.addNewCard(card1);
     pts.addNewCard(card2);
+
     expect(pts.getCard(0).getStateName()).toEqual('First State');
     expect(pts.getCard(1).getStateName()).toEqual('Second State');
 
     pts.restore(oldTranscript);
+
     expect(pts.getCard(0).getStateName()).toEqual('Third State');
     expect(pts.getCard(1).getStateName()).toEqual('Fourth State');
   });
@@ -300,10 +303,12 @@ describe('Player transcript service', () => {
 
     pts.addNewCard(card1);
     pts.addNewCard(card2);
+
     expect(pts.getCard(0).getStateName()).toEqual('First State');
     expect(pts.getCard(1).getStateName()).toEqual('Second State');
 
     pts.restoreImmutably(oldTranscript);
+
     expect(pts.getCard(0).getStateName()).toEqual('Third State');
     expect(pts.getCard(1).getStateName()).toEqual('Fourth State');
   });
@@ -318,6 +323,7 @@ describe('Player transcript service', () => {
       {} as WrittenTranslations, '', atls));
 
     pts.getCard(1);
+
     expect(ls.error).toHaveBeenCalledWith(
       'Requested card with index 1, but transcript only has length 1 cards.');
   });
