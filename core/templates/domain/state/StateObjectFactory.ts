@@ -61,7 +61,7 @@ export interface StateBackendDict {
 }
 
 export class State {
-  name: string;
+  name: string | null;
   classifierModelId: string | null;
   linkedSkillId: string | null;
   content: SubtitledHtml;
@@ -74,7 +74,7 @@ export class State {
   nextContentIdIndex: number;
 
   constructor(
-      name: string, classifierModelId: string | null,
+      name: string | null, classifierModelId: string | null,
       linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
@@ -167,7 +167,7 @@ export class StateObjectFactory {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
-  createDefaultState(newStateName: string): State {
+  createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
@@ -189,7 +189,7 @@ export class StateObjectFactory {
   }
 
   createFromBackendDict(
-      stateName: string, stateDict: StateBackendDict): State {
+      stateName: string | null, stateDict: StateBackendDict): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,

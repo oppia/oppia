@@ -36,9 +36,7 @@ interface QuestionPlayerState {
     linkedSkillIds: string[],
     answers: Answer[],
     usedHints: UsedHint[],
-    viewedSolution: {
-      timestamp: number
-    }
+    viewedSolution: UsedHint | null
   }
 }
 

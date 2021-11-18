@@ -194,6 +194,7 @@
     "core/templates/domain/learner_dashboard/non-existent-explorations.model.spec.ts",
     "core/templates/domain/learner_dashboard/non-existent-topics-and-stories.model.ts",
     "core/templates/domain/learner_dashboard/non-existent-topics-and-stories.model.spec.ts",
+    "core/templates/domain/question/QuestionObjectFactory.ts",
     "core/templates/domain/question/question-domain.constants.ts",
     "core/templates/domain/question/question-summary-for-one-skill-object.model.ts",
     "core/templates/domain/question/question-summary-for-one-skill-object.model.spec.ts",

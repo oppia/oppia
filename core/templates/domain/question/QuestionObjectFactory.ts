@@ -21,11 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface QuestionBackendDict {
-  'id': string;
+  'id': string | null;
   'question_state_data': StateBackendDict,
   'question_state_data_schema_version': number;
   'language_code': string;
@@ -35,7 +36,7 @@ export interface QuestionBackendDict {
 }
 
 export class Question {
-  _id: string;
+  _id: string | null;
   _stateData: State;
   _languageCode: string;
   _version: number;
@@ -43,7 +44,7 @@ export class Question {
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
-      id: string, stateData: State, languageCode: string,
+      id: string | null, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
     this._id = id;
@@ -55,7 +56,7 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -97,7 +98,7 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getValidationErrorMessage(): string {
+  getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
@@ -107,7 +108,7 @@ export class Question {
       return 'An interaction must be specified';
     }
 
-    if (interaction.defaultOutcome.feedback._html.length === 0) {
+    if (interaction.defaultOutcome?.feedback._html.length === 0) {
       return 'Please enter a feedback for the default outcome.';
     }
 
@@ -116,7 +117,8 @@ export class Question {
     }
     if (
       !interaction.solution &&
-      INTERACTION_SPECS[interaction.id].can_have_solution) {
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interaction.id as InteractionSpecsKey].can_have_solution) {
       return 'A solution must be specified';
     }
     var answerGroups = this._stateData.interaction.answerGroups;
@@ -133,17 +135,18 @@ export class Question {
     return null;
   }
 
-  getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
+  getUnaddressedMisconceptionNames(
+      misconceptionsBySkill: MisconceptionSkillMap = {}): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
-    var taggedSkillMisconceptionIds = {};
+    var taggedSkillMisconceptionIds: { [stateName: string]: boolean } = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
           answerGroups[i].taggedSkillMisconceptionId !== null) {
         taggedSkillMisconceptionIds[
-          answerGroups[i].taggedSkillMisconceptionId] = true;
+          answerGroups[i].taggedSkillMisconceptionId || 'null'] = true;
       }
     }
-    var unaddressedMisconceptionNames = [];
+    var unaddressedMisconceptionNames: string[] = [];
     var self = this;
     Object.keys(misconceptionsBySkill).forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
@@ -167,7 +170,7 @@ export class Question {
   }
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
-    var questionBackendDict = {
+    var questionBackendDict: QuestionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
