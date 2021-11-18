@@ -13,19 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for final summary to be displayed on conversation
- * skin.
+ * @fileoverview Component for ratings and recommendations to be shown
+ * on conversation skin.
  */
 
 import { Component, Input, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
+
+interface ResultActionButton {
+  type: string;
+  i18nId: string;
+  url: string;
+}
+
+interface QuestionPlayerConfig {
+  resultActionButtons: ResultActionButton[];
+  skillList: string[];
+  skillDescriptions: string[];
+  questionCount: number;
+  questionPlayerMode: {
+    modeType: string;
+    passCutoff: number;
+  },
+  questionsSortedByDifficulty: boolean;
+}
 
 @Component({
   selector: 'oppia-ratings-and-recommendations',
@@ -34,12 +54,12 @@ import { LearnerViewRatingService } from '../services/learner-view-rating.servic
 export class RatingsAndRecommendationsComponent {
   @Input() userIsLoggedIn: boolean;
   @Input() explorationIsInPreviewMode: boolean;
-  @Input() questionPlayerConfig;
+  @Input() questionPlayerConfig: QuestionPlayerConfig;
   @Input() inStoryMode: boolean;
   @Input() storyViewerUrl!: string;
-  @Input() collectionSummary;
+  @Input() collectionSummary: CollectionSummary;
   @Input() isRefresherExploration: boolean;
-  @Input() recommendedExplorationSummaries;
+  @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
   collectionId: string;
   userRating: number;

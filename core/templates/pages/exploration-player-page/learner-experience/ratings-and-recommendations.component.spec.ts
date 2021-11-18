@@ -83,7 +83,8 @@ describe('Ratings and recommendations component', () => {
     userService = TestBed.inject(UserService);
   });
 
-  it('should initialize', fakeAsync(() => {
+  it('should populate internal properties and subscribe to event' +
+    ' listeners on initialize', fakeAsync(() => {
     let collectionId = 'collection_id';
     let userRating = 5;
     let mockOnRatingUpdated = new EventEmitter<void>();

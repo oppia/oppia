@@ -68,7 +68,6 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @ashutoshc8101
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @ashutoshc8101
 /core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @ashutoshc8101
-
 # TS typing
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek

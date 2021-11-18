@@ -1,6 +1,5 @@
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card"
-     [ngClass]="{'animate-card-width': startCardChangeAnimation}"
      [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
   <oppia-smooth-height [trigger]="displayedCard.getContentHtml()">
     <div class="oppia-learner-view-card-content">
