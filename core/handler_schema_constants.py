@@ -14,108 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validates handler args against its schema by calling schema utils.
-Also contains a list of handler class names which does not contain the schema.
-"""
-
-from __future__ import annotations
-
-from core import schema_utils
-
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-
-# This function recursively uses the schema dictionary and handler_args, and
-# passes their values to itself as arguments, so their type is Any.
-# See: https://github.com/python/mypy/issues/731
-def validate(
-        handler_args: Any,
-        handler_args_schemas: Any,
-        allowed_extra_args: bool,
-        allow_string_to_bool_conversion: bool = False
-) -> Tuple[Dict[str, Any], List[str]]:
-    """Calls schema utils for normalization of object against its schema
-    and collects all the errors.
-
-    Args:
-        handler_args: *. Object for normalization.
-        handler_args_schemas: dict. Schema for args.
-        allowed_extra_args: bool. Whether extra args are allowed in handler.
-        allow_string_to_bool_conversion: bool. Whether to allow string to
-            boolean coversion.
-
-    Returns:
-        *. A two tuple, where the first element represents the normalized value
-        in dict format and the second element represents the lists of errors
-        after validation.
-    """
-    # Collect all errors and present them at once.
-    errors = []
-    normalized_value = {}
-    for arg_key, arg_schema in handler_args_schemas.items():
-
-        if arg_key not in handler_args or handler_args[arg_key] is None:
-            if ('default_value' in arg_schema and
-                    arg_schema['default_value'] is None):
-                # Skip validation for optional cases.
-                continue
-            elif ('default_value' in arg_schema and
-                  arg_schema['default_value'] is not None):
-                handler_args[arg_key] = arg_schema['default_value']
-            elif 'default_value' not in arg_schema:
-                errors.append('Missing key in handler args: %s.' % arg_key)
-                continue
-
-        # Below normalization is for arguments which are expected to be boolean
-        # but from API request they are received as string type.
-        if (
-                allow_string_to_bool_conversion and
-                arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
-                and isinstance(handler_args[arg_key], str)
-        ):
-            handler_args[arg_key] = (
-                convert_string_to_bool(handler_args[arg_key]))
-
-        try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema(
-                handler_args[arg_key], arg_schema['schema'])
-        except Exception as e:
-            errors.append(
-                'Schema validation for \'%s\' failed: %s' % (arg_key, e))
-
-    extra_args = set(handler_args.keys()) - set(handler_args_schemas.keys())
-
-    if not allowed_extra_args and extra_args:
-        errors.append('Found extra args: %s.' % (list(extra_args)))
-
-    return normalized_value, errors
-
-
-def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
-    """Converts a request param of type string into expected bool type.
-
-    Args:
-        param: str. The params which needs normalization.
-
-    Returns:
-        bool. Converts the string param into its expected bool type.
-    """
-    case_insensitive_param = param.lower()
-
-    if case_insensitive_param == 'true':
-        return True
-    elif case_insensitive_param == 'false':
-        return False
-    else:
-        # String values other than booleans should be returned as it is, so that
-        # schema validation will raise exceptions appropriately.
-        return param
-
-
 # Handlers which require schema validation, but currently they do
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
+
+"""Contains a list of handler class names that do not contain schemas.
+This is a temporary file which will be removed once all of the handlers
+mentioned in the list have a schema. This file resides in this folder as
+it will be used  by both scripts/ and core/, and hence would be easier to
+import from this location.
+"""
+
+from __future__ import annotations
+
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
@@ -172,7 +84,9 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SiteLanguageHandler',
     'SkillDataHandler',
     'SkillDescriptionHandler',
+    'SkillEditorPage',
     'SkillMasteryDataHandler',
+    'SkillRightsHandler',
     'SkillsDashboardPageDataHandler',
     'SolutionHitEventHandler',
     'StartedTranslationTutorialEventHandler',
@@ -219,7 +133,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'WarmupPage',
     'HomePageRedirectPage',
     'SplashRedirectPage'
-    ]
+]
 
 # These handlers do not require any schema validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
@@ -235,4 +149,3 @@ HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
 HANDLER_CLASS_NAMES_WITH_NO_SCHEMA = (
     HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS +
     HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS)
-
