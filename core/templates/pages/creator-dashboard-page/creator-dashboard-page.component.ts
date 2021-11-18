@@ -54,8 +54,8 @@ export class CreatorDashboardPageComponent {
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
   subscribersList: ProfileSummary[];
-  lastWeekStats: { totalPlays: number; };
-  dashboardStats: { totalPlays: number; };
+  lastWeekStats: { totalPlays: number};
+  dashboardStats: { totalPlays: number};
   relativeChangeInTotalPlays: number;
   getLocaleAbbreviatedDatetimeString: (millisSinceEpoch: number) => string;
   getHumanReadableStatus: (status: string) => string;
@@ -178,7 +178,7 @@ export class CreatorDashboardPageComponent {
   }
 
   sortByFunction(
-      entity: { [x: string]: number | string; status: string; }
+      entity: { [x: string]: number | string; status: string}
   ): string | number {
     // This function is passed as a custom comparator function to
     // `orderBy`, so that special cases can be handled while sorting

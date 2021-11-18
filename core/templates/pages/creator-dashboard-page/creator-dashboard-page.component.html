@@ -176,7 +176,7 @@
             <col class="oppia-colgroup-col-6">
           </colgroup>
           <tr>
-            <th *ngFor="let item of EXPLORATIONS_SORT_BY_KEYS | keyvalue"
+            <th *ngFor="let item of EXPLORATIONS_SORT_BY_KEYS | keyvalue: 0"
                 class="oppia-dashboard-table-headings"
                 (click)="setExplorationsSortingOptions(item.value)">
               <p *ngIf="item.key === 'TITLE'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION' | translate"></p>
@@ -604,6 +604,7 @@
   }
 
   .oppia-dashboard-table .oppia-dashboard-table-headings p {
+    cursor: pointer;
     display: inline;
   }
 
@@ -688,6 +689,8 @@
     font-style: italic;
   }
   .oppia-card-view-wrap {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
     position: relative;
   }
   .oppia-dashboard-mobile-statistics-card-link {
