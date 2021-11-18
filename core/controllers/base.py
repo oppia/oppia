@@ -392,12 +392,9 @@ class BaseHandler(webapp2.RequestHandler):
                     handler_class_name))
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        normalized_arg_values, errors = (
-            payload_validator.validate_arguments_against_schema(
-                url_path_args,
-                schema_for_url_path_args,
-                extra_args_are_allowed
-            )
+        self.request.route_kwargs, errors = (
+            payload_validator.validate(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
 
         if errors:
