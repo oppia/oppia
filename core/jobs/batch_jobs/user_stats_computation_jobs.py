@@ -23,6 +23,7 @@ from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -92,23 +93,13 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
 
         new_user_stats_job_result = (
             new_user_stats_models
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS NEW %s' % x)
-            )
+            | 'Create new job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult('NEW MODELS'))
         )
         old_user_stats_job_result = (
             old_user_stats_models
-            | 'Count all old models' >> beam.combiners.Count.Globally()
-            | 'Only create result for old models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for old models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS OLD %s' % x)
-            )
+            | 'Create old job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult('OLD MODELS'))
         )
 
         return (
