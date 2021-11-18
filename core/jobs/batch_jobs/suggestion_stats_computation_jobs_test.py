@@ -111,7 +111,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -163,14 +163,14 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -241,7 +241,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -298,7 +298,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -378,7 +378,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)

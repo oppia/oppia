@@ -1469,14 +1469,14 @@ class WrittenTranslation:
 
     @classmethod
     def is_data_format_list(cls, data_format):
-        """Check whether the content of translation with given format is of
+        """Checks whether the content of translation with given format is of
         a list type.
 
         Args:
             data_format: str. The format of the translation.
 
         Returns:
-            bool. Whether the the content of translation is a list.
+            bool. Whether the content of translation is a list.
         """
         return data_format in (
             cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
