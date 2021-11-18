@@ -64,7 +64,7 @@ export class QuestionPlayerStateService {
   }
 
   hintUsed(question: Question): void {
-    let questionId = question.getId();
+    let questionId = String(question.getId());
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -75,7 +75,7 @@ export class QuestionPlayerStateService {
   }
 
   solutionViewed(question: Question): void {
-    let questionId = question.getId();
+    let questionId = String(question.getId());
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -89,7 +89,7 @@ export class QuestionPlayerStateService {
       question: Question,
       isCorrect: boolean,
       taggedSkillMisconceptionId: string): void {
-    let questionId = question.getId();
+    let questionId = String(question.getId());
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
