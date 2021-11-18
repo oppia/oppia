@@ -131,10 +131,12 @@ describe('Ratings and recommendations component', () => {
 
   it('should submit user rating when user clicks on rating star', () => {
     spyOn(learnerViewRatingService, 'submitUserRating');
+    const userRating = 5;
 
-    componentInstance.submitUserRating(5);
+    componentInstance.submitUserRating(userRating);
 
-    expect(learnerViewRatingService.submitUserRating).toHaveBeenCalled();
+    expect(learnerViewRatingService.submitUserRating).toHaveBeenCalledWith(
+      userRating);
   });
 
   it('should redirect to sign in page when user clicks on signin button',
