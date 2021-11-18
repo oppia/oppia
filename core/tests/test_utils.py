@@ -3371,7 +3371,7 @@ class LinterTestBase(GenericTestBase):
             """
             self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def assert_same_list_elements(self, phrases, stdout):
         """Checks to see if all of the phrases appear in at least one of the
