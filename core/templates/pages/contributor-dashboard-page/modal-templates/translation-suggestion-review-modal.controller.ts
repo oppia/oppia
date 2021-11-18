@@ -108,10 +108,10 @@ angular.module('oppia').controller(
 
         return commitMessage;
       };
-      var _getThreadMessagesAsync = function(threadId) {
+      const _getThreadMessagesAsync = function(threadId) {
         return ThreadDataBackendApiService.fetchMessagesAsync(
           threadId).then((response) => {
-          let threadMessageBackendDicts = response.messages;
+          const threadMessageBackendDicts = response.messages;
           $scope.reviewMessage = threadMessageBackendDicts.map(
             m => ThreadMessage.createFromBackendDict(m))[1].text;
         });

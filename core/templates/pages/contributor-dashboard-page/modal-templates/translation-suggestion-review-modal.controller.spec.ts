@@ -363,10 +363,10 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   describe('when viewing suggestion', function() {
     const reviewable = false;
-    var $q = null;
-    var $rootScope = null;
+    let $q = null;
+    let $rootScope = null;
     const subheading = 'subheading_title';
-    var ThreadDataBackendApiService = null;
+    let ThreadDataBackendApiService = null;
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',

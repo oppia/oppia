@@ -414,8 +414,8 @@ describe('Question Suggestion Review Modal Controller', function() {
 
   describe('when a suggestion is rejected', function() {
     let $rootScope = null;
-    var $q = null;
-    var ThreadDataBackendApiService = null;
+    let $q = null;
+    let ThreadDataBackendApiService = null;
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
@@ -525,7 +525,7 @@ describe('Question Suggestion Review Modal Controller', function() {
         ]
       };
 
-      var spyObj = spyOn(
+      let spyObj = spyOn(
         ThreadDataBackendApiService, 'fetchMessagesAsync')
         .and.returnValue($q.resolve(responseDict));
 
