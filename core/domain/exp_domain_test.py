@@ -1006,7 +1006,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
+proto_size_in_bytes: 4456
 schema_version: 55
 states:
   Algebraic Expression Input:

@@ -557,7 +557,7 @@ class Exploration:
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            proto_size_in_bytes=0, created_on=None, last_updated=None):
+            proto_size_in_bytes, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -585,12 +585,12 @@ class Exploration:
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            proto_size_in_bytes: int. The byte size of the exploration
+                proto object.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
-            proto_size_in_bytes: int. The byte size of the exploration
-                proto object.
         """
         self.id = exploration_id
         self.title = title
@@ -661,7 +661,7 @@ class Exploration:
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False, 0)
 
         exp_android_proto_size = exploration.get_proto_size()
         cls.update_proto_size_in_bytes(cls, exp_android_proto_size)
