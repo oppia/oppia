@@ -43,7 +43,7 @@ interface QuestionPlayerConfig {
   questionPlayerMode: {
     modeType: string;
     passCutoff: number;
-  },
+  };
   questionsSortedByDifficulty: boolean;
 }
 
