@@ -228,25 +228,26 @@ def rewrite_android_proto_files():
     for p in protobuf_dir:
         if p.suffix == '.proto':
             # Remove package statement.
-            # Example - 'package org.oppia.proto.v1.api'.
+            # Example: 'package org.oppia.proto.v1.api'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^package ([^\s]+)',
                 r'')
             # Remove option statement.
-            # Example - 'option java_package = "org.oppia.proto.v1.api";'.
+            # Example: 'option java_package = "org.oppia.proto.v1.api";'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^option java_.+',
                 r'')
             # Update import statement.
-            # Example - 'import "org/oppia/proto/v1/api/state.proto";'.
+            # Example: 'import "org/oppia/proto/v1/api/state.proto";' to
+            # 'import "state.proto";'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'^import (?!\"google)([^\s]+)[\\/]([^\s]+)',
                 r'import "\2')
             # Remove all subpackage directories.
-            # Example - 'org.oppia.'.
+            # Example: 'org.oppia.'.
             common.inplace_replace_file(
                 p.absolute(),
                 r'org.oppia.*\.',
@@ -254,8 +255,8 @@ def rewrite_android_proto_files():
 
 
 def move_all_proto_files_to_third_party():
-    """Move all proto files from subdirectories to the
-    third_party folder.
+    """Move all proto files from subdirectories
+    to the third_party folder.
     """
     oppia_proto_api_path = (
         os.path.join(
@@ -271,7 +272,7 @@ def move_all_proto_files_to_third_party():
             filename = os.path.basename(source)
             dest = os.path.join(destination, filename)
             shutil.move(str(source), str(dest))
-    if os.path.exists(oppia_proto_api_path + '/org'):
+    if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
         shutil.rmtree(oppia_proto_api_path + '/org')
 
 

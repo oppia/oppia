@@ -932,7 +932,8 @@ class Exploration:
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
 
-        if not isinstance(self.proto_size_in_bytes, int):
+        if not isinstance(
+            self.proto_size_in_bytes, int) and (self.proto_size_in_bytes > 0):
             raise utils.ValidationError(
                 'Expected proto size to be a int, received %s'
                 % self.proto_size_in_bytes)
@@ -2249,14 +2250,9 @@ class Exploration:
             dict. The dict representation of the Exploration domain object,
             following schema version v55.
         """
-        # The demo exploration does not contain id.
-        # Adding a sample id here.
-        if exploration_dict.get('id') is None:
-            exploration_dict['id'] = '0'
         exploration = cls.from_dict(exploration_dict)
         exploration_dict['proto_size_in_bytes'] = (
             exploration.get_proto_size())
-        del exploration_dict['id']
         return exploration_dict
 
     @classmethod
@@ -2294,11 +2290,6 @@ class Exploration:
                 'at present.' % (
                     cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                     cls.CURRENT_EXP_SCHEMA_VERSION))
-
-        if exploration_schema_version == 41:
-            exploration_dict = cls._convert_v42_dict_to_v43_dict(
-                exploration_dict)
-            exploration_schema_version = 42
 
         if exploration_schema_version == 46:
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
@@ -2530,23 +2521,21 @@ class Exploration:
             state_proto = state.to_proto()
             state_protos[state_name] = state_proto
 
-        if isinstance(self.title, str):
-            exploration_proto = exploration_pb2.Exploration(
-                id=self.id,
-                content_version=self.version,
-                init_state_name=self.init_state_name,
-                title=self.title,
-                states=state_protos)
+        exploration_proto = exploration_pb2.Exploration(
+            id=self.id,
+            content_version=self.version,
+            init_state_name=self.init_state_name,
+            title=self.title,
+            states=state_protos)
         return exploration_proto
 
     def get_proto_size(self):
         """Calculate the byte size of the proto object.
 
         Returns:
-            Int. The byte size of the proto object.
+            int. The byte size of the proto object.
         """
-        proto = self.to_proto()
-        return int(proto.ByteSize())
+        return int(self.to_proto().ByteSize())
 
 
 class ExplorationSummary:

@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from extensions.interactions import base
+from proto_files import state_pb2
 
 
 class MultipleChoiceInput(base.BaseInteraction):
@@ -81,3 +82,88 @@ class MultipleChoiceInput(base.BaseInteraction):
         'calculation_id': 'AnswerFrequencies',
         'addressed_info_is_supported': True,
     }]
+
+    @classmethod
+    def to_proto(cls, interaction):
+        """Creates a MultipleChoiceInputInstance proto object.
+
+        Args:
+            interaction: InteractionInstance. The interaction instance
+                associated with this state.
+
+        Returns:
+            MultipleChoiceInputInstance. The
+            MultipleChoiceInputInstance proto object.
+        """
+        customization_args_proto = (
+            cls._to_customization_args_proto(
+                interaction.customization_args))
+
+        outcome_proto = interaction.default_outcome.to_proto()
+
+        hints_proto_list = []
+        for hint in interaction.hints:
+            hint_proto = hint.to_proto()
+            hints_proto_list.append(hint_proto)
+
+        answer_groups_proto = cls._to_answer_groups_proto(
+            interaction.answer_groups)
+
+        multiple_choice_interaction_proto = (
+            state_pb2.MultipleChoiceInputInstance(
+                customization_args=customization_args_proto,
+                default_outcome=outcome_proto,
+                hints=hints_proto_list,
+                answer_groups=answer_groups_proto))
+
+        return multiple_choice_interaction_proto
+
+    @classmethod
+    def _to_customization_args_proto(
+            cls, customization_args):
+        """Creates a CustomizationArgs proto object
+            for MultipleChoiceInputInstance.
+
+        Args:
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+
+        Returns:
+            CustomizationArgs. The CustomizationArgs proto object.
+        """
+        choices_list_proto = []
+
+        for value in customization_args['choices'].value:
+            value_proto = value.to_proto()
+            choices_list_proto.append(value_proto)
+
+        customization_arg_proto = (
+            state_pb2.MultipleChoiceInputInstance.CustomizationArgs(
+                choices=choices_list_proto))
+
+        return customization_arg_proto
+
+    @classmethod
+    def _to_answer_groups_proto(cls, answer_groups):
+        """Creates a AnswerGroup proto object
+            for MultipleChoiceInputInstance.
+
+        Args:
+            answer_groups: list(AnswerGroup). List of answer groups of the
+                interaction instance.
+
+        Returns:
+            list. The AnswerGroup proto object list.
+        """
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = answer_group.to_proto()
+            answer_group_proto = (
+                state_pb2.MultipleChoiceInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto))
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto

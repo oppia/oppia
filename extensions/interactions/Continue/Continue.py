@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from extensions.interactions import base
+from proto_files import state_pb2
 
 
 class Continue(base.BaseInteraction):
@@ -52,3 +53,40 @@ class Continue(base.BaseInteraction):
             'unicode_str': 'Continue'
         },
     }]
+
+    @classmethod
+    def to_proto(cls, interaction):
+        """Creates a ContinueInstance proto object.
+
+        Returns:
+            ContinueInstance. The ContinueInstance proto object.
+        """
+        outcome_proto = interaction.default_outcome.to_proto()
+        customization_args_proto = (
+            cls._to_customization_args_proto(
+                interaction.customization_args))
+        continue_proto = state_pb2.ContinueInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto)
+
+        return continue_proto
+
+    @classmethod
+    def _to_customization_args_proto(cls, customization_args):
+        """Creates a CustomizationArgs proto object
+            for ContinueInstance.
+
+        Args:
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+
+        Returns:
+            CustomizationArgs. The CustomizationArgs proto object.
+        """
+        customization_arg_proto = (
+            state_pb2.ContinueInstance.CustomizationArgs(
+                button_text=customization_args['buttonText'].value.to_proto()))
+
+        return customization_arg_proto
