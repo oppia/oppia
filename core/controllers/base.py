@@ -28,6 +28,7 @@ import time
 import urllib
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.controllers import payload_validator
@@ -345,7 +346,7 @@ class BaseHandler(webapp2.RequestHandler):
         request_method = self.request.environ['REQUEST_METHOD']
         url_path_args = self.request.route_kwargs
         handler_class_names_with_no_schema = (
-            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
         if handler_class_name in handler_class_names_with_no_schema:
             return

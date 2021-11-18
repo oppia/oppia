@@ -26,7 +26,7 @@ import re
 import sys
 import tokenize
 
-from core.controllers import payload_validator
+from core import handler_schema_constants
 
 from .. import docstrings_checker
 
@@ -2230,7 +2230,10 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if not self.check_parent_class_is_basehandler(node):
             return
 
-        if node.name in payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
+        if (
+            node.name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
             return
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
