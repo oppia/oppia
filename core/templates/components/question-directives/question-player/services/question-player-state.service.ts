@@ -22,24 +22,24 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Question } from 'domain/question/QuestionObjectFactory';
 
 interface UsedHint {
-  timestamp: number
+  timestamp: number;
 }
 
 interface Answer {
   isCorrect: boolean;
   timestamp: number;
-  taggedSkillMisconceptionId: string
+  taggedSkillMisconceptionId: string;
 }
 
 interface QuestionPlayerState {
   [key: string]: {
-    linkedSkillIds: string[],
-    answers: Answer[],
-    usedHints: UsedHint[],
+    linkedSkillIds: string[];
+    answers: Answer[];
+    usedHints: UsedHint[];
     viewedSolution: {
-      timestamp: number
-    }
-  }
+      timestamp: number;
+    };
+  };
 }
 
 @Injectable({
