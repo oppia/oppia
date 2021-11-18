@@ -313,6 +313,8 @@ requests-mock==1.9.3
     # via -r requirements.in
 requests-toolbelt==0.9.1
     # via -r requirements.in
+result==0.6.0
+    # via -r requirements.in
 rsa==4.7.2
     # via
     #   -r requirements.in
