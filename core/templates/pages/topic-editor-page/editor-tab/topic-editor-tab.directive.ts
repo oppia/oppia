@@ -324,16 +324,20 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.updatePracticeTabIsDisplayed = function(
             newPracticeTabIsDisplayed) {
+          if (
+            newPracticeTabIsDisplayed !==
+            $scope.topic.getPracticeTabIsDisplayed() && $scope.hasMoreThanTenQuestions()) {
+            TopicUpdateService.setPracticeTabIsDisplayed(
+              $scope.topic, newPracticeTabIsDisplayed);
+            }
+          };
+
+          $scope.hasMoreThanTenQuestions = function() {
             var countQuestions = 0;
             $scope.topic.getSkillIds().forEach(item => {
               countQuestions += $scope.skillQuestionCountDict[item];
             })
-          if (
-            newPracticeTabIsDisplayed !==
-            $scope.topic.getPracticeTabIsDisplayed() && countQuestions >= 10) {
-            TopicUpdateService.setPracticeTabIsDisplayed(
-              $scope.topic, newPracticeTabIsDisplayed);
-            }
+            return countQuestions >= 10;
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {

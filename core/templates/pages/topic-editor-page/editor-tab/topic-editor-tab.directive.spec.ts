@@ -397,16 +397,9 @@ describe('Topic editor tab directive', function() {
   
   it('should call the TopicUpdateService for practice tab if there are more than 10 questions '+
   'in the topic, if practice tab is displayed property is changed', function () {
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
-    $scope.createQuestion();
+    for (let i = 0; i < 10; i++) {
+      $scope.createQuestion();
+    }
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
     $scope.updatePracticeTabIsDisplayed(true);
