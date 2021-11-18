@@ -936,22 +936,22 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'value': ''
             }
         }
-        exp_issue = stats_domain.ExplorationIssue.from_dict({
+        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': expected_customization_args,
             'playthrough_ids': [],
             'schema_version': 1,
             'is_valid': True
         })
-        exp_issue_dict = exp_issue.to_dict()
-        self.assertEqual(
-            exp_issue_dict, {
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': expected_customization_args,
-                'playthrough_ids': [],
-                'schema_version': 1,
-                'is_valid': True
-            })
+        exp_issue2 = stats_domain.ExplorationIssue.from_dict({
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': expected_customization_args,
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        })
+
+        self.assertTrue(exp_issue1 == exp_issue2)
 
     def test_from_dict_raises_exception(self):
         """Test the from_dict() method."""
