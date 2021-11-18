@@ -1271,7 +1271,7 @@ class VersionedModel(BaseModel):
         if current_version_model is None:
             return None
 
-        current_version_model._require_not_marked_deleted()  # pylNint: disable=protected-access
+        current_version_model._require_not_marked_deleted()  # pylint: disable=protected-access
 
         snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 

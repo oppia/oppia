@@ -35,7 +35,7 @@ interface UpdateRoleAction {
 }
 
 interface RemoveEditorRole {
-  username: string
+  username: string;
   isValid: () => boolean;
 }
 

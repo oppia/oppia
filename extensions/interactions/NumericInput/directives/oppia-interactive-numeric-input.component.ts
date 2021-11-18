@@ -30,6 +30,11 @@ import { NumericInputCustomizationArgs } from 'interactions/customization-args-d
 import { NumericInputRulesService } from './numeric-input-rules.service';
 import { NumericInputValidationService } from './numeric-input-validation.service';
 
+interface NumericInputFormSchema {
+  type: string;
+  'ui_config': {};
+}
+
 @Component({
   selector: 'oppia-interactive-numeric-input',
   templateUrl: './numeric-input-interaction.component.html'
@@ -41,7 +46,7 @@ export class InteractiveNumericInput implements OnInit {
   errorString = '';
   requireNonnegativeInput: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
+  NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormSchema;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -84,7 +89,7 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {}; } {
+  getSchema(): NumericInputFormSchema {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 

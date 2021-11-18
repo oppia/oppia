@@ -169,8 +169,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/moderator_services_test.py',
     'core/domain/object_registry.py',
     'core/domain/object_registry_test.py',
-    'core/domain/opportunity_domain.py',
-    'core/domain/opportunity_domain_test.py',
     'core/domain/opportunity_jobs_one_off.py',
     'core/domain/opportunity_jobs_one_off_test.py',
     'core/domain/opportunity_services.py',
