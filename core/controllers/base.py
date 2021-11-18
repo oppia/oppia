@@ -195,6 +195,11 @@ class BaseHandler(webapp2.RequestHandler):
             auth_services.destroy_auth_session(self.response)
             self.redirect(user_services.create_login_url(self.request.uri))
             return
+        except auth_domain.UserDisabledError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
@@ -276,11 +281,6 @@ class BaseHandler(webapp2.RequestHandler):
         if not self._is_requested_path_currently_accessible_to_user():
             self.handle_exception(
                 self.TemporaryMaintenanceException(), self.app.debug)
-            return
-
-        if self.user_is_scheduled_for_deletion:
-            self.redirect(
-                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
         if self.partially_logged_in and request_split.path != '/logout':

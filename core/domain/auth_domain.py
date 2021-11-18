@@ -46,6 +46,12 @@ class StaleAuthSessionError(Exception):
     pass
 
 
+class UserDisabledError(Exception):
+    """Error raised when the user which details are requested is disabled."""
+
+    pass
+
+
 class AuthClaims:
     """Domain object for holding onto essential Claims about an authorized user.
 
