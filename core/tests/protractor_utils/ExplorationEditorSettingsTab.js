@@ -153,7 +153,6 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setTitle = async function(title) {
-    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await general.scrollToTop();
     await action.clear('Exploration Title Input', explorationTitleInput);
