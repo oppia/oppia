@@ -136,8 +136,8 @@ interface LearnerDashboardFeedbackUpdatesData {
 
 
 export interface AddMessagePayload {
-  'updated_status': boolean,
-  'updated_subject': string,
+  'updated_status': boolean;
+  'updated_subject': string;
   'text': string;
 }
 
@@ -150,7 +150,7 @@ export interface SubtopicMasteryDict {
 }
 
 interface MessageSummaryList {
-  'message_summary_list': FeedbackMessageSummaryBackendDict[]
+  'message_summary_list': FeedbackMessageSummaryBackendDict[];
 }
 
 @Injectable({
