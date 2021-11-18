@@ -176,7 +176,7 @@
             <col class="oppia-colgroup-col-6">
           </colgroup>
           <tr>
-            <th *ngFor="let item of EXPLORATIONS_SORT_BY_KEYS | keyvalue: 0"
+            <th *ngFor="let item of EXPLORATIONS_SORT_BY_KEYS | keyvalue: returnZero"
                 class="oppia-dashboard-table-headings"
                 (click)="setExplorationsSortingOptions(item.value)">
               <p *ngIf="item.key === 'TITLE'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION' | translate"></p>
@@ -191,7 +191,7 @@
             </th>
           </tr>
           <hr>
-          <tr *ngFor="let exploration of explorationsList"
+          <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration)"
               class="exploration-list-item">
             <td>
               <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-title">
@@ -233,7 +233,7 @@
 
     <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
          class="oppia-card-view-wrap">
-      <mat-card *ngFor="let exploration of explorationsList"
+      <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration)"
                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
                 is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
@@ -689,8 +689,6 @@
     font-style: italic;
   }
   .oppia-card-view-wrap {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
     position: relative;
   }
   .oppia-dashboard-mobile-statistics-card-link {
@@ -765,6 +763,13 @@
   }
   .oppia-sort-options {
     width: 160px;
+  }
+
+  @media(min-width: 823px) {
+    .oppia-card-view-wrap {
+      display: grid;
+      grid-template-columns: auto auto auto auto;
+    }
   }
 
   @media(max-width: 464px) {

@@ -35,6 +35,7 @@ import { CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -60,7 +61,8 @@ export class CreatorDashboardPageComponent {
   getLocaleAbbreviatedDatetimeString: (millisSinceEpoch: number) => string;
   getHumanReadableStatus: (status: string) => string;
   emptyDashboardImgUrl: string;
-  getAverageRating;
+  getAverageRating: (
+    (ratingFrequencies: ExplorationRatings) => number | null);
   SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS;
   EXPLORATIONS_SORT_BY_KEYS =
@@ -178,28 +180,19 @@ export class CreatorDashboardPageComponent {
   }
 
   sortByFunction(
-      entity: { [x: string]: number | string; status: string}
+      exploration: CreatorExplorationSummary
   ): string | number {
-    // This function is passed as a custom comparator function to
-    // `orderBy`, so that special cases can be handled while sorting
-    // explorations.
-    let value = entity[this.currentSortType];
-    if (entity.status === 'private') {
-      if (this.currentSortType ===
-            CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.TITLE) {
-        value = (value || this.DEFAULT_EMPTY_TITLE);
-      } else if (this.currentSortType !==
-        CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
-        value = 0;
-      }
-    } else if (
+    let value: number;
+    if (
       this.currentSortType ===
         CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.RATING) {
       let averageRating = (
-        this.getAverageRating(value));
+        this.getAverageRating(exploration.ratings));
       value = (averageRating || 0);
+      return value;
+    } else {
+      return this.currentSortType;
     }
-    return value;
   }
 
   getCompleteThumbnailIconUrl(iconUrl: string): string {
@@ -286,6 +279,14 @@ export class CreatorDashboardPageComponent {
 
   createNewExploration(): void {
     this.explorationCreationService.createNewExploration();
+  }
+
+  returnZero(): number {
+    // This function is used as a custom function to
+    // sort heading in the list view. Directly assigning
+    // keyvalue : 0 gives error "TypeError: The comparison function
+    // must be either a function or undefined" .
+    return 0;
   }
 }
 
