@@ -293,7 +293,7 @@ describe('SvgSanitizerService', () => {
 
   it('should catch malicious SVGs', () => {
     const testCases: {
-      title: string, payload: string, expected: [number, number]}[] = [{
+      title: string; payload: string; expected: [number, number]; }[] = [{
         title: 'DOM clobbering attack using name=body',
         payload: '<image name=body><image name=adoptNode>@mmrupp<image name=' +
         'firstElementChild><svg onload=alert(1)>',

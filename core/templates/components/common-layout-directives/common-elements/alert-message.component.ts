@@ -23,9 +23,9 @@ import { AlertsService } from 'services/alerts.service';
 require('ngx-toastr/toastr.css');
 
 export interface MessageObject {
-  type: string,
-  content: string,
-  timeout: number
+  type: string;
+  content: string;
+  timeout: number;
 }
 
 @Component({

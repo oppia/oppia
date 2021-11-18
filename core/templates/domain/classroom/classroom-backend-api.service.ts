@@ -35,10 +35,10 @@ interface ClassroomPromosStatusBackendDict {
 }
 
 interface ClassroomDataBackendDict {
-  'name': string,
-  'topic_summary_dicts': CreatorTopicSummaryBackendDict[],
-  'course_details': string,
-  'topic_list_intro': string
+  'name': string;
+  'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
+  'course_details': string;
+  'topic_list_intro': string;
 }
 
 @Injectable({

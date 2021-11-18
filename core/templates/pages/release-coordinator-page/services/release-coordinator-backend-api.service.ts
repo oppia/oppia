@@ -43,9 +43,9 @@ export interface JobsDataBackendDict {
 }
 
 interface MemoryCacheProfileResponse {
-  'peak_allocation': string,
-  'total_allocation': string,
-  'total_keys_stored': string
+  'peak_allocation': string;
+  'total_allocation': string;
+  'total_keys_stored': string;
 }
 
 interface BeamJobsResponse {

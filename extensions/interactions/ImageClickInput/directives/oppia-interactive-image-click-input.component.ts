@@ -42,8 +42,8 @@ interface RectangleRegion extends ImagePoint {
 }
 
 interface ImagePoint {
-  left: number,
-  top: number
+  left: number;
+  top: number;
 }
 
 @Component({
@@ -68,8 +68,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   isLoadingIndicatorShown: boolean;
   isTryAgainShown: boolean;
   dimensions: ImageDimensions;
-  imageContainerStyle: { height: string; width?: string; };
-  loadingIndicatorStyle: { height: string; width?: string; };
+  imageContainerStyle: { height: string; width?: string };
+  loadingIndicatorStyle: { height: string; width?: string };
   allRegions: LabeledRegion[];
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,

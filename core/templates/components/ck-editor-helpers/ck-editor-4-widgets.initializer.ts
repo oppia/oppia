@@ -24,7 +24,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
-    name: string, value: unknown, 'default_value': unknown
+    name: string; value: unknown; 'default_value': unknown;
   }[];
   id: string;
   iconDataUrl: string;
@@ -40,7 +40,8 @@ interface RteHelperService {
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
     customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-    onDismissCallback) => void
+    onDismissCallback
+  ) => void;
 }
 
 import { Injectable } from '@angular/core';

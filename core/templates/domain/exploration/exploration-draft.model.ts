@@ -43,7 +43,7 @@ export interface ExplorationChangeAddState {
 }
 
 export interface ExplorationChangeRenameState {
-  'cmd': 'rename_state',
+  'cmd': 'rename_state';
   'new_state_name': string;
   'old_state_name': string;
 }
@@ -54,7 +54,7 @@ export interface ExplorationChangeDeleteState {
 }
 
 export interface ExplorationChangeEditStateProperty {
-  'cmd': 'edit_state_property',
+  'cmd': 'edit_state_property';
   'new_value': SubtitledHtmlBackendDict |
     InteractionBackendDict |
     ParamChangeBackendDict[] |
@@ -120,7 +120,7 @@ export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
 
 export interface ExplorationDraftDict {
   draftChanges: ExplorationChange[];
-  draftChangeListId: number
+  draftChangeListId: number;
 }
 
 export class ExplorationDraft {

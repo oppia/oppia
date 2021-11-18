@@ -45,12 +45,12 @@ export interface UpdateEditableQuestionBackendResponse {
   questionDict: QuestionBackendDict;
 }
 export interface FetchQuestionResponse{
-  questionObject: Question,
+  questionObject: Question;
   'associated_skill_dicts': SkillBackendDict[];
 }
 export interface ImageData {
-  filename: string,
-  imageBlob: Blob
+  filename: string;
+  imageBlob: Blob;
 }
 @Injectable({
   providedIn: 'root'

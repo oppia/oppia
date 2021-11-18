@@ -19,6 +19,8 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { TranslatableSetOfStringSchema } from './translatable-set-of-normalized-string-editor.component';
+
 @Component({
   selector: 'translatable-set-of-unicode-string-editor',
   templateUrl: './translatable-set-of-unicode-string-editor.component.html'
@@ -29,11 +31,7 @@ export class TranslatableSetOfUnicodeStringEditorComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: { unicodeStrSet: string };
   @Output() valueChanged = new EventEmitter();
-  schema: {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-  } = {
+  schema: TranslatableSetOfStringSchema = {
     type: 'list',
     items: {
       type: 'unicode'
@@ -54,11 +52,7 @@ export class TranslatableSetOfUnicodeStringEditorComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-    } {
+  getSchema(): TranslatableSetOfStringSchema {
     return this.schema;
   }
 }

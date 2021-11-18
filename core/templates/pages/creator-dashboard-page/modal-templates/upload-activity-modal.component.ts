@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 
 interface ExplorationObj {
-  yamlFile: File | null
+  yamlFile: File | null;
 }
 
 @Component({

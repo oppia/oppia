@@ -23,13 +23,13 @@ import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 export interface TopicAssignmentsSummary {
-  subtopicId: number,
-  topicVersion: number,
-  topicId: string
+  subtopicId: number;
+  topicVersion: number;
+  topicId: string;
 }
 
 export interface TopicAssignments {
-  [key: string]: TopicAssignmentsSummary
+  [key: string]: TopicAssignmentsSummary;
 }
 
 @Component({

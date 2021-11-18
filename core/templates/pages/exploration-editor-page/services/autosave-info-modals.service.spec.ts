@@ -29,13 +29,13 @@ class showNonStrictValidationFailModalRef {
 
 class showVersionMismatchModalRef {
   componentInstance: {
-    lostChanges: null,
+    lostChanges: null;
   };
 }
 
 class showLostChangesModalRef {
   componentInstance: {
-    lostChanges: null,
+    lostChanges: null;
   };
 }
 

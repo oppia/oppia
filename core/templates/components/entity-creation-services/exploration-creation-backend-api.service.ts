@@ -22,15 +22,15 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface ExplorationCreationBackendDict {
-  'exploration_id': string
+  'exploration_id': string;
 }
 
 export interface ExplorationCreationResponse {
-  explorationId: string
+  explorationId: string;
 }
 
 export interface NewExplorationData {
-  title: string
+  title: string;
 }
 
 @Injectable({

@@ -102,7 +102,7 @@ export interface DragAndDropSortInputCustomizationArgsBackendDict {
   };
   allowMultipleItemsInSamePosition: {
     value: boolean;
-  }
+  };
 }
 export interface DragAndDropSortInputCustomizationArgs {
   choices: {
@@ -110,7 +110,7 @@ export interface DragAndDropSortInputCustomizationArgs {
   };
   allowMultipleItemsInSamePosition: {
     value: boolean;
-  }
+  };
 }
 
 

@@ -499,10 +499,10 @@ describe('Library Page Component', () => {
 
     spyOn(window, '$').and.returnValue({
       animate: (options, arg2: {
-        duration: number,
-        queue: boolean,
-        start: () => void,
-        complete: () => void
+        duration: number;
+        queue: boolean;
+        start: () => void;
+        complete: () => void;
       }) => {
         arg2.start();
         arg2.complete();
@@ -556,10 +556,10 @@ describe('Library Page Component', () => {
 
     spyOn(window, '$').and.returnValue({
       animate: (options, arg2: {
-        duration: number,
-        queue: boolean,
-        start: () => void,
-        complete: () => void
+        duration: number;
+        queue: boolean;
+        start: () => void;
+        complete: () => void;
       }) => {
         arg2.start();
         arg2.complete();

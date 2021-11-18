@@ -24,8 +24,8 @@ import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface IntValidatorSchema {
-  type: string,
-  validators: { id: string }[]
+  type: string;
+  validators: { id: string }[];
 }
 
 @Component({

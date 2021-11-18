@@ -29,20 +29,20 @@ import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/moda
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 interface LearnerPlaylistResponseObject {
-  'belongs_to_completed_or_incomplete_list': boolean
-  'belongs_to_subscribed_activities': boolean
-  'is_super_admin': boolean
-  'playlist_limit_exceeded': boolean
-  'user_email': string
-  'username': string
+  'belongs_to_completed_or_incomplete_list': boolean;
+  'belongs_to_subscribed_activities': boolean;
+  'is_super_admin': boolean;
+  'playlist_limit_exceeded': boolean;
+  'user_email': string;
+  'username': string;
   }
 
 interface LearnerGoalsResponseObject {
-  'belongs_to_learnt_list': boolean
-  'is_super_admin': boolean
-  'goals_limit_exceeded': boolean
-  'user_email': string
-  'username': string
+  'belongs_to_learnt_list': boolean;
+  'is_super_admin': boolean;
+  'goals_limit_exceeded': boolean;
+  'user_email': string;
+  'username': string;
   }
 
 @Injectable({

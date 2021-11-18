@@ -21,10 +21,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
 interface CodeMirrorMergeViewOptions {
-  lineNumbers: boolean,
-  readOnly: boolean,
-  mode: string,
-  viewportMargin: number
+  lineNumbers: boolean;
+  readOnly: boolean;
+  mode: string;
+  viewportMargin: number;
 }
 
 @Component({

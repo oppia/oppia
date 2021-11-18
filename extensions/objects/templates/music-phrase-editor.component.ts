@@ -32,8 +32,8 @@ interface MusicPhraseSchema {
     type: string;
     choices: string[];
   };
-  'ui_config': {'add_element_text': string;};
-  validators: { id: string; 'max_value': number; }[];
+  'ui_config': { 'add_element_text': string };
+  validators: { id: string; 'max_value': number }[];
 }
 
 @Component({

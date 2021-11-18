@@ -26,8 +26,8 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 
 interface SubmitAnswerEventDataInterface {
-  currentAnswer: string,
-  rulesService: InteractionRulesService
+  currentAnswer: string;
+  rulesService: InteractionRulesService;
 }
 
 @Component({

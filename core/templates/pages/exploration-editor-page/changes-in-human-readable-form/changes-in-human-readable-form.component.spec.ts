@@ -31,7 +31,7 @@ describe('Changes in Human Readable Form Component', () => {
 
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
-  const removeComments = (HTML: { toString: () => string; }) => {
+  const removeComments = (HTML: { toString: () => string }) => {
     return HTML
       .toString()
       // Removes Unecessary white spaces and new lines.

@@ -23,11 +23,11 @@ import { TestBed } from '@angular/core/testing';
 
 class MockNgbModalRef {
   componentInstance: {
-    skillSummaries: null,
-    skillsInSameTopicCount: null,
-    categorizedSkills: null,
-    allowSkillsFromOtherTopics: null,
-    untriagedSkillSummaries: null
+    skillSummaries: null;
+    skillsInSameTopicCount: null;
+    categorizedSkills: null;
+    allowSkillsFromOtherTopics: null;
+    untriagedSkillSummaries: null;
   };
 }
 

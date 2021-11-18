@@ -27,14 +27,14 @@ import { AppConstants } from 'app.constants';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 
 interface SetOfAlgebraicIdentifierEditorSchema {
-  type: 'list',
+  type: 'list';
   items: {
-    type: 'unicode',
-    choices: string[]
-  },
+    type: 'unicode';
+    choices: string[];
+  };
   validators: [{
-    id: 'is_uniquified'
-  }]
+    id: 'is_uniquified';
+  }];
 }
 
 @Component({

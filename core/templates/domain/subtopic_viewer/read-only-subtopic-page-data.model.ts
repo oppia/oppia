@@ -27,9 +27,9 @@ import { SubtopicBackendDict, Subtopic } from
 export interface SubtopicDataBackendDict {
   'subtopic_title': string;
   'page_contents': SubtopicPageContentsBackendDict;
-  'next_subtopic_dict': SubtopicBackendDict | null,
-  'topic_id': string,
-  'topic_name': string
+  'next_subtopic_dict': SubtopicBackendDict | null;
+  'topic_id': string;
+  'topic_name': string;
 }
 
 export class ReadOnlySubtopicPageData {

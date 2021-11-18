@@ -120,7 +120,7 @@ export class SvgEditorComponent implements OnInit {
   // The data variable is used to store the saved svg data
   // and the filename.
   data: {
-    savedSvgUrl?: SafeResourceUrl | string,
+    savedSvgUrl?: SafeResourceUrl | string;
     savedSvgFileName?: string;
   } = {};
   // The diagramStatus stores the mode of the tool that is being used.
@@ -164,8 +164,8 @@ export class SvgEditorComponent implements OnInit {
   }];
   allowedImageFormats = ['svg'];
   uploadedSvgDataUrl: {
-    safeUrl: SafeResourceUrl,
-    unsafeUrl: string
+    safeUrl: SafeResourceUrl;
+    unsafeUrl: string;
   } = null;
   loadType = 'group';
   defaultTopCoordinate = 50;
@@ -252,8 +252,8 @@ export class SvgEditorComponent implements OnInit {
   }
 
   private getTrustedResourceUrlForSvgFileName(
-      svgFileName: string): {
-        safeUrl: SafeResourceUrl | string, unsafeUrl: string} {
+      svgFileName: string
+  ): { safeUrl: SafeResourceUrl | string; unsafeUrl: string } {
     if (
       this.imageSaveDestination ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
@@ -929,7 +929,7 @@ export class SvgEditorComponent implements OnInit {
   }
 
   getPieSlice(
-      center: {x: number, y: number},
+      center: { x: number; y: number },
       radius: number,
       startAngle: number,
       endAngle: number,
@@ -1498,7 +1498,8 @@ export class SvgEditorComponent implements OnInit {
       if (this.drawMode === this.DRAW_MODE_BEZIER) {
         var pt = e.target;
         var curve = this.getQuadraticBezierCurve() as unknown as {
-          path: number[][]};
+          path: number[][];
+        };
         if (e.target.name === 'p0') {
           curve.path[0][1] = pt.left;
           curve.path[0][2] = pt.top;

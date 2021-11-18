@@ -39,9 +39,9 @@ import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
 interface QuestionPlayerConfigDict {
-  skillList: string[],
-  questionCount: number,
-  questionsSortedByDifficulty: boolean
+  skillList: string[];
+  questionCount: number;
+  questionsSortedByDifficulty: boolean;
 }
 
 @Injectable({

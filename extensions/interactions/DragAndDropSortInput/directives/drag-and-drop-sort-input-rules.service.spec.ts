@@ -112,7 +112,7 @@ describe('Drag and Drop Sort Input rules service', () => {
   });
 
   it('should have a correct \'has element X at position Y\' rule', () => {
-    var RULE_INPUT: {x: string, y: number} = {
+    var RULE_INPUT: { x: string; y: number } = {
       x: 'rule_input_2',
       y: 2
     };
@@ -140,7 +140,7 @@ describe('Drag and Drop Sort Input rules service', () => {
 
   it('should have a correct \'has element X before element Y\' rule',
     () => {
-      var RULE_INPUT: {x: string, y: string} = {
+      var RULE_INPUT: { x: string; y: string } = {
         x: 'rule_input_2',
         y: 'rule_input_5'
       };
