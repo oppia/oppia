@@ -473,8 +473,8 @@ interface TopicLanguageCodeChange {
 }
 
 interface TopicPageTitleFragmentForWebChange {
-  'cmd': 'update_topic_property',
-  'property_name': 'page_title_fragment_for_web',
+  'cmd': 'update_topic_property';
+  'property_name': 'page_title_fragment_for_web';
   'new_value': string;
   'old_value': string;
 }
@@ -556,8 +556,8 @@ interface TopicAddSubtopicChange {
 }
 
 interface TopicAddUncategorizedSkillId {
-  'cmd': 'add_uncategorized_skill_id',
-  'new_uncategorized_skill_id': string
+  'cmd': 'add_uncategorized_skill_id';
+  'new_uncategorized_skill_id': string;
 }
 
 interface TopicDeleteSubtopicChange {

@@ -29,6 +29,7 @@ import re
 import types
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.constants import constants
@@ -1336,7 +1337,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     architecture.
     """
     handler_class_names_with_no_schema = (
-        payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
@@ -1528,7 +1529,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
-            payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 

@@ -27,7 +27,7 @@ export interface LearnerTopicSummaryBackendDict {
   'description': string;
   'version': number;
   'story_titles': string[];
-  'total_published_node_count': number,
+  'total_published_node_count': number;
   'canonical_story_summary_dict': StorySummaryBackendDict[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
