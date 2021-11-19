@@ -517,22 +517,22 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should fetch the rejection message', function() {
-      const responseDict = {
-        messages: [
-          { text: 'Question submitted.' },
-          { text: 'This is a rejection.' }
-        ]
-      };
+    fit('should fetch the rejection message', function() {
+      var messages = [
+        { text: 'Question submitted.' },
+        { text: 'This is a rejection.' }
+      ];
 
       let spyObj = spyOn(
         ThreadDataBackendApiService, 'fetchMessagesAsync')
-        .and.returnValue($q.resolve(responseDict));
+        .and.returnValue($q.resolve({
+          messages: messages
+        }));
 
       $scope.init();
       $rootScope.$apply();
 
-      expect(spyObj).toHaveBeenCalledWith();
+      expect(spyObj).toHaveBeenCalledWith(0);
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });

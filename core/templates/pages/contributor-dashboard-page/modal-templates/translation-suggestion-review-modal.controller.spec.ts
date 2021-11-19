@@ -463,7 +463,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope.init();
         $rootScope.$apply();
 
-        expect(spyObj).toHaveBeenCalledWith();
+        expect(spyObj).toHaveBeenCalledWith('suggestion_1');
         expect($scope.reviewMessage).toBe('');
       });
   });
