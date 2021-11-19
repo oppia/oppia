@@ -87,7 +87,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         chapter_title: 'chapter_2'
       }
     };
-    
+
     const suggestionIdToContribution = {
       suggestion_1: contribution1,
       suggestion_2: contribution2,
@@ -457,7 +457,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
   });
 
-  describe('when reviewing suggestions' + 
+  describe('when reviewing suggestions' +
     'with deleted opportunites', function() {
     const reviewable = false;
     let $httpBackend = null;
@@ -530,7 +530,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
       const $rootScope = $injector.get('$rootScope');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-      $httpBackend = $injector.get('$httpBackend');
 
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
