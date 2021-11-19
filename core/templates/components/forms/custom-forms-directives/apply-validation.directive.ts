@@ -27,7 +27,7 @@ interface InteractionValidator {
 interface ApplyValidationCustomScope extends ng.IScope {
   $ctrl: {
     validators: () => InteractionValidator[];
-  }
+  };
 }
 
 /* eslint-disable-next-line angular/directive-restrict */
