@@ -196,7 +196,8 @@ angular.module('oppia').controller(
 
         [$scope.activeSuggestionId, $scope.activeContribution] = (
           remainingContributions.pop());
-
+        // Close modal instance if activeContribution.details is null.
+        // See issue #14234.
         if (!$scope.activeContribution.details) {
           $uibModalInstance.close(resolvedSuggestionIds);
           return;
