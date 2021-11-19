@@ -19,8 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -30,8 +28,6 @@ describe('Pending Account Deletion Page Root', () => {
   let fixture: ComponentFixture<PendingAccountDeletionPageRootComponent>;
   let component: PendingAccountDeletionPageRootComponent;
   let pageHeadService: PageHeadService;
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
-  let loaderService: LoaderService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -53,9 +49,6 @@ describe('Pending Account Deletion Page Root', () => {
     fixture = TestBed.createComponent(PendingAccountDeletionPageRootComponent);
     component = fixture.componentInstance;
     pageHeadService = TestBed.inject(PageHeadService);
-    loaderService = TestBed.inject(LoaderService);
-    accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
   });
 
   it('should successfully instantiate the component',
@@ -65,37 +58,9 @@ describe('Pending Account Deletion Page Root', () => {
 
   it('should initialize and show page when access is valid', fakeAsync(() => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
-    spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
-      .and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();
     tick();
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.accountDeletionIsEnabled)
-      .toHaveBeenCalled();
     expect(component.pageIsShown).toBeTrue();
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
-
-  it('should initialize and show error page when server respond with error',
-    fakeAsync(() => {
-      spyOn(pageHeadService, 'updateTitleAndMetaTags');
-      spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
-        .and.returnValue(Promise.reject());
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(loaderService, 'hideLoadingScreen');
-      component.ngOnInit();
-      tick();
-      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.accountDeletionIsEnabled)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
 });

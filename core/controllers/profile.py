@@ -24,7 +24,6 @@ import zipfile
 
 from core import feconf
 from core import utils
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -404,9 +403,6 @@ class DeleteAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def delete(self):
         """Handles DELETE requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-
         wipeout_service.pre_delete_user(self.user_id)
         self.render_json({'success': True})
 
@@ -419,9 +415,6 @@ class ExportAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_EXPORT:
-            raise self.PageNotFoundException
-
         # Retrieve user data.
         user_takeout_object = takeout_service.export_data_for_user(
             self.user_id)

@@ -197,10 +197,6 @@ def main(args=None):
         run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:
-        stack.enter_context(common.inplace_replace_file_context(
-            common.CONSTANTS_FILE_PATH,
-            '"ENABLE_ACCOUNT_DELETION": .*',
-            '"ENABLE_ACCOUNT_DELETION": true,'))
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
 

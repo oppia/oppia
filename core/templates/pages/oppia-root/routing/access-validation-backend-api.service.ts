@@ -30,8 +30,6 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/can_manage_own_account');
   DOES_PROFILE_EXIST = (
     '/access_validation_handler/does_profile_exist/<username>');
-  ACCOUNT_DELETION_IS_ENABLED = (
-    '/access_validation_handler/account_deletion_is_enabled');
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
@@ -62,10 +60,6 @@ export class AccessValidationBackendApiService {
       });
 
     return this.http.get<void>(url).toPromise();
-  }
-
-  accountDeletionIsEnabled(): Promise<void> {
-    return this.http.get<void>(this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
   }
 
   validateAccessToReleaseCoordinatorPage():
