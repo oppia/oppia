@@ -9,7 +9,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success" (click)="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
+  <button class="btn btn-success" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText">Create Thread</button>
 </div>
 
 <style>
