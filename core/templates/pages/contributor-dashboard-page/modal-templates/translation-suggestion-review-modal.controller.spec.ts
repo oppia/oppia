@@ -542,50 +542,50 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it( 'should reject suggestion in suggestion modal service when clicking ' +
+    it('should reject suggestion in suggestion modal service when clicking ' +
       'on reject and review next suggestion button', function() {
-        expect($scope.activeSuggestionId).toBe('suggestion_1');
-        expect($scope.activeSuggestion).toEqual(suggestion1);
-        expect($scope.reviewable).toBe(reviewable);
-        expect($scope.reviewMessage).toBe('');
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
 
-        spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
-          .and.callFake((
-              targetId, suggestionId, action, reviewMessage, commitMessage,
-              callback) => {
-            callback();
-          });
-        spyOn(
-          SiteAnalyticsService,
-          'registerContributorDashboardRejectSuggestion');
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            callback) => {
+          callback();
+        });
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
 
-        $scope.reviewMessage = 'Review message example';
-        $scope.rejectAndReviewNext();
+      $scope.reviewMessage = 'Review message example';
+      $scope.rejectAndReviewNext();
 
-        expect($scope.activeSuggestionId).toBe('suggestion_2');
-        expect($scope.activeSuggestion).toEqual(suggestion2);
-        expect($scope.reviewable).toBe(reviewable);
-        expect($scope.reviewMessage).toBe('');
-        expect(
-          SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
-          .toHaveBeenCalledWith('Translation');
-        expect(contributionAndReviewService.resolveSuggestionToExploration)
-          .toHaveBeenCalledWith(
-            '1', 'suggestion_1', 'reject', 'Review message example',
-            'hint section of "StateName" card', $scope.showNextItemToReview);
+      expect($scope.activeSuggestionId).toBe('suggestion_2');
+      expect($scope.activeSuggestion).toEqual(suggestion2);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
 
-        $scope.reviewMessage = 'Review message example 2';
-        $scope.rejectAndReviewNext();
+      $scope.reviewMessage = 'Review message example 2';
+      $scope.rejectAndReviewNext();
 
-        expect(
-          SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
-          .toHaveBeenCalledWith('Translation');
-        expect(contributionAndReviewService.resolveSuggestionToExploration)
-          .toHaveBeenCalledWith(
-            '2', 'suggestion_2', 'reject', 'Review message example 2',
-            'hint section of "StateName" card', $scope.showNextItemToReview);
-        expect($uibModalInstance.close).toHaveBeenCalledWith([
-          'suggestion_1', 'suggestion_2']);
-      });
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '2', 'suggestion_2', 'reject', 'Review message example 2',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'suggestion_1', 'suggestion_2']);
+    });
   });
 });
