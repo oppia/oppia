@@ -88,8 +88,7 @@ describe('Rubrics Editor Component', () => {
   it('should get explanation validation status', () => {
     let index: number = 2;
     componentInstance.ngOnInit();
-    componentInstance.editableExplanations[difficulty][index] = 'not_empty';
-    expect(componentInstance.isExplanationValid(difficulty, index))
+    expect(componentInstance.isExplanationEmpty('not_empty'))
       .toBeTrue();
   });
 

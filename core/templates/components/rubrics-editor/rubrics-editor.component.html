@@ -65,18 +65,18 @@
             </button>
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
-                    [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), idx)
-                      || !this.isExplanationLengthValid()"
+                    [disabled]="!this.isExplanationEmpty(explanation)
+                      || !this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)"
                     (click)="this.saveExplanation(this.rubric.getDifficulty(), idx)">
               Save
             </button>
           </div>
           <br>
-          <div *ngIf="!this.isExplanationLengthValid()" class="rubric-error-message">
+          <div *ngIf="!this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)" class="rubric-error-message">
             Explanations should have at most 300 characters.
           </div>
           <div class="oppia-card-content-limit-error" *ngIf="this.isTotalExplanationsLengthReached()">
-            There can be total of 10 explanations considering all levels.
+            There can be maximum of 10 explanations across all levels.
           </div>
         </div>
       </div>
@@ -106,8 +106,8 @@
   }
 
   .oppia-card-content-limit-error {
-    background: #f1ce32;
-    border: 0.0625rem solid #333;
+    background: #FFF5C8;
+    border: 0.0625rem solid #827127;
     border-radius: 0.25rem;
     color: #333;
     padding-left: 0.25rem;

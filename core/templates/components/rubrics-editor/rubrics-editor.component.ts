@@ -91,22 +91,12 @@ export class RubricsEditorComponent {
     this.explanationEditorIsOpen[difficulty][index] = true;
   }
 
-  isExplanationValid(difficulty: string, index: number): boolean {
-    return Boolean(this.editableExplanations[difficulty][index]);
-  }
-
-  ismediumLevelExplanationLengthEqualsOne(difficulty: string): boolean {
-    if (difficulty === this.skillDifficultyMedium) {
-      return this.rubrics[1]._explanations.length === 1;
-    }
-    return false;
+  isExplanationLengthValid(difficulty: string, idx: number): boolean {
+    return this.editableExplanations[difficulty][idx].length <= 300;
   }
 
   isMediumLevelExplanationValid(): boolean {
-    if (this.rubrics[1]._explanations.length >= 1) {
-      return true;
-    }
-    return false;
+    return (this.rubrics[1]._explanations.length >= 1)
   }
 
   isTotalExplanationsLengthReached(): boolean {
@@ -122,10 +112,6 @@ export class RubricsEditorComponent {
         totalEasyExplanations + totalMediumExplanations +
         totalHardExplanations >= 10);
     }
-  }
-
-  isExplanationLengthValid(): boolean {
-    return this.editableExplanations[this.rubric.getDifficulty()][0].length <= 300;
   }
 
   updateExplanation($event: string, idx: number): void {
