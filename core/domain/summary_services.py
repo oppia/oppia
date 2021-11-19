@@ -261,7 +261,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            python_utils.ZIP(
+            zip(
                 exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
@@ -323,7 +323,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            python_utils.ZIP(
+            zip(
                 exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (

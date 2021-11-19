@@ -53,7 +53,7 @@ class RecentCommitsHandler(base.BaseHandler):
         unique_user_ids = list(set(commit.user_id for commit in all_commits))
         unique_usernames = user_services.get_usernames(unique_user_ids)
         user_id_to_username = dict(
-            python_utils.ZIP(unique_user_ids, unique_usernames))
+            zip(unique_user_ids, unique_usernames))
 
         all_commit_dicts = []
         for commit in all_commits:

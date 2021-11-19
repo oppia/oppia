@@ -873,7 +873,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
-            for state_name, dest_state_name in python_utils.ZIP(
+            for state_name, dest_state_name in zip(
                 state_names[:-1], state_names[1:]))
         actions.append({
             'action_type': 'ExplorationQuit',

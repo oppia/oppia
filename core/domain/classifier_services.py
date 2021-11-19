@@ -572,7 +572,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
         job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
             job_dicts)
 
-        for algorithm_id, job_id in python_utils.ZIP(
+        for algorithm_id, job_id in zip(
                 algorithm_ids_to_add, job_ids):
             state_training_jobs_mapping.algorithm_ids_to_job_ids[
                 algorithm_id] = job_id

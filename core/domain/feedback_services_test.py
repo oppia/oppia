@@ -425,7 +425,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID))
         # Check if the number of unread messages match.
         self.assertEqual(number_of_unread_threads, 0)
-        for summary, thread, exploration_title in python_utils.ZIP(
+        for summary, thread, exploration_title in zip(
                 thread_summaries, threads, exploration_titles):
             self.assertEqual(summary.status, thread.status)
             self.assertEqual(
@@ -525,7 +525,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Create a list of FullyQualifiedMessageIdentifier objects for the
         # sample_message_ids and sample_thread_ids.
         message_identifiers = []
-        for sample_thread_id, sample_message_id in python_utils.ZIP(
+        for sample_thread_id, sample_message_id in zip(
                 sample_thread_ids, sample_message_ids):
             message_identifiers.append(
                 feedback_domain.FullyQualifiedMessageIdentifier(
@@ -539,7 +539,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         # Assert tht the message_ids were added to message_ids_read_by_user
         # property of the corresponding thread.
-        for sample_thread_id, sample_message_id in python_utils.ZIP(
+        for sample_thread_id, sample_message_id in zip(
                 sample_thread_ids, sample_message_ids):
             self.assertEqual(
                 self._get_all_messages_read(self.user_id, sample_thread_id),

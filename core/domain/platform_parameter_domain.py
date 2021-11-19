@@ -390,7 +390,7 @@ class PlatformParameterFilter:
         version_a = version_a.split('.')
         version_b = version_b.split('.')
 
-        for sub_version_a, sub_version_b in python_utils.ZIP(
+        for sub_version_a, sub_version_b in zip(
                 version_a, version_b):
             if int(sub_version_a) < int(sub_version_b):
                 return True
