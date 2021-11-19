@@ -21,7 +21,7 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { CreatorDashboardBackendApiService, CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -31,6 +31,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 
 describe('Creator Dashboard Page Component', () => {
   let fixture: ComponentFixture<CreatorDashboardPageComponent>;
@@ -49,7 +50,8 @@ describe('Creator Dashboard Page Component', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         CreatorDashboardPageComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
+        SortByPipe
       ],
       providers: [],
       schemas: [NO_ERRORS_SCHEMA]
@@ -64,6 +66,7 @@ describe('Creator Dashboard Page Component', () => {
       CreatorDashboardBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     explorationCreationService = TestBed.inject(ExplorationCreationService);
+    userService = TestBed.inject(UserService);
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
@@ -244,7 +247,7 @@ describe('Creator Dashboard Page Component', () => {
         }]
       };
 
-      beforeEach(() => {
+      beforeEach(waitForAsync(() => {
         spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
           .and.returnValue(Promise.resolve({
             dashboardStats: CreatorDashboardStats
@@ -268,7 +271,7 @@ describe('Creator Dashboard Page Component', () => {
           Promise.resolve(userInfo as UserInfo));
 
         component.ngOnInit();
-      });
+      }));
 
       it('should save the exploration format view in the backend when creator' +
         ' changes the format view', () => {
@@ -284,10 +287,10 @@ describe('Creator Dashboard Page Component', () => {
 
       it('should reverse the sort order of explorations when the creator' +
         ' re-selects the current sorting type', () => {
-        expect(component.isCurrentSortDescending).toBe(true);
+        expect(component.isCurrentSortDescending).toBeTrue();
         expect(component.currentSortType).toBe('numOpenThreads');
         component.setExplorationsSortingOptions('numOpenThreads');
-        expect(component.isCurrentSortDescending).toBe(false);
+        expect(component.isCurrentSortDescending).toBeFalse();
       });
 
       it('should update the exploration sort order based on the' +
@@ -298,10 +301,10 @@ describe('Creator Dashboard Page Component', () => {
 
       it('should reverse the sort order of subscriptions when the creator' +
         ' re-selects the current sorting type', () => {
-        expect(component.isCurrentSubscriptionSortDescending).toBe(true);
+        expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
         expect(component.currentSubscribersSortType).toBe('username');
         component.setSubscriptionSortingOptions('username');
-        expect(component.isCurrentSubscriptionSortDescending).toBe(false);
+        expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
       });
 
       it('should update the subscription sort order based on the' +
@@ -335,7 +338,18 @@ describe('Creator Dashboard Page Component', () => {
         expect(component.sortByFunction({
           title: '',
           status: 'private'
-        })).toBe('Untitled');
+        } as CreatorExplorationSummary)).toBe('title');
+      });
+
+      it('should sort exploration list by options that is not last update' +
+        ' when trying to sort by number of views', () => {
+        component.setExplorationsSortingOptions('ratings');
+        expect(component.currentSortType).toBe('ratings');
+
+        expect(component.sortByFunction({
+          numViews: 0,
+          status: 'private'
+        } as CreatorExplorationSummary)).toBe(0);
       });
 
       it('should sort exploration list by last updated when last updated' +
@@ -346,7 +360,11 @@ describe('Creator Dashboard Page Component', () => {
         expect(component.sortByFunction({
           lastUpdatedMsec: 1,
           status: ''
-        })).toBe(1);
+        } as CreatorExplorationSummary)).toBe('lastUpdatedMsec');
+      });
+
+      it('should expect 0 to be returned', () => {
+        expect(component.returnZero()).toBe(0);
       });
 
       it('should not sort exploration list by options that is not last update' +
@@ -355,13 +373,13 @@ describe('Creator Dashboard Page Component', () => {
         expect(component.currentSortType).toBe('numViews');
 
         expect(component.sortByFunction({
-          numViews: '',
+          numViews: 0,
           status: 'private'
-        })).toBe(0);
+        } as CreatorExplorationSummary)).toBe('numViews');
       });
 
       it('should update exploration view and publish text on resizing page',
-        () => {
+        fakeAsync(() => {
           let innerWidthSpy = spyOnProperty(window, 'innerWidth');
           let spyObj = spyOn(
             creatorDashboardBackendApiService, 'postExplorationViewAsync')
@@ -385,10 +403,10 @@ describe('Creator Dashboard Page Component', () => {
 
           angular.element(window).triggerHandler('resize');
 
-          expect(component.myExplorationsView).toBe('list');
+          expect(component.myExplorationsView).toBe('card');
           expect(component.publishText).toBe(
             'This exploration is private. Publish it to receive statistics.');
-        });
+        }));
     });
 
   describe('when on collections tab', () => {
@@ -423,7 +441,7 @@ describe('Creator Dashboard Page Component', () => {
       suggestions_to_review_list: []
     };
 
-    beforeEach(() => {
+    beforeEach(waitForAsync(() => {
       spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue(Promise.resolve({
           dashboardStats: CreatorDashboardStats
@@ -446,7 +464,7 @@ describe('Creator Dashboard Page Component', () => {
         } as unknown as CreatorDashboardData));
 
       component.ngOnInit();
-    });
+    }));
 
     it('should evaluate active tab', () => {
       component.setActiveTab('myCollections');
@@ -455,16 +473,16 @@ describe('Creator Dashboard Page Component', () => {
   });
 
   describe('when fetching dashboard fails', () => {
-    it('should use reject handler', () => {
+    it('should use reject handler', fakeAsync(() => {
       spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue(Promise.reject({
           status: 404
         }));
-      spyOn(alertsService, 'addWarning').and.callThrough();
-
+      spyOn(alertsService, 'addWarning');
       component.ngOnInit();
+      tick();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
-    });
+    }));
   });
 });
