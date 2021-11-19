@@ -40,7 +40,7 @@ var suites = {
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
     ],
-  
+
     blogDashboard: [
       'protractor_desktop/blogDashboard.js'
     ],
@@ -284,6 +284,7 @@ exports.config = {
         // Actions.
         '--no-sandbox',
         '--disable-dev-shm-usage',
+        '--disable-gpu',
       ],
       prefs: {
         download: {

@@ -433,6 +433,7 @@
       "error",
       "any"
     ],
+    "@typescript-eslint/member-delimiter-style": ["error"],
     "@typescript-eslint/method-signature-style": ["error"],
     "@typescript-eslint/space-before-function-paren": [
       "error",
