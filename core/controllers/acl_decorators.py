@@ -3414,9 +3414,10 @@ def can_edit_entity(handler):
             return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_TOPIC:
             return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_SKILL:
-            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS:
+        elif (
+            entity_type == feconf.ENTITY_TYPE_SKILL or
+            entity_type == feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
+        ):
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)

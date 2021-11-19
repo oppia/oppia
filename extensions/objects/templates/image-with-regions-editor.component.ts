@@ -314,7 +314,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   getPreviewUrl(imageUrl: string): string {
-    if (this.contextService.getEntityType() !== AppConstants.ENTITY_TYPE.EXPLORATION) {
+    if (
+      this.contextService.getEntityType() !== (
+        AppConstants.ENTITY_TYPE.EXPLORATION)
+    ) {
       return this.assetsBackendApiService.getImageUrlForPreview(
         this.contextService.getEntityType(),
         this.contextService.getEntityId(),
