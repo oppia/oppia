@@ -34,9 +34,9 @@ export interface TranslatableItem {
   more: boolean
   dataFormat: string,
   contentType: string,
-  // These properties will be null when there
-  // is no interaction.
   text: string | string[] | null,
+  // The following two properties are set to null
+  // when interaction and ruletype is not selected.
   interactionId: string | null,
   ruleType: string | null
 }
@@ -53,7 +53,7 @@ export class StateAndContent {
     public dataFormat: string,
     public contentType: string,
     // The following two properties are set to null
-    // when they have no interaction.
+    // when interaction and ruletype is not selected.
     public interactionId: string | null,
     public ruleType: string | null
   ) {}
@@ -145,7 +145,7 @@ export class TranslateTextService {
       dataFormat: string,
       contentType: string,
       // The following two properties are set to null
-      // when they have no interaction.
+      // when interaction and ruletype is not selected.
       interactionId: string | null,
       ruleType: string | null
     } = this.stateAndContent[this.activeIndex];
