@@ -218,7 +218,7 @@ angular.module('oppia').component('questionsList', {
             if (commitMessage) {
               ctrl.questionIsBeingSaved = true;
               EditableQuestionBackendApiService.updateQuestionAsync(
-                ctrl.questionId, ctrl.question.getVersion(), commitMessage,
+                ctrl.questionId, commitMessage,
                 QuestionUndoRedoService.getCommittableChangeList()).then(
                 function() {
                   QuestionUndoRedoService.clearChanges();

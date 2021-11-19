@@ -193,12 +193,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'version': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
-            },
             'commit_message': {
                 'schema': {
                     'type': 'basestring',

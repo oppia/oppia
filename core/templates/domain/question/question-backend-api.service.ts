@@ -91,7 +91,7 @@ export class QuestionBackendApiService {
       errorCallback: (reason: string) => void): void {
     var questionsCountUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTION_COUNT_URL_TEMPLATE, {
-        comma_separated_skill_ids: skillIds.join(','),
+        skill_ids: JSON.stringify(skillIds),
       }
     );
     this.http.get<QuestionCountBackendResponse>(
@@ -113,7 +113,7 @@ export class QuestionBackendApiService {
 
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {
-        comma_separated_skill_ids: skillIds.join(','),
+        skill_ids: JSON.stringify(skillIds),
         offset: offset.toString()
       });
     this.http.get<QuestionSummariesBackendResponse>(

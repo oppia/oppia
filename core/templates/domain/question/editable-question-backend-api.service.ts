@@ -127,7 +127,6 @@ export class EditableQuestionBackendApiService {
   }
   private async _updateQuestionAsync(
       questionId: string,
-      questionVersion: string,
       commitMessage: string,
       changeList: string[],
       successCallback: (value: QuestionBackendDict) => void,
@@ -139,7 +138,6 @@ export class EditableQuestionBackendApiService {
         });
 
       let putData = {
-        version: questionVersion,
         commit_message: commitMessage,
         change_list: changeList
       };
@@ -208,10 +206,7 @@ export class EditableQuestionBackendApiService {
   }
 
   /**
-  * Updates a question in the backend with the provided question ID.
-  * The changes only apply to the question of the given version and the
-  * request to update the question will fail if the provided question
-  * version is older than the current version stored in the backend. Both
+  * Updates a question in the backend with the provided question ID. Both
   * the changes and the message to associate with those changes are used
   * to commit a change to the question. The new question is passed to
   * the success callback, if one is provided to the returned promise
@@ -219,12 +214,11 @@ export class EditableQuestionBackendApiService {
   */
   async updateQuestionAsync(
       questionId: string,
-      questionVersion: string,
       commitMessage: string,
       changeList: string[]): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
       this._updateQuestionAsync(
-        questionId, questionVersion,
+        questionId,
         commitMessage, changeList, resolve, reject);
     });
   }

@@ -309,10 +309,10 @@ URLS = [
         r'%s' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
-        r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
+        r'%s/<skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
         questions_list.QuestionsListHandler),
     get_redirect_route(
-        r'%s/<comma_separated_skill_ids>' % feconf.QUESTION_COUNT_URL_PREFIX,
+        r'%s/<skill_ids>' % feconf.QUESTION_COUNT_URL_PREFIX,
         questions_list.QuestionCountDataHandler),
     get_redirect_route(
         r'%s/practice/session' % feconf.TOPIC_VIEWER_URL_PREFIX,

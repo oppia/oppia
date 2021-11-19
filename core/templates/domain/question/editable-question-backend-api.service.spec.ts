@@ -241,14 +241,13 @@ describe('Editable question backend API service', function() {
       flushMicrotasks();
 
       question.question_state_data.content.html = 'New Question Content';
-      question.version = '2';
       let questionWrapper = {
         questionDict: question
       };
 
       // Send a request to update question.
       editableQuestionBackendApiService.updateQuestionAsync(
-        question.id, question.version, 'Question Data is updated', []
+        question.id, 'Question Data is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
         '/question_editor_handler/data/0');
@@ -265,7 +264,7 @@ describe('Editable question backend API service', function() {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     editableQuestionBackendApiService.updateQuestionAsync(
-      '1', '1', 'Update an invalid question.', []
+      '1', 'Update an invalid question.', []
     ).then(successHandler, failHandler);
 
     var req = httpTestingController.expectOne(
