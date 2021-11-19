@@ -21,8 +21,7 @@ import { EventEmitter } from '@angular/core';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 import { UserInfo } from 'domain/user/user-info.model';
-import { CookieModule, CookieService } from 'ngx-cookie';
-import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { TranslateCacheService } from 'ngx-translate-cache';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
@@ -31,12 +30,11 @@ import { I18nService } from './i18n.service';
 
 describe('I18n service', () => {
   let i18nService: I18nService;
-  let cookieService: CookieService;
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let userService: UserService;
   let userBackendApiService: UserBackendApiService;
-  const CACHE_KEY_FOR_TESTS: string = 'CACHED_LANG_KEY';
+  const CACHE_KEY = 'lang';
 
   class MockWindowRef {
     nativeWindow = {
@@ -62,11 +60,6 @@ describe('I18n service', () => {
       return 'cached_lang';
     }
   }
-
-  class MockTranslateCacheSettings {
-    cacheName = CACHE_KEY_FOR_TESTS;
-  }
-
   class MockTranslateService {
     use(langCode: string): void {}
   }
@@ -74,21 +67,16 @@ describe('I18n service', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule,
-        CookieModule.forRoot()
+        HttpClientTestingModule
       ],
       providers: [
         {
-          provide: TranslateCacheService,
-          useClass: MockTranslateCacheService
-        },
-        {
-          provide: TranslateCacheSettings,
-          useClass: MockTranslateCacheSettings
-        },
-        {
           provide: TranslateService,
           useClass: MockTranslateService
+        },
+        {
+          provide: TranslateCacheService,
+          useClass: MockTranslateCacheService
         },
         {
           provide: WindowRef,
@@ -100,7 +88,6 @@ describe('I18n service', () => {
 
   beforeEach(() => {
     i18nService = TestBed.inject(I18nService);
-    cookieService = TestBed.inject(CookieService);
     windowRef = TestBed.inject(WindowRef);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     userService = TestBed.inject(UserService);
@@ -109,21 +96,30 @@ describe('I18n service', () => {
 
   it('should set cache language according to URL lang param', () => {
     // Setting 'en' as cache language code.
-    cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
+    if (i18nService.localStorage) {
+      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    }
     // This sets the url to 'http://localhost:8181/?lang=es'
     // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/?lang=es');
-    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null)
+      .toBe('en');
 
     i18nService.initialize();
 
-    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('es');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null)
+      .toBe('es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
-    cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
-    spyOn(cookieService, 'put');
+    if (i18nService.localStorage) {
+      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    }
     // This sets the url to 'http://localhost:8181/?lang=invalid'
     // when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
@@ -133,24 +129,29 @@ describe('I18n service', () => {
 
     // Translation cache should not be updated as the language param
     // is invalid.
-    expect(cookieService.put).not.toHaveBeenCalledWith();
-    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
   });
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
-    cookieService.put(CACHE_KEY_FOR_TESTS, 'en');
+    if (i18nService.localStorage) {
+      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+    }
     // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
       .and.returnValue('http://localhost:8181/');
-    spyOn(cookieService, 'put');
 
-    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
 
     i18nService.initialize();
 
-    expect(cookieService.put).not.toHaveBeenCalledWith();
-    expect(cookieService.get(CACHE_KEY_FOR_TESTS)).toBe('en');
+    expect(
+      i18nService.localStorage ?
+      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
   });
 
   it('should remove url lang param', () => {
