@@ -632,9 +632,9 @@
 
 
 # User Data Takeout.
-# TODO(#14285): Re-add @BenHenning for both.
-/core/domain/takeout_*.py @vojtechjelinek
-/core/domain/wipeout_*.py @vojtechjelinek
+# TODO(#14285): Replace @seanlip with @BenHenning for both.
+/core/domain/takeout_*.py @seanlip @vojtechjelinek
+/core/domain/wipeout_*.py @seanlip @vojtechjelinek
 
 
 # User’s profile page.
