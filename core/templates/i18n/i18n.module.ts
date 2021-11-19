@@ -66,10 +66,7 @@ import { I18nService } from './i18n.service';
         provide: TranslateCacheService,
         useFactory: TranslateCacheFactory.createTranslateCacheService,
         deps: [TranslateService, TranslateCacheSettings]
-      },
-      cacheName: 'NG_TRANSLATE_LANG_KEY',
-      cacheMechanism: 'Cookie',
-      cookieExpiry: 30
+      }
     })
   ],
 
