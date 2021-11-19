@@ -202,7 +202,7 @@ describe('Supplemental card component', () => {
       ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS);
   });
 
-  it('should update displayedCard', () => {
+  it('should update the displayedCard when changes are detected', () => {
     let updatedStateCard = new StateCard(
       'state_name', 'new content', 'html', null, [], null,
       null, '', null);;
