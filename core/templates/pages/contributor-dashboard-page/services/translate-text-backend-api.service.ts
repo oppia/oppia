@@ -39,29 +39,34 @@ export class TranslateTextBackendApiService {
       return TranslatableTexts.createFromBackendDict(backendDict);
     });
   }
-  blob2Base64 = (blob: Blob): Promise<string> => {
+  async blobtoBase64(blob: Blob): Promise<string> {
     return new Promise<string> ((resolve, reject)=> {
       const reader = new FileReader();
-      reader.onerror = error => reject(error);
+      reader.readAsDataURL(blob);
       reader.onloadend = () => {
         const dataurl = reader.result as string;
         const base64 = dataurl.substring(dataurl.indexOf(',') + 1);
         resolve(base64);
       };
-      reader.readAsDataURL(blob);
+      reader.onerror = error => reject(error);
     });
-  };
+  }
   async ImagesDict(imagesData: ImagesData[]): Promise<object> {
-    return new Promise<object>((resolve, reject) => {
-      const images = {};
-      imagesData.forEach(async obj => {
-        if (obj.imageBlob === null) {
-          throw new Error('No image data found');
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<object>(async(resolve, reject) => {
+      try {
+        const images: {[key: string]: string} = {};
+        for await (const obj of imagesData) {
+          if (obj.imageBlob === null) {
+            reject(new Error('No image data found'));
+          }
+          const image = await this.blobtoBase64(obj.imageBlob);
+          images[obj.filename] = image;
         }
-        const image = await this.blob2Base64(obj.imageBlob);
-        images[obj.filename] = image;
         resolve(images);
-      });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
   async suggestTranslatedTextAsync(
@@ -89,7 +94,7 @@ export class TranslateTextBackendApiService {
     const body = new FormData();
     const images = await this.ImagesDict(imagesData);
     if (Object.keys(images).length !== 0) {
-      postData.files = {...images};
+      postData.files = images;
     }
     body.append('payload', JSON.stringify(postData));
     return this.http.post(
