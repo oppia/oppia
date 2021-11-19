@@ -121,13 +121,13 @@ describe('Create New Story Modal Component', function() {
   });
 
   it('should not update topic url fragment if not provided by user',
-  () => {
-    componentInstance.newlyCreatedStory.urlFragment = '';
-    spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
-    componentInstance.onStoryUrlFragmentChange();
-    expect(storyEditorStateService.updateExistenceOfStoryUrlFragment)
-      .not.toHaveBeenCalled();
-  });
+    () => {
+      componentInstance.newlyCreatedStory.urlFragment = '';
+      spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
+      componentInstance.onStoryUrlFragmentChange();
+      expect(storyEditorStateService.updateExistenceOfStoryUrlFragment)
+        .not.toHaveBeenCalled();
+    });
 
   it('should check if url fragment already exists', () => {
     spyOn(

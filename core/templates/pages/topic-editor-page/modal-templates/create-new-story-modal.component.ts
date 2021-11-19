@@ -17,7 +17,7 @@
  */
 
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
@@ -34,7 +34,7 @@ import constants from 'assets/constants';
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   allowedBgColors: object = constants.ALLOWED_THUMBNAIL_BG_COLORS.story;
   validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
-  newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();;
+  newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
   storyUrlFragmentExists: boolean = false;
   hostname: string = this.windowRef.nativeWindow.location.hostname;
   classroomUrlFragment: string;
@@ -72,15 +72,15 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
 
   onStoryUrlFragmentChange(): void {
     if (!this.newlyCreatedStory.urlFragment) {
-        return;
+      return;
     }
 
     this.storyEditorStateService.updateExistenceOfStoryUrlFragment(
       this.newlyCreatedStory.urlFragment, ()=> {
-       this.storyUrlFragmentExists = (
+        this.storyUrlFragmentExists = (
           this.storyEditorStateService.getStoryWithUrlFragmentExists());
       });
-    }
+  }
 
   isValid(): boolean {
     return Boolean(
