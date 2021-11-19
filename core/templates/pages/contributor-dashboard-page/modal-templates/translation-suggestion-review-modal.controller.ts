@@ -151,6 +151,8 @@ angular.module('oppia').controller(
         $scope.startedEditing = false;
         $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingContributions.length <= 0;
+        console.log("LOOK HERE JIM::::: " + remainingContributions.length);
+        console.log(JSON.stringify($scope.activeContribution));
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
         $scope.status = $scope.activeSuggestion.status;
@@ -196,6 +198,12 @@ angular.module('oppia').controller(
 
         [$scope.activeSuggestionId, $scope.activeContribution] = (
           remainingContributions.pop());
+
+        if (!$scope.activeContribution.details) {
+          $uibModalInstance.close(resolvedSuggestionIds);
+          return;
+        }
+
         $scope.activeSuggestion = $scope.activeContribution.suggestion;
         $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(
