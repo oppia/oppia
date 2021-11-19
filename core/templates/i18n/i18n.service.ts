@@ -19,8 +19,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
-import { CookieService } from 'ngx-cookie';
-import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { TranslateCacheService } from 'ngx-translate-cache';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -40,16 +39,27 @@ export class I18nService {
   private _directionChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
   url!: URL;
+  // Check that local storage exists and works as expected.
+  // If it does storage stores the localStorage object,
+  // else storage is undefined or false.
+  localStorage = (function() {
+    let test = 'test';
+    let result;
+    try {
+      localStorage.setItem(test, test);
+      result = localStorage.getItem(test) === test;
+      localStorage.removeItem(test);
+      return result && localStorage;
+    } catch (exception) {}
+  }());
 
   constructor(
-    private cookieService: CookieService,
     private documentAttributeCustomizationService:
     DocumentAttributeCustomizationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userBackendApiService: UserBackendApiService,
     private userService: UserService,
     private translateCacheService: TranslateCacheService,
-    private translateCacheSettings: TranslateCacheSettings,
     private translateService: TranslateService,
     private windowRef: WindowRef
   ) {}
@@ -84,15 +94,16 @@ export class I18nService {
       );
       let siteLanguageCode = searchParams.get('lang') || '';
       if (supportedSiteLanguageCodes.includes(siteLanguageCode)) {
-        // When translation cache is initialized, language code stored in cookie
-        // is used to set the site language. To have a single source of truth,
-        // we first directly update the language code in cookie using URL before
-        // intializing the translation cache, so that we always read the
-        // language code from the cookie to set site language. This removes
-        // the need of continously syncing URL lang param and cache, and
-        // avoids race conditions.
-        this.cookieService.put(
-          this.translateCacheSettings.cacheName, siteLanguageCode);
+        // When translation cache is initialized, language code stored in local
+        // storage is used to set the site language. To have a single source of
+        // truth, we first directly update the language code in local storage
+        // before intializing the translation cache, so that we always read the
+        // language code from the local storage to set site language.
+        // This removes the need of continously syncing URL lang param and
+        // cache, and avoids race conditions.
+        if (this.localStorage) {
+          this.localStorage.setItem('lang', siteLanguageCode);
+        }
       } else {
         // In the case where the URL contains an invalid language code, we
         // load the site using last cached language code and remove the language
@@ -106,7 +117,7 @@ export class I18nService {
     // The translateCacheService should only be initialized after the
     // translation cache is set according to the URL language parameter (if
     // present).This avoids race conditions between the URL language parameter
-    // and the language code stored in the local cookie.
+    // and the language code stored in the local storage.
     this.translateCacheService.init();
 
     const cachedLanguageCode = (
