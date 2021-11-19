@@ -686,11 +686,12 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'],
-            'Invalid filename extension: it should have '
-            'one of the following extensions: %s'
-            % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation'
+            ' failed: is_allowed_audio_extension (\{\}) for object '
+            'test.wav'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_empty_audio(self):
         """Test upload of empty audio."""
@@ -707,7 +708,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'No audio supplied')
+        error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: Validation'
+            ' failed: is_nonempty (\{\}) for object b\'\''
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_bad_audio(self):
         """Test upload of malformed audio."""
@@ -748,11 +753,12 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'],
-            'No filename extension: it should have '
-            'one of the following extensions: '
-            '%s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': \'^[A-Za-z0-9-]+[.][a-z'
+            '0-9]+$\'}) for object test'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_exceed_max_length_detected(self):
         """Test that audio file is less than max playback length."""
