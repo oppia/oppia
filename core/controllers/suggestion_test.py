@@ -2244,7 +2244,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'new_value': {
                         'content_id': 'content',
-                        'html': '<p>new content html</p>'
+                        'html': '<p>new content html&nbsp;Text</p>'
                     }
                 })], 'Add content')
 
@@ -2258,7 +2258,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': '<p>new content html</p>',
+            'content_html': '<p>new content html Text</p>',
             'translation_html': '<p>new content html in Hindi</p>',
             'data_format': 'html'
         }
@@ -2314,6 +2314,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             suggestion['suggestion_type'],
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
         )
+        self.assertEqual(
+            suggestion['exploration_content_html'],
+            '<p>new content html Text</p>')
         self.assertEqual(
             suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(suggestion['target_id'], self.EXP_ID)

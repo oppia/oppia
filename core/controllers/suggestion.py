@@ -478,7 +478,9 @@ def _construct_exploration_suggestions(suggestions):
         content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
             suggestion.change.state_name, suggestion.change.content_id)
         suggestion_dict = suggestion.to_dict()
-        suggestion_dict['exploration_content_html'] = content_html
+        # Make sure the exploration_content_html is cleaned. See issue #14230.
+        suggestion_dict['exploration_content_html'] = html_cleaner.clean(
+            content_html)
         suggestion_dicts.append(suggestion_dict)
     return suggestion_dicts
 
