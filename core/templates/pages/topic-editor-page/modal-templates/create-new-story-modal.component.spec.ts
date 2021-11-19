@@ -25,27 +25,35 @@ import { StoryEditorStateService } from 'pages/story-editor-page/services/story-
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
-import { CreateNewTopicModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-topic-modal.component';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { ContextService } from 'services/context.service';
 import constants from 'assets/constants';
 
-
-describe('Create New Story Modal Component', function() {
+fdescribe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
   let fixture: ComponentFixture<CreateNewStoryModalComponent>;
   let contextService: ContextService;
   let ngbActiveModal: NgbActiveModal;
   let imageLocalStorageService: ImageLocalStorageService;
   let storyEditorStateService: StoryEditorStateService;
+  let windowRef: WindowRef;
 
-  
   class MockWindowRef {
     nativeWindow = {
       location: {
         hostname: ''
       }
     };
+  }
+
+  class MockActiveModal {
+    close(): void {
+      return;
+    }
+  
+    dismiss(): void {
+      return;
+    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -55,16 +63,19 @@ describe('Create New Story Modal Component', function() {
         FormsModule
       ],
       declarations: [
-        CreateNewTopicModalComponent,
+        CreateNewStoryModalComponent,
       ],
       providers: [
-        NgbActiveModal,
         ImageLocalStorageService,
         TopicEditorStateService,
         {
           provide: WindowRef,
           useClass: MockWindowRef
-        }
+        },
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -75,6 +86,7 @@ describe('Create New Story Modal Component', function() {
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    windowRef = TestBed.inject(WindowRef);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
   });
@@ -83,11 +95,11 @@ describe('Create New Story Modal Component', function() {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should intialize', () => {
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
-    componentInstance.ngOnInit();
-    expect(contextService.setImageSaveDestinationToLocalStorage)
-      .toHaveBeenCalled();
+  it('should check if properties was initialized correctly', function() {
+    expect(componentInstance.newlyCreatedStory.title).toBe('');
+    expect(componentInstance.newlyCreatedStory.description).toBe('');
+    expect(componentInstance.MAX_CHARS_IN_STORY_TITLE).toBe(
+      constants.MAX_CHARS_IN_STORY_TITLE);
   });
 
   it('should save new topic', () => {
@@ -135,14 +147,7 @@ describe('Create New Story Modal Component', function() {
       .not.toHaveBeenCalled();
   });
 
-  it('should check if properties was initialized correctly', function() {
-    expect(this.story.title).toBe('');
-    expect(this.story.description).toBe('');
-    expect(this.MAX_CHARS_IN_STORY_TITLE).toBe(
-      constants.MAX_CHARS_IN_STORY_TITLE);
-  });
-
-  it('should check if url fragment already exists', function() {
+  it('should check if url fragment already exists', () => {
     spyOn(
       storyEditorStateService,
       'updateExistenceOfStoryUrlFragment').and.callFake(
@@ -150,10 +155,9 @@ describe('Create New Story Modal Component', function() {
     spyOn(
       storyEditorStateService,
       'getStoryWithUrlFragmentExists').and.returnValue(true);
-    expect(this.storyUrlFragmentExists).toBeFalse();
-    this.story.urlFragment = 'test-url';
-    this.onStoryUrlFragmentChange();
-    expect(this.storyUrlFragmentExists).toBeTrue();
+    expect(componentInstance.storyUrlFragmentExists).toBeFalse();
+    componentInstance.newlyCreatedStory.urlFragment = 'test-url';
+    componentInstance.onStoryUrlFragmentChange();
+    expect(componentInstance.storyUrlFragmentExists).toBeTrue();
   });
-
 });
