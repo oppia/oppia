@@ -28,6 +28,7 @@ import time
 import urllib
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.controllers import payload_validator
@@ -347,7 +348,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if (
             handler_class_name in
-            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
         ):
             # TODO(#13155): Remove this clause once all the handlers have had
             # schema validation implemented.
@@ -393,7 +394,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         self.request.route_kwargs, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
 
