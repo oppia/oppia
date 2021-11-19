@@ -262,8 +262,10 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/question_suggestions/%s' % (self.IMAGE_UPLOAD_URL_PREFIX,
-            skill_id),
+            '%s/question_suggestions/%s' % (
+                self.IMAGE_UPLOAD_URL_PREFIX,
+                skill_id
+            ),
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)
