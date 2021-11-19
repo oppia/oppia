@@ -220,7 +220,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         base_models.BaseModel.update_timestamps_multi(
             models_2_without_none, update_last_updated_time=False)
         base_models.BaseModel.put_multi(models_2_without_none)
-        for model_id, last_updated in ZIP(
+        for model_id, last_updated in zip(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
             self.assertEqual(model.last_updated, last_updated)
@@ -233,7 +233,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         )
         base_models.BaseModel.update_timestamps_multi(models_3_without_none)
         base_models.BaseModel.put_multi(models_3_without_none)
-        for model_id, last_updated in ZIP(
+        for model_id, last_updated in zip(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
             self.assertNotEqual(model.last_updated, last_updated)

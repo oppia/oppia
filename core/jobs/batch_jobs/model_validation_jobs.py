@@ -118,7 +118,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 beam.ParDo(base_validation.ValidateDeletedModel()))
         ]
 
-        model_groups = ZIP(KIND_BY_INDEX, models_of_kind_by_index)
+        model_groups = zip(KIND_BY_INDEX, models_of_kind_by_index)
         for kind, models_of_kind in model_groups:
             audit_error_pcolls.extend(models_of_kind | ApplyAuditDoFns(kind))
 

@@ -340,7 +340,7 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights_models = CollectionRightsModel.get_multi(
                 entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
-            for model, rights_model in ZIP(
+            for model, rights_model in zip(
                     versioned_models, collection_rights_models):
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
