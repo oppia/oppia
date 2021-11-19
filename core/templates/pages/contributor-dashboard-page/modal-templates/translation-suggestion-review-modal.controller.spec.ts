@@ -75,6 +75,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       },
       exploration_content_html: 'Translation CHANGED'
     };
+
     const contribution1 = {
       suggestion: suggestion1,
       details: null
@@ -90,7 +91,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     const suggestionIdToContribution = {
       suggestion_1: contribution1,
-      suggestion_2: contribution2,
+      suggestion_2: contribution2
     };
     beforeEach(angular.mock.inject(function($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
@@ -522,7 +523,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     const suggestionIdToContribution = {
       suggestion_1: contribution1,
       suggestion_deleted: deletedContribution,
-      suggestion_2: contribution2,
+      suggestion_2: contribution2
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
