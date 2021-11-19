@@ -23,6 +23,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContextService } from 'services/context.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
+import { AppConstants } from 'app.constants';
 
 describe('ImageWithRegionsEditorComponent', () => {
   let component: ImageWithRegionsEditorComponent;
@@ -105,12 +106,65 @@ describe('ImageWithRegionsEditorComponent', () => {
     // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new MockImageObject(490, 864));
-    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
   });
 
   it('should initialize component when interaction editor is opened.', () => {
     spyOn(component, 'initializeEditor').and.callThrough();
     spyOn(component, 'imageValueChanged').and.callThrough();
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
+    spyOn(component.valueChanged, 'emit');
+
+    component.ngOnInit();
+
+    expect(component.alwaysEditable).toBe(true);
+    expect(component.SCHEMA).toEqual({
+      type: 'custom',
+      obj_type: 'Filepath'
+    });
+    // Testing values initialised in initializeEditor function.
+    expect(component.initializeEditor).toHaveBeenCalled();
+    expect(component.mouseX).toBe(0);
+    expect(component.mouseY).toBe(0);
+    expect(component.originalMouseX).toBe(0);
+    expect(component.originalMouseY).toBe(0);
+    expect(component.originalRectArea).toEqual({
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    });
+    expect(component.rectX).toBe(0);
+    expect(component.rectY).toBe(0);
+    expect(component.rectWidth).toBe(0);
+    expect(component.rectHeight).toBe(0);
+    expect(component.userIsCurrentlyDrawing).toBe(false);
+    expect(component.userIsCurrentlyDragging).toBe(false);
+    expect(component.userIsCurrentlyResizing).toBe(false);
+    expect(component.xDirection).toBe(0);
+    expect(component.yDirection).toBe(0);
+    expect(component.yDirectionToggled).toBe(false);
+    expect(component.xDirectionToggled).toBe(false);
+    expect(component.movedOutOfRegion).toBe(false);
+    expect(component.resizableBorderWidthPx).toBe(10);
+    expect(component.hoveredRegion).toBeNull();
+    expect(component.selectedRegion).toBeNull();
+    expect(component.errorText).toBe('');
+    // Testing values initalised in the imageValueChanged function.
+    expect(component.imageValueChanged).toHaveBeenCalled();
+    expect(component.originalImageWidth).toBe(490);
+    expect(component.originalImageHeight).toBe(864);
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
+  });
+
+  it('should initialize component when interaction editor is opened with a' +
+  ' custom entity context', () => {
+    spyOn(component, 'initializeEditor').and.callThrough();
+    spyOn(component, 'imageValueChanged').and.callThrough();
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     spyOn(component.valueChanged, 'emit');
 
     component.ngOnInit();
@@ -161,6 +215,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return selected region css styling for the rectangle' +
   ' when a region is selected', () => {
     component.selectedRegion = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionStyle(0))
       .toBe('fill: #00f; opacity: 0.5; stroke: #00d');
@@ -169,6 +226,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return default region css styling for the rectangle' +
   ' when a region is not selected', () => {
     component.selectedRegion = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionStyle(1))
       .toBe('fill: white; opacity: 0.5; stroke: #ddd');
@@ -177,6 +237,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return selected region trash icon css styling' +
   ' when a region is selected', () => {
     component.selectedRegion = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionTrashStyle(0))
       .toBe('fill: #eee; opacity: 0.7');
@@ -185,6 +248,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return default trash icon css styling for the trash icon' +
   ' when a region is not selected', () => {
     component.selectedRegion = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionTrashStyle(1))
       .toBe('fill: #333; opacity: 0.7');
@@ -193,6 +259,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return region label css styling for a selected region' +
   ' when a region is selected', () => {
     component.selectedRegion = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionLabelStyle(0))
       .toBe(
@@ -203,6 +272,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return default label css styling for other regions' +
   ' when a region is not selected', () => {
     component.selectedRegion = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionLabelStyle(1))
       .toBe(
@@ -231,6 +303,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.selectedRegion = 0;
     component.originalImageWidth = 490;
     component.originalImageHeight = 864;
@@ -245,6 +320,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should return default label css styling for other regions' +
   ' when no region is selected', () => {
     component.selectedRegion = null;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getRegionLabelEditorStyle()).toBe('display: none');
   });
@@ -253,6 +331,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.selectedRegion = null;
     component.selectedRegion = 0;
     component.errorText = '';
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.value.labeledRegions[0].label).toBe('Region1');
 
@@ -267,6 +348,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.selectedRegion = null;
     component.selectedRegion = 0;
     component.errorText = '';
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.value.labeledRegions[0].label).toBe('Region1');
 
@@ -298,6 +382,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     );
     spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(500);
     spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(400);
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDrawing = true;
     component.originalMouseX = 200;
@@ -334,6 +421,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     );
     spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(700);
     spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(600);
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDragging = true;
     component.originalMouseX = 500;
@@ -400,6 +490,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     );
     spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(2000);
     spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(1707);
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDragging = true;
     component.originalMouseX = 500;
@@ -467,6 +560,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     );
     spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(600);
     spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(400);
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDrawing = false;
     component.userIsCurrentlyDragging = false;
@@ -541,6 +637,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     );
     spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(600);
     spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(200);
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDrawing = false;
     component.userIsCurrentlyDragging = false;
@@ -602,6 +701,9 @@ describe('ImageWithRegionsEditorComponent', () => {
       800, 600, 500, 400, false, false, false, false, 0, null
     );
     spyOn(Event.prototype, 'preventDefault');
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.mouseX = 500;
     component.mouseY = 400;
     component.hoveredRegion = null;
@@ -629,6 +731,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.movedOutOfRegion = true;
     component.xDirection = 1;
     component.yDirection = 1;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onSvgMouseUp();
 
@@ -658,6 +763,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.xDirectionToggled = true;
     component.yDirectionToggled = true;
     component.userIsCurrentlyDrawing = true;
@@ -768,6 +876,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   ' a region', () => {
     component.hoveredRegion = null;
     component.movedOutOfRegion = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onMouseoverRegion(1);
 
@@ -782,6 +893,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.xDirection = 1;
     component.yDirection = 1;
     component.movedOutOfRegion = false;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onMouseoutRegion(1);
 
@@ -797,6 +911,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.xDirection = 1;
     component.yDirection = 1;
     component.movedOutOfRegion = false;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onMouseoutRegion(1);
 
@@ -825,6 +942,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.originalImageWidth = 968;
     component.originalImageHeight = 1707;
     component.xDirection = 1;
@@ -861,6 +981,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.originalImageWidth = 968;
     component.originalImageHeight = 1707;
     component.hoveredRegion = 1;
@@ -886,6 +1009,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   ' while editing the region label', () => {
     component.userIsCurrentlyDragging = true;
     component.userIsCurrentlyResizing = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.regionLabelEditorMouseUp();
 
@@ -901,6 +1027,9 @@ describe('ImageWithRegionsEditorComponent', () => {
       }) as NgbModalRef);
     spyOn(component, 'imageValueChanged');
     spyOn(component, 'initializeEditor');
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.value).toEqual({
       imagePath: 'img_20210627_214959_mwljsqraka_height_691_width_392.svg',
@@ -963,6 +1092,9 @@ describe('ImageWithRegionsEditorComponent', () => {
       }) as NgbModalRef);
     spyOn(component, 'imageValueChanged');
     spyOn(component, 'initializeEditor');
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.resetEditor();
 
@@ -1007,6 +1139,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.originalImageWidth = 968;
     component.originalImageHeight = 1707;
     component.mouseX = 500;
@@ -1043,6 +1178,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.originalImageWidth = 968;
     component.originalImageHeight = 1707;
     component.mouseX = 100;
@@ -1079,6 +1217,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     component.originalImageWidth = 968;
     component.originalImageHeight = 1707;
     component.mouseX = 200;
@@ -1098,6 +1239,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.xDirection = 0;
     component.yDirection = 0;
     component.userIsCurrentlyDragging = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onMouseMoveRegion(0);
 
@@ -1112,6 +1256,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.xDirection = 0;
     component.yDirection = 0;
     component.userIsCurrentlyResizing = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onMouseMoveRegion(0);
 
@@ -1124,6 +1271,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should delete region when user clicks the trash icon', () => {
     component.selectedRegion = 1;
     component.hoveredRegion = 1;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.value.labeledRegions).toEqual([
       {
@@ -1188,6 +1338,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   ' when user deletes a region', () => {
     component.selectedRegion = 1;
     component.hoveredRegion = 1;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.value.labeledRegions).toEqual([
       {
@@ -1255,6 +1408,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.yDirection = 1;
     component.xDirectionToggled = true;
     component.yDirectionToggled = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getCursorStyle()).toBe('se-resize');
   });
@@ -1265,6 +1421,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.yDirection = -1;
     component.xDirectionToggled = true;
     component.yDirectionToggled = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getCursorStyle()).toBe('nw-resize');
   });
@@ -1274,6 +1433,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.hoveredRegion = 0;
     component.xDirection = 0;
     component.yDirection = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getCursorStyle()).toBe('pointer');
   });
@@ -1283,6 +1445,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.hoveredRegion = null;
     component.xDirection = 0;
     component.yDirection = 0;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getCursorStyle()).toBe('crosshair');
   });
@@ -1293,6 +1458,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.yDirection = 1;
     component.xDirectionToggled = false;
     component.yDirectionToggled = true;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getCursorStyle()).toBe('s-resize');
   });
@@ -1303,6 +1471,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.yDirection = 0;
     component.xDirectionToggled = true;
     component.yDirectionToggled = false;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     expect(component.getCursorStyle()).toBe('e-resize');
   });

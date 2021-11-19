@@ -70,11 +70,12 @@ class SuggestionHandler(base.BaseHandler):
         ):
             self.render_json(self.values)
             return
-
-        _upload_suggestion_images(
-            self.request,
-            suggestion,
-            suggestion.get_new_image_filenames_added_in_suggestion())
+        if self.payload.get(
+            'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            _upload_suggestion_images(
+                self.request,
+                suggestion,
+                suggestion.get_new_image_filenames_added_in_suggestion())
 
         self.render_json(self.values)
 
