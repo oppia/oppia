@@ -514,14 +514,14 @@ describe('Translation Suggestion Review Modal Controller', function() {
       }
     };
 
-    const deleted_contribution = {
+    const deletedContribution = {
       suggestion: suggestion3,
       details: null
     };
 
     const suggestionIdToContribution = {
       suggestion_1: contribution1,
-      suggestion_deleted: deleted_contribution,
+      suggestion_deleted: deletedContribution,
       suggestion_2: contribution2,
     };
 
