@@ -541,8 +541,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         suggestionIdToContribution: angular.copy(suggestionIdToContribution)
       });
     }));
-    it(
-      'should reject suggestion in suggestion modal service when clicking ' +
+
+    it( 'should reject suggestion in suggestion modal service when clicking ' +
       'on reject and review next suggestion button', function() {
         expect($scope.activeSuggestionId).toBe('suggestion_1');
         expect($scope.activeSuggestion).toEqual(suggestion1);
