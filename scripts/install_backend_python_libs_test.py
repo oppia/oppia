@@ -477,7 +477,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs, 'get_mismatches',
             mock_get_mismatches)
         swap_call = self.swap(subprocess, 'check_call', mock_call)
-        swap_print = self.swap(python_utils, 'builtins, print', mock_print)
+        swap_print = self.swap(builtins, 'print', mock_print)
         with swap_call, swap_get_mismatches, swap_print, self.open_file_swap:
             with swap_validate_metadata_directories:
                 install_backend_python_libs.main()
