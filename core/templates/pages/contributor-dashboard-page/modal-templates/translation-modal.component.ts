@@ -445,7 +445,7 @@ export class TranslationModalComponent {
       this.translateTextService.suggestTranslatedText(
         this.activeWrittenTranslation,
         this.translationLanguageService.getActiveLanguageCode(),
-        imagesData, this.activeDataFormat, () => {
+        imagesData, this.activeDataFormat, null, () => {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.');
           this.uploadingTranslation = false;

@@ -223,7 +223,8 @@ export class TranslateTextService {
 
   suggestTranslatedText(
       translation: string | string[], languageCode: string, imagesData:
-      ImagesData[], dataFormat: string, successCallback: () => void,
+      ImagesData[], dataFormat: string, files: object | null,
+      successCallback: () => void,
       errorCallback: (reason: string) => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
@@ -235,7 +236,8 @@ export class TranslateTextService {
         this.activeStateName][this.activeContentId].content,
       translation,
       imagesData,
-      dataFormat
+      dataFormat,
+      files
     ).then(() => {
       this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
       this.stateAndContent[this.activeIndex].translation = (
