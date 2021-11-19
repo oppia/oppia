@@ -517,7 +517,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    fit('should fetch the rejection message', function() {
+    it('should fetch the rejection message', function() {
       var messages = [
         { text: 'Question submitted.' },
         { text: 'This is a rejection.' }
