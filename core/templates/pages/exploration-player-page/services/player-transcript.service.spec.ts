@@ -26,14 +26,17 @@ import { AudioTranslationLanguageService } from
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Player transcript service', () => {
   let pts: PlayerTranscriptService;
   let atls: AudioTranslationLanguageService;
+  let ls: LoggerService;
 
   beforeEach(() => {
     pts = TestBed.inject(PlayerTranscriptService);
     atls = TestBed.inject(AudioTranslationLanguageService);
+    ls = TestBed.inject(LoggerService);
   });
 
   it('should reset the transcript correctly', () => {
@@ -113,6 +116,19 @@ describe('Player transcript service', () => {
     expect(pts.getCard(0).getStateName()).toEqual('First state');
     expect(pts.getCard(1).getStateName()).toEqual('Second state');
     expect(pts.getCard(2).getStateName()).toEqual('First state');
+  });
+
+  it('should throw error when there is only one card and' +
+      'adding previous card fails', () => {
+    pts.addNewCard(StateCard.createNewCard(
+      'First state', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls));
+
+    expect(() => pts.addPreviousCard()).toThrowError(
+      'Exploration player is on the first card and hence no previous ' +
+        'card exists.');
   });
 
   it('should set lastAnswer correctly', () => {
@@ -198,5 +214,117 @@ describe('Player transcript service', () => {
     expect(pts.getNumSubmitsForLastCard()).toBe(1);
     pts.addNewInput('second answer', false);
     expect(pts.getNumSubmitsForLastCard()).toBe(2);
+  });
+
+  it('should update interaction html of the latest card', () => {
+    pts.addNewCard(StateCard.createNewCard(
+      'First state', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls));
+
+    let secondCard = StateCard.createNewCard(
+      'Second state', 'Content HTML',
+      '<oppia-number-input-html></oppia-number-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    pts.updateLatestInteractionHtml(secondCard.getInteractionHtml());
+
+    expect(pts.getLastCard().getInteractionHtml()).toEqual(
+      secondCard.getInteractionHtml());
+  });
+
+  it('should restore the old transcript', () => {
+    let card1 = StateCard.createNewCard(
+      'First State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let card2 = StateCard.createNewCard(
+      'Second State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let card3 = StateCard.createNewCard(
+      'Third State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let card4 = StateCard.createNewCard(
+      'Fourth State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let oldTranscript = [card3, card4];
+
+    pts.addNewCard(card1);
+    pts.addNewCard(card2);
+
+    expect(pts.getCard(0).getStateName()).toEqual('First State');
+    expect(pts.getCard(1).getStateName()).toEqual('Second State');
+
+    pts.restore(oldTranscript);
+
+    expect(pts.getCard(0).getStateName()).toEqual('Third State');
+    expect(pts.getCard(1).getStateName()).toEqual('Fourth State');
+  });
+
+  it('should restore the old transcript immutably', () => {
+    let card1 = StateCard.createNewCard(
+      'First State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let card2 = StateCard.createNewCard(
+      'Second State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let card3 = StateCard.createNewCard(
+      'Third State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let card4 = StateCard.createNewCard(
+      'Fourth State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls);
+
+    let oldTranscript = [card3, card4];
+
+    pts.addNewCard(card1);
+    pts.addNewCard(card2);
+
+    expect(pts.getCard(0).getStateName()).toEqual('First State');
+    expect(pts.getCard(1).getStateName()).toEqual('Second State');
+
+    pts.restoreImmutably(oldTranscript);
+
+    expect(pts.getCard(0).getStateName()).toEqual('Third State');
+    expect(pts.getCard(1).getStateName()).toEqual('Fourth State');
+  });
+
+  it('should show error on the console when invalid index is provided', () => {
+    spyOn(ls, 'error');
+
+    pts.addNewCard(StateCard.createNewCard(
+      'First State', 'Content HTML',
+      '<oppia-text-input-html></oppia-text-input-html>',
+      {} as Interaction, {} as RecordedVoiceovers,
+      {} as WrittenTranslations, '', atls));
+
+    pts.getCard(1);
+
+    expect(ls.error).toHaveBeenCalledWith(
+      'Requested card with index 1, but transcript only has length 1 cards.');
   });
 });
