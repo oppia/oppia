@@ -460,7 +460,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
   describe('when reviewing suggestions' +
     'with deleted opportunites', function() {
     const reviewable = false;
-    let $httpBackend = null;
     const subheading = 'subheading_title';
 
     const suggestion1 = {
