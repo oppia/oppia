@@ -96,21 +96,20 @@ class DragAndDropSortInput(base.BaseInteraction):
         """
         customization_args_proto = (
             cls._to_customization_args_proto(
-                interaction.customization_args))
+                interaction.customization_args)
+        )
 
         outcome_proto = interaction.default_outcome.to_proto()
 
-        hints_proto_list = []
-        for hint in interaction.hints:
-            hint_proto = hint.to_proto()
-            hints_proto_list.append(hint_proto)
+        hints_proto_list = cls.get_hint_proto(cls, interaction.hints)
 
         solution_proto = cls._to_solution_proto(
             interaction.solution)
 
         answer_groups_proto = (
             cls._to_answer_groups_proto(
-                interaction.answer_groups))
+                interaction.answer_groups)
+        )
 
         drag_and_drop_interaction_proto = (
             state_pb2.DragAndDropSortInputInstance(
@@ -118,7 +117,9 @@ class DragAndDropSortInput(base.BaseInteraction):
                 hints=hints_proto_list,
                 default_outcome=outcome_proto,
                 solution=solution_proto,
-                answer_groups=answer_groups_proto))
+                answer_groups=answer_groups_proto
+            )
+        )
 
         return drag_and_drop_interaction_proto
 
@@ -140,7 +141,9 @@ class DragAndDropSortInput(base.BaseInteraction):
             base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = (
                 state_pb2.DragAndDropSortInputInstance.AnswerGroup(
-                    base_answer_group=base_answer_group_proto))
+                    base_answer_group=base_answer_group_proto
+                )
+            )
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
@@ -164,13 +167,17 @@ class DragAndDropSortInput(base.BaseInteraction):
                     base_solution=solution.to_proto(),
                     correct_answer=(
                         cls._to_list_of_set_of_translatable_html_content_ids(
-                            solution.correct_answer))))
+                            solution.correct_answer)
+                    )
+                )
+            )
 
         return solution_proto
 
     @classmethod
     def _to_list_of_set_of_translatable_html_content_ids(
-        cls, correct_answer):
+        cls, correct_answer
+    ):
         """Creates a ListOfSetsOfTranslatableHtmlContentIds proto object.
 
         Args:
@@ -186,12 +193,14 @@ class DragAndDropSortInput(base.BaseInteraction):
         for set_of_content_id in correct_answer:
             translatable_html_content_id_proto = (
                 cls._to_set_of_translatable_html_content_ids_proto(
-                    set_of_content_id))
+                    set_of_content_id)
+            )
             content_id_lists_proto.append(translatable_html_content_id_proto)
 
         list_of_set_of_translatable_html_content_ids_proto = (
             objects_pb2.ListOfSetsOfTranslatableHtmlContentIds(
-                content_id_sets=content_id_lists_proto))
+                content_id_sets=content_id_lists_proto)
+        )
 
         return list_of_set_of_translatable_html_content_ids_proto
 
@@ -212,18 +221,21 @@ class DragAndDropSortInput(base.BaseInteraction):
         for translatable_html_content_id in set_of_content_id:
             translatable_html_content_id_proto = (
                 cls._to_translatable_html_content_id_proto(
-                    translatable_html_content_id))
+                    translatable_html_content_id)
+            )
             content_id_lists_proto.append(translatable_html_content_id_proto)
 
         set_of_translatable_html_content_ids_proto = (
             objects_pb2.SetOfTranslatableHtmlContentIds(
-                content_ids=content_id_lists_proto))
+                content_ids=content_id_lists_proto)
+        )
 
         return set_of_translatable_html_content_ids_proto
 
     @classmethod
     def _to_translatable_html_content_id_proto(
-        cls, translatable_html_content_id):
+        cls, translatable_html_content_id
+    ):
         """Creates a TranslatableHtmlContentId proto object.
 
         Args:
@@ -236,7 +248,8 @@ class DragAndDropSortInput(base.BaseInteraction):
         """
         translatable_html_content_id_proto = (
             objects_pb2.TranslatableHtmlContentId(
-                content_id=translatable_html_content_id))
+                content_id=translatable_html_content_id)
+        )
 
         return translatable_html_content_id_proto
 
@@ -254,17 +267,17 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             CustomizationArgs. The CustomizationArgs proto object.
         """
-        choices_list_proto = []
-
-        for value in customization_args['choices'].value:
-            value_proto = value.to_proto()
-            choices_list_proto.append(value_proto)
+        choices_list_proto = [
+            value.to_proto() for value in customization_args['choices'].value
+        ]
 
         customization_arg_proto = (
             state_pb2.DragAndDropSortInputInstance.CustomizationArgs(
                 choices=choices_list_proto,
                 allowMultipleItemsInSamePosition=(
-                    customization_args['allowMultipleItemsInSamePosition']
-                    .value)))
+                    customization_args['allowMultipleItemsInSamePosition'].value
+                )
+            )
+        )
 
         return customization_arg_proto

@@ -97,14 +97,12 @@ class MultipleChoiceInput(base.BaseInteraction):
         """
         customization_args_proto = (
             cls._to_customization_args_proto(
-                interaction.customization_args))
+                interaction.customization_args)
+        )
 
         outcome_proto = interaction.default_outcome.to_proto()
 
-        hints_proto_list = []
-        for hint in interaction.hints:
-            hint_proto = hint.to_proto()
-            hints_proto_list.append(hint_proto)
+        hints_proto_list = cls.get_hint_proto(cls, interaction.hints)
 
         answer_groups_proto = cls._to_answer_groups_proto(
             interaction.answer_groups)
@@ -114,13 +112,14 @@ class MultipleChoiceInput(base.BaseInteraction):
                 customization_args=customization_args_proto,
                 default_outcome=outcome_proto,
                 hints=hints_proto_list,
-                answer_groups=answer_groups_proto))
+                answer_groups=answer_groups_proto
+            )
+        )
 
         return multiple_choice_interaction_proto
 
     @classmethod
-    def _to_customization_args_proto(
-            cls, customization_args):
+    def _to_customization_args_proto(cls, customization_args):
         """Creates a CustomizationArgs proto object
             for MultipleChoiceInputInstance.
 
@@ -133,15 +132,15 @@ class MultipleChoiceInput(base.BaseInteraction):
         Returns:
             CustomizationArgs. The CustomizationArgs proto object.
         """
-        choices_list_proto = []
-
-        for value in customization_args['choices'].value:
-            value_proto = value.to_proto()
-            choices_list_proto.append(value_proto)
+        choices_list_proto = [
+            value.to_proto() for value in customization_args['choices'].value
+        ]
 
         customization_arg_proto = (
             state_pb2.MultipleChoiceInputInstance.CustomizationArgs(
-                choices=choices_list_proto))
+                choices=choices_list_proto
+            )
+        )
 
         return customization_arg_proto
 
@@ -163,7 +162,9 @@ class MultipleChoiceInput(base.BaseInteraction):
             base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = (
                 state_pb2.MultipleChoiceInputInstance.AnswerGroup(
-                    base_answer_group=base_answer_group_proto))
+                    base_answer_group=base_answer_group_proto
+                )
+            )
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto

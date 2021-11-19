@@ -2238,30 +2238,33 @@ class Exploration:
         return exploration_dict
 
     @classmethod
-    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict, exploration_id):
         """Converts a v54 exploration dict into a v54 exploration dict.
         Version 55 contains exploration size.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v55.
+            exploration_id: str. The exploration id.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v55.
         """
+        exploration_dict['id'] = exploration_id
         exploration = cls.from_dict(exploration_dict)
         exploration_dict['proto_size_in_bytes'] = (
             exploration.get_proto_size())
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content):
+    def _migrate_to_latest_yaml_version(cls, yaml_content, exploration_id):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
+            exploration_id: str. The exploration id.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -2333,7 +2336,7 @@ class Exploration:
 
         if exploration_schema_version == 54:
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
-                exploration_dict)
+                exploration_dict, exploration_id)
             exploration_schema_version = 55
 
         return exploration_dict
@@ -2355,7 +2358,8 @@ class Exploration:
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
+        exploration_dict = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 
@@ -2527,6 +2531,7 @@ class Exploration:
             init_state_name=self.init_state_name,
             title=self.title,
             states=state_protos)
+
         return exploration_proto
 
     def get_proto_size(self):

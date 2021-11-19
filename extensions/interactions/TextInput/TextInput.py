@@ -103,14 +103,12 @@ class TextInput(base.BaseInteraction):
             TextInputInstance. The TextInputInstance proto object.
         """
         customization_args_proto = cls._to_customization_args_proto(
-            interaction.customization_args)
+            interaction.customization_args
+        )
 
         outcome_proto = interaction.default_outcome.to_proto()
 
-        hints_proto_list = []
-        for hint in interaction.hints:
-            hint_proto = hint.to_proto()
-            hints_proto_list.append(hint_proto)
+        hints_proto_list = cls.get_hint_proto(cls, interaction.hints)
 
         solution_proto = cls._to_solution_proto(interaction.solution)
 
@@ -122,7 +120,8 @@ class TextInput(base.BaseInteraction):
             default_outcome=outcome_proto,
             hints=hints_proto_list,
             solution=solution_proto,
-            answer_groups=answer_groups_proto)
+            answer_groups=answer_groups_proto
+        )
 
         return text_input_interaction_proto
 
@@ -143,7 +142,8 @@ class TextInput(base.BaseInteraction):
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             answer_group_proto = state_pb2.TextInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto)
+                base_answer_group=base_answer_group_proto
+            )
             answer_group_list_proto.append(answer_group_proto)
         return answer_group_list_proto
 
@@ -163,7 +163,8 @@ class TextInput(base.BaseInteraction):
         if solution is not None:
             solution_proto = state_pb2.TextInputInstance.Solution(
                 base_solution=solution.to_proto(),
-                correct_answer=solution.correct_answer)
+                correct_answer=solution.correct_answer
+            )
 
         return solution_proto
 
@@ -183,6 +184,7 @@ class TextInput(base.BaseInteraction):
         """
 
         customization_arg_proto = state_pb2.TextInputInstance.CustomizationArgs(
-            rows=customization_args['rows'].value)
+            rows=customization_args['rows'].value
+        )
 
         return customization_arg_proto

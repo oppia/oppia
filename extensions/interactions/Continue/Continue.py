@@ -64,7 +64,9 @@ class Continue(base.BaseInteraction):
         outcome_proto = interaction.default_outcome.to_proto()
         customization_args_proto = (
             cls._to_customization_args_proto(
-                interaction.customization_args))
+                interaction.customization_args
+            )
+        )
         continue_proto = state_pb2.ContinueInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto)
@@ -87,6 +89,8 @@ class Continue(base.BaseInteraction):
         """
         customization_arg_proto = (
             state_pb2.ContinueInstance.CustomizationArgs(
-                button_text=customization_args['buttonText'].value.to_proto()))
+                button_text=customization_args['buttonText'].value.to_proto()
+            )
+        )
 
         return customization_arg_proto

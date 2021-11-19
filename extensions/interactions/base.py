@@ -263,3 +263,7 @@ class BaseInteraction:
                 return param_type
         raise Exception(
             'Rule %s has no param called %s' % (rule_name, rule_param_name))
+
+    def get_hint_proto(self, hints):
+        """Gets the list of Hint proto for given hints domain object list."""
+        return [hint.to_proto() for hint in hints]

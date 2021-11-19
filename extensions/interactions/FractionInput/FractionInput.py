@@ -94,12 +94,12 @@ class FractionInput(base.BaseInteraction):
         """
         customization_args_proto = (
             cls._to_customization_args_proto(
-                interaction.customization_args))
+                interaction.customization_args)
+        )
 
         outcome_proto = interaction.default_outcome.to_proto()
 
-        solution_proto = cls._to_solution_proto(
-            interaction.solution)
+        solution_proto = cls._to_solution_proto(interaction.solution)
 
         answer_groups_proto = cls._to_answer_groups_proto(
             interaction.answer_groups)
@@ -128,12 +128,17 @@ class FractionInput(base.BaseInteraction):
         """
         customization_arg_proto = (
             state_pb2.FractionInputInstance.CustomizationArgs(
-            requires_simplest_form=(
-                customization_args['requireSimplestForm'].value),
-            allow_improper_fractions=(
-                customization_args['allowImproperFraction'].value),
-            allow_nonzero_integer_part=(
-                customization_args['allowNonzeroIntegerPart'].value)))
+                requires_simplest_form=(
+                    customization_args['requireSimplestForm'].value
+                ),
+                allow_improper_fractions=(
+                    customization_args['allowImproperFraction'].value
+                ),
+                allow_nonzero_integer_part=(
+                    customization_args['allowNonzeroIntegerPart'].value
+                )
+            )
+        )
 
         return customization_arg_proto
 
@@ -151,12 +156,10 @@ class FractionInput(base.BaseInteraction):
         """
         solution_proto = None
         if solution is not None:
-            solution_proto = (
-                state_pb2.FractionInputInstance.Solution(
+            solution_proto = state_pb2.FractionInputInstance.Solution(
                 base_solution=solution.to_proto(),
-                correct_answer=(
-                    cls._to_fraction_proto(
-                        solution.correct_answer))))
+                correct_answer=cls._to_fraction_proto(solution.correct_answer)
+            )
 
         return solution_proto
 
@@ -178,10 +181,10 @@ class FractionInput(base.BaseInteraction):
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_fraction_rule_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = (
-                state_pb2.FractionInputInstance.AnswerGroup(
-                    base_answer_group=base_answer_group_proto,
-                    rule_specs=rules_spec_proto))
+            answer_group_proto = state_pb2.FractionInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto,
+                rule_specs=rules_spec_proto
+            )
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
@@ -217,90 +220,61 @@ class FractionInput(base.BaseInteraction):
         rule_specs_list_proto = []
         rules_specs_proto = {}
 
+        rule_type_to_proto_fun_mapping = {
+            'IsExactlyEqualTo': cls._to_is_exactly_equal_to_proto,
+            'IsEquivalentTo': cls._to_is_equivalent_to_proto,
+            'IsEquivalentToAndInSimplestForm': cls._to_is_equivalent_to_and_in_simplest_form_proto, # pylint: disable=line-too-long
+            'IsLessThan': cls._to_is_less_than_proto,
+            'IsGreaterThanSpec': cls._to_is_greater_than_proto,
+            'HasNumeratorEqualTo': cls._to_has_numerator_equal_to_proto,
+            'HasDenominatorEqualTo': cls._to_has_denominator_equal_to_proto,
+            'HasIntegerPartEqualTo': cls._to_has_integer_part_equal_to_proto,
+            'HasNoFractionalPart': cls._to_has_no_fractional_part_proto,
+            'HasFractionalPartExactlyEqualTo': cls._to_has_fractional_part_exactly_equal_to_proto # pylint: disable=line-too-long
+        }
+        rule_typ_to_proto_mapping = {
+            'IsExactlyEqualTo': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    is_exactly_equal_to=x)),
+            'IsEquivalentTo': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    is_equivalent_to=x)),
+            'IsEquivalentToAndInSimplestForm': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    is_equivalent_to_and_in_simplest_form=x)),
+            'IsLessThan': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    is_less_than=x)),
+            'IsGreaterThanSpec': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    to_is_greater_than=x)),
+            'HasNumeratorEqualTo': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    has_numerator_equal_to=x)),
+            'HasDenominatorEqualTo': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    has_denominator_equal_to=x)),
+            'HasIntegerPartEqualTo': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    has_integer_part_equal_to=x)),
+            'HasNoFractionalPart': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    has_no_fractional_part=x)),
+            'HasFractionalPartExactlyEqualTo': lambda x: (
+                state_pb2.FractionInputInstance.RuleSpec(
+                    has_fractional_part_exactly_equal_to=x))
+        }
+
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            if rule_type == 'IsExactlyEqualTo':
-                is_exactly_equal_to_proto = (
-                    cls._to_is_exactly_equal_to_proto(
-                        rule_spec.inputs['f']))
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        is_exactly_equal_to=is_exactly_equal_to_proto))
-
-            if rule_type == 'IsEquivalentTo':
-                is_equivalent_to_proto = cls._to_is_equivalent_to_proto(
-                    rule_spec.inputs['f'])
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        is_equivalent_to=is_equivalent_to_proto))
-
-            if rule_type == 'IsEquivalentToAndInSimplestForm':
-                is_equivalent_to_and_in_simplest_form_proto = (
-                    cls._to_is_equivalent_to_and_in_simplest_form_proto(
-                        rule_spec.inputs['f']))
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        is_equivalent_to_and_in_simplest_form=(
-                            is_equivalent_to_and_in_simplest_form_proto)))
-
-            if rule_type == 'IsLessThan':
-                is_less_than_proto = cls._to_is_less_than_proto(
-                    rule_spec.inputs['f'])
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        is_less_than=is_less_than_proto))
-
-            if rule_type == 'IsGreaterThanSpec':
-                is_greater_than_proto = cls._to_is_greater_than_proto(
-                    rule_spec.inputs['f'])
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        to_is_greater_than=is_greater_than_proto))
-
-            if rule_type == 'HasNumeratorEqualTo':
-                has_numerator_equal_to_proto = (
-                    cls._to_has_numerator_equal_to_proto(
-                        rule_spec.inputs['f']))
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        has_numerator_equal_to=(
-                            has_numerator_equal_to_proto)))
-
-            if rule_type == 'HasDenominatorEqualTo':
-                has_denominator_equal_to_proto = (
-                    cls._to_has_denominator_equal_to_proto(
-                        rule_spec.inputs['f']))
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        has_denominator_equal_to=(
-                            has_denominator_equal_to_proto)))
-
-            if rule_type == 'HasIntegerPartEqualTo':
-                has_integer_part_equal_to_proto = (
-                    cls._to_has_integer_part_equal_to_proto(
-                        rule_spec.inputs['f']))
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        has_integer_part_equal_to=(
-                            has_integer_part_equal_to_proto)))
-
-            if rule_type == 'HasNoFractionalPart':
-                has_no_fractional_part_proto = (
-                    cls._to_has_no_fractional_part_proto())
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        has_no_fractional_part=(
-                            has_no_fractional_part_proto)))
-
-            if rule_type == 'HasFractionalPartExactlyEqualTo':
-                has_fractional_part_exactly_equal_to_proto = (
-                    cls._to_has_fractional_part_exactly_equal_to_proto(
-                        rule_spec.inputs['f']))
-                rules_specs_proto = (
-                    state_pb2.FractionInputInstance.RuleSpec(
-                        has_fractional_part_exactly_equal_to=(
-                            has_fractional_part_exactly_equal_to_proto)))
-
+            rule_proto = (
+                rule_type_to_proto_fun_mapping[rule_type](
+                    rule_spec.inputs['f']
+                )
+            )
+            rules_specs_proto = (
+                rule_typ_to_proto_mapping[rule_type](rule_proto)
+            )
             rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
