@@ -616,7 +616,8 @@ class ExplorationStartEventHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         event_services.StartExplorationEventHandler.record(
-            exploration_id, self.normalized_payload.get('version'),
+            exploration_id,
+            self.normalized_payload.get('version'),
             self.normalized_payload.get('state_name'),
             self.normalized_payload.get('session_id'),
             self.normalized_payload.get('params'),
@@ -670,7 +671,8 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests."""
         event_services.ExplorationActualStartEventHandler.record(
-            exploration_id, self.normalized_payload.get('exploration_version'),
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
             self.normalized_payload.get('state_name'),
             self.normalized_payload.get('session_id'))
         self.render_json({})
