@@ -537,7 +537,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),),
-            expected_status_int=404
+            expected_status_int=400
         )
         self.logout()
 
