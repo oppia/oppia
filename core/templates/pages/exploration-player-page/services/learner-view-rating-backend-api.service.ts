@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { ExplorationEngineService } from './exploration-engine.service';
 
 interface LearnerViewRatingBackendResponse {
-  'user_rating': number
+  'user_rating': number;
 }
 
 @Injectable({

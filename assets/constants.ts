@@ -4772,6 +4772,10 @@ export default {
     "description": "shqip (Albanian)",
     "direction": "ltr"
   }, {
+    "code": "az",
+    "description": "Azeri (Azerbaijani)",
+    "direction": "ltr"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)",
     "direction": "ltr"
@@ -5051,6 +5055,11 @@ export default {
     "description": "Arabic",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
+  }, {
+    "id": "az",
+    "description": "Azerbaijani",
+    "relatedLanguages": ["az"],
+    "direction": "ltr"
   }, {
     "id": "bg",
     "description": "Bulgarian",
@@ -5818,9 +5827,10 @@ export default {
 
   // Placeholder texts for the math interactions.
   "MATH_INTERACTION_PLACEHOLDERS": {
-    "AlgebraicExpressionInput": "Type an expression here.",
-    "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+    "AlgebraicExpressionInput": "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION",
+    "MathEquationInput": "I18N_INTERACTIONS_MATH_EQ_INSTRUCTION",
+    // The following is user editable and hence, is not translated.
+    "NumericExpressionInput": "Type an expression here, using only numbers."
   },
 
   // Unfinished features.
@@ -5839,12 +5849,6 @@ export default {
   "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-
-  // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
-
-  // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": true,
 
   // Link to open when the Oppia avatar is clicked on any page.
   "OPPIA_AVATAR_LINK_URL": null,
