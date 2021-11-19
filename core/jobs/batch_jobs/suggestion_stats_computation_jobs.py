@@ -24,6 +24,7 @@ from core import feconf
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
+from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.jobs import base_jobs
@@ -145,11 +146,22 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            # Count the number of words in the original content, ignoring any
-            # HTML tags and attributes.
-            content_plain_text = html_cleaner.strip_html_tags( # type: ignore[no-untyped-call]
-                suggestion.change.content_html) # type: ignore[attr-defined]
-            content_word_count = len(content_plain_text.split())
+            # Content in set format is a list, content in unicode and html
+            # format is a string. This code normalizes the content to the list
+            # type so that we can easily count words.
+            if state_domain.WrittenTranslation.is_data_format_list(
+                    suggestion.change.data_format
+            ):
+                content_items = suggestion.change.content_html
+            else:
+                content_items = [suggestion.change.content_html]
+
+            content_word_count = 0
+            for item in content_items:
+                # Count the number of words in the original content, ignoring
+                # any HTML tags and attributes.
+                content_plain_text = html_cleaner.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
+                content_word_count += len(content_plain_text.split())
 
             key = (
                 suggestion_models.TranslationContributionStatsModel.generate_id(
