@@ -681,3 +681,21 @@ class _Validators:
             return True
         except utils.ValidationError:
             return False
+
+    @staticmethod
+    def is_allowed_audio_extension(obj: str) -> bool:
+        """Checks if the given obj (a string) is a filename with
+        valid audio extension.
+
+        Args:
+            obj: str. The string to verify.
+
+        Returns:
+            bool. Whether the given object is a filename with valid
+            audio extension.
+        """
+        dot_index = obj.rfind('.')
+        extension = obj[dot_index + 1:].lower()
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+            return False
+        return True
