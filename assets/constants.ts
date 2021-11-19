@@ -4772,6 +4772,10 @@ export default {
     "description": "shqip (Albanian)",
     "direction": "ltr"
   }, {
+    "code": "az",
+    "description": "Azeri (Azerbaijani)",
+    "direction": "ltr"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)",
     "direction": "ltr"
@@ -5051,6 +5055,11 @@ export default {
     "description": "Arabic",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
+  }, {
+    "id": "az",
+    "description": "Azerbaijani",
+    "relatedLanguages": ["az"],
+    "direction": "ltr"
   }, {
     "id": "bg",
     "description": "Bulgarian",
