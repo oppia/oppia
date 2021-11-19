@@ -27,22 +27,12 @@ import { FormsModule } from '@angular/forms';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import constants from 'assets/constants';
 
-describe('Create New Story Modal Component', function() {
+fdescribe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
   let fixture: ComponentFixture<CreateNewStoryModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let imageLocalStorageService: ImageLocalStorageService;
   let storyEditorStateService: StoryEditorStateService;
-
-  class MockActiveModal {
-    close(): void {
-      return;
-    }
-
-    dismiss(): void {
-      return;
-    }
-  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -54,12 +44,9 @@ describe('Create New Story Modal Component', function() {
         CreateNewStoryModalComponent,
       ],
       providers: [
+        NgbActiveModal,
         ImageLocalStorageService,
         TopicEditorStateService,
-        {
-          provide: NgbActiveModal,
-          useClass: MockActiveModal
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -77,14 +64,7 @@ describe('Create New Story Modal Component', function() {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should check if properties was initialized correctly', function() {
-    expect(componentInstance.newlyCreatedStory.title).toBe('');
-    expect(componentInstance.newlyCreatedStory.description).toBe('');
-    expect(componentInstance.MAX_CHARS_IN_STORY_TITLE).toBe(
-      constants.MAX_CHARS_IN_STORY_TITLE);
-  });
-
-  it('should save new topic', () => {
+  it('should save new story', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.save();
     expect(ngbActiveModal.close).toHaveBeenCalled();
@@ -96,7 +76,7 @@ describe('Create New Story Modal Component', function() {
     expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
   });
 
-  it('should validate newly created topic', () => {
+  it('should validate newly created story', () => {
     spyOn(componentInstance.newlyCreatedStory, 'isValid').and.returnValue(true);
     spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([{
       filename: '',
@@ -120,14 +100,20 @@ describe('Create New Story Modal Component', function() {
       .toHaveBeenCalled();
   });
 
-  it('should not update topic url fragment if not provided by user',
-    () => {
-      componentInstance.newlyCreatedStory.urlFragment = '';
-      spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
-      componentInstance.onStoryUrlFragmentChange();
-      expect(storyEditorStateService.updateExistenceOfStoryUrlFragment)
-        .not.toHaveBeenCalled();
-    });
+  it('should not update topic url fragment if not provided by user', () => {
+    componentInstance.newlyCreatedStory.urlFragment = '';
+    spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
+    componentInstance.onStoryUrlFragmentChange();
+    expect(storyEditorStateService.updateExistenceOfStoryUrlFragment)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should check if properties was initialized correctly', () => {
+    expect(componentInstance.newlyCreatedStory.title).toBe('');
+    expect(componentInstance.newlyCreatedStory.description).toBe('');
+    expect(componentInstance.MAX_CHARS_IN_STORY_TITLE).toBe(
+      constants.MAX_CHARS_IN_STORY_TITLE);
+  });
 
   it('should check if url fragment already exists', () => {
     spyOn(
