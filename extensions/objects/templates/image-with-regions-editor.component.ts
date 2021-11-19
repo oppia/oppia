@@ -318,8 +318,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.contextService.getEntityType() !== (
         AppConstants.ENTITY_TYPE.EXPLORATION)
     ) {
+      const entityType: string = this.contextService.getEntityType()!;
       return this.assetsBackendApiService.getImageUrlForPreview(
-        this.contextService.getEntityType(),
+        entityType,
         this.contextService.getEntityId(),
         encodeURIComponent(imageUrl));
     }
