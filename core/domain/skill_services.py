@@ -1039,8 +1039,7 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_id, skill_mastery_model in zip(
-            skill_ids, skill_mastery_models):
+    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:

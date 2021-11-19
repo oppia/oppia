@@ -415,8 +415,7 @@ def associate_multi_auth_ids_with_user_ids(
     if any(user_id is not None for user_id in user_id_collisions):
         user_id_collisions_text = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
-            for auth_id, user_id in zip(
-                auth_ids, user_id_collisions)
+            for auth_id, user_id in zip(auth_ids, user_id_collisions)
             if user_id is not None)
         raise Exception('already associated: %s' % user_id_collisions_text)
 
@@ -424,8 +423,7 @@ def associate_multi_auth_ids_with_user_ids(
     if any(auth_id is not None for auth_id in auth_id_collisions):
         auth_id_collisions_text = ', '.join(
             '{user_id=%r: auth_id=%r}' % (user_id, auth_id)
-            for user_id, auth_id in zip(
-                user_ids, auth_id_collisions)
+            for user_id, auth_id in zip(user_ids, auth_id_collisions)
             if auth_id is not None)
         raise Exception('already associated: %s' % auth_id_collisions_text)
 
