@@ -29,6 +29,7 @@ import re
 import types
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.constants import constants
@@ -1336,7 +1337,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     architecture.
     """
     handler_class_names_with_no_schema = (
-        payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
@@ -1522,13 +1523,13 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
     def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(self):
         """This test ensures that the
-        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in payload validator
+        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in handler_schema_constants
         only contains handler class names which require schemas.
         """
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
-            payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
@@ -1551,7 +1552,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Handlers to be removed from schema requiring list in '
-            'payload validator file: [ %s ].' % (
+            'handler_schema_constants file: [ %s ].' % (
                 ', '.join(list_of_handlers_to_be_removed)))
 
         self.assertEqual(list_of_handlers_to_be_removed, [], error_msg)
