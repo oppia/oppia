@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-import { CreateNewStoryModalComponent } from "pages/topic-editor-page/modal-templates/create-new-story-modal.component";
+import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -24,11 +24,11 @@ require('services/alerts.service.ts');
 require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', 'NgbModal', '$window', 'AlertsService', 'ImageLocalStorageService',
-  'LoaderService', 'TopicEditorStateService', 'UrlInterpolationService',
+  '$http', '$window', 'AlertsService', 'ImageLocalStorageService',
+  'LoaderService', 'NgbModal', 'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, NgbModal, $window, AlertsService, ImageLocalStorageService,
-      LoaderService, TopicEditorStateService, UrlInterpolationService) {
+      $http, $window, AlertsService, ImageLocalStorageService,
+      LoaderService, NgbModal, TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;

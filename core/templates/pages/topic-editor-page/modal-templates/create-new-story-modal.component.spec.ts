@@ -19,38 +19,26 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CreateNewStoryModalComponent } from './create-new-story-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { ContextService } from 'services/context.service';
 import constants from 'assets/constants';
 
-fdescribe('Create New Story Modal Component', function() {
+describe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
   let fixture: ComponentFixture<CreateNewStoryModalComponent>;
-  let contextService: ContextService;
   let ngbActiveModal: NgbActiveModal;
   let imageLocalStorageService: ImageLocalStorageService;
   let storyEditorStateService: StoryEditorStateService;
-  let windowRef: WindowRef;
-
-  class MockWindowRef {
-    nativeWindow = {
-      location: {
-        hostname: ''
-      }
-    };
-  }
 
   class MockActiveModal {
     close(): void {
       return;
     }
-  
+
     dismiss(): void {
       return;
     }
@@ -69,10 +57,6 @@ fdescribe('Create New Story Modal Component', function() {
         ImageLocalStorageService,
         TopicEditorStateService,
         {
-          provide: WindowRef,
-          useClass: MockWindowRef
-        },
-        {
           provide: NgbActiveModal,
           useClass: MockActiveModal
         },
@@ -84,9 +68,7 @@ fdescribe('Create New Story Modal Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewStoryModalComponent);
     componentInstance = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    windowRef = TestBed.inject(WindowRef);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
   });

@@ -27,8 +27,8 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import constants from 'assets/constants';
 
 @Component({
-    selector: 'oppia-create-new-story-modal',
-    templateUrl: './create-new-story-modal.component.html'
+  selector: 'oppia-create-new-story-modal',
+  templateUrl: './create-new-story-modal.component.html'
 })
 
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
@@ -53,39 +53,39 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     private windowRef: WindowRef
   ) {
     super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.classroomUrlFragment = (
+      this.topicEditorStateService.getClassroomUrlFragment());
+    this.topicUrlFragment = (
+      this.topicEditorStateService.getTopic().getUrlFragment());
+  }
+
+  save(): void {
+    this.ngbActiveModal.close(this.newlyCreatedStory);
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss('cancel');
+  }
+
+  onStoryUrlFragmentChange(): void {
+    if (!this.newlyCreatedStory.urlFragment) {
+        return;
     }
 
-    ngOnInit(): void {
-      this.classroomUrlFragment = (
-        this.topicEditorStateService.getClassroomUrlFragment());
-      this.topicUrlFragment = (
-        this.topicEditorStateService.getTopic().getUrlFragment());
+    this.storyEditorStateService.updateExistenceOfStoryUrlFragment(
+      this.newlyCreatedStory.urlFragment, ()=> {
+       this.storyUrlFragmentExists = (
+          this.storyEditorStateService.getStoryWithUrlFragmentExists());
+      });
     }
 
-    save(): void {
-      this.ngbActiveModal.close(this.newlyCreatedStory);
-    }
-
-    cancel(): void {
-      this.ngbActiveModal.dismiss('cancel');
-    }
-
-    onStoryUrlFragmentChange(): void {
-      if (!this.newlyCreatedStory.urlFragment) {
-          return;
-      }
-
-      this.storyEditorStateService.updateExistenceOfStoryUrlFragment(
-        this.newlyCreatedStory.urlFragment, ()=> {
-         this.storyUrlFragmentExists = (
-            this.storyEditorStateService.getStoryWithUrlFragmentExists());
-        } );
-    }
-
-    isValid(): boolean {
-      return Boolean(
-       this.newlyCreatedStory.isValid() &&
-       this.imageLocalStorageService.getStoredImagesData().length > 0 &&
-       !this.storyUrlFragmentExists);
-   }
+  isValid(): boolean {
+    return Boolean(
+     this.newlyCreatedStory.isValid() &&
+     this.imageLocalStorageService.getStoredImagesData().length > 0 &&
+     !this.storyUrlFragmentExists);
+  }
 }
