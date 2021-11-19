@@ -51,14 +51,18 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     trigger('expandInOut', [
       state('in', style({
         overflow: 'visible',
-        height: '*',
+        height: '*'
       })),
       state('out', style({
         overflow: 'hidden',
-        height: '0px'
+        height: '0px',
+        display: 'none'
       })),
       transition('in => out', animate('500ms ease-in-out')),
-      transition('out => in', animate('500ms ease-in-out'))
+      transition('out => in', [
+        style({ display: 'block' }),
+        animate('500ms ease-in-out')
+      ])
     ])
   ]
 })
