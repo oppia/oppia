@@ -31,7 +31,6 @@ from __future__ import annotations
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
-    'AudioUploadHandler',
     'BulkEmailWebhookEndpoint',
     'DeferredTasksHandler',
     'DeleteAccountPage',
@@ -89,7 +88,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SkillRightsHandler',
     'SkillsDashboardPageDataHandler',
     'SolutionHitEventHandler',
-    'StartedTranslationTutorialEventHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
     'StoryUrlFragmentHandler',
