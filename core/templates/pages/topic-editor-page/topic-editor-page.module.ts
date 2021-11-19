@@ -38,6 +38,7 @@ import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.compon
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
 
 @NgModule({
   imports: [
@@ -54,6 +55,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
+    CreateNewStoryModalComponent
   ],
   entryComponents: [
     StoriesListComponent,
@@ -61,6 +63,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
+    CreateNewStoryModalComponent
   ],
   providers: [
     {

@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { CreateNewStoryModalComponent } from "pages/topic-editor-page/modal-templates/create-new-story-modal.component";
+
 /**
  * @fileoverview Modal and functionality for the create story button.
  */
 
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'create-new-story-modal.controller.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$uibModal', '$window', 'AlertsService', 'ImageLocalStorageService',
+  '$http', 'NgbModal', '$window', 'AlertsService', 'ImageLocalStorageService',
   'LoaderService', 'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, $uibModal, $window, AlertsService, ImageLocalStorageService,
+      $http, NgbModal, $window, AlertsService, ImageLocalStorageService,
       LoaderService, TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
@@ -39,12 +38,8 @@ angular.module('oppia').factory('StoryCreationService', [
         if (storyCreationInProgress) {
           return;
         }
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-            'create-new-story-modal.template.html'),
-          backdrop: 'static',
-          controller: 'CreateNewStoryModalController'
+        return NgbModal.open(CreateNewStoryModalComponent, {
+          backdrop: true
         }).result.then(function(newlyCreatedStory) {
           if (!newlyCreatedStory.isValid()) {
             throw new Error('Story fields cannot be empty');
