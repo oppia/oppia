@@ -932,10 +932,15 @@ class Exploration:
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
 
-        if not isinstance(
-            self.proto_size_in_bytes, int) and (self.proto_size_in_bytes > 0):
+        if not isinstance(self.proto_size_in_bytes, int):
             raise utils.ValidationError(
                 'Expected proto size to be a int, received %s'
+                % self.proto_size_in_bytes)
+
+        if (isinstance(self.proto_size_in_bytes, int) and
+            (self.proto_size_in_bytes < -1)):
+            raise utils.ValidationError(
+                'Expected proto size to be positive integer, received %s'
                 % self.proto_size_in_bytes)
 
         for param_name in self.param_specs:
@@ -2252,6 +2257,13 @@ class Exploration:
             following schema version v55.
         """
         exploration_dict['id'] = exploration_id
+
+        # Need to a proto_size_in_bytes with zero value as the earlier versions
+        # doesn't have this attribute. In order to calulate the size, we need
+        # to call from_dict which uses the attribute proto_size_in_bytes.
+        if exploration_dict.get('proto_size_in_bytes') is None:
+            exploration_dict['proto_size_in_bytes'] = 0
+
         exploration = cls.from_dict(exploration_dict)
         exploration_dict['proto_size_in_bytes'] = (
             exploration.get_proto_size())

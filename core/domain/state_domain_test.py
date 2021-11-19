@@ -5344,11 +5344,11 @@ class AnswerGroupDomainTests(test_utils.GenericTestBase):
             base_answer_proto.outcome.feedback.text,
             '<p>Feedback</p>')
         self.assertEqual(
-            base_answer_proto.tagged_skill_misconception.misconception_id,
-            'skill_id-1')
+            base_answer_proto.tagged_skill_misconception.skill_id,
+            'skill_id')
         self.assertEqual(
             base_answer_proto.tagged_skill_misconception.misconception_id,
-            'skill_id-1')
+            '1')
 
 
 class HintDomainTests(test_utils.GenericTestBase):

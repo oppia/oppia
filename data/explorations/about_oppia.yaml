@@ -8,7 +8,6 @@ language_code: en
 objective: Learn about the world's first community-built personal online tutor
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: 47
 states:
   About this website:

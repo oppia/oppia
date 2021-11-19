@@ -1266,7 +1266,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: 47
 states:
   Introduction:
@@ -1510,7 +1509,6 @@ title: Title
         objective: ''
         param_changes: []
         param_specs: {}
-        proto_size_in_bytes: 0
         states:
           Introduction:
             classifier_model_id: null
@@ -1844,7 +1842,6 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: %d
 states:
   %s:
@@ -1953,7 +1950,6 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: %d
 states:
   %s:
@@ -5210,7 +5206,6 @@ language_code: en
 objective: Old objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: %d
 states:
   END:

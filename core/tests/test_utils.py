@@ -1722,7 +1722,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: %d
 states:
   %s:

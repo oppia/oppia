@@ -25,7 +25,6 @@ param_specs:
     obj_type: UnicodeString
   sneezeitem:
     obj_type: UnicodeString
-proto_size_in_bytes: 0
 schema_version: 47
 states:
   Clearing:

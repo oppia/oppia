@@ -8,7 +8,6 @@ language_code: en
 objective: test android specific interactions
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
 schema_version: 50
 states:
   Fraction:

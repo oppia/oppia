@@ -3307,7 +3307,7 @@ title: Title
             'exp_id', self.sample_yaml_content_for_proto)
 
         exploration_proto_size = exploration.get_proto_size()
-        self.assertEqual(exploration_proto_size, 4456)
+        self.assertEqual(exploration_proto_size, 4460)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
@@ -5161,7 +5161,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 298
 schema_version: 46
 states:
   (untitled state):
@@ -5278,7 +5277,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 298
+proto_size_in_bytes: 300
 schema_version: 55
 states:
   (untitled state):
@@ -5404,7 +5403,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 384
 schema_version: 46
 states:
   (untitled state):
@@ -5533,7 +5531,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 384
+proto_size_in_bytes: 386
 schema_version: 55
 states:
   (untitled state):
@@ -5669,7 +5667,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 226
 schema_version: 46
 states:
   (untitled state):
@@ -5760,7 +5757,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 226
+proto_size_in_bytes: 228
 schema_version: 55
 states:
   (untitled state):
