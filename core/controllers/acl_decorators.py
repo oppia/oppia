@@ -2566,8 +2566,8 @@ def can_edit_skill(handler):
     return test_can_edit_skill
 
 
-def can_submit_question(handler):
-    """Decorator to check whether the user can submit a question.
+def can_submit_images_to_questions(handler):
+    """Decorator to check whether the user can submit images to questions.
 
     Args:
         handler: function. The function to be decorated.
@@ -2576,8 +2576,8 @@ def can_submit_question(handler):
         function. The newly decorated function that now also checks if
         the user has permission to submit a question.
     """
-    def test_can_submit_question(self, skill_id, **kwargs):
-        """Test to see if user can submit a question for a skill.
+    def test_can_submit_images_to_questions(self, skill_id, **kwargs):
+        """Test to see if user can submit images to questions.
 
         Args:
             skill_id: str. The skill ID.
@@ -2599,10 +2599,10 @@ def can_submit_question(handler):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to submit a question.')
+                'You do not have credentials to submit images to questions.')
 
-    test_can_submit_question.__wrapped__ = True
-    return test_can_submit_question
+    test_can_submit_images_to_questions.__wrapped__ = True
+    return test_can_submit_images_to_questions
 
 
 def can_delete_skill(handler):
@@ -3460,7 +3460,7 @@ def can_edit_entity(handler):
                 can_edit_skill(reduced_handler)(
                     self, entity_id, **kwargs)),
             feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
-                can_submit_question(reduced_handler)(
+                can_submit_images_to_questions(reduced_handler)(
                     self, entity_id, **kwargs)),
             feconf.ENTITY_TYPE_STORY: lambda entity_id: (
                 can_edit_story(reduced_handler)(
