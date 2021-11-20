@@ -97,8 +97,7 @@ def download_files(source_url_root, target_dir, source_filenames):
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
-            print(
-                'Downloading file %s to %s ...' % (filename, target_dir))
+            print('Downloading file %s to %s ...' % (filename, target_dir))
             urlrequest.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
                 filename=os.path.join(target_dir, filename))

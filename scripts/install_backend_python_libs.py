@@ -470,8 +470,7 @@ def _run_pip_command(cmd_parts):
             command + ['--user', '--prefix=', '--system'])
     else:
         print(stderr)
-        print(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
 
 
@@ -691,7 +690,7 @@ def main():
         validate_metadata_directories()
     else:
         print(
-            'All third-party Python libraries are already installed correctly.')
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

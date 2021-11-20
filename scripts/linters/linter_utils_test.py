@@ -242,7 +242,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         def mock_print(*args):
             """Mock for print."""
-            self.log = ' '.join(python_utils.UNICODE(arg) for arg in args)
+            self.log = ' '.join(str(arg) for arg in args)
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 

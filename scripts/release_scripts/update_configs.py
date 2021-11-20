@@ -147,8 +147,7 @@ def check_updates_to_terms_of_service(
 
     if terms_of_service_are_changed in (
             common.AFFIRMATIVE_CONFIRMATIONS):
-        print(
-            'Enter sha of the commit which changed the terms of service.')
+        print('Enter sha of the commit which changed the terms of service.')
         commit_sha = input().lstrip().rstrip()
         commit_time = repo.get_commit(commit_sha).commit.committer.date
         time_tuple = (

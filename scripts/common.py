@@ -278,8 +278,7 @@ def open_new_tab_in_browser_if_possible(url):
             'Confirm by entering y/ye/yes.')
         USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
-        print(
-            'Please open the following link in browser: %s' % url)
+        print('Please open the following link in browser: %s' % url)
         return
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
@@ -294,10 +293,8 @@ def open_new_tab_in_browser_if_possible(url):
     print('')
     print('    %s' % url)
     print('')
-    print(
-        'NOTE: To get rid of this message, open scripts/common.py and fix')
-    print(
-        'the function open_new_tab_in_browser_if_possible() to work on your')
+    print('NOTE: To get rid of this message, open scripts/common.py and fix')
+    print('the function open_new_tab_in_browser_if_possible() to work on your')
     print('system.')
     input()
 
@@ -496,8 +493,7 @@ def ask_user_to_confirm(message):
             to do.
     """
     while True:
-        print(
-            '******************************************************')
+        print('******************************************************')
         print(message)
         print('Confirm once you are done by entering y/ye/yes.\n')
         answer = input().lower()
@@ -686,8 +682,7 @@ def wait_for_port_to_be_in_use(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        print(
-            'Failed to start server on port %s, exiting ...' %
+        print('Failed to start server on port %s, exiting ...' %
             port_number)
         print(
             'This may be because you do not have enough available '

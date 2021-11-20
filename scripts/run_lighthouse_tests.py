@@ -90,8 +90,7 @@ def run_lighthouse_puppeteer_script():
         # Error output is in bytes, we need to decode the line to
         # print it.
         print(stderr.decode('utf-8'))
-        print(
-            'Puppeteer script failed. More details can be found above.')
+        print('Puppeteer script failed. More details can be found above.')
         sys.exit(1)
 
 
@@ -168,8 +167,7 @@ def run_lighthouse_checks(lighthouse_mode, shard):
         # Error output is in bytes, we need to decode the line to
         # print it.
         print(stderr.decode('utf-8'))
-        print(
-            'Lighthouse checks failed. More details can be found above.')
+        print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
 
 

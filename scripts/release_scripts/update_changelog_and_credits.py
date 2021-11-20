@@ -439,8 +439,7 @@ def is_invalid_email_present(release_summary_lines):
     invalid_email_ids = [
         email_id for email_id in new_email_ids
         if constants.release_constants.INVALID_EMAIL_SUFFIX in email_id]
-    print(
-        'Following email ids are invalid: %s' % invalid_email_ids)
+    print('Following email ids are invalid: %s' % invalid_email_ids)
     return bool(invalid_email_ids)
 
 

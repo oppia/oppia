@@ -478,8 +478,7 @@ def check_for_backend_python_library_inconsistencies():
             'the `third_party/python_libs` directory.\n'])
         sys.exit(1)
     else:
-        print(
-            'Python dependencies consistency check succeeded.')
+        print('Python dependencies consistency check succeeded.')
 
 
 def main(args=None):
@@ -517,8 +516,7 @@ def main(args=None):
             if files_to_lint:
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
-                    print(
-                        'Push failed, please correct the linting issues above.')
+                    print('Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
             mypy_check_status = execute_mypy_checks()
@@ -533,8 +531,7 @@ def main(args=None):
                 typescript_checks_status = run_script_and_get_returncode(
                     TYPESCRIPT_CHECKS_CMDS)
             if typescript_checks_status != 0:
-                print(
-                    'Push aborted due to failing typescript checks.')
+                print('Push aborted due to failing typescript checks.')
                 sys.exit(1)
 
             strict_typescript_checks_status = 0
@@ -553,15 +550,13 @@ def main(args=None):
                 frontend_status = run_script_and_get_returncode(
                     FRONTEND_TEST_CMDS)
             if frontend_status != 0:
-                print(
-                    'Push aborted due to failing frontend tests.')
+                print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
             if does_diff_include_ci_config_or_js_files(files_to_lint):
                 ci_check_status = run_script_and_get_returncode(
                     CI_PROTRACTOR_CHECK_CMDS)
             if ci_check_status != 0:
-                print(
-                    'Push aborted due to failing e2e test configuration check.')
+                print('Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
     return
 

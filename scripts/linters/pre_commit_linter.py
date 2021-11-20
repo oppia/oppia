@@ -366,8 +366,7 @@ def _get_filepaths_from_path(input_path, namespace=None):
     file_cache = namespace.files
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
-        print(
-            'Could not locate file or directory %s. Exiting.' % input_path)
+        print('Could not locate file or directory %s. Exiting.' % input_path)
         print('----------------------------------------')
         sys.exit(1)
     if os.path.isfile(input_path):

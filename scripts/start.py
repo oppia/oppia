@@ -25,7 +25,8 @@ import time
 
 
 from . import install_third_party_libs
-# This installs third party libraries before importing other files.
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

@@ -36,8 +36,7 @@ def log(message, show_time=False):
     """
     with LOG_LOCK:
         if show_time:
-            print(
-                datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
+            print(datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
         else:
             print(message)
 

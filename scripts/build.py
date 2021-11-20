@@ -445,8 +445,7 @@ def _compare_file_count(
     for second_dir_path in second_dir_list:
         file_counts[1] += get_file_count(second_dir_path)
     if file_counts[0] != file_counts[1]:
-        print(
-            'Comparing %s vs %s' % (first_dir_list, second_dir_list))
+        print('Comparing %s vs %s' % (first_dir_list, second_dir_list))
         raise ValueError(
             '%s files in first dir list != %s files in second dir list' % (
                 file_counts[0], file_counts[1]))
@@ -614,8 +613,7 @@ def build_third_party_libs(third_party_directory_path):
     single js file. Copies both files and all fonts into third party folder.
     """
 
-    print(
-        'Building third party libs at %s' % third_party_directory_path)
+    print('Building third party libs at %s' % third_party_directory_path)
 
     third_party_js_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
@@ -946,8 +944,7 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
 
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
-            print(
-                'Building directory %s' % os.path.join(root, directory))
+            print('Building directory %s' % os.path.join(root, directory))
         for filename in filenames:
             source_path = os.path.join(root, filename)
             target_path = source_path.replace(source, target)
@@ -1007,8 +1004,7 @@ def generate_delete_tasks_to_remove_deleted_files(
         deque(Thread). A deque that contains all delete tasks
         queued to be processed.
     """
-    print(
-        'Scanning directory %s to remove deleted file' % staging_directory)
+    print('Scanning directory %s to remove deleted file' % staging_directory)
     delete_tasks = collections.deque()
     for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
@@ -1132,8 +1128,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 source_dir, staging_dir, recently_changed_filenames)
         else:
-            print(
-                'No changes detected. Using previously built files.')
+            print('No changes detected. Using previously built files.')
 
     return build_tasks
 

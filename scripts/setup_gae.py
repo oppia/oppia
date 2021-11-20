@@ -53,8 +53,7 @@ def main(args=None):
         'Checking whether google-cloud-sdk is installed in %s'
         % common.GOOGLE_CLOUD_SDK_HOME)
     if not os.path.exists(common.GOOGLE_CLOUD_SDK_HOME):
-        print(
-            'Downloading Google Cloud SDK (this may take a little while)...')
+        print('Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding

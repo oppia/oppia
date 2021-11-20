@@ -167,8 +167,7 @@ def main(args=None):
     if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
             'deploy-'):
         print('')
-        print(
-            'WARNING   This script should be run from the oppia/ root folder.')
+        print('WARNING   This script should be run from the oppia/ root folder.')
         print('')
         raise Exception('Invalid root directory.')
 
@@ -203,8 +202,7 @@ def main(args=None):
         common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
     # Download and install yarn.
-    print(
-        'Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
+    print('Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.YARN_PATH):
         print('Removing package-lock.json')
         clean.delete_file('package-lock.json')

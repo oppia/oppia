@@ -187,8 +187,7 @@ def ensure_pip_library_is_installed(package, version, path):
         version: str. The package version.
         path: str. The installation path for the package.
     """
-    print(
-        'Checking if %s is installed in %s' % (package, path))
+    print('Checking if %s is installed in %s' % (package, path))
 
     exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
     if not os.path.exists(exact_lib_path):
@@ -206,8 +205,7 @@ def ensure_system_python_libraries_are_installed(package, version):
         package: str. The package name.
         version: str. The package version.
     """
-    print(
-        'Checking if %s is installed.' % (package))
+    print('Checking if %s is installed.' % (package))
     install_backend_python_libs.pip_install_to_system(package, version)
 
 
@@ -288,8 +286,7 @@ def main() -> None:
     # __init__.py files (python requires modules to have __init__.py files in
     # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
-    print(
-        'Checking that all google library modules contain __init__.py files...')
+    print('Checking that all google library modules contain __init__.py files...')
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):

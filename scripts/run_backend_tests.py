@@ -370,16 +370,12 @@ def main(args=None):
                 all_test_targets = [parsed_args.test_target]
             else:
                 print('')
-                print(
-                    '---------------------------------------------------------')
-                print(
-                    'WARNING : test_target flag should point to the test file.')
-                print(
-                    '---------------------------------------------------------')
+                print('---------------------------------------------------------')
+                print('WARNING : test_target flag should point to the test file.')
+                print('---------------------------------------------------------')
                 print('')
                 time.sleep(3)
-                print(
-                    'Redirecting to its corresponding test file...')
+                print('Redirecting to its corresponding test file...')
                 all_test_targets = [parsed_args.test_target + '_test']
         elif parsed_args.test_shard:
             validation_error = _check_shards_match_tests(
@@ -439,12 +435,10 @@ def main(args=None):
             test_count = 0
         elif task.exception and isinstance(
                 task.exception, subprocess.CalledProcessError):
-            print(
-                'ERROR     %s: Error raised by subprocess.')
+            print('ERROR     %s: Error raised by subprocess.')
             raise task.exception
         elif task.exception and 'No tests were run' in task.exception.args[0]:
-            print(
-                'ERROR     %s: No tests found.' % spec.test_target)
+            print('ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
             exc_str = task.exception.args[0]
@@ -472,11 +466,9 @@ def main(args=None):
                 print('')
                 print(
                     '------------------------------------------------------')
-                print(
-                    '    WARNING: FAILED TO RUN %s' % spec.test_target)
+                print('    WARNING: FAILED TO RUN %s' % spec.test_target)
                 print('')
-                print(
-                    '    This is most likely due to an import error.')
+                print('    This is most likely due to an import error.')
                 print(
                     '------------------------------------------------------')
                 raise task.exception
@@ -515,8 +507,7 @@ def main(args=None):
         len(tasks), '' if len(tasks) == 1 else 's'))
 
     if total_errors or total_failures:
-        print(
-            '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+        print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
     else:
         print('All tests passed.')
 
@@ -532,12 +523,6 @@ def main(args=None):
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
-        process = subprocess.Popen(
-            [sys.executable, COVERAGE_MODULE_PATH, 'report',
-             '--omit="%s*","third_party/*","/usr/share/*"'
-             % common.OPPIA_TOOLS_DIR, '--show-missing'],
-            stdout=subprocess.PIPE, encoding='utf-8')
-
         report_stdout, _ = process.communicate()
         print(report_stdout)
 

@@ -469,12 +469,10 @@ def main(args=None):
     return_code, mypy_exec_path = install_mypy_prerequisites(
         parsed_args.install_globally)
     if return_code != 0:
-        print(
-            'Cannot install Mypy and stubs for third party libraries.')
+        print('Cannot install Mypy and stubs for third party libraries.')
         sys.exit(1)
 
-    print(
-        'Installed Mypy and stubs for third party libraries.')
+    print('Installed Mypy and stubs for third party libraries.')
 
     print('Starting Mypy type checks.')
     cmd = get_mypy_cmd(

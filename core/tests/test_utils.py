@@ -992,8 +992,7 @@ class TestBase(unittest.TestCase):
         that calls the test.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
-        print(
-            b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
+        print(b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""

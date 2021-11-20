@@ -231,7 +231,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         print_arr = []
         def mock_print(msg):
             print_arr.append(msg)
-        print_swap = self.swap(python_utils, 'builtins, print', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
         with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'zip', {

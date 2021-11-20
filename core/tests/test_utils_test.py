@@ -416,7 +416,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            sys.stdout.write('5')
+            print('5')
         logging.error('6')
 
         self.assertEqual(logs, ['3', '4'])

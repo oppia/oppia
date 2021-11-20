@@ -153,8 +153,7 @@ def main():
             'directory is missing from protractor.conf.js')
     print('Done!')
 
-    print(
-        'Checking e2e tests are captured in CI config files...')
+    print('Checking e2e tests are captured in CI config files...')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
     ci_suite_names = get_e2e_suite_names_from_ci_config_file()
 

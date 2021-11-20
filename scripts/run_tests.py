@@ -65,8 +65,7 @@ def main(args=None):
     print('Running end-to-end tests')
     subprocess.Popen('bash scripts/run_e2e_tests.sh', shell=True)
 
-    print(
-        'SUCCESS    All frontend, backend and end-to-end tests passed!')
+    print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 
 if __name__ == '__main__':
