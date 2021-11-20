@@ -65,7 +65,7 @@
             </button>
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
-                    [disabled]="!this.isExplanationEmpty(explanation)
+                    [disabled]="this.isExplanationEmpty(explanation)
                       || !this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)"
                     (click)="this.saveExplanation(this.rubric.getDifficulty(), idx)">
               Save

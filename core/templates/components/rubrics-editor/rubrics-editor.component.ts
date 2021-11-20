@@ -96,7 +96,10 @@ export class RubricsEditorComponent {
   }
 
   isMediumLevelExplanationValid(): boolean {
-    return (this.rubrics[1]._explanations.length >= 1)
+    if (this.rubrics[1] === undefined) {
+      return false;
+    }
+    return (this.rubrics[1]._explanations.length >= 1);
   }
 
   isTotalExplanationsLengthReached(): boolean {
