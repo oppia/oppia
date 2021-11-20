@@ -4752,12 +4752,12 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_entity/%s/%s' % (
+            self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
                 expected_status_int=401)
 
     def test_cannot_submit_images_to_questions_without_having_permissions(self):
-        self.login(self.NEW_USER_EMAIL)
+        self.login(self.user_email)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4765,7 +4765,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to submit '
+                response['error'], 'You do not have credentials to submit'
                 ' images to questions.')
         self.logout()
 
