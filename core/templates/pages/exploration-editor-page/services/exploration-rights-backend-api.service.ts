@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import constants from 'assets/constants';
+import AppConstants from 'assets/constants';
 import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service';
 import { AlertsService } from 'services/alerts.service';
@@ -42,20 +42,20 @@ export interface ExplorationRightsBackendData {
   providedIn: 'root'
 })
 export class ExplorationRightsService {
-  ownerNames: string[] = undefined;
-  editorNames: string[] = undefined;
-  voiceArtistNames: string[] = undefined;
-  viewerNames: string[] = undefined;
-  _status: string = undefined;
-  _clonedFrom: string = undefined;
-  _isCommunityOwned: boolean = undefined;
-  _viewableIfPrivate: boolean = undefined;
+  ownerNames: string[];
+  editorNames: string[];
+  voiceArtistNames: string[];
+  viewerNames: string[];
+  private _status: string;
+  private _clonedFrom: string;
+  private _isCommunityOwned: boolean;
+  private _viewableIfPrivate: boolean;
 
   constructor(
     private alertsService: AlertsService,
-    private httpClient: HttpClient,
+    private http: HttpClient,
     private explorationDataService: ExplorationDataService,
-  ) { }
+  ) {}
 
   init(
       ownerNames: string[], editorNames: string[], voiceArtistNames: string[],
@@ -80,11 +80,11 @@ export class ExplorationRightsService {
   }
 
   isPublic(): boolean {
-    return this._status === constants.ACTIVITY_STATUS_PUBLIC;
+    return this._status === AppConstants.ACTIVITY_STATUS_PUBLIC;
   }
 
   isPrivate(): boolean {
-    return this._status === constants.ACTIVITY_STATUS_PRIVATE;
+    return this._status === AppConstants.ACTIVITY_STATUS_PRIVATE;
   }
 
   viewableIfPrivate(): boolean {
@@ -96,9 +96,9 @@ export class ExplorationRightsService {
   }
 
   makeCommunityOwned(): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
-    return this.httpClient.put(requestUrl, {
+    return this.http.put(requestUrl, {
       version: this.explorationDataService.data.version,
       make_community_owned: true
     }).toPromise().then((response: ExplorationRightsBackendData) => {
@@ -115,10 +115,10 @@ export class ExplorationRightsService {
   saveRoleChanges(
       newMemberUsername: string,
       newMemberRole: string): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
-    return this.httpClient.put(requestUrl, {
+    return this.http.put(requestUrl, {
       version: this.explorationDataService.data.version,
       new_member_role: newMemberRole,
       new_member_username: newMemberUsername
@@ -135,10 +135,10 @@ export class ExplorationRightsService {
 
   setViewability(
       viewableIfPrivate: boolean): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
-    return this.httpClient.put(requestUrl, {
+    return this.http.put(requestUrl, {
       version: this.explorationDataService.data.version,
       viewable_if_private: viewableIfPrivate
     }).toPromise().then((response: ExplorationRightsBackendData) => {
@@ -153,10 +153,10 @@ export class ExplorationRightsService {
   }
 
   publish(): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/createhandler/status/' + this.explorationDataService.explorationId);
 
-    return this.httpClient.put(requestUrl, {
+    return this.http.put(requestUrl, {
       make_public: true
     }).toPromise().then((response: ExplorationRightsBackendData) => {
       let data = response;
@@ -170,11 +170,11 @@ export class ExplorationRightsService {
   }
 
   saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
-    let explorationModeratorRightsUrl = (
+    const explorationModeratorRightsUrl = (
       '/createhandler/moderatorrights/' +
       this.explorationDataService.explorationId);
 
-    return this.httpClient.put(explorationModeratorRightsUrl, {
+    return this.http.put(explorationModeratorRightsUrl, {
       email_body: emailBody,
       version: this.explorationDataService.data.version
     }).toPromise().then((response: ExplorationRightsBackendData) => {
@@ -187,16 +187,16 @@ export class ExplorationRightsService {
         data.rights.community_owned, data.rights.viewable_if_private);
     }).catch(() => {
       this.init(
-        undefined, undefined, undefined, undefined,
-        undefined, undefined, undefined, undefined);
+        null, null, null, null,
+        null, null, null, null);
     });
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
-    return this.httpClient.delete(requestUrl, {
+    return this.http.delete(requestUrl, {
       params: {
         username: memberUsername
       }
@@ -212,11 +212,11 @@ export class ExplorationRightsService {
   }
 
   assignVoiceArtistRoleAsync(newVoiceArtistUsername: string): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/voice_artist_management_handler/' + 'exploration/' +
       this.explorationDataService.explorationId);
 
-    return this.httpClient.post(requestUrl, {
+    return this.http.post(requestUrl, {
       username: newVoiceArtistUsername}).toPromise().then(() => {
       this.alertsService.clearWarnings();
       this.voiceArtistNames.push(newVoiceArtistUsername);
@@ -224,10 +224,10 @@ export class ExplorationRightsService {
   }
 
   removeVoiceArtistRoleAsync(voiceArtistUsername: string): Promise<void> {
-    let requestUrl = (
+    const requestUrl = (
       '/voice_artist_management_handler/' + 'exploration/' +
       this.explorationDataService.explorationId);
-    return this.httpClient.delete(requestUrl, {
+    return this.http.delete(requestUrl, {
       params: {
         voice_artist: voiceArtistUsername
       }
@@ -248,13 +248,13 @@ export class ExplorationRightsService {
 
   getOldRole(username: string): string {
     if (this.ownerNames.includes(username)) {
-      return constants.ROLE_OWNER;
+      return AppConstants.ROLE_OWNER;
     } else if (this.editorNames.includes(username)) {
-      return constants.ROLE_EDITOR;
+      return AppConstants.ROLE_EDITOR;
     } else if (this.voiceArtistNames.includes(username)) {
-      return constants.ROLE_VOICE_ARTIST;
+      return AppConstants.ROLE_VOICE_ARTIST;
     } else {
-      return constants.ROLE_VIEWER;
+      return AppConstants.ROLE_VIEWER;
     }
   }
 }
