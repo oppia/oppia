@@ -152,6 +152,24 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 class ProfilePictureDataUrlHandler(base.BaseHandler):
     """Provides data url for profile picture."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'update_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'data': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     @acl_decorators.can_manage_own_account
     def get(self):
@@ -182,14 +200,32 @@ class ProfilePictureDataUrlHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        update_type = self.payload.get('update_type')
-        data = self.payload.get('data')
+        update_type = self.normalized_payload.get('update_type')
+        data = self.normalized_payload.get('data')
         if update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
 
 
 class BulkEmailMessageHandler(base.BaseHandler):
     """Provides bulk email signup messages."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'update_type': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+            'data': {
+                'schema': {
+                    'type': 'dict',
+                },
+                'default_value': False
+            }
+        }
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
