@@ -532,7 +532,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       $scope.init();
       $rootScope.$apply();
 
-      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith(undefined);
+      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });

@@ -104,7 +104,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         SiteAnalyticsService
           .registerContributorDashboardViewSuggestionForReview('Question');
       } else if ($scope.suggestionIsRejected) {
-        _getThreadMessagesAsync($scope.activeSuggestionId);
+        _getThreadMessagesAsync(suggestionId);
       }
     };
 
