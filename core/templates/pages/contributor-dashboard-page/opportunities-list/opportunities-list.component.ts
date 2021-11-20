@@ -33,7 +33,7 @@ import { Subscription } from 'rxjs';
 })
 export class OpportunitiesListComponent {
   @Input() loadOpportunities: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[], more: boolean}>;
+    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;

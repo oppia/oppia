@@ -32,7 +32,7 @@ import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
   componentInstance: {
-    bindedMessage: null
+    bindedMessage: null;
   };
 }
 
