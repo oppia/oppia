@@ -118,6 +118,8 @@ describe('Ratings and recommendations component', () => {
 
     componentInstance.togglePopover();
 
+    // Using a mock for popover don't allow us to check its final state.
+    // So, using a spy on function toggle instead.
     expect(componentInstance.feedbackPopOver.toggle).toHaveBeenCalled();
   });
 
@@ -126,6 +128,8 @@ describe('Ratings and recommendations component', () => {
 
     componentInstance.closePopover();
 
+    // Using a mock for popover don't allow us to check its final state.
+    // So, using a spy on function close instead.
     expect(componentInstance.feedbackPopOver.close).toHaveBeenCalled();
   });
 

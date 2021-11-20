@@ -20,7 +20,7 @@ import { ElementRef, HostBinding, Component, Input, OnChanges } from '@angular/c
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'oppia-smooth-height',
+  selector: 'oppia-smooth-height-animation',
   template: `
     <ng-content></ng-content>
   `,

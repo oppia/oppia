@@ -4844,3 +4844,21 @@ div.oppia-issues-learner-action {
 .cdk-global-overlay-wrapper, .cdk-overlay-container {
   z-index: 10000 !important;
 }
+
+.oppia-exploration-summary-tile {
+  margin-left: 10px;
+}
+
+.oppia-login-button {
+  background-color: #00645C;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
+
+.oppia-sign-up-button {
+  background-color: #00609C;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
