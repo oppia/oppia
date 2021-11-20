@@ -78,8 +78,8 @@ describe('Story Creation Service', () => {
   }));
 
   it('should not initiate new story creation if another is in process',
-  fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue(
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.resolve({
           isValid: () => true,
@@ -122,8 +122,8 @@ describe('Story Creation Service', () => {
   }));
 
   it('should throw error if the newly created story is not valid',
-  fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue(
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.resolve({
           isValid: () => true,
@@ -132,11 +132,11 @@ describe('Story Creation Service', () => {
           urlFragment: 'url'
         })
       } as NgbModalRef
-    );
-    try {
+      );
+      try {
       StoryCreationService.createNewCanonicalStory();
       tick();
-    } catch (e) {
+      } catch (e) {
       expect(e).toBe(new Error('Story fields cannot be empty'));
     }
   }));
