@@ -1641,59 +1641,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             response_dict['error'])
         self.logout()
 
-    def test_suggestion_creation_when_images_are_not_valid(self):
-        self.save_new_skill(
-            'skill_id2', self.admin_id, description='description')
-        question_state_data_dict = self._create_valid_question_data(
-            'default_state').to_dict()
-        valid_html = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
-        )
-        question_state_data_dict['content']['html'] = valid_html
-        self.question_dict = {
-            'question_state_data': question_state_data_dict,
-            'language_code': 'en',
-            'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': ['skill_id2'],
-            'inapplicable_skill_misconception_ids': []
-        }
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        large_image = '<svg><path d="%s" /></svg>' % (
-            'M150 0 L75 200 L225 200 Z ' * 4000)
-
-        response_dict = self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': feconf.ENTITY_TYPE_SKILL,
-                'target_id': self.SKILL_ID,
-                'target_version_at_submission': 1,
-                'change': {
-                    'cmd': (
-                        question_domain
-                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                    'question_dict': self.question_dict,
-                    'skill_id': self.SKILL_ID,
-                    'skill_difficulty': 0.3
-                },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token,
-            upload_files=(
-                ('file.svg', 'file.svg', large_image),),
-            expected_status_int=400)
-
-        self.assertIn(
-            'Image exceeds file size limit of 100 KB.',
-            response_dict['error'])
-        self.logout()
-
 
 class SkillSuggestionTests(test_utils.GenericTestBase):
 

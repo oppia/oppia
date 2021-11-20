@@ -253,7 +253,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(response.body, raw_image)
 
         # Image context: Question Suggestions.
-        self.login(self.SUPER_ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         with python_utils.open_file(
