@@ -30,7 +30,7 @@ const hashes = require('hashes.json');
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
 export interface InterpolationValuesType {
-  [param: string]: string
+  [param: string]: string;
 }
 
 @Injectable({

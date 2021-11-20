@@ -26,7 +26,7 @@ import re
 import sys
 import tokenize
 
-from core.controllers import payload_validator
+from core import handler_schema_constants
 
 from .. import docstrings_checker
 
@@ -1368,7 +1368,12 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     }
 
     # If import from any of these is made, it may not be a module.
-    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing', 'mypy_imports']
+    EXCLUDED_IMPORT_MODULES = [
+        '__future__',
+        'typing',
+        'mypy_imports',
+        'typing_extensions'
+    ]
 
     @checker_utils.check_messages('import-only-modules')
     def visit_importfrom(self, node):
@@ -2225,7 +2230,10 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if not self.check_parent_class_is_basehandler(node):
             return
 
-        if node.name in payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
+        if (
+            node.name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
             return
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
