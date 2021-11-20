@@ -1,13 +1,14 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
 
-  <div class="oppia-dashboard-title">
+  <div class="oppia-dashboard-title" ng-class="$ctrl.checkMobileView() ? 'oppia-dashboard-title-mobile-padding': 'oppia-dashboard-title-desktop-padding'">
     <span class="float-left" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></span>
-      <button type="button"
-        class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
-        ng-click="$ctrl.createNewExploration()"
-        translate="I18N_CREATE_EXPLORATION" autofocus>
-      </button>
+    <button type="button"
+      class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
+      ng-class="$ctrl.checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'"
+      ng-click="$ctrl.createNewExploration()"
+      translate="I18N_CREATE_EXPLORATION" autofocus>
+    </button>
   </div>
 
   <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content pt-1"
@@ -545,8 +546,13 @@
     font-size: 3em;
     margin-bottom: 25px;
     margin-top: 0;
-    padding-top: 78.5px;
     text-align: center;
+  }
+  .oppia-dashboard-title-desktop-padding {
+    padding-top: 78.5px;
+  }
+  .oppia-dashboard-title-mobile-padding {
+    padding-top: 15px;
   }
   .oppia-dashboard-tabs .list-card-view-toggle {
     margin-left: auto;
@@ -658,7 +664,7 @@
   .oppia-dashboard-table td {
     padding: 7px 3px;
   }
-  .oppia-creator-dashboard-intro-button{
+  .oppia-creator-dashboard-intro-button {
     background-color: #00645c;
     border-radius: 6px;
     color: #fff;
@@ -667,9 +673,14 @@
     font-weight: 500;
     letter-spacing: 0.7px;
     margin-top: 10px;
+    padding: 10px 12px;
     text-transform: uppercase;
     width: 200px;
-    padding: 10px 12px;
+  }
+  .oppia-creator-dashboard-button-mobile {
+    transform: none;
+  }
+  .oppia-creator-dashboard-button-desktop {
     transform: translate(70px, -15px);
   }
   .oppia-dashboard-intro-card {
