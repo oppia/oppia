@@ -77,18 +77,42 @@
             </span>
           </a>
           <ul ngbDropdownMenu
-              class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
+              class="dropdown-menu oppia-navbar-dropdown classroom-dropdown-menu"
               (mouseover)="openSubmenu($event, 'classroomMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu"
               autofocus>
             <li class="nav-item">
-              <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})"
-                 (click)="navigateToClassroomPage('/learn/math')"
-                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link"
-                 href="#"
-                 [innerHTML]="'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate">
-              </a>
+              <div class="nav-item-main d-flex justify-content-between">
+                <div class="nav-item-left d-flex flex-column">
+                  <div class="nav-item-top d-flex justify-content-between">
+                    <div class="nav-content d-flex flex-column">
+                      <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math')" class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link" href="#" [innerHTML]="'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate"></a>
+                      <div class="des">
+                        Beginner friendly lessons to help you get started in math.
+                      </div>
+                    </div>
+                    <picture>
+                      <source type="image/png"
+                              [srcset]="getStaticImageUrl('/topnav/learn.png')">
+                      <img [src]="getStaticImageUrl('/topnav/learn.png')"
+                           class="learn"
+                           alt="Learn" >
+                    </picture>
+                  </div>
+                  <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
+                    <a class="nav-item-links">Place Values</a>
+                    <a class="nav-item-links">Addition and Subtraction</a>
+                    <a class="nav-item-links">Multiplication</a>
+                    <a class="nav-item-bottom-link">See All Lessons <span class="material-icons">arrow_right_alt</span></a>
+                  </div>
+                </div>
+                <div class="nav-content nav-item-right d-flex flex-column">
+                  <div class="nav-item-right-head">WAYS TO LEARN MORE</div>
+                  <div class="des">Additional resources made by the community to help you learn more.</div>
+                  <a class="nav-item-bottom-link">Community Library <span class="material-icons">arrow_right_alt</span></a>
+                </div>
+              </div>
             </li>
           </ul>
         </li>
@@ -449,6 +473,66 @@
   }
   .dropdown-toggle::after {
     margin-right: 0.255em;
+  }
+  .classroom-dropdown-menu {
+    border-radius: 3px;
+    left: 0 !important;
+    min-width: 668px;
+    padding: 0;
+  }
+  .classroom-dropdown-menu .nav-item-top-link {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 18.75px;
+    padding: 0;
+    padding-bottom: 8px;
+  }
+  .classroom-dropdown-menu .nav-item-right-head {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    line-height: 14.06px;
+    padding: 0;
+    padding-bottom: 8px;
+  }
+  .classroom-dropdown-menu .nav-item-links {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.41px;
+    padding: 0;
+    padding-top: 16px;
+  }
+  .classroom-dropdown-menu .nav-item-left {
+    border-right: 1px solid #0000000d;
+    padding: 32px;
+    width: 388px;
+  }
+  .classroom-dropdown-menu .nav-item-right {
+    min-width: 300px;
+    padding: 32px;
+  }
+  .classroom-dropdown-menu .nav-content {
+    color: #767676;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    width: 224px;
+  }
+  .classroom-dropdown-menu .nav-item-bottom-link {
+    color: #00645C;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.41px;
+    padding: 0;
+    padding-top: 16px;
   }
   .dropdown-menu {
     border-radius: 3px;
