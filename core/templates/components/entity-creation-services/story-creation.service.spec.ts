@@ -19,12 +19,11 @@
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import { fakeAsync, tick } from '@angular/core/testing';
 require('services/ngb-modal.service.ts');
 
 describe('Story Creation Service', () => {
   let $rootScope = null;
-  let $scope = null;
   let StoryCreationService = null;
   let TopicEditorStateService = null;
   let ImageLocalStorageService = null;
@@ -58,7 +57,6 @@ describe('Story Creation Service', () => {
     $q = $injector.get('$q');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
     CsrfTokenService = $injector.get('CsrfTokenService');
@@ -85,9 +83,9 @@ describe('Story Creation Service', () => {
       {
         result: Promise.resolve({
           isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url'
         })
       } as NgbModalRef
     );
@@ -105,15 +103,15 @@ describe('Story Creation Service', () => {
       {
         result: Promise.resolve({
           isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url'
         })
       } as NgbModalRef
     );
 
     $httpBackend.expectPOST('/topic_editor_story_handler/id')
-    .respond(200, {storyId: 'id'});
+      .respond(200, {storyId: 'id'});
 
     expect(mockWindow.location).toBe('');
 
@@ -129,9 +127,9 @@ describe('Story Creation Service', () => {
       {
         result: Promise.resolve({
           isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url'
         })
       } as NgbModalRef
     );
