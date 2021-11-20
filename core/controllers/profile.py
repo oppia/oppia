@@ -22,7 +22,8 @@ import logging
 import re
 import zipfile
 
-from core import constants, feconf
+from core import constants
+from core import feconf
 from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
