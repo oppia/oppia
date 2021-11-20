@@ -1411,6 +1411,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response_dict['error'])
         self.logout()
 
+
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
