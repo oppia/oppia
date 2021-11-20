@@ -17,7 +17,10 @@
  */
 
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+require('services/ngb-modal.service.ts');
 
 describe('Story Creation Service', () => {
   let $rootScope = null;
@@ -26,7 +29,7 @@ describe('Story Creation Service', () => {
   let TopicEditorStateService = null;
   let ImageLocalStorageService = null;
   let CsrfTokenService: CsrfTokenService;
-  let $uibModal = null;
+  let ngbModal: NgbModal = null;
   let $httpBackend = null;
   let $q = null;
   let imageBlob = null;
@@ -34,7 +37,15 @@ describe('Story Creation Service', () => {
     location: ''
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -43,7 +54,7 @@ describe('Story Creation Service', () => {
 
   beforeEach(angular.mock.inject(function($injector) {
     StoryCreationService = $injector.get('StoryCreationService');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
@@ -68,62 +79,67 @@ describe('Story Creation Service', () => {
       .and.returnValue($q.resolve('sample-csrf-token'));
   }));
 
-  it('should not initiate new story creation if another is in process', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => true,
+  it('should not initiate new story creation if another is in process',
+  fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.resolve({
+          isValid: () => true,
         title: 'Title',
         description: 'Description',
         urlFragment: 'url'
-      })
-    });
+        })
+      } as NgbModalRef
+    );
 
     StoryCreationService.createNewCanonicalStory();
-    $scope.$apply();
+    tick();
 
     // Creating a new story while previous was in creation process.
     expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
-  });
+  }));
 
   it('should post story data to server and change window location' +
-    ' on success', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => true,
+    ' on success', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.resolve({
+          isValid: () => true,
         title: 'Title',
         description: 'Description',
         urlFragment: 'url'
-      })
-    });
+        })
+      } as NgbModalRef
+    );
 
     $httpBackend.expectPOST('/topic_editor_story_handler/id')
-      .respond(200, {storyId: 'id'});
+    .respond(200, {storyId: 'id'});
 
     expect(mockWindow.location).toBe('');
 
-
     StoryCreationService.createNewCanonicalStory();
-    $scope.$apply();
-
-    $httpBackend.flush();
+    tick();
 
     expect(mockWindow.location).toBe('/story_editor/id');
-  });
+  }));
 
-  it('should throw error if the newly created story is not valid', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => false,
+  it('should throw error if the newly created story is not valid',
+  fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.resolve({
+          isValid: () => true,
         title: 'Title',
         description: 'Description',
         urlFragment: 'url'
-      })
-    });
+        })
+      } as NgbModalRef
+    );
     try {
       StoryCreationService.createNewCanonicalStory();
-      $scope.$apply();
+      tick();
     } catch (e) {
       expect(e).toBe(new Error('Story fields cannot be empty'));
     }
-  });
+  }));
 });
