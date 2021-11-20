@@ -25,7 +25,7 @@ interface SettingTabBackendDict {
 }
 
 interface SettingTabResponse {
-  draftEmailBody: string
+  draftEmailBody: string;
 }
 
 @Injectable({
