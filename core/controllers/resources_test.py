@@ -687,8 +687,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
-            'Schema validation for \'filename\' failed: Validation'
-            ' failed: has_allowed_audio_extension ({}) for object '
+            'Schema validation for \'filename\' failed: Validation '
+            'failed: has_allowed_audio_extension ({}) for object '
             'test.wav'
         )
         self.assertEqual(response_dict['error'], error_msg)
@@ -709,8 +709,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
-            'Schema validation for \'raw_audio_file\' failed: Validation'
-            ' failed: is_nonempty ({}) for object b\'\''
+            'Schema validation for \'raw_audio_file\' failed: Validation '
+            'failed: is_nonempty ({}) for object b\'\''
         )
         self.assertEqual(response_dict['error'], error_msg)
 
