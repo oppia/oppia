@@ -566,6 +566,47 @@ class ExplorationStartEventHandler(base.BaseHandler):
     """Tracks a learner starting an exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'params': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': []
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -574,14 +615,12 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        if self.payload.get('version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Exploration start')
         event_services.StartExplorationEventHandler.record(
-            exploration_id, self.payload.get('version'),
-            self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('params'),
+            exploration_id,
+            self.normalized_payload.get('version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
         self.render_json({})
 
@@ -592,16 +631,50 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exploration_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
-            exploration_id, self.payload.get('exploration_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'))
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'))
         self.render_json({})
 
 
