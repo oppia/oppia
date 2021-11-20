@@ -389,20 +389,10 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             self.payload.get('question_state_data'))
         question_state_data_obj.validate(None, False)
 
-        updated_suggestion = suggestion_services.update_question_suggestion(
+        suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
             self.payload.get('question_state_data'))
-
-        new_image_filenames = (
-            utils.compute_list_difference(
-                updated_suggestion
-                    .get_new_image_filenames_added_in_suggestion(),
-                suggestion.get_new_image_filenames_added_in_suggestion()
-            )
-        )
-        _upload_suggestion_images(
-            self.request, updated_suggestion, new_image_filenames)
 
         self.render_json(self.values)
 

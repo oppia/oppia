@@ -1386,6 +1386,40 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
+    def test_suggestion_creation_when_images_are_not_provided(self):
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': valid_html,
+                    'translation_html': ['test1', 'test2'],
+                    'data_format': 'set_of_normalized_string',
+                },
+                'description': 'description',
+            }, csrf_token=csrf_token)
+
+        self.assertIn(
+            'No image data provided for file with name file.svg.',
+            response_dict['error'])
+        self.logout()
+
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
@@ -1592,53 +1626,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token, upload_files=(
                 ('file.svg', 'file.svg', raw_image), ))
-        self.logout()
-
-    def test_suggestion_creation_when_images_are_not_provided(self):
-        self.save_new_skill(
-            'skill_id2', self.admin_id, description='description')
-        question_state_data_dict = self._create_valid_question_data(
-            'default_state').to_dict()
-        valid_html = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
-        )
-        question_state_data_dict['content']['html'] = valid_html
-        self.question_dict = {
-            'question_state_data': question_state_data_dict,
-            'language_code': 'en',
-            'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': ['skill_id2'],
-            'inapplicable_skill_misconception_ids': []
-        }
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        response_dict = self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': feconf.ENTITY_TYPE_SKILL,
-                'target_id': self.SKILL_ID,
-                'target_version_at_submission': 1,
-                'change': {
-                    'cmd': (
-                        question_domain
-                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                    'question_dict': self.question_dict,
-                    'skill_id': self.SKILL_ID,
-                    'skill_difficulty': 0.3
-                },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertIn(
-            'No image data provided for file with name file.svg.',
-            response_dict['error'])
         self.logout()
 
 

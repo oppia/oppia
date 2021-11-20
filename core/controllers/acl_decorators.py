@@ -2565,6 +2565,44 @@ def can_edit_skill(handler):
     test_can_edit_skill.__wrapped__ = True
     return test_can_edit_skill
 
+def can_submit_question(handler):
+    """Decorator to check whether the user can submit a question.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        the user has permission to submit a question.
+    """
+    def test_can_submit_question(self, skill_id, **kwargs):
+        """Test to see if user can submit a question for a skill.
+
+        Args:
+            skill_id: str. The skill ID.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The given page cannot be found.
+            UnauthorizedUserException. The user does not have the
+                credentials to edit the given skill.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+            return handler(self, skill_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to submit a question.')
+
+    test_can_submit_question.__wrapped__ = True
+    return test_can_submit_question
+
 
 def can_delete_skill(handler):
     """Decorator to check whether the user can delete a skill.
@@ -3414,11 +3452,10 @@ def can_edit_entity(handler):
             return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_TOPIC:
             return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-        elif (
-            entity_type == feconf.ENTITY_TYPE_SKILL or
-            entity_type == feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
-        ):
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS:
+            return can_submit_question(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_BLOG_POST:
