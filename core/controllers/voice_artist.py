@@ -57,7 +57,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                    'id': 'is_nonempty'
+                        'id': 'is_nonempty'
                     }]
                 }
             },
@@ -65,10 +65,10 @@ class AudioUploadHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
                     }, {
-                    'id': 'is_allowed_audio_extension'
+                        'id': 'has_allowed_audio_extension'
                     }]
                 }
             }

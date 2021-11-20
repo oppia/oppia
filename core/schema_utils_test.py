@@ -890,6 +890,19 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(has_length(['efg'], 2))
         self.assertFalse(has_length(['efg', 'ghj', 'huij'], 2))
 
+    def test_has_allowed_audio_extension_validator(self) -> None:
+        """Tests if a given filename has an allowed audio
+        extension.
+        """
+        has_allowed_audio_extension = schema_utils.get_validator(
+            'has_allowed_audio_extension')
+        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+        for extension in allowed_formats:
+            filename = 'abc.' + extension
+            self.assertTrue(has_allowed_audio_extension(filename))
+
+        self.assertFalse(has_allowed_audio_extension('abc.xyz'))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""

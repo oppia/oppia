@@ -683,7 +683,7 @@ class _Validators:
             return False
 
     @staticmethod
-    def is_allowed_audio_extension(obj: str) -> bool:
+    def has_allowed_audio_extension(obj: str) -> bool:
         """Checks if the given obj (a string) is a filename with
         valid audio extension.
 
