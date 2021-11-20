@@ -62,8 +62,7 @@ describe('Exploration rights service', () => {
     });
     als = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
-    ers =
-      TestBed.inject(ExplorationRightsService);
+    ers = TestBed.inject(ExplorationRightsService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -80,7 +79,7 @@ describe('Exploration rights service', () => {
     httpTestingController.verify();
   });
 
-  it('should correctly initializes the service', function() {
+  it('should correctly initializes the service', () => {
     expect(ers.ownerNames).toBeUndefined();
     expect(ers.editorNames).toBeUndefined();
     expect(ers.voiceArtistNames).toBeUndefined();
@@ -115,7 +114,7 @@ describe('Exploration rights service', () => {
       serviceData.rights.viewable_if_private);
   });
 
-  it('should reports the correct cloning status', function() {
+  it('should reports the correct cloning status', () => {
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.isCloned()).toBe(true);
     expect(ers.clonedFrom()).toEqual('1234');
@@ -125,7 +124,7 @@ describe('Exploration rights service', () => {
     expect(ers.clonedFrom()).toBeNull();
   });
 
-  it('should reports the correct community-owned status', function() {
+  it('should reports the correct community-owned status', () => {
     ers.init(['abc'], [], [], [], 'public', '1234', false, false);
     expect(ers.isCommunityOwned()).toBe(false);
 
@@ -133,7 +132,7 @@ describe('Exploration rights service', () => {
     expect(ers.isCommunityOwned()).toBe(true);
   });
 
-  it('should reports the correct derived statuses', function() {
+  it('should reports the correct derived statuses', () => {
     ers.init(['abc'], [], [], [], 'private', 'e1234', true, false);
     expect(ers.isPrivate()).toBe(true);
     expect(ers.isPublic()).toBe(false);
@@ -144,7 +143,7 @@ describe('Exploration rights service', () => {
   });
 
   it('should reports correcty if exploration rights is viewable when private',
-    function() {
+    () => {
       ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
       expect(ers.viewableIfPrivate()).toBe(true);
 
@@ -296,7 +295,7 @@ describe('Exploration rights service', () => {
     expect(ers.voiceArtistNames).toEqual([]);
   }));
 
-  it('should check user already has roles', function() {
+  it('should check user already has roles', () => {
     let sampleDataResultsCopy = angular.copy(serviceData);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');
@@ -321,7 +320,7 @@ describe('Exploration rights service', () => {
     expect(ers.checkUserAlreadyHasRoles('notInAllUsersList')).toBeFalsy();
   });
 
-  it('should check oldrole of user', function() {
+  it('should check oldrole of user', () => {
     let sampleDataResultsCopy = angular.copy(serviceData);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');
