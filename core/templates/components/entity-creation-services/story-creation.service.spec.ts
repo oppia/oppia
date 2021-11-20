@@ -56,7 +56,6 @@ describe('Story Creation Service', () => {
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
     CsrfTokenService = $injector.get('CsrfTokenService');
@@ -88,14 +87,15 @@ describe('Story Creation Service', () => {
           urlFragment: 'url'
         })
       } as NgbModalRef
-    );
+      );
 
-    StoryCreationService.createNewCanonicalStory();
-    tick();
+      StoryCreationService.createNewCanonicalStory();
+      tick();
 
-    // Creating a new story while previous was in creation process.
-    expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
-  }));
+      // Creating a new story while previous was in creation process.
+      expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
+    })
+  );
 
   it('should post story data to server and change window location' +
     ' on success', fakeAsync(() => {
@@ -119,7 +119,8 @@ describe('Story Creation Service', () => {
     tick();
 
     expect(mockWindow.location).toBe('/story_editor/id');
-  }));
+    })
+  );
 
   it('should throw error if the newly created story is not valid',
     fakeAsync(() => {
@@ -138,6 +139,7 @@ describe('Story Creation Service', () => {
       tick();
       } catch (e) {
       expect(e).toBe(new Error('Story fields cannot be empty'));
-    }
-  }));
+      }
+    })
+  );
 });
