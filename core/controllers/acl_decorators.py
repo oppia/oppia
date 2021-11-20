@@ -2565,6 +2565,7 @@ def can_edit_skill(handler):
     test_can_edit_skill.__wrapped__ = True
     return test_can_edit_skill
 
+
 def can_submit_question(handler):
     """Decorator to check whether the user can submit a question.
 
