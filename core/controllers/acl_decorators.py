@@ -3445,24 +3445,32 @@ def can_edit_entity(handler):
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return can_edit_exploration(reduced_handler)(
-                self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
-            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_SKILL:
-            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS:
-            return can_submit_question(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_STORY:
-            return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_BLOG_POST:
-            return (
-                can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs))
-        else:
+        functions = {
+            feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
+                can_edit_exploration(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: (
+                can_edit_question(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: (
+                can_edit_topic(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_SKILL: lambda entity_id: (
+                can_edit_skill(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
+                can_submit_question(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_STORY: lambda entity_id: (
+                can_edit_story(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: (
+                can_edit_blog_post(reduced_handler)(
+                    self, entity_id, **kwargs))
+        }
+        if entity_type not in dict.keys(functions):
             raise self.PageNotFoundException
+        return functions[entity_type](entity_id)
 
     test_can_edit_entity.__wrapped__ = True
 
