@@ -524,7 +524,7 @@ def main(args=None):
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
-        report_stdout, _ = process.communicate()
+        report_stdout, coverage = _check_coverage(True)
         print(report_stdout)
 
         if (coverage != 100
