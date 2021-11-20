@@ -1000,132 +1000,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             new_solution_dict)
         self.logout()
 
-    def test_update_question_suggestion_with_large_image_throws_error(self):
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
-        suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id,
-            'skill_difficulty': 0.3
-        }
-        new_solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'Solution',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is the updated solution.</p>',
-            },
-        }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
-            self.author_id, suggestion_change, 'test description')
-
-        question_state_data = self._create_valid_question_data(
-            'default_state').to_dict()
-        html_with_file = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
-        )
-        question_state_data['content']['html'] = html_with_file
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        large_image = '<svg><path d="%s" /></svg>' % (
-            'M150 0 L75 200 L225 200 Z ' * 4000)
-
-        response_dict = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
-                'question_state_data': question_state_data,
-                'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, expected_status_int=400, upload_files=(
-                ('file.svg', 'file.svg', large_image),),)
-
-        self.assertIn(
-            'Image exceeds file size limit of 100 KB.',
-            response_dict['error'])
-        self.logout()
-
-    def test_update_question_suggestion_with_missing_image_data_throws_error(
-            self):
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
-        suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id,
-            'skill_difficulty': 0.3
-        }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
-            self.author_id, suggestion_change, 'test description')
-
-        question_state_data = self._create_valid_question_data(
-            'default_state').to_dict()
-        html_with_file = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
-        )
-        question_state_data['content']['html'] = html_with_file
-        new_solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'Solution',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is the updated solution.</p>',
-            },
-        }
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        response_dict = self.post_json('%s/%s' % (
-            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
-                'question_state_data': question_state_data,
-                'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertIn(
-            'No image data provided for file with name file.svg.',
-            response_dict['error'])
-        self.logout()
-
     def test_cannot_update_question_with_invalid_skill_difficulty(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -1387,6 +1261,46 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_provided(self):
+        exp_id = '12345678exp1'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, self.editor_id, ['State 1'],
+                ['EndExploration'], category='Algebra'))
+
+        state_content_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>')
+        }
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+        self.post_json(
+            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            {'filename': 'img.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),))
+        exp_services.update_exploration(
+            self.editor_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'new_value': state_content_dict
+            })], 'Changes content.')
+        rights_manager.publish_exploration(self.editor, exp_id)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        text_to_translate = exploration.states['State 1'].content.html
+        self.logout()
+
         valid_html = (
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
             'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
@@ -1401,18 +1315,17 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': self.EXP_ID,
-                'target_version_at_submission': self.exploration.version,
+                'target_id': exp_id,
+                'target_version_at_submission': exploration.version,
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'content_html': valid_html,
-                    'translation_html': ['test1', 'test2'],
-                    'data_format': 'set_of_normalized_string',
+                    'content_html': text_to_translate,
+                    'translation_html': valid_html,
+                    'data_format': 'html'
                 },
-                'description': 'description',
             }, csrf_token=csrf_token)
 
         self.assertIn(
