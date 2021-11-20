@@ -167,7 +167,7 @@ def main(args=None):
     if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
             'deploy-'):
         print('')
-        print('WARNING   This script should be run from the oppia/ root folder.')
+        print('WARNING This script should be run from the oppia/ root folder.')
         print('')
         raise Exception('Invalid root directory.')
 

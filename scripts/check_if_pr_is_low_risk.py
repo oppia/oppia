@@ -87,7 +87,7 @@ def load_diff(base_branch):
             continue
         split = line.split()
         if len(split) < 2 or len(split) > 3:
-            print('Failed to parse diff --name-status line "%s"'% line)
+            print('Failed to parse diff --name-status line "%s"' % line)
             return [], {}
         elif len(split) == 2:
             diff_files.append((split[1], split[1]))
@@ -118,8 +118,7 @@ def load_diff(base_branch):
             if i == len(file_diff_split):
                 # We reached the end of the diff without finding the
                 # header, or the header consumes the entire diff.
-                print('Failed to find end of header in "%s" diff'
-                    % filename)
+                print('Failed to find end of header in "%s" diff'% filename)
                 return [], {}
             file_diffs[filename] = file_diff_split[i:]
     return diff_files, file_diffs

@@ -682,8 +682,7 @@ def wait_for_port_to_be_in_use(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        print('Failed to start server on port %s, exiting ...' %
-            port_number)
+        print('Failed to start server on port %s, exiting ...' %port_number)
         print(
             'This may be because you do not have enough available '
             'memory. Please refer to '

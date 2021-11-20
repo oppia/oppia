@@ -286,7 +286,8 @@ def main() -> None:
     # __init__.py files (python requires modules to have __init__.py files in
     # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
-    print('Checking that all google library modules contain __init__.py files...')
+    print(
+        'Checking that all google library modules contain __init__.py files...')
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):

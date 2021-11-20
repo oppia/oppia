@@ -370,9 +370,10 @@ def main(args=None):
                 all_test_targets = [parsed_args.test_target]
             else:
                 print('')
-                print('---------------------------------------------------------')
-                print('WARNING : test_target flag should point to the test file.')
-                print('---------------------------------------------------------')
+                print('------------------------------------------------------')
+                print(
+                'WARNING : test_target flag should point to the test file.')
+                print('------------------------------------------------------')
                 print('')
                 time.sleep(3)
                 print('Redirecting to its corresponding test file...')

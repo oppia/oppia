@@ -516,7 +516,8 @@ def main(args=None):
             if files_to_lint:
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
-                    print('Push failed, please correct the linting issues above.')
+                    print(
+                        'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
             mypy_check_status = execute_mypy_checks()
@@ -556,7 +557,8 @@ def main(args=None):
                 ci_check_status = run_script_and_get_returncode(
                     CI_PROTRACTOR_CHECK_CMDS)
             if ci_check_status != 0:
-                print('Push aborted due to failing e2e test configuration check.')
+                print(
+                    'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
     return
 

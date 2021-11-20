@@ -23,7 +23,6 @@ import os
 import tarfile
 import urllib.request as urlrequest
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import common
