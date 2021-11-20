@@ -443,7 +443,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         // content_html.
         expect($scope.hasExplorationContentChanged()).toBe(true);
 
-        var messages = [{
+        const messages = [{
           author_username: '',
           created_om_msecs: 0,
           entity_type: '',
@@ -454,7 +454,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
           updated_subject: '',
         }];
 
-        var spyObj = spyOn(
+        const fetchMessagesAsyncSpy = spyOn(
           ThreadDataBackendApiService, 'fetchMessagesAsync')
           .and.returnValue($q.resolve({
             messages: messages
@@ -463,7 +463,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope.init();
         $rootScope.$apply();
 
-        expect(spyObj).toHaveBeenCalledWith('suggestion_1');
+        expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect($scope.reviewMessage).toBe('');
       });
   });

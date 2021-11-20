@@ -518,12 +518,12 @@ describe('Question Suggestion Review Modal Controller', function() {
     }));
 
     it('should fetch the rejection message', function() {
-      var messages = [
+      const messages = [
         { text: 'Question submitted.' },
         { text: 'This is a rejection.' }
       ];
 
-      let spyObj = spyOn(
+      const fetchMessagesAsyncSpy = spyOn(
         ThreadDataBackendApiService, 'fetchMessagesAsync')
         .and.returnValue($q.resolve({
           messages: messages
@@ -532,7 +532,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       $scope.init();
       $rootScope.$apply();
 
-      expect(spyObj).toHaveBeenCalledWith(undefined);
+      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith(undefined);
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });
