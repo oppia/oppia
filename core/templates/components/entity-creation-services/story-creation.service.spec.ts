@@ -23,7 +23,6 @@ import { fakeAsync, tick } from '@angular/core/testing';
 require('services/ngb-modal.service.ts');
 
 describe('Story Creation Service', () => {
-  let $rootScope = null;
   let StoryCreationService = null;
   let TopicEditorStateService = null;
   let ImageLocalStorageService = null;
@@ -119,8 +118,7 @@ describe('Story Creation Service', () => {
     tick();
 
     expect(mockWindow.location).toBe('/story_editor/id');
-    })
-  );
+  }));
 
   it('should throw error if the newly created story is not valid',
     fakeAsync(() => {
@@ -135,10 +133,10 @@ describe('Story Creation Service', () => {
       } as NgbModalRef
       );
       try {
-      StoryCreationService.createNewCanonicalStory();
-      tick();
+        StoryCreationService.createNewCanonicalStory();
+        tick();
       } catch (e) {
-      expect(e).toBe(new Error('Story fields cannot be empty'));
+        expect(e).toBe(new Error('Story fields cannot be empty'));
       }
     })
   );
