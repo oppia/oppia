@@ -2065,6 +2065,13 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
+    def test_user_cannot_voiceover_exploration_with_invalid_exp_id(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/invalid_exp_id', expected_status_int=404)
+        self.logout()
+
 
 class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
