@@ -52,30 +52,12 @@ export class SideNavigationBarComponent {
 
    togglelearnSubmenu(): void {
      this.learnSubmenuIsShown = !this.learnSubmenuIsShown;
-     var expandiconLEARN = document.querySelector('.expand-icon-learn');
-     var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
-     if (expandiconLEARN !== null && bordertoggleEleLEARN !== null) {
-       expandiconLEARN.classList.toggle('oppia-sidebar-menu-icon-transition');
-       bordertoggleEleLEARN.classList.toggle('oppia-sidebar-submenu-toggle');
-     }
    }
 
    togglegetinvolvedSubmenu(): void {
      this.getinvolvedSubmenuIsShown =
      !this.getinvolvedSubmenuIsShown;
      this.learnSubmenuIsShown = false;
-
-     var expandiconLEARN = document.querySelector('.expand-icon-learn');
-     var bordertoggleEleLEARN = document.querySelector('.bordertoggle-learn');
-     var expandiconINVOLVED = document.querySelector('.expand-icon-involved');
-     var bordertoggleEleINVOLVED = (
-       document.querySelector(
-         '.bordertoggle-involved'));
-
-     expandiconINVOLVED?.classList.toggle('oppia-sidebar-menu-icon-transition');
-     bordertoggleEleINVOLVED?.classList.toggle('oppia-sidebar-submenu-toggle');
-     expandiconLEARN?.classList.remove('oppia-sidebar-menu-icon-transition');
-     bordertoggleEleLEARN?.classList.remove('oppia-sidebar-submenu-toggle');
    }
 }
 

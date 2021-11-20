@@ -87,12 +87,16 @@ describe('Side Navigation Bar Component', () => {
     componentInstance.learnSubmenuIsShown = false;
     componentInstance.togglelearnSubmenu();
     expect(componentInstance.learnSubmenuIsShown).toBeTrue();
+    componentInstance.togglelearnSubmenu();
+    expect(componentInstance.learnSubmenuIsShown).toBeFalse();
   });
 
   it('should toggle get involved submenu', () => {
     componentInstance.getinvolvedSubmenuIsShown = false;
     componentInstance.togglegetinvolvedSubmenu();
     expect(componentInstance.getinvolvedSubmenuIsShown).toBeTrue();
+    componentInstance.togglegetinvolvedSubmenu();
+    expect(componentInstance.getinvolvedSubmenuIsShown).toBeFalse();
   });
 
   it('should get static image url', () => {
