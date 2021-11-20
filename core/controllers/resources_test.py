@@ -688,7 +688,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
             'Schema validation for \'filename\' failed: Validation'
-            ' failed: is_allowed_audio_extension ({}) for object '
+            ' failed: has_allowed_audio_extension ({}) for object '
             'test.wav'
         )
         self.assertEqual(response_dict['error'], error_msg)
