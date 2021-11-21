@@ -28,7 +28,7 @@ import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-transla
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { EventEmitter } from '@angular/core';
 
-describe('Translation language selector', () => {
+fdescribe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
   let translationLanguageService: TranslationLanguageService;
@@ -66,6 +66,7 @@ describe('Translation language selector', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TranslationLanguageSelectorComponent);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
     component = fixture.componentInstance;
     component.activeLanguageCode = 'en';
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
@@ -184,11 +185,11 @@ describe('Translation language selector', () => {
 
   it('should show the correct language when the language is changed'
     , () => {
+      expect(component.languageSelection).toBe('Select a language...');
+      component.ngOnInit();
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(
         'en');
-      component.ngOnInit();
-      expect(component.languageSelection).toBe('Select a language...');
 
       activeLanguageChangedEmitter.emit();
 
