@@ -795,7 +795,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
                     'translation_html': ['test1', 'test2'],
-                    'data_format': 'set_of_normalized_string',
+                    'data_format': (
+                        state_domain.WrittenTranslation
+                        .DATA_FORMAT_SET_OF_NORMALIZED_STRING
+                    ),
                 },
                 'description': 'description',
             }, csrf_token=csrf_token)
