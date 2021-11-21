@@ -16,12 +16,10 @@
 
 """Unit tests for jobs.job_test_utils."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from unittest import mock
 
-from core import python_utils
 from core.jobs import job_test_utils
 from core.platform import models
 from core.tests import test_utils
@@ -126,7 +124,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
             with job_test_utils.decorate_beam_errors():
                 raise beam_testing_util.BeamAssertException(actual_msg)
         except AssertionError as e:
-            self.assertMultiLineEqual(python_utils.UNICODE(e), decorated_msg)
+            self.assertMultiLineEqual(str(e), decorated_msg)
 
     def test_decorates_message_with_both_unexpected_and_missing(self) -> None:
         actual_msg = (

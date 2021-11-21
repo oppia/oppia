@@ -16,9 +16,7 @@
 
 """Feature detection utilities for Python 2 and Python 3."""
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import itertools
@@ -46,12 +44,10 @@ import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-impor
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
-BASESTRING = past.builtins.basestring
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
 PRINT = print
-UNICODE = builtins.str
 ZIP = builtins.zip
 
 
@@ -312,32 +308,6 @@ def url_encode(query, doseq=False):
     return urlparse.urlencode(query, doseq=doseq)
 
 
-def url_retrieve(source_url, filename=None):
-    """Copy a network object denoted by a URL to a local file using
-    urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-        filename: str. The file location to copy to.
-
-    Returns:
-        urlretrieve. The 'urlretrieve' object.
-    """
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib as urlrequest
-
-    # Change the User-Agent to prevent servers from blocking requests.
-    # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
-    urlrequest.URLopener.version = (
-        'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-        'Gecko/20100101 Firefox/47.0'
-    )
-    return urlrequest.urlretrieve(source_url, filename=filename)
-
-
 def url_open(source_url):
     """Open a network object denoted by a URL for reading using
     urllib2.urlopen if run under Python 2 and urllib.request.urlopen if
@@ -393,28 +363,6 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def convert_to_bytes(string_to_convert) -> bytes:
-    """Converts the string to bytes.
-
-    Args:
-        string_to_convert: unicode|str. Required string to be converted into
-            bytes.
-
-    Returns:
-        bytes. The encoded string.
-    """
-    if isinstance(string_to_convert, UNICODE):
-        return string_to_convert.encode('utf-8')
-    elif isinstance(string_to_convert, int):
-        raise Exception(
-            'Passing int is not allowed, since it is insecure, because when a '
-            'big number is passed to the bytes function it can spend some time '
-            'generating an array with empty bytes. '
-            'See: https://beginnersbook.com/2019/05/python-bytes/'
-        )
-    return bytes(string_to_convert)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
@@ -437,7 +385,7 @@ def _recursively_convert_to_str(value):
         }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == UNICODE:  # pylint: disable=unidiomatic-typecheck
+    elif type(value) == str:  # pylint: disable=unidiomatic-typecheck
         return value
     elif type(value) == builtins.bytes:  # pylint: disable=unidiomatic-typecheck
         return value.decode('utf-8')

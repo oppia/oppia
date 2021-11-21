@@ -24,7 +24,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
-    name: string, value: unknown, 'default_value': unknown
+    name: string; value: unknown; 'default_value': unknown;
   }[];
   id: string;
   iconDataUrl: string;
@@ -40,7 +40,8 @@ interface RteHelperService {
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
     customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-    onDismissCallback) => void
+    onDismissCallback
+  ) => void;
 }
 
 import { Injectable } from '@angular/core';
@@ -166,7 +167,9 @@ export class CkEditorInitializerService {
               downcast: function(element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
-                (<CKEDITOR.htmlParser.element>element.children[0]).setHtml('');
+                (
+                  element.children[0] as CKEDITOR.htmlParser.element
+                ).setHtml('');
                 // Return just the rich text component, without its wrapper.
                 return element.children[0];
               },
@@ -180,7 +183,7 @@ export class CkEditorInitializerService {
                   element.name !== 'p' &&
                   element.children.length > 0 &&
                   (
-                    <CKEDITOR.htmlParser.element>element.children[0]
+                    element.children[0] as CKEDITOR.htmlParser.element
                   ).name === tagName);
               },
               data: function() {

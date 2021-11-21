@@ -477,7 +477,7 @@ describe('Admin page feature tab', function() {
     it('should return [\'dev\'] for feature in dev stage', () => {
       expect(
         options.filter(option => optionFilter(
-          <PlatformParameter>{featureStage: FeatureStage.DEV},
+          { featureStage: FeatureStage.DEV } as PlatformParameter,
           option))
       )
         .toEqual(['dev']);
@@ -486,7 +486,7 @@ describe('Admin page feature tab', function() {
     it('should return [\'dev\', \'test\'] for feature in test stage', () => {
       expect(
         options.filter(option => optionFilter(
-          <PlatformParameter>{featureStage: FeatureStage.TEST},
+          { featureStage: FeatureStage.TEST } as PlatformParameter,
           option))
       )
         .toEqual(['dev', 'test']);
@@ -496,7 +496,7 @@ describe('Admin page feature tab', function() {
       () => {
         expect(
           options.filter(option => optionFilter(
-            <PlatformParameter>{featureStage: FeatureStage.PROD},
+            { featureStage: FeatureStage.PROD } as PlatformParameter,
             option))
         )
           .toEqual(['dev', 'test', 'prod']);
@@ -506,7 +506,7 @@ describe('Admin page feature tab', function() {
     it('should return empty array for feature in invalid stage', () => {
       expect(
         options.filter(option => optionFilter(
-          <PlatformParameter>{featureStage: null},
+          { featureStage: null } as PlatformParameter,
           option))
       )
         .toEqual([]);

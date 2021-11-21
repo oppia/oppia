@@ -20,7 +20,7 @@ import { ApplicationRef, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
-import { HumanReadableContributorsSummary } from 'domain/summary/learner-exploration-summary.model';
+import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ContextService } from 'services/context.service';
 
 @Injectable({
@@ -45,7 +45,7 @@ export class AttributionService {
         let contributorSummary = (
           summaries.length ?
           summaries[0].human_readable_contributors_summary :
-          <HumanReadableContributorsSummary> {}
+          {} as HumanReadableContributorsSummary
         );
         this.authors = (
           Object.keys(contributorSummary).sort(

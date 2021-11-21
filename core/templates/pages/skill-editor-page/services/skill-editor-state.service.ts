@@ -33,7 +33,11 @@ import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
 export interface GroupedSkillSummaries {
-  [topicName: string]: SkillSummaryBackendDict[]
+  current: {
+    id: string;
+    description: string;
+  }[];
+  others: SkillSummaryBackendDict[];
 }
 @Injectable({
   providedIn: 'root'
@@ -56,7 +60,7 @@ export class SkillEditorStateService {
   private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
   private assignedSkillTopicData!: {
-    [topicName: string]: string
+    [topicName: string]: string;
   } ;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;

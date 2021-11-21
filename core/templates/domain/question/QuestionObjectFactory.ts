@@ -27,7 +27,7 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 
 export interface QuestionBackendDict {
   'id': string;
-  'question_state_data': StateBackendDict,
+  'question_state_data': StateBackendDict;
   'question_state_data_schema_version': number;
   'language_code': string;
   'version': number;

@@ -40,7 +40,7 @@ export interface AggregatedStats {
   'num_completions': number;
   'num_actual_starts': number;
   'state_stats_mapping': {
-    [stateName: string]: SessionStateStats
+    [stateName: string]: SessionStateStats;
   };
 }
 
@@ -63,7 +63,8 @@ export class StatsReportingBackendApiService {
     try {
       return this.urlInterpolationService.interpolateUrl(
         ExplorationPlayerConstants.STATS_REPORTING_URLS[
-          <StatsReportingUrlsKey> urlIdentifier], {
+          urlIdentifier as StatsReportingUrlsKey
+        ], {
           exploration_id: explorationId
         });
     } catch (e: unknown) {
