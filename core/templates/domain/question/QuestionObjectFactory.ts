@@ -140,7 +140,7 @@ export class Question {
   getUnaddressedMisconceptionNames(
       misconceptionsBySkill: Misconception[]): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
-    var taggedSkillMisconceptionIds: string[] = [];
+    var taggedSkillMisconceptionIds: { [key: string]: boolean } = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
         answerGroups[i].taggedSkillMisconceptionId !== null
@@ -149,7 +149,7 @@ export class Question {
           answerGroups[i].taggedSkillMisconceptionId || 'null'] = true;
       }
     }
-    var unaddressedMisconceptionNames!: string[];
+    var unaddressedMisconceptionNames: string[] = [];
     var self = this;
     Object.keys(misconceptionsBySkill).forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length(); i++) {
