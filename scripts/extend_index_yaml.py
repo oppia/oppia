@@ -34,7 +34,14 @@ WEB_INF_INDEX_YAML_PATH = os.path.join(
 
 
 def open_yaml_as_dict(yaml_file):
-    """Opens yaml file and returns it as a dictionary."""
+    """Opens yaml file and returns it as a dictionary.
+
+    Args:
+        yaml_file: str. Path to yaml file.
+
+    Returns:
+        dict. Dictionary of yaml file.
+    """
     data = {}
     with open(yaml_file, 'r', encoding='utf-8') as fp:
         docs = yaml.safe_load_all(fp)
@@ -44,8 +51,12 @@ def open_yaml_as_dict(yaml_file):
     return data
 
 
-def write(new_yaml_data_dict):
-    """Writes new yaml data to index.yaml."""
+def write_yaml(new_yaml_data_dict):
+    """Writes new yaml data to index.yaml.
+
+    Args:
+        new_yaml_data_dict: dict. Dictionary of new yaml data.
+    """
     yaml_data = ''
     for data in new_yaml_data_dict:
         yaml_data += data + ':\n'
@@ -66,6 +77,13 @@ def extract_new_kind_from_yaml(INDEX_YAML_DICT, WEB_INF_INDEX_YAML_DICT):
     """Extract new kind from
     ../cloud_datastore_emulator_cache/WEB-INF/index.yaml
     and appends it to index.yaml.
+
+    Args:
+        INDEX_YAML_DICT: dict. Dictionary of index.yaml.
+        WEB_INF_INDEX_YAML_DICT: dict. Dictionary of index.yaml in WEB-INF.
+
+    Returns:
+        list. List of new kind missing in index.yaml.
     """
     extracted_data = []
     web_ind_index_yaml_data = [data['kind'] for data in WEB_INF_INDEX_YAML_DICT]
@@ -74,8 +92,9 @@ def extract_new_kind_from_yaml(INDEX_YAML_DICT, WEB_INF_INDEX_YAML_DICT):
             extracted_data.append(data)
     return extracted_data
 
-def update_yaml():
-    """Update index.yaml"""
+
+def main() -> None:
+    """Extends index.yaml file."""
     ind = open_yaml_as_dict(INDEX_YAML_PATH)
     web_inf_ind = open_yaml_as_dict(WEB_INF_INDEX_YAML_PATH)
     web_inf_ind_keys = web_inf_ind.keys()
@@ -85,7 +104,9 @@ def update_yaml():
         if web_inf_ind[key] is not None:
             value = extract_new_kind_from_yaml(web_inf_ind[key], ind[key])
             ind[key] += value
-    
-    write(ind)
 
-update_yaml()
+    write_yaml(ind)
+
+
+if __name__ == '__main__':
+    main()

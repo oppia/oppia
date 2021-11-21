@@ -24,10 +24,14 @@ import contextlib
 import time
 
 
+from . import extend_index_yaml
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
+# This extends the index.yaml file after extracting new kind from
+# ../cloud_datastore_emulator_cache/WEB-INF/index.yaml.
+extend_index_yaml.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
