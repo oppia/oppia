@@ -3,7 +3,8 @@
 
   <div class="oppia-dashboard-title" ng-class="$ctrl.checkMobileView() ? 'oppia-dashboard-title-mobile-padding': 'oppia-dashboard-title-desktop-padding'">
     <span class="float-left" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></span>
-    <button type="button" class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus" ng-class="$ctrl.checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'" ng-click="$ctrl.createNewExploration()" translate="I18N_CREATE_EXPLORATION_BUTTON" autofocus>
+    <button type="button" class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus" ng-class="$ctrl.checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'" ng-click="$ctrl.createNewExploration()" autofocus>
+      + {{'I18N_CREATE_EXPLORATION' | translate}}
     </button>
   </div>
 
