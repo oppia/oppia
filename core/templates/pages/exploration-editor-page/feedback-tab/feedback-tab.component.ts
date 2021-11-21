@@ -16,9 +16,7 @@
  * @fileoverview Component for the exploration editor feedback tab.
  */
 
-require(
-  'pages/exploration-editor-page/feedback-tab/templates/' +
-  'create-feedback-thread-modal.controller.ts');
+import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -41,20 +39,21 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
-    '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$q', '$rootScope', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-    'FocusManagerService', 'LoaderService',
+    'FocusManagerService', 'LoaderService', 'NgbModal',
     'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UserService',
     function(
-        $q, $rootScope, $uibModal, AlertsService, ChangeListService,
+        $q, $rootScope, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
-        FocusManagerService, LoaderService,
+        FocusManagerService, LoaderService, NgbModal,
         SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
         UserService) {
@@ -95,12 +94,8 @@ angular.module('oppia').component('feedbackTab', {
       };
 
       ctrl.showCreateThreadModal = function() {
-        return $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/feedback-tab/templates/' +
-            'create-feedback-thread-modal.template.html'),
-          backdrop: 'static',
-          controller: 'CreateFeedbackThreadModalController'
+        return NgbModal.open(CreateFeedbackThreadModalComponent, {
+          backdrop: 'static'
         }).result.then(
           result => ThreadDataBackendApiService.createNewThreadAsync(
             result.newThreadSubject, result.newThreadText)

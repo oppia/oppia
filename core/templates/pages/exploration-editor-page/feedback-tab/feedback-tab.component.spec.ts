@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -34,13 +35,13 @@ import { UserService } from 'services/user.service';
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var $uibModal = null;
   var $rootScope = null;
   var alertsService = null;
   let changeListService: ChangeListService = null;
@@ -51,6 +52,7 @@ describe('Feedback Tab Component', function() {
   var suggestionThreadObjectFactory = null;
   var threadDataBackendApiService = null;
   var userService = null;
+  let ngbModal: NgbModal = null;
 
   importAllAngularServices();
 
@@ -81,12 +83,24 @@ describe('Feedback Tab Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
     $provide.value(
       'UserService', TestBed.get(UserService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve(
+            {
+              newThreadSubject: 'New subject',
+              newThreadText: 'New text'
+            }
+          )
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     editabilityService = $injector.get('EditabilityService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     suggestionModalForExplorationEditorService = $injector.get(
@@ -415,19 +429,13 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should create a new thread when closing create new thread modal',
-    function() {
+    fakeAsync(() => {
       spyOn(alertsService, 'addSuccessMessage').and.callThrough();
       spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.
-        returnValue($q.resolve());
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          newThreadSubject: 'New subject',
-          newThreadText: 'New text'
-        })
-      });
+        returnValue(Promise.resolve());
       ctrl.showCreateThreadModal();
-      $scope.$apply();
-      $scope.$apply();
+      tick();
+      tick();
 
       expect(threadDataBackendApiService.createNewThreadAsync)
         .toHaveBeenCalledWith('New subject', 'New text');
@@ -435,13 +443,15 @@ describe('Feedback Tab Component', function() {
         'Feedback thread created.');
       expect(ctrl.tmpMessage.status).toBe(null);
       expect(ctrl.tmpMessage.text).toBe('');
-    });
+    }));
 
   it('should not create a new thread when dismissing create new thread modal',
     function() {
       spyOn(threadDataBackendApiService, 'createNewThreadAsync');
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          result: Promise.reject()
+        } as NgbModalRef);
       });
       ctrl.showCreateThreadModal();
       $scope.$apply();
