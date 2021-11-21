@@ -16,17 +16,6 @@
  * @fileoverview Component for the voiceover opportunities.
  */
 
-require(
-  'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.component.ts');
-
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities.service.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-language.service.ts');
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
@@ -54,9 +43,7 @@ export class VoiceoverOpportunitiesComponent implements OnInit, OnDestroy {
 
   updateWithNewOpportunities(
       opportunities: ExplorationOpportunitySummary[], more: boolean): void {
-    for (let index in opportunities) {
-      let opportunity = opportunities[index];
-
+    for (let opportunity of opportunities) {
       this.opportunities.push({
         heading: opportunity.getOpportunityHeading(),
         subheading: opportunity.getOpportunitySubheading(),

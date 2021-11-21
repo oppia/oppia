@@ -43,7 +43,7 @@ require(
 
 require(
   'pages/contributor-dashboard-page/services/' +
-  'contribution-and-review.service.ts');
+  'contribution-and-review-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestion-modal.service.ts');

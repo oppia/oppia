@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require(
   'pages/contributor-dashboard-page/services/' +
-  'contribution-and-review.service.ts');
+  'contribution-and-review-backend-api.service.ts');
 
 describe('ContributionAndReviewService', function() {
   var ContributionAndReviewService, $httpBackend;

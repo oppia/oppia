@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for voiceoverOpportunities.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -31,12 +31,16 @@ describe('Voiceover opportunities component', () => {
   let activeLanguageChangedEmitter = new EventEmitter();
   let component: VoiceoverOpportunitiesComponent;
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
       ],
-    });
+      declarations: [
+        VoiceoverOpportunitiesComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -75,7 +79,7 @@ describe('Voiceover opportunities component', () => {
                 }
               })
             ],
-            more: false
+            more: true
           });
         });
       });
@@ -99,7 +103,7 @@ describe('Voiceover opportunities component', () => {
                 }
               })
             ],
-            more: false
+            more: true
           });
         });
       });
@@ -107,7 +111,7 @@ describe('Voiceover opportunities component', () => {
     let fixture = TestBed.createComponent(VoiceoverOpportunitiesComponent);
     component = fixture.componentInstance;
     component.ngOnInit();
-  });
+  }));
 
   afterEach(() => {
     component.ngOnDestroy();
@@ -120,26 +124,28 @@ describe('Voiceover opportunities component', () => {
     expect(component.progressBarRequired).toBe(false);
   });
 
-  it('should load more opportunities when opportunities are available', () => {
-    component.onLoadMoreOpportunities();
-    expect(component.opportunitiesAreLoading).toBe(false);
-    expect(component.opportunities.length).toBe(3);
+  it('should load more opportunities when opportunities are available',
+    fakeAsync(() => {
+      expect(component.opportunitiesAreLoading).toBe(false);
+      expect(component.opportunities.length).toBe(2);
 
-    activeLanguageChangedEmitter.emit();
-
-    expect(component.opportunitiesAreLoading).toBe(false);
-    expect(component.opportunities.length).toBe(2);
-  });
+      component.onLoadMoreOpportunities();
+      tick();
+      expect(component.opportunitiesAreLoading).toBe(false);
+      expect(component.opportunities.length).toBe(3);
+    }));
 
   it('should get opportunities from new language when active language is' +
-    ' changed', () => {
+    ' changed', fakeAsync(() => {
     component.onLoadMoreOpportunities();
+    tick();
     expect(component.opportunitiesAreLoading).toBe(false);
     expect(component.opportunities.length).toBe(3);
 
     activeLanguageChangedEmitter.emit();
+    tick();
 
     expect(component.opportunitiesAreLoading).toBe(false);
     expect(component.opportunities.length).toBe(2);
-  });
+  }));
 });

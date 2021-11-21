@@ -50,7 +50,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-navbar.component.ts',
     'collection-player-page.directive.ts',
     'collection.model.ts',
-    'contribution-and-review.service.ts',
+    'contribution-and-review-backend-api.service.ts',
     'conversation-skin.directive.ts',
     'current-interaction.service.ts',
     'exploration-states.service.ts',
