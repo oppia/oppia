@@ -33,11 +33,7 @@ import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
 export interface GroupedSkillSummaries {
-  current: {
-    id: string;
-    description: string;
-  }[];
-  others: SkillSummaryBackendDict[];
+  [topicName: string]: SkillSummaryBackendDict[];
 }
 @Injectable({
   providedIn: 'root'

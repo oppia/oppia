@@ -26,7 +26,6 @@ import { Skill, SkillBackendDict, SkillObjectFactory } from
   'domain/skill/SkillObjectFactory';
 import { SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
-import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { Observable } from 'rxjs';
@@ -46,7 +45,9 @@ interface FetchSkillResponse {
   assignedSkillTopicData: {
     [topicName: string]: string;
   };
-  groupedSkillSummaries: GroupedSkillSummaries;
+  groupedSkillSummaries: {
+    [topicName: string]: SkillSummaryBackendDict[];
+  };
 }
 
 interface FetchMultiSkillsBackendResponse {
