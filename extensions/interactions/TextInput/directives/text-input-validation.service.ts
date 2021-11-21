@@ -53,8 +53,8 @@ export type RequireOnlyOne<T, Keys extends keyof T> =
 export type Validators = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
 
 interface Warning {
-  type: string,
-  message: string
+  type: string;
+  message: string;
 }
 
 @Injectable({
