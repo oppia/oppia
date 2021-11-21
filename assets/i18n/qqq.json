@@ -147,7 +147,6 @@
 	"I18N_CREATE_ACTIVITY_TITLE": "Text displayed in the header of a dialog. - The dialog appears when the user clicks the I18N_CREATE_EXPLORATION_CREATE button.",
 	"I18N_CREATE_COLLECTION": "Text of a button in the 'create new activity' dialog. - When the user clicks the button, a new collection is created and they are taken to the exploration editor page.",
 	"I18N_CREATE_EXPLORATION": "Text of a button in the 'create new activity' dialog. - When the user clicks the button, a new exploration is created and they are taken to the exploration editor page.",
-	"I18N_CREATE_EXPLORATION_BUTTON": "Text of a button in the intro of creators dashborad. - when the user clicks the button,  a new exploration is created and they are taken to the exploration editor page.",
 	"I18N_CREATE_EXPLORATION_CREATE": "Text displayed in a button in the navigation bar. - When the user clicks the button a dialog is opened where the user can create a new exploration.\n{{Identical|Create}}",
 	"I18N_CREATE_EXPLORATION_QUESTION": "Subtitle of a dialog. - The user is asked if he wants to create a new exploration. See I18N_CREATE_EXPLORATION_CREATE.",
 	"I18N_CREATE_EXPLORATION_TITLE": "Title of a dialog. - see I18N_CREATE_EXPLORATION_CREATE",
