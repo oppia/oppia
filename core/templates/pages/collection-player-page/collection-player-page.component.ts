@@ -35,33 +35,33 @@ import { CollectionPlayerBackendApiService } from './services/collection-player-
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
 export interface IconParametersArray {
-  thumbnailIconUrl: string
-  left: string,
-  top: string,
-  thumbnailBgColor: string
+  thumbnailIconUrl: string;
+  left: string;
+  top: string;
+  thumbnailBgColor: string;
 }
 
 export interface CollectionSummary {
-  'is_admin': boolean,
-  'summaries': string[],
-  'user_email': string,
-  'is_topic_manager': false,
-  'username': boolean
+  'is_admin': boolean;
+  'summaries': string[];
+  'user_email': string;
+  'is_topic_manager': false;
+  'username': boolean;
 }
 
 export interface CollectionHandler {
-  'can_edit': boolean
-  'collection': Collection
-  'is_admin': boolean
-  'is_logged_in': boolean
-  'is_moderator': boolean
-  'is_super_admin': boolean
-  'is_topic_manager': boolean
-  'meta_description': string
-  'meta_name': string
-  'session_id': string
-  'user_email': string
-  'username': string
+  'can_edit': boolean;
+  'collection': Collection;
+  'is_admin': boolean;
+  'is_logged_in': boolean;
+  'is_moderator': boolean;
+  'is_super_admin': boolean;
+  'is_topic_manager': boolean;
+  'meta_description': string;
+  'meta_name': string;
+  'session_id': string;
+  'user_email': string;
+  'username': string;
 }
 
 @Component({
