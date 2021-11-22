@@ -679,7 +679,7 @@ class AuthServicesStub:
         """
         return next((
             a for a, u in self._user_id_by_auth_id.items()
-            if u['id'] == user_id
+            if u['id'] == user_id and not u['deleted']
         ), None)
 
     def get_user_id_from_auth_id(self, auth_id, include_deleted=False):
