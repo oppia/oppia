@@ -159,7 +159,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.signup(self.DELETED_USER_EMAIL, self.DELETED_USER_USERNAME)
         deleted_user_id = self.get_user_id_from_email(self.DELETED_USER_EMAIL)
         wipeout_service.pre_delete_user(deleted_user_id)
-        wipeout_service.delete_users_pending_to_be_deleted()
 
         # Create a new user but do not submit their registration form.
         user_services.create_new_user(
