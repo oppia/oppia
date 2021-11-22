@@ -357,11 +357,11 @@ def divide(number1, number2):
     Returns:
         int. The quotent.
     """
-    if type(number1)==float or type(number2)==float:
-        return number1/number2
+    if isinstance(number1)==float or isinstance(number2)==float:
+        return number1 / number2
     else:
-        return number1//number2
-
+        return number1 // number2
+ 
 
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
