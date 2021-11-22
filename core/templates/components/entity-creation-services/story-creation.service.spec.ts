@@ -20,10 +20,9 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, tick } from '@angular/core/testing';
-import { async } from 'q';
 require('services/ngb-modal.service.ts');
 
-fdescribe('Story Creation Service', () => {
+describe('Story Creation Service', () => {
   let $scope = null;
   let $rootScope = null;
   let StoryCreationService = null;
