@@ -69,8 +69,8 @@ export class TranslateTextBackendApiService {
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
-      dataFormat: string, files: object | null): Promise<unknown> {
-    const postData = {
+      dataFormat: string): Promise<unknown> {
+    const postData: Record<string, unknown> = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
       description: 'Adds translation',
@@ -84,12 +84,11 @@ export class TranslateTextBackendApiService {
         content_html: contentHtml,
         translation_html: translationHtml,
         data_format: dataFormat
-      },
-      files: files
+      }
     };
     const body = new FormData();
-    const images = await this.ImagesDict(imagesData);
-    if (Object.keys(images).length !== 0) {
+    if (imagesData) {
+      const images = await this.ImagesDict(imagesData);
       postData.files = images;
     }
     body.append('payload', JSON.stringify(postData));

@@ -236,8 +236,7 @@ export class TranslateTextService {
         this.activeStateName][this.activeContentId].content,
       translation,
       imagesData,
-      dataFormat,
-      files
+      dataFormat
     ).then(() => {
       this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
       this.stateAndContent[this.activeIndex].translation = (

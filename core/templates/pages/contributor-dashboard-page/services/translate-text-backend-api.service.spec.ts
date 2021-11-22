@@ -140,8 +140,7 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html',
-        null).then(successHandler, failHandler);
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -163,8 +162,7 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html',
-        null).then(successHandler, failHandler);
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -212,8 +210,7 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html',
-        null).then(successHandler, failHandler);
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -258,8 +255,7 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html',
-        null).then(successHandler, failHandler);
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -284,8 +280,7 @@ describe('TranslateTextBackendApiService', () => {
           'contentHtml',
           'translationHtml',
           imagesData,
-          'html',
-          null)
+          'html')
       ).toBeRejectedWithError('No image data found');
     });
   });
