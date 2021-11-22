@@ -342,10 +342,7 @@ def url_request(source_url, data, headers):
     Returns:
         Request. The 'Request' object.
     """
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib2 as urlrequest
+    import urllib.request as urlrequest
     return urlrequest.Request(source_url, data, headers)
 
 
@@ -360,7 +357,10 @@ def divide(number1, number2):
     Returns:
         int. The quotent.
     """
-    return past.utils.old_div(number1, number2)
+    if type(number1)==float or type(number2)==float:
+        return number1/number2
+    else:
+        return number1//number2
 
 
 def _recursively_convert_to_str(value):
