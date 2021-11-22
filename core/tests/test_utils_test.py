@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 import os
 import re
-import sys
 from unittest import mock
 
 from core import python_utils
