@@ -121,7 +121,6 @@ fdescribe('Story Creation Service', () => {
 
     StoryCreationService.createNewCanonicalStory();
     tick();
-    $scope.$apply();
 
     expect(mockWindow.location).toBe('/story_editor/id');
   }));
