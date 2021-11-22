@@ -23,8 +23,10 @@ and appends it into index.yaml"""
 from __future__ import annotations
 
 import os
-import yaml
 
+from core import utils
+
+import yaml
 
 INDEX_YAML_PATH = os.path.join(os.getcwd(), 'index.yaml')
 WEB_INF_INDEX_YAML_PATH = os.path.join(
@@ -33,22 +35,17 @@ WEB_INF_INDEX_YAML_PATH = os.path.join(
 )
 
 
-def open_yaml_as_dict(yaml_file):
-    """Opens yaml file and returns it as a dictionary.
+def read_yaml(file_path):
+    """Reads yaml file.
 
     Args:
-        yaml_file: str. Path to yaml file.
+        file_path: str. Path of yaml file.
 
     Returns:
         dict. Dictionary of yaml file.
     """
-    data = {}
-    with open(yaml_file, 'r', encoding='utf-8') as fp:
-        docs = yaml.safe_load_all(fp)
-        for doc in docs:
-            for key, value in doc.items():
-                data[key] = value
-    return data
+    with open(file_path, 'r', encoding='utf-8') as yaml_file:
+        return utils.dict_from_yaml(yaml_file)
 
 
 def write_yaml(new_yaml_data_dict):
@@ -95,8 +92,8 @@ def extract_new_kind_from_yaml(INDEX_YAML_DICT, WEB_INF_INDEX_YAML_DICT):
 
 def main() -> None:
     """Extends index.yaml file."""
-    ind = open_yaml_as_dict(INDEX_YAML_PATH)
-    web_inf_ind = open_yaml_as_dict(WEB_INF_INDEX_YAML_PATH)
+    ind = read_yaml(INDEX_YAML_PATH)
+    web_inf_ind = read_yaml(WEB_INF_INDEX_YAML_PATH)
     web_inf_ind_keys = web_inf_ind.keys()
     for key in web_inf_ind_keys:
         if key not in ind.keys():
