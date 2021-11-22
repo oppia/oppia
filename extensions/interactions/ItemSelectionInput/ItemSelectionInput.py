@@ -97,41 +97,37 @@ class ItemSelectionInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(cls, interaction):
+    def to_proto(
+        cls, default_outcome, customization_args, hints, answer_groups
+    ):
         """Creates a ItemSelectionInputInstance proto object.
 
         Args:
-            interaction: InteractionInstance. The interaction instance
-                associated with this state.
+            default_outcome: Outcome. The domain object.
+            customization_args: CustominzationArgs. The domain object.
+            hints: Hint. The domain object.
+            answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            ItemSelectionInputInstance. The
-            ItemSelectionInputInstance proto object.
+            ItemSelectionInputInstance. The proto object.
         """
         customization_arg_proto = (
             cls._to_customization_args_proto(
-                interaction.customization_args)
+                customization_args)
         )
-
-        outcome_proto = interaction.default_outcome.to_proto()
-
-        hints_proto_list = cls.get_hint_proto(cls, interaction.hints)
-
+        outcome_proto = default_outcome.to_proto()
+        hints_proto_list = cls.get_hint_proto(cls, hints)
         answer_groups_proto = (
             cls._to_answer_groups_proto(
-                interaction.answer_groups)
+                answer_groups)
         )
 
-        item_selection_single_interaction_proto = (
-            state_pb2.ItemSelectionInputInstance(
-                customization_args=customization_arg_proto,
-                default_outcome=outcome_proto,
-                hints=hints_proto_list,
-                answer_groups=answer_groups_proto
-            )
+        return state_pb2.ItemSelectionInputInstance(
+            customization_args=customization_arg_proto,
+            default_outcome=outcome_proto,
+            hints=hints_proto_list,
+            answer_groups=answer_groups_proto
         )
-
-        return item_selection_single_interaction_proto
 
     @classmethod
     def _to_customization_args_proto(cls, customization_args):
@@ -145,30 +141,26 @@ class ItemSelectionInput(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The CustomizationArgs proto object.
+            CustomizationArgs. The proto object.
         """
         choices_list_proto = [
             value.to_proto() for value in customization_args['choices'].value
         ]
 
-        customization_arg_proto = (
-            state_pb2.ItemSelectionInputInstance.CustomizationArgs(
-                min_allowable_selection_count=(
-                    customization_args['minAllowableSelectionCount'].value
-                ),
-                max_allowable_selection_count=(
-                    customization_args['maxAllowableSelectionCount'].value
-                ),
-                choices=choices_list_proto
-            )
+        return state_pb2.ItemSelectionInputInstance.CustomizationArgs(
+            min_allowable_selection_count=(
+                customization_args['minAllowableSelectionCount'].value
+            ),
+            max_allowable_selection_count=(
+                customization_args['maxAllowableSelectionCount'].value
+            ),
+            choices=choices_list_proto
         )
-
-        return customization_arg_proto
 
     @classmethod
     def _to_answer_groups_proto(cls, answer_groups):
         """Creates a AnswerGroup proto object
-            for ItemSelectionInputInstance.
+        for ItemSelectionInputInstance.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the

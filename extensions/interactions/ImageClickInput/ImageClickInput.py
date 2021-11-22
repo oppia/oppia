@@ -72,36 +72,35 @@ class ImageClickInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(cls, interaction):
+    def to_proto(
+        cls, default_outcome, customization_args, hints, answer_groups
+    ):
         """Creates a ImageClickInputInstance proto object.
 
         Args:
-            interaction: InteractionInstance. The interaction instance
-                associated with this state.
+            default_outcome: Outcome. The domain object.
+            customization_args: CustominzationArgs. The domain object.
+            hints: Hint. The domain object.
+            answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            ImageClickInputInstance. The
-            ImageClickInputInstance proto object.
+            ImageClickInputInstance. The proto object.
         """
         customization_args_proto = (
             cls._to_customization_args_proto(
-                interaction.customization_args)
+                customization_args)
         )
-
-        outcome_proto = interaction.default_outcome.to_proto()
-
-        hints_proto_list = cls.get_hint_proto(cls, interaction.hints)
-
+        outcome_proto = default_outcome.to_proto()
+        hints_proto_list = cls.get_hint_proto(cls, hints)
         answer_groups_proto = cls._to_answer_groups_proto(
-            interaction.answer_groups)
+            answer_groups)
 
-        image_click_interaction_proto = state_pb2.ImageClickInputInstance(
+        return state_pb2.ImageClickInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             hints=hints_proto_list,
-            answer_groups=answer_groups_proto)
-
-        return image_click_interaction_proto
+            answer_groups=answer_groups_proto
+        )
 
     @classmethod
     def _to_answer_groups_proto(cls, answer_groups):
@@ -162,19 +161,16 @@ class ImageClickInput(base.BaseInteraction):
             is_in_region: str. The input region name.
 
         Returns:
-            IsInRegionSpec. The IsInRegionSpec proto object.
+            IsInRegionSpec. The proto object.
         """
-        is_in_region_proto = (
-            state_pb2.ImageClickInputInstance.RuleSpec.IsInRegionSpec(
-                input_region=is_in_region)
-        )
-
-        return is_in_region_proto
+        return state_pb2.ImageClickInputInstance.RuleSpec.IsInRegionSpec(
+            input_region=is_in_region
+    )
 
     @classmethod
     def _to_customization_args_proto(cls, customization_args):
         """Creates a CustomizationArgs proto object
-            for ImageClickInputInstance.
+        for ImageClickInputInstance.
 
         Args:
             customization_args: dict. The customization dict. The keys are
@@ -183,17 +179,14 @@ class ImageClickInput(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The CustomizationArgs proto object.
+            CustomizationArgs. The proto object.
         """
         image_and_regions_proto = cls._to_image_and_regions_proto(
             customization_args['imageAndRegions'])
 
-        customization_arg_proto = (
-            state_pb2.ImageClickInputInstance.CustomizationArgs(
-                image_and_regions=image_and_regions_proto)
+        return state_pb2.ImageClickInputInstance.CustomizationArgs(
+            image_and_regions=image_and_regions_proto
         )
-
-        return customization_arg_proto
 
     @classmethod
     def _to_image_and_regions_proto(cls, image_and_regions_list):
@@ -204,18 +197,15 @@ class ImageClickInput(base.BaseInteraction):
                 image and regions.
 
         Returns:
-            ImageWithRegions. The ImageWithRegions proto object.
+            ImageWithRegions. The proto object.
         """
         image_file_path = image_and_regions_list.value['imagePath']
-
         labeled_regions_list_proto = cls._to_labeled_region_list_proto(
             image_and_regions_list.value['labeledRegions'])
-
-        image_with_regions_proto = objects_pb2.ImageWithRegions(
+        return objects_pb2.ImageWithRegions(
             image_file_path=image_file_path,
-            labeled_regions=labeled_regions_list_proto)
-
-        return image_with_regions_proto
+            labeled_regions=labeled_regions_list_proto
+        )
 
     @classmethod
     def _to_labeled_region_list_proto(cls, labeled_regions_list):
@@ -254,13 +244,10 @@ class ImageClickInput(base.BaseInteraction):
         normalized_rectangle_2d_proto = (
             cls._to_normalized_rectangle_2d_proto(area))
 
-        labeled_region_proto = (
-            objects_pb2.ImageWithRegions.LabeledRegion(
-                label=label,
-                normalized_rectangle_2d=normalized_rectangle_2d_proto)
+        return objects_pb2.ImageWithRegions.LabeledRegion(
+            label=label,
+            normalized_rectangle_2d=normalized_rectangle_2d_proto
         )
-
-        return labeled_region_proto
 
     @classmethod
     def _to_normalized_rectangle_2d_proto(cls, area):
@@ -271,16 +258,12 @@ class ImageClickInput(base.BaseInteraction):
                 of x,y points.
 
         Returns:
-            NormalizedRectangle2d. The NormalizedRectangle2d proto object.
+            NormalizedRectangle2d. The proto object.
         """
-        normalized_rectangle_2d_proto = (
-            objects_pb2.ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
-                top_left=cls._to_point2d_proto(area[0]),
-                bottom_right=cls._to_point2d_proto(area[1])
-            )
+        return objects_pb2.ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
+            top_left=cls._to_point2d_proto(area[0]),
+            bottom_right=cls._to_point2d_proto(area[1])
         )
-
-        return normalized_rectangle_2d_proto
 
     @classmethod
     def _to_point2d_proto(cls, area):

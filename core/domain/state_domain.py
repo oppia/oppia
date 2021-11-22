@@ -594,43 +594,60 @@ class InteractionInstance:
             InteractionInstance|dict. The InteractionInstance proto object
             if the id of the interaction matches else return an empty dict.
         """
-        interaction = None
+        interaction_instance = None
         interaction_proto = {}
         if self.id is not None:
-            interaction = (
+            interaction_instance = (
                 interaction_registry.Registry.get_interaction_by_id(
                     self.id))
 
         if self.id == 'Continue':
             interaction_proto = state_pb2.InteractionInstance(
-                continue_instance=interaction.to_proto(self))
+                continue_instance=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args))
         elif self.id == 'FractionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                fraction_input=interaction.to_proto(self))
+                fraction_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.answer_groups))
         elif self.id == 'ItemSelectionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                item_selection_input=interaction.to_proto(self))
+                item_selection_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.hints, self.answer_groups))
         elif self.id == 'MultipleChoiceInput':
             interaction_proto = state_pb2.InteractionInstance(
-                multiple_choice_input=interaction.to_proto(self))
+                multiple_choice_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.hints, self.answer_groups))
         elif self.id == 'NumericInput':
             interaction_proto = state_pb2.InteractionInstance(
-                numeric_input=interaction.to_proto(self))
+                numeric_input=interaction_instance.to_proto(
+                    self.default_outcome, self.solution,
+                    self.hints, self.answer_groups))
         elif self.id == 'TextInput':
             interaction_proto = state_pb2.InteractionInstance(
-                text_input=interaction.to_proto(self))
+                text_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
         elif self.id == 'RatioExpressionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                ratio_expression_input=interaction.to_proto(self))
+                ratio_expression_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
         elif self.id == 'ImageClickInput':
             interaction_proto = state_pb2.InteractionInstance(
-                image_click_input=interaction.to_proto(self))
+                image_click_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.hints, self.answer_groups))
         elif self.id == 'DragAndDropSortInput':
             interaction_proto = state_pb2.InteractionInstance(
-                drag_and_drop_sort_input=interaction.to_proto(self))
+                drag_and_drop_sort_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
         elif self.id == 'EndExploration':
             interaction_proto = state_pb2.InteractionInstance(
-                end_exploration=interaction.to_proto())
+                end_exploration=interaction_instance.to_proto())
 
         return interaction_proto
 

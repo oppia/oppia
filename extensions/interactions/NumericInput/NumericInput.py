@@ -60,45 +60,45 @@ class NumericInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(cls, interaction):
+    def to_proto(
+        cls, default_outcome, solution, hints, answer_groups
+    ):
         """Creates a NumericInputInstance proto object.
 
         Args:
-            interaction: InteractionInstance. The interaction instance
-                associated with this state.
+            default_outcome: Outcome. The domain object.
+            solution: Solution. The domain object.
+            hints: Hint. The domain object.
+            answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            NumericInputInstance. The NumericInputInstance proto object.
+            NumericInputInstance. The proto object.
         """
-        outcome_proto = interaction.default_outcome.to_proto()
-
-        hints_proto_list = cls.get_hint_proto(cls, interaction.hints)
-
+        outcome_proto = default_outcome.to_proto()
+        hints_proto_list = cls.get_hint_proto(cls, hints)
         solution_proto = cls._to_solution_proto(
-            interaction.solution)
-
+            solution)
         answer_groups_proto = cls._to_answer_groups_proto(
-            interaction.answer_groups)
+            answer_groups)
 
-        numeric_interaction_proto = state_pb2.NumericInputInstance(
+        return state_pb2.NumericInputInstance(
             default_outcome=outcome_proto,
             hints=hints_proto_list,
             solution=solution_proto,
-            answer_groups=answer_groups_proto)
-
-        return numeric_interaction_proto
+            answer_groups=answer_groups_proto
+        )
 
     @classmethod
     def _to_solution_proto(cls, solution):
         """Creates a Solution proto object
-            for NumericInputInstance.
+        for NumericInputInstance.
 
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
 
         Returns:
-            Solution. The Solution proto object.
+            Solution. The proto object.
         """
         solution_proto = None
         if solution is not None:
@@ -112,7 +112,7 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _to_answer_groups_proto(cls, answer_groups):
         """Creates a AnswerGroup proto object
-            for NumericInputInstance.
+        for NumericInputInstance.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
@@ -151,9 +151,12 @@ class NumericInput(base.BaseInteraction):
             'Equals': cls._to_numeric_equals_to_proto,
             'IsLessThan': cls._to_numeric_is_less_than_proto,
             'IsGreaterThan': cls._to_numeric_is_greater_than_proto,
-            'IsLessThanOrEqualTo': cls._to_numeric_is_less_than_or_equal_to_proto, # pylint: disable=line-too-long
-            'IsGreaterThanOrEqualTo': cls._to_numeric_is_greater_than_or_equal_to_proto, # pylint: disable=line-too-long
-            'IsInclusivelyBetween': cls._to_numeric_is_inclusively_between_proto, # pylint: disable=line-too-long
+            'IsLessThanOrEqualTo': (
+                cls._to_numeric_is_less_than_or_equal_to_proto),
+            'IsGreaterThanOrEqualTo': (
+                cls._to_numeric_is_greater_than_or_equal_to_proto),
+            'IsInclusivelyBetween': (
+                cls._to_numeric_is_inclusively_between_proto),
             'IsWithinTolerance': cls._to_numeric_is_within_tolerance_proto
         }
         rule_typ_to_proto_mapping = {
@@ -202,7 +205,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            EqualsSpec. The EqualsSpec proto object.
+            EqualsSpec. The proto object.
         """
         equals_to_proto = {}
         x = inputs['x']
@@ -222,7 +225,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            IsLessThanSpec. The IsLessThanSpec proto object.
+            IsLessThanSpec. The proto object.
         """
         is_less_than_proto = {}
         x = inputs['x']
@@ -242,7 +245,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            IsGreaterThanSpec. The IsGreaterThanSpec proto object.
+            IsGreaterThanSpec. The proto object.
         """
         is_greater_than_proto = {}
         x = inputs['x']
@@ -262,8 +265,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            IsLessThanOrEqualToSpec. The
-            IsLessThanOrEqualToSpec proto object.
+            IsLessThanOrEqualToSpec. The proto object.
         """
         is_less_than_or_equal_to_proto = {}
         x = inputs['x']
@@ -284,8 +286,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            IsGreaterThanOrEqualToSpec. The
-            IsGreaterThanOrEqualToSpec proto object.
+            IsGreaterThanOrEqualToSpec. The proto object.
         """
         is_greater_than_or_equal_to_proto = {}
         x = inputs['x']
@@ -306,8 +307,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            IsInclusivelyBetweenSpec. The
-            IsInclusivelyBetweenSpec proto object.
+            IsInclusivelyBetweenSpec. The proto object.
         """
         is_inclusively_between_proto = {}
         a = inputs['a']
@@ -330,8 +330,7 @@ class NumericInput(base.BaseInteraction):
             inputs: list. The input list.
 
         Returns:
-            IsWithinToleranceSpec. The
-            IsWithinToleranceSpec proto object.
+            IsWithinToleranceSpec. The proto object.
         """
         is_within_tolerance_proto = {}
         x = inputs['x']
