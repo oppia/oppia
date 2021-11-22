@@ -190,8 +190,7 @@ def main(args=None):
         'the start.py script.\n')
 
     # Download and install node.js.
-    print(
-        'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
+    print('Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
         print('Installing Node.js')
         download_and_install_node()

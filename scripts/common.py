@@ -477,8 +477,7 @@ def install_npm_library(library_name, version, path):
         version: str. The library version.
         path: str. The installation path for the library.
     """
-    print(
-        'Checking whether %s is installed in %s' % (library_name, path))
+    print('Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
         print('Installing %s' % library_name)
         subprocess.check_call([

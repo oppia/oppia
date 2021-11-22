@@ -255,8 +255,7 @@ def main() -> None:
     # so we must combine the two modules into one. We solve this by copying the
     # Google Cloud SDK libraries that we need into the correct google
     # module directory in the 'third_party/python_libs' directory.
-    print(
-        'Copying Google Cloud SDK modules to third_party/python_libs...')
+    print('Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
         common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
     if not os.path.isdir(correct_google_path):
