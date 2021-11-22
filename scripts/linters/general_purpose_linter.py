@@ -197,7 +197,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py',
-            'core/tests/test_utils_test.py' ),
+            'core/tests/test_utils_test.py'),
         'excluded_dirs': ('scripts/',)
     },
     {
