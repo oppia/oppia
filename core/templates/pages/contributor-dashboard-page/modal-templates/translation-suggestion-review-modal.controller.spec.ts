@@ -459,7 +459,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   });
 
   describe('when reviewing suggestions' +
-    'with deleted opportunites', function() {
+    ' with deleted opportunites', function() {
     const reviewable = false;
     const subheading = 'subheading_title';
 
@@ -489,41 +489,19 @@ describe('Translation Suggestion Review Modal Controller', function() {
       exploration_content_html: 'Translation'
     };
 
-    const suggestion3 = {
-      suggestion_id: 'suggestion_3',
-      target_id: '3',
-      suggestion_type: 'translate_content',
-      change: {
-        content_id: 'hint_1',
-        content_html: 'Translation',
-        translation_html: 'Tradução',
-        state_name: 'StateName'
-      },
-      exploration_content_html: 'Translation'
-    };
-
     const contribution1 = {
       suggestion: suggestion1,
       details: null
     };
-    const contribution2 = {
-      suggestion: suggestion2,
-      details: {
-        topic_name: 'topic_2',
-        story_title: 'story_2',
-        chapter_title: 'chapter_2'
-      }
-    };
 
     const deletedContribution = {
-      suggestion: suggestion3,
+      suggestion: suggestion2,
       details: null
     };
 
     const suggestionIdToContribution = {
       suggestion_1: contribution1,
       suggestion_deleted: deletedContribution,
-      suggestion_2: contribution2
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -561,11 +539,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
       $scope.reviewMessage = 'Review message example';
       $scope.rejectAndReviewNext();
-
-      expect($scope.activeSuggestionId).toBe('suggestion_2');
-      expect($scope.activeSuggestion).toEqual(suggestion2);
-      expect($scope.reviewable).toBe(reviewable);
-      expect($scope.reviewMessage).toBe('');
       expect(
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -573,19 +546,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
           'hint section of "StateName" card', $scope.showNextItemToReview);
-
-      $scope.reviewMessage = 'Review message example 2';
-      $scope.rejectAndReviewNext();
-
-      expect(
-        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
-        .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.resolveSuggestionToExploration)
-        .toHaveBeenCalledWith(
-          '2', 'suggestion_2', 'reject', 'Review message example 2',
-          'hint section of "StateName" card', $scope.showNextItemToReview);
       expect($uibModalInstance.close).toHaveBeenCalledWith([
-        'suggestion_1', 'suggestion_2']);
+        'suggestion_1']);
     });
   });
 });
