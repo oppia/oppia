@@ -1,51 +1,62 @@
-<div class="modal-header create-new-story-modal-header">
+<div class="modal-header create-new-story-header">
   <h3>
     New story
   </h3>
   <i class="fa fa-times modal-close-button" (click)="cancel()"></i>
 </div>
 <form (submit)="save()">
-  <div class="modal-body create-new-story-form">
-    <div class="create-new-story-input-field">
-      <div><span class="create-new-story-input-label">Title*</span></div>
-      <input class="protractor-test-new-story-title-field required"
+  <div class="modal-body create-new-story">
+    <div class="story-input">
+      <div class="story-input-header">
+        <span>Title*</span>
+      </div>
+      <input class="form-control protractor-test-new-story-title-field required"
              [(ngModel)]="newlyCreatedStory.title"
              [maxlength]="MAX_CHARS_IN_STORY_TITLE"
-             [ngModelOptions]="{standalone: true}">
-      <div class="oppia-input-box-subtitle">
-        <em>
-          Story title should be at most {{ MAX_CHARS_IN_STORY_TITLE }} characters.
-        </em>
+             [ngModelOptions]="{standalone: true}" autofocus>
+      <div>
+       <span class="oppia-input-box-subtitle">
+         <em>
+           Story title should be at most {{MAX_CHARS_IN_STORY_TITLE}} characters.
+         </em>
+       </span>
       </div>
     </div>
-    <div class="create-new-story-input-field">
-      <div><span class="create-new-story-input-label">Description*</span></div>
-      <textarea class="protractor-test-new-story-description-field required"
-                rows="4" cols="50"
+    <div class="story-input story-input-description">
+      <div class="story-input-header">
+        <span>Description*</span>
+      </div>
+      <textarea class="form-control protractor-test-new-story-description-field required"
+                rows="3" cols="50"
                 [maxlength]="MAX_CHARS_IN_STORY_DESCRIPTION"
                 [(ngModel)]="newlyCreatedStory.description"
-                [ngModelOptions]="{standalone: true}">
+                [ngModelOptions]="{standalone: true}"
+                aria-label="Description">
       </textarea>
-      <div class="oppia-input-box-subtitle">
+      <span class="oppia-input-box-subtitle">
         <em>
-          Story description should be at most {{ MAX_CHARS_IN_STORY_DESCRIPTION }} characters.
+          Story description should be at most
+          {{MAX_CHARS_IN_STORY_DESCRIPTION}} characters.
         </em>
-      </div>
+      </span>
     </div>
-    <div class="create-new-story-input-field">
-      <div><span class="create-new-story-input-label">URL Fragment*</span></div>
-      <input class="protractor-test-new-story-url-fragment-field required"
+    <div class="story-input">
+      <div class="story-input-header">
+        <span>Url Fragment*</span>
+      </div>
+      <input class="form-control protractor-test-new-story-url-fragment-field"
              [(ngModel)]="newlyCreatedStory.urlFragment"
              [ngModelOptions]="{standalone: true}"
              [maxlength]="MAX_CHARS_IN_STORY_URL_FRAGMENT"
              [ngClass]="{'invalid-field': storyUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedStory.urlFragment)}"
-             (change)="onStoryUrlFragmentChange()">
+             (change)="onStoryUrlFragmentChange()"
+             aria-label="Url fragment">
       <div>
         <span class="oppia-input-box-subtitle">
           <em>
-            The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_TOPIC_URL_FRAGMENT }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
-            This topic can be accessed at the following URL:<br>
-            {{ hostname }}/learn/{{classroomUrlFragment}}/{{topicUrlFragment}}/story/{{newlyCreatedStory.urlFragment}}
+            The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{MAX_CHARS_IN_STORY_URL_FRAGMENT}} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+            This story can be accessed at the following URL:<br>
+            {{hostname}}/learn/{{classroomUrlFragment}}/{{topicUrlFragment}}/story/{{newlyCreatedStory.urlFragment}}
           </em>
         </span>
         <div *ngIf="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
@@ -56,8 +67,10 @@
       </div>
     </div>
 
-    <div class="create-new-story-input-field">
-      <label class="create-new-story-input-label">Thumbnail Image*</label>
+    <div class="story-input story-input-thumbnail">
+      <div class="story-input-header">
+        <span>Thumbnail Image*</span>
+      </div>
       <oppia-thumbnail-uploader [previewTitle]="newlyCreatedStory.title"
                                 [aspectRatio]="'4:3'"
                                 [disabled]="false"
@@ -76,56 +89,25 @@
   </div>
 </form>
 <style>
-  .create-new-story-modal-header h3 {
+ .create-new-story-header h3 {
     font-size: 28px;
   }
-  .create-new-story-form .ng-touched.invalid-field,
-  .create-new-story-form .ng-touched.ng-empty.required {
-     outline: 1px solid #F00;
+  .create-new-story .story-input {
+    padding: 10px 10px 16px;
   }
-  .create-new-story-form .create-new-story-input-field {
-     margin: 10px 0;
+  .create-new-story input {
+    width: 70%;
   }
-  .create-new-story-form .create-new-story-input-field input, .create-new-story-input-field textarea,.create-new-story-input-field select {
-    border: 1px solid #b9b5b5;
-    border-radius: 5px;
+  .story-input-description input {
+    width: 95%;
   }
-  .create-new-story-form .create-new-story-input-label {
+  .create-new-story .story-input-header span {
     font-weight: bold;
   }
-  .create-new-story-modal-header .modal-close-button {
-    display: none;
+  .create-new-story .story-input-thumbnail {
+    padding-top: 15px;
   }
-
-  @media screen and (max-width: 768px) {
-    .create-new-story .modal-dialog {
-      border: 0;
-      border-radius: 0;
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-    }
-    .create-new-story .modal-content {
-      border: 0;
-      border-radius: 0;
-      display: block;
-      min-height: 100vh;
-    }
-    .create-new-story .modal-header {
-      align-items: center;
-      background-color: #00609C;
-      display: flex;
-    }
-    .create-new-story .modal-header h3 {
-      color: #FFF;
-    }
-    .create-new-story .create-new-story-input-field {
-      margin: 25px 0;
-    }
-    .create-new-story .modal-close-button {
-      color: #FFF;
-      display: block;
-      font-size: 20px;
-    }
+  .create-new-story .ng-touched.ng-empty.required {
+     outline: 1px solid #F00;
   }
 </style>

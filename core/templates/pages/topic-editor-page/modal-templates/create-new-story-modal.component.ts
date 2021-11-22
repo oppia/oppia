@@ -37,8 +37,10 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
   storyUrlFragmentExists: boolean = false;
   hostname: string = this.windowRef.nativeWindow.location.hostname;
-  classroomUrlFragment: string;
-  topicUrlFragment: string;
+  classroomUrlFragment = (
+    this.topicEditorStateService.getClassroomUrlFragment());
+  topicUrlFragment = (
+    this.topicEditorStateService.getTopic().getUrlFragment());
   MAX_CHARS_IN_STORY_TITLE: number = constants.MAX_CHARS_IN_STORY_TITLE;
   MAX_CHARS_IN_STORY_URL_FRAGMENT: number = (
     constants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
@@ -50,16 +52,9 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     private imageLocalStorageService: ImageLocalStorageService,
     private storyEditorStateService: StoryEditorStateService,
     private topicEditorStateService: TopicEditorStateService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
   ) {
     super(ngbActiveModal);
-  }
-
-  ngOnInit(): void {
-    this.classroomUrlFragment = (
-      this.topicEditorStateService.getClassroomUrlFragment());
-    this.topicUrlFragment = (
-      this.topicEditorStateService.getTopic().getUrlFragment());
   }
 
   save(): void {
@@ -76,7 +71,7 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     }
 
     this.storyEditorStateService.updateExistenceOfStoryUrlFragment(
-      this.newlyCreatedStory.urlFragment, ()=> {
+      this.newlyCreatedStory.urlFragment, () => {
         this.storyUrlFragmentExists = (
           this.storyEditorStateService.getStoryWithUrlFragmentExists());
       });

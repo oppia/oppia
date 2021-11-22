@@ -41,7 +41,7 @@ angular.module('oppia').factory('StoryCreationService', [
           return;
         }
         return NgbModal.open(CreateNewStoryModalComponent, {
-          backdrop: true
+          backdrop: 'static'
         }).result.then(function(newlyCreatedStory) {
           if (!newlyCreatedStory.isValid()) {
             throw new Error('Story fields cannot be empty');
