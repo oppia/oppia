@@ -284,6 +284,11 @@ class BaseHandler(webapp2.RequestHandler):
                 self.TemporaryMaintenanceException(), self.app.debug)
             return
 
+        if self.user_is_scheduled_for_deletion:
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
+
         if self.partially_logged_in and request_split.path != '/logout':
             self.redirect('/logout?redirect_url=%s' % request_split.path)
             return

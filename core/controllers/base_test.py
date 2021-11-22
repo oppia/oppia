@@ -43,6 +43,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import main
@@ -157,11 +158,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Create user that is scheduled for deletion.
         self.signup(self.DELETED_USER_EMAIL, self.DELETED_USER_USERNAME)
         deleted_user_id = self.get_user_id_from_email(self.DELETED_USER_EMAIL)
-        deleted_user_model = (
-            user_models.UserSettingsModel.get_by_id(deleted_user_id))
-        deleted_user_model.deleted = True
-        deleted_user_model.update_timestamps()
-        deleted_user_model.put()
+        wipeout_service.pre_delete_user(deleted_user_id)
+        wipeout_service.delete_users_pending_to_be_deleted()
 
         # Create a new user but do not submit their registration form.
         user_services.create_new_user(
