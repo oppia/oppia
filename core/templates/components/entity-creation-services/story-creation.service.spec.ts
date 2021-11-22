@@ -20,9 +20,12 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, tick } from '@angular/core/testing';
+import { async } from 'q';
 require('services/ngb-modal.service.ts');
 
-describe('Story Creation Service', () => {
+fdescribe('Story Creation Service', () => {
+  let $scope = null;
+  let $rootScope = null;
   let StoryCreationService = null;
   let TopicEditorStateService = null;
   let ImageLocalStorageService = null;
@@ -51,6 +54,8 @@ describe('Story Creation Service', () => {
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
     StoryCreationService = $injector.get('StoryCreationService');
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
@@ -116,6 +121,7 @@ describe('Story Creation Service', () => {
 
     StoryCreationService.createNewCanonicalStory();
     tick();
+    $scope.$apply();
 
     expect(mockWindow.location).toBe('/story_editor/id');
   }));
