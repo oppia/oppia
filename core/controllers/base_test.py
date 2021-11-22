@@ -331,6 +331,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
 
+    def test_redirect_when_user_is_disabled(self):
+        # The old demo server redirects to the new demo server.
+        get_auth_claims_from_request_swap = self.swap_to_always_raise(
+            auth_services,
+            'get_auth_claims_from_request',
+            auth_domain.UserDisabledError
+        )
+        with get_auth_claims_from_request_swap:
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn(
+                'pending-account-deletion', response.headers['location'])
+
     def test_redirect_oppia_test_server(self):
         # The old demo server redirects to the new demo server.
         response = self.get_html_response(
