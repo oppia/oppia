@@ -88,9 +88,7 @@
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math')" class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link" href="#" [innerHTML]="'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate"></a>
-                      <div class="des">
-                        Beginner friendly lessons to help you get started in math.
-                      </div>
+                      <div class="des" [innerHTML]="'I18N_TOPNAV_CLASSROOM_DESCRIPTION_1' | translate"></div>
                     </div>
                     <picture>
                       <source type="image/png"
@@ -104,13 +102,13 @@
                     <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/place-values')" class="nav-item-links">Place Values</a>
                     <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/addition-subtraction')" class="nav-item-links">Addition and Subtraction</a>
                     <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/multiplication')" class="nav-item-links">Multiplication</a>
-                    <a class="nav-item-bottom-link" href="/learn/math">See All Lessons <span class="material-icons">arrow_right_alt</span></a>
+                    <a class="nav-item-bottom-link" href="/learn/math"><span [innerHTML]="'I18N_TOPNAV_CLASSROOM_LINK_1' | translate"></span> <span class="material-icons">arrow_right_alt</span></a>
                   </div>
-                  <a *ngIf="userIsLoggedIn" class="nav-item-bottom-link-logged" href="/learn/math">Continue Learning <span class="material-icons">arrow_right_alt</span></a>
+                  <a *ngIf="userIsLoggedIn" class="nav-item-bottom-link-logged" href="/learn/math"><span [innerHTML]="'I18N_TOPNAV_CLASSROOM_LINK_2' | translate"></span> <span class="material-icons">arrow_right_alt</span></a>
                 </div>
                 <div class="nav-content nav-item-right d-flex flex-column">
-                  <div class="nav-item-right-head">WAYS TO LEARN MORE</div>
-                  <div class="des">Additional resources made by the community to help you learn more.</div>
+                  <div class="nav-item-right-head" [innerHTML]="'I18N_TOPNAV_CLASSROOM_HEADING' | translate"></div>
+                  <div class="des" [innerHTML]="'I18N_TOPNAV_CLASSROOM_DESCRIPTION_2' | translate"></div>
                   <a class="nav-item-bottom-link" href="/community-library"><span [innerHTML]="'I18N_TOPNAV_LIBRARY' | translate"></span> <span class="material-icons">arrow_right_alt</span></a>
                 </div>
               </div>
@@ -491,6 +489,7 @@
     line-height: 14.06px;
     padding: 0;
     padding-bottom: 8px;
+    text-transform: uppercase;
   }
   .classroom-dropdown-menu .nav-item-links {
     color: #333;
