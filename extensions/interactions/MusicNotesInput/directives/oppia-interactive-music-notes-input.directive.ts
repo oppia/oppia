@@ -65,7 +65,7 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
   initialSequence?: string;
   interactionIsActive?: boolean;
   noteSequence?: {
-    note: MusicNote
+    note: MusicNote;
   }[];
   playCurrentSequence?: (() => void);
   playSequenceToGuess?: (() => void);
