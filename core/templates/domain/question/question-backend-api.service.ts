@@ -109,7 +109,7 @@ export class QuestionBackendApiService {
       skillId: string, offset: number,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
-    const skillIds = [skillId];
+    const skillIds = skillId.split(',');
 
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {

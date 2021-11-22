@@ -379,4 +379,27 @@ describe('Question backend Api service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should successfully fetch question count from the backend' +
+      'with multiple question ids', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let questionCountHandlerUrl = (
+      '/question_count_handler/' + encodeURIComponent('["1","2"]'));
+
+    questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
+      ['1', '2']).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(questionCountHandlerUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      total_question_count: 3
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(3);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

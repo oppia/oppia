@@ -552,7 +552,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.get_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'invalid_question_id'),
-            expected_status_int=404)
+            expected_status_int=400)
         self.logout()
 
     def test_delete_with_guest_does_not_allow_question_deletion(self):

@@ -41,6 +41,31 @@ describe('Questions List Service', () => {
     }],
     more: false
   };
+  let sampleResponseMultipleSummaries = {
+    question_summary_dicts: [
+      {
+        skill_descriptions: [],
+        summary: {
+          creator_id: '1',
+          created_on_msec: 0,
+          last_updated_msec: 0,
+          id: '0',
+          question_content: ''
+        }
+      },
+      {
+        skill_descriptions: [],
+        summary: {
+          creator_id: '2',
+          created_on_msec: 3,
+          last_updated_msec: 4,
+          id: '1',
+          question_content: ''
+        }
+      }
+    ],
+    more: false
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -155,5 +180,22 @@ describe('Questions List Service', () => {
 
     const cachedQuestionSummaries = qls.getCachedQuestionSummaries();
     expect(cachedQuestionSummaries[0]._questionSummary._questionId).toBe('0');
+  }));
+
+  it('should get multiple cached question summaries', fakeAsync(() => {
+    qls.getQuestionSummariesAsync('1,2', true, true);
+    const req = httpTestingController.expectOne(
+      '/questions_list_handler/' + encodeURIComponent('["1","2"]') +
+       '?offset=0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponseMultipleSummaries);
+    flushMicrotasks();
+
+    expect(qls.getCurrentPageNumber()).toBe(0);
+    expect(qls.isLastQuestionBatch()).toBe(true);
+    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(1);
+
+    const cachedQuestionSummaries = qls.getCachedQuestionSummaries();
+    expect(cachedQuestionSummaries.length).toBe(2);
   }));
 });
