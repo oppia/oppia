@@ -536,9 +536,10 @@ describe('Translation Suggestion Review Modal Controller', function() {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
-
       $scope.reviewMessage = 'Review message example';
+
       $scope.rejectAndReviewNext();
+
       expect(
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
