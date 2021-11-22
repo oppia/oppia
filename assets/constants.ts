@@ -5631,6 +5631,7 @@ export default {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {

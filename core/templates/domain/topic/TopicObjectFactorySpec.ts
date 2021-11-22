@@ -236,6 +236,16 @@ describe('Topic object factory', () => {
     expect(issue).toEqual(['Topic should have page title fragment.']);
   });
 
+  it('should warn user when page title length is less than the' +
+  ' allowed limit', () => {
+    _sampleTopic._pageTitleFragmentForWeb = Array(3).join('a');
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(
+      ['Topic page title fragment should not be shorter than ' +
+      '5 characters.']);
+  });
+
   it('should warn user when page title length is more than the' +
   ' allowed limit', () => {
     _sampleTopic._pageTitleFragmentForWeb = Array(52).join('a');
