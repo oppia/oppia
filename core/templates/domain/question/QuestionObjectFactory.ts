@@ -98,6 +98,7 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
+  // Null in return type depicts no validation errors.
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
     var questionContent = this._stateData.content._html;

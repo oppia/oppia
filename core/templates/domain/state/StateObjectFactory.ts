@@ -61,7 +61,7 @@ export interface StateBackendDict {
 }
 
 export class State {
-  name: string | null;
+  name: string;
   classifierModelId: string | null;
   linkedSkillId: string | null;
   content: SubtitledHtml;

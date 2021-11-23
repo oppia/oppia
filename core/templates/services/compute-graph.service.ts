@@ -55,14 +55,14 @@ export class ComputeGraphService {
         for (let h = 0; h < groups.length; h++) {
           links.push({
             source: stateName,
-            target: String(groups[h].outcome.dest),
+            target: groups[h].outcome.dest,
           });
         }
 
         if (interaction.defaultOutcome) {
           links.push({
             source: stateName,
-            target: String(interaction.defaultOutcome.dest),
+            target: interaction.defaultOutcome.dest,
           });
         }
       }
