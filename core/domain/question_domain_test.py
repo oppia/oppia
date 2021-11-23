@@ -14,22 +14,25 @@
 
 """Tests for question domain objects."""
 
-from __future__ import annotations
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import re
+from typing import Any
 
 from core import feconf
 from core import utils
 from core.domain import question_domain
 from core.domain import state_domain
 from core.tests import test_utils
+from question_domain import QuestionInstanceDict
 
 
 class QuestionChangeTest(test_utils.GenericTestBase):
     """Test for Question Change object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Change object."""
         expected_object_dict = {
             'cmd': 'update_question_property',
@@ -44,39 +47,39 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'new_value': 'new_value',
             'old_value': 'old_value',
         }
-        observed_object = question_domain.QuestionChange(
+        observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
-        )
+        ) 
 
-        self.assertEqual(expected_object_dict, observed_object.to_dict())
+        self.assertEqual(expected_object_dict, observed_object.to_dict()) # type: ignore[no-untyped-call]
 
-    def test_change_dict_without_cmd(self):
+    def test_change_dict_without_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        self.assertRaisesRegexp(
-            utils.ValidationError,
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, 
             'Missing cmd key in change dict',
             callableObj=question_domain.QuestionChange,
             change_dict={}
         )
 
-    def test_change_dict_with_wrong_cmd(self):
+    def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionChange,
             change_dict={'cmd': 'wrong', }
         )
 
-    def test_change_dict_with_missing_attributes_in_cmd(self):
+    def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following required attributes are present: new_value',
             callableObj=question_domain.QuestionChange,
@@ -87,22 +90,22 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_change_dict_with_extra_attributes_in_cmd(self):
+    def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid',
             callableObj=question_domain.QuestionChange,
             change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
         )
 
-    def test_update_question_property_with_wrong_property_name(self):
+    def test_update_question_property_with_wrong_property_name(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'Value for property_name in cmd update_question_property: '
                 'wrong is not allowed'),
@@ -115,20 +118,20 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_create_new(self):
+    def test_create_new(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is create_new.
         """
         change_dict = {
             'cmd': 'create_new'
         }
-        observed_object = question_domain.QuestionChange(
+        observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
 
         self.assertEqual('create_new', observed_object.cmd)
 
-    def test_update_question_property(self):
+    def test_update_question_property(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property.
         """
@@ -138,16 +141,16 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'new_value': 'new_value',
             'old_value': 'old_value'
         }
-        observed_object = question_domain.QuestionChange(
+        observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict
         )
 
         self.assertEqual('update_question_property', observed_object.cmd)
-        self.assertEqual('question_state_data', observed_object.property_name)
-        self.assertEqual('new_value', observed_object.new_value)
-        self.assertEqual('old_value', observed_object.old_value)
+        self.assertEqual('question_state_data', observed_object.property_name) # type: ignore[attr-defined]
+        self.assertEqual('new_value', observed_object.new_value) # type: ignore[attr-defined]
+        self.assertEqual('old_value', observed_object.old_value) # type: ignore[attr-defined]
 
-    def test_create_new_fully_specified_question(self):
+    def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is create_new_fully_specified_question.
         """
@@ -156,16 +159,16 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'question_dict': {},
             'skill_id': '10',
         }
-        observed_object = question_domain.QuestionChange(
+        observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
 
         self.assertEqual(
             'create_new_fully_specified_question', observed_object.cmd)
-        self.assertEqual('10', observed_object.skill_id)
-        self.assertEqual({}, observed_object.question_dict)
+        self.assertEqual('10', observed_object.skill_id) # type: ignore[attr-defined]
+        self.assertEqual({}, observed_object.question_dict) # type: ignore[attr-defined]
 
-    def test_migrate_state_schema_to_latest_version(self):
+    def test_migrate_state_schema_to_latest_version(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is migrate_state_schema_to_latest_version.
         """
@@ -174,20 +177,20 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'from_version': 0,
             'to_version': 10,
         }
-        observed_object = question_domain.QuestionChange(
+        observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
 
         self.assertEqual(
             'migrate_state_schema_to_latest_version', observed_object.cmd)
-        self.assertEqual(0, observed_object.from_version)
-        self.assertEqual(10, observed_object.to_version)
+        self.assertEqual(0, observed_object.from_version) # type: ignore[attr-defined]
+        self.assertEqual(10, observed_object.to_version) # type: ignore[attr-defined]
 
 
 class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
     """Test for QuestionSuggestionChange object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Change object."""
         expected_object_dict = {
             'cmd': 'create_new_fully_specified_question',
@@ -202,39 +205,39 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'skill_id': 'skill_1',
             'skill_difficulty': '0.3'
         }
-        observed_object = question_domain.QuestionSuggestionChange(
+        observed_object = question_domain.QuestionSuggestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
 
-        self.assertEqual(expected_object_dict, observed_object.to_dict())
+        self.assertEqual(expected_object_dict, observed_object.to_dict()) # type: ignore[no-untyped-call]
 
-    def test_change_dict_without_cmd(self):
+    def test_change_dict_without_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Missing cmd key in change dict',
             callableObj=question_domain.QuestionSuggestionChange,
             change_dict={}
         )
 
-    def test_change_dict_with_wrong_cmd(self):
+    def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionSuggestionChange,
             change_dict={'cmd': 'wrong', }
         )
 
-    def test_change_dict_with_missing_attributes_in_cmd(self):
+    def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following required attributes are present: new_value',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -244,11 +247,11 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_change_dict_with_extra_attributes_in_cmd(self):
+    def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -261,7 +264,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_create_new_fully_specified_question(self):
+    def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when cmd is create_new_fully_specified_question.
         """
@@ -271,37 +274,37 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'skill_id': '10',
             'skill_difficulty': '0.3',
         }
-        observed_object = question_domain.QuestionSuggestionChange(
+        observed_object = question_domain.QuestionSuggestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
 
         self.assertEqual(
             'create_new_fully_specified_question', observed_object.cmd)
-        self.assertEqual('10', observed_object.skill_id)
-        self.assertEqual({}, observed_object.question_dict)
+        self.assertEqual('10', observed_object.skill_id) # type: ignore[attr-defined]
+        self.assertEqual({}, observed_object.question_dict) # type: ignore[attr-defined]
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):
     """Tests for Question domain object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a question."""
         super(QuestionDomainTest, self).setUp()
-        question_state_data = self._create_valid_question_data('ABC')
+        question_state_data = self._create_valid_question_data('ABC') # type: ignore[no-untyped-call]
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
             ['skillId12345-123'])
 
-    def test_to_and_from_dict(self):
+    def test_to_and_from_dict(self) -> None:
         """Test to verify to_dict and from_dict methods
         of Question domain object.
         """
         default_question_state_data = (
             question_domain.Question.create_default_question_state())
-        question_dict = {
+        question_dict: QuestionInstanceDict = {
             'id': 'col1.random',
-            'question_state_data': default_question_state_data.to_dict(),
+            'question_state_data': default_question_state_data.to_dict(), # type: ignore[no-untyped-call]
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
@@ -313,14 +316,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         observed_object = question_domain.Question.from_dict(question_dict)
         self.assertEqual(question_dict, observed_object.to_dict())
 
-    def _assert_validation_error(self, expected_error_substring):
+    def _assert_validation_error(self, expected_error_substring: Any) -> None: # type: ignore[override]
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring
         ):
             self.question.validate()
 
-    def test_strict_validation(self):
+    def test_strict_validation(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True.
         """
@@ -338,14 +341,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected at least one answer group to have a correct answer')
 
-    def test_strict_validation_for_answer_groups(self):
+    def test_strict_validation_for_answer_groups(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True for interaction with answer group.
         """
         state = self.question.question_state_data
         state.interaction.default_outcome.labelled_as_correct = False
         state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict({
+            state_domain.AnswerGroup.from_dict({ # type: ignore[no-untyped-call]
                 'outcome': {
                     'dest': 'abc',
                     'feedback': {
@@ -374,29 +377,35 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
 
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[list-item] is used to test inapplicable_skill_misconception_ids 
+    # value for invalid list type.
     def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
-            self):
+            self) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid list.
         """
-        self.question.inapplicable_skill_misconception_ids = ['Test', 1]
+        self.question.inapplicable_skill_misconception_ids = ['Test', 1] # type: ignore[list-item]
         self._assert_validation_error(
             re.escape(
                 'Expected inapplicable_skill_misconception_ids to be a list of '
                 'strings, received [\'Test\', 1]'))
 
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test inapplicable_skill_misconception_ids 
+    # value for invalid type.
     def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
-            self):
+            self) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid type.
         """
-        self.question.inapplicable_skill_misconception_ids = 123
+        self.question.inapplicable_skill_misconception_ids = 123 # type: ignore[assignment]
         self._assert_validation_error(
             'Expected inapplicable_skill_misconception_ids to be a list of '
             'strings, received 123')
 
     def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
-            self):
+            self) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid format i.e.
         it is not of the form <skill-id>-<misconception-id>.
@@ -409,7 +418,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'received [\'abc\', \'def\']'))
 
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
-            self):
+            self) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids list is has duplicate values.
         """
@@ -418,40 +427,43 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'inapplicable_skill_misconception_ids has duplicate values')
 
-    def test_strict_validation_passes(self):
+    def test_strict_validation_passes(self) -> None:
         """Test to verify validate method of a finalized Question domain object
         with correct input.
         """
         self.question.validate()
 
-    def test_not_strict_validation(self):
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test Question domain object
+    # attributes for invalid type.
+    def test_not_strict_validation(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as False.
         """
         self.question.language_code = 'abc'
         self._assert_validation_error('Invalid language code')
 
-        self.question.question_state_data = 'State data'
+        self.question.question_state_data = 'State data' # type: ignore[assignment]
         self._assert_validation_error(
             'Expected question state data to be a State object')
 
-        self.question.question_state_data_schema_version = 'abc'
+        self.question.question_state_data_schema_version = 'abc' # type: ignore[assignment]
         self._assert_validation_error(
             'Expected schema version to be an integer')
 
-        self.question.linked_skill_ids = 'Test'
+        self.question.linked_skill_ids = 'Test' # type: ignore[assignment]
         self._assert_validation_error(
             'Expected linked_skill_ids to be a list of strings')
 
-        self.question.linked_skill_ids = None
+        self.question.linked_skill_ids = None # type: ignore[assignment]
         self._assert_validation_error(
             'inked_skill_ids is either null or an empty list')
 
-        self.question.linked_skill_ids = []
+        self.question.linked_skill_ids = [] 
         self._assert_validation_error(
             'linked_skill_ids is either null or an empty list')
 
-        self.question.linked_skill_ids = ['Test', 1]
+        self.question.linked_skill_ids = ['Test', 1] # type: ignore[list-item]
         self._assert_validation_error(
             'Expected linked_skill_ids to be a list of strings')
 
@@ -459,16 +471,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'linked_skill_ids has duplicate skill ids')
 
-        self.question.language_code = 1
+        self.question.language_code = 1 # type: ignore[assignment]
         self._assert_validation_error('Expected language_code to be a string')
 
-        self.question.version = 'abc'
+        self.question.version = 'abc' # type: ignore[assignment]
         self._assert_validation_error('Expected version to be an integer')
 
-        self.question.id = 123
+        self.question.id = 123 # type: ignore[assignment]
         self._assert_validation_error('Expected ID to be a string')
 
-    def test_create_default_question(self):
+    def test_create_default_question(self) -> None:
         """Test to verify create_default_question method of the Question domain
         object.
         """
@@ -477,16 +489,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question = question_domain.Question.create_default_question(
             question_id, skill_ids)
         default_question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
+            question_domain.Question.create_default_question_state().to_dict()) # type: ignore[no-untyped-call]
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(
-            question.question_state_data.to_dict(), default_question_data)
+            question.question_state_data.to_dict(), default_question_data) # type: ignore[no-untyped-call]
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.version, 0)
         self.assertEqual(question.linked_skill_ids, skill_ids)
 
-    def test_update_language_code(self):
+    def test_update_language_code(self) -> None:
         """Test to verify update_language_code method of the Question domain
         object.
         """
@@ -494,7 +506,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual('pl', self.question.language_code)
 
-    def test_update_linked_skill_ids(self):
+    def test_update_linked_skill_ids(self) -> None:
         """Test to verify update_linked_skill_ids method of the Question domain
         object.
         """
@@ -502,7 +514,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
-    def test_update_inapplicable_skill_misconception_ids(self):
+    def test_update_inapplicable_skill_misconception_ids(self) -> None:
         """Test to verify update_inapplicable_skill_misconception_ids method
         of the Question domain object.
         """
@@ -515,24 +527,24 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ['skillid-misconceptionid'],
             self.question.inapplicable_skill_misconception_ids)
 
-    def test_update_question_state_data(self):
+    def test_update_question_state_data(self) -> None:
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
-        question_state_data = self._create_valid_question_data('Test')
+        question_state_data = self._create_valid_question_data('Test') # type: ignore[no-untyped-call]
 
         self.question.update_question_state_data(question_state_data)
 
         self.assertEqual(
             question_state_data.to_dict(),
-            self.question.question_state_data.to_dict()
+            self.question.question_state_data.to_dict() # type: ignore[no-untyped-call]
         )
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(QuestionSummaryTest, self).setUp()
         self.fake_date_created = datetime.datetime(
             2018, 11, 17, 20, 2, 45, 0)
@@ -547,7 +559,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             misconception_ids=['skill1-1', 'skill2-2']
         )
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Summary
         object.
         """
@@ -564,61 +576,75 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
 
         self.assertEqual(expected_object_dict, self.observed_object.to_dict())
 
-    def test_validation_with_valid_properties(self):
+    def test_validation_with_valid_properties(self) -> None:
         self.observed_object.validate()
 
-    def test_validation_with_invalid_id(self):
-        self.observed_object.id = 1
-        with self.assertRaisesRegexp(
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test id value for invalid type.
+    def test_validation_with_invalid_id(self) -> None:
+        self.observed_object.id = 1 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_interaction_id(self):
-        self.observed_object.interaction_id = 1
-        with self.assertRaisesRegexp(
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test interaction id value for invalid type.
+    def test_validation_with_invalid_interaction_id(self) -> None:
+        self.observed_object.interaction_id = 1 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_question_content(self):
+    def test_validation_with_invalid_question_content(self) -> None:
         self.observed_object.question_content = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_created_on(self):
-        self.observed_object.created_on = 1
-        with self.assertRaisesRegexp(
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test datetime value for invalid type.
+    def test_validation_with_invalid_created_on(self) -> None:
+        self.observed_object.created_on = 1 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected created on to be a datetime, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_last_updated(self):
-        self.observed_object.last_updated = 1
-        with self.assertRaisesRegexp(
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test datetime value for invalid type.
+    def test_validation_with_invalid_last_updated(self) -> None:
+        self.observed_object.last_updated = 1 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
 
-    def test_validate_invalid_list_of_misconception_ids(self):
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test misconception_ids 
+    # value for invalid list type.
+    def test_validate_invalid_list_of_misconception_ids(self) -> None:
         """Test to verify that the validation fails when
         misconception_ids value is an invalid list.
         """
-        self.observed_object.misconception_ids = ['Test', 1]
-        with self.assertRaisesRegexp(
+        self.observed_object.misconception_ids = ['Test', 1] # type: ignore[list-item]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
                 'received [\'Test\', 1]')):
             self.observed_object.validate()
 
-    def test_validate_invalid_type_of_misconception_ids(self):
+    # TODO: Remove this test after the backend is fully type-annotated. 
+    # Here ignore[assignment] is used to test misconception_ids 
+    # value for invalid type.
+    def test_validate_invalid_type_of_misconception_ids(self) -> None:
         """Test to verify that the validation fails when
         misconception_ids value is an invalid type.
         """
-        self.observed_object.misconception_ids = 123
-        with self.assertRaisesRegexp(
+        self.observed_object.misconception_ids = 123 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):
@@ -628,7 +654,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Skill Link Domain object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Skill Link Domain
         object.
         """
@@ -646,7 +672,7 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
 class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Merged Question Skill Link Domain object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Merged Question Skill Link
         Domain object.
         """
