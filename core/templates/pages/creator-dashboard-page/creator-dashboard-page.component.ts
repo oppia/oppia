@@ -36,6 +36,7 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
+import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -56,7 +57,7 @@ export class CreatorDashboardPageComponent {
   collectionsList: CollectionSummary[];
   subscribersList: ProfileSummary[];
   lastWeekStats: { totalPlays: number};
-  dashboardStats: { totalPlays: number};
+  dashboardStats: CreatorDashboardStats;
   relativeChangeInTotalPlays: number;
   getLocaleAbbreviatedDatetimeString: (millisSinceEpoch: number) => string;
   getHumanReadableStatus: (status: string) => string;
@@ -86,7 +87,7 @@ export class CreatorDashboardPageComponent {
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
   ) {}
 
   EXP_PUBLISH_TEXTS = {
@@ -131,7 +132,10 @@ export class CreatorDashboardPageComponent {
     }
   }
 
-  // @HostListener('window:resize', [])
+  getTrustedResourceUrl(imageFileName: string): string {
+    return decodeURIComponent(imageFileName);
+  }
+
   updatesGivenScreenWidth(): void {
     if (this.checkMobileView()) {
       // For mobile users, the view of the creators
@@ -166,30 +170,15 @@ export class CreatorDashboardPageComponent {
     }
   }
 
-  sortSubscriptionFunction(
-      entity: { [x: string]: number }): number {
-    // This function is passed as a custom comparator function to
-    // `orderBy`, so that special cases can be handled while sorting
-    // subscriptions.
-    let value = entity[this.currentSubscribersSortType];
-    if (this.currentSubscribersSortType ===
-          this.SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
-      value = (value || 0);
-    }
-    return value;
+  sortSubscriptionFunction(): string {
+    return this.currentSubscribersSortType;
   }
 
-  sortByFunction(
-      exploration: CreatorExplorationSummary
-  ): string | number {
-    let value: number;
+  sortByFunction(): string {
     if (
       this.currentSortType ===
         CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.RATING) {
-      let averageRating = (
-        this.getAverageRating(exploration.ratings));
-      value = (averageRating || 0);
-      return value;
+      return 'title';
     } else {
       return this.currentSortType;
     }
