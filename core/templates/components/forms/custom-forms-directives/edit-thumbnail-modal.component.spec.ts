@@ -44,6 +44,7 @@ describe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
+  let svgSanitizerService: SvgSanitizerService;
   let closeSpy: jasmine.Spy;
   let dismissSpy: jasmine.Spy;
 
@@ -102,6 +103,7 @@ describe('Edit Thumbnail Modal Component', () => {
     fixture = TestBed.createComponent(EditThumbnailModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     // This throws "Argument of type 'mockImageObject' is not assignable to
@@ -257,5 +259,27 @@ describe('Edit Thumbnail Modal Component', () => {
   it('should close the modal on clicking cancel button', () => {
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should disable \'Add Thumbnail\' button unless a new image is' +
+    ' uploaded', () => {
+    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
+    spyOn(component, 'isValidFilename').and.returnValue(true);
+    spyOn(
+      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
+    ).and.callFake(() => {
+      return { tags: [], attrs: [] };
+    });
+    const safeSvg = (
+      'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
+      'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
+      'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
+      'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+'
+    );
+    let file = new File([safeSvg], 'triangle.svg', {type: 'image/svg'});
+    component.uploadedImageMimeType = 'image/svg+xml';
+    expect(component.thumbnailHasChanged).toBeFalse();
+    component.onFileChanged(file);
+    expect(component.thumbnailHasChanged).toBeTrue();
   });
 });
