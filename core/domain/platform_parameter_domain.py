@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import json
 import re
+from typing import Any, Callable, Optional
 
 from core import feconf
 from core import python_utils
@@ -77,7 +78,7 @@ class EvaluationContext:
         self._server_mode = server_mode
 
     @property
-    def platform_type(self):
+    def platform_type(self) -> str:
         """Returns platform type.
 
         Returns:
@@ -86,7 +87,7 @@ class EvaluationContext:
         return self._platform_type
 
     @property
-    def browser_type(self):
+    def browser_type(self) -> Optional[str]:
         """Returns client browser type.
 
         Returns:
@@ -96,7 +97,7 @@ class EvaluationContext:
         return self._browser_type
 
     @property
-    def app_version(self):
+    def app_version(self) -> Optional[str]:
         # TODO(#11208): Update the documentation below to reflect the change
         # when the GAE app version is used for web & backend.
         """Returns client application version.
@@ -108,7 +109,7 @@ class EvaluationContext:
         return self._app_version
 
     @property
-    def server_mode(self):
+    def server_mode(self) -> str :
         """Returns the server mode of Oppia.
 
         Returns:
@@ -118,7 +119,7 @@ class EvaluationContext:
         return self._server_mode
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         """Returns whether this context object is valid for evaluating
         parameters. An invalid context object usually indicates that one of the
         object's required fields is missing or an unexpected value. Note that
@@ -134,7 +135,7 @@ class EvaluationContext:
             self._platform_type is not None and
             self._platform_type in ALLOWED_PLATFORM_TYPES)
 
-    def validate(self):
+    def validate(self) -> NoReturn:   # à ajouter dans les modules d'import 
         """Validates the EvaluationContext domain object, raising an exception
         if the object is in an irrecoverable error state.
         """
@@ -165,7 +166,7 @@ class EvaluationContext:
                     self._server_mode.value, ALLOWED_SERVER_MODES))
 
     @classmethod
-    def from_dict(cls, client_context_dict, server_context_dict):
+    def from_dict(cls, client_context_dict : dict, server_context_dict : dict) -> EvaluationContext :
         """Creates a new EvaluationContext object by combining both client side
         and server side context.
 
@@ -201,12 +202,12 @@ class PlatformParameterFilter:
         'app_version': ['=', '<', '<=', '>', '>='],
     }
 
-    def __init__(self, filter_type, conditions):
+    def __init__(self, filter_type : any , conditions : any):
         self._type = filter_type
         self._conditions = conditions
 
     @property
-    def type(self):
+    def type(self) -> bool: #pas sûr 
         """Returns filter type.
 
         Returns:
@@ -215,7 +216,7 @@ class PlatformParameterFilter:
         return self._type
 
     @property
-    def conditions(self):
+    def conditions(self) ->bool:
         """Returns filter conditions.
 
         Returns:
@@ -225,7 +226,7 @@ class PlatformParameterFilter:
         """
         return self._conditions
 
-    def evaluate(self, context):
+    def evaluate(self, context) -> bool:
         """Tries to match the given context with the filter against its
         value(s).
 
@@ -240,7 +241,7 @@ class PlatformParameterFilter:
             for op, value in self._conditions
         )
 
-    def _evaluate_single_value(self, op, value, context):
+    def _evaluate_single_value(self, op : str, value : str, context : EvaluationContext) -> Optional[bool]:
         """Tries to match the given context with the filter against the
         given value.
 
@@ -273,7 +274,7 @@ class PlatformParameterFilter:
 
         return matched
 
-    def validate(self):
+    def validate(self) -> NoReturn:
         """Validates the PlatformParameterFilter domain object."""
         if self._type not in self.SUPPORTED_FILTER_TYPES:
             raise utils.ValidationError(
@@ -316,7 +317,7 @@ class PlatformParameterFilter:
                         'regexp %s.' % (
                             version, APP_VERSION_WITHOUT_HASH_REGEXP))
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str,bool]:
         """Returns a dict representation of the PlatformParameterFilter domain
         object.
 
@@ -330,7 +331,7 @@ class PlatformParameterFilter:
         }
 
     @classmethod
-    def from_dict(cls, filter_dict):
+    def from_dict(cls, filter_dict : Dict[str,bool]) -> PlatformParameterFilter :
         """Returns an PlatformParameterFilter object from a dict.
 
         Args:
@@ -343,7 +344,7 @@ class PlatformParameterFilter:
         """
         return cls(filter_dict['type'], filter_dict['conditions'])
 
-    def _match_version_expression(self, op, value, client_version):
+    def _match_version_expression(self, op : str , value : str, client_version: Optional[str]) -> bool:
         """Tries to match the version expression against the client version.
 
         Args:
@@ -399,7 +400,7 @@ class PlatformParameterFilter:
                 return False
         return False
 
-    def _match_version_flavor(self, op, flavor, client_version):
+    def _match_version_flavor(self, op : str, flavor : str, client_version : str) -> bool:
         """Matches the client version flavor.
 
         Args:
@@ -440,7 +441,7 @@ class PlatformParameterFilter:
         elif op == '>=':
             return is_equal or is_client_flavor_larger
 
-    def _is_first_flavor_smaller(self, flavor_a, flavor_b):
+    def _is_first_flavor_smaller(self, flavor_a : str, flavor_b : str) -> bool:
         """Compares two version flavors, return True if the first version is
         smaller in the following ordering:
         'test' < 'alpha' < 'beta' < 'release'.
@@ -466,7 +467,7 @@ class PlatformParameterRule:
         self._value_when_matched = value_when_matched
 
     @property
-    def filters(self):
+    def filters(self) -> any:
         """Returns the filters of the rule.
 
         Returns:
@@ -475,7 +476,7 @@ class PlatformParameterRule:
         return self._filters
 
     @property
-    def value_when_matched(self):
+    def value_when_matched(self) -> any:
         """Returns the value outcome if this rule is matched.
 
         Returns:
@@ -483,7 +484,7 @@ class PlatformParameterRule:
         """
         return self._value_when_matched
 
-    def evaluate(self, context):
+    def evaluate(self, context: EvaluationContext) -> bool:
         """Tries to match the given context with the rule against its filter(s).
         A rule is matched when all its filters are matched.
 
@@ -497,7 +498,7 @@ class PlatformParameterRule:
             filter_domain.evaluate(context)
             for filter_domain in self._filters)
 
-    def has_server_mode_filter(self):
+    def has_server_mode_filter(self) -> bool:
         """Checks if the rule has a filter with type 'server_mode'.
 
         Returns:
@@ -507,7 +508,7 @@ class PlatformParameterRule:
             filter_domain.type == 'server_mode'
             for filter_domain in self._filters)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict [str, any] :
         """Returns a dict representation of the PlatformParameterRule domain
         object.
 
@@ -521,13 +522,13 @@ class PlatformParameterRule:
             'value_when_matched': self._value_when_matched,
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the PlatformParameterRule domain object."""
         for filter_domain_object in self._filters:
             filter_domain_object.validate()
 
     @classmethod
-    def from_dict(cls, rule_dict):
+    def from_dict(cls, rule_dict : dict) -> PlatformParameterRule :
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
