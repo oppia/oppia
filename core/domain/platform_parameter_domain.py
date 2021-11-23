@@ -17,10 +17,16 @@
 """Domain objects for platform parameters."""
 
 from __future__ import annotations
-
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 import re
-from typing import Any, Callable, Optional
+
+import enum as enum
+from typing_extensions import TypedDict
+from typing import (
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence,
+    Type, TypeVar, Tuple, Union, NoReturn)
 
 from core import feconf
 from core import python_utils
@@ -28,9 +34,29 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
+# Enum and TypedDict used for MyPy Type annotations
+class SERVER_MODES(enum.Enum):
+    dev = 'dev'
+    test = 'test'
+    prod = 'prod'
+
+class DATA_TYPES(enum.Enum):
+    bool = 'bool'
+    string = 'string'
+    number = 'number'
+
+class Server_context_dict(TypedDict):
+    server_mode: SERVER_MODES
+
+class Filter_dict(TypedDict):
+    type: str
+    conditions: List[Tuple[str,str]]
+
+class PlatformParameterRule_dict(TypedDict):
+    filters: List[Filter_dict]
+    value_when_matched: Any
+
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
-DATA_TYPES = python_utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
@@ -70,14 +96,15 @@ class EvaluationContext:
     """Domain object representing the context for parameter evaluation."""
 
     def __init__(
-            self, platform_type, browser_type, app_version, server_mode):
+            self, platform_type: Optional[str], browser_type: Optional[str], 
+            app_version: Optional[str], server_mode: SERVER_MODES) -> None:
         self._platform_type = platform_type
         self._browser_type = browser_type
         self._app_version = app_version
         self._server_mode = server_mode
 
     @property
-    def platform_type(self) -> str:
+    def platform_type(self) -> Optional[str]:
         """Returns platform type.
 
         Returns:
@@ -108,11 +135,11 @@ class EvaluationContext:
         return self._app_version
 
     @property
-    def server_mode(self) -> str :
+    def server_mode(self) -> SERVER_MODES :
         """Returns the server mode of Oppia.
 
         Returns:
-            Enum(SERVER_MODES). The the server mode of Oppia,
+            Enum(SERVER_MODES). The server mode of Oppia,
             must be one of the following: dev, test, prod.
         """
         return self._server_mode
@@ -134,7 +161,7 @@ class EvaluationContext:
             self._platform_type is not None and
             self._platform_type in ALLOWED_PLATFORM_TYPES)
 
-    def validate(self) -> NoReturn:   # à ajouter dans les modules d'import 
+    def validate(self) -> None:  
         """Validates the EvaluationContext domain object, raising an exception
         if the object is in an irrecoverable error state.
         """
@@ -164,8 +191,10 @@ class EvaluationContext:
                 'Invalid server mode \'%s\', must be one of %s.' % (
                     self._server_mode.value, ALLOWED_SERVER_MODES))
 
+    # Type ignore because key 'server_mode' can not be None
     @classmethod
-    def from_dict(cls, client_context_dict : dict, server_context_dict : dict) -> EvaluationContext :
+    def from_dict(cls, client_context_dict: Dict[str, Optional[str]],
+    server_context_dict: Server_context_dict) -> EvaluationContext:
         """Creates a new EvaluationContext object by combining both client side
         and server side context.
 
@@ -177,12 +206,13 @@ class EvaluationContext:
             EvaluationContext. The corresponding EvaluationContext domain
             object.
         """
+             
         return cls(
             client_context_dict.get('platform_type'),
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
-            server_context_dict.get('server_mode'),
-        )
+            server_context_dict.get('server_mode'), # type: ignore[arg-type]
+            )
 
 
 class PlatformParameterFilter:
@@ -201,12 +231,12 @@ class PlatformParameterFilter:
         'app_version': ['=', '<', '<=', '>', '>='],
     }
 
-    def __init__(self, filter_type : any , conditions : any):
+    def __init__(self, filter_type: str , conditions: List[Tuple[str, str]] ) -> None:
         self._type = filter_type
         self._conditions = conditions
 
     @property
-    def type(self) -> bool: #pas sûr 
+    def type(self) -> str: 
         """Returns filter type.
 
         Returns:
@@ -215,7 +245,7 @@ class PlatformParameterFilter:
         return self._type
 
     @property
-    def conditions(self) ->bool:
+    def conditions(self) -> List[Tuple[str, str]]:
         """Returns filter conditions.
 
         Returns:
@@ -225,7 +255,7 @@ class PlatformParameterFilter:
         """
         return self._conditions
 
-    def evaluate(self, context) -> bool:
+    def evaluate(self, context: EvaluationContext) -> bool:
         """Tries to match the given context with the filter against its
         value(s).
 
@@ -240,7 +270,7 @@ class PlatformParameterFilter:
             for op, value in self._conditions
         )
 
-    def _evaluate_single_value(self, op : str, value : str, context : EvaluationContext) -> Optional[bool]:
+    def _evaluate_single_value(self, op: str, value: str, context: EvaluationContext) -> bool:
         """Tries to match the given context with the filter against the
         given value.
 
@@ -268,12 +298,13 @@ class PlatformParameterFilter:
         elif self._type == 'app_version_flavor':
             matched = self._match_version_flavor(op, value, context.app_version)
         elif self._type == 'app_version':
-            matched = self._match_version_expression(
-                op, value, context.app_version)
-
+            if (self._match_version_expression(op, value, context.app_version)):
+                matched = True
+            else:
+                matched = False
         return matched
 
-    def validate(self) -> NoReturn:
+    def validate(self) -> None:
         """Validates the PlatformParameterFilter domain object."""
         if self._type not in self.SUPPORTED_FILTER_TYPES:
             raise utils.ValidationError(
@@ -316,7 +347,7 @@ class PlatformParameterFilter:
                         'regexp %s.' % (
                             version, APP_VERSION_WITHOUT_HASH_REGEXP))
 
-    def to_dict(self) -> Dict[str,bool]:
+    def to_dict(self) -> Filter_dict:
         """Returns a dict representation of the PlatformParameterFilter domain
         object.
 
@@ -330,7 +361,7 @@ class PlatformParameterFilter:
         }
 
     @classmethod
-    def from_dict(cls, filter_dict : Dict[str,bool]) -> PlatformParameterFilter :
+    def from_dict(cls, filter_dict: Filter_dict) -> PlatformParameterFilter :
         """Returns an PlatformParameterFilter object from a dict.
 
         Args:
@@ -343,7 +374,8 @@ class PlatformParameterFilter:
         """
         return cls(filter_dict['type'], filter_dict['conditions'])
 
-    def _match_version_expression(self, op : str , value : str, client_version: Optional[str]) -> bool:
+    # Type ignore because if match is None then method stops line 393 with a False return
+    def _match_version_expression(self, op: str , value: str, client_version: Optional[str]) -> bool:
         """Tries to match the version expression against the client version.
 
         Args:
@@ -358,9 +390,12 @@ class PlatformParameterFilter:
             return False
 
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
-        client_version_without_hash = match.group(1)
-
-        is_equal = value == client_version_without_hash
+        client_version_without_hash = match.group(1) #type: ignore[union-attr] 
+        
+        if ((value == client_version_without_hash)) : 
+            is_equal = True
+        else : 
+            is_equal = False
         is_client_version_smaller = self._is_first_version_smaller(
             client_version_without_hash, value)
         is_client_version_larger = self._is_first_version_smaller(
@@ -376,20 +411,23 @@ class PlatformParameterFilter:
             return is_client_version_larger
         elif op == '>=':
             return is_equal or is_client_version_larger
+        return False
 
-    def _is_first_version_smaller(self, version_a, version_b):
+
+    def _is_first_version_smaller(self, version_a_str: str, version_b_str: str) -> bool:
         """Compares two version strings, return True if the first version is
-        smaller.
+        smaller. 
 
         Args:
-            version_a: str. The version string (e.g. '1.0.0').
-            version_b: str. The version string (e.g. '1.0.0').
+            version_a_str: str. The version string (e.g. '1.0.0').
+            version_b_str: str. The version string (e.g. '1.0.0').
 
         Returns:
             bool. True if the first version is smaller.
         """
-        version_a = version_a.split('.')
-        version_b = version_b.split('.')
+        version_a = version_a_str.split(".")
+        version_b = version_b_str.split('.')
+
 
         for sub_version_a, sub_version_b in python_utils.ZIP(
                 version_a, version_b):
@@ -399,7 +437,8 @@ class PlatformParameterFilter:
                 return False
         return False
 
-    def _match_version_flavor(self, op : str, flavor : str, client_version : str) -> bool:
+    # Type ignore because if client_verison is None then method stops line 462 with a False return
+    def _match_version_flavor(self, op: str, flavor: str, client_version: Optional[str]) -> bool:
         """Matches the client version flavor.
 
         Args:
@@ -415,8 +454,12 @@ class PlatformParameterFilter:
             bool. True is the client_version matches the given flavor using
             the operator.
         """
+
+        if client_version is None:
+            return False
+
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
-        client_flavor = match.group(2)
+        client_flavor = match.group(2) #type: ignore[union-attr]
 
         # An unspecified client flavor means no flavor-based filters should
         # match to it.
@@ -430,7 +473,7 @@ class PlatformParameterFilter:
             flavor, client_flavor)
 
         if op == '=':
-            return is_equal
+            return is_equal # type: ignore[no-any-return]
         elif op == '<':
             return is_client_flavor_smaller
         elif op == '<=':
@@ -439,8 +482,9 @@ class PlatformParameterFilter:
             return is_client_flavor_larger
         elif op == '>=':
             return is_equal or is_client_flavor_larger
+        return False
 
-    def _is_first_flavor_smaller(self, flavor_a : str, flavor_b : str) -> bool:
+    def _is_first_flavor_smaller(self, flavor_a: str, flavor_b: str) -> bool:
         """Compares two version flavors, return True if the first version is
         smaller in the following ordering:
         'test' < 'alpha' < 'beta' < 'release'.
@@ -452,7 +496,7 @@ class PlatformParameterFilter:
         Returns:
             bool. True if the first flavor is smaller.
         """
-        return (
+        return ( # type: ignore[no-any-return]
             ALLOWED_APP_VERSION_FLAVORS.index(flavor_a) <
             ALLOWED_APP_VERSION_FLAVORS.index(flavor_b)
         )
@@ -461,12 +505,12 @@ class PlatformParameterFilter:
 class PlatformParameterRule:
     """Domain object for rules in platform parameters."""
 
-    def __init__(self, filters, value_when_matched):
+    def __init__(self, filters: List[PlatformParameterFilter], value_when_matched: Any) -> None:
         self._filters = filters
         self._value_when_matched = value_when_matched
 
     @property
-    def filters(self) -> any:
+    def filters(self) -> List[PlatformParameterFilter]:
         """Returns the filters of the rule.
 
         Returns:
@@ -475,7 +519,7 @@ class PlatformParameterRule:
         return self._filters
 
     @property
-    def value_when_matched(self) -> any:
+    def value_when_matched(self) -> Any:
         """Returns the value outcome if this rule is matched.
 
         Returns:
@@ -507,7 +551,7 @@ class PlatformParameterRule:
             filter_domain.type == 'server_mode'
             for filter_domain in self._filters)
 
-    def to_dict(self) -> Dict [str, any] :
+    def to_dict(self) -> PlatformParameterRule_dict :
         """Returns a dict representation of the PlatformParameterRule domain
         object.
 
@@ -527,7 +571,7 @@ class PlatformParameterRule:
             filter_domain_object.validate()
 
     @classmethod
-    def from_dict(cls, rule_dict : dict) -> PlatformParameterRule :
+    def from_dict(cls, rule_dict : PlatformParameterRule_dict) -> PlatformParameterRule :
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
@@ -551,15 +595,16 @@ class PlatformParameter:
 
     DATA_TYPE_PREDICATES_DICT = {
         DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: lambda x: isinstance(x, str),
+        DATA_TYPES.string.value: (
+            lambda x: isinstance(x, python_utils.BASESTRING)),
         DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
 
     def __init__(
-            self, name, description, data_type, rules,
-            rule_schema_version, default_value, is_feature, feature_stage):
+            self, name: str, description: str, data_type: DATA_TYPES, rules: List[PlatformParameterRule],
+            rule_schema_version: int, default_value: Any, is_feature: bool, feature_stage: SERVER_MODES) -> None:
         self._name = name
         self._description = description
         self._data_type = data_type
@@ -570,7 +615,7 @@ class PlatformParameter:
         self._feature_stage = feature_stage
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Returns the name of the platform parameter.
 
         Returns:
@@ -579,7 +624,7 @@ class PlatformParameter:
         return self._name
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Returns the description of the platform parameter.
 
         Returns:
@@ -588,7 +633,7 @@ class PlatformParameter:
         return self._description
 
     @property
-    def data_type(self):
+    def data_type(self) -> DATA_TYPES:
         """Returns the data type of the platform parameter.
 
         Returns:
@@ -597,15 +642,15 @@ class PlatformParameter:
         return self._data_type
 
     @property
-    def rules(self):
+    def rules(self) -> List[PlatformParameterRule]:
         """Returns the rules of the platform parameter.
 
         Returns:
-            list(PlatformParameterRules). The rules of the platform parameter.
+            list(PlatformParameterRule). The rules of the platform parameter.
         """
         return self._rules
 
-    def set_rules(self, new_rules):
+    def set_rules(self, new_rules: List[PlatformParameterRule]) -> None:
         """Sets the rules of the PlatformParameter.
 
         Args:
@@ -615,7 +660,7 @@ class PlatformParameter:
         self._rules = new_rules
 
     @property
-    def rule_schema_version(self):
+    def rule_schema_version(self) -> int:
         """Returns the schema version of the rules.
 
         Returns:
@@ -624,7 +669,7 @@ class PlatformParameter:
         return self._rule_schema_version
 
     @property
-    def default_value(self):
+    def default_value(self) -> Any:
         """Returns the default value of the platform parameter.
 
         Returns:
@@ -633,7 +678,7 @@ class PlatformParameter:
         return self._default_value
 
     @property
-    def is_feature(self):
+    def is_feature(self) -> bool:
         """Returns whether this parameter is also a feature flag.
 
         Returns:
@@ -642,7 +687,7 @@ class PlatformParameter:
         return self._is_feature
 
     @property
-    def feature_stage(self):
+    def feature_stage(self) -> Optional[FEATURE_STAGES]:
         """Returns the stage of the feature flag.
 
         Returns:
@@ -651,24 +696,25 @@ class PlatformParameter:
         """
         return self._feature_stage
 
-    def validate(self):
+    # We are comparing the same types
+    def validate(self) -> None:
         """Validates the PlatformParameter domain object."""
         if re.match(self.PARAMETER_NAME_REGEXP, self._name) is None:
             raise utils.ValidationError(
                 'Invalid parameter name \'%s\', expected to match regexp '
                 '%s.' % (self._name, self.PARAMETER_NAME_REGEXP))
 
-        if self._data_type not in self.DATA_TYPE_PREDICATES_DICT:
+        if self._data_type not in self.DATA_TYPE_PREDICATES_DICT: # type: ignore[comparison-overlap]
             raise utils.ValidationError(
                 'Unsupported data type \'%s\'.' % self._data_type)
 
-        predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type]
-        if not predicate(self._default_value):
+        predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type] # type: ignore[index]
+        if not predicate(self._default_value): # type: ignore[no-untyped-call]
             raise utils.ValidationError(
                 'Expected %s, received \'%s\' in default value.' % (
                     self._data_type, self._default_value))
         for rule in self._rules:
-            if not predicate(rule.value_when_matched):
+            if not predicate(rule.value_when_matched): # type: ignore[no-untyped-call]
                 raise utils.ValidationError(
                     'Expected %s, received \'%s\' in value_when_matched.' % (
                         self._data_type, rule.value_when_matched))
@@ -680,7 +726,7 @@ class PlatformParameter:
         if self._is_feature:
             self._validate_feature_flag()
 
-    def evaluate(self, context):
+    def evaluate(self, context: EvaluationContext) -> Any:
         """Evaluates the value of the platform parameter in the given context.
         The value of first matched rule is returned as the result.
 
@@ -701,7 +747,7 @@ class PlatformParameter:
                     return rule.value_when_matched
         return self._default_value
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representation of the PlatformParameter domain
         object.
 
@@ -719,16 +765,17 @@ class PlatformParameter:
             'feature_stage': self._feature_stage
         }
 
-    def _validate_feature_flag(self):
+    # We are comparing the same types
+    def _validate_feature_flag(self) -> None:
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if self._data_type != DATA_TYPES.bool.value:
+        if self._data_type != DATA_TYPES.bool.value: # type: ignore[comparison-overlap]
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
         if not any(
-                self._feature_stage == feature_stage
+                self._feature_stage == feature_stage # type: ignore[comparison-overlap]
                 for feature_stage in ALLOWED_FEATURE_STAGES
         ):
             raise utils.ValidationError(
@@ -743,21 +790,21 @@ class PlatformParameter:
             for server_mode_filter in server_mode_filters:
                 server_modes = [
                     value for _, value in server_mode_filter.conditions]
-                if self._feature_stage == FEATURE_STAGES.dev.value:
+                if self._feature_stage == FEATURE_STAGES.dev.value: # type: ignore[comparison-overlap]
                     if (
                             SERVER_MODES.test.value in server_modes or
                             SERVER_MODES.prod.value in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
-                elif self._feature_stage == FEATURE_STAGES.test.value:
+                elif self._feature_stage == FEATURE_STAGES.test.value: # type: ignore[comparison-overlap]
                     if SERVER_MODES.prod.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')
 
     @classmethod
-    def from_dict(cls, param_dict):
+    def from_dict(cls, param_dict: Dict[str, Any]) -> PlatformParameter:
         """Returns an PlatformParameter object from a dict.
 
         Args:
@@ -796,7 +843,7 @@ class PlatformParameter:
             param_dict['feature_stage'],
         )
 
-    def serialize(self):
+    def serialize(self) -> str:
         """Returns the object serialized as a JSON string.
 
         Returns:
@@ -807,7 +854,7 @@ class PlatformParameter:
         return json.dumps(platform_parameter_dict)
 
     @classmethod
-    def deserialize(cls, json_string):
+    def deserialize(cls, json_string: str) -> PlatformParameter:
         """Returns a PlatformParameter domain object decoded from a JSON
         string.
 
