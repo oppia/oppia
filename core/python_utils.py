@@ -40,9 +40,6 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 
 MAP = builtins.map
 NEXT = builtins.next

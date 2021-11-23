@@ -24,7 +24,6 @@ import io
 import json
 
 from core import feconf
-from core import python_utils
 from core.domain import rights_domain
 from core.platform import models
 

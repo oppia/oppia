@@ -23,8 +23,6 @@ import os
 import re
 import sys
 
-from core import python_utils
-
 from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
