@@ -120,7 +120,7 @@ describe('Story Creation Service', () => {
 
     StoryCreationService.createNewCanonicalStory();
 
-    $scope.$apply()
+    $scope.$apply();
     tick();
     $httpBackend.flush();
 
