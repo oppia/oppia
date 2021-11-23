@@ -77,6 +77,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+        'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
@@ -88,7 +89,8 @@ angular.module('oppia').directive('topicEditorTab', [
             WindowDimensionsService, WindowRef,
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
-            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -99,6 +101,8 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
           $scope.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+          $scope.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
           ctrl.initEditor = function() {
             $scope.skillCreationIsAllowed = (
               TopicEditorStateService.isSkillCreationAllowed());
