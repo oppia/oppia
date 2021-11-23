@@ -196,6 +196,13 @@ angular.module('oppia').controller(
 
         [$scope.activeSuggestionId, $scope.activeContribution] = (
           remainingContributions.pop());
+        // Close modal instance if the suggestion's corresponding opportunity
+        // is deleted. See issue #14234.
+        if (!$scope.activeContribution.details) {
+          $uibModalInstance.close(resolvedSuggestionIds);
+          return;
+        }
+
         $scope.activeSuggestion = $scope.activeContribution.suggestion;
         $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(

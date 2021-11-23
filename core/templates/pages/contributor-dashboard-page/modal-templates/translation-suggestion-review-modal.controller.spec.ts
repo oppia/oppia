@@ -457,4 +457,98 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.reviewMessage).toBe('');
       });
   });
+
+  describe('when reviewing suggestions' +
+    ' with deleted opportunites', function() {
+    const reviewable = false;
+    const subheading = 'subheading_title';
+
+    const suggestion1 = {
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: ['Translation1', 'Translation2'],
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      status: 'rejected'
+    };
+    const suggestion2 = {
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      exploration_content_html: 'Translation'
+    };
+
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: null
+    };
+
+    const deletedContribution = {
+      suggestion: suggestion2,
+      details: null
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_deleted: deletedContribution,
+    };
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      const $rootScope = $injector.get('$rootScope');
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller('TranslationSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
+        reviewable: reviewable,
+        suggestionIdToContribution: angular.copy(suggestionIdToContribution)
+      });
+    }));
+
+    it('should reject suggestion in suggestion modal service when clicking ' +
+      'on reject and review next suggestion button', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            callback) => {
+          callback();
+        });
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
+      $scope.reviewMessage = 'Review message example';
+
+      $scope.rejectAndReviewNext();
+
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'suggestion_1']);
+    });
+  });
 });
