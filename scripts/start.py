@@ -107,6 +107,7 @@ def alert_on_exit():
 
 def notify_about_successful_shutdown():
     """Notifies developers that the servers have shutdown gracefully."""
+    extend_index_yaml.main()
     python_utils.PRINT(
         '\n\n'
         # ANSI escape sequence for bright green text color.
@@ -136,12 +137,7 @@ def main(args=None):
     # the "latter" context (context managers exit in reverse-order).
     with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
-        # extend_index_yaml extends the index.yaml file after extracting new kind
-        # from ../cloud_datastore_emulator_cache/WEB-INF/index.yaml.
-        # notify_about_successful_shutdown() gets called after extend_index_yaml
-        # is done.
         stack.callback(
-            extend_index_yaml.main(),
             notify_about_successful_shutdown
         )
 
