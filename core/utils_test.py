@@ -696,6 +696,9 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
+        print(dt)
+        print(datetime.datetime.fromtimestamp(
+                python_utils.divide(msecs, 1000.0)))
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(

@@ -357,7 +357,7 @@ def divide(number1, number2):
     Returns:
         int. The quotent.
     """
-    if isinstance(number1)==float or isinstance(number2)==float:
+    if isinstance(number1,float)==True or isinstance(number2,float)==True:
         return number1 / number2
     else:
         return number1 // number2
