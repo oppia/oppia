@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import feconf
 from core import python_utils
 from core import utils
@@ -32,7 +34,8 @@ from core.tests import test_utils
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-PARAM_NAMES = python_utils.create_enum('parameter_a')  # pylint: disable=invalid-name
+PARAM_NAMES = enum.Enum("PARAM_NAMES", {
+    'parameter_a': 'parameter_a'})
 
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
@@ -86,7 +89,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter.validate()
 
     def test_create_platform_parameter_with_invalid_type_failure(self):
-        _data_type = python_utils.create_enum('invalid')
+        _data_type = enum.Enum("_data_type", {
+            'invalid': 'invalid'})
         with self.assertRaisesRegexp(
             Exception, 'Unsupported data type \'invalid\''):
             registry.Registry.create_platform_parameter(

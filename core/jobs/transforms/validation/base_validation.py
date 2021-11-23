@@ -28,6 +28,7 @@ with the result of the super function.
 from __future__ import annotations
 
 import datetime
+import enum
 import re
 
 from core import feconf
@@ -45,7 +46,10 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODES = python_utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
+VALIDATION_MODES = enum.Enum("VALIDATION_MODES", {
+    'neutral': 'neutral',
+    'strict': 'strict',
+    'non_strict': 'non_strict'})
 
 
 class ValidateDeletedModel(beam.DoFn):

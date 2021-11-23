@@ -16,7 +16,8 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import enum
+
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
@@ -25,7 +26,9 @@ from core.domain import platform_parameter_list as param_list
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
-PARAM_NAMES = python_utils.create_enum('parameter_a', 'parameter_b')  # pylint: disable=invalid-name
+PARAM_NAMES = enum.Enum("PARAM_NAMES", {
+    'parameter_a': 'parameter_a',
+     'parameter_b': 'parameter_b',})
 DATA_TYPES = param_domain.DATA_TYPES
 
 

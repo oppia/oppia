@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import python_utils
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
@@ -26,8 +28,9 @@ Registry = registry.Registry
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
-PARAM_NAMES = python_utils.create_enum( # pylint: disable=invalid-name
-    'dummy_feature', 'dummy_parameter')
+PARAM_NAMES = enum.Enum( "PARAM_NAMES", {
+    'dummy_feature': 'dummy_feature',
+    'dummy_parameter': 'dummy_parameter'})
 
 # Platform parameters should all be defined below.
 

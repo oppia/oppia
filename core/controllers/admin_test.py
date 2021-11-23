@@ -17,10 +17,10 @@
 from __future__ import annotations
 
 import datetime
+import enum
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -63,7 +63,9 @@ from core.tests import test_utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
+PARAM_NAMES = enum.Enum( "PARAM_NAMES", {
+    'test_feature_1': 'test_feature_1',
+})
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
 
