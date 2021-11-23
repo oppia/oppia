@@ -942,7 +942,7 @@ class Exploration:
                 'Expected proto size to be a int, received %s'
                 % self.proto_size_in_bytes)
 
-        if not self.proto_size_in_bytes > 0:
+        if self.proto_size_in_bytes <= 0:
             raise utils.ValidationError(
                 'Expected proto size to be positive integer, received %s'
                 % self.proto_size_in_bytes)
