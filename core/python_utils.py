@@ -357,10 +357,7 @@ def divide(number1, number2):
     Returns:
         int. The quotent.
     """
-    if isinstance(number1,float)==True or isinstance(number2,float)==True:
-        return number1 / number2
-    else:
-        return number1 // number2
+    return past.utils.old_div(number1, number2)
  
 
 def _recursively_convert_to_str(value):
