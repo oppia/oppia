@@ -283,7 +283,6 @@ describe('Permissions for private explorations', function() {
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
     await workflow.addExplorationCollaborator('bobPrivileges');
-    await browser.refresh();
     expect(await workflow.getExplorationManagers()).toEqual(
       ['alicePrivileges']);
     expect(await workflow.getExplorationCollaborators()).toEqual(
