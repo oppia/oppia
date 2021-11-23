@@ -56,7 +56,6 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
-    ContextService.resetImageSaveDestination();
     ContextService.setCustomEntityContext(
       IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
       $scope.skill.getId()
