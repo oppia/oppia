@@ -23,6 +23,8 @@ import { fakeAsync, tick } from '@angular/core/testing';
 require('services/ngb-modal.service.ts');
 
 describe('Story Creation Service', () => {
+  let $rootScope = null;
+  let $scope = null;
   let StoryCreationService = null;
   let TopicEditorStateService = null;
   let ImageLocalStorageService = null;
@@ -51,6 +53,8 @@ describe('Story Creation Service', () => {
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
     StoryCreationService = $injector.get('StoryCreationService');
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
@@ -115,7 +119,10 @@ describe('Story Creation Service', () => {
     expect(mockWindow.location).toBe('');
 
     StoryCreationService.createNewCanonicalStory();
+
+    $scope.$apply()
     tick();
+    $httpBackend.flush();
 
     expect(mockWindow.location).toBe('/story_editor/id');
   }));
