@@ -314,19 +314,15 @@ describe('Creator Dashboard Page Component', () => {
       });
 
       it('should sort subscription list by username', () => {
-        let entity = {
-          username: 1
-        };
         expect(component.currentSubscribersSortType).toBe('username');
-        expect(component.sortSubscriptionFunction(entity)).toBe(
-          1);
+        expect(component.sortSubscriptionFunction()).toBe('username');
       });
 
       it('should not sort subscription list by impact given empty object',
         () => {
           component.setSubscriptionSortingOptions('impact');
           expect(component.currentSubscribersSortType).toBe('impact');
-          expect(component.sortSubscriptionFunction({})).toBe(0);
+          expect(component.sortSubscriptionFunction()).toBe('impact');
         });
 
       it('should sort exploration list by untitled explorations when title' +
@@ -335,10 +331,7 @@ describe('Creator Dashboard Page Component', () => {
         component.setExplorationsSortingOptions('title');
         expect(component.currentSortType).toBe('title');
 
-        expect(component.sortByFunction({
-          title: '',
-          status: 'private'
-        } as CreatorExplorationSummary)).toBe('title');
+        expect(component.sortByFunction()).toBe('title');
       });
 
       it('should sort exploration list by options that is not last update' +
@@ -346,10 +339,7 @@ describe('Creator Dashboard Page Component', () => {
         component.setExplorationsSortingOptions('ratings');
         expect(component.currentSortType).toBe('ratings');
 
-        expect(component.sortByFunction({
-          numViews: 0,
-          status: 'private'
-        } as CreatorExplorationSummary)).toBe(0);
+        expect(component.sortByFunction()).toBe('ratings');
       });
 
       it('should sort exploration list by last updated when last updated' +
@@ -357,10 +347,7 @@ describe('Creator Dashboard Page Component', () => {
         component.setExplorationsSortingOptions('lastUpdatedMsec');
         expect(component.currentSortType).toBe('lastUpdatedMsec');
 
-        expect(component.sortByFunction({
-          lastUpdatedMsec: 1,
-          status: ''
-        } as CreatorExplorationSummary)).toBe('lastUpdatedMsec');
+        expect(component.sortByFunction()).toBe('lastUpdatedMsec');
       });
 
       it('should expect 0 to be returned', () => {
@@ -372,10 +359,7 @@ describe('Creator Dashboard Page Component', () => {
         component.setExplorationsSortingOptions('numViews');
         expect(component.currentSortType).toBe('numViews');
 
-        expect(component.sortByFunction({
-          numViews: 0,
-          status: 'private'
-        } as CreatorExplorationSummary)).toBe('numViews');
+        expect(component.sortByFunction()).toBe('numViews');
       });
 
       it('should update exploration view and publish text on resizing page',
