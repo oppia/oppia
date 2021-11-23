@@ -178,6 +178,17 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
+            
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            target_entity_html_list = suggestion.get_target_entity_html_strings()
+            target_image_filenames = (
+                html_cleaner.get_image_filenames_from_html_strings(
+                    target_entity_html_list))
+
+            fs_services.copy_images(
+                suggestion.target_type, suggestion.target_id,
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, suggestion.target_id,
+                target_image_filenames)
         elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
