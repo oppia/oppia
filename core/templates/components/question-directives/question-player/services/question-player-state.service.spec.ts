@@ -18,12 +18,14 @@
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Question } from 'domain/question/QuestionObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { QuestionPlayerStateService } from './question-player-state.service';
 
 describe('Question player state service', () => {
   let qpss: QuestionPlayerStateService;
   let questionId = 'question_id';
-  let question = new Question(questionId, null, '', 7, [], []);
+  let stateObject: StateObjectFactory;
+  let question: Question;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({}).compileComponents();
@@ -31,6 +33,10 @@ describe('Question player state service', () => {
 
   beforeEach(() => {
     qpss = TestBed.inject(QuestionPlayerStateService);
+    stateObject = TestBed.inject(StateObjectFactory);
+    question = new Question(
+      questionId, stateObject.createDefaultState('state'), '', 7, [], []
+    );
   });
 
   it('should register hint as used', () => {
