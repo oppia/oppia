@@ -88,8 +88,9 @@
 
 
 # App Feedback Reporting project
-/core/domain/app_feedback_report_*.py @BenHenning
-/core/controllers/incoming_app_feedback_report*.py @BenHenning
+# TODO(#14285): Replace @seanlip with @BenHenning for both.
+/core/domain/app_feedback_report_*.py @seanlip
+/core/controllers/incoming_app_feedback_report*.py @seanlip
 
 
 # Audio and Translation team.
@@ -132,20 +133,25 @@
 
 
 # Core documentation
-/AUTHORS @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/AUTHORS @seanlip
 /CHANGELOG @seanlip @vojtechjelinek
-/CONTRIBUTORS @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/core/templates/pages/about-page/about-page.constants.ts @seanlip
 /core/templates/pages/license-page/ @vojtechjelinek
 /core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
-/core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/core/templates/pages/privacy-page/privacy-page.component.html @seanlip
 /core/templates/pages/privacy-page/privacy-page.component.ts @DubeySandeep
 /core/templates/pages/terms-page/ @DubeySandeep
-/core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/core/templates/pages/terms-page/terms-page.component.html @seanlip
 
 
 # Dashboard pages.
@@ -626,8 +632,9 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_*.py @BenHenning @vojtechjelinek
-/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
+# TODO(#14285): Replace @seanlip with @BenHenning for both.
+/core/domain/takeout_*.py @seanlip @vojtechjelinek
+/core/domain/wipeout_*.py @seanlip @vojtechjelinek
 
 
 # User’s profile page.
@@ -644,13 +651,14 @@
 
 
 # Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @BenHenning
-/core/domain/platform_feature_services*.py @BenHenning
-/core/domain/platform_parameter*.py @BenHenning
-/core/platform_feature*.py @BenHenning
-/core/templates/domain/platform_feature/ @BenHenning
-/core/templates/pages/admin-page/features-tab/ @BenHenning
-/core/templates/services/platform-feature*.ts @BenHenning
+# TODO(#14285): Replace @seanlip with @BenHenning for all of the patterns in this section.
+/core/controllers/platform_feature*.py @seanlip
+/core/domain/platform_feature_services*.py @seanlip
+/core/domain/platform_parameter*.py @seanlip
+/core/platform_feature*.py @seanlip
+/core/templates/domain/platform_feature/ @seanlip
+/core/templates/pages/admin-page/features-tab/ @seanlip
+/core/templates/services/platform-feature*.ts @seanlip
 
 
 # Frontend unit tests
@@ -727,6 +735,7 @@
 /.github/stale.yml @vojtechjelinek
 /.github/workflows/ @DubeySandeep @oppia/automated-qa-reviewers
 # Files needed by the Android team.
-/core/controllers/android_e2e_config*.py @seanlip @BenHenning
-/core/android_validation_constants*.py @seanlip @BenHenning
-/extensions/interactions/rule_templates.json @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning for the following 3.
+/core/controllers/android_e2e_config*.py @seanlip
+/core/android_validation_constants*.py @seanlip
+/extensions/interactions/rule_templates.json @seanlip
